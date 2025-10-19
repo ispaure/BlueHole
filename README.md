@@ -73,3 +73,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+NOTE: This also includes some code from [Epic Games - Blender Tools](https://github.com/EpicGamesExt/BlenderTools) with a separate license under Lib/send2ue.
