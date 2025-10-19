@@ -1,7 +1,7 @@
 *.pyc
 
 # Ignore the Perforce library folder
-/Lib/p4/
+/Lib/p4
 
 # Ignore everything in envFiles
 /envFiles/*
