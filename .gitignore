@@ -1,0 +1,12 @@
+*.pyc
+
+# Ignore everything in envFiles
+/envFiles/*
+
+# But don't ignore the default folder
+!/envFiles/default/
+
+# And don't ignore the contents of the default folder
+!/envFiles/default/**
+
+**/.DS_Store
