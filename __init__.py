@@ -2,7 +2,7 @@
 Blue Hole is a blender addon that was created and written by Marc-André Voyer for Environment Artists.
 
 Highlights are export scripts and Perforce source control integration.
-Official website: https://sites.google.com/view/bluehole/home
+Official GitHUB: https://www.github.com/ispaure/BlueHole
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Install PySide6
+# Install PySide6 (Only Custom Library required for Blue Hole -- It's for the User Interface)
 try:
     from PySide6.QtWidgets import QApplication
 except ImportError:
@@ -28,6 +28,7 @@ except ImportError:
     except Exception as install_error:
         print("[PIP ERROR] Failed to install PySide6: ", install_error)
         raise install_error
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Import Blue Hole Scripts
 from .blenderUtils import callbacks
