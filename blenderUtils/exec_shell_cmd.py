@@ -76,7 +76,7 @@ def exec_cmd(command):
         command = '"' + new_p4_path + '"' + command[2:]
 
         # Set permissions for executable in case it will be needed later
-        exec_cmd('chmod +x ' + new_p4_path)
+        exec_cmd(f'chmod +x "{new_p4_path}"')
 
     # If debug, print command that was sent
     print_debug_msg('Initiating Execute Shell Command procedure.', show_verbose)
