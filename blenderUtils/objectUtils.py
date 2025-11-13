@@ -7,7 +7,7 @@ Object utilities for Blue Hole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -18,7 +18,6 @@ import mathutils as mathutils
 
 import bpy
 
-import BlueHole.blenderUtils.configUtils as configUtils
 from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
 import BlueHole.blenderUtils.addon as addon

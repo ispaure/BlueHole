@@ -7,7 +7,7 @@ Trigger import command to Unreal.
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -15,9 +15,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 from pathlib import Path
-import os
 
-import bpy
 import time
 
 from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg

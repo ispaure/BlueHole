@@ -7,7 +7,7 @@ Blue Hole functions to read through Sections & Values from a config (.ini) file.
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'

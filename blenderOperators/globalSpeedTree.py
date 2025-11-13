@@ -7,7 +7,7 @@ Adds Blue Hole Blender Operators [SpeedTree]
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -15,7 +15,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 import bpy
-
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.debugUtils as debugUtils
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
