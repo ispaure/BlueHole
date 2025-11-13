@@ -53,7 +53,11 @@ class PIE_MT_Object_Tools(Menu):
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
         # 2 - BOTTOM
         if addonUtils.is_addon_enabled_and_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
-            pie.operator("hops.mirror_gizmo", text="Mirror Gizmo", icon='MOD_MIRROR')
+            # Previous option
+            # pie.operator("hops.mirror_gizmo", text="Mirror Gizmo", icon='MOD_MIRROR')
+
+            # New Option Nov 2025: Modifier Toggle
+            pie.operator('hops.bool_toggle_viewport', text='Modifier Toggle', icon='QUIT').all_modifiers = True
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
         # 8 - TOP

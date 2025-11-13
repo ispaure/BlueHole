@@ -247,7 +247,7 @@ class PIE_MT_Vertex_Action_More(Menu):
         # 1 - BOTTOM - LEFT
         pie.separator()
         # 3 - BOTTOM - RIGHT
-        pie.separator()
+        pie.operator('view3d.vertcircle', text='Vertex to Circle')
 
 
 # Pie Edge - Action Select
