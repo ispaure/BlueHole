@@ -328,6 +328,34 @@ class WM_OT_disabled_addon_mesh_angle(bpy.types.Operator):
         return {'CANCELLED'}
 
 
+class WM_OT_disabled_addon_dreamuv(bpy.types.Operator):
+    bl_idname = "wm.disabled_addon_dreamuv"
+    bl_label = "DreamUV add-on is not enabled"
+    bl_description = "DreamUV add-on is required for this button"
+
+    open_prefs: bpy.props.BoolProperty(default=True)
+
+    def execute(self, context):
+        self.report({'WARNING'}, "DreamUV add-on is not enabled. Enable it in Preferences > Add-ons.")
+        if self.open_prefs:
+            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
+        return {'CANCELLED'}
+
+
+class WM_OT_disabled_addon_zen_uv(bpy.types.Operator):
+    bl_idname = "wm.disabled_addon_zen_uv"
+    bl_label = "Zen UV add-on is not enabled"
+    bl_description = "Zen UV add-on is required for this button"
+
+    open_prefs: bpy.props.BoolProperty(default=True)
+
+    def execute(self, context):
+        self.report({'WARNING'}, "Zen UV add-on is not enabled. Enable it in Preferences > Add-ons.")
+        if self.open_prefs:
+            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
+        return {'CANCELLED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -344,7 +372,9 @@ classes = (WM_OT_URLOpen,
            WM_OT_disabled_addon_interactive_tools,
            WM_OT_disabled_addon_machin3tools,
            WM_OT_disabled_addon_hardops,
-           WM_OT_disabled_addon_mesh_angle
+           WM_OT_disabled_addon_mesh_angle,
+           WM_OT_disabled_addon_dreamuv,
+           WM_OT_disabled_addon_zen_uv
            )
 
 
