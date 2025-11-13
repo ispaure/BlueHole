@@ -3,7 +3,7 @@
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -98,7 +98,7 @@ class PIE_MT_UV_Cursor(Menu):
             op.auto_unwrap = False
             op.influence_mode_faces = False
             op.op_keep_proportion = False
-            op.match_rotation = True
+            op.match_rotation = False
             op.op_order = 'ONE_BY_ONE'
             op.fit_mode = 'TO_TRIM_T'
         else:
@@ -182,10 +182,12 @@ class PIE_MT_UV_Tools(Menu):
         # 8 - TOP
         if addonUtils.is_addon_enabled_and_loaded('ZenUV'):
             op = pie.operator("uv.zenuv_fit_to_trim", text="Fit to Trim", icon='MOD_UVPROJECT')
-            op.auto_unwrap = True
-            op.influence_mode_faces = True
-            op.op_keep_proportion = True
+            op.auto_unwrap = False
+            op.influence_mode_faces = False
+            op.op_keep_proportion = False
             op.match_rotation = True
+            op.op_order = 'ONE_BY_ONE'
+            op.fit_mode = 'TO_TRIM_T'
         else:
             pie.operator("wm.disabled_addon_zen_uv", text="Can't Show; Zen UV add-on disabled!!!", icon='ERROR')
         # 7 - TOP - LEFT

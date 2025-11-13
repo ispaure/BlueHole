@@ -7,7 +7,7 @@ This will register/unregister any scripts associated with Blue Hole's active env
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -15,11 +15,8 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 from pathlib import Path
-import os
-import bpy
 from typing import *
 import BlueHole.blenderUtils.addon as addon
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
 import BlueHole.blenderUtils.importUtils as importUtils
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.configUtils as configUtils

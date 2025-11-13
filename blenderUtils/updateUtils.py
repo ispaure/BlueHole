@@ -7,7 +7,7 @@ Scripts to update Blue Hole (download or upload) to Dropbox cloud service.
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -24,9 +24,7 @@ from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
 import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.configUtils as configUtils
 import BlueHole.envUtils.envUtils as envUtils
-import time
 import datetime
-import sys
 from datetime import date
 
 # ----------------------------------------------------------------------------------------------------------------------

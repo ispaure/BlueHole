@@ -25,14 +25,13 @@ OK so after much thought, this is how I'll have to go about this
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
 import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.envUtils.envUtils as envUtils
 import BlueHole.blenderUtils.fileUtils as fileUtils

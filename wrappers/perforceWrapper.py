@@ -3,7 +3,7 @@
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -13,7 +13,7 @@ __status__ = 'Production'
 # Import dependencies
 import enum
 from typing import *
-import BlueHole.blenderUtils.exec_shell_cmd as exec_shell_cmd
+import BlueHole.wrappers.cmdWrapper as cmdWrapper
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.uiUtils as uiUtils
@@ -65,7 +65,7 @@ class P4Info:
 
     def update_fields(self):
         # Get the information from p4 info
-        info_array = exec_shell_cmd.exec_cmd('p4 info')
+        info_array = cmdWrapper.exec_cmd('p4 info')
 
         # If could not get info, set status to False
         if "Perforce client error" in info_array[0] or "is not recognized" in info_array[0]:
@@ -83,7 +83,7 @@ class P4Info:
                 return
 
             if 'Permission denied' in item:
-                p4_macos_path = exec_shell_cmd.get_p4_macos_path()
+                p4_macos_path = cmdWrapper.get_p4_macos_path()
                 P4ErrorMessage().info_mac_p4_cmd_missing(p4_macos_path)
                 return
 
@@ -336,7 +336,7 @@ class P4File:
 
         # Run command for p4_file
         display_name = self.get_display_name()
-        exec_shell_cmd.exec_cmd(f'{command} {display_name}')
+        cmdWrapper.exec_cmd(f'{command} {display_name}')
     
     def _run_p4_add(self):
         self._callback_pre_add()
@@ -585,7 +585,7 @@ class P4FileGroup:
             call_counter += 1
             log(Severity.DEBUG, tool_name,
                 'Issuing Call (from clientFile) #' + str(call_counter) + ' of ' + str(len(file_path_string_lst)))
-            exec_shell_cmd.exec_cmd(f'{command} {file_path_string}')
+            cmdWrapper.exec_cmd(f'{command} {file_path_string}')
 
         # Run command for p4_file with depotFile (and no clientFile)
         file_path_with_depot_file_dict = self.get_p4_file_with_depot_file_and_no_client_file()
@@ -609,7 +609,7 @@ class P4FileGroup:
             call_counter += 1
             log(Severity.DEBUG, tool_name,
                 'Issuing Call (from depotFile) #' + str(call_counter) + ' of ' + str(len(file_path_string_lst)))
-            exec_shell_cmd.exec_cmd(f'{command} {file_path_string}')
+            cmdWrapper.exec_cmd(f'{command} {file_path_string}')
 
     def open_for_edit(self):
         """
@@ -743,7 +743,7 @@ def p4_fstat_dict(file_path_string, silent_mode=False):
         file_path_string = '"' + file_path_string + '"'
 
     # Get status of files
-    result_array = exec_shell_cmd.exec_cmd("p4 fstat {}".format(file_path_string))
+    result_array = cmdWrapper.exec_cmd("p4 fstat {}".format(file_path_string))
 
     result_dicts_lst = []
     result_dict = {}
@@ -862,22 +862,22 @@ def set_p4_env_settings():
                 if addon.preference().sourcecontrol.override_mode == 'singleuser-workspace':
                     print('Override environment setting is set to singleuser-workspace')
                     cmd_str = 'p4 set P4USER=' + addon.preference().sourcecontrol.macos_env_setting_P4USER
-                    exec_shell_cmd.exec_cmd(cmd_str)
+                    cmdWrapper.exec_cmd(cmd_str)
                     cmd_str = 'p4 set P4PORT=' + addon.preference().sourcecontrol.macos_env_setting_P4PORT
-                    exec_shell_cmd.exec_cmd(cmd_str)
+                    cmdWrapper.exec_cmd(cmd_str)
                     cmd_str = 'p4 set P4CLIENT=' + addon.preference().sourcecontrol.macos_env_setting_P4CLIENT
-                    exec_shell_cmd.exec_cmd(cmd_str)
+                    cmdWrapper.exec_cmd(cmd_str)
                 elif addon.preference().sourcecontrol.override_mode == 'multiuser-workspace':
                     print('Override environment setting is set to multiuser-workspace')
                     set_p4_env_settings_multi_user()
         # If Platform is MacOS, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
         elif filterUtils.filter_platform('mac'):
             cmd_str = 'p4 set P4USER=' + addon.preference().sourcecontrol.macos_env_setting_P4USER
-            exec_shell_cmd.exec_cmd(cmd_str)
+            cmdWrapper.exec_cmd(cmd_str)
             cmd_str = 'p4 set P4PORT=' + addon.preference().sourcecontrol.macos_env_setting_P4PORT
-            exec_shell_cmd.exec_cmd(cmd_str)
+            cmdWrapper.exec_cmd(cmd_str)
             cmd_str = 'p4 set P4CLIENT=' + addon.preference().sourcecontrol.macos_env_setting_P4CLIENT
-            exec_shell_cmd.exec_cmd(cmd_str)
+            cmdWrapper.exec_cmd(cmd_str)
 
 
 class P4UserWorkspace:
@@ -994,11 +994,11 @@ def set_p4_env_settings_multi_user():
     if computer_name in p4userws_cls_dict.keys():
         print('Current computer in multi user-workspace list! Overriding perforce environment values...')
         cmd_str = 'p4 set P4USER=' + p4userws_cls_dict[computer_name].username
-        exec_shell_cmd.exec_cmd(cmd_str)
+        cmdWrapper.exec_cmd(cmd_str)
         cmd_str = 'p4 set P4PORT=' + addon.preference().sourcecontrol.win32_env_setting_P4PORT
-        exec_shell_cmd.exec_cmd(cmd_str)
+        cmdWrapper.exec_cmd(cmd_str)
         cmd_str = 'p4 set P4CLIENT=' + p4userws_cls_dict[computer_name].workspace
-        exec_shell_cmd.exec_cmd(cmd_str)
+        cmdWrapper.exec_cmd(cmd_str)
     else:
         print('Computer name was not found in keys. Not overriding perforce environment settings')
 

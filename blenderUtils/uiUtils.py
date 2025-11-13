@@ -7,7 +7,7 @@ User Interface (UI) Functions for Blue Hole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -21,7 +21,7 @@ from pathlib import Path
 import bpy
 import sys
 
-import BlueHole.blenderUtils.exec_shell_cmd as exec_cmd
+import BlueHole.wrappers.cmdWrapper as cmdWrapper
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -82,7 +82,7 @@ def show_dialog_box(title, message, execute_fn=empty_fn):
     # Show Dialog Window (MacOS) and return user input
     def show_dialog_box_macos(message, title):
         command_str = "osascript -e 'Tell application \"System Events\" to display dialog \"{message}\" with title \"{title}\"'".format(message=message, title=title)
-        return_val = exec_cmd.exec_cmd(command_str)
+        return_val = cmdWrapper.exec_cmd(command_str)
         return return_val
 
     # Since Blender API doesn't have proper message box that waits on user, we have to get a bit creative.

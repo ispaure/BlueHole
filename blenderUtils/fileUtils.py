@@ -7,7 +7,7 @@ File utilities for Blue Hole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -27,7 +27,6 @@ from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree
 
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.envUtils.envUtils as envUtils
 import BlueHole.envUtils.envUtils2 as envUtils2
 from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg

@@ -7,7 +7,7 @@ Adds Blue Hole Blender Operators [Help]
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -15,16 +15,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 import bpy
-import os
-
-import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.debugUtils as debugUtils
-import BlueHole.blenderUtils.filterUtils as filterUtils
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 from BlueHole.blenderUtils.uiUtils import show_label as show_label
 import BlueHole.envUtils.envUtils as envUtils
-import BlueHole.blenderUtils.updateUtils as updateUtils
 import BlueHole.blenderUtils.configUtils as configUtils
 
 

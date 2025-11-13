@@ -10,7 +10,7 @@ Official GitHUB: https://www.github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "GNU General Public License"
+__license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -66,7 +66,7 @@ bl_info = {"name": "Blue Hole",
            "author": "Marc-André Voyer",
            "description": "",
            "blender": (4, 5, 1),
-           "version": (1, 0, 0),
+           "version": (1, 0, 1),
            "location": "",
            "warning": "",
            "category": "Generic",
