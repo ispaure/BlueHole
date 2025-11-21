@@ -58,7 +58,7 @@ def addon_utils_check_incl_profile(module_name: str):
 
 
 def is_addon_enabled_and_loaded(module_name: str) -> bool:
-    print_enabled_addon_lst()
+
     # enabled in user prefs?
     enabled_in_prefs = is_addon_enabled_in_prefs(module_name)
 

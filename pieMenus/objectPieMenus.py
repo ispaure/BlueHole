@@ -42,17 +42,17 @@ class PIE_MT_Object_Tools(Menu):
         pie = layout.menu_pie()
 
         # 4 - LEFT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
+        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
             pie.operator("hops.mod_lattice", text="Lattice", icon='MOD_LATTICE')
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
         # 6 - RIGHT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
+        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
             pie.operator("hops.st3_array", text="Array", icon='MOD_ARRAY')
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
         # 2 - BOTTOM
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
+        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
             # Previous option
             # pie.operator("hops.mirror_gizmo", text="Mirror Gizmo", icon='MOD_MIRROR')
 
@@ -65,17 +65,17 @@ class PIE_MT_Object_Tools(Menu):
         # 7 - TOP - LEFT
         pie.operator("object.modifier_add", text="Weighted Normal", icon='NORMALS_VERTEX_FACE').type = 'WEIGHTED_NORMAL'
         # 9 - TOP - RIGHT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
+        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
             pie.operator("hops.array_twist", text="Twist Array", icon='ALIASED')
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
         # 3 - BOTTOM - LEFT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
+        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
             pie.operator("hops.mod_subdivision", text="Add Subdivision Modifier", icon='MOD_SUBSURF')
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
         # 1 - BOTTOM - RIGHT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
+        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
             pie.operator("hops.radial_array", text="Radial Array", icon='OUTLINER_DATA_POINTCLOUD')
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
@@ -93,7 +93,7 @@ class PIE_MT_Object_Tools_More(Menu):
         # 6 - RIGHT
         pie.separator()
         # 2 - BOTTOM
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
+        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
             pie.operator("hops.mod_apply", text="Apply Modifier", icon='OUTPUT')
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
@@ -210,7 +210,7 @@ class PIE_MT_Object_Action_More(Menu):
         # 4 - LEFT
         pie.operator("view3d.clean_mesh", text="Clean", icon='SHADERFX')
         # 6 - RIGHT
-        if filterUtils.check_addon_loaded('HOps') or filterUtils.check_addon_loaded('hardops'):
+        if filterUtils.check_addon_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
             pie.operator("hops.apply_modifiers", text="Apply Modifiers", icon='MODIFIER_DATA')
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
