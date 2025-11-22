@@ -43,7 +43,7 @@ def import_fbx_obj(import_path):
     if 'fbx' in file_ext.lower():
         bpy.ops.import_scene.fbx(filepath=import_path)  # Import mesh as FBX
     else:
-        bpy.ops.import_scene.obj(filepath=import_path)  # Import mesh as OBJ
+        bpy.ops.wm.obj_import(filepath=import_path)  # Import mesh as OBJ
 
 
 def import_current_env_scale_guide(mesh_name):
