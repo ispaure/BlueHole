@@ -8,29 +8,28 @@ __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
-# ----------------------------------------------------------------------------------------------------------------------
-
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
-
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+# IMPORTS
 
 import bpy
-from bpy.types import (
-        Menu,
-        Operator,
-        )
+from BlueHole.blenderUtils.debugUtils import *
 import os
 
 
-class PIE_MT_Curve_Action(Menu):
+# ----------------------------------------------------------------------------------------------------------------------
+# USER DEFINED SETTINGS
+
+name = filename = os.path.basename(__file__)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# PIE MENUS
+
+
+# Context: 3D Viewport (Curve)
+# Hotkey: Ctrl + RMB
+class PIE_MT_Curve_Action(bpy.types.Menu):
     bl_idname = "PIE_MT_curve_action"
     bl_label = "Blue Hole: Curve > Action"
 
@@ -55,7 +54,9 @@ class PIE_MT_Curve_Action(Menu):
         pie.operator("curve.cyclic_toggle", text="Toggle Cyclic", icon='CURVE_NCIRCLE')
 
 
-class PIE_MT_Curve_Tools(Menu):
+# Context: 3D Viewport (Curve)
+# Hotkey: Shift + RMB
+class PIE_MT_Curve_Tools(bpy.types.Menu):
     bl_idname = "PIE_MT_curve_tools"
     bl_label = "Blue Hole: Curve > Tools"
 
@@ -69,7 +70,7 @@ class PIE_MT_Curve_Tools(Menu):
         # 2 - BOTTOM
         pie.operator("curve.smooth", text="Smooth", icon='MOD_OFFSET')
         # 8 - TOP
-        pie.operator("curvetools.bezier_points_fillet", text="Bezier points Fillet", icon='CURVE_NCURVE')
+        pie.separator()
         # 7 - TOP - LEFT
         pie.operator("transform.tilt", text="Tilt", icon='ORIENTATION_GIMBAL')
         # 9 - TOP - RIGHT
@@ -80,7 +81,9 @@ class PIE_MT_Curve_Tools(Menu):
         pie.operator("curve.subdivide", text="Subdivide", icon='PARTICLE_POINT')
 
 
-class PIE_MT_Curve_Hide(Menu):
+# Context: 3D Viewport (Curve)
+# Hotkey: Shift + S + Drag Mouse in any direction
+class PIE_MT_Curve_Hide(bpy.types.Menu):
     bl_idname = "PIE_MT_curve_hide"
     bl_label = "Blue Hole: Curve > Hide"
 
@@ -105,21 +108,22 @@ class PIE_MT_Curve_Hide(Menu):
         pie.separator()
 
 
-classes = (
-    PIE_MT_Curve_Action,
-    PIE_MT_Curve_Tools,
-    PIE_MT_Curve_Hide
-    )
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
 
-addon_keymaps = []
+# Menu classes
+classes = (PIE_MT_Curve_Action,
+           PIE_MT_Curve_Tools,
+           PIE_MT_Curve_Hide)
 
 
 def register():
     for cls in classes:
-        print_debug_msg('Loading Pie Menu: ' + cls.bl_idname, show_verbose)
+        log(Severity.DEBUG, name, 'Registering')
         bpy.utils.register_class(cls)
 
 
 def unregister():
     for cls in classes:
+        log(Severity.DEBUG, name, 'Unregistering')
         bpy.utils.unregister_class(cls)

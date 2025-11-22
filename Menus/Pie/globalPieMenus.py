@@ -8,32 +8,29 @@ __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
-# ----------------------------------------------------------------------------------------------------------------------
-
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
-import BlueHole.blenderUtils.addon as addon
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
-
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+# IMPORTS
 
 import bpy
-from bpy.types import (
-        Menu,
-        Operator,
-        )
+from BlueHole.blenderUtils.debugUtils import *
+import BlueHole.blenderUtils.addon as addon
+import BlueHole.blenderUtils.exportUtils2 as exportUtils2
 import os
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# USER DEFINED SETTINGS
+
+name = filename = os.path.basename(__file__)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# PIE MENUS
+
+
 # Pie Global-Help
-class PIE_MT_Global_Help(Menu):
+class PIE_MT_Global_Help(bpy.types.Menu):
     bl_idname = "PIE_MT_global_help"
     bl_label = "Blue Hole: Help"
 
@@ -59,7 +56,7 @@ class PIE_MT_Global_Help(Menu):
 
 
 # Pie Global-Theme
-class PIE_MT_Global_Theme(Menu):
+class PIE_MT_Global_Theme(bpy.types.Menu):
     bl_idname = "PIE_MT_global_theme"
     bl_label = "Blue Hole: Theme"
 
@@ -85,7 +82,7 @@ class PIE_MT_Global_Theme(Menu):
 
 
 # Pie Global-Directories
-class PIE_MT_Global_Directories(Menu):
+class PIE_MT_Global_Directories(bpy.types.Menu):
     bl_idname = "PIE_MT_global_directories"
     bl_label = "Blue Hole: Directories"
 
@@ -118,7 +115,7 @@ class PIE_MT_Global_Directories(Menu):
 
 
 # Pie Global-Import/Export
-class PIE_MT_Import_Export(Menu):
+class PIE_MT_Import_Export(bpy.types.Menu):
     bl_idname = "PIE_MT_global_import_export"
     bl_label = "Blue Hole: Import/Export"
 
@@ -153,7 +150,7 @@ class PIE_MT_Import_Export(Menu):
 
 
 # Pie Global-Import/Export
-class PIE_MT_Export(Menu):
+class PIE_MT_Export(bpy.types.Menu):
     bl_idname = "PIE_MT_global_export"
     bl_label = "Blue Hole: Export"
 
@@ -180,7 +177,7 @@ class PIE_MT_Export(Menu):
 
 
 # Pie Global-Send
-class PIE_MT_Send(Menu):
+class PIE_MT_Send(bpy.types.Menu):
     bl_idname = "PIE_MT_global_send"
     bl_label = "Blue Hole: Send"
 
@@ -206,7 +203,7 @@ class PIE_MT_Send(Menu):
 
 
 # Pie Global-Source Control
-class PIE_MT_Source_Control(Menu):
+class PIE_MT_Source_Control(bpy.types.Menu):
     bl_idname = "PIE_MT_global_source_control"
     bl_label = "Blue Hole: Source Control"
 
@@ -232,7 +229,7 @@ class PIE_MT_Source_Control(Menu):
 
 
 # Pie Global-Order
-class PIE_MT_Order(Menu):
+class PIE_MT_Order(bpy.types.Menu):
     bl_idname = "PIE_MT_global_order"
     bl_label = "Blue Hole: Order"
 
@@ -257,26 +254,27 @@ class PIE_MT_Order(Menu):
         pie.separator()
 
 
-classes = (
-    PIE_MT_Global_Help,
-    PIE_MT_Global_Theme,
-    PIE_MT_Global_Directories,
-    PIE_MT_Import_Export,
-    PIE_MT_Export,
-    PIE_MT_Send,
-    PIE_MT_Source_Control,
-    PIE_MT_Order
-    )
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
 
-addon_keymaps = []
+# Menu classes
+classes = (PIE_MT_Global_Help,
+           PIE_MT_Global_Theme,
+           PIE_MT_Global_Directories,
+           PIE_MT_Import_Export,
+           PIE_MT_Export,
+           PIE_MT_Send,
+           PIE_MT_Source_Control,
+           PIE_MT_Order)
 
 
 def register():
     for cls in classes:
-        print_debug_msg('Loading Pie Menu: ' + cls.bl_idname, show_verbose)
+        log(Severity.DEBUG, name, 'Registering')
         bpy.utils.register_class(cls)
 
 
 def unregister():
     for cls in classes:
+        log(Severity.DEBUG, name, 'Unregistering')
         bpy.utils.unregister_class(cls)

@@ -8,51 +8,52 @@ __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
-# ----------------------------------------------------------------------------------------------------------------------
-
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
-from BlueHole.blenderUtils import filterUtils as filterUtils
-import BlueHole.blenderUtils.addonUtils as addonUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+# IMPORTS
 
 import bpy
-from bpy.types import (
-        Menu,
-        Operator,
-        )
 import os
+from BlueHole.blenderUtils.debugUtils import *
+import BlueHole.blenderUtils.addonUtils as addonUtils
+
 
 # ----------------------------------------------------------------------------------------------------------------------
-# OPERATORS
+# USER DEFINED SETTINGS
+
+name = filename = os.path.basename(__file__)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# OPERATOR
 
 
 class WM_OT_CustomKnifeTool(bpy.types.Operator):
     """Activates the Custom Knife Tool"""
+    # TODO: Change this into a normal pie.operator using the knowledge I have gained since.
     bl_idname = "wm.bh_custom_knife_tool"
     bl_label = ""
     bl_options = {'INTERNAL'}
 
     def execute(self, _context):
-        print('test')
-        bpy.ops.mesh.knife_tool('INVOKE_DEFAULT', use_occlude_geometry=True, only_selected=False, xray=True, visible_measurements='NONE',
-                                angle_snapping='NONE', angle_snapping_increment=0.261799, wait_for_input=True)
-        print('test2')
+        bpy.ops.mesh.knife_tool('INVOKE_DEFAULT',
+                                use_occlude_geometry=True,
+                                only_selected=False,
+                                xray=True,
+                                visible_measurements='NONE',
+                                angle_snapping='NONE',
+                                angle_snapping_increment=0.261799,
+                                wait_for_input=True)
         return {'FINISHED'}
 
 
-# MENUS
+# ----------------------------------------------------------------------------------------------------------------------
+# PIE MENUS
 
 
-# Pie Mesh - Hide
-class PIE_MT_Mesh_Hide(Menu):
+# Context: 3D Viewport (Mesh)
+# Hotkey: Shift + S + Drag Mouse in any direction
+class PIE_MT_Mesh_Hide(bpy.types.Menu):
     bl_idname = "PIE_MT_mesh_hide"
     bl_label = "Blue Hole Pie Menu: Mesh > Hide"
 
@@ -77,8 +78,10 @@ class PIE_MT_Mesh_Hide(Menu):
         pie.separator()
 
 
-# Pie Mesh - Tools
-class PIE_MT_Mesh_Tools(Menu):
+# Context: 3D Viewport (Mesh)
+# Hotkey: Shift + RMB
+# Changes options displayed if Vertex/Edge/Face Mode
+class PIE_MT_Mesh_Tools(bpy.types.Menu):
     bl_idname = "PIE_MT_mesh_tools"
     bl_label = "Blue Hole: Mesh > Tools"
 
@@ -106,8 +109,9 @@ class PIE_MT_Mesh_Tools(Menu):
         pie.operator("transform.shrink_fatten", text="Shrink/Fatten", icon='MOD_EXPLODE')
 
 
-# Pie Mesh - Action
-class PIE_MT_Mesh_Action(Menu):
+# Context: 3D Viewport (Mesh)
+# Hotkey: Ctrl + RMB
+class PIE_MT_Mesh_Action(bpy.types.Menu):
     bl_idname = "PIE_MT_mesh_action"
     bl_label = "Blue Hole: Mesh > Action"
 
@@ -189,8 +193,8 @@ class PIE_MT_Mesh_Action(Menu):
             pie.operator("mesh.separate", text="Separate Loose Parts", icon='OUTLINER_DATA_LATTICE').type = 'LOOSE'
 
 
-# Pie Vertex - Action Select
-class PIE_MT_Vertex_Action_Select(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Vertex_Action_Select(bpy.types.Menu):
     bl_idname = "PIE_MT_vertex_action_select"
     bl_label = "Blue Hole: Vertex > Action > Select"
 
@@ -215,8 +219,8 @@ class PIE_MT_Vertex_Action_Select(Menu):
         pie.operator("mesh.select_random", text="Random", icon='GROUP_VERTEX')
 
 
-# Pie Vertex - Action More
-class PIE_MT_Vertex_Action_More(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Vertex_Action_More(bpy.types.Menu):
     bl_idname = "PIE_MT_vertex_action_more"
     bl_label = "Blue Hole: Vertex > Action > More"
 
@@ -224,10 +228,7 @@ class PIE_MT_Vertex_Action_More(Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        if addonUtils.is_addon_enabled_and_loaded('MACHIN3tools'):
-            pie.operator("machin3.clean_up", text="Clean Up", icon='SHADERFX')
-        else:
-            pie.operator("wm.disabled_addon_machin3tools", text="Can't Show; MACHIN3tools add-on disabled!!!", icon='ERROR')
+        pie.separator()
         # 6 - RIGHT
         pie.operator("mesh.symmetrize", text="Symmetrize", icon='MESH_MONKEY')
         # 2 - BOTTOM
@@ -250,8 +251,8 @@ class PIE_MT_Vertex_Action_More(Menu):
         pie.operator('view3d.vertcircle', text='Vertex to Circle')
 
 
-# Pie Edge - Action Select
-class PIE_MT_Edge_Action_Select(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Edge_Action_Select(bpy.types.Menu):
     bl_idname = "PIE_MT_edge_action_select"
     bl_label = "Blue Hole: Edge > Action > Select"
 
@@ -276,8 +277,8 @@ class PIE_MT_Edge_Action_Select(Menu):
         pie.separator()
 
 
-# Pie Edge - Action More
-class PIE_MT_Edge_Action_More(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Edge_Action_More(bpy.types.Menu):
     bl_idname = "PIE_MT_edge_action_more"
     bl_label = "Blue Hole: Edge > Action > More"
 
@@ -309,8 +310,8 @@ class PIE_MT_Edge_Action_More(Menu):
         pie.separator()
 
 
-# Pie Face - Action Select
-class PIE_MT_Face_Action_Select(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Face_Action_Select(bpy.types.Menu):
     bl_idname = "PIE_MT_face_action_select"
     bl_label = "Blue Hole: Face > Action > Select"
 
@@ -335,8 +336,8 @@ class PIE_MT_Face_Action_Select(Menu):
         pie.separator()
 
 
-# Pie Face - Action More
-class PIE_MT_Face_Action_More(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Face_Action_More(bpy.types.Menu):
     bl_idname = "PIE_MT_face_action_more"
     bl_label = "Blue Hole: Face > Action > More"
 
@@ -364,28 +365,29 @@ class PIE_MT_Face_Action_More(Menu):
         pie.operator("mesh.tris_convert_to_quads", text="Tris to Quads", icon='MOD_WIREFRAME')
 
 
-classes = (
-    WM_OT_CustomKnifeTool,
-    PIE_MT_Mesh_Hide,
-    PIE_MT_Mesh_Tools,
-    PIE_MT_Mesh_Action,
-    PIE_MT_Vertex_Action_More,
-    PIE_MT_Vertex_Action_Select,
-    PIE_MT_Edge_Action_More,
-    PIE_MT_Edge_Action_Select,
-    PIE_MT_Face_Action_More,
-    PIE_MT_Face_Action_Select
-    )
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
 
-addon_keymaps = []
+# Menu classes
+classes = (WM_OT_CustomKnifeTool,
+           PIE_MT_Mesh_Hide,
+           PIE_MT_Mesh_Tools,
+           PIE_MT_Mesh_Action,
+           PIE_MT_Vertex_Action_More,
+           PIE_MT_Vertex_Action_Select,
+           PIE_MT_Edge_Action_More,
+           PIE_MT_Edge_Action_Select,
+           PIE_MT_Face_Action_More,
+           PIE_MT_Face_Action_Select)
 
 
 def register():
     for cls in classes:
-        print_debug_msg('Loading Pie Menu: ' + cls.bl_idname, show_verbose)
+        log(Severity.DEBUG, name, 'Registering')
         bpy.utils.register_class(cls)
 
 
 def unregister():
     for cls in classes:
+        log(Severity.DEBUG, name, 'Unregistering')
         bpy.utils.unregister_class(cls)
