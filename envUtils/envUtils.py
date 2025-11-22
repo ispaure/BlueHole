@@ -110,28 +110,6 @@ def unregister_current_env():
             imp_module.unregister()
 
 
-def draw_current_env_menu_items(menu, layout):
-    """
-    Draw additional menu items specific to the current environment, if these are available.
-    """
-    print_debug_msg('Executing draw_current_env_menu_items function', show_verbose)
-
-    # Determine path to current environment
-    current_env_path = get_env_dict()[addon.preference().environment.active_environment]
-    # Determine path to menu .py file
-    python_module_path = str(Path(current_env_path + '/scripts/blenderOperators/' + menu + '.py'))
-
-    # Attempt to import module
-    module = importUtils.import_python_module_absolute_path(python_module_path)
-
-    # If module got loaded and is valid
-    if module is not None:
-        # Add separator at beginning, to delimit new items.
-        layout.separator()
-        # Draw additional items
-        module.draw_menu_items(layout)
-
-
 def get_env_dict() -> Dict[str, str]:
     """
     Deterministic map: environment name -> absolute path.

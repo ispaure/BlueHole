@@ -79,7 +79,9 @@ def register():
     bpy.app.handlers.load_post.append(load_post_handler)
     bpy.app.handlers.save_pre.append(save_pre_handler)
     bpy.app.handlers.save_post.append(save_post_handler)
-    bpy.app.handlers.depsgraph_update_post.append(call_load_handlers)
+
+    # # supposedly not needed anymore and throws errors
+    # bpy.app.handlers.depsgraph_update_post.append(call_load_handlers)
 
 
 def unregister():

@@ -10,29 +10,21 @@ __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-import BlueHole.pieMenus.globalPieMenus as globalPieMenus
-import BlueHole.pieMenus.meshPieMenus as meshPieMenus
-import BlueHole.pieMenus.objectPieMenus as objectPieMenus
-import BlueHole.pieMenus.uvPieMenus as uvPieMenus
-import BlueHole.pieMenus.curvePieMenus as curvePieMenus
-import BlueHole.pieMenus.sculptPieMenus as sculptPieMenus
-import BlueHole.pieMenus.addPieMenus as addPieMenus
+import bpy
+import BlueHole.Menus.Pie.globalPieMenus as globalPieMenus
+import BlueHole.Menus.Pie.meshPieMenus as meshPieMenus
+import BlueHole.Menus.Pie.objectPieMenus as objectPieMenus
+import BlueHole.Menus.Pie.uvPieMenus as uvPieMenus
+import BlueHole.Menus.Pie.curvePieMenus as curvePieMenus
+import BlueHole.Menus.Pie.sculptPieMenus as sculptPieMenus
+import BlueHole.Menus.Pie.addPieMenus as addPieMenus
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# REGISTER / UNREGISTER
 
-show_verbose = True
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-pie_menus_cls_lst = (globalPieMenus,
+# Menu classes
+pie_menu_file_lst = (globalPieMenus,
                      meshPieMenus,
                      objectPieMenus,
                      uvPieMenus,
@@ -40,11 +32,15 @@ pie_menus_cls_lst = (globalPieMenus,
                      sculptPieMenus,
                      addPieMenus)
 
+
+# Register
 def register():
-    for pie_menu_cls in pie_menus_cls_lst:
-        pie_menu_cls.register()
+    # Register Operators
+    for pie_menu_file in pie_menu_file_lst:
+        pie_menu_file.register()
 
 
+# Unregister
 def unregister():
-    for pie_menu_cls in pie_menus_cls_lst:
-        pie_menu_cls.unregister()
+    for pie_menu_file in pie_menu_file_lst:
+        pie_menu_file.unregister()
