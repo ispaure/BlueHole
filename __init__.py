@@ -149,5 +149,3 @@ def unregister():
 
     # Unregister pie menus
     pieMenusOps.unregister()
-
-
