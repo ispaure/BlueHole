@@ -32,8 +32,8 @@ name = filename = os.path.basename(__file__)
 
 # Context: 2D UV Editor Viewport
 # Hotkey: Ctrl+Shift+RMB
-class PIE_MT_UV_Cursor(bpy.types.Menu):
-    bl_idname = "PIE_MT_uv_cursor"  # named wrong
+class MT_pie_UV_cursor(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_UV_cursor"  # named wrong
     bl_label = "Blue Hole: UV > Cursor"
 
     def draw(self, context):
@@ -59,8 +59,8 @@ class PIE_MT_UV_Cursor(bpy.types.Menu):
 
 # Context: 2D UV Editor Viewport
 # Hotkey: Shift+RMB
-class PIE_MT_UV_Tools(bpy.types.Menu):
-    bl_idname = "PIE_MT_uv_tools"  # named wrong
+class MT_pie_UV_tool(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_UV_tool"  # named wrong
     bl_label = "Blue Hole: UV > Tools"
 
     def draw(self, context):
@@ -87,8 +87,8 @@ class PIE_MT_UV_Tools(bpy.types.Menu):
 
 # Context: 2D UV Editor Viewport
 # Hotkey: Ctrl+RMB
-class PIE_MT_UV_Action(bpy.types.Menu):
-    bl_idname = "PIE_MT_uv_action"  # named wrong
+class MT_pie_UV_action(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_UV_action"  # named wrong
     bl_label = "Blue Hole: UV > Action"
 
     def draw(self, context):
@@ -102,7 +102,7 @@ class PIE_MT_UV_Action(bpy.types.Menu):
         # 2 - BOTTOM
         zenuvPieButton.merge_verts(pie)
         # 8 - TOP
-        pie.operator("wm.call_menu_pie", text="Select...", icon='TRIA_UP').name = 'PIE_MT_uv_action_select'
+        pie.operator("wm.call_menu_pie", text="Select...", icon='TRIA_UP').name = MT_pie_UV_action_select.bl_idname
         # 7 - TOP - LEFT
         zenuvPieButton.get_tx_density(pie)
         # 9 - TOP - RIGHT
@@ -114,8 +114,8 @@ class PIE_MT_UV_Action(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class PIE_MT_UV_Action_Select(bpy.types.Menu):
-    bl_idname = "PIE_MT_uv_action_select"  # named wrong
+class MT_pie_UV_action_select(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_UV_action_select"  # named wrong
     bl_label = "Blue Hole: UV > Action > Select"
 
     def draw(self, context):
@@ -142,8 +142,8 @@ class PIE_MT_UV_Action_Select(bpy.types.Menu):
 
 # Context: 2D UV Editor Viewport
 # Hotkey: Ctrl+Alt+Shift+RMB
-class PIE_MT_UV_Action_Special(bpy.types.Menu):
-    bl_idname = "PIE_MT_uv_action_special"  # named wrong
+class MT_pie_UV_action_uvspecial(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_UV_action_uvspecial"  # named wrong
     bl_label = "Blue Hole: UV > Action (Special)"
 
     def draw(self, context):
@@ -170,8 +170,8 @@ class PIE_MT_UV_Action_Special(bpy.types.Menu):
 
 # Context: 3D Viewport Mesh Edit (Vertex/Edge/Vert)
 # Hotkey: Ctrl+Alt+Shift+RMB
-class PIE_MT_UV_Mesh_Action_UVSpecial(bpy.types.Menu):
-    bl_idname = "PIE_MT_mesh_action_uvspecial"  # named wrong
+class MT_pie_mesh_action_uvspecial(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_mesh_action_uvspecial"  # named wrong
     bl_label = "Blue Hole: Mesh > Action (UV Special)"
 
     def draw(self, context):
@@ -200,12 +200,12 @@ class PIE_MT_UV_Mesh_Action_UVSpecial(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (PIE_MT_UV_Cursor,
-           PIE_MT_UV_Tools,
-           PIE_MT_UV_Action,
-           PIE_MT_UV_Action_Select,
-           PIE_MT_UV_Action_Special,
-           PIE_MT_UV_Mesh_Action_UVSpecial)
+classes = (MT_pie_UV_cursor,
+           MT_pie_UV_tool,
+           MT_pie_UV_action,
+           MT_pie_UV_action_select,
+           MT_pie_UV_action_uvspecial,
+           MT_pie_mesh_action_uvspecial)
 
 
 def register():

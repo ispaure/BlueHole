@@ -56,13 +56,28 @@ class WM_OT_SetP4EnvSettings(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class WM_OT_disabled_source_control(bpy.types.Operator):
+    bl_idname = "wm.disabled_source_control"
+    bl_label = "Source Control is Disabled!"
+    bl_description = "Source Control is required for this button."
+
+    open_prefs: bpy.props.BoolProperty(default=True)
+
+    def execute(self, context):
+        self.report({'WARNING'}, "Source Control is not enabled for this Environment. Enable it in Preferences > Add-ons > Blue Hole.")
+        if self.open_prefs:
+            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
+        return {'CANCELLED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 # List of classes to register/unregister
 classes = (P4CheckOutCurrentScene,
            P4DisplayServerInfo,
-           WM_OT_SetP4EnvSettings
+           WM_OT_SetP4EnvSettings,
+           WM_OT_disabled_source_control
            )
 
 

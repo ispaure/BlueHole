@@ -29,8 +29,8 @@ name = filename = os.path.basename(__file__)
 
 # Context: 3D Viewport (Global)
 # Hotkey: Shift + A + Drag Mouse in any direction
-class PIE_MT_Add(bpy.types.Menu):
-    bl_idname = "PIE_MT_add"
+class MT_pie_add(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_add"
     bl_label = "Blue Hole: Add"
 
     def draw(self, context):
@@ -47,7 +47,7 @@ class PIE_MT_Add(bpy.types.Menu):
         button_02.align = 'CURSOR'
         button_02.size = 1.0
         # 2 - BOTTOM
-        pie.operator("wm.call_menu_pie", text="More...").name = 'PIE_MT_global_add_more'
+        pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_add_more.bl_idname
         # 8 - TOP
         button_03 = pie.operator("mesh.primitive_uv_sphere_add", text="UV Sphere", icon='MATSPHERE')
         button_03.radius = 0.5
@@ -62,8 +62,8 @@ class PIE_MT_Add(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class PIE_MT_Add_More(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_add_more"
+class MT_pie_add_more(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_add_more"
     bl_label = "Blue Hole: Add > More"
 
     def draw(self, context):
@@ -89,8 +89,8 @@ class PIE_MT_Add_More(bpy.types.Menu):
         pie.operator("curve.primitive_bezier_circle_add", text="Bezier Circle", icon='CURVE_BEZCIRCLE')
 
 
-classes = (PIE_MT_Add,
-           PIE_MT_Add_More)
+classes = (MT_pie_add,
+           MT_pie_add_more)
 
 
 def register():

@@ -30,8 +30,8 @@ name = filename = os.path.basename(__file__)
 
 
 # Pie Global-Help
-class PIE_MT_Global_Help(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_help"
+class MT_pie_global_help(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_help"
     bl_label = "Blue Hole: Help"
 
     def draw(self, context):
@@ -50,14 +50,14 @@ class PIE_MT_Global_Help(bpy.types.Menu):
         # 9 - TOP - RIGHT
         pie.operator("wm.bh_help_open_guide", text="Online Guide", icon='HELP')
         # 1 - BOTTOM - LEFT
-        pie.menu("PIE_MT_global_theme", text="Themes", icon='IMAGE_RGB')
+        pie.menu(MT_pie_global_theme.bl_idname, text="Themes", icon='IMAGE_RGB')
         # 3 - BOTTOM - RIGHT
         pie.operator("wm.bh_help_open_pie_menus_list", text="Pie Menus List", icon='URL')
 
 
 # Pie Global-Theme
-class PIE_MT_Global_Theme(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_theme"
+class MT_pie_global_theme(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_theme"
     bl_label = "Blue Hole: Theme"
 
     def draw(self, context):
@@ -82,8 +82,8 @@ class PIE_MT_Global_Theme(bpy.types.Menu):
 
 
 # Pie Global-Directories
-class PIE_MT_Global_Directories(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_directories"
+class MT_pie_global_dirs(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_dirs"
     bl_label = "Blue Hole: Directories"
 
     def draw(self, context):
@@ -115,34 +115,33 @@ class PIE_MT_Global_Directories(bpy.types.Menu):
 
 
 # Pie Global-Import/Export
-class PIE_MT_Import_Export(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_import_export"
+class MT_pie_global_import_export(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_import_export"
     bl_label = "Blue Hole: Import/Export"
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.separator()
-        # pie.menu("PIE_MT_global_import", text="Import...", icon='IMPORT')
+        pie.operator("wm.call_menu_pie", text="Extra...").name = MT_pie_global_extra.bl_idname
         # 6 - RIGHT
-        pie.operator("wm.call_menu_pie", text="Export...", icon='EXPORT').name = 'PIE_MT_global_export'
+        pie.operator("wm.call_menu_pie", text="Export...", icon='EXPORT').name = MT_pie_global_export.bl_idname
         # 2 - BOTTOM
-        pie.operator("wm.call_menu_pie", text="Send...", icon='UV_SYNC_SELECT').name = 'PIE_MT_global_send'
+        pie.operator("wm.call_menu_pie", text="Send...", icon='UV_SYNC_SELECT').name = MT_pie_global_send.bl_idname
         # 8 - TOP
         if addon.preference().sourcecontrol.source_control_enable:
             if addon.preference().sourcecontrol.source_control_solution == 'perforce':
-                pie.operator("wm.call_menu_pie", text="Source Control (Perforce)...", icon='CHECKMARK').name = 'PIE_MT_global_source_control'
+                pie.operator("wm.call_menu_pie", text="Source Control (Perforce)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
             if addon.preference().sourcecontrol.source_control_solution == 'plastic-scm':
-                pie.operator("wm.call_menu_pie", text="Source Control (Plastic SCM)...", icon='CHECKMARK').name = 'PIE_MT_global_source_control'
+                pie.operator("wm.call_menu_pie", text="Source Control (Plastic SCM)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
             if addon.preference().sourcecontrol.source_control_solution == 'git':
-                pie.operator("wm.call_menu_pie", text="Source Control (Git)...", icon='CHECKMARK').name = 'PIE_MT_global_source_control'
+                pie.operator("wm.call_menu_pie", text="Source Control (Git)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
         else:
-            pie.separator()
+            pie.operator("wm.disabled_source_control", text="Can't Show; Source Control disabled!!!", icon='ERROR')
         # 7 - TOP - LEFT
-        pie.separator()
+        pie.operator("wm.call_menu_pie", text="Open Directories...").name = MT_pie_global_dirs.bl_idname
         # 9 - TOP - RIGHT
-        pie.separator()
+        pie.operator('wm.bh_scene_add_asset_hierarchy', text='Add Asset Hierarchy')
         # 1 - BOTTOM - LEFT
         pie.separator()
         # 3 - BOTTOM - RIGHT
@@ -150,8 +149,35 @@ class PIE_MT_Import_Export(bpy.types.Menu):
 
 
 # Pie Global-Import/Export
-class PIE_MT_Export(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_export"
+class MT_pie_global_extra(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_extra"
+    bl_label = "Blue Hole: Extra"
+
+    def draw(self, context):
+        layout = self.layout
+        pie = layout.menu_pie()
+        # 4 - LEFT
+        pie.separator()
+        # 6 - RIGHT
+        pie.separator()
+        # 2 - BOTTOM
+        pie.separator()
+        # 8 - TOP
+        pie.separator()
+        # 7 - TOP - LEFT
+        pie.separator()
+        # 9 - TOP - RIGHT
+        pie.separator()
+        # 1 - BOTTOM - LEFT
+        op = pie.operator('wm.tool_set_by_id', text='Select Box X-Ray')
+        op.name = 'object_tool.select_box_xray'
+        # 3 - BOTTOM - RIGHT
+        pie.operator("arp.arp_export_fbx_panel", text='Auto-Rig Pro FBX Export')
+
+
+# Pie Global-Import/Export
+class MT_pie_global_export(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_export"
     bl_label = "Blue Hole: Export"
 
     def draw(self, context):
@@ -177,8 +203,8 @@ class PIE_MT_Export(bpy.types.Menu):
 
 
 # Pie Global-Send
-class PIE_MT_Send(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_send"
+class MT_pie_global_send(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_send"
     bl_label = "Blue Hole: Send"
 
     def draw(self, context):
@@ -203,8 +229,8 @@ class PIE_MT_Send(bpy.types.Menu):
 
 
 # Pie Global-Source Control
-class PIE_MT_Source_Control(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_source_control"
+class MT_pie_global_source_control(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_source_control"
     bl_label = "Blue Hole: Source Control"
 
     def draw(self, context):
@@ -229,8 +255,8 @@ class PIE_MT_Source_Control(bpy.types.Menu):
 
 
 # Pie Global-Order
-class PIE_MT_Order(bpy.types.Menu):
-    bl_idname = "PIE_MT_global_order"
+class MT_pie_global_order(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_global_order"
     bl_label = "Blue Hole: Order"
 
     def draw(self, context):
@@ -258,14 +284,15 @@ class PIE_MT_Order(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (PIE_MT_Global_Help,
-           PIE_MT_Global_Theme,
-           PIE_MT_Global_Directories,
-           PIE_MT_Import_Export,
-           PIE_MT_Export,
-           PIE_MT_Send,
-           PIE_MT_Source_Control,
-           PIE_MT_Order)
+classes = (MT_pie_global_help,
+           MT_pie_global_theme,
+           MT_pie_global_dirs,
+           MT_pie_global_import_export,
+           MT_pie_global_export,
+           MT_pie_global_send,
+           MT_pie_global_source_control,
+           MT_pie_global_order,
+           MT_pie_global_extra)
 
 
 def register():
