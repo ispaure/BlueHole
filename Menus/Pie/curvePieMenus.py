@@ -29,8 +29,8 @@ name = filename = os.path.basename(__file__)
 
 # Context: 3D Viewport (Curve)
 # Hotkey: Ctrl + RMB
-class PIE_MT_Curve_Action(bpy.types.Menu):
-    bl_idname = "PIE_MT_curve_action"
+class MT_pie_curve_action(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_curve_action"
     bl_label = "Blue Hole: Curve > Action"
 
     def draw(self, context):
@@ -56,8 +56,8 @@ class PIE_MT_Curve_Action(bpy.types.Menu):
 
 # Context: 3D Viewport (Curve)
 # Hotkey: Shift + RMB
-class PIE_MT_Curve_Tools(bpy.types.Menu):
-    bl_idname = "PIE_MT_curve_tools"
+class MT_pie_curve_tool(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_curve_tool"
     bl_label = "Blue Hole: Curve > Tools"
 
     def draw(self, context):
@@ -83,8 +83,8 @@ class PIE_MT_Curve_Tools(bpy.types.Menu):
 
 # Context: 3D Viewport (Curve)
 # Hotkey: Shift + S + Drag Mouse in any direction
-class PIE_MT_Curve_Hide(bpy.types.Menu):
-    bl_idname = "PIE_MT_curve_hide"
+class MT_pie_curve_hide(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_curve_hide"
     bl_label = "Blue Hole: Curve > Hide"
 
     def draw(self, context):
@@ -112,9 +112,9 @@ class PIE_MT_Curve_Hide(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (PIE_MT_Curve_Action,
-           PIE_MT_Curve_Tools,
-           PIE_MT_Curve_Hide)
+classes = (MT_pie_curve_action,
+           MT_pie_curve_tool,
+           MT_pie_curve_hide)
 
 
 def register():

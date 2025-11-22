@@ -53,8 +53,8 @@ class WM_OT_CustomKnifeTool(bpy.types.Operator):
 
 # Context: 3D Viewport (Mesh)
 # Hotkey: Shift + S + Drag Mouse in any direction
-class PIE_MT_Mesh_Hide(bpy.types.Menu):
-    bl_idname = "PIE_MT_mesh_hide"
+class MT_pie_mesh_hide(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_mesh_hide"
     bl_label = "Blue Hole Pie Menu: Mesh > Hide"
 
     def draw(self, context):
@@ -81,8 +81,8 @@ class PIE_MT_Mesh_Hide(bpy.types.Menu):
 # Context: 3D Viewport (Mesh)
 # Hotkey: Shift + RMB
 # Changes options displayed if Vertex/Edge/Face Mode
-class PIE_MT_Mesh_Tools(bpy.types.Menu):
-    bl_idname = "PIE_MT_mesh_tools"
+class MT_pie_mesh_tool(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_mesh_tool"
     bl_label = "Blue Hole: Mesh > Tools"
 
     def draw(self, context):
@@ -111,8 +111,8 @@ class PIE_MT_Mesh_Tools(bpy.types.Menu):
 
 # Context: 3D Viewport (Mesh)
 # Hotkey: Ctrl + RMB
-class PIE_MT_Mesh_Action(bpy.types.Menu):
-    bl_idname = "PIE_MT_mesh_action"
+class MT_pie_mesh_action(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_mesh_action"
     bl_label = "Blue Hole: Mesh > Action"
 
     def draw(self, context):
@@ -127,9 +127,9 @@ class PIE_MT_Mesh_Action(bpy.types.Menu):
             # 6 - RIGHT
             pie.operator("mesh.merge", text="Merge to Center", icon='FREEZE').type = 'CENTER'
             # 2 - BOTTOM
-            pie.operator("wm.call_menu_pie", text="More...").name = 'PIE_MT_vertex_action_more'
+            pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_vertex_action_more.bl_idname
             # 8 - TOP
-            pie.operator("wm.call_menu_pie", text="Select...").name = 'PIE_MT_vertex_action_select'
+            pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_vertex_action_select.bl_idname
             # 7 - TOP - LEFT
             if addonUtils.is_addon_enabled_and_loaded('MACHIN3tools'):
                 pie.operator("machin3.straighten", text="Straighten", icon='THREE_DOTS')
@@ -152,9 +152,9 @@ class PIE_MT_Mesh_Action(bpy.types.Menu):
             # 6 - RIGHT
             pie.operator("transform.edge_crease", text="Edge Crease", icon='PARTICLE_PATH')
             # 2 - BOTTOM
-            pie.operator("wm.call_menu_pie", text="More...").name = 'PIE_MT_edge_action_more'
+            pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_edge_action_more.bl_idname
             # 8 - TOP
-            pie.operator("wm.call_menu_pie", text="Select...").name = 'PIE_MT_edge_action_select'
+            pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_edge_action_select.bl_idname
             # 7 - TOP - LEFT
             pie.operator("mesh.fill_grid", text="Grid Fill", icon='SHAPEKEY_DATA')
             # 9 - TOP - RIGHT
@@ -174,9 +174,9 @@ class PIE_MT_Mesh_Action(bpy.types.Menu):
             # 6 - RIGHT
             pie.operator("mesh.separate", text="Separate", icon='MOD_PHYSICS').type = 'SELECTED'
             # 2 - BOTTOM
-            pie.operator("wm.call_menu_pie", text="More...").name = 'PIE_MT_face_action_more'
+            pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_face_action_more.bl_idname
             # 8 - TOP
-            pie.operator("wm.call_menu_pie", text="Select...").name = 'PIE_MT_face_action_select'
+            pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_face_action_select.bl_idname
             # 7 - TOP - LEFT
             if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
                 pie.operator("mesh.quick_lattice", text="Quick Lattice", icon='OUTLINER_DATA_LATTICE')
@@ -194,8 +194,8 @@ class PIE_MT_Mesh_Action(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class PIE_MT_Vertex_Action_Select(bpy.types.Menu):
-    bl_idname = "PIE_MT_vertex_action_select"
+class MT_pie_vertex_action_select(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_vertex_action_select"
     bl_label = "Blue Hole: Vertex > Action > Select"
 
     def draw(self, context):
@@ -220,8 +220,8 @@ class PIE_MT_Vertex_Action_Select(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class PIE_MT_Vertex_Action_More(bpy.types.Menu):
-    bl_idname = "PIE_MT_vertex_action_more"
+class MT_pie_vertex_action_more(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_vertex_action_more"
     bl_label = "Blue Hole: Vertex > Action > More"
 
     def draw(self, context):
@@ -252,8 +252,8 @@ class PIE_MT_Vertex_Action_More(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class PIE_MT_Edge_Action_Select(bpy.types.Menu):
-    bl_idname = "PIE_MT_edge_action_select"
+class MT_pie_edge_action_select(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_edge_action_select"
     bl_label = "Blue Hole: Edge > Action > Select"
 
     def draw(self, context):
@@ -278,8 +278,8 @@ class PIE_MT_Edge_Action_Select(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class PIE_MT_Edge_Action_More(bpy.types.Menu):
-    bl_idname = "PIE_MT_edge_action_more"
+class MT_pie_edge_action_more(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_edge_action_more"
     bl_label = "Blue Hole: Edge > Action > More"
 
     def draw(self, context):
@@ -311,8 +311,8 @@ class PIE_MT_Edge_Action_More(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class PIE_MT_Face_Action_Select(bpy.types.Menu):
-    bl_idname = "PIE_MT_face_action_select"
+class MT_pie_face_action_select(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_face_action_select"
     bl_label = "Blue Hole: Face > Action > Select"
 
     def draw(self, context):
@@ -337,8 +337,8 @@ class PIE_MT_Face_Action_Select(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class PIE_MT_Face_Action_More(bpy.types.Menu):
-    bl_idname = "PIE_MT_face_action_more"
+class MT_pie_face_action_more(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_face_action_more"
     bl_label = "Blue Hole: Face > Action > More"
 
     def draw(self, context):
@@ -370,15 +370,15 @@ class PIE_MT_Face_Action_More(bpy.types.Menu):
 
 # Menu classes
 classes = (WM_OT_CustomKnifeTool,
-           PIE_MT_Mesh_Hide,
-           PIE_MT_Mesh_Tools,
-           PIE_MT_Mesh_Action,
-           PIE_MT_Vertex_Action_More,
-           PIE_MT_Vertex_Action_Select,
-           PIE_MT_Edge_Action_More,
-           PIE_MT_Edge_Action_Select,
-           PIE_MT_Face_Action_More,
-           PIE_MT_Face_Action_Select)
+           MT_pie_mesh_hide,
+           MT_pie_mesh_tool,
+           MT_pie_mesh_action,
+           MT_pie_vertex_action_more,
+           MT_pie_vertex_action_select,
+           MT_pie_edge_action_more,
+           MT_pie_edge_action_select,
+           MT_pie_face_action_more,
+           MT_pie_face_action_select)
 
 
 def register():
