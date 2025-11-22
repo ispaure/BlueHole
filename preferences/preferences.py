@@ -14,9 +14,6 @@ __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-import os
-from pathlib import Path
-
 import bpy
 from bpy.props import *
 from bpy.types import Operator, AddonPreferences

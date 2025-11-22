@@ -8,32 +8,30 @@ __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
-# ----------------------------------------------------------------------------------------------------------------------
 
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
+# ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
+
+import bpy
+import os
+from BlueHole.blenderUtils.debugUtils import *
 from BlueHole.blenderUtils import filterUtils as filterUtils
 import BlueHole.blenderUtils.addonUtils as addonUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# USER DEFINED SETTINGS
 
-show_verbose = True
+name = filename = os.path.basename(__file__)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# CODE
-
-import bpy
-from bpy.types import (
-        Menu,
-        Operator,
-        )
-import os
+# PIE MENUS
 
 
-# Pie Object - Tools
-class PIE_MT_Object_Tools(Menu):
+# Context: 3D Viewport (Object Mode)
+# Hotkey: Shift+RMB
+class PIE_MT_Object_Tools(bpy.types.Menu):
     bl_idname = "PIE_MT_object_tools"
     bl_label = "Blue Hole: Object > Tools (Modifiers)"
 
@@ -81,7 +79,8 @@ class PIE_MT_Object_Tools(Menu):
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
 
 
-class PIE_MT_Object_Tools_More(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Object_Tools_More(bpy.types.Menu):
     bl_idname = "PIE_MT_object_tools_more"
     bl_label = "Blue Hole: Object > Tools (Modifiers) > More"
 
@@ -109,8 +108,9 @@ class PIE_MT_Object_Tools_More(Menu):
         pie.separator()
 
 
-# Pie Object - Hide
-class PIE_MT_Object_Hide(Menu):
+# Context: 3D Viewport (Mesh)
+# Hotkey: Shift + S + Drag Mouse in any direction
+class PIE_MT_Object_Hide(bpy.types.Menu):
     bl_idname = "PIE_MT_object_hide"
     bl_label = "Blue Hole: Object > Hide"
 
@@ -138,8 +138,9 @@ class PIE_MT_Object_Hide(Menu):
         pie.separator()
 
 
-# Pie Object - Action
-class PIE_MT_Object_Action(Menu):
+# Context: 3D Viewport (Object Mode)
+# Hotkey: Ctrl+RMB
+class PIE_MT_Object_Action(bpy.types.Menu):
     bl_idname = "PIE_MT_object_action"
     bl_label = "Blue Hole: Object > Action"
 
@@ -173,8 +174,8 @@ class PIE_MT_Object_Action(Menu):
         button_2.keep_transform = True
 
 
-# Pie Object - Action Select
-class PIE_MT_Object_Action_Select(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Object_Action_Select(bpy.types.Menu):
     bl_idname = "PIE_MT_object_action_select"
     bl_label = "Blue Hole: Object > Action > Select"
 
@@ -186,7 +187,7 @@ class PIE_MT_Object_Action_Select(Menu):
         # 6 - RIGHT
         pie.operator("object.select_grouped", text="Select Parent", icon='DRIVER').type = 'PARENT'
         # 2 - BOTTOM
-        pie.operator("object.select_all", text="Invert", icon='OVERLAY').type = 'INVERT'
+        pie.operator("object.select_all", text="Invert", icon='OVERLAY')
         # 8 - TOP
         pie.operator("object.select_grouped", text="Select Grouped", icon='GROUP').type = 'COLLECTION'
         # 7 - TOP - LEFT
@@ -199,8 +200,8 @@ class PIE_MT_Object_Action_Select(Menu):
         pie.separator()
 
 
-# Pie Object - Action More
-class PIE_MT_Object_Action_More(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Object_Action_More(bpy.types.Menu):
     bl_idname = "PIE_MT_object_action_more"
     bl_label = "Blue Hole: Object > Action > More"
 
@@ -228,24 +229,25 @@ class PIE_MT_Object_Action_More(Menu):
         pie.separator()
 
 
-classes = (
-    PIE_MT_Object_Hide,
-    PIE_MT_Object_Tools,
-    PIE_MT_Object_Tools_More,
-    PIE_MT_Object_Action,
-    PIE_MT_Object_Action_Select,
-    PIE_MT_Object_Action_More
-    )
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
 
-addon_keymaps = []
+# Menu classes
+classes = (PIE_MT_Object_Hide,
+           PIE_MT_Object_Tools,
+           PIE_MT_Object_Tools_More,
+           PIE_MT_Object_Action,
+           PIE_MT_Object_Action_Select,
+           PIE_MT_Object_Action_More)
 
 
 def register():
     for cls in classes:
-        print_debug_msg('Loading Pie Menu: ' + cls.bl_idname, show_verbose)
+        log(Severity.DEBUG, name, 'Registering')
         bpy.utils.register_class(cls)
 
 
 def unregister():
     for cls in classes:
+        log(Severity.DEBUG, name, 'Unregistering')
         bpy.utils.unregister_class(cls)

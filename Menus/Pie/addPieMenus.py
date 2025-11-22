@@ -8,28 +8,28 @@ __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
-# ----------------------------------------------------------------------------------------------------------------------
-
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+# IMPORTS
 
 import bpy
-from bpy.types import (
-        Menu,
-        Operator,
-        )
+from BlueHole.blenderUtils.debugUtils import *
 import os
 
 
-class PIE_MT_Add(Menu):
+# ----------------------------------------------------------------------------------------------------------------------
+# USER DEFINED SETTINGS
+
+name = filename = os.path.basename(__file__)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# PIE MENUS
+
+
+# Context: 3D Viewport (Global)
+# Hotkey: Shift + A + Drag Mouse in any direction
+class PIE_MT_Add(bpy.types.Menu):
     bl_idname = "PIE_MT_add"
     bl_label = "Blue Hole: Add"
 
@@ -61,7 +61,8 @@ class PIE_MT_Add(Menu):
         pie.operator("curve.primitive_bezier_curve_add", text="Bezier", icon='CURVE_BEZCURVE')
 
 
-class PIE_MT_Add_More(Menu):
+# No Hotkey; Submenu
+class PIE_MT_Add_More(bpy.types.Menu):
     bl_idname = "PIE_MT_global_add_more"
     bl_label = "Blue Hole: Add > More"
 
@@ -88,20 +89,17 @@ class PIE_MT_Add_More(Menu):
         pie.operator("curve.primitive_bezier_circle_add", text="Bezier Circle", icon='CURVE_BEZCIRCLE')
 
 
-classes = (
-    PIE_MT_Add,
-    PIE_MT_Add_More
-    )
-
-addon_keymaps = []
+classes = (PIE_MT_Add,
+           PIE_MT_Add_More)
 
 
 def register():
     for cls in classes:
-        print_debug_msg('Loading Pie Menu: ' + cls.bl_idname, show_verbose)
+        log(Severity.DEBUG, name, 'Registering')
         bpy.utils.register_class(cls)
 
 
 def unregister():
     for cls in classes:
+        log(Severity.DEBUG, name, 'Unregistering')
         bpy.utils.unregister_class(cls)
