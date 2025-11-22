@@ -23,9 +23,6 @@ from bpy.types import Operator, AddonPreferences
 
 from . import general, sourcecontrol, help_n_update, environment
 import BlueHole.envUtils.envUtils as envUtils
-import BlueHole.blenderOperators.globalUnlisted as globalUnlisted
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
-import BlueHole.blenderUtils.importUtils as importUtils
 import BlueHole.blenderUtils.addon as addon
 
 # ----------------------------------------------------------------------------------------------------------------------

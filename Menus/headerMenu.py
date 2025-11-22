@@ -50,7 +50,6 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         # layout.menu("BLUE_HOLE_MT_scene")
         layout.separator()
         layout.menu("BLUE_HOLE_MT_sort")
-        layout.menu("BLUE_HOLE_MT_open", icon='FOLDER_REDIRECT')
         layout.menu("BLUE_HOLE_MT_import", icon='IMPORT')
         layout.menu("BLUE_HOLE_MT_export", icon='EXPORT')
         layout.menu("BLUE_HOLE_MT_send", icon='UV_SYNC_SELECT')
