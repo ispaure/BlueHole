@@ -46,15 +46,6 @@ def import_fbx_obj(import_path):
         bpy.ops.wm.obj_import(filepath=import_path)  # Import mesh as OBJ
 
 
-def import_current_env_scale_guide(mesh_name):
-
-    # Get import path for the mesh
-    import_path = str(Path(fileUtils.get_current_env_msh_guides_path() + '/' + mesh_name))
-
-    # import fbx or obj, whatever mesh_name is
-    import_fbx_obj(import_path)
-
-
 def import_default_env_scale_guide(mesh_name):
 
     # Get import path for the mesh

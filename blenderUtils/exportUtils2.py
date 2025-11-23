@@ -33,6 +33,8 @@ import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.blenderUtils.sendUnreal as sendUnreal
 import BlueHole.blenderUtils.configUtils as configUtils
 import BlueHole.envUtils.envUtils2 as envUtils2
+import BlueHole.Utils.env as env
+from typing import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -420,37 +422,40 @@ def get_ah_root_lst(ah_prefix_lst, sel):
     return exp_root_lst
 
 
-def get_unity_exp_path():
+def get_unity_exp_dir_path() -> Optional[Path]:
     # EXPORT OPTIONS
     # Export Format
 
     # Determine Export Directory
     blend_dir_path = fileUtils.get_blend_directory_path()
 
+    # Blue Hole Prefs Class
+    bh_prefs_cls = env.BlueHolePrefs()
+
     # Get sc path
-    sc_path = envUtils2.get_valid_sc_path()
+    sc_path = bh_prefs_cls.get_valid_sc_dir_path()
+    if not sc_path:
+        return None
+    else:
+        sc_path_str = str(sc_path)
 
     # Get unity assets path
-    if filterUtils.filter_platform('win'):
-        unity_assets_path = str(Path(addon.preference().general.unity_assets_path))
-    elif filterUtils.filter_platform('mac'):
-        unity_assets_path = str(Path(addon.preference().general.unity_assets_path_mac))
+    unity_asset_path = bh_prefs_cls.get_valid_unity_asset_dir_path()
+    if not unity_asset_path:
+        return None
     else:
-        return False
+        unity_asset_path_str = str(unity_asset_path)
 
     # Ensure most chances of swap
-    sc_path = sc_path.replace('\\', '/')
-    unity_assets_path = unity_assets_path.replace('\\', '/')
+    sc_path_str = sc_path_str.replace('\\', '/')
+    unity_asset_path_str = unity_asset_path_str.replace('\\', '/')
     blend_dir_path = blend_dir_path.replace('\\', '/')
 
     # Swap
-    exp_dir = blend_dir_path.replace(sc_path, unity_assets_path)
+    exp_dir = blend_dir_path.replace(sc_path_str, unity_asset_path_str)
 
-    # If on Windows, paths should have slant from left to right
-    if filterUtils.filter_platform('win'):
-        exp_dir = exp_dir.replace('/', '\\')
-
-    return exp_dir
+    # Normalize Path for OS
+    return Path(exp_dir)
 
 
 def get_unity_asset_hierarchy_exp_set_cls():
@@ -462,7 +467,7 @@ def get_unity_asset_hierarchy_exp_set_cls():
     exp_set_cls.exp_format = 'FBX'
 
     # Get export directory
-    exp_set_cls.exp_dir = get_unity_exp_path()
+    exp_set_cls.exp_dir = get_unity_exp_dir_path()
 
     # Zero Root Transform
     exp_set_cls.zero_root_transform = addon.preference().general.unity_bridge_zero_root_transform

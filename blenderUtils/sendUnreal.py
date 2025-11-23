@@ -26,6 +26,7 @@ import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Lib.send2ue.dependencies.remote_execution as remote_execution
 import BlueHole.blenderUtils.exportUtils2 as exportUtils2
 import BlueHole.envUtils.envUtils2 as envUtils2
+import BlueHole.Utils.env as env
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -48,19 +49,18 @@ def trigger_unreal_import(file_path_source):
     """
 
     def display_path_error_source_content(path):
-        msg = 'The Source Content directory path specified in the active environment\'s env_variables.ini file is ' \
-              'invalid. Please create said directory or edit env_variables.ini to match your SourceContent folder.' \
-              '\n\nAttempted path: '
-        msg += str(path)
-        show_dialog_box('Blender to Unreal Bridge', msg)
+        err_msg = ('The Source Content directory path specified in the active environment\'s env_variables.ini file '
+                   'is invalid. Please create said directory or edit env_variables.ini to match your '
+                   f'Source Content folder.\n\nAttempted path: "{path}"')
+        show_dialog_box('Blender to Unreal Bridge', err_msg)
 
     def display_path_error_blend(sc_path, blend_path):
-        msg = 'The currently opened Blender file is not located within the Source Content directory path specified in' \
-              ' the active environment\'s env_variables.ini file. Please move your blender file or edit the ' \
-              'Source Content path from env_variables.ini' \
-              '\n\nExpected blender path to be within: {sc_path}' \
-              '\nFound blender path to be: {blend_path}'.format(sc_path=sc_path, blend_path=blend_path)
-        show_dialog_box('Blender to Unreal Bridge', msg)
+        err_msg = ('The currently opened Blender file is not located within the Source Content directory path '
+                   'specified in the active environment\'s env_variables.ini file. Please move your blender file '
+                   'or edit the Source Content path from env_variables.ini.\n\nExpected blender path to be '
+                   f'within: "{sc_path}"'
+                   f'\nFound blender path to be: "{blend_path}"')
+        show_dialog_box('Blender to Unreal Bridge', err_msg)
 
     # ------------------------------------------------------------------------------------------------------------------
     # VALIDATE ENV_VARIABLES.INI has valid SourceContent path for Unreal Bridge,
@@ -68,12 +68,14 @@ def trigger_unreal_import(file_path_source):
 
     # Get SourceContent's directory path from env_variables.ini
     # (the root of where blender files and assets are saved)
-    sc_path = envUtils2.get_valid_sc_path()
+    sc_path = env.BlueHolePrefs().get_valid_sc_dir_path()
 
     # Validate this path is valid, else throw error
-    if not fileUtils.is_path_valid(sc_path):
+    if not sc_path:
         display_path_error_source_content(sc_path)
         return False
+    else:
+        sc_path_str = str(sc_path)
 
     # Validate that currently opened blend file has location on disk.
     check_result = filterUtils.check_tests('Export Asset Hierarchy',
@@ -83,23 +85,14 @@ def trigger_unreal_import(file_path_source):
 
     # Validate currently opened blend file is within SourceContent
     blend_path = str(Path(fileUtils.get_blend_directory_path()))
-    if sc_path not in blend_path:
-        display_path_error_blend(sc_path, blend_path)
+    if sc_path_str not in blend_path:
+        display_path_error_blend(sc_path_str, blend_path)
         return False
-
-    # # Get Unreal Project's "Content" sub-folder path from env_variables.ini
-    # # (the root where Unreal assets are to be saved)
-    # unreal_content_path = str(
-    #     Path(configUtils.get_current_env_cfg_value('UnrealBridge', 'unreal_project_content_dir_path')))
-    # # Validate this path is valid, else throw error
-    # if not fileUtils.is_path_valid(unreal_content_path):
-    #     display_path_error_unreal_assets(unreal_content_path)
-    #     return False
 
     # ------------------------------------------------------------------------------------------------------------------
     # Know everything is valid, send command to Unreal.
 
-    file_path_dest = file_path_source.replace(sc_path, '/Game')
+    file_path_dest = file_path_source.replace(sc_path_str, '/Game')
 
     msg = 'Triggering Unreal import of source file: "{source}" to "{destination}".'.format(source=file_path_source,
                                                                                            destination=file_path_dest)

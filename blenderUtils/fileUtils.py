@@ -31,6 +31,7 @@ import BlueHole.envUtils.envUtils as envUtils
 import BlueHole.envUtils.envUtils2 as envUtils2
 from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
 import BlueHole.blenderUtils.filterUtils as filterUtils
+import BlueHole.Utils.env as env
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -234,8 +235,7 @@ def get_blue_hole_user_env_files_path():
     Get the environments path in Blue Hole (AppData)
     :rtype: str
     """
-    env_path = Path(get_blue_hole_user_addon_path() + '/envFiles')
-    return str(env_path)
+    return Path(get_blue_hole_user_addon_path(), 'envFiles')
 
 
 def get_blue_hole_local_env_files_path():
@@ -247,28 +247,12 @@ def get_blue_hole_local_env_files_path():
     return str(env_path)
 
 
-def get_current_env_path():
-    """
-    Get the current environment path.
-    :rtype: str
-    """
-    current_env = envUtils2.get_environment()
-    env_path = envUtils.get_env_dict()[current_env]
-    return env_path
-
-
-def get_current_env_msh_guides_path():
-    scale_guides_path = str(Path(get_current_env_path() + '/msh_scale_guides'))
-    return scale_guides_path
-
-
 def get_current_env_var_path():
     """
     Get the config file path for the current environment.
     :rtype: str
     """
-    env_var_path = Path(get_current_env_path() + '/env_variables.ini')
-    return str(env_var_path)
+    return env.get_env_from_prefs_active_env().env_variables_path
 
 
 def get_default_env_path():
@@ -276,21 +260,18 @@ def get_default_env_path():
     Get the default environment path.
     :rtype: str
     """
-    env_path = Path(get_blue_hole_user_addon_path() + '/envFiles/default')
-    return str(env_path)
+    return env.get_default_env().path
 
 
 def get_default_env_var_path():
     """
     Get the config file path for the default environment
     """
-    env_var_path = Path(get_default_env_path() + '/env_variables.ini')
-    return str(env_var_path)
+    return env.get_default_env().env_variables_path
 
 
 def get_default_env_msh_guides_path():
-    scale_guides_path = str(Path(get_default_env_path() + '/msh_scale_guides'))
-    return scale_guides_path
+    return Path(env.get_default_env().path, 'msh_scale_guides')
 
 
 def get_file_path_list(dir_name):

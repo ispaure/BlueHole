@@ -53,6 +53,7 @@ from .Operators import sourceControlOp as sourceControlOp
 from .Operators import themeOp as themeOp
 
 # Import Env Utils
+from .Utils import env as env
 from .envUtils import envUtils as envUtils
 
 # Import Menus
@@ -119,21 +120,16 @@ def register():
     # Register Header Menu
     headerMenu.register()
 
-    # Source Control: Override Perforce Environment Settings (If set up in preferences)
-    p4Wrapper.set_p4_env_settings()
-
     # Register Current Env Tools
-    envUtils.if_environment_missing_set_to_default()  # When a saved environment is no longer available, rever to default
-    envUtils.register_current_env()
+    env.if_current_env_missing_set_default()  # When a saved environment is no longer available, rever to default
+    env_cls = env.get_env_from_prefs_active_env()
+    env_cls.set_pref_from_ini()
 
 
 # Unregister
 def unregister():
     # Unregister Callbacks
     callbacks.unregister()
-
-    # Unregister Current Env Tools
-    envUtils.unregister_current_env()
 
     # Unregister preferences
     preferences.unregister()

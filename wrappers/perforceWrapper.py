@@ -63,6 +63,8 @@ class P4Info:
         # Update keys
         self.update_fields()
 
+        set_p4_env_settings()  # Sets P4 Environment Settings so they are set for later use. Don't know if I need this anywhere else.
+
     def update_fields(self):
         # Get the information from p4 info
         info_array = cmdWrapper.exec_cmd('p4 info')
@@ -738,6 +740,7 @@ def p4_fstat_dict(file_path_string, silent_mode=False):
     """
     Get p4 fstat results, cleaned as an array of dicts (1 dict per item)
     """
+
     # If file_path isn't enclosed in quotation marks, enclose.
     if '"' not in file_path_string[0]:
         file_path_string = '"' + file_path_string + '"'
