@@ -41,7 +41,7 @@ def config_section_map(section, value, cfg_file_path):
     :rtype: str
     """
     # Read config file
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(interpolation=None)
     env_config_filepath = cfg_file_path  # Get path of current env config file
     config.read(env_config_filepath)
     config.sections()
