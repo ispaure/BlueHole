@@ -25,6 +25,7 @@ import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.envUtils.projectUtils as projectUtils
 import BlueHole.envUtils.envUtils2 as envUtils2
 from BlueHole.blenderUtils.debugUtils import *
+import BlueHole.Utils.env as env
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -42,13 +43,6 @@ def filter_platform(platform):
             return True
         else:
             return False
-
-
-def filter_env(env):
-    if env in envUtils2.get_environment():
-        return True
-    else:
-        return False
 
 
 def filter_source_control():
@@ -260,35 +254,34 @@ def check_tests(script_name,
             return False
         log(Severity.DEBUG, script_name, 'Check Source Control: Succeeded')
 
+    # Attempt to get valid source content path
+    bh_prefs_cls = env.BlueHolePrefs()
+    sc_path = bh_prefs_cls.get_valid_sc_dir_path()
+
     # Check Source Content Root Path Exists
     if check_source_content_root_path_exist:
-        sc_path = envUtils2.get_valid_sc_path()
-        # Validate this path is valid, else throw error
-        if not fileUtils.is_path_valid(sc_path):
+        if not sc_path:
             display_path_error_source_content(sc_path)
             return False
 
     # Check Blender File is within Source Content
     if check_blend_in_source_content:
-        sc_path = envUtils2.get_valid_sc_path()
+        if not sc_path:
+            display_path_error_source_content(sc_path)
+            return False
+        sc_path_str = str(sc_path)
 
         blend_path = str(Path(fileUtils.get_blend_directory_path()))
-        if sc_path not in blend_path:
+        if sc_path_str not in blend_path:
             display_path_error_blend(sc_path, blend_path)
             return False
 
     # Check that Unity Asset's Path Exists
     if check_unity_assets_path_exist:
-        if filter_platform('win'):
-            unity_assets_path = str(Path(addon.preference().general.unity_assets_path))
-        elif filter_platform('mac'):
-            unity_assets_path = str(Path(addon.preference().general.unity_assets_path_mac))
-        else:
-            return False
+        unity_asset_path = bh_prefs_cls.get_valid_unity_asset_dir_path()
 
-        # Validate this path is valid, else throw error
-        if not fileUtils.is_path_valid(unity_assets_path):
-            display_path_error_unity_assets(unity_assets_path)
+        if not unity_asset_path:
+            display_path_error_unity_assets(unity_asset_path)
             return False
 
     # Reached the end, so return True

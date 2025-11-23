@@ -26,6 +26,7 @@ import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.envUtils.envUtils as envUtils
 
 import BlueHole.envUtils.envUtils2 as envUtils2
+import BlueHole.Utils.env as env
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -37,7 +38,7 @@ class WM_OT_SetActiveEnvironment(bpy.types.Operator):
     bl_label = "Set the Active Environment"
     bl_options = {'INTERNAL'}
 
-    env_items_lst = envUtils.get_env_lst_enum_property()
+    env_items_lst = env.get_env_lst_enum_property()
     # Active Environment
     active_environment: bpy.props.EnumProperty(name="Active Environment",
                                      description="Defines the project directory structure.",
@@ -55,13 +56,9 @@ class WM_OT_SetActiveEnvironment(bpy.types.Operator):
         box.label(text='To save as default, save Blender Preferences.')
 
     def execute(self, context):
-        envUtils2.set_environment(self.active_environment)
-        try:
-            envUtils.register_current_env()
-        except:
-            pass
-        # msg = 'Load newly set environment?'
-        # uiUtils.show_dialog_box('Blue Hole', msg, envUtils.register_current_env)
+        env.set_pref_current_env(self.active_environment)
+        env_cls = env.get_env_from_prefs_active_env()
+        env_cls.set_pref_from_ini()
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -73,7 +70,7 @@ class WM_OT_AddEnvironment(bpy.types.Operator):
     bl_label = "Create an Environment"
     bl_options = {'INTERNAL'}
 
-    env_items_lst = envUtils.get_env_lst_enum_property()
+    env_items_lst = env.get_env_lst_enum_property()
 
     add_based_from_environment: bpy.props.EnumProperty(name="Environment",
                                                        description="Environment to base the new one from. "
@@ -104,7 +101,9 @@ class WM_OT_AddEnvironment(bpy.types.Operator):
         row.label(text='You may want to save your scene before proceeding.')
 
     def execute(self, context):
-        envUtils2.add_env(self.new_environment_name_str, self.add_based_from_environment)
+        sanitized_name = self.new_environment_name_str.replace(' ', '_').replace('.', '_')
+        env_cls = env.Environment(sanitized_name)
+        env_cls.add_env(self.add_based_from_environment)
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -116,7 +115,7 @@ class WM_OT_DeleteAnEnvironment(bpy.types.Operator):
     bl_label = "Delete an Environment"
     bl_options = {'INTERNAL'}
 
-    env_items_lst = envUtils.get_env_lst_enum_property(exclude_default=True)
+    env_items_lst = env.get_env_lst_enum_property(exclude_default=True)
 
     if len(env_items_lst) > 0:
         deletable_environments: bpy.props.EnumProperty(name="Deletable Environments",
@@ -142,28 +141,12 @@ class WM_OT_DeleteAnEnvironment(bpy.types.Operator):
         row.label(text='You may want to save your scene before proceeding.')
 
     def execute(self, context):
-        envUtils2.delete_env(self.deletable_environments)
+        env_cls = env.Environment(self.deletable_environments)
+        env_cls.delete_env()
         return {'FINISHED'}
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
-
-
-class WM_OT_ApplyActiveEnvironment(bpy.types.Operator):
-    """
-    I think this was only used to Apply Changes in options, which is not necessary anymore (only for custom scripts)
-    TODO: Can probably delete this!
-    """
-    bl_idname = "wm.bh_apply_active_environment"
-    bl_label = "LOAD ENV"
-    bl_options = {'INTERNAL'}
-
-    def execute(self, context):
-        try:
-            envUtils.register_current_env()
-        except:
-            pass
-        return {'FINISHED'}
 
 
 class WM_OT_CustomizeEnvVariables(bpy.types.Operator):
@@ -186,7 +169,6 @@ class WM_OT_CustomizeEnvVariables(bpy.types.Operator):
 
 # List of classes to register/unregister
 classes = (WM_OT_SetActiveEnvironment,
-           WM_OT_ApplyActiveEnvironment,
            WM_OT_CustomizeEnvVariables,
            WM_OT_AddEnvironment,
            WM_OT_DeleteAnEnvironment

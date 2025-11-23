@@ -21,6 +21,7 @@ from bpy.types import Operator, AddonPreferences
 from . import general, sourcecontrol, help_n_update, environment
 import BlueHole.envUtils.envUtils as envUtils
 import BlueHole.blenderUtils.addon as addon
+import BlueHole.Utils.env as env
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -33,20 +34,6 @@ show_verbose = True
 
 # Dictionary of environments with preferences file
 env_preferences = {}
-
-# Get list of environments
-env_lst = envUtils.get_env_dict()
-
-# # Add entries to dictionary if preferences file was found
-# for env, value in env_lst.items():
-#     imp_module_path = str(Path(value + '/env_preferences.py'))
-#     if os.path.exists(imp_module_path):
-#         print_debug_msg('Environment "' + env + '" does have a preference file. Loading it...', show_verbose)
-#         env_preferences[env] = importUtils.import_python_module_absolute_path(imp_module_path).bc
-#         # env_preferences[env] = importlib.import_module(imp_module_path).bc
-#         print_debug_msg('Preference file loaded!', show_verbose)
-#     else:
-#         print_debug_msg('Environment "' + env + '" does not have a preferences file.', show_verbose)
 
 
 class BlueHole(AddonPreferences):
@@ -89,7 +76,7 @@ class BlueHole(AddonPreferences):
         row = column.row()
         row.operator('wm.set_active_environment', text='Set Active Env.', icon='PRESET')
         row.operator('wm.add_environment', text='Create Env.', icon='PRESET_NEW')
-        if len(envUtils.get_env_lst_enum_property(exclude_default=True)) > 0:
+        if len(env.get_env_lst_enum_property(exclude_default=True)) > 0:
             row.operator('wm.delete_environment', text='Delete Env.', icon='REMOVE')
         if addon.preference().environment.active_environment == 'default':
             row = column.row()
@@ -106,7 +93,8 @@ class BlueHole(AddonPreferences):
         globals()[self.settings.lower()].draw(self, context, box)
 
         # Keep trying to update the preference file
-        envUtils.write_env_ini_from_bh_prefs()
+        env_cls = env.get_env_from_prefs_active_env()
+        env_cls.set_ini_from_pref()
 
 
 classes = (general.bc,  # Need to make sure sub bc are before others

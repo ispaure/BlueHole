@@ -25,6 +25,7 @@ import BlueHole.blenderUtils.exportUtils2 as exportUtils2
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.addon as addon
 import BlueHole.envUtils.envUtils2 as envUtils2
+import BlueHole.Utils.env as env
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -124,7 +125,9 @@ class OpenSourceContentPath(bpy.types.Operator):
     bl_description = 'Opens Source Content Root Path, as specified in the active environment\'s settings.'
 
     def execute(self, context):
-        fileUtils.open_dir_path(envUtils2.get_valid_sc_path())
+        valid_sc_path = env.BlueHolePrefs().get_valid_sc_dir_path()
+        if valid_sc_path:
+            fileUtils.open_dir_path(valid_sc_path)
         return {'FINISHED'}
 
 
@@ -158,7 +161,9 @@ class OpenUnityAssetsCurrentExportPath(bpy.types.Operator):
         if not result:
             return False
         else:
-            fileUtils.open_dir_path(exportUtils2.get_unity_exp_path())
+            unity_exp_dir_path = exportUtils2.get_unity_exp_dir_path()
+            if unity_exp_dir_path:
+                fileUtils.open_dir_path(unity_exp_dir_path)
         return {'FINISHED'}
 
 

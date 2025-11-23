@@ -450,8 +450,6 @@ def draw(preference, context, layout):
                         row.prop(preference.sourcecontrol, 'env_setting_user15_user', text='User')
                         row.prop(preference.sourcecontrol, 'env_setting_user15_workspace', text='Workspace')
 
-                    # Set Environment Variables (in case they were changed by user)
-                    p4Wrapper.set_p4_env_settings()
 
             # Environment Settings Override (Impacts MacOS Only)
             if filterUtils.filter_platform('mac'):
@@ -466,5 +464,3 @@ def draw(preference, context, layout):
                 row = column.row()
                 row.enabled = enable_rows
                 row.prop(preference.sourcecontrol, 'macos_env_setting_P4CLIENT', text='Workspace (P4CLIENT)')
-                # Set Environment Variables (in case they were changed by user)
-                p4Wrapper.set_p4_env_settings()

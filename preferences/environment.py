@@ -19,10 +19,7 @@ from bpy.props import *
 from pathlib import Path
 
 import BlueHole.blenderUtils.addon as addon
-import BlueHole.blenderUtils.importUtils as importUtils
-import BlueHole.envUtils.envUtils as envUtils
-import BlueHole.blenderUtils.configUtils as configUtils
-import BlueHole.preferences.preferences as preferences
+import BlueHole.Utils.env as env
 import BlueHole.blenderUtils.filterUtils as filterUtils
 
 
@@ -38,7 +35,7 @@ show_verbose = True
 class bc(bpy.types.PropertyGroup):
 
     # Get list of environments
-    env_enum_prop_lst = envUtils.get_env_lst_enum_property()
+    env_enum_prop_lst = env.get_env_lst_enum_property()
 
     # Active Environment
     active_environment: EnumProperty(name="Active Environment",
