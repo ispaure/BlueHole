@@ -103,7 +103,7 @@ class WM_OT_AddEnvironment(bpy.types.Operator):
     def execute(self, context):
         sanitized_name = self.new_environment_name_str.replace(' ', '_').replace('.', '_')
         env_cls = env.Environment(sanitized_name)
-        env_cls.add_env(self.add_based_from_environment)
+        env_cls.add_env(env.Environment(self.add_based_from_environment))
         return {'FINISHED'}
 
     def invoke(self, context, event):
