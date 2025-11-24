@@ -311,33 +311,33 @@ class BlueHolePrefs:
     def __init__(self):
         pass
 
-    def __get_dir_path_if_valid(self, path_def: str, path_str: str) -> Optional[Path]:
+    def __get_dir_path_if_valid(self, path_def: str, path_str: str, quiet: bool) -> Optional[Path]:
 
         # Validate something other than default has been set.
         if len(path_str) == 0 or path_str.startswith('<'):
-            msg = (f'Source Content Path "{path_str}" is undefined. It is required for the bridges to game '
+            msg = (f'{path_def} Path "{path_str}" is undefined. It is required for the bridges to game '
                    f'engines. Navigate to Blender Blue Hole settings and define a Source Content Path.')
-            log(Severity.ERROR, env_tool_name, msg)
+            log(Severity.ERROR, env_tool_name, msg, popup=not quiet)
             return None
 
         # Validate the path exists
         if not os.path.exists(path_str):
-            msg = (f'Source Content Path "{path_str}" does not correspond to a valid path on disk. '
+            msg = (f'{path_def} Path "{path_str}" does not correspond to a valid path on disk. '
                    f'Navigate to Blender Blue Hole settings and define a valid Source Content Path.')
-            log(Severity.ERROR, env_tool_name, msg)
+            log(Severity.ERROR, env_tool_name, msg, popup=not quiet)
             return None
 
         # Validate the path is not pointing to a file
         if os.path.isfile(path_str):
-            msg = (f'Source Content Path "{path_str}" points to a file, not a directory. Navigate to '
+            msg = (f'{path_def} Path "{path_str}" points to a file, not a directory. Navigate to '
                    f'Blender Blue Hole settings and define a Source Content Path that points to a directory.')
-            log(Severity.ERROR, env_tool_name, msg)
+            log(Severity.ERROR, env_tool_name, msg, popup=not quiet)
             return None
 
         # Passed the Checks -- Return the Path!
         return Path(path_str)
 
-    def get_valid_sc_dir_path(self) -> Optional[Path]:
+    def get_valid_sc_dir_path(self, quiet: bool = False) -> Optional[Path]:
         """Attempts to get a valid source content path from the current Blue Hole settings, regardless of OS"""
         path_def = 'Source Content'
 
@@ -354,17 +354,17 @@ class BlueHolePrefs:
 
         # Attempt to get the source content path from the available options
         for sc_path in sc_path_to_attempt_lst:
-            result = self.__get_dir_path_if_valid(path_def, sc_path)
+            result = self.__get_dir_path_if_valid(path_def, sc_path, quiet)
             if result:
                 return result
 
         # If got here without able to return, no path was valid
         error_msg = (f'Unable to find a valid {path_def} Path in Blue Hole settings, which is required for the '
                      'bridges to game engines. See log for more details.')
-        log(Severity.ERROR, env_tool_name, error_msg, popup=True)
+        log(Severity.ERROR, env_tool_name, error_msg, popup=not quiet)
         return None
 
-    def get_valid_unity_asset_dir_path(self) -> Optional[Path]:
+    def get_valid_unity_asset_dir_path(self, quiet: bool = False) -> Optional[Path]:
         """Attempts to get a valid unity asset path from the current Blue Hole settings, regardless of OS"""
         path_def = 'Unity Assets'
 
@@ -378,14 +378,14 @@ class BlueHolePrefs:
             return None
 
         # Attempt to get the unity asset path from the available options
-        result = self.__get_dir_path_if_valid(path_def, unity_asset_path)
+        result = self.__get_dir_path_if_valid(path_def, unity_asset_path, quiet)
         if result:
             return result
 
         # If got here without able to return, no path was valid
         error_msg = (f'Unable to find a valid {path_def} Path in Blue Hole settings, which is required for the '
                      'bridge to Unity. See log for more details.')
-        log(Severity.ERROR, env_tool_name, error_msg, popup=True)
+        log(Severity.ERROR, env_tool_name, error_msg, popup=quiet)
         return None
 
 

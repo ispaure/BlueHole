@@ -35,13 +35,14 @@ debugUtils.print_debug_msg('Loading Header Menu...', show_verbose)
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
 
+
 # Header Blue Hole Menu
 class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
-    bl_label = loc_str('addon_name')
+    bl_label = 'BlueHole2' + ' [' + str(addon.preference().environment.active_environment.lower()) + ']'
 
     def draw(self, context):
         # import BlueHole.__init__
-        self.bl_label = 'Blue Hole ' + ' [' + str(addon.preference().environment.active_environment.lower()) + ']'
+        self.bl_label = 'BlueHole2' + ' [' + str(addon.preference().environment.active_environment.lower()) + ']'
         layout = self.layout
         layout.operator('wm.set_active_environment')
         layout.menu("BLUE_HOLE_MT_help", icon='HELP')
@@ -61,6 +62,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
 
     def menu_draw(self, context):
         self.layout.menu("BLUE_HOLE_MT_top_menu")
+        # self.layout.menu("BLUE_HOLE_MT_top_menu", icon='MOD_OCEAN')
 
 
 # Import / Export Sub-Menu

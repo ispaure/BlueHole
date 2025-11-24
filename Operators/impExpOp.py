@@ -72,17 +72,6 @@ class BatchExportSelectedToFinal(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class BatchExportSelectedToSpeedTreeDoc(bpy.types.Operator):
-
-    bl_idname = "wm.bh_export_speedtree_doc"
-    bl_label = '[[[[ ' + 'SPEEDTREE FRONDS Folder' + ' ]]]]'
-    bl_description = loc_str('open_doc_page')
-
-    def execute(self, context):
-        fileUtils.open_url(configUtils.get_url_db_value('Tutorial', 'speedtree_export'))
-        return{'FINISHED'}
-
-
 class BatchExportSelectedToResources(bpy.types.Operator):
     bl_idname = "wm.bh_batch_export_select_to_resources"
     bl_label = 'Batch Export (Selection) to RESOURCES Folder'
@@ -385,7 +374,6 @@ classes = (ImportGuide_5_6_ScaleMan,
            ImportGuide_6_1_ScaleMan,
            ExportAllHierarchiesToUE,
            ExportSelectHierarchiesToUE,
-           BatchExportSelectedToSpeedTreeDoc,
            BatchExportSelectedToSpeedTree_FBX,
            BatchExportSelectedToSpeedtreeLR_FBX,
            BatchExportSelectedToSpeedtreeHR_FBX,

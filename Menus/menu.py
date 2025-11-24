@@ -87,7 +87,7 @@ class BLUE_HOLE_MT_export(bpy.types.Menu):
         show_label('RESOURCES Folder', layout)
         layout.operator(impExpOp.BatchExportSelectedToResources.bl_idname, icon='EXPORT')
         layout.separator()
-        layout.operator(impExpOp.BatchExportSelectedToSpeedTreeDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+        show_label('SPEEDTREE FRONDS Folder', layout)
         layout.operator(impExpOp.BatchExportSelectedToSpeedTree_FBX.bl_idname, icon='EXPORT')
         layout.operator(impExpOp.BatchExportSelectedToSpeedtreeLR_FBX.bl_idname, icon='EXPORT')
         layout.operator(impExpOp.BatchExportSelectedToSpeedtreeHR_FBX.bl_idname, icon='EXPORT')

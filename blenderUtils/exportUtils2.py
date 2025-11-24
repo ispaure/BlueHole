@@ -421,7 +421,7 @@ def get_ah_root_lst(ah_prefix_lst, sel):
     return exp_root_lst
 
 
-def get_unity_exp_dir_path() -> Optional[Path]:
+def get_unity_exp_dir_path(quiet: bool = False) -> Optional[Path]:
     # EXPORT OPTIONS
     # Export Format
 
@@ -432,14 +432,14 @@ def get_unity_exp_dir_path() -> Optional[Path]:
     bh_prefs_cls = env.BlueHolePrefs()
 
     # Get sc path
-    sc_path = bh_prefs_cls.get_valid_sc_dir_path()
+    sc_path = bh_prefs_cls.get_valid_sc_dir_path(quiet)
     if not sc_path:
         return None
     else:
         sc_path_str = str(sc_path)
 
     # Get unity assets path
-    unity_asset_path = bh_prefs_cls.get_valid_unity_asset_dir_path()
+    unity_asset_path = bh_prefs_cls.get_valid_unity_asset_dir_path(quiet)
     if not unity_asset_path:
         return None
     else:
