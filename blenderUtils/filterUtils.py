@@ -23,7 +23,6 @@ import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.envUtils.projectUtils as projectUtils
-import BlueHole.envUtils.envUtils2 as envUtils2
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.Utils.env as env
 

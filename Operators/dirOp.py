@@ -24,7 +24,6 @@ import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.exportUtils2 as exportUtils2
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.addon as addon
-import BlueHole.envUtils.envUtils2 as envUtils2
 import BlueHole.Utils.env as env
 
 

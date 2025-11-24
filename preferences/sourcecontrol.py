@@ -18,7 +18,6 @@ import bpy
 from bpy.props import *
 
 import BlueHole.blenderUtils.addon as addon
-import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.filterUtils as filterUtils
 
 

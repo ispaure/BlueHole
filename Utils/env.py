@@ -25,6 +25,7 @@ import BlueHole.blenderUtils.configUtils as configUtils
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
+# import BlueHole.preferences.environment as envPref
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -258,7 +259,7 @@ class Environment:
             current_env_cls.set_pref_from_ini()
 
         # Terminate Blender Process
-        # TODO: See if this is still necessary
+        # TODO: Find a way to refresh active_environment in BlueHole.preferences.environment.bc.active_environment
         msg = f'Terminating Blender on Environment Deletion'
         log(Severity.INFO, env_tool_name, msg)
         fileUtils.terminate_blender()
@@ -296,7 +297,7 @@ class Environment:
         fileUtils.copy_dir(source_env.path, self.path)
 
         # Terminate Blender Process
-        # TODO: See if this is still necessary
+        # TODO: Find a way to refresh active_environment in BlueHole.preferences.environment.bc.active_environment
         msg = f'Terminating Blender on Environment Addition'
         log(Severity.INFO, env_tool_name, msg)
         fileUtils.terminate_blender()

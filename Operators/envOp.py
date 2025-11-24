@@ -23,9 +23,6 @@ import bpy
 from bpy.props import *
 
 import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.envUtils.envUtils as envUtils
-
-import BlueHole.envUtils.envUtils2 as envUtils2
 import BlueHole.Utils.env as env
 
 

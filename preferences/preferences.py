@@ -19,7 +19,6 @@ from bpy.props import *
 from bpy.types import Operator, AddonPreferences
 
 from . import general, sourcecontrol, help_n_update, environment
-import BlueHole.envUtils.envUtils as envUtils
 import BlueHole.blenderUtils.addon as addon
 import BlueHole.Utils.env as env
 
