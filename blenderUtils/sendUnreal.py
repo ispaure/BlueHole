@@ -18,9 +18,8 @@ from pathlib import Path
 
 import time
 
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
+from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.blenderUtils.uiUtils import show_dialog_box as show_dialog_box
 import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Lib.send2ue.dependencies.remote_execution as remote_execution
@@ -32,7 +31,7 @@ import BlueHole.Utils.env as env
 # DEBUG
 
 show_verbose = True
-
+send_ue_name = 'Send to Unreal'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -51,7 +50,7 @@ def trigger_unreal_import(file_path_source):
         err_msg = ('The Source Content directory path specified in the active environment\'s env_variables.ini file '
                    'is invalid. Please create said directory or edit env_variables.ini to match your '
                    f'Source Content folder.\n\nAttempted path: "{path}"')
-        show_dialog_box('Blender to Unreal Bridge', err_msg)
+        show_prompt('Blender to Unreal Bridge', err_msg)
 
     def display_path_error_blend(sc_path, blend_path):
         err_msg = ('The currently opened Blender file is not located within the Source Content directory path '
@@ -59,7 +58,7 @@ def trigger_unreal_import(file_path_source):
                    'or edit the Source Content path from env_variables.ini.\n\nExpected blender path to be '
                    f'within: "{sc_path}"'
                    f'\nFound blender path to be: "{blend_path}"')
-        show_dialog_box('Blender to Unreal Bridge', err_msg)
+        show_prompt('Blender to Unreal Bridge', err_msg)
 
     # ------------------------------------------------------------------------------------------------------------------
     # VALIDATE ENV_VARIABLES.INI has valid SourceContent path for Unreal Bridge,
@@ -93,16 +92,15 @@ def trigger_unreal_import(file_path_source):
 
     file_path_dest = file_path_source.replace(sc_path_str, '/Game')
 
-    msg = 'Triggering Unreal import of source file: "{source}" to "{destination}".'.format(source=file_path_source,
-                                                                                           destination=file_path_dest)
-    print_debug_msg(msg, show_verbose)
+    msg = f'Triggering Unreal import of source file: "{file_path_source}" to "{file_path_dest}".'
+    log(Severity.DEBUG, send_ue_name, msg)
 
     result = import_asset(str(Path(file_path_source)), str(Path(file_path_dest)))
     if not result:
+        log(Severity.ERROR, send_ue_name, 'Command did not succeed!')
         return False
 
-    print_debug_msg('Command succeeded!', show_verbose)
-
+    log(Severity.DEBUG, send_ue_name, 'Command succeeded!')
     return True
 
 
@@ -111,7 +109,7 @@ def display_cannot_connect_unreal_error():
           '\n\nPlease make sure:' \
           '\n1)Unreal Editor is opened and has a project loaded.' \
           '\n2)You have followed the setup instructions on the Blue Hole website for the Unreal bridge.'
-    show_dialog_box('Blender to Unreal Bridge', msg)
+    log(Severity.ERROR, send_ue_name, msg, popup=True)
 
 
 def import_asset(file_path_source, file_path_dest):
@@ -125,15 +123,15 @@ def import_asset(file_path_source, file_path_dest):
     remote_exec = remote_execution.RemoteExecution()
     remote_exec.start()
     # Fetch properties
-    print_debug_msg('Fetching properties...', show_verbose)
+    log(Severity.DEBUG, send_ue_name, 'Fetching Properties...')
 
     # Was it a skeletal?
     sk_prefix = exportUtils2.get_hierarchy_prefix_lst()[2]
     if sk_prefix == file_path_source.split('/')[-1][0:len(sk_prefix)]:
-        print_debug_msg('Export is a skeletal mesh.', show_verbose)
+        log(Severity.DEBUG, send_ue_name, 'Export is a Skeletal Mesh')
         is_skeletal = True
     else:
-        print_debug_msg('Export is not a skeletal mesh.', show_verbose)
+        log(Severity.DEBUG, send_ue_name, 'Export is a Static Mesh')
         is_skeletal = False
 
     # Is importing animations?

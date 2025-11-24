@@ -346,13 +346,13 @@ class P4File:
         self._callback_post_add()
     
     def _run_p4_sync(self):
-        self.callback_pre_sync()
+        self._callback_pre_sync()
         # progress_bar = uiUtils.display_progress_bar(f'{tool_name}: Getting Latest...')
         # progress_bar.update_progress(10)
         self.__run_p4_cmd(command='p4 sync -f', incl_status_lst=[P4FileStatus.NOT_LATEST_REVISION])
         # progress_bar.update_progress(100)
         # progress_bar.dlg.close()
-        self.callback_post_sync()
+        self._callback_post_sync()
     
     def _run_p4_edit(self):
         self._callback_pre_edit()
@@ -377,7 +377,7 @@ class P4File:
     def _callback_post_edit(self):
         pass
     
-    def open_for_edit(self, load_func = None, silent: bool = False):
+    def open_for_edit(self, silent: bool = False):
         
         msg = ('P4File.open_for_edit: Running single-file open_for_edit, which is costly to run in a loop. Please only use for explicit checkout'
                'requiring user interaction. For batch checkout, use P4FileGroup.open_for_edit instead as it is more optimized!')
@@ -408,8 +408,8 @@ class P4File:
             if silent:
                 self._run_p4_add()
             else:
-                msg = f'File {self.name} is not marked for add. Do you want to mark for add?'
-                result = uiUtils.display_msg_box_ok_cancel(tool_name, msg, self._run_p4_add)
+                msg = f'File "{self.file_name}" is not marked for add. Do you want to mark for add?'
+                result = uiUtils.show_prompt(tool_name, msg, self._run_p4_add)
                 if not result:
                     return False
 
@@ -418,8 +418,8 @@ class P4File:
             if silent:
                 self._run_p4_sync()
             else:
-                msg = f'File {self.name} is not synced to the latest revision. Sync to the latest revision?'
-                result = uiUtils.display_msg_box_ok_cancel(tool_name, msg, self._run_p4_sync)
+                msg = f'File "{self.file_name}" is not synced to the latest revision. Sync to the latest revision?'
+                result = uiUtils.show_prompt(tool_name, msg, self._run_p4_sync)
                 if not result:
                     return False
 
@@ -428,18 +428,25 @@ class P4File:
             if silent:
                 self._run_p4_edit()
             else:
-                msg = f'File {self.name} is not checked out. Check out?'
-                result = uiUtils.display_msg_box_ok_cancel(tool_name, msg, self._run_p4_edit)
+                msg = f'File "{self.file_name}" is not checked out. Check out?'
+                result = uiUtils.show_prompt(tool_name, msg, self._run_p4_edit)
                 if not result:
                     return False
 
         # If got here with no issue, completed successfully
         self.update_fields()
 
+        # If not checked out or marked for add, did not succeed
+        if self.status not in [P4FileStatus.MARKED_FOR_ADD, P4FileStatus.CHECKOUT_BY_ME]:
+            msg = f'File "{self.file_name}" could not be successfully checked out! Check log for details.'
+            log(Severity.ERROR, tool_name, msg)
+            return False
+
         return True
 
 
 class BlendP4File(P4File):
+    # TODO: Handle sync (exit > sync > reload scene)
     def __init__(self, client_file: Union[str, None] = None, depot_file: Union[str, None] = None):
         if client_file is None:
             log(Severity.CRITICAL, tool_name, 'BlendP4File: Input client_file is Invalid! Received None.')
@@ -459,24 +466,10 @@ class BlendP4File(P4File):
         if not check_result:
             return False
 
-        # Refresh file status
-        self.update_fields()
+        super().open_for_edit(silent=silent)
 
-        # If marked for add or for edit, no need to continue
-        if self.status in [P4FileStatus.MARKED_FOR_ADD, P4FileStatus.CHECKOUT_BY_ME]:
-            return
-
-        # Ask for open for edit
-        msg = f'Do you want to mark for add or checkout {self.get_display_name()}?'
-        uiUtils.show_dialog_box(tool_name, msg, self.__open_blend_for_edit_and_load)
-
-    def __open_blend_for_edit_and_load(self):
-        super().open_for_edit(load_func=self.load_scene, silent=True)
-
-    def load_scene(self):
+    def _callback_post_sync(self):
         bpy.ops.wm.open_mainfile(filepath=self.clientFile)
-
-
 
 
 class P4FileGroup:
@@ -819,9 +812,8 @@ def source_control_disabled_dialog():
     """
     Dialog box warns the user source control is currently disabled in Blue Hole preferences.
     """
-    print_debug_msg('Execute function: "source_control_disabled_dialog"', show_verbose)
     message = 'Source Control is currently disabled in the Blue Hole Add-ons settings. Enable it and try again!'
-    return uiUtils.show_dialog_box(tool_name, message)
+    log(Severity.ERROR, tool_name, message)
 
 
 def dialog_box_p4_info():
@@ -844,7 +836,7 @@ def dialog_box_p4_info():
                                      server_address=p4_info_cls.server_address,
                                      server_uptime=p4_info_cls.server_uptime
                                      )
-    uiUtils.show_dialog_box(tool_name, msg)
+    log(Severity.INFO, tool_name, msg)
     return True
 
 

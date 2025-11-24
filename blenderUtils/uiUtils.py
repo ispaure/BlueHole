@@ -55,7 +55,7 @@ def empty_fn():
     pass
 
 
-def show_dialog_box(title, message, execute_fn=empty_fn):
+def show_prompt(title, message, execute_fn=empty_fn):
     """
     Displays dialog box
     :param title: Dialog box title
@@ -76,11 +76,11 @@ def show_dialog_box(title, message, execute_fn=empty_fn):
     message = message.replace('\\n', '\n').replace('\\t', '\t')
 
     # Show Dialog Window (Windows) and return user input
-    def show_dialog_box_win32(message, title):
+    def show_prompt_windows(message, title):
         return ctypes.windll.user32.MessageBoxW(0, message, title, MbConstants.MB_OKCANCEL)
 
     # Show Dialog Window (MacOS) and return user input
-    def show_dialog_box_macos(message, title):
+    def show_prompt_macos(message, title):
         command_str = "osascript -e 'Tell application \"System Events\" to display dialog \"{message}\" with title \"{title}\"'".format(message=message, title=title)
         return_val = cmdWrapper.exec_cmd(command_str)
         return return_val
@@ -88,7 +88,7 @@ def show_dialog_box(title, message, execute_fn=empty_fn):
     # Since Blender API doesn't have proper message box that waits on user, we have to get a bit creative.
 
     if sys.platform == 'win32':  # Solution which only works on Windows
-        rc = show_dialog_box_win32(message, title)
+        rc = show_prompt_windows(message, title)
         if rc == MbConstants.IDOK:
             execute_fn()
             return True
@@ -97,11 +97,38 @@ def show_dialog_box(title, message, execute_fn=empty_fn):
     else:
         message = message.replace('"', '')
         message = message.replace("'", '')
-        if 'OK' in show_dialog_box_macos(message, title)[0]:
+        if 'OK' in show_prompt_macos(message, title)[0]:
             execute_fn()
             return True
         else:
             return False
+
+
+def show_message(title, message):
+    """
+    Displays a simple message box with an OK button.
+    Pauses script until user presses OK.
+    :param title: Dialog box title
+    :type title: str
+    :param message: Message to be shown in dialog box
+    :type message: str
+    """
+    import sys
+    import ctypes
+
+    # Prevent escape sequences
+    message = message.replace('\\n', '\n').replace('\\t', '\t')
+
+    if sys.platform == 'win32':
+        class MbConstants:
+            MB_OK = 0
+        ctypes.windll.user32.MessageBoxW(0, message, title, MbConstants.MB_OK)
+
+    else:  # macOS
+        message = message.replace('"', '').replace("'", '')
+        import subprocess
+        cmd = f"""osascript -e 'Tell application "System Events" to display dialog "{message}" with title "{title}" buttons {{"OK"}} default button "OK"'"""
+        subprocess.run(cmd, shell=True)
 
 
 def write_text(layout, text, width = 30, icon = "NONE"):

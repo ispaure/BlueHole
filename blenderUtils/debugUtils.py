@@ -122,7 +122,7 @@ class DebugLogger:
         if popup:
             try:
                 import BlueHole.blenderUtils.uiUtils as uiUtils
-                uiUtils.show_dialog_box(title, message)
+                uiUtils.show_message(title, message)
             except Exception:
                 print('Could not load uiUtils!')
 

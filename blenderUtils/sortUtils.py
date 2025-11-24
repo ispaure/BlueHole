@@ -15,20 +15,21 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 import mathutils as mathutils
-
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.blenderUtils.debugUtils as debugUtils
 import BlueHole.blenderUtils.uiUtils as uiUtils
+from BlueHole.blenderUtils.debugUtils import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
 
 show_verbose = True
-
+sort_utils_name = filename = os.path.basename(__file__)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
+
 
 def sort_selected(world_axis, distance, second_world_axis=None, item_amt_per_row=None):
     """
@@ -74,7 +75,7 @@ def sort_selected(world_axis, distance, second_world_axis=None, item_amt_per_row
         elif world_axis == 'Z':
             translation_vector = mathutils.Vector((0, 0, sort_distance))
         else:
-            debugUtils.print_debug_msg('Sort Selected: World Axis is Invalid!', show_verbose)
+            log(Severity.ERROR, 'Sort Selection Tool', 'World Axis is Invalid!')
             return False
 
         # Set translation
@@ -125,11 +126,11 @@ def batch_rename_selected(name, padding):
 
     def no_input_name():
         msg = 'No Input Name was given for objects. Please try again.'
-        uiUtils.show_dialog_box(tool_name, msg)
+        log(Severity.ERROR, sort_utils_name, msg)
 
     def no_selection():
         msg = 'No object was selected for the operation. Select at least one object and try again.'
-        uiUtils.show_dialog_box(tool_name, msg)
+        log(Severity.ERROR, sort_utils_name, msg)
 
     tool_name = 'Batch Rename (Selected)'
 

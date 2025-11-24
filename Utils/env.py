@@ -57,7 +57,7 @@ class Setting:
         if return_value is None:
             msg = 'Could not find value {value} in section {section} in either the current env config file or the ' \
                   'default. Please add missing value to one of those files.'.format(value=value, section=section)
-            uiUtils.show_dialog_box('Blue Hole', msg)
+            log(Severity.ERROR, env_tool_name, msg)
         return return_value
 
     def set_pref_from_ini(self, path: Path):

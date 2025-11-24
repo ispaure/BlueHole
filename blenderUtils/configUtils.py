@@ -18,13 +18,14 @@ import configparser
 
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.uiUtils as uiUtils
+from BlueHole.blenderUtils.debugUtils import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
 
 show_verbose = True
-
+name = filename = os.path.basename(__file__)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -171,7 +172,7 @@ def get_current_env_cfg_value(section, value):
         if return_value is None:
             msg = 'Could not find value {value} in section {section} in either the current env config file or the ' \
                   'default. Please add missing value to one of those files.'.format(value=value, section=section)
-            uiUtils.show_dialog_box('Blue Hole', msg)
+            log(Severity.ERROR, name, msg, popup=True)
         return return_value
 
 

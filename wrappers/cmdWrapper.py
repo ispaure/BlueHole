@@ -20,17 +20,14 @@ from pathlib import Path
 
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
+from BlueHole.blenderUtils.debugUtils import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
+
+cmd_wrapper_name = 'Cmd/Terminal Wrapper'
+
 
 def get_p4_macos_path():
     return str(Path(fileUtils.get_blue_hole_user_addon_path() + '/Lib/p4'))
@@ -63,7 +60,7 @@ def exec_cmd(command):
         decoded_line = line_str.decode()
         cleaned_line = decoded_line.rstrip('\n')  # Remove n from end of line
         cleaned_line = cleaned_line.rstrip('\r')  # Remove r from end of line
-        print_debug_msg(cleaned_line, show_verbose)  # Print line (if debug)
+        # log(Severity.DEBUG, cmd_wrapper_name, f'{cleaned_line}')
         return cleaned_line
 
     # Time out value (in milliseconds)
@@ -78,10 +75,7 @@ def exec_cmd(command):
         # Set permissions for executable in case it will be needed later
         exec_cmd(f'chmod +x "{new_p4_path}"')
 
-    # If debug, print command that was sent
-    print_debug_msg('Initiating Execute Shell Command procedure.', show_verbose)
-    print_debug_msg('Command to send:', show_verbose)
-    print_debug_msg(command, show_verbose)
+    log(Severity.DEBUG, cmd_wrapper_name, f'Sending command: {command}')
 
     # Open subprocess, until all output is received.
     p_open = subprocess.Popen(command,
@@ -128,7 +122,8 @@ def exec_cmd(command):
             break
 
     # If debug, print result
-    print_debug_msg('Output lines:', show_verbose)
+    log(Severity.DEBUG, cmd_wrapper_name, 'Printing Output Lines...')
+    log(Severity.DEBUG, cmd_wrapper_name, output_lines)
 
     # Clean the output lines
     output_lines_cleaned = []

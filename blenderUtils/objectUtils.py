@@ -18,7 +18,7 @@ import mathutils as mathutils
 
 import bpy
 
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
+from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
 import BlueHole.blenderUtils.addon as addon
 
@@ -115,8 +115,7 @@ def add_asset_hierarchy(hierarchy_lst, include_default_mesh, include_selected_ob
     :param include_element_sockets: Should an empty object of type sockets be created in hierarchy
     :type include_element_sockets: bool
     """
-
-    print_debug_msg("Executing \"add_object_hierarchy\" function...", show_verbose)
+    log(Severity.DEBUG, 'Add Asset Hierarchy', 'Executing Add Asset Hierarchy Procedure...')
 
     # Set to Object Mode
     sceneUtils.set_object_mode()

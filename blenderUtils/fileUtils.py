@@ -26,7 +26,7 @@ import ssl
 from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
+from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Utils.env as env
 from typing import *
@@ -385,27 +385,6 @@ def copy_file(source, destination):
     copyfile(source, destination)
 
 
-def download_dropbox_file(url, destination):
-    """
-    Downloads Dropbox file to destination.
-    """
-    print_debug_msg('Downloading from: "' + url + '" to: "' + destination + '".', show_verbose)
-    # Create context
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-
-    # Get file
-    u = urllib.request.urlopen(url, context=ctx)
-    data = u.read()
-    u.close()
-
-    with open(destination, "wb") as f:
-        f.write(data)
-
-    print_debug_msg('Downloaded and saved successfully to disk!', show_verbose)
-
-
 def is_path_valid(path):
     """Determines if path given is valid"""
     if os.path.isdir(path):
@@ -472,7 +451,7 @@ def delete_dir(dir_path, debug_mode=False):
     :return:
     """
     if debug_mode:
-        print_debug_msg('Would have deleted: "{}"'.format(dir_path), show_verbose)
+        log(Severity.DEBUG, 'fileUtils.py', f'Would have deleted: "{dir_path}"')
     else:
         rmtree(dir_path)
 
