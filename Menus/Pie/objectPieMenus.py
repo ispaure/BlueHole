@@ -51,15 +51,11 @@ class MT_pie_object_tool(bpy.types.Menu):
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
         # 2 - BOTTOM
         if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            # Previous option
-            # pie.operator("hops.mirror_gizmo", text="Mirror Gizmo", icon='MOD_MIRROR')
-
-            # New Option Nov 2025: Modifier Toggle
             pie.operator('hops.bool_toggle_viewport', text='Modifier Toggle', icon='QUIT').all_modifiers = True
         else:
             pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
         # 8 - TOP
-        pie.operator("wm.call_menu_pie", text="Modifiers Options...").name = 'PIE_MT_object_tools_more'
+        pie.operator("wm.call_menu_pie", text="Modifiers Options...").name = MT_pie_object_tool_more.bl_idname
         # 7 - TOP - LEFT
         pie.operator("object.modifier_add", text="Weighted Normal", icon='NORMALS_VERTEX_FACE').type = 'WEIGHTED_NORMAL'
         # 9 - TOP - RIGHT

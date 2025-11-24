@@ -50,7 +50,7 @@ class MT_pie_global_help(bpy.types.Menu):
         # 9 - TOP - RIGHT
         pie.operator("wm.bh_help_open_guide", text="Online Guide", icon='HELP')
         # 1 - BOTTOM - LEFT
-        pie.menu(MT_pie_global_theme.bl_idname, text="Themes", icon='IMAGE_RGB')
+        pie.menu(MT_pie_global_theme.bl_idname, text="Themes...", icon='IMAGE_RGB')
         # 3 - BOTTOM - RIGHT
         pie.operator("wm.bh_help_open_pie_menus_list", text="Pie Menus List", icon='URL')
 
@@ -92,7 +92,7 @@ class MT_pie_global_dirs(bpy.types.Menu):
         # 4 - LEFT
         if addon.preference().sourcecontrol.source_control_enable and addon.preference().sourcecontrol.source_control_solution == 'perforce':
             pie.operator("wm.bh_dir_open_workspace_root", text="Open WORKSPACE ROOT Folder", icon='FILEBROWSER')
-        elif os.path.exists(exportUtils2.get_unity_exp_dir_path()):
+        elif exportUtils2.get_unity_exp_dir_path(quiet=True) is not None and os.path.exists(exportUtils2.get_unity_exp_dir_path(quiet=True)):
             pie.operator('wm.bh_dir_open_unity_assets_current_exp_dir', text="Open UNITY ASSETS CURRENT EXPORT Folder", icon='FILEBROWSER')
         elif os.path.exists(addon.preference().environment.sc_path) or os.path.exists(addon.preference().environment.sc_path_alternate) or os.path.exists(addon.preference().environment.sc_path_mac) or os.path.exists(addon.preference().environment.sc_path_mac_alternate):
             pie.operator("wm.bh_dir_open_source_content_root_dir", text="Open SOURCECONTENT ROOT Folder", icon='FILEBROWSER')

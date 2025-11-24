@@ -33,6 +33,7 @@ import BlueHole.Utils.env as env
 class WM_OT_SetActiveEnvironment(bpy.types.Operator):
     bl_idname = "wm.set_active_environment"
     bl_label = "Set the Active Environment"
+    bl_description = 'Set the Active Environment, valid for this Blender session.'
     bl_options = {'INTERNAL'}
 
     env_items_lst = env.get_env_lst_enum_property()

@@ -35,7 +35,7 @@ import bpy
 
 # Import Blue Hole Scripts
 from .blenderUtils import callbacks
-from .Menus import headerMenu
+
 from .wrappers import perforceWrapper as p4Wrapper
 from .blenderUtils import fileUtils as fileUtils
 from .blenderUtils import filterUtils as filterUtils
@@ -69,7 +69,7 @@ bl_info = {"name": "Blue Hole",
            "author": "Marc-André Voyer",
            "description": "",
            "blender": (4, 5, 1),
-           "version": (1, 0, 1),
+           "version": (2, 0, 0),
            "location": "",
            "warning": "",
            "category": "Generic"
@@ -119,13 +119,14 @@ def register():
     for file in menu_file_lst:
         file.register()
 
-    # Register Header Menu
-    headerMenu.register()
-
     # Register Current Env Tools
     env.if_current_env_missing_set_default()  # When a saved environment is no longer available, rever to default
     env_cls = env.get_env_from_prefs_active_env()
     env_cls.set_pref_from_ini()
+
+    # Register Header Menu
+    from .Menus import headerMenu
+    headerMenu.register()
 
     # Register timer to update .ini file if modified in Blender Prefs
     if not hasattr(bpy.app.timers, "_bluehole_timer_registered"):
@@ -142,6 +143,7 @@ def unregister():
     preferences.unregister()
 
     # Unregister Header Menu
+    from .Menus import headerMenu
     headerMenu.unregister()
 
     # Register operators

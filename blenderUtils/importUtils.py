@@ -49,7 +49,7 @@ def import_fbx_obj(import_path):
 def import_default_env_scale_guide(mesh_name):
 
     # Get import path for the mesh
-    import_path = str(Path(fileUtils.get_default_env_msh_guides_path() + '/' + mesh_name))
+    import_path = str(Path(fileUtils.get_default_env_msh_guides_path(), mesh_name))
 
     # import fbx or obj, whatever mesh_name is
     import_fbx_obj(import_path)
