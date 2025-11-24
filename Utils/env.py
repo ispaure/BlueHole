@@ -85,45 +85,44 @@ class Setting:
         # 4. Set the final attribute
         setattr(pref_obj, attrs[-1], val)
 
-    def set_ini_from_pref(self, path: Path, show_verbose=True):
+    def set_ini_from_pref(self, pref_obj, path: Path, show_verbose=False):
         """
         Writes the value from Blender preference to the INI file, preserving your old logic.
         Uses the provided path instead of the default current environment path.
         """
         # 1. Get the current preference dynamically
-        pref_obj = addon.preference()
         for attr in self.pref_path.split(".")[:-1]:
             pref_obj = getattr(pref_obj, attr)
         val = getattr(pref_obj, self.pref_path.split(".")[-1])
-
         # 2. Convert bools to string if needed
         if self.var_type == bool:
             val_str = fileUtils.bool_to_string(val)
         else:
             val_str = str(val)
-
         # 3. Debug message
-        msg = f'Evaluating [{self.ini_section}]: {self.ini_value} which needs to be: {val_str}'
-        print_debug_msg(msg, show_verbose)
-
+        if show_verbose:
+            msg = f'Evaluating [{self.ini_section}]: {self.ini_value} which ultimately should be: {val_str}'
+            log(Severity.DEBUG, env_tool_name, msg)
         # 4. Check if key exists in current environment
         current_val = configUtils.config_section_map(self.ini_section, self.ini_value, str(path))
         default_val = configUtils.config_section_map(self.ini_section, self.ini_value, fileUtils.get_default_env_var_path())
-
         if current_val is None:
             if val_str == default_val:
-                print_debug_msg('Default config already stores same value. Ignore!', show_verbose)
+                if show_verbose:
+                    msg = 'Default config already stores same value. Ignore!'
+                    log(Severity.DEBUG, env_tool_name, msg)
             else:
                 msg = f'Value missing in active env, different from default. Adding to env_variables.ini.'
-                print_debug_msg(msg, show_verbose)
+                log(Severity.WARNING, env_tool_name, msg)
                 configUtils.config_add_variable(self.ini_section, self.ini_value, val_str, str(path))
         else:
             if val_str == current_val:
-                msg = 'Value in env_variables.ini remains unchanged. Skipping.'
-                print_debug_msg(msg, show_verbose)
+                if show_verbose:
+                    msg = 'Value in env_variables.ini remains unchanged. Skipping.'
+                    log(Severity.DEBUG, env_tool_name, msg)
             else:
                 msg = 'Value in env_variables.ini has changed. Updating.'
-                print_debug_msg(msg, show_verbose)
+                log(Severity.WARNING, env_tool_name, msg)
                 configUtils.config_set_variable(self.ini_section, self.ini_value, val_str, path)
 
 
@@ -205,7 +204,7 @@ class Environment:
         # Add Setting Lists
         self.setting_lst += general_setting_lst
         self.setting_lst += environment_setting_lst
-        self.setting_lst = source_control_setting_lst
+        self.setting_lst += source_control_setting_lst
 
         # Add user Workspace Settings (1 to 15)
         for i in range(1, 16):
@@ -234,9 +233,10 @@ class Environment:
         for setting in self.setting_lst:
             setting.set_pref_from_ini(self.env_variables_path)
 
-    def set_ini_from_pref(self):
+    def set_ini_from_pref(self, pref_obj):
+        # TODO: Optimize this by caching the env_variables.ini / configparser so it doesn't read the file like 50 times in the loop
         for setting in self.setting_lst:
-            setting.set_ini_from_pref(self.env_variables_path)
+            setting.set_ini_from_pref(pref_obj, self.env_variables_path)
 
     def __delete_dir(self):
         fileUtils.delete_dir(self.path)

@@ -66,6 +66,7 @@ def config_section_map(section, value, cfg_file_path):
         return None
 
 
+# TODO: Optimize batching of checks; create class where it only re-triggers file read when I want, so it can get through testing many fields much more quickly.
 def config_add_variable(section, variable, value, cfg_file_path):
     """
     Expects variable to not be there already.

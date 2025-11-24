@@ -378,12 +378,12 @@ classes = (MT_pie_sculpt_tool,
 
 
 def register():
+    log(Severity.DEBUG, name, 'Registering')
     for cls in classes:
-        log(Severity.DEBUG, name, 'Registering')
         bpy.utils.register_class(cls)
 
 
 def unregister():
+    log(Severity.DEBUG, name, 'Unregistering')
     for cls in classes:
-        log(Severity.DEBUG, name, 'Unregistering')
         bpy.utils.unregister_class(cls)
