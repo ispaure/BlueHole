@@ -30,6 +30,9 @@ except ImportError:
         raise install_error
 # ----------------------------------------------------------------------------------------------------------------------
 
+# Import bpy
+import bpy
+
 # Import Blue Hole Scripts
 from .blenderUtils import callbacks
 from .Menus import headerMenu
@@ -125,6 +128,11 @@ def register():
     env_cls = env.get_env_from_prefs_active_env()
     env_cls.set_pref_from_ini()
 
+    # Register timer to update .ini file if modified in Blender Prefs
+    if not hasattr(bpy.app.timers, "_bluehole_timer_registered"):
+        bpy.app.timers.register(update_env_timer, persistent=True)
+        bpy.app.timers._bluehole_timer_registered = True
+
 
 # Unregister
 def unregister():
@@ -144,3 +152,42 @@ def unregister():
     # Register menus
     for file in menu_file_lst:
         file.unregister()
+
+    # Unregister timer
+    bpy.app.timers.unregister(update_env_timer)
+    if hasattr(bpy.app.timers, "_bluehole_timer_registered"):
+        del bpy.app.timers._bluehole_timer_registered
+
+
+def update_env_timer():
+    """
+    Every set interval whilst the preferences are opened, fields from Blue Hole are compared to the Active Environment's
+    env_variables.ini. If changes are detected, the .ini file is overwritten with the changes.
+    """
+
+    interval = 0.25
+    prefs = bpy.context.preferences
+    addon = prefs.addons.get(__package__)
+    if addon is None:
+        return interval  # addon not loaded
+
+    addon_prefs = addon.preferences
+    if addon_prefs is None:
+        return interval  # should not happen
+
+    # Only run if Add-ons section is active
+    if prefs.active_section != 'ADDONS':
+        return interval
+
+    # Check if the panel was drawn recently
+    visible = getattr(addon_prefs, "_prefs_visible", False)
+    # Reset for next timer run
+    addon_prefs._prefs_visible = False
+    if not visible:
+        return interval  # skip logic if panel not drawn
+
+    # Safe to run expensive logic
+    env_cls = env.get_env_from_prefs_active_env()
+    env_cls.set_ini_from_pref(addon_prefs)
+
+    return interval

@@ -39,6 +39,7 @@ env_preferences = {}
 class BlueHole(AddonPreferences):
     bl_idname = 'BlueHole'
     print(__package__)
+    _prefs_visible = False
 
     settings: EnumProperty(
         name = 'Settings',
@@ -60,11 +61,7 @@ class BlueHole(AddonPreferences):
             c3_prod: PointerProperty(type=value)
 
     def draw(self, context):
-        # layout = self.layout
-        # layout.label(text="This is a preferences view for our add-on")
-        # layout.prop(self, "filepath")
-        # layout.prop(self, "number")
-        # layout.prop(self, "boolean")
+        BlueHole._prefs_visible = True
         layout = self.layout
 
         # Set Active Environment
@@ -91,10 +88,6 @@ class BlueHole(AddonPreferences):
 
         box = column.box()
         globals()[self.settings.lower()].draw(self, context, box)
-
-        # Keep trying to update the preference file
-        env_cls = env.get_env_from_prefs_active_env()
-        env_cls.set_ini_from_pref()
 
 
 classes = (general.bc,  # Need to make sure sub bc are before others
