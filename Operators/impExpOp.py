@@ -40,7 +40,7 @@ class ExportAllHierarchiesToUE(bpy.types.Operator):
 
     def execute(self, context):
         msg = 'Do you really want to export *ALL* Asset Hierarchies? Press OK to confirm.'
-        state = uiUtils.show_dialog_box('Unreal Export', msg)
+        state = uiUtils.show_prompt('Unreal Export', msg)
         if state:
             exportUtils2.export_asset_hierarchies(selected_only=False,
                                                   preset='Unreal',

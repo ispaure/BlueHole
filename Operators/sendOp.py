@@ -33,7 +33,7 @@ class SendAllHierarchiesToUnity(bpy.types.Operator):
     def execute(self, context):
         # exportUtils.exp_obj_hierarchies_unity(selected_only=False)
         msg = 'Do you really want to send *ALL* Asset Hierarchies to Unity? Press OK to confirm.'
-        state = uiUtils.show_dialog_box('Unity Export', msg)
+        state = uiUtils.show_prompt('Unity Export', msg)
         if state:
             exportUtils2.export_asset_hierarchies(selected_only=False,
                                                   preset='Unity',
@@ -63,7 +63,7 @@ class SendAllHierarchiesToUnreal(bpy.types.Operator):
     def execute(self, context):
         # exportUtils.exp_obj_hierarchies_unreal(selected_only=False, trigger_import_cmd=True)
         msg = 'Do you really want to send *ALL* Asset Hierarchies to Unreal? Press OK to confirm.'
-        state = uiUtils.show_dialog_box('Unreal Export', msg)
+        state = uiUtils.show_prompt('Unreal Export', msg)
         if state:
             exportUtils2.export_asset_hierarchies(selected_only=False,
                                                   preset='Unreal',
@@ -78,7 +78,6 @@ class SendSelectedHierarchiesToUnreal(bpy.types.Operator):
     bl_description = 'Sends selected asset hierarchies to Unreal'
 
     def execute(self, context):
-        # exportUtils.exp_obj_hierarchies_unreal(selected_only=True, trigger_import_cmd=True)
         exportUtils2.export_asset_hierarchies(selected_only=True,
                                               preset='Unreal',
                                               is_send=True,

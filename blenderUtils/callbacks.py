@@ -34,18 +34,19 @@ def load_pre_handler(scene):
 @persistent
 def load_post_handler(scene):
     print("Event: load_post")
-    scUtils.sc_check_blend(silent_mode=True)  # Checks status with perforce and prompt to get latest, checkout, etc.
+    scUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
 
 
 @persistent
 def save_pre_handler(scene):
+    scUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
     print("Event: save_pre")
 
 
 @persistent
 def save_post_handler(scene):
     print("Event: save_post")
-    scUtils.sc_check_blend(silent_mode=True)  # Checks status with perforce and prompt to get latest, checkout, etc.
+
 
 
 class OBJECT_OT_dummy(bpy.types.Operator):

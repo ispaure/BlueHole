@@ -22,27 +22,18 @@ from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-show_verbose = True
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
-
-debugUtils.print_debug_msg('Loading Header Menu...', show_verbose)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
 # MENUS
+
+bh_name = 'Blue Hole'
 
 
 # Header Blue Hole Menu
 class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
-    bl_label = 'BlueHole2' + ' [' + str(addon.preference().environment.active_environment.lower()) + ']'
+    bl_label = f'{bh_name} [' + str(addon.preference().environment.active_environment.lower()) + ']'
 
     def draw(self, context):
         # import BlueHole.__init__
-        self.bl_label = 'BlueHole2' + ' [' + str(addon.preference().environment.active_environment.lower()) + ']'
+        self.bl_label = f'{bh_name} [' + str(addon.preference().environment.active_environment.lower()) + ']'
         layout = self.layout
         layout.operator('wm.set_active_environment')
         layout.menu("BLUE_HOLE_MT_help", icon='HELP')
@@ -112,8 +103,3 @@ def unregister():
     bpy.types.TOPBAR_MT_editor_menus.remove(BLUE_HOLE_MT_top_menu.menu_draw)
     for cls in classes:
         bpy.utils.unregister_class(cls)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# End of File Debug Message
-debugUtils.print_debug_msg('Header Menu Loaded!', show_verbose)

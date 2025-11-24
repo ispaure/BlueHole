@@ -21,11 +21,10 @@ from pathlib import Path
 import bpy
 
 import BlueHole.blenderUtils.sourceControlUtils as scUtils
-from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
+from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
 import BlueHole.blenderUtils.objectUtils as oUtils
 import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.blenderUtils.uiUtils import show_dialog_box as show_dialog_box
 import BlueHole.envUtils.projectUtils as projectUtils
 import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
@@ -45,7 +44,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-ah_tool_name = 'Asset Hierarchy Exporter'
+ah_tool_name = 'Asset Hierarchy Exporter (V2)'
 
 
 class ExportSettings:
@@ -126,7 +125,8 @@ def batch_export_selection(exp_dir, exp_format='FBX'):
     # Assign Export File Paths per Object
     exp_cont_cls_lst = []
     for sel_obj in sel_obj_lst:
-        print_debug_msg('Creating Container Class for object named: ' + oUtils.get_obj_name(sel_obj), show_verbose)
+        msg = f'Creating Container Class for object named: "{oUtils.get_obj_name(sel_obj)}"'
+        log(Severity.DEBUG, ah_tool_name, msg)
         exp_cont = ExportContainer()
         exp_cont.root = sel_obj
         exp_cont.name = oUtils.get_obj_name(sel_obj)
@@ -608,7 +608,8 @@ def export_containers(exp_cont_cls_lst, exp_set_cls, is_unity=False):
     """
     Export Containers (Asset Hierarchies, Individual Objects, etc.) to disk. And connect to Source Control if required
     """
-    print_debug_msg('Initiating Export Containers Procedure...', show_verbose)
+    msg = 'Initiating Export Containers Procedure...'
+    log(Severity.INFO, ah_tool_name, msg)
 
     # If not asked to skip Source Control, Continue
     if not exp_set_cls.skip_sc:
@@ -620,12 +621,18 @@ def export_containers(exp_cont_cls_lst, exp_set_cls, is_unity=False):
 
         # Attempt to Open Files for Edit
         if not scUtils.sc_open_edit_file_path_lst(exp_file_path_lst):
+            msg = 'There were errors checking out files'
             if addon.preference().sourcecontrol.source_control_error_aborts_exp:
-                print_debug_msg('There were errors checking out files; Aborting!', show_verbose)
+                msg += ' - Aborting!'
+                log(Severity.ERROR, ah_tool_name, msg)
                 return False
+            else:
+                msg += ' - Proceeding regardless!'
+                log(Severity.WARNING, ah_tool_name, msg)
 
     # PREPARE SELECTION STATE FOR EXPORT
-    print_debug_msg('Preparing Selection State for Exports (Unselect All)', show_verbose)
+    msg = 'Preparing Selection State for Exports (Unselect All)'
+    log(Severity.DEBUG, ah_tool_name, msg)
     view_layer = bpy.context.view_layer
     obj_active = view_layer.objects.active
     # Set to Object Mode
@@ -635,8 +642,8 @@ def export_containers(exp_cont_cls_lst, exp_set_cls, is_unity=False):
 
     # Batch Export Containers
     for exp_cont_cls in exp_cont_cls_lst:
-        msg = 'Initiating Export Container Procedure: {container_name}'
-        print_debug_msg(msg.format(container_name=exp_cont_cls.name), show_verbose)
+        msg = f'Initiating Export Container Procedure: {exp_cont_cls.name}'
+        log(Severity.DEBUG, ah_tool_name, msg)
 
         # Rename Render, Collision, Socket objects
         if exp_cont_cls.render_obj is not None:
@@ -644,19 +651,19 @@ def export_containers(exp_cont_cls_lst, exp_set_cls, is_unity=False):
             exp_cont_cls.render_obj.name = addon.preference().environment.asset_hierarchy_empty_object_meshes
             exp_cont_cls.render_obj.name = addon.preference().environment.asset_hierarchy_empty_object_meshes
             exp_cont_cls.render_obj.name = addon.preference().environment.asset_hierarchy_empty_object_meshes
-            print(exp_cont_cls.render_obj.name)
+            log(Severity.DEBUG, ah_tool_name, f'Render OBJ Name: "{exp_cont_cls.render_obj.name}"')
         if exp_cont_cls.collision_obj is not None:
             # Have to do three times for this to work... IDK Why. But it works?
             exp_cont_cls.collision_obj.name = addon.preference().environment.asset_hierarchy_empty_object_collisions
             exp_cont_cls.collision_obj.name = addon.preference().environment.asset_hierarchy_empty_object_collisions
             exp_cont_cls.collision_obj.name = addon.preference().environment.asset_hierarchy_empty_object_collisions
-            print(exp_cont_cls.collision_obj.name)
+            log(Severity.DEBUG, ah_tool_name, f'Collision OBJ Name: "{exp_cont_cls.collision_obj.name}"')
         if exp_cont_cls.socket_obj is not None:
             # Have to do three times for this to work... IDK Why. But it works?
             exp_cont_cls.socket_obj.name = addon.preference().environment.asset_hierarchy_empty_object_sockets
             exp_cont_cls.socket_obj.name = addon.preference().environment.asset_hierarchy_empty_object_sockets
             exp_cont_cls.socket_obj.name = addon.preference().environment.asset_hierarchy_empty_object_sockets
-            print(exp_cont_cls.socket_obj.name)
+            log(Severity.DEBUG, ah_tool_name, f'Socket OBJ Name: "{exp_cont_cls.socket_obj.name}"')
 
         # Store visibility of objects
         obj_visib_lst = []
@@ -750,7 +757,7 @@ def display_error_code_1_dialog():
           ''.format(addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh,
                     addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh_kit,
                     addon.preference().environment.asset_hierarchy_struct_prefix_skeletal_mesh)
-    show_dialog_box(ah_tool_name, msg)
+    show_prompt(ah_tool_name, msg)
 
 
 def display_error_code_2_dialog(req_exp_type, req_exp_name, exp_root_name):
@@ -765,7 +772,7 @@ def display_error_code_2_dialog(req_exp_type, req_exp_name, exp_root_name):
           '\n-The simplest solution is to create ' \
           'a new Asset Hierarchy from scratch using the tool in the Blue Hole Header Menu.' \
           '\n\nAborting export!'.format(req_exp_type=req_exp_type, req_exp_name=req_exp_name, exp_root=exp_root_name)
-    show_dialog_box(ah_tool_name, msg)
+    show_prompt(ah_tool_name, msg)
 
 
 def display_error_code_3_dialog(required_exp, exp_root_name):
@@ -773,7 +780,7 @@ def display_error_code_3_dialog(required_exp, exp_root_name):
           'more than once. This can happen because of the trailing numbers Blender creates (.001, .002). ' \
           'Please fix this issue.' \
           '\n\nAborting export!'.format(required_exp=required_exp, exp_root=exp_root_name)
-    show_dialog_box(ah_tool_name, msg)
+    show_prompt(ah_tool_name, msg)
 
 
 def display_error_code_4_dialog(exp_root, child):
@@ -782,7 +789,7 @@ def display_error_code_4_dialog(exp_root, child):
     msg = 'The object named {child_name} under the Asset Hierarchy "{exp_root_name}" is not of type Empty Object.' \
           ' Please move it within one of the Asset Hierarchy\'s required Export Element(s) -- or at least within ' \
           'an Empty Object. \n\nAborting export!'.format(exp_root_name=exp_root_name, child_name=child_name)
-    show_dialog_box(ah_tool_name, msg)
+    show_prompt(ah_tool_name, msg)
 
 
 def display_error_code_7_dialog():
@@ -790,7 +797,7 @@ def display_error_code_7_dialog():
           'the Active Environment\'s settings. If you are unsure what is wrong, try using the Send All ' \
           'Asset Hierarchies option. You may get more insight.' \
           '\n\nAborting export!'
-    show_dialog_box(ah_tool_name, msg)
+    show_prompt(ah_tool_name, msg)
 
 
 def display_error_doc():
