@@ -32,6 +32,7 @@ import BlueHole.envUtils.envUtils2 as envUtils2
 from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Utils.env as env
+from typing import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -424,7 +425,7 @@ def is_file_path_valid(path):
         return False
 
 
-def copy_dir(source_dir, destination_dir):
+def copy_dir(source_dir: Union[str, Path], destination_dir: Union[str, Path]):
     """
     Copies a directory (incl. its underlying hierarchy from source to destination
     :param source_dir: Source Directory
@@ -432,6 +433,13 @@ def copy_dir(source_dir, destination_dir):
     :param destination_dir: Destination Directory
     :type destination_dir: str
     """
+
+    # Ensure type is str before doing copytree, else it'll fail
+    if isinstance(source_dir, Path):
+        source_dir = str(source_dir)
+    if isinstance(destination_dir, Path):
+        destination_dir = str(destination_dir)
+
     copy_tree(source_dir, destination_dir)
 
 
