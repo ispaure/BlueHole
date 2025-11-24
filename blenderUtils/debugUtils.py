@@ -79,12 +79,16 @@ class DebugLogger:
 
         skip_char = ' ' if timestamp else ''
 
-        popup_title = f"{timestamp}{skip_char}[{severity.value}] {title}"
+        # If popup to user, should be written (in case popup doesn't appear, which itself is an error)
+        if popup:
+            popup_txt = ' POPUP'
+        else:
+            popup_txt = ''
 
         if '\n' not in message:
-            full_message_for_print = f"{timestamp}{skip_char}[{severity.value}] {title}: {message}"
+            full_message_for_print = f"{timestamp}{skip_char}[{severity.value}{popup_txt}] {title}: {message}"
         else:
-            full_message = (f"{timestamp}{skip_char}[{severity.value}] {title}\n"
+            full_message = (f"{timestamp}{skip_char}[{severity.value}{popup_txt}] {title}\n"
                             f"{message}")
             # line skips always put text a bit further on line
             num_spaces = len(timestamp) + len(f'{severity.value}') + 3 + len(skip_char)
