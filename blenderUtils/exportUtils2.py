@@ -32,7 +32,6 @@ import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.blenderUtils.sendUnreal as sendUnreal
 import BlueHole.blenderUtils.configUtils as configUtils
-import BlueHole.envUtils.envUtils2 as envUtils2
 import BlueHole.Utils.env as env
 from typing import *
 

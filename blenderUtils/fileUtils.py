@@ -26,9 +26,6 @@ import ssl
 from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree
-
-import BlueHole.envUtils.envUtils as envUtils
-import BlueHole.envUtils.envUtils2 as envUtils2
 from BlueHole.blenderUtils.debugUtils import print_debug_msg as print_debug_msg
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Utils.env as env
