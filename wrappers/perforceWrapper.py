@@ -70,8 +70,14 @@ class P4Info:
         info_array = cmdWrapper.exec_cmd('p4 info')
 
         # If could not get info, set status to False
-        if "Perforce client error" in info_array[0] or "is not recognized" in info_array[0]:
+        if "Perforce client error" in info_array[0]:
             self.status = False
+            P4ErrorMessage().info_perforce_client_error()
+            return
+
+        if "is not recognized" in info_array[0]:
+            self.status = False
+            P4ErrorMessage().info_not_recognized()
             return
 
         # Create directory from the output of p4 info
@@ -80,21 +86,18 @@ class P4Info:
 
             # If client unknown, perforce connection has not been set properly. Warn user!
             if 'Client unknown.' in item:
-                P4ErrorMessage().info_default_connection()
                 self.status = False
+                P4ErrorMessage().info_default_connection()
                 return
 
             if 'Permission denied' in item:
+                self.status = False
                 p4_macos_path = cmdWrapper.get_p4_macos_path()
                 P4ErrorMessage().info_mac_p4_cmd_missing(p4_macos_path)
                 return
 
             item_split = item.split(": ")
             p4_info_dict[item_split[0]] = item_split[1]
-
-        print('Printing info array')
-        for item in info_array:
-            print(item)
 
         # Assign the dictionary keys to the values
         self.status = True
@@ -116,7 +119,7 @@ class P4Info:
             P4ErrorMessage(silent).info_server_cannot_connect()
             return False
         else:
-            P4LogMessage().log_server_accessible()
+            P4LogMessage().info_log_server_accessible()
             return True
 
     def display_info_window(self):
@@ -173,10 +176,14 @@ class P4File:
         self.actionOwner = None
         self.workRev = None
 
-    def update_fields(self, f_stat_dict=None):
+    def update_fields(self, f_stat_dict=None) -> bool:
         # If no dict is given for the refresh, fetch info.
         if f_stat_dict is None:
-            f_stat_dict = p4_fstat_dict(self.clientFile)[0]
+            f_stat_dict = p4_fstat_dict(self.clientFile)
+            if f_stat_dict is not None:
+                f_stat_dict = f_stat_dict[0]  # There was no error, get the first (only) item to process.
+            else:
+                return False  # There was an error, return False as could not process properly.
 
         self.depotFile = self.key_else_default(f_stat_dict, 'depotFile')
         self.clientFile = self.key_else_default(f_stat_dict, 'clientFile')
@@ -213,6 +220,9 @@ class P4File:
 
         # Deduce the simple current status of the file
         self.status = self.get_status()
+
+        # Completed successfully
+        return True
 
     def get_display_name(self):
         # Prefer clientFile as a display name, else use depotFile as fallback. One of the two is guaranteed available.
@@ -382,24 +392,28 @@ class P4File:
         msg = ('P4File.open_for_edit: Running single-file open_for_edit, which is costly to run in a loop. Please only use for explicit checkout'
                'requiring user interaction. For batch checkout, use P4FileGroup.open_for_edit instead as it is more optimized!')
         log(Severity.WARNING, tool_name, msg)
-        
-        # Update fields
-        self.update_fields()
 
-        # Perform Checks before Proceeding
+        # Perforce Server accessible Check
         p4_info_cls = P4Info()
         if not p4_info_cls.is_server_accessible(silent):
             return False
-        elif not self.is_client_file_under_workspace_root(p4_info_cls, silent):
+        elif not self.is_client_file_under_workspace_root(p4_info_cls, silent=True):
             P4ErrorMessage(silent).not_under_ws_root_elaborate(p4_info_cls)
             return False
-        elif not self.is_in_client_view(silent):
+        
+        # Update fields
+        result = self.update_fields()
+        if not result:  # Fields didn't properly get set
+            return False
+
+        # Perform other checks before checkout
+        elif not self.is_in_client_view(silent=True):
             P4ErrorMessage(silent).not_in_client_view_elaborate(p4_info_cls)
             return False
-        elif not self.is_free_from_other_checkouts(silent):
+        elif not self.is_free_from_other_checkouts(silent=True):
             P4ErrorMessage(silent).not_free_from_other_checkouts_elaborate()
             return False
-        elif not self.is_not_marked_for_delete(silent):
+        elif not self.is_not_marked_for_delete(silent=True):
             P4ErrorMessage(silent).marked_for_delete_elaborate()
             return False
 
@@ -433,8 +447,10 @@ class P4File:
                 if not result:
                     return False
 
-        # If got here with no issue, completed successfully
-        self.update_fields()
+        # Update fields
+        result = self.update_fields()
+        if not result:  # Fields didn't properly get set
+            return False
 
         # If not checked out or marked for add, did not succeed
         if self.status not in [P4FileStatus.MARKED_FOR_ADD, P4FileStatus.CHECKOUT_BY_ME]:
@@ -522,6 +538,8 @@ class P4FileGroup:
 
             # Inquire and get results as a lst of dicts
             result_dicts_lst = p4_fstat_dict(file_path_string)
+            if not result_dicts_lst:
+                return False  # There was an error fetching the dict
 
             for result_dict in result_dicts_lst:
                 result_client_file = result_dict['clientFile']
@@ -540,12 +558,16 @@ class P4FileGroup:
 
             # Inquire and get results as a lst of dicts
             result_dicts_lst = p4_fstat_dict(file_path_string)
+            if not result_dicts_lst:
+                return False  # There was an error fetching the dict
 
             for result_dict in result_dicts_lst:
                 result_depot_file = result_dict['depotFile']
                 target_p4_file = file_path_with_depot_file_dict[result_depot_file]
                 target_p4_file.update_fields(result_dict)
+
         # Completed
+        return True
 
     def force_get_latest(self):
         self.__run_p4_cmd_on_p4_file_lst(command='p4 sync -f')
@@ -611,15 +633,19 @@ class P4FileGroup:
         Accurate method of opening files for edit (Get latest if needed, only checks out if not checked out yet, warning if someone else has the file, etc.)
         """
 
-        # Update Fields
-        self.update_fields()
-
-        # Perform Checks before Proceeding
+        # Check Perforce server is accessible
         p4_info_cls = P4Info()
         if not p4_info_cls.is_server_accessible():
             return False
         if not self.is_client_file_under_workspace_root(p4_info_cls):
             return False
+
+        # Update fields
+        result = self.update_fields()
+        if not result:  # Fields didn't properly get set
+            return False
+
+        # Perform Checks before Proceeding
         if not self.is_in_client_view(p4_info_cls):
             return False
         if not self.is_free_from_other_checkouts():
@@ -639,8 +665,12 @@ class P4FileGroup:
                                                           P4FileStatus.MARKED_FOR_ADD,
                                                           P4FileStatus.CHECKOUT_BY_ME])
 
+        # Update fields
+        result = self.update_fields()
+        if not result:  # Fields didn't properly get set
+            return False
+
         # If got here with no issue, completed successfully
-        self.update_fields()
         return True
 
     def is_client_file_under_workspace_root(self, p4_info_cls: P4Info) -> bool:
@@ -729,7 +759,7 @@ class P4FileGroup:
         return file_str_lst
 
 
-def p4_fstat_dict(file_path_string, silent_mode=False):
+def p4_fstat_dict(file_path_string, silent_mode=False) -> Optional[List[Dict[str, str]]]:
     """
     Get p4 fstat results, cleaned as an array of dicts (1 dict per item)
     """
@@ -749,8 +779,8 @@ def p4_fstat_dict(file_path_string, silent_mode=False):
         if 'Your session has expired, please login again' in i:
             if not silent_mode:
                 msg = 'Your session has expired. Please login again from Perforce. Aborting!'
-                log(Severity.CRITICAL, tool_name, msg, popup=True)
-            return False
+                log(Severity.ERROR, tool_name, msg, popup=True)
+            return None
         elif ' - no such file(s).' in i:
             result_dict = {'clientFile': i.replace(' - no such file(s).', '')}
             result_dicts_lst.append(result_dict)
@@ -812,8 +842,8 @@ def source_control_disabled_dialog():
     """
     Dialog box warns the user source control is currently disabled in Blue Hole preferences.
     """
-    message = 'Source Control is currently disabled in the Blue Hole Add-ons settings. Enable it and try again!'
-    log(Severity.ERROR, tool_name, message)
+    message = 'Disregarding Source Control stuff: Source Control is disabled in the Blue Hole addon settings.'
+    log(Severity.DEBUG, tool_name, message)
 
 
 def dialog_box_p4_info():
@@ -1008,7 +1038,7 @@ class P4LogMessage:
         log(Severity.DEBUG, tool_name, msg)
 
     # DEBUG LOGS (NEVER Popup)
-    def log_server_accessible(self):
+    def info_log_server_accessible(self):
         msg = 'Perforce Server is Accessible!'
         self.log(msg)
 
@@ -1048,6 +1078,14 @@ class P4ErrorMessage:
                'Aborting Perforce Scripts!')
         self.log_error(msg)
 
+    def info_perforce_client_error(self):
+        msg = 'Perforce has client error. See log for details.'
+        self.log_error(msg)
+
+    def info_not_recognized(self):
+        msg = 'Perforce not recognized. Is Perforce Visual Client Installed? See log for details.'
+        self.log_error(msg)
+
     def info_mac_p4_cmd_missing(self, exec_pth):
         msg = ('Perforce permission denied. If on macOS, launch executable here once by right-clicking and selecting '
                '"Open": {}. If that does not work (ex. file opens in TextEdit), you will need to open a terminal '
@@ -1063,13 +1101,14 @@ class P4ErrorMessage:
         self.log_error(msg)
 
     def not_under_ws_root_elaborate(self, p4_info_cls: P4Info):
-        msg = (f'You cannot send Perforce commands for some file(s) because they are not under your current'
-               f'workspace tree. Workspace name: "{p4_info_cls.client_name}", Workspace root: '
-               f'"{p4_info_cls.client_root}" See logs for details. \n\n'
-               'Please solve in an appropriate manner. Suggestions:\n'
+        msg = (f'You cannot send Perforce commands for some file(s) because they are not under your current '
+               f'workspace tree.\n\n'
+               f'Workspace name: "{p4_info_cls.client_name}"\n'
+               f'Workspace root: "{p4_info_cls.client_root}"\n\n'
+               'Suggestions on how to fix:\n'
                'A) Move designated file(s) under your current workspace tree.\n'
-               'B) Set corresponding workspace in Perforce Environment Settings.\n'
-               'Attempt to send Perforce Command again afterwards.')
+               'B) If the workspace tree is wrong, check your Perforce Environment Settings.\n'
+               'See log for further details.')
         self.log_error(msg)
 
     def not_in_client_view(self, name):
