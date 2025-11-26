@@ -255,7 +255,10 @@ def check_tests(script_name,
 
     # Attempt to get valid source content path
     bh_prefs_cls = env.BlueHolePrefs()
-    sc_path = bh_prefs_cls.get_valid_sc_dir_path()
+    if check_source_content_root_path_exist or check_blend_in_source_content:
+        sc_path = bh_prefs_cls.get_valid_sc_dir_path()
+    else:
+        sc_path = None
 
     # Check Source Content Root Path Exists
     if check_source_content_root_path_exist:
