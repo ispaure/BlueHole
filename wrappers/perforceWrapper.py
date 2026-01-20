@@ -300,7 +300,19 @@ class P4File:
     def is_client_file_under_workspace_root(self, p4_info_cls: P4Info, silent: bool = False):
         if self.clientFile is not None:
             normalized_client_root = str(Path(p4_info_cls.client_root))  # Sometime it outputs with / or not, so normalize here.
-            if self.clientFile.startswith(f'{normalized_client_root}{fileUtils.get_os_split_char()}'):
+
+            # If on Windows, should test in lowercase (not be case-sensitive)
+            if filterUtils.filter_platform('win'):
+                client_file_str = self.clientFile.lower()
+                client_root_str = normalized_client_root.lower()
+            elif filterUtils.filter_platform('mac'):
+                client_file_str = self.clientFile
+                client_root_str = normalized_client_root
+            else:
+                log(Severity.CRITICAL, tool_name, 'Unsupported Platform')
+                return
+
+            if client_file_str.startswith(f'{client_root_str}{fileUtils.get_os_split_char()}'):
                 P4LogMessage().under_ws_root(self.get_display_name())
                 return True
         P4ErrorMessage(silent).not_under_ws_root(self.get_display_name())
