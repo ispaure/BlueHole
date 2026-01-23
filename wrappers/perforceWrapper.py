@@ -537,49 +537,68 @@ class P4FileGroup:
                     P4CriticalMessage().p4_file_client_or_depot_path_required(group=True)
         return p4_file_dict
 
-    def update_fields(self):
-        # Update fields for p4_file with clientFile
-        file_path_with_client_file_dict = self.get_p4_file_with_client_file_dict()
-        file_path_string_lst = self.append_lst_to_string_max_length(file_path_with_client_file_dict.keys(), ' ', 1000, quotation_marks=True)
-        call_counter = 0
-        for file_path_string in file_path_string_lst:
-            # Print number of call executed, to give progress feedback...
-            call_counter += 1
-            log(Severity.DEBUG, tool_name,
-                'Issuing Call (from clientFile) #' + str(call_counter) + ' of ' + str(len(file_path_string_lst)))
+    def update_fields_client_n_depot(self):
+        """
+        Create dictionary of clientFile & depotFile and update fields and match.
+        """
 
-            # Inquire and get results as a lst of dicts
-            result_dicts_lst = p4_fstat_dict(file_path_string)
-            if not result_dicts_lst:
-                return False  # There was an error fetching the dict
+        # Update fields for Dict [clientFile (str), P4File]
+        client_file_p4_file_dict = self.get_p4_file_with_client_file_dict()
+        if not self.update_fields_by_matching_key('clientFile', client_file_p4_file_dict):
+            return False
 
-            for result_dict in result_dicts_lst:
-                result_client_file = result_dict['clientFile']
-                target_p4_file = file_path_with_client_file_dict[result_client_file]
-                target_p4_file.update_fields(result_dict)
-
-        # Alternatively, Update fields for p4_file with depotFile (and no clientFile)
-        file_path_with_depot_file_dict = self.get_p4_file_with_depot_file_and_no_client_file()
-        file_path_string_lst = self.append_lst_to_string_max_length(file_path_with_depot_file_dict.keys(), ' ', 1000, quotation_marks=True)
-        call_counter = 0
-        for file_path_string in file_path_string_lst:
-            # Print number of call executed, to give progress feedback...
-            call_counter += 1
-            log(Severity.DEBUG, tool_name,
-                'Issuing Call (from depotFile) #' + str(call_counter) + ' of ' + str(len(file_path_string_lst)))
-
-            # Inquire and get results as a lst of dicts
-            result_dicts_lst = p4_fstat_dict(file_path_string)
-            if not result_dicts_lst:
-                return False  # There was an error fetching the dict
-
-            for result_dict in result_dicts_lst:
-                result_depot_file = result_dict['depotFile']
-                target_p4_file = file_path_with_depot_file_dict[result_depot_file]
-                target_p4_file.update_fields(result_dict)
+        # Update fields for Dict [depotFile (str), P4File]
+        depot_file_p4_file_dict = self.get_p4_file_with_depot_file_and_no_client_file()
+        if not self.update_fields_by_matching_key('depotFile', depot_file_p4_file_dict):
+            return False
 
         # Completed
         return True
+
+    def update_fields_by_matching_key(self, fstat_key: str, p4_file_dict: Dict[str, P4File]):
+        """
+        Batch operation. Updates the fields of a dictionary of P4 Files, where the key is either clientFile or
+        depotFile. A fstat_key parameter is given, saying what's the key (clientFile or depotFile)
+        """
+        if fstat_key not in ['depotFile', 'clientFile']:
+            log(Severity.CRITICAL, tool_name, 'Update fields by matching key: fstat_key is invalid')
+            return False
+
+        file_path_string_lst = self.append_lst_to_string_max_length(p4_file_dict.keys(), ' ', 1000, quotation_marks=True)
+        call_counter = 0
+        for file_path_string in file_path_string_lst:
+            # Print number of call executed, to give progress feedback...
+            call_counter += 1
+            log(Severity.DEBUG, tool_name, f'Issuing Call (from {fstat_key}) # {call_counter} of {len(file_path_string_lst)}')
+
+            # Inquire and get results as a lst of dicts
+            result_dicts_lst = p4_fstat_dict(file_path_string)
+            if not result_dicts_lst:
+                return False  # There was an error fetching the dict
+
+            for result_dict in result_dicts_lst:
+                result_match_key = result_dict[fstat_key]
+                match_p4_file: Optional[P4File] = None
+
+                # If on Windows and cannot find key, attempt by ignoring case. Other platform YOLO it that way too.
+                if result_match_key not in p4_file_dict.keys():
+                    result_match_key_lower = result_match_key.lower()
+                    for original_key in p4_file_dict.keys():
+                        original_key_lower = original_key.lower()
+                        if original_key_lower == result_match_key_lower:
+                            match_p4_file = p4_file_dict[original_key]
+                            break
+                else:
+                    match_p4_file = p4_file_dict[result_match_key]
+
+                if match_p4_file is not None:
+                    match_p4_file.update_fields(result_dict)
+                else:
+                    msg = f'Could not match key {fstat_key} {result_match_key} to a P4File!'
+                    log(Severity.ERROR, tool_name, msg)
+                    return False
+
+        return True  # Worked properly for all
 
     def force_get_latest(self):
         self.__run_p4_cmd_on_p4_file_lst(command='p4 sync -f')
@@ -653,7 +672,7 @@ class P4FileGroup:
             return False
 
         # Update fields
-        result = self.update_fields()
+        result = self.update_fields_client_n_depot()
         if not result:  # Fields didn't properly get set
             return False
 
@@ -678,7 +697,7 @@ class P4FileGroup:
                                                           P4FileStatus.CHECKOUT_BY_ME])
 
         # Update fields
-        result = self.update_fields()
+        result = self.update_fields_client_n_depot()
         if not result:  # Fields didn't properly get set
             return False
 
@@ -830,7 +849,7 @@ def get_p4_file_group_from_depot_file_lst(depot_file_lst: List[str]) -> P4FileGr
     p4_file_group = P4FileGroup()
     for file_path in depot_file_lst:
         p4_file_group.append_p4_file_to_group_from_depot_file(file_path)
-    p4_file_group.update_fields()  # Batch operation, very efficient in perforce calls
+    p4_file_group.update_fields_client_n_depot()  # Batch operation, very efficient in perforce calls
 
     return p4_file_group
 
@@ -844,7 +863,7 @@ def get_p4_file_group_from_client_file_lst(client_file_lst: List[str]) -> P4File
     p4_file_group = P4FileGroup()
     for file_path in client_file_lst:
         p4_file_group.append_p4_file_to_group_from_client_file(file_path)
-    p4_file_group.update_fields()  # Batch operation, very efficient in perforce calls
+    p4_file_group.update_fields_client_n_depot()  # Batch operation, very efficient in perforce calls
 
     return p4_file_group
 
