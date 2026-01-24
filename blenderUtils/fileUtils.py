@@ -170,7 +170,7 @@ def get_addons_path():
     Get directory path where all add-ons are located.
     :rtype: str
     """
-    addons_path = Path(get_resource_path_user() + "/scripts/addons")
+    addons_path = Path(get_resource_path_user(), 'scripts', 'addons')
     return str(addons_path)
 
 
@@ -178,7 +178,7 @@ def get_extensions_path():
     return Path(get_resource_path_user(), 'extensions')
 
 
-def get_blue_hole_user_addon_path():
+def get_blue_hole_user_addon_path() -> Optional[str]:
     """
     Get directory path of Blue Hole Addon in %AppData%
     :rtype: str
@@ -201,28 +201,28 @@ def get_blue_hole_user_addon_path():
     return str(blue_hole_addon_path)
 
 
-def get_bh_url_db_file_path():
+def get_bh_url_db_file_path() -> str:
     """
     Returns the url database file path, which contains URLs for Blue Hole website, doc and tutorials.
     """
-    return str(get_blue_hole_user_addon_path() + '/url_database.ini')
+    return str(Path(get_blue_hole_user_addon_path(), 'url_database.ini'))
 
 
-def get_blue_hole_themes_path():
+def get_blue_hole_themes_path() -> str:
     """
     Get directory path of Blue Hole Themes
     :rtype: str
     """
-    themes_path = Path(get_blue_hole_user_addon_path() + '/UI/themes/')
+    themes_path = Path(get_blue_hole_user_addon_path(), 'UI', 'themes')
     return str(themes_path)
 
 
-def get_blue_hole_localization_file_path():
-    localization_file_path = Path(get_blue_hole_user_addon_path() + '/Localization/localization.csv')
+def get_blue_hole_localization_file_path() -> str:
+    localization_file_path = Path(get_blue_hole_user_addon_path(), 'Localization', 'localization.csv')
     return str(localization_file_path)
 
 
-def get_blue_hole_user_env_files_path():
+def get_blue_hole_user_env_files_path() -> Path:
     """
     Get the environments path in Blue Hole (AppData)
     :rtype: str
@@ -230,12 +230,12 @@ def get_blue_hole_user_env_files_path():
     return Path(get_blue_hole_user_addon_path(), 'envFiles')
 
 
-def get_blue_hole_local_env_files_path():
+def get_blue_hole_local_env_files_path() -> str:
     """
     Get the environments path in Blue Hole (Blender install dir)
     :rtype: str
     """
-    env_path = Path(get_resource_path_local() + '/BlueHoleLocalEnv')
+    env_path = Path(get_resource_path_local(), 'BlueHoleLocalEnv')
     return str(env_path)
 
 
