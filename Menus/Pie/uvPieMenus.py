@@ -72,7 +72,7 @@ class MT_pie_UV_tool(bpy.types.Menu):
         # 6 - RIGHT
         zenuvPieButton.relax(pie)
         # 2 - BOTTOM
-        zenuvPieButton.zen_unwrap(pie)
+        blenderPieButton.uv_unwrap_conformal(pie)
         # 8 - TOP
         zenuvPieButton.quick_rotate(pie)
         # 7 - TOP - LEFT
@@ -155,7 +155,7 @@ class MT_pie_UV_action_uvspecial(bpy.types.Menu):
         # 6 - RIGHT
         zenuvPieButton.world_orient(pie)
         # 2 - BOTTOM
-        zenuvPieButton.zen_unwrap(pie)
+        blenderPieButton.uv_unwrap_conformal(pie)
         # 8 - TOP
         zenuvPieButton.select_trim_tool(pie)
         # 7 - TOP - LEFT
@@ -183,7 +183,7 @@ class MT_pie_mesh_action_uvspecial(bpy.types.Menu):
         # 6 - RIGHT
         blenderPieButton.mark_seam(pie)
         # 2 - BOTTOM
-        zenuvPieButton.zen_unwrap(pie)
+        blenderPieButton.uv_unwrap_conformal(pie)
         # 8 - TOP
         dreamuvPieButton.hotspotter(pie)
         # 7 - TOP - LEFT

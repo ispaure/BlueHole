@@ -74,3 +74,9 @@ def uv_cube_project(pie):
 
 def uv_split_island(pie):
     pie.operator('uv.select_split', text='Split Island', icon='MOD_PHYSICS')
+
+
+def uv_unwrap_conformal(pie):
+    op = pie.operator('uv.unwrap', text='Unwrap Conformal', icon='UV')
+    op.method = 'CONFORMAL'
+    # more settings link: https://docs.blender.org/api/current/bpy.ops.uv.html
