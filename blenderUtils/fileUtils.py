@@ -84,14 +84,8 @@ def get_blend_file_name():
     Returns the currently opened blend file name (excl. extension)
     :rtype: str
     """
-    if sys.platform == "win32":
-        split_lst = str(get_blend_file_path()).split('\\')[-1].split('.')[:-1]
-    else:
-        split_lst = str(get_blend_file_path()).split('/')[-1].split('.')[:-1]
-    total_path = ''
-    for element in split_lst:
-        total_path += (str(element))
-    return total_path
+    path_path = Path(get_blend_file_path())
+    return path_path.stem
 
 
 def get_blend_directory_path():
