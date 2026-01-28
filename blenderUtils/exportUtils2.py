@@ -757,7 +757,7 @@ def display_error_code_1_dialog():
           ''.format(addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh,
                     addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh_kit,
                     addon.preference().environment.asset_hierarchy_struct_prefix_skeletal_mesh)
-    show_prompt(ah_tool_name, msg)
+    log(Severity.ERROR, ah_tool_name, msg, popup=True)
 
 
 def display_error_code_2_dialog(req_exp_type, req_exp_name, exp_root_name):
@@ -772,7 +772,7 @@ def display_error_code_2_dialog(req_exp_type, req_exp_name, exp_root_name):
           '\n-The simplest solution is to create ' \
           'a new Asset Hierarchy from scratch using the tool in the Blue Hole Header Menu.' \
           '\n\nAborting export!'.format(req_exp_type=req_exp_type, req_exp_name=req_exp_name, exp_root=exp_root_name)
-    show_prompt(ah_tool_name, msg)
+    log(Severity.ERROR, ah_tool_name, msg, popup=True)
 
 
 def display_error_code_3_dialog(required_exp, exp_root_name):
@@ -780,7 +780,7 @@ def display_error_code_3_dialog(required_exp, exp_root_name):
           'more than once. This can happen because of the trailing numbers Blender creates (.001, .002). ' \
           'Please fix this issue.' \
           '\n\nAborting export!'.format(required_exp=required_exp, exp_root=exp_root_name)
-    show_prompt(ah_tool_name, msg)
+    log(Severity.ERROR, ah_tool_name, msg, popup=True)
 
 
 def display_error_code_4_dialog(exp_root, child):
@@ -789,7 +789,7 @@ def display_error_code_4_dialog(exp_root, child):
     msg = 'The object named {child_name} under the Asset Hierarchy "{exp_root_name}" is not of type Empty Object.' \
           ' Please move it within one of the Asset Hierarchy\'s required Export Element(s) -- or at least within ' \
           'an Empty Object. \n\nAborting export!'.format(exp_root_name=exp_root_name, child_name=child_name)
-    show_prompt(ah_tool_name, msg)
+    log(Severity.ERROR, ah_tool_name, msg, popup=True)
 
 
 def display_error_code_7_dialog():
@@ -797,7 +797,7 @@ def display_error_code_7_dialog():
           'the Active Environment\'s settings. If you are unsure what is wrong, try using the Send All ' \
           'Asset Hierarchies option. You may get more insight.' \
           '\n\nAborting export!'
-    show_prompt(ah_tool_name, msg)
+    log(Severity.ERROR, ah_tool_name, msg, popup=True)
 
 
 def display_error_doc():
