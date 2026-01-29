@@ -18,7 +18,8 @@ __status__ = 'Production'
 
 import bpy
 import BlueHole.blenderUtils.objectUtils as objectUtils
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
+from BlueHole.blenderUtils.exportSettings import *
+import BlueHole.blenderUtils.exportHierarchy as exportHierarchy
 import BlueHole.blenderUtils.addon as addon
 import BlueHole.envUtils.projectExport as projectExport
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
@@ -42,10 +43,11 @@ class ExportAllHierarchiesToUE(bpy.types.Operator):
         msg = 'Do you really want to export *ALL* Asset Hierarchies? Press OK to confirm.'
         state = uiUtils.show_prompt('Unreal Export', msg)
         if state:
-            exportUtils2.export_asset_hierarchies(selected_only=False,
-                                                  preset='Unreal',
-                                                  is_send=False,
-                                                  skip_sc=False)
+            # Get Unreal Export Profile
+            export_settings = export_settings_dict[ExportSettingsPreset.UNREAL]
+            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies.set_hierarchies_from_scene()
+            asset_hierarchies.export(send=False, skip_sc=False)
         return {'FINISHED'}
 
 
@@ -56,10 +58,11 @@ class ExportSelectHierarchiesToUE(bpy.types.Operator):
     bl_description = 'Exports selected hierarchies created with the "Add Asset Hierarchy" tool in FINAL Folder'
 
     def execute(self, context):
-        exportUtils2.export_asset_hierarchies(selected_only=True,
-                                              preset='Unreal',
-                                              is_send=False,
-                                              skip_sc=False)
+        # Get Unreal Export Profile
+        export_settings = export_settings_dict[ExportSettingsPreset.UNREAL]
+        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies.set_hierarchies_from_selection()
+        asset_hierarchies.export(send=False, skip_sc=False)
         return {'FINISHED'}
 
 
@@ -288,7 +291,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
                     result_hierarchy_name = ''
                     for key, value in self.hierarchy_types.items():
                         if key in self.asset_type:
-                            result_hierarchy_name += exportUtils2.get_hierarchy_prefix_lst()[value]
+                            result_hierarchy_name += exportHierarchy.get_hierarchy_prefix_lst()[value]
                     result_hierarchy_name += self.asset_name
                     result_hierarchy_name += '_' + str(format(item, '02'))
                     result_hierarchy_lst.append(result_hierarchy_name)
@@ -296,7 +299,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
                 result_hierarchy_name = ''
                 for key, value in self.hierarchy_types.items():
                     if key in self.asset_type:
-                        result_hierarchy_name += exportUtils2.get_hierarchy_prefix_lst()[value]
+                        result_hierarchy_name += exportHierarchy.get_hierarchy_prefix_lst()[value]
                 result_hierarchy_name += self.asset_name
                 result_hierarchy_name += '_' + str(format(self.version_suffix, '02'))
                 if len(self.version_suffix_letter) > 0:

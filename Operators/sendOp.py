@@ -17,7 +17,8 @@ __status__ = 'Production'
 
 
 import bpy
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
+from BlueHole.blenderUtils.exportSettings import *
+import BlueHole.blenderUtils.exportHierarchy as exportHierarchy
 import BlueHole.blenderUtils.uiUtils as uiUtils
 
 
@@ -35,10 +36,11 @@ class SendAllHierarchiesToUnity(bpy.types.Operator):
         msg = 'Do you really want to send *ALL* Asset Hierarchies to Unity? Press OK to confirm.'
         state = uiUtils.show_prompt('Unity Export', msg)
         if state:
-            exportUtils2.export_asset_hierarchies(selected_only=False,
-                                                  preset='Unity',
-                                                  is_send=True,
-                                                  skip_sc=False)
+            # Get Unity Export Profile
+            export_settings = export_settings_dict[ExportSettingsPreset.UNITY]
+            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies.set_hierarchies_from_scene()
+            asset_hierarchies.export(send=True, skip_sc=False)
         return {'FINISHED'}
 
 
@@ -48,10 +50,11 @@ class SendSelectedHierarchiesToUnity(bpy.types.Operator):
     bl_description = 'Sends selected asset hierarchies to Unity'
 
     def execute(self, context):
-        exportUtils2.export_asset_hierarchies(selected_only=True,
-                                              preset='Unity',
-                                              is_send=True,
-                                              skip_sc=False)
+        # Get Unity Export Profile
+        export_settings = export_settings_dict[ExportSettingsPreset.UNITY]
+        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies.set_hierarchies_from_selection()
+        asset_hierarchies.export(send=True, skip_sc=False)
         return {'FINISHED'}
 
 
@@ -65,10 +68,11 @@ class SendAllHierarchiesToUnreal(bpy.types.Operator):
         msg = 'Do you really want to send *ALL* Asset Hierarchies to Unreal? Press OK to confirm.'
         state = uiUtils.show_prompt('Unreal Export', msg)
         if state:
-            exportUtils2.export_asset_hierarchies(selected_only=False,
-                                                  preset='Unreal',
-                                                  is_send=True,
-                                                  skip_sc=False)
+            # Get Unreal Export Profile
+            export_settings = export_settings_dict[ExportSettingsPreset.UNREAL]
+            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies.set_hierarchies_from_scene()
+            asset_hierarchies.export(send=True, skip_sc=False)
         return {'FINISHED'}
 
 
@@ -78,10 +82,11 @@ class SendSelectedHierarchiesToUnreal(bpy.types.Operator):
     bl_description = 'Sends selected asset hierarchies to Unreal'
 
     def execute(self, context):
-        exportUtils2.export_asset_hierarchies(selected_only=True,
-                                              preset='Unreal',
-                                              is_send=True,
-                                              skip_sc=False)
+        # Get Unreal Export Profile
+        export_settings = export_settings_dict[ExportSettingsPreset.UNREAL]
+        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies.set_hierarchies_from_selection()
+        asset_hierarchies.export(send=True, skip_sc=False)
         return {'FINISHED'}
 
 

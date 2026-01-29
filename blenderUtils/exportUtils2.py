@@ -421,40 +421,7 @@ def get_ah_root_lst(ah_prefix_lst, sel):
     return exp_root_lst
 
 
-def get_unity_exp_dir_path(quiet: bool = False) -> Optional[Path]:
-    # EXPORT OPTIONS
-    # Export Format
 
-    # Determine Export Directory
-    blend_dir_path = fileUtils.get_blend_directory_path()
-
-    # Blue Hole Prefs Class
-    bh_prefs_cls = env.BlueHolePrefs()
-
-    # Get sc path
-    sc_path = bh_prefs_cls.get_valid_sc_dir_path(quiet)
-    if not sc_path:
-        return None
-    else:
-        sc_path_str = str(sc_path)
-
-    # Get unity assets path
-    unity_asset_path = bh_prefs_cls.get_valid_unity_asset_dir_path(quiet)
-    if not unity_asset_path:
-        return None
-    else:
-        unity_asset_path_str = str(unity_asset_path)
-
-    # Ensure most chances of swap
-    sc_path_str = sc_path_str.replace('\\', '/')
-    unity_asset_path_str = unity_asset_path_str.replace('\\', '/')
-    blend_dir_path = blend_dir_path.replace('\\', '/')
-
-    # Swap
-    exp_dir = blend_dir_path.replace(sc_path_str, unity_asset_path_str)
-
-    # Normalize Path for OS
-    return Path(exp_dir)
 
 
 def get_unity_asset_hierarchy_exp_set_cls():
@@ -502,7 +469,7 @@ def get_unreal_asset_hierarchy_exp_set_cls():
     # Export Format
     exp_set_cls.exp_format = 'FBX'
     # Determine Export Directory
-    exp_set_cls.exp_dir = projectUtils.get_project_sub_dir('path_final')
+    exp_set_cls.exp_dir = str(projectUtils.get_project_sub_dir('path_final'))
     # Zero Root Transform
     exp_set_cls.zero_root_transform = addon.preference().general.ue_bridge_zero_root_transform
 
@@ -548,7 +515,7 @@ def get_bridge_asset_hierarchy_exp_set_cls(preset_exp_set_dict):
     if 'Export Directory' in preset_exp_set_dict.keys():
         exp_set_cls.exp_dir = preset_exp_set_dict['Export Directory']
     else:
-        exp_set_cls.exp_dir = projectUtils.get_project_sub_dir('path_resources')
+        exp_set_cls.exp_dir = str(projectUtils.get_project_sub_dir('path_resources'))
 
     # Zero Root Transform
     # Not supported because exporting multiple hierarchies in one file << This is total bs, adding it if key provided
@@ -631,14 +598,7 @@ def export_containers(exp_cont_cls_lst, exp_set_cls, is_unity=False):
                 log(Severity.WARNING, ah_tool_name, msg)
 
     # PREPARE SELECTION STATE FOR EXPORT
-    msg = 'Preparing Selection State for Exports (Unselect All)'
-    log(Severity.DEBUG, ah_tool_name, msg)
-    view_layer = bpy.context.view_layer
-    obj_active = view_layer.objects.active
-    # Set to Object Mode
-    sceneUtils.set_object_mode()
-    # Unselect everything
-    sceneUtils.deselect_all()
+
 
     # Batch Export Containers
     for exp_cont_cls in exp_cont_cls_lst:
@@ -802,13 +762,3 @@ def display_error_code_7_dialog():
 
 def display_error_doc():
     fileUtils.open_url(configUtils.get_url_db_value('Tutorial', 'asset_hierarchy_exporter_errors'))
-
-
-def get_hierarchy_prefix_lst():
-    """
-    Returns list of hierarchy prefix
-    """
-    prefix_lst = [addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh,
-                  addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh_kit,
-                  addon.preference().environment.asset_hierarchy_struct_prefix_skeletal_mesh]
-    return prefix_lst
