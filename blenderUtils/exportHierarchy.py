@@ -183,7 +183,7 @@ class AssetHierarchy:
         view_layer.objects.active = self.root
 
         # Create Directory if it doesn't exist already
-        self.path.mkdir(parents=True, exist_ok=True)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
 
         # Export scene to FBX
         bpy.ops.export_scene.fbx(filepath=str(self.path),
@@ -252,7 +252,7 @@ class AssetHierarchy:
         first_mesh_name = self.get_first_mesh_name()
         counter = 1
         for coll_obj in coll_obj_lst:
-            coll_obj.name = f'UCX_{first_mesh_name}_{format(counter, '03')}'
+            coll_obj.name = f'UCX_{first_mesh_name}_{format(counter, "03")}'
             counter += 1
 
     def get_first_mesh_name(self) -> str:

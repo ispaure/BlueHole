@@ -52,6 +52,7 @@ class Severity(enum.Enum):
 
 
 class BlueHoleException(Exception):
+    pass
 
 
 class DebugLogger:

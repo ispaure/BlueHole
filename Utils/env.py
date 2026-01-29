@@ -317,21 +317,21 @@ class BlueHolePrefs:
         if len(path_str) == 0 or path_str.startswith('<'):
             msg = (f'{path_def} Path "{path_str}" is undefined. It is required for the bridges to game '
                    f'engines. Navigate to Blender Blue Hole settings and define a Source Content Path.')
-            log(Severity.ERROR, env_tool_name, msg, popup=not quiet)
+            log(Severity.CRITICAL, env_tool_name, msg, popup=not quiet)
             return None
 
         # Validate the path exists
         if not os.path.exists(path_str):
             msg = (f'{path_def} Path "{path_str}" does not correspond to a valid path on disk. '
                    f'Navigate to Blender Blue Hole settings and define a valid Source Content Path.')
-            log(Severity.ERROR, env_tool_name, msg, popup=not quiet)
+            log(Severity.CRITICAL, env_tool_name, msg, popup=not quiet)
             return None
 
         # Validate the path is not pointing to a file
         if os.path.isfile(path_str):
             msg = (f'{path_def} Path "{path_str}" points to a file, not a directory. Navigate to '
                    f'Blender Blue Hole settings and define a Source Content Path that points to a directory.')
-            log(Severity.ERROR, env_tool_name, msg, popup=not quiet)
+            log(Severity.CRITICAL, env_tool_name, msg, popup=not quiet)
             return None
 
         # Passed the Checks -- Return the Path!
@@ -349,7 +349,7 @@ class BlueHolePrefs:
                                       addon.preference().environment.sc_path_mac_alternate]
         else:
             msg_os = 'Invalid OS! Blue Hole only supports Windows & macOS at the moment.'
-            log(Severity.ERROR, env_tool_name, msg_os)
+            log(Severity.CRITICAL, env_tool_name, msg_os)
             return None
 
         # Attempt to get the source content path from the available options
@@ -361,7 +361,7 @@ class BlueHolePrefs:
         # If got here without able to return, no path was valid
         error_msg = (f'Unable to find a valid {path_def} Path in Blue Hole settings, which is required for the '
                      'bridges to game engines. See log for more details.')
-        log(Severity.ERROR, env_tool_name, error_msg, popup=not quiet)
+        log(Severity.CRITICAL, env_tool_name, error_msg, popup=not quiet)
         return None
 
     def get_valid_unity_asset_dir_path(self, quiet: bool = False) -> Optional[Path]:
@@ -374,7 +374,7 @@ class BlueHolePrefs:
             unity_asset_path = addon.preference().general.unity_assets_path_mac
         else:
             msg_os = 'Invalid OS! Blue Hole only supports Windows & macOS at the moment.'
-            log(Severity.ERROR, env_tool_name, msg_os)
+            log(Severity.CRITICAL, env_tool_name, msg_os)
             return None
 
         # Attempt to get the unity asset path from the available options
@@ -385,7 +385,7 @@ class BlueHolePrefs:
         # If got here without able to return, no path was valid
         error_msg = (f'Unable to find a valid {path_def} Path in Blue Hole settings, which is required for the '
                      'bridge to Unity. See log for more details.')
-        log(Severity.ERROR, env_tool_name, error_msg, popup=quiet)
+        log(Severity.CRITICAL, env_tool_name, error_msg, popup=quiet)
         return None
 
 

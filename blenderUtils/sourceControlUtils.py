@@ -40,7 +40,7 @@ def sc_open_edit_file_path_lst(file_path_lst):
         if addon.preference().sourcecontrol.source_control_solution == 'perforce':
             p4_file_grp_cls = p4Wrapper.P4FileGroup()
             for file_path in file_path_lst:
-                p4_file_grp_cls.append_p4_file_to_group_from_client_file(file_path)
+                p4_file_grp_cls.append_p4_file_to_group_from_client_file(str(file_path))
             result = p4_file_grp_cls.open_for_edit()
             return result
         elif addon.preference().sourcecontrol.source_control_solution == 'plastic-scm':

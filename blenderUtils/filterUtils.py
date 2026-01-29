@@ -113,18 +113,18 @@ def check_tests(script_name,
     def dialog_check_blend_exist():
         if silent_mode is False:
             msg = 'Cannot execute script because Blender file is not saved on disk. Save Blender scene and try again.'
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_selection_not_empty():
         if silent_mode is False:
             msg = 'Cannot execute script because selection is empty. Select at least one element and try again.'
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_source_control_enable():
         if silent_mode is False:
             msg = 'Cannot execute script because Source Control is currently disabled in the Blue Hole Add-ons ' \
                   'settings. Enable it and try again.'
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_source_control_connection():
         if not silent_mode:
@@ -178,7 +178,7 @@ def check_tests(script_name,
                       '1. Open the Blender Preferences (Edit -> Preferences).\n' \
                       '2. Add-ons -> Blue Hole -> Source Control\n' \
                       '3. Fill out the three fields (Server, User, Workspace)'
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_blend_location_in_dir_structure():
         if silent_mode is False:
@@ -187,19 +187,19 @@ def check_tests(script_name,
                   'file and try again.'
             specified_sub_folder = addon.preference().environment.sc_dir_struct_scenes
             msg = msg.format(sub_folder=specified_sub_folder)
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_source_content(path):
         msg = 'The Source Content Root Path specified in the Active Environment\'s preferences could ' \
               'not be reached: "{path}". Please create said directory or edit the Active Environment\'s preferences ' \
               'to point to an existing folder.'.format(path=str(path))
-        log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_unity_assets(path):
         msg = 'The Unity Project\'s Assets Path specified in the Active Environment\'s preferences could ' \
               'not be reached: "{}". Please create said directory or edit the Active Environment\'s preferences ' \
               'to point to an existing Unity Assets folder. Example: "C:\\YourUnityProject\\Assets\\"'.format(str(path))
-        log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_blend(sc_path_seek, blend_path_found):
         msg = 'The opened Blender scene file is not located within the Source Content directory path specified in ' \
@@ -209,12 +209,12 @@ def check_tests(script_name,
               'Source Content Root Path to the Unity Project\'s Assets Path. Please move your Blender file or edit ' \
               'the Source Content Root Path in the Active Environment\'s ' \
               'preferences.'.format(sc_path=sc_path_seek, blend_path=blend_path_found)
-        log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     # Check if Blend exists
     if check_blend_exist:
         if len(fileUtils.get_blend_file_path()) == 0:
-            log(Severity.ERROR, script_name, 'Check Blend Exist Failed')
+            log(Severity.CRITICAL, script_name, 'Check Blend Exist Failed')
             dialog_check_blend_exist()
             return False
         log(Severity.DEBUG, script_name, 'Check Blend Exist Succeeded!')
@@ -223,7 +223,7 @@ def check_tests(script_name,
     if check_blend_loc_in_dir_structure:
         check_result = check_blend_location_in_dir_structure()
         if not check_result:
-            log(Severity.ERROR, script_name, 'Check Blend Location in Directory Structure Failed')
+            log(Severity.CRITICAL, script_name, 'Check Blend Location in Directory Structure Failed')
             dialog_check_blend_location_in_dir_structure()
             return False
         log(Severity.DEBUG, script_name, 'Check Blend Location in Directory Structure Succeeded')
@@ -231,7 +231,7 @@ def check_tests(script_name,
     # Check if selection is not empty
     if check_selection_not_empty:
         if len(objectUtils.get_selection()) == 0:
-            log(Severity.ERROR, script_name, 'Check Selection not Empty Failed')
+            log(Severity.CRITICAL, script_name, 'Check Selection not Empty Failed')
             dialog_check_selection_not_empty()
             return False
         log(Severity.DEBUG, script_name, 'Check Selection not Empty Succeeded')
@@ -239,7 +239,7 @@ def check_tests(script_name,
     # Check if source control is enabled
     if check_source_control_enable:
         if not filter_source_control():
-            log(Severity.ERROR, script_name, 'Check Source Control Enabled: Failed')
+            log(Severity.CRITICAL, script_name, 'Check Source Control Enabled: Failed')
             dialog_source_control_enable()
             return False
         log(Severity.DEBUG, script_name, 'Check Source Control Enabled: Succeeded')
@@ -248,7 +248,7 @@ def check_tests(script_name,
     if check_source_control_connection:
         p4_info_cls = p4Wrapper.P4Info()
         if p4_info_cls.status is False:
-            log(Severity.ERROR, script_name, 'Check Source Control Connection: Failed')
+            log(Severity.CRITICAL, script_name, 'Check Source Control Connection: Failed')
             dialog_source_control_connection()
             return False
         log(Severity.DEBUG, script_name, 'Check Source Control: Succeeded')

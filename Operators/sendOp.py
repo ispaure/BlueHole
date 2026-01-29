@@ -37,7 +37,7 @@ class SendAllHierarchiesToUnity(bpy.types.Operator):
         state = uiUtils.show_prompt('Unity Export', msg)
         if state:
             # Get Unity Export Profile
-            export_settings = export_settings_dict[ExportSettingsPreset.UNITY]
+            export_settings = get_export_settings(ExportSettingsPreset.UNITY)
             asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
             asset_hierarchies.set_hierarchies_from_scene()
             asset_hierarchies.export(send=True, skip_sc=False)
@@ -51,7 +51,7 @@ class SendSelectedHierarchiesToUnity(bpy.types.Operator):
 
     def execute(self, context):
         # Get Unity Export Profile
-        export_settings = export_settings_dict[ExportSettingsPreset.UNITY]
+        export_settings = get_export_settings(ExportSettingsPreset.UNITY)
         asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
         asset_hierarchies.set_hierarchies_from_selection()
         asset_hierarchies.export(send=True, skip_sc=False)
@@ -69,7 +69,7 @@ class SendAllHierarchiesToUnreal(bpy.types.Operator):
         state = uiUtils.show_prompt('Unreal Export', msg)
         if state:
             # Get Unreal Export Profile
-            export_settings = export_settings_dict[ExportSettingsPreset.UNREAL]
+            export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
             asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
             asset_hierarchies.set_hierarchies_from_scene()
             asset_hierarchies.export(send=True, skip_sc=False)
@@ -83,7 +83,7 @@ class SendSelectedHierarchiesToUnreal(bpy.types.Operator):
 
     def execute(self, context):
         # Get Unreal Export Profile
-        export_settings = export_settings_dict[ExportSettingsPreset.UNREAL]
+        export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
         asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
         asset_hierarchies.set_hierarchies_from_selection()
         asset_hierarchies.export(send=True, skip_sc=False)

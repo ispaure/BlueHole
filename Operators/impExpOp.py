@@ -44,7 +44,7 @@ class ExportAllHierarchiesToUE(bpy.types.Operator):
         state = uiUtils.show_prompt('Unreal Export', msg)
         if state:
             # Get Unreal Export Profile
-            export_settings = export_settings_dict[ExportSettingsPreset.UNREAL]
+            export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
             asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
             asset_hierarchies.set_hierarchies_from_scene()
             asset_hierarchies.export(send=False, skip_sc=False)
@@ -59,7 +59,7 @@ class ExportSelectHierarchiesToUE(bpy.types.Operator):
 
     def execute(self, context):
         # Get Unreal Export Profile
-        export_settings = export_settings_dict[ExportSettingsPreset.UNREAL]
+        export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
         asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
         asset_hierarchies.set_hierarchies_from_selection()
         asset_hierarchies.export(send=False, skip_sc=False)
