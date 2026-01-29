@@ -108,51 +108,57 @@ class ExportSettingsFactory:
         return export_set_cls
 
 
-export_settings_dict: Dict[ExportSettingsPreset, ExportSettings] = {
+def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
+    """
+    Made this a get, because we need to get the correct settings at that specific point and not at initial plugin init.
+    """
+    match preset:
+        case ExportSettingsPreset.UNITY:
+            preset = ExportSettings(
+                # EXPORT OPTIONS
+                exp_format="FBX",
+                exp_dir=get_unity_exp_dir_path(),
+                zero_root_transform=addon.preference().general.unity_bridge_zero_root_transform,
 
-    # UNITY EXPORT SETTINGS
-    ExportSettingsPreset.UNITY: ExportSettings(
-        # EXPORT OPTIONS
-        exp_format="FBX",
-        exp_dir=get_unity_exp_dir_path(),
-        zero_root_transform=addon.preference().general.unity_bridge_zero_root_transform,
+                # INCLUDED ELEMENTS
+                include_render=addon.preference().environment.create_element_render,
+                include_collision=addon.preference().environment.create_element_collision,
+                include_socket=addon.preference().environment.create_element_sockets,
 
-        # INCLUDED ELEMENTS
-        include_render=addon.preference().environment.create_element_render,
-        include_collision=addon.preference().environment.create_element_collision,
-        include_socket=addon.preference().environment.create_element_sockets,
+                # FBX SPECIFIC OPTIONS
+                axis_up=addon.preference().general.unity_up_axis,
+                axis_fwd=addon.preference().general.unity_forward_axis,
+                mesh_smooth_type="OFF",
+                bake_anim=addon.preference().general.unity_bridge_include_animation,
+                apply_scale_options="FBX_SCALE_UNITS",
+                rename_collisions_for_ue=False,
 
-        # FBX SPECIFIC OPTIONS
-        axis_up=addon.preference().general.unity_up_axis,
-        axis_fwd=addon.preference().general.unity_forward_axis,
-        mesh_smooth_type="OFF",
-        bake_anim=addon.preference().general.unity_bridge_include_animation,
-        apply_scale_options="FBX_SCALE_UNITS",
-        rename_collisions_for_ue=False,
+                # ENGINE
+                engine=Engine.UNITY)
 
-        # ENGINE
-        engine=Engine.UNITY),
+        case ExportSettingsPreset.UNREAL:
+            preset = ExportSettings(
+                # EXPORT OPTIONS
+                exp_format="FBX",
+                exp_dir=projectUtils.get_project_sub_dir("path_final"),
+                zero_root_transform=addon.preference().general.ue_bridge_zero_root_transform,
 
-    # UNREAL EXPORT SETTINGS
-    ExportSettingsPreset.UNREAL: ExportSettings(
-        # EXPORT OPTIONS
-        exp_format="FBX",
-        exp_dir=projectUtils.get_project_sub_dir("path_final"),
-        zero_root_transform=addon.preference().general.ue_bridge_zero_root_transform,
+                # INCLUDED ELEMENTS
+                include_render=addon.preference().environment.create_element_render,
+                include_collision=addon.preference().environment.create_element_collision,
+                include_socket=addon.preference().environment.create_element_sockets,
 
-        # INCLUDED ELEMENTS
-        include_render=addon.preference().environment.create_element_render,
-        include_collision=addon.preference().environment.create_element_collision,
-        include_socket=addon.preference().environment.create_element_sockets,
+                # FBX SPECIFIC OPTIONS
+                axis_up="Z",
+                axis_fwd="-Y",
+                mesh_smooth_type="OFF",
+                bake_anim=addon.preference().general.ue_bridge_include_animation,
+                apply_scale_options="FBX_SCALE_NONE",
+                rename_collisions_for_ue=True,
 
-        # FBX SPECIFIC OPTIONS
-        axis_up="Z",
-        axis_fwd="-Y",
-        mesh_smooth_type="OFF",
-        bake_anim=addon.preference().general.ue_bridge_include_animation,
-        apply_scale_options="FBX_SCALE_NONE",
-        rename_collisions_for_ue=True,
+                # ENGINE
+                engine=Engine.UNREAL)
+        case _:
+            log(Severity.CRITICAL, 'ExportSettingsPreset', 'Requested invalid ExportSettingsPreset')
 
-        # ENGINE
-        engine=Engine.UNREAL)
-}
+    return preset
