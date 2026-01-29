@@ -23,7 +23,6 @@ import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Lib.send2ue.dependencies.remote_execution as remote_execution
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
 import BlueHole.Utils.env as env
 
 

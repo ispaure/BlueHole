@@ -15,7 +15,7 @@ __status__ = 'Production'
 import bpy
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.addon as addon
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
+import BlueHole.blenderUtils.exportUnity as exportUnity
 import os
 
 
@@ -92,7 +92,7 @@ class MT_pie_global_dirs(bpy.types.Menu):
         # 4 - LEFT
         if addon.preference().sourcecontrol.source_control_enable and addon.preference().sourcecontrol.source_control_solution == 'perforce':
             pie.operator("wm.bh_dir_open_workspace_root", text="Open WORKSPACE ROOT Folder", icon='FILEBROWSER')
-        elif exportUtils2.get_unity_exp_dir_path(quiet=True) is not None and os.path.exists(exportUtils2.get_unity_exp_dir_path(quiet=True)):
+        elif exportUnity.get_unity_exp_dir_path(quiet=True) is not None and os.path.exists(str(exportUnity.get_unity_exp_dir_path(quiet=True))):
             pie.operator('wm.bh_dir_open_unity_assets_current_exp_dir', text="Open UNITY ASSETS CURRENT EXPORT Folder", icon='FILEBROWSER')
         elif os.path.exists(addon.preference().environment.sc_path) or os.path.exists(addon.preference().environment.sc_path_alternate) or os.path.exists(addon.preference().environment.sc_path_mac) or os.path.exists(addon.preference().environment.sc_path_mac_alternate):
             pie.operator("wm.bh_dir_open_source_content_root_dir", text="Open SOURCECONTENT ROOT Folder", icon='FILEBROWSER')

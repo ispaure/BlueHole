@@ -20,8 +20,8 @@ import bpy
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.envUtils.projectOpenDirectory as envOpenDirectory
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
+import BlueHole.blenderUtils.exportUnity as exportUnity
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.addon as addon
 import BlueHole.Utils.env as env
@@ -160,9 +160,9 @@ class OpenUnityAssetsCurrentExportPath(bpy.types.Operator):
         if not result:
             return False
         else:
-            unity_exp_dir_path = exportUtils2.get_unity_exp_dir_path()
+            unity_exp_dir_path = exportUnity.get_unity_exp_dir_path()
             if unity_exp_dir_path:
-                fileUtils.open_dir_path(unity_exp_dir_path)
+                fileUtils.open_dir_path(str(unity_exp_dir_path))
         return {'FINISHED'}
 
 
