@@ -51,6 +51,9 @@ class Severity(enum.Enum):
     CRITICAL = "CRITICAL"
 
 
+class BlueHoleException(Exception):
+
+
 class DebugLogger:
     def __init__(self, log_file="debug.log"):
         self.log_file = log_file
@@ -128,7 +131,7 @@ class DebugLogger:
 
         # If Critical, end application
         if severity == Severity.CRITICAL:
-            sys.exit(1)
+            raise BlueHoleException(full_message_for_print)
 
 
 # Create a singleton instance of the logger

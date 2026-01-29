@@ -29,7 +29,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-def get_project_sub_dir(path_append):
+def get_project_sub_dir(path_append) -> Path:
     """
     Gets desired project directory (based on project from the opened Blender scene)
     :param path_append: Specifies directory to get. Has to be an entry of
@@ -48,10 +48,11 @@ def get_project_sub_dir(path_append):
     path_append = configUtils.get_current_env_cfg_value("AssetDirectoryStructure", path_append)
 
     # Apply the two modifications (truncate & append) we just wrote about to the original .blend file path
-    project_sub_dir = fileUtils.truncate_n_append_str(blend_directory_path, path_remove, path_append)
+    project_sub_dir: str = fileUtils.truncate_n_append_str(blend_directory_path, path_remove, path_append)
 
     # If folder path hadn't been created already, make it.
     # Useful in preventing bugs where user haven't created their folders yet.
-    Path(project_sub_dir).mkdir(parents=True, exist_ok=True)
+    project_sub_dir_path: Path = Path(project_sub_dir)
+    project_sub_dir_path.mkdir(parents=True, exist_ok=True)
 
-    return project_sub_dir
+    return project_sub_dir_path

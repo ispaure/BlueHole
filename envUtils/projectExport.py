@@ -15,7 +15,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 import BlueHole.envUtils.projectUtils as projectUtils
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
+import BlueHole.blenderUtils.exportIndividual as exportIndividual
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -35,8 +35,8 @@ def batch_export_selection_to_project_sub_dir(path_append):
     :type path_append: str
     """
     # Get path of desired sub project directory to export to
-    export_dir = projectUtils.get_project_sub_dir(path_append)
+    export_dir = str(projectUtils.get_project_sub_dir(path_append))
 
     # Batch export selection to FBX. Connects to source control
-    exportUtils2.batch_export_selection(export_dir, exp_format='FBX')
+    exportIndividual.batch_export_selection(export_dir, exp_format='FBX')
     # exportUtils.batch_export_selected_as_fbx(export_dir)

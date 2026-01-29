@@ -126,7 +126,7 @@ def import_asset(file_path_source, file_path_dest):
     log(Severity.DEBUG, send_ue_name, 'Fetching Properties...')
 
     # Was it a skeletal?
-    sk_prefix = exportUtils2.get_hierarchy_prefix_lst()[2]
+    sk_prefix = addon.preference().environment.asset_hierarchy_struct_prefix_skeletal_mesh
     if sk_prefix == file_path_source.split('/')[-1][0:len(sk_prefix)]:
         log(Severity.DEBUG, send_ue_name, 'Export is a Skeletal Mesh')
         is_skeletal = True

@@ -115,7 +115,7 @@ def get_resource_path_local():
     return bpy.utils.resource_path('LOCAL')
 
 
-def truncate_n_append_str(original_str, truncate_str, append_str):
+def truncate_n_append_str(original_str, truncate_str, append_str) -> str:
     """
     Truncates a string by the length of another string and appends another string at the end
     :param original_str: String to truncate
