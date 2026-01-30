@@ -21,7 +21,7 @@ from pathlib import Path
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
-import BlueHole.envUtils.projectUtils as projectUtils
+import BlueHole.blenderUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.environment.envPathResolver as envPathResolver
 from BlueHole.preferences.prefs import *

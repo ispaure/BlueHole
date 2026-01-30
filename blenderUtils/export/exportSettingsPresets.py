@@ -23,7 +23,7 @@ from enum import Enum
 from BlueHole.blenderUtils.debugUtils import *
 from BlueHole.blenderUtils.export.exportSettings import *
 from BlueHole.preferences.prefs import *
-import BlueHole.envUtils.projectUtils as projectUtils
+import BlueHole.blenderUtils.projectUtils as projectUtils
 import BlueHole.environment.envPathResolver as envPathResolver
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -18,11 +18,11 @@ __status__ = 'Production'
 # System
 from dataclasses import dataclass
 from enum import Enum
+from typing import *
 
 # Blue Hole
-from BlueHole.blenderUtils.exportUnity import *
 from BlueHole.preferences.prefs import *
-from BlueHole.envUtils import projectUtils
+import BlueHole.blenderUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.export.exportSettings import *
 
 # ----------------------------------------------------------------------------------------------------------------------
