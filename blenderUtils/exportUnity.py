@@ -21,7 +21,7 @@ from typing import *
 
 # Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.Utils.env as env
+import BlueHole.environment.envPathResolver as envPathResolver
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -39,18 +39,15 @@ def get_unity_exp_dir_path(quiet: bool = False) -> Optional[Path]:
     # Determine Export Directory
     blend_dir_path = fileUtils.get_blend_directory_path()
 
-    # Blue Hole Prefs Class
-    bh_prefs_cls = env.BlueHolePrefs()
-
     # Get sc path
-    sc_path = bh_prefs_cls.get_valid_sc_dir_path(quiet)
+    sc_path = envPathResolver.get_valid_sc_dir_path(quiet)
     if not sc_path:
         return None
     else:
         sc_path_str = str(sc_path)
 
     # Get unity assets path
-    unity_asset_path = bh_prefs_cls.get_valid_unity_asset_dir_path(quiet)
+    unity_asset_path = envPathResolver.get_valid_unity_asset_dir_path(quiet)
     if not unity_asset_path:
         return None
     else:

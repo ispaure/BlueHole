@@ -56,7 +56,7 @@ from .Operators import sourceControlOp as sourceControlOp
 from .Operators import themeOp as themeOp
 
 # Import Env Utils
-from .Utils import env as env
+from .environment import envManager as envManager
 
 # Import Menus
 from .Menus import menu as menu
@@ -120,8 +120,8 @@ def register():
         file.register()
 
     # Register Current Env Tools
-    env.if_current_env_missing_set_default()  # When a saved environment is no longer available, rever to default
-    env_cls = env.get_env_from_prefs_active_env()
+    envManager.if_current_env_missing_set_default()  # When a saved environment is no longer available, rever to default
+    env_cls = envManager.get_env_from_prefs_active_env()
     env_cls.set_pref_from_ini()
 
     # Register Header Menu

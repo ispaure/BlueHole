@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-import BlueHole.Utils.env as env
+import BlueHole.environment.envManager as envManager
 import BlueHole.blenderUtils.filterUtils as filterUtils
 from BlueHole.preferences.prefs import *
 
@@ -34,7 +34,7 @@ show_verbose = True
 class EnvironmentPG(bpy.types.PropertyGroup):
 
     # Get list of environments
-    env_enum_prop_lst = env.get_env_lst_enum_property()
+    env_enum_prop_lst = envManager.get_env_lst_enum_property()
 
     # Active Environment
     active_environment: EnumProperty(name="Active Environment",
