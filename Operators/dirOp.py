@@ -20,7 +20,7 @@ import bpy
 
 # Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.envUtils.projectOpenDirectory as envOpenDirectory
+import BlueHole.blenderUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.filterUtils as filterUtils
@@ -38,7 +38,7 @@ class OpenFinalFolder(bpy.types.Operator):
     bl_description = loc_str('open_final_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_final')
+        projectUtils.open_project_sub_dir('path_final')
         return {'FINISHED'}
 
 
@@ -49,7 +49,7 @@ class OpenReferencesFolder(bpy.types.Operator):
     bl_description = loc_str('open_references_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_references')
+        projectUtils.open_project_sub_dir('path_references')
         return {'FINISHED'}
 
 
@@ -60,7 +60,7 @@ class OpenResourcesFolder(bpy.types.Operator):
     bl_description = loc_str('open_resources_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_resources')
+        projectUtils.open_project_sub_dir('path_resources')
         return {'FINISHED'}
 
 
@@ -71,7 +71,7 @@ class OpenRootFolder(bpy.types.Operator):
     bl_description = loc_str('open_root_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_root')
+        projectUtils.open_project_sub_dir('path_root')
         return {'FINISHED'}
 
 
@@ -101,7 +101,7 @@ class OpenSpeedTreeMeshesFolder(bpy.types.Operator):
     bl_description = loc_str('open_speedtree_msh_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_speedtree_msh')
+        projectUtils.open_project_sub_dir('path_speedtree_msh')
         return {'FINISHED'}
 
 

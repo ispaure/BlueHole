@@ -26,7 +26,7 @@ import BlueHole.blenderUtils.objectUtils as oUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 from BlueHole.preferences.prefs import *
-import BlueHole.envUtils.projectUtils as projectUtils
+import BlueHole.blenderUtils.projectUtils as projectUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
