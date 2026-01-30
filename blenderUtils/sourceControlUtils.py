@@ -16,17 +16,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# Blue Hole
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.preferences.prefsCls import *
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

@@ -19,7 +19,7 @@ import bpy
 from bpy.props import *
 import BlueHole.Utils.env as env
 import BlueHole.blenderUtils.filterUtils as filterUtils
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-class bc(bpy.types.PropertyGroup):
+class EnvironmentPG(bpy.types.PropertyGroup):
 
     # Get list of environments
     env_enum_prop_lst = env.get_env_lst_enum_property()

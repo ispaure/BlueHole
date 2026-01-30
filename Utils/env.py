@@ -17,14 +17,16 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# System
 from typing import *
 from pathlib import Path
+
+# Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.configUtils as configUtils
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.filterUtils as filterUtils
-from BlueHole.preferences.prefsCls import *
-
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Environment code

@@ -21,7 +21,7 @@ import bpy
 
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

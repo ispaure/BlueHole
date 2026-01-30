@@ -24,7 +24,7 @@ import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.envUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.Utils.env as env
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

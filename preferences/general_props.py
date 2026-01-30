@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 import BlueHole.blenderUtils.filterUtils as filterUtils
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -29,7 +29,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-class bc(bpy.types.PropertyGroup):
+class GeneralPG(bpy.types.PropertyGroup):
 
     # EXPORTS: BATCH SELECTION -----------------------------------------------------------------------------------------
 

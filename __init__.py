@@ -39,7 +39,7 @@ from .blenderUtils import callbacks
 from .wrappers import perforceWrapper as p4Wrapper
 from .blenderUtils import fileUtils as fileUtils
 from .blenderUtils import filterUtils as filterUtils
-from .preferences import preferences as preferences
+from .preferences import addon_prefs as addon_prefs
 
 # Import Blue Hole Operators
 from .Operators import dirOp as dirOp
@@ -109,7 +109,7 @@ def register():
     # Register Callbacks
     callbacks.register()
     # Register preferences
-    preferences.register()
+    addon_prefs.register()
 
     # Register operators
     for file in operator_file_lst:
@@ -140,7 +140,7 @@ def unregister():
     callbacks.unregister()
 
     # Unregister preferences
-    preferences.unregister()
+    addon_prefs.unregister()
 
     # Unregister Header Menu
     from .Menus import headerMenu
@@ -172,8 +172,8 @@ def update_env_timer():
     if addon is None:
         return interval  # addon not loaded
 
-    addon_prefs = addon.preferences
-    if addon_prefs is None:
+    addon_preferences = addon.preferences
+    if addon_preferences is None:
         return interval  # should not happen
 
     # Only run if Add-ons section is active
@@ -181,14 +181,14 @@ def update_env_timer():
         return interval
 
     # Check if the panel was drawn recently
-    visible = getattr(addon_prefs, "_prefs_visible", False)
+    visible = getattr(addon_preferences, "_prefs_visible", False)
     # Reset for next timer run
-    addon_prefs._prefs_visible = False
+    addon_preferences._prefs_visible = False
     if not visible:
         return interval  # skip logic if panel not drawn
 
     # Safe to run expensive logic
     env_cls = env.get_env_from_prefs_active_env()
-    env_cls.set_ini_from_pref(addon_prefs)
+    env_cls.set_ini_from_pref(addon_preferences)
 
     return interval

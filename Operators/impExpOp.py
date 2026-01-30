@@ -15,8 +15,10 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# Blender
 import bpy
+
+# Blue Hole
 import BlueHole.blenderUtils.objectUtils as objectUtils
 from BlueHole.blenderUtils.exportSettings import *
 import BlueHole.blenderUtils.exportHierarchy as exportHierarchy
@@ -24,7 +26,7 @@ import BlueHole.envUtils.projectExport as projectExport
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.blenderUtils.importUtils as importUtils
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

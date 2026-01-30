@@ -17,17 +17,18 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-from bpy.types import Operator, AddonPreferences
+from bpy.types import AddonPreferences
 
-from . import general, sourcecontrol, help_n_update, environment
+from . import general_props, environment_props, sourcecontrol_props, help_update_props
 import BlueHole.Utils.env as env
-from BlueHole.preferences.prefsCls import *
+
+# Import your new prefs API (adjust module path if yours is named differently)
+from BlueHole.preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
 
 show_verbose = True
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -35,25 +36,35 @@ show_verbose = True
 # Dictionary of environments with preferences file
 env_preferences = {}
 
+# Explicit mapping: enum key -> module with a draw() function
+_DRAW_MODULES = {
+    "ENVIRONMENT": environment_props,
+    "GENERAL": general_props,
+    "SOURCECONTROL": sourcecontrol_props,
+    "HELP_N_UPDATE": help_update_props,
+}
+
 
 class BlueHole(AddonPreferences):
     bl_idname = 'BlueHole'
-    print(__package__)
     _prefs_visible = False
 
     settings: EnumProperty(
-        name = 'Settings',
-        description = 'Settings to display',
-        items = [('ENVIRONMENT', 'Structure', ''),
-                 ('GENERAL', 'Bridges', ''),
-                 ('SOURCECONTROL', 'Source Control', ''),
-                 ('HELP_N_UPDATE', 'Help & Updates', '')],
-        default = 'ENVIRONMENT')
+        name='Settings',
+        description='Settings to display',
+        items=[
+            ('ENVIRONMENT', 'Structure', ''),
+            ('GENERAL', 'Bridges', ''),
+            ('SOURCECONTROL', 'Source Control', ''),
+            ('HELP_N_UPDATE', 'Help & Updates', ''),
+        ],
+        default='ENVIRONMENT'
+    )
 
-    general: PointerProperty(type=general.bc)
-    environment: PointerProperty(type=environment.bc)
-    sourcecontrol: PointerProperty(type=sourcecontrol.bc)
-    help_n_update: PointerProperty(type=help_n_update.bc)
+    general: PointerProperty(type=general_props.GeneralPG)
+    environment: PointerProperty(type=environment_props.EnvironmentPG)
+    sourcecontrol: PointerProperty(type=sourcecontrol_props.SourceControlPG)
+    help_n_update: PointerProperty(type=help_update_props.HelpUpdatePG)
 
     # For environments with known preference files:
     for key, value in env_preferences.items():
@@ -86,16 +97,23 @@ class BlueHole(AddonPreferences):
         row = column.row(align=True)
         row.prop(self, 'settings', expand=True)
 
+        # Draw selected panel
         box = column.box()
-        globals()[self.settings.lower()].draw(self, context, box)
+        module = _DRAW_MODULES.get(self.settings)
+        if module is None:
+            box.label(text=f'Unknown settings panel: {self.settings}')
+            return
+
+        module.draw(self, context, box)
 
 
-classes = (general.bc,  # Need to make sure sub bc are before others
-           environment.bc,
-           sourcecontrol.bc,
-           help_n_update.bc,
-           BlueHole
-           )
+classes = (
+    general_props.GeneralPG,        # sub PropertyGroups before others
+    environment_props.EnvironmentPG,
+    sourcecontrol_props.SourceControlPG,
+    help_update_props.HelpUpdatePG,
+    BlueHole
+)
 
 
 # Registration
@@ -109,5 +127,5 @@ def register():
 def unregister():
     for key, val in env_preferences.items():
         bpy.utils.unregister_class(val)
-    for cls in classes:
+    for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

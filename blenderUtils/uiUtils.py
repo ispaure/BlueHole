@@ -13,21 +13,18 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import ctypes
 import textwrap
+import sys
 from pathlib import Path
 
+# Blender
 import bpy
-import sys
 
+# Blue Hole
 import BlueHole.wrappers.cmdWrapper as cmdWrapper
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

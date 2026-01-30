@@ -15,20 +15,17 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# System
 from pathlib import Path
+
+# Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.configUtils as configUtils
-from BlueHole.preferences.prefsCls import *
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
+
 
 def get_project_sub_dir(path_append) -> Path:
     """

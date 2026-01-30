@@ -13,13 +13,14 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
+# System
 import mathutils as mathutils
-import BlueHole.blenderUtils.objectUtils as objectUtils
-import BlueHole.blenderUtils.debugUtils as debugUtils
-import BlueHole.blenderUtils.uiUtils as uiUtils
-from BlueHole.blenderUtils.debugUtils import *
 
+# Blue Hole
+import BlueHole.blenderUtils.objectUtils as objectUtils
+from BlueHole.blenderUtils.debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -86,7 +87,6 @@ def sort_selected(world_axis, distance, second_world_axis=None, item_amt_per_row
 
     # When done, return True
     return True
-
 
 def search_replace_name_selected(search, replace):
     """

@@ -13,16 +13,12 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
+# Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.envUtils.projectUtils as projectUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
 
 
 # ----------------------------------------------------------------------------------------------------------------------

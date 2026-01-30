@@ -15,16 +15,17 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# System
 import sys
 import subprocess
 
+# Blender
 import bpy
 from bpy.props import *
 
+# Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.Utils.env as env
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

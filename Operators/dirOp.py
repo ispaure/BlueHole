@@ -15,8 +15,10 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# Blender
 import bpy
+
+# Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.envUtils.projectOpenDirectory as envOpenDirectory
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
@@ -24,8 +26,7 @@ import BlueHole.blenderUtils.exportUnity as exportUnity
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Utils.env as env
-from BlueHole.preferences.prefsCls import *
-
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

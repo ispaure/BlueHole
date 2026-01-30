@@ -17,7 +17,6 @@ __status__ = 'Production'
 import configparser
 
 import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.uiUtils as uiUtils
 from BlueHole.blenderUtils.debugUtils import *
 
 

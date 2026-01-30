@@ -13,16 +13,16 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
-import os
-import importlib
+# System
 from pathlib import Path
-import importlib.util as importlib_util
 
+# Blender
 import bpy
 
+# Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.blenderUtils.debugUtils import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

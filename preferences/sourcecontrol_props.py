@@ -19,7 +19,7 @@ import bpy
 from bpy.props import *
 
 import BlueHole.blenderUtils.filterUtils as filterUtils
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-class bc(bpy.types.PropertyGroup):
+class SourceControlPG(bpy.types.PropertyGroup):
 
     # Enable Source Control
     source_control_enable: BoolProperty(name = 'Enable Source Control',
