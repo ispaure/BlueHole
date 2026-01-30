@@ -31,7 +31,7 @@ import BlueHole.environment.envPathResolver as envPathResolver
 # CODE
 
 unreal_response = ''
-send_ue_name = 'Send to Unreal'
+send_ue_name = 'Blue Hole Bridge to Unreal'
 
 
 def trigger_unreal_import(file_path_source):
@@ -45,7 +45,7 @@ def trigger_unreal_import(file_path_source):
         err_msg = ('The Source Content directory path specified in the active environment\'s env_variables.ini file '
                    'is invalid. Please create said directory or edit env_variables.ini to match your '
                    f'Source Content folder.\n\nAttempted path: "{path}"')
-        show_prompt('Blender to Unreal Bridge', err_msg)
+        log(Severity.CRITICAL, send_ue_name, err_msg)
 
     def display_path_error_blend(sc_path, blend_path):
         err_msg = ('The currently opened Blender file is not located within the Source Content directory path '
@@ -53,7 +53,7 @@ def trigger_unreal_import(file_path_source):
                    'or edit the Source Content path from env_variables.ini.\n\nExpected blender path to be '
                    f'within: "{sc_path}"'
                    f'\nFound blender path to be: "{blend_path}"')
-        show_prompt('Blender to Unreal Bridge', err_msg)
+        log(Severity.CRITICAL, send_ue_name, err_msg)
 
     # ------------------------------------------------------------------------------------------------------------------
     # VALIDATE ENV_VARIABLES.INI has valid SourceContent path for Unreal Bridge,
