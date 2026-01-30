@@ -13,11 +13,12 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 from pathlib import Path
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.configUtils as configUtils
+from BlueHole.preferences.prefsCls import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -41,7 +42,7 @@ def get_project_sub_dir(path_append) -> Path:
 
     # Remove 'path_scenes' from directory, since path_scenes contains
     # the location of the subdirectory in which the .blend file resides
-    path_remove = addon.preference().environment.sc_dir_struct_scenes
+    path_remove = prefs().env.sc_dir_struct_scenes
     # This gets us to the root of the project directory
 
     # Append the path we desire to browse into, which was the argument fed to this function.

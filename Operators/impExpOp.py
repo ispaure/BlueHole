@@ -20,13 +20,11 @@ import bpy
 import BlueHole.blenderUtils.objectUtils as objectUtils
 from BlueHole.blenderUtils.exportSettings import *
 import BlueHole.blenderUtils.exportHierarchy as exportHierarchy
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.envUtils.projectExport as projectExport
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.blenderUtils.uiUtils as uiUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.configUtils as configUtils
 import BlueHole.blenderUtils.importUtils as importUtils
+from BlueHole.preferences.prefsCls import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -253,12 +251,12 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         row = column.row()
         row.prop(self, 'preview', expand=True)
         box.label(text=hierarchy_to_create_lst[0])
-        if addon.preference().environment.create_element_render:
-            box.label(text='   ↳ ' + addon.preference().environment.asset_hierarchy_empty_object_meshes)
-        if addon.preference().environment.create_element_collision:
-            box.label(text='   ↳ ' + addon.preference().environment.asset_hierarchy_empty_object_collisions)
-        if addon.preference().environment.create_element_sockets:
-            box.label(text='   ↳ ' + addon.preference().environment.asset_hierarchy_empty_object_sockets)
+        if prefs().env.create_element_render:
+            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_meshes)
+        if prefs().env.create_element_collision:
+            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_collisions)
+        if prefs().env.create_element_sockets:
+            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_sockets)
         if len(hierarchy_to_create_lst) > 1:
             row = column.row()
             box.label(text='...')
@@ -273,7 +271,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         row.prop(self, "include_default_mesh")
         row.prop(self, "dsp_empty_obj_arrows")
         row = column.row()
-        if len(hierarchy_to_create_lst) == 1 and addon.preference().environment.create_element_render:
+        if len(hierarchy_to_create_lst) == 1 and prefs().env.create_element_render:
             row.prop(self, 'include_selected_obj')
 
         # for hierarchy in hierarchy_to_create_lst:

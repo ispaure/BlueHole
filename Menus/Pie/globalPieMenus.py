@@ -14,9 +14,9 @@ __status__ = 'Production'
 
 import bpy
 from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.exportUnity as exportUnity
 import os
+from BlueHole.preferences.prefsCls import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -90,11 +90,11 @@ class MT_pie_global_dirs(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        if addon.preference().sourcecontrol.source_control_enable and addon.preference().sourcecontrol.source_control_solution == 'perforce':
+        if prefs().sc.source_control_enable and prefs().sc.source_control_solution == 'perforce':
             pie.operator("wm.bh_dir_open_workspace_root", text="Open WORKSPACE ROOT Folder", icon='FILEBROWSER')
         elif exportUnity.get_unity_exp_dir_path(quiet=True) is not None and os.path.exists(str(exportUnity.get_unity_exp_dir_path(quiet=True))):
             pie.operator('wm.bh_dir_open_unity_assets_current_exp_dir', text="Open UNITY ASSETS CURRENT EXPORT Folder", icon='FILEBROWSER')
-        elif os.path.exists(addon.preference().environment.sc_path) or os.path.exists(addon.preference().environment.sc_path_alternate) or os.path.exists(addon.preference().environment.sc_path_mac) or os.path.exists(addon.preference().environment.sc_path_mac_alternate):
+        elif os.path.exists(prefs().env.sc_path) or os.path.exists(prefs().env.sc_path_alternate) or os.path.exists(prefs().env.sc_path_mac) or os.path.exists(prefs().env.sc_path_mac_alternate):
             pie.operator("wm.bh_dir_open_source_content_root_dir", text="Open SOURCECONTENT ROOT Folder", icon='FILEBROWSER')
         else:
             pie.separator()
@@ -129,12 +129,12 @@ class MT_pie_global_import_export(bpy.types.Menu):
         # 2 - BOTTOM
         pie.operator("wm.call_menu_pie", text="Send...", icon='UV_SYNC_SELECT').name = MT_pie_global_send.bl_idname
         # 8 - TOP
-        if addon.preference().sourcecontrol.source_control_enable:
-            if addon.preference().sourcecontrol.source_control_solution == 'perforce':
+        if prefs().sc.source_control_enable:
+            if prefs().sc.source_control_solution == 'perforce':
                 pie.operator("wm.call_menu_pie", text="Source Control (Perforce)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
-            if addon.preference().sourcecontrol.source_control_solution == 'plastic-scm':
+            if prefs().sc.source_control_solution == 'plastic-scm':
                 pie.operator("wm.call_menu_pie", text="Source Control (Plastic SCM)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
-            if addon.preference().sourcecontrol.source_control_solution == 'git':
+            if prefs().sc.source_control_solution == 'git':
                 pie.operator("wm.call_menu_pie", text="Source Control (Git)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
         else:
             pie.operator("wm.disabled_source_control", text="Can't Show; Source Control disabled!!!", icon='ERROR')

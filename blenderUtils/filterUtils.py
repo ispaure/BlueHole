@@ -13,18 +13,18 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
-import sys
 import addon_utils
 from pathlib import Path
 
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.envUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.Utils.env as env
+from BlueHole.preferences.prefsCls import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ def filter_platform(platform):
 
 
 def filter_source_control():
-    if addon.preference().sourcecontrol.source_control_enable:
+    if prefs().sc.source_control_enable:
         return True
     else:
         return False
@@ -129,8 +129,8 @@ def check_tests(script_name,
     def dialog_source_control_connection():
         if not silent_mode:
             if filter_platform('win'):
-                if addon.preference().sourcecontrol.win32_env_override:
-                    if addon.preference().sourcecontrol.override_mode == 'singleuser-workspace':
+                if prefs().sc.win32_env_override:
+                    if prefs().sc.override_mode == 'singleuser-workspace':
                         msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
                               'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
                               'Perforce Environment Settings. Since you are in override mode, do those steps:\n' \
@@ -139,7 +139,7 @@ def check_tests(script_name,
                               '3. Check the "Override P4V Environment Settings" box\n' \
                               '4. Fill out the three fields (Server, User, Workspace)\n' \
                               '5. Click the Apply Override Settings'
-                    elif addon.preference().sourcecontrol.override_mode == 'multiuser-workspace':
+                    elif prefs().sc.override_mode == 'multiuser-workspace':
                         msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
                               'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
                               'Perforce Environment Settings.\n' \
@@ -185,7 +185,7 @@ def check_tests(script_name,
             msg = 'Cannot execute script because the currently opened Blender file is not located in the sub-folder ' \
                   'specified in the current environments Directory Structure: {sub_folder}. Please relocate the ' \
                   'file and try again.'
-            specified_sub_folder = addon.preference().environment.sc_dir_struct_scenes
+            specified_sub_folder = prefs().env.sc_dir_struct_scenes
             msg = msg.format(sub_folder=specified_sub_folder)
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 

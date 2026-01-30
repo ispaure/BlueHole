@@ -15,29 +15,17 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
-import os
-from pathlib import Path
-from typing import *
-
-
 # Blender
 import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.sourceControlUtils as scUtils
 from BlueHole.blenderUtils.exportSettings import *
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
 import BlueHole.blenderUtils.objectUtils as oUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.envUtils.projectUtils as projectUtils
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
-import BlueHole.blenderUtils.sendUnreal as sendUnreal
-import BlueHole.blenderUtils.configUtils as configUtils
-import BlueHole.Utils.env as env
+from BlueHole.preferences.prefsCls import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -171,7 +159,7 @@ class ExportMeshes:
             # Attempt to Open Files for Edit
             if not scUtils.sc_open_edit_file_path_lst(sc_file_path_lst):
                 msg = 'There were errors checking out files'
-                if addon.preference().sourcecontrol.source_control_error_aborts_exp:
+                if prefs().sc.source_control_error_aborts_exp:
                     msg += ' - Aborting!'
                     log(Severity.CRITICAL, ah_tool_name, msg)
                     return False
@@ -228,7 +216,7 @@ def batch_export_selection(exp_dir, exp_format='FBX'):
         # EXPORT OPTIONS
         exp_format=exp_format,
         exp_dir=Path(exp_dir),
-        zero_root_transform=addon.preference().general.exp_select_zero_root_transform,
+        zero_root_transform=prefs().general.exp_select_zero_root_transform,
 
         # INCLUDED ELEMENTS
         include_render=False,

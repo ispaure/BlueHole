@@ -13,14 +13,13 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import bpy
 from bpy.props import *
-from pathlib import Path
-
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.Utils.env as env
 import BlueHole.blenderUtils.filterUtils as filterUtils
+from BlueHole.preferences.prefsCls import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -170,17 +169,8 @@ def label_row(path, prop, row, label=''):
 
 def draw(preference, context, layout):
 
-    # # Draw Environment specific settings, if available.
-    # # Determine path to current environment
-    # current_env_path = envUtils.get_env_lst()[addon.preference().environment.active_environment]
-    # # Determine path to preference file
-    # python_module_path = str(Path(current_env_path + '/env_preferences.py'))
-    # imp_module = importUtils.import_python_module_absolute_path(python_module_path)
-    # if imp_module is not None:
-    #     imp_module.draw(preference, context, layout)
-
     # Lay out environment settings
-    enable_rows = addon.preference().environment.active_environment != 'default'
+    enable_rows = prefs().env.active_environment != 'default'
 
     # Source Content Path
     box = layout.box()
@@ -269,15 +259,15 @@ def draw(preference, context, layout):
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.environment, 'create_element_render', text='Render')
-    if addon.preference().environment.create_element_render:
+    if prefs().env.create_element_render:
         row.prop(preference.environment, 'asset_hierarchy_empty_object_meshes', text='Name')
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.environment, 'create_element_collision', text='Collision')
-    if addon.preference().environment.create_element_collision:
+    if prefs().env.create_element_collision:
         row.prop(preference.environment, 'asset_hierarchy_empty_object_collisions', text='Name')
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.environment, 'create_element_sockets', text='Socket')
-    if addon.preference().environment.create_element_sockets:
+    if prefs().env.create_element_sockets:
         row.prop(preference.environment, 'asset_hierarchy_empty_object_sockets', text='Name')

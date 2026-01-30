@@ -25,19 +25,16 @@ from typing import *
 import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.sourceControlUtils as scUtils
+
+from BlueHole.blenderUtils import sourceControlUtils as scUtils
 from BlueHole.blenderUtils.exportSettings import *
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
 import BlueHole.blenderUtils.objectUtils as oUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.envUtils.projectUtils as projectUtils
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.blenderUtils.sendUnreal as sendUnreal
-import BlueHole.blenderUtils.configUtils as configUtils
-import BlueHole.Utils.env as env
+from BlueHole.preferences.prefsCls import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -48,7 +45,6 @@ show_verbose = True
 # CODE
 
 ah_tool_name = 'Asset Hierarchy Exporter (V3)'
-
 
 
 class AssetHierarchy:
@@ -75,17 +71,17 @@ class AssetHierarchy:
                     self.critical_rogue_object_directly_under_root(self.root, child_obj)
 
         if self.export_settings.include_render:
-            component_name = addon.preference().environment.asset_hierarchy_empty_object_meshes
+            component_name = prefs().env.asset_hierarchy_empty_object_meshes
             component_type = 'Render'
             self.render = self.__get_required_empty_obj(component_name, component_type)
 
         if self.export_settings.include_collision:
-            component_name = addon.preference().environment.asset_hierarchy_empty_object_collisions
+            component_name = prefs().env.asset_hierarchy_empty_object_collisions
             component_type = 'Collision'
             self.collision = self.__get_required_empty_obj(component_name, component_type)
 
         if self.export_settings.include_socket:
-            component_name = addon.preference().environment.asset_hierarchy_empty_object_sockets
+            component_name = prefs().env.asset_hierarchy_empty_object_sockets
             component_type = 'Socket'
             self.socket = self.__get_required_empty_obj(component_name, component_type)
 
@@ -126,19 +122,19 @@ class AssetHierarchy:
         # Rename Render, Collision, Socket objects
         if self.render is not None:
             # Have to do three times for this to work... IDK Why. But it works?
-            self.render.name = addon.preference().environment.asset_hierarchy_empty_object_meshes
-            self.render.name = addon.preference().environment.asset_hierarchy_empty_object_meshes
-            self.render.name = addon.preference().environment.asset_hierarchy_empty_object_meshes
+            self.render.name = prefs().env.asset_hierarchy_empty_object_meshes
+            self.render.name = prefs().env.asset_hierarchy_empty_object_meshes
+            self.render.name = prefs().env.asset_hierarchy_empty_object_meshes
         if self.collision is not None:
             # Have to do three times for this to work... IDK Why. But it works?
-            self.collision.name = addon.preference().environment.asset_hierarchy_empty_object_collisions
-            self.collision.name = addon.preference().environment.asset_hierarchy_empty_object_collisions
-            self.collision.name = addon.preference().environment.asset_hierarchy_empty_object_collisions
+            self.collision.name = prefs().env.asset_hierarchy_empty_object_collisions
+            self.collision.name = prefs().env.asset_hierarchy_empty_object_collisions
+            self.collision.name = prefs().env.asset_hierarchy_empty_object_collisions
         if self.socket is not None:
             # Have to do three times for this to work... IDK Why. But it works?
-            self.socket.name = addon.preference().environment.asset_hierarchy_empty_object_sockets
-            self.socket.name = addon.preference().environment.asset_hierarchy_empty_object_sockets
-            self.socket.name = addon.preference().environment.asset_hierarchy_empty_object_sockets
+            self.socket.name = prefs().env.asset_hierarchy_empty_object_sockets
+            self.socket.name = prefs().env.asset_hierarchy_empty_object_sockets
+            self.socket.name = prefs().env.asset_hierarchy_empty_object_sockets
 
         # Rename collisions
         if self.export_settings.rename_collisions_for_ue:
@@ -227,7 +223,7 @@ class AssetHierarchy:
         for component in [self.render, self.collision, self.socket]:
             if component is not None:
                 child_obj_lst = oUtils.get_obj_child_recursive(component)
-                if len(child_obj_lst) > 0 or not addon.preference().environment.exclude_element_if_no_child:
+                if len(child_obj_lst) > 0 or not prefs().env.exclude_element_if_no_child:
                     obj_lst.append(component)
                     for child_obj in child_obj_lst:
                         obj_lst.append(child_obj)
@@ -336,9 +332,9 @@ class AssetHierarchies:
         """
         # Get list of hierarchy prefixes
         ah_prefix_lst: List[str] = [
-            addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh,
-            addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh_kit,
-            addon.preference().environment.asset_hierarchy_struct_prefix_skeletal_mesh
+            prefs().env.asset_hierarchy_struct_prefix_static_mesh,
+            prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit,
+            prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
         ]
 
         # Export Root List
@@ -367,7 +363,7 @@ class AssetHierarchies:
             # Attempt to Open Files for Edit
             if not scUtils.sc_open_edit_file_path_lst(sc_file_path_lst):
                 msg = 'There were errors checking out files'
-                if addon.preference().sourcecontrol.source_control_error_aborts_exp:
+                if prefs().sc.source_control_error_aborts_exp:
                     msg += ' - Aborting!'
                     log(Severity.CRITICAL, ah_tool_name, msg)
                     return False
@@ -394,9 +390,9 @@ class AssetHierarchies:
 
     def critical_no_hierarchy(self):
         # Define the prefix variables first
-        static_mesh_prefix = addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh
-        kit_prefix = addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh_kit
-        skeletal_mesh_prefix = addon.preference().environment.asset_hierarchy_struct_prefix_skeletal_mesh
+        static_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh
+        kit_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit
+        skeletal_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
 
         # Construct the message
         msg = (f'The {ah_tool_name} could not find an asset hierarchy at the root of the Blender scene. '
@@ -412,7 +408,7 @@ def get_hierarchy_prefix_lst():
     """
     Returns list of hierarchy prefix
     """
-    prefix_lst = [addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh,
-                  addon.preference().environment.asset_hierarchy_struct_prefix_static_mesh_kit,
-                  addon.preference().environment.asset_hierarchy_struct_prefix_skeletal_mesh]
+    prefix_lst = [prefs().env.asset_hierarchy_struct_prefix_static_mesh,
+                  prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit,
+                  prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh]
     return prefix_lst

@@ -15,17 +15,15 @@ __status__ = 'Production'
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Imports
+# IMPORTS
 
 from typing import *
 from pathlib import Path
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.configUtils as configUtils
 from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
-# import BlueHole.preferences.environment as envPref
+from BlueHole.preferences.prefsCls import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +76,7 @@ class Setting:
             val = ini_val_str  # default: str
 
         # 3. Resolve the Blender preference object dynamically
-        pref_obj = addon.preference()  # always fresh
+        pref_obj = prefs().prefs  # always fresh
         attrs = self.pref_path.split(".")
         for attr in attrs[:-1]:
             pref_obj = getattr(pref_obj, attr)
@@ -171,14 +169,13 @@ environment_setting_lst = [
 
 source_control_setting_lst = [
     # ------------------- SourceControl -------------------
-    Setting(pref_path='sourcecontrol.win32_env_setting_P4PORT', ini_section='Perforce', ini_value='win32_env_setting_p4port', var_type=str),
-    Setting(pref_path='sourcecontrol.win32_env_setting_P4USER', ini_section='Perforce', ini_value='win32_env_setting_p4user', var_type=str),
-    Setting(pref_path='sourcecontrol.win32_env_setting_P4CLIENT', ini_section='Perforce', ini_value='win32_env_setting_p4client', var_type=str),
-    Setting(pref_path='sourcecontrol.macos_env_setting_P4PORT', ini_section='Perforce', ini_value='macos_env_setting_p4port', var_type=str),
-    Setting(pref_path='sourcecontrol.macos_env_setting_P4USER', ini_section='Perforce', ini_value='macos_env_setting_p4user', var_type=str),
-    Setting(pref_path='sourcecontrol.macos_env_setting_P4CLIENT', ini_section='Perforce', ini_value='macos_env_setting_p4client', var_type=str),
+    Setting(pref_path='sourcecontrol.win32_env_setting_p4port', ini_section='Perforce', ini_value='win32_env_setting_p4port', var_type=str),
+    Setting(pref_path='sourcecontrol.win32_env_setting_p4user', ini_section='Perforce', ini_value='win32_env_setting_p4user', var_type=str),
+    Setting(pref_path='sourcecontrol.win32_env_setting_p4client', ini_section='Perforce', ini_value='win32_env_setting_p4client', var_type=str),
+    Setting(pref_path='sourcecontrol.macos_env_setting_p4port', ini_section='Perforce', ini_value='macos_env_setting_p4port', var_type=str),
+    Setting(pref_path='sourcecontrol.macos_env_setting_p4user', ini_section='Perforce', ini_value='macos_env_setting_p4user', var_type=str),
+    Setting(pref_path='sourcecontrol.macos_env_setting_p4client', ini_section='Perforce', ini_value='macos_env_setting_p4client', var_type=str),
     Setting(pref_path='sourcecontrol.source_control_solution', ini_section='SourceControl', ini_value='solution', var_type=str),
-    Setting(pref_path='sourcecontrol.override_mode', ini_section='Perforce', ini_value='override_env_setting_mode', var_type=str),
     Setting(pref_path='sourcecontrol.source_control_enable', ini_section='SourceControl', ini_value='enable', var_type=bool),
     Setting(pref_path='sourcecontrol.source_control_error_aborts_exp', ini_section='SourceControl', ini_value='abort_export_on_error', var_type=bool),
     Setting(pref_path='sourcecontrol.win32_env_override', ini_section='Perforce', ini_value='override_env_setting', var_type=bool),
@@ -206,29 +203,6 @@ class Environment:
         self.setting_lst += general_setting_lst
         self.setting_lst += environment_setting_lst
         self.setting_lst += source_control_setting_lst
-
-        # Add user Workspace Settings (1 to 15)
-        for i in range(1, 16):
-            idx = str(i).zfill(2)
-
-            self.setting_lst.append(
-                Setting(pref_path=f'sourcecontrol.env_setting_user{idx}_computername',
-                        ini_section='Perforce',
-                        ini_value=f'env_setting_user{idx}_computername',
-                        var_type=str)
-            )
-            self.setting_lst.append(
-                Setting(pref_path=f'sourcecontrol.env_setting_user{idx}_user',
-                        ini_section='Perforce',
-                        ini_value=f'env_setting_user{idx}_user',
-                        var_type=str)
-            )
-            self.setting_lst.append(
-                Setting(pref_path=f'sourcecontrol.env_setting_user{idx}_workspace',
-                        ini_section='Perforce',
-                        ini_value=f'env_setting_user{idx}_workspace',
-                        var_type=str)
-            )
 
     def set_pref_from_ini(self):
         for setting in self.setting_lst:
@@ -342,11 +316,11 @@ class BlueHolePrefs:
         path_def = 'Source Content'
 
         if filterUtils.filter_platform('win'):
-            sc_path_to_attempt_lst = [addon.preference().environment.sc_path,
-                                      addon.preference().environment.sc_path_alternate]
+            sc_path_to_attempt_lst = [prefs().env.sc_path,
+                                      prefs().env.sc_path_alternate]
         elif filterUtils.filter_platform('mac'):
-            sc_path_to_attempt_lst = [addon.preference().environment.sc_path_mac,
-                                      addon.preference().environment.sc_path_mac_alternate]
+            sc_path_to_attempt_lst = [prefs().env.sc_path_mac,
+                                      prefs().env.sc_path_mac_alternate]
         else:
             msg_os = 'Invalid OS! Blue Hole only supports Windows & macOS at the moment.'
             log(Severity.CRITICAL, env_tool_name, msg_os)
@@ -369,9 +343,9 @@ class BlueHolePrefs:
         path_def = 'Unity Assets'
 
         if filterUtils.filter_platform('win'):
-            unity_asset_path = addon.preference().general.unity_assets_path
+            unity_asset_path = prefs().general.unity_assets_path
         elif filterUtils.filter_platform('mac'):
-            unity_asset_path = addon.preference().general.unity_assets_path_mac
+            unity_asset_path = prefs().general.unity_assets_path_mac
         else:
             msg_os = 'Invalid OS! Blue Hole only supports Windows & macOS at the moment.'
             log(Severity.CRITICAL, env_tool_name, msg_os)
@@ -393,7 +367,7 @@ def get_env_from_prefs_active_env() -> Environment:
     """
     Gets an Environment class that matches the current one that's active (per the Blender Blue Hole Preferences)
     """
-    env_name = addon.preference().environment.active_environment
+    env_name = prefs().env.active_environment
     return Environment(env_name)
 
 
@@ -401,7 +375,7 @@ def set_pref_current_env(env_name: str):
     """
     Sets the current environment from a name string
     """
-    addon.preference().environment.active_environment = env_name
+    prefs().env.active_environment = env_name
 
 
 def get_default_env():
@@ -410,12 +384,12 @@ def get_default_env():
 
 def set_env_to_default():
     log(Severity.DEBUG, env_tool_name, 'Setting Active Environment to Default')
-    addon.preference().environment.active_environment = 'default'
+    prefs().env.active_environment = 'default'
 
 
 def if_current_env_missing_set_default():
     def current_env_exists():
-        current_env = addon.preference().environment.active_environment
+        current_env = prefs().env.active_environment
 
         # If length of active_environment field is 0, Blue Hole was most likely newly installed (need to set to default)
         if len(current_env) == 0:

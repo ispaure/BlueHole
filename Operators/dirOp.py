@@ -23,8 +23,8 @@ from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.blenderUtils.exportUnity as exportUnity
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.Utils.env as env
+from BlueHole.preferences.prefsCls import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -138,9 +138,9 @@ class OpenUnityAssetsPath(bpy.types.Operator):
 
     def execute(self, context):
         if filterUtils.filter_platform('win'):
-            fileUtils.open_dir_path(addon.preference().general.unity_assets_path)
+            fileUtils.open_dir_path(prefs().general.unity_assets_path)
         else:
-            fileUtils.open_dir_path(addon.preference().general.unity_assets_path_mac)
+            fileUtils.open_dir_path(prefs().general.unity_assets_path_mac)
         return {'FINISHED'}
 
 

@@ -16,29 +16,15 @@ __status__ = 'Production'
 # IMPORTS
 
 # System
-import os
-from pathlib import Path
-from typing import *
 from dataclasses import dataclass
 from enum import Enum
 
 # Blender
-import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.sourceControlUtils as scUtils
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.sceneUtils as sceneUtils
-import BlueHole.blenderUtils.objectUtils as oUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.envUtils.projectUtils as projectUtils
-import BlueHole.blenderUtils.addon as addon
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.objectUtils as objectUtils
-import BlueHole.blenderUtils.sendUnreal as sendUnreal
-import BlueHole.blenderUtils.configUtils as configUtils
-import BlueHole.Utils.env as env
 from BlueHole.blenderUtils.exportUnity import *
+from BlueHole.preferences.prefsCls import *
+from BlueHole.envUtils import projectUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -92,15 +78,15 @@ class ExportSettingsFactory:
             zero_root_transform=preset.get("Zero Root Transform", False),
 
             # INCLUDED ELEMENTS
-            include_render=included.get("Render", addon.preference().environment.create_element_render),
-            include_collision=included.get("Collision", addon.preference().environment.create_element_collision),
-            include_socket=included.get("Socket", addon.preference().environment.create_element_sockets),
+            include_render=included.get("Render", prefs().env.create_element_render),
+            include_collision=included.get("Collision", prefs().env.create_element_collision),
+            include_socket=included.get("Socket", prefs().env.create_element_sockets),
 
             # FBX SPECIFIC OPTIONS
             axis_up=preset.get("Axis Up", "Z"),
             axis_fwd=preset.get("Axis Forward", "-Y"),
             mesh_smooth_type=preset.get("Mesh Smooth Type", "OFF"),
-            bake_anim=preset.get("Bake Animation", addon.preference().general.ue_bridge_include_animation),
+            bake_anim=preset.get("Bake Animation", prefs().general.ue_bridge_include_animation),
             apply_scale_options=preset.get("Apply Scale Option", "FBX_SCALE_NONE"),
             rename_collisions_for_ue=preset.get("Rename Collisions for UE", False),
 
@@ -118,18 +104,18 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
                 # EXPORT OPTIONS
                 exp_format="FBX",
                 exp_dir=get_unity_exp_dir_path(),
-                zero_root_transform=addon.preference().general.unity_bridge_zero_root_transform,
+                zero_root_transform=prefs().general.unity_bridge_zero_root_transform,
 
                 # INCLUDED ELEMENTS
-                include_render=addon.preference().environment.create_element_render,
-                include_collision=addon.preference().environment.create_element_collision,
-                include_socket=addon.preference().environment.create_element_sockets,
+                include_render=prefs().env.create_element_render,
+                include_collision=prefs().env.create_element_collision,
+                include_socket=prefs().env.create_element_sockets,
 
                 # FBX SPECIFIC OPTIONS
-                axis_up=addon.preference().general.unity_up_axis,
-                axis_fwd=addon.preference().general.unity_forward_axis,
+                axis_up=prefs().general.unity_up_axis,
+                axis_fwd=prefs().general.unity_forward_axis,
                 mesh_smooth_type="OFF",
-                bake_anim=addon.preference().general.unity_bridge_include_animation,
+                bake_anim=prefs().general.unity_bridge_include_animation,
                 apply_scale_options="FBX_SCALE_UNITS",
                 rename_collisions_for_ue=False,
 
@@ -141,18 +127,18 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
                 # EXPORT OPTIONS
                 exp_format="FBX",
                 exp_dir=projectUtils.get_project_sub_dir("path_final"),
-                zero_root_transform=addon.preference().general.ue_bridge_zero_root_transform,
+                zero_root_transform=prefs().general.ue_bridge_zero_root_transform,
 
                 # INCLUDED ELEMENTS
-                include_render=addon.preference().environment.create_element_render,
-                include_collision=addon.preference().environment.create_element_collision,
-                include_socket=addon.preference().environment.create_element_sockets,
+                include_render=prefs().env.create_element_render,
+                include_collision=prefs().env.create_element_collision,
+                include_socket=prefs().env.create_element_sockets,
 
                 # FBX SPECIFIC OPTIONS
                 axis_up="Z",
                 axis_fwd="-Y",
                 mesh_smooth_type="OFF",
-                bake_anim=addon.preference().general.ue_bridge_include_animation,
+                bake_anim=prefs().general.ue_bridge_include_animation,
                 apply_scale_options="FBX_SCALE_NONE",
                 rename_collisions_for_ue=True,
 
