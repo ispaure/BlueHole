@@ -20,9 +20,9 @@ import bpy
 
 # Blue Hole
 import BlueHole.blenderUtils.objectUtils as objectUtils
-from BlueHole.blenderUtils.exportSettings import *
-import BlueHole.blenderUtils.exportHierarchy as exportHierarchy
-import BlueHole.envUtils.projectExport as projectExport
+from BlueHole.blenderUtils.export.exportSettingsPresets import *
+import BlueHole.blenderUtils.export.exportHierarchy as exportHierarchy
+import BlueHole.blenderUtils.export.exportIndividual as exportIndividual
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.blenderUtils.importUtils as importUtils
@@ -71,7 +71,7 @@ class BatchExportSelectedToFinal(bpy.types.Operator):
     bl_label = 'Batch Export (Selection) to FINAL Folder'
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_final')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_final')
         return {'FINISHED'}
 
 
@@ -80,7 +80,7 @@ class BatchExportSelectedToResources(bpy.types.Operator):
     bl_label = 'Batch Export (Selection) to RESOURCES Folder'
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_resources')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_resources')
         return {'FINISHED'}
 
 
@@ -90,7 +90,7 @@ class BatchExportSelectedToSpeedTree_FBX(bpy.types.Operator):
     bl_description = loc_str('export_select_to_speedtree_fbx_tt')
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_speedtree_msh')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh')
         return {'FINISHED'}
 
 
@@ -100,7 +100,7 @@ class BatchExportSelectedToSpeedtreeLR_FBX(bpy.types.Operator):
     bl_description = loc_str('export_select_to_speedtree_fbx_lr_tt')
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_speedtree_msh_lr')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh_lr')
         return {'FINISHED'}
 
 
@@ -110,7 +110,7 @@ class BatchExportSelectedToSpeedtreeHR_FBX(bpy.types.Operator):
     bl_description = loc_str('export_select_to_speedtree_fbx_hr_tt')
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_speedtree_msh_hr')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh_hr')
         return {'FINISHED'}
 
 
@@ -120,7 +120,7 @@ class BatchExportSelectedToBakeFBX(bpy.types.Operator):
     bl_description = loc_str('export_select_to_bake_fbx_tt')
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_mshbake')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_mshbake')
         return {'FINISHED'}
 
 
