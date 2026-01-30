@@ -19,8 +19,8 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from BlueHole.blenderUtils.exportSettings import *
-import BlueHole.blenderUtils.exportHierarchy as exportHierarchy
+from BlueHole.blenderUtils.export.exportSettingsPresets import *
+import BlueHole.blenderUtils.export.exportHierarchy as exportHierarchy
 import BlueHole.blenderUtils.uiUtils as uiUtils
 
 # ----------------------------------------------------------------------------------------------------------------------

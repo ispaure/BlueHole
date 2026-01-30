@@ -20,7 +20,7 @@ import bpy
 
 # Blue Hole
 from BlueHole.blenderUtils import sourceControlUtils as scUtils
-from BlueHole.blenderUtils.exportSettings import *
+from BlueHole.blenderUtils.export.exportSettings import *
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
 import BlueHole.blenderUtils.objectUtils as oUtils

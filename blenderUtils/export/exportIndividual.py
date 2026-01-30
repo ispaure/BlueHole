@@ -19,13 +19,14 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from BlueHole.blenderUtils.exportSettings import *
+from BlueHole.blenderUtils.export.exportSettings import *
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
 import BlueHole.blenderUtils.objectUtils as oUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 from BlueHole.preferences.prefs import *
+import BlueHole.envUtils.projectUtils as projectUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -237,3 +238,18 @@ def batch_export_selection(exp_dir, exp_format='FBX'):
     export_meshes = ExportMeshes(exp_set_cls)
     export_meshes.set_meshes_from_selection()
     export_meshes.export()
+
+
+def batch_export_selection_to_project_sub_dir(path_append):
+    """
+    Exports selected asset files in desired location, relative to open project.
+    :param path_append: Specifies directory to export to. Has to be an entry of
+                        env_variables.ini under "DirectoryStructure" section.
+    :type path_append: str
+    """
+    # Get path of desired sub project directory to export to
+    export_dir = str(projectUtils.get_project_sub_dir(path_append))
+
+    # Batch export selection to FBX. Connects to source control
+    batch_export_selection(export_dir, exp_format='FBX')
+    # exportUtils.batch_export_selected_as_fbx(export_dir)

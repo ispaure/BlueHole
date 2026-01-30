@@ -20,76 +20,19 @@ from dataclasses import dataclass
 from enum import Enum
 
 # Blue Hole
-from BlueHole.blenderUtils.exportUnity import *
+from BlueHole.blenderUtils.debugUtils import *
+from BlueHole.blenderUtils.export.exportSettings import *
 from BlueHole.preferences.prefs import *
-from BlueHole.envUtils import projectUtils
+import BlueHole.envUtils.projectUtils as projectUtils
+import BlueHole.environment.envPathResolver as envPathResolver
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
 
-class Engine(Enum):
-    UNREAL = "Unreal"
-    UNITY = "Unity"
-    UNDEFINED = "Undefined"
-
-
 class ExportSettingsPreset(Enum):
     UNREAL = "Unreal"
     UNITY = "Unity"
-
-
-@dataclass(frozen=True, kw_only=True)
-class ExportSettings:
-    # General Export Settings
-    exp_dir: Path
-    exp_format: str
-    zero_root_transform: bool
-
-    # Included Elements
-    include_render: bool
-    include_collision: bool
-    include_socket: bool
-
-    # FBX Specific Settings
-    axis_up: str
-    axis_fwd: str
-    mesh_smooth_type: str
-    bake_anim: bool
-    apply_scale_options: str
-    rename_collisions_for_ue: bool
-
-    # Engine
-    engine: Engine
-
-
-class ExportSettingsFactory:
-    """ Create an ExportSettings class from a dictionary. Kept for legacy / keep existing behavior. """
-    @staticmethod
-    def from_dict(preset: Mapping[str, Any], *, engine: Engine) -> ExportSettings:
-        included = preset.get("Included Elements", {})
-
-        export_set_cls = ExportSettings(
-            # EXPORT OPTIONS
-            exp_format=preset.get("Format", "FBX"),
-            exp_dir=preset.get("Export Directory", projectUtils.get_project_sub_dir("path_resources")),
-            zero_root_transform=preset.get("Zero Root Transform", False),
-
-            # INCLUDED ELEMENTS
-            include_render=included.get("Render", prefs().env.create_element_render),
-            include_collision=included.get("Collision", prefs().env.create_element_collision),
-            include_socket=included.get("Socket", prefs().env.create_element_sockets),
-
-            # FBX SPECIFIC OPTIONS
-            axis_up=preset.get("Axis Up", "Z"),
-            axis_fwd=preset.get("Axis Forward", "-Y"),
-            mesh_smooth_type=preset.get("Mesh Smooth Type", "OFF"),
-            bake_anim=preset.get("Bake Animation", prefs().general.ue_bridge_include_animation),
-            apply_scale_options=preset.get("Apply Scale Option", "FBX_SCALE_NONE"),
-            rename_collisions_for_ue=preset.get("Rename Collisions for UE", False),
-
-            engine=engine)
-        return export_set_cls
 
 
 def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
@@ -101,7 +44,7 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
             preset = ExportSettings(
                 # EXPORT OPTIONS
                 exp_format="FBX",
-                exp_dir=get_unity_exp_dir_path(),
+                exp_dir=envPathResolver.get_unity_exp_dir_path(),
                 zero_root_transform=prefs().general.unity_bridge_zero_root_transform,
 
                 # INCLUDED ELEMENTS
