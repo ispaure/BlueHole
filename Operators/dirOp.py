@@ -25,7 +25,7 @@ from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.blenderUtils.exportUnity as exportUnity
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.Utils.env as env
+import BlueHole.environment.envPathResolver as envPathResolver
 from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ class OpenSourceContentPath(bpy.types.Operator):
     bl_description = 'Opens Source Content Root Path, as specified in the active environment\'s settings.'
 
     def execute(self, context):
-        valid_sc_path = env.BlueHolePrefs().get_valid_sc_dir_path()
+        valid_sc_path = envPathResolver.get_valid_sc_dir_path()
         if valid_sc_path:
             fileUtils.open_dir_path(valid_sc_path)
         return {'FINISHED'}

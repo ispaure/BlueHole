@@ -24,7 +24,7 @@ import bpy
 from shutil import rmtree
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.Utils.env as env
+import BlueHole.environment.envManager as envManager
 from typing import *
 
 
@@ -135,21 +135,22 @@ def truncate_n_append_str(original_str, truncate_str, append_str) -> str:
     return result
 
 
-def open_dir_path(dir_path):
+def open_dir_path(dir_path: Union[str, Path]):
     """
     Opens the directory path that is given as a string
     :param dir_path: Directory to open
     :type dir_path: str
     """
-    if os.path.isdir(dir_path):  # Validate string is in fact a path
+    str_dir_path = str(dir_path)
+    if os.path.isdir(str_dir_path):  # Validate string is in fact a path
         if sys.platform == "win32":
-            os.startfile(dir_path)
+            os.startfile(str_dir_path)
         else:
             opener = "open" if sys.platform == "darwin" else "xdg-open"
-            subprocess.call([opener, dir_path])
+            subprocess.call([opener, str_dir_path])
     else:
         print('ERROR: UNABLE TO OPEN PROJECT DIRECTORY.'
-              '\nAttempted path: ' + dir_path)
+              '\nAttempted path: ' + str_dir_path)
 
 
 def open_url(url):
@@ -240,7 +241,7 @@ def get_current_env_var_path():
     Get the config file path for the current environment.
     :rtype: str
     """
-    return env.get_env_from_prefs_active_env().env_variables_path
+    return envManager.get_env_from_prefs_active_env().env_variables_path
 
 
 def get_default_env_path():
@@ -248,18 +249,18 @@ def get_default_env_path():
     Get the default environment path.
     :rtype: str
     """
-    return env.get_default_env().path
+    return envManager.get_default_env().path
 
 
 def get_default_env_var_path():
     """
     Get the config file path for the default environment
     """
-    return env.get_default_env().env_variables_path
+    return envManager.get_default_env().env_variables_path
 
 
 def get_default_env_msh_guides_path():
-    return Path(env.get_default_env().path, 'msh_scale_guides')
+    return Path(envManager.get_default_env().path, 'msh_scale_guides')
 
 
 def get_file_path_list(dir_name):
@@ -431,7 +432,7 @@ def bool_to_string(bool_value):
         return 'false'
 
 
-def delete_dir(dir_path, debug_mode=False):
+def delete_dir(dir_path: Union[str, Path], debug_mode=False):
     """
     Delete a directory. Be careful when using this function! Test before with a print to see what will be deleted!
     :param dir_path: Directory to delete
@@ -443,7 +444,7 @@ def delete_dir(dir_path, debug_mode=False):
     if debug_mode:
         log(Severity.DEBUG, 'fileUtils.py', f'Would have deleted: "{dir_path}"')
     else:
-        rmtree(dir_path)
+        rmtree(str(dir_path))
 
 
 def terminate_blender():

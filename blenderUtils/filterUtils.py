@@ -23,7 +23,7 @@ import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.envUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.Utils.env as env
+import BlueHole.environment.envPathResolver as envPathResolver
 from BlueHole.preferences.prefs import *
 
 
@@ -254,9 +254,8 @@ def check_tests(script_name,
         log(Severity.DEBUG, script_name, 'Check Source Control: Succeeded')
 
     # Attempt to get valid source content path
-    bh_prefs_cls = env.BlueHolePrefs()
     if check_source_content_root_path_exist or check_blend_in_source_content:
-        sc_path = bh_prefs_cls.get_valid_sc_dir_path()
+        sc_path = envPathResolver.get_valid_sc_dir_path()
     else:
         sc_path = None
 
@@ -280,7 +279,7 @@ def check_tests(script_name,
 
     # Check that Unity Asset's Path Exists
     if check_unity_assets_path_exist:
-        unity_asset_path = bh_prefs_cls.get_valid_unity_asset_dir_path()
+        unity_asset_path = envPathResolver.get_valid_unity_asset_dir_path()
 
         if not unity_asset_path:
             display_path_error_unity_assets(unity_asset_path)

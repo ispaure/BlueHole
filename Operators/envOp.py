@@ -25,7 +25,8 @@ from bpy.props import *
 
 # Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.Utils.env as env
+import BlueHole.environment.envManager as envManager
+import BlueHole.environment.model as envModel
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -37,7 +38,7 @@ class WM_OT_SetActiveEnvironment(bpy.types.Operator):
     bl_description = 'Set the Active Environment, valid for this Blender session.'
     bl_options = {'INTERNAL'}
 
-    env_items_lst = env.get_env_lst_enum_property()
+    env_items_lst = envManager.get_env_lst_enum_property()
     # Active Environment
     active_environment: bpy.props.EnumProperty(name="Active Environment",
                                      description="Defines the project directory structure.",
@@ -55,8 +56,8 @@ class WM_OT_SetActiveEnvironment(bpy.types.Operator):
         box.label(text='To save as default, save Blender Preferences.')
 
     def execute(self, context):
-        env.set_pref_current_env(self.active_environment)
-        env_cls = env.get_env_from_prefs_active_env()
+        envManager.set_pref_current_env(self.active_environment)
+        env_cls = envManager.get_env_from_prefs_active_env()
         env_cls.set_pref_from_ini()
         return {'FINISHED'}
 
@@ -69,7 +70,7 @@ class WM_OT_AddEnvironment(bpy.types.Operator):
     bl_label = "Create an Environment"
     bl_options = {'INTERNAL'}
 
-    env_items_lst = env.get_env_lst_enum_property()
+    env_items_lst = envManager.get_env_lst_enum_property()
 
     add_based_from_environment: bpy.props.EnumProperty(name="Environment",
                                                        description="Environment to base the new one from. "
@@ -101,8 +102,8 @@ class WM_OT_AddEnvironment(bpy.types.Operator):
 
     def execute(self, context):
         sanitized_name = self.new_environment_name_str.replace(' ', '_').replace('.', '_')
-        env_cls = env.Environment(sanitized_name)
-        env_cls.add_env(env.Environment(self.add_based_from_environment))
+        env_cls = envModel.Environment(sanitized_name)
+        env_cls.add_env(envModel.Environment(self.add_based_from_environment))
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -114,7 +115,7 @@ class WM_OT_DeleteAnEnvironment(bpy.types.Operator):
     bl_label = "Delete an Environment"
     bl_options = {'INTERNAL'}
 
-    env_items_lst = env.get_env_lst_enum_property(exclude_default=True)
+    env_items_lst = envManager.get_env_lst_enum_property(exclude_default=True)
 
     if len(env_items_lst) > 0:
         deletable_environments: bpy.props.EnumProperty(name="Deletable Environments",
@@ -140,7 +141,7 @@ class WM_OT_DeleteAnEnvironment(bpy.types.Operator):
         row.label(text='You may want to save your scene before proceeding.')
 
     def execute(self, context):
-        env_cls = env.Environment(self.deletable_environments)
+        env_cls = envModel.Environment(self.deletable_environments)
         env_cls.delete_env()
         return {'FINISHED'}
 

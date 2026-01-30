@@ -20,7 +20,7 @@ from bpy.props import *
 from bpy.types import AddonPreferences
 
 from .props import general_props, environment_props, sourcecontrol_props, help_update_props
-import BlueHole.Utils.env as env
+import BlueHole.environment.envManager as envManager
 
 # Import your new prefs API (adjust module path if yours is named differently)
 from BlueHole.preferences.prefs import prefs
@@ -84,7 +84,7 @@ class BlueHole(AddonPreferences):
         row = column.row()
         row.operator('wm.set_active_environment', text='Set Active Env.', icon='PRESET')
         row.operator('wm.add_environment', text='Create Env.', icon='PRESET_NEW')
-        if len(env.get_env_lst_enum_property(exclude_default=True)) > 0:
+        if len(envManager.get_env_lst_enum_property(exclude_default=True)) > 0:
             row.operator('wm.delete_environment', text='Delete Env.', icon='REMOVE')
         if prefs().env.active_environment == 'default':
             row = column.row()
