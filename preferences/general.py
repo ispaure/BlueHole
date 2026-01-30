@@ -13,12 +13,12 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import bpy
 from bpy.props import *
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
-
+from BlueHole.preferences.prefsCls import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -110,7 +110,7 @@ def label_row(path, prop, row, label=''):
 def draw(preference, context, layout):
 
     # Lay out environment settings
-    enable_rows = addon.preference().environment.active_environment != 'default'
+    enable_rows = prefs().env.active_environment != 'default'
 
     # SEND ASSET HIERARCHIES TO UNREAL
     box = layout.box()

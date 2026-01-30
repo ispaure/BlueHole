@@ -14,11 +14,12 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.fileUtils as fileUtils
+from BlueHole.preferences.prefsCls import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -37,15 +38,15 @@ def sc_open_edit_file_path_lst(file_path_lst):
     """
     # CHECK IF SOURCE CONTROL IS ENABLED
     if filterUtils.filter_source_control():
-        if addon.preference().sourcecontrol.source_control_solution == 'perforce':
+        if prefs().sc.source_control_solution == 'perforce':
             p4_file_grp_cls = p4Wrapper.P4FileGroup()
             for file_path in file_path_lst:
                 p4_file_grp_cls.append_p4_file_to_group_from_client_file(str(file_path))
             result = p4_file_grp_cls.open_for_edit()
             return result
-        elif addon.preference().sourcecontrol.source_control_solution == 'plastic-scm':
+        elif prefs().sc.source_control_solution == 'plastic-scm':
             return True  # By default there is nothing to do for plastic SCM to do its job
-        elif addon.preference().sourcecontrol.source_control_solution == 'git':
+        elif prefs().sc.source_control_solution == 'git':
             return False  # TODO: Source Control - Git integration
     else:
         return True  # Return True since ran as intended (nothing to do; skip)
@@ -56,7 +57,7 @@ def sc_check_blend(silent_mode=False):
     Checks out the currently opened scene. Depending on solution, will redirect
     """
     if filterUtils.filter_source_control():
-        if addon.preference().sourcecontrol.source_control_solution == 'perforce':
+        if prefs().sc.source_control_solution == 'perforce':
             # # OLD METHOD TO FULLY REMOVE LATER ONCE NEW ONE HAS BEEN THOROUGHLY TESTED
             # p4Utils.p4_check_blend(silent_mode)
 
@@ -89,9 +90,9 @@ def sc_check_blend(silent_mode=False):
             # return result
             # --------------------------------------------------------------------------------
 
-        elif addon.preference().sourcecontrol.source_control_solution == 'plastic-scm':
+        elif prefs().sc.source_control_solution == 'plastic-scm':
             return True  # By default there is nothing to do for plastic SCM to do its job
-        elif addon.preference().sourcecontrol.source_control_solution == 'git':
+        elif prefs().sc.source_control_solution == 'git':
             return False  # TODO: Source Control - Git integration
     else:
         if not silent_mode:
@@ -101,11 +102,11 @@ def sc_check_blend(silent_mode=False):
 
 def sc_dialog_box_info():
     if filterUtils.filter_source_control():
-        if addon.preference().sourcecontrol.source_control_solution == 'perforce':
+        if prefs().sc.source_control_solution == 'perforce':
             p4Wrapper.dialog_box_p4_info()
-        elif addon.preference().sourcecontrol.source_control_solution == 'plastic-scm':
+        elif prefs().sc.source_control_solution == 'plastic-scm':
             return False  # TODO: Plastic SCM should show server info!
-        elif addon.preference().sourcecontrol.source_control_solution == 'git':
+        elif prefs().sc.source_control_solution == 'git':
             return False  # TODO: Source Control - Git integration
     else:
         p4Wrapper.source_control_disabled_dialog()

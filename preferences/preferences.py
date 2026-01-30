@@ -13,14 +13,15 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import bpy
 from bpy.props import *
 from bpy.types import Operator, AddonPreferences
 
 from . import general, sourcecontrol, help_n_update, environment
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.Utils.env as env
+from BlueHole.preferences.prefsCls import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -65,7 +66,7 @@ class BlueHole(AddonPreferences):
 
         # Set Active Environment
         box = layout.box()
-        msg = "Active Environment: " + addon.preference().environment.active_environment
+        msg = "Active Environment: " + prefs().env.active_environment
         column = box.column()
         row = column.row()
         row.label(text=msg.upper())
@@ -74,7 +75,7 @@ class BlueHole(AddonPreferences):
         row.operator('wm.add_environment', text='Create Env.', icon='PRESET_NEW')
         if len(env.get_env_lst_enum_property(exclude_default=True)) > 0:
             row.operator('wm.delete_environment', text='Delete Env.', icon='REMOVE')
-        if addon.preference().environment.active_environment == 'default':
+        if prefs().env.active_environment == 'default':
             row = column.row()
             row.label(text='The settings for the default environment are locked.')
             row = column.row()

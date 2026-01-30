@@ -9,19 +9,19 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
-# Import dependencies
 import enum
 from typing import *
 import BlueHole.wrappers.cmdWrapper as cmdWrapper
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.uiUtils as uiUtils
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import bpy
 from pathlib import Path
+from BlueHole.preferences.prefsCls import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED VARIABLES
@@ -778,7 +778,7 @@ class P4FileGroup:
             file_str += item + split_str
 
         # Add what is left in file_str to file_str_lst
-        if file_str is not '':
+        if file_str != '':
             file_str_lst.append(file_str)
 
         # Remove the in-between at the end of each string of the array.
@@ -908,31 +908,28 @@ def set_p4_env_settings():
     print('Initialize set P4 environment settings')
 
     # If Source Control is enabled in the Preferences
-    if filterUtils.filter_source_control() and addon.preference().sourcecontrol.source_control_solution == 'perforce':
+    if filterUtils.filter_source_control() and prefs().sc.source_control_solution == 'perforce':
         print('Attempting to set P4 environment settings')
         # If platform is Windows
         if filterUtils.filter_platform('win'):
             # If preference set to "Override Environment Settings"
-            if addon.preference().sourcecontrol.win32_env_override:
+            if prefs().sc.win32_env_override:
                 print('Override environment settings is ON')
-                if addon.preference().sourcecontrol.override_mode == 'singleuser-workspace':
+                if prefs().sc.override_mode == 'singleuser-workspace':
                     print('Override environment setting is set to singleuser-workspace')
-                    cmd_str = 'p4 set P4USER=' + addon.preference().sourcecontrol.macos_env_setting_P4USER
+                    cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
                     cmdWrapper.exec_cmd(cmd_str)
-                    cmd_str = 'p4 set P4PORT=' + addon.preference().sourcecontrol.macos_env_setting_P4PORT
+                    cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
                     cmdWrapper.exec_cmd(cmd_str)
-                    cmd_str = 'p4 set P4CLIENT=' + addon.preference().sourcecontrol.macos_env_setting_P4CLIENT
+                    cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
                     cmdWrapper.exec_cmd(cmd_str)
-                elif addon.preference().sourcecontrol.override_mode == 'multiuser-workspace':
-                    print('Override environment setting is set to multiuser-workspace')
-                    set_p4_env_settings_multi_user()
         # If Platform is MacOS, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
         elif filterUtils.filter_platform('mac'):
-            cmd_str = 'p4 set P4USER=' + addon.preference().sourcecontrol.macos_env_setting_P4USER
+            cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
             cmdWrapper.exec_cmd(cmd_str)
-            cmd_str = 'p4 set P4PORT=' + addon.preference().sourcecontrol.macos_env_setting_P4PORT
+            cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
             cmdWrapper.exec_cmd(cmd_str)
-            cmd_str = 'p4 set P4CLIENT=' + addon.preference().sourcecontrol.macos_env_setting_P4CLIENT
+            cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
             cmdWrapper.exec_cmd(cmd_str)
 
 
@@ -950,116 +947,8 @@ def create_p4_user_workspace_cls(computer_name, username, workspace):
     p4userws_cls.workspace = workspace
     return p4userws_cls
 
-
-def set_p4_env_settings_multi_user():
-    """
-    Sets the p4 env settings when it is set to multi user (must compare computer name and if there is a match, set
-    the settings for that one)
-    """
-
-    # Create list of user-workspace classes
-    p4userws_cls_lst = []
-
-    #-------------------------------------------------------------------------------------------------------------------
-    # Create the classes from the preferences (has to be done one by one, but after it's in a class it can be iterated
-
-    # User 1
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user01_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user01_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user01_workspace))
-
-    # User 2
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user02_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user02_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user02_workspace))
-
-    # User 3
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user03_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user03_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user03_workspace))
-
-    # User 4
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user04_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user04_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user04_workspace))
-
-    # User 5
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user05_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user05_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user05_workspace))
-
-    # User 6
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user06_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user06_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user06_workspace))
-
-    # User 7
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user07_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user07_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user07_workspace))
-
-    # User 8
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user08_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user08_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user08_workspace))
-
-    # User 9
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user09_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user09_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user09_workspace))
-
-    # User 10
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user10_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user10_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user10_workspace))
-
-    # User 11
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user11_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user11_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user11_workspace))
-
-    # User 12
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user12_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user12_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user12_workspace))
-
-    # User 13
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user13_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user13_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user13_workspace))
-
-    # User 14
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user14_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user14_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user14_workspace))
-
-    # User 15
-    p4userws_cls_lst.append(create_p4_user_workspace_cls(computer_name=addon.preference().sourcecontrol.env_setting_user15_computername,
-                                                         username=addon.preference().sourcecontrol.env_setting_user15_user,
-                                                         workspace=addon.preference().sourcecontrol.env_setting_user15_workspace))
-    # ------------------------------------------------------------------------------------------------------------------
-
-    # Turn the list into a dict with keys as computer name
-    p4userws_cls_dict = {}
-    for p4userws_cls in p4userws_cls_lst:
-        if p4userws_cls.computername != '':
-            p4userws_cls_dict[p4userws_cls.computername] = p4userws_cls
-
-    computer_name = os.environ['COMPUTERNAME']
-
-    if computer_name in p4userws_cls_dict.keys():
-        print('Current computer in multi user-workspace list! Overriding perforce environment values...')
-        cmd_str = 'p4 set P4USER=' + p4userws_cls_dict[computer_name].username
-        cmdWrapper.exec_cmd(cmd_str)
-        cmd_str = 'p4 set P4PORT=' + addon.preference().sourcecontrol.win32_env_setting_P4PORT
-        cmdWrapper.exec_cmd(cmd_str)
-        cmd_str = 'p4 set P4CLIENT=' + p4userws_cls_dict[computer_name].workspace
-        cmdWrapper.exec_cmd(cmd_str)
-    else:
-        print('Computer name was not found in keys. Not overriding perforce environment settings')
-
-
 # LOG, ERROR, CRITICAL MESSAGES
+
 
 class P4LogMessage:
     def __init__(self):
