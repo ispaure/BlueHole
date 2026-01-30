@@ -15,17 +15,10 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
-import os
-from pathlib import Path
-from typing import *
-
-
 # Blender
 import bpy
 
 # Blue Hole
-
 from BlueHole.blenderUtils import sourceControlUtils as scUtils
 from BlueHole.blenderUtils.exportSettings import *
 from BlueHole.blenderUtils.debugUtils import *
@@ -34,7 +27,7 @@ import BlueHole.blenderUtils.objectUtils as oUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.blenderUtils.sendUnreal as sendUnreal
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

@@ -13,19 +13,15 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
+# Blue Hole
 import BlueHole.envUtils.projectUtils as projectUtils
 import BlueHole.blenderUtils.exportIndividual as exportIndividual
 
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
+
 
 def batch_export_selection_to_project_sub_dir(path_append):
     """

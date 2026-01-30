@@ -16,13 +16,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
-import bpy
+# System
 import os
+
+# Blender
+import bpy
+
+# Blue Hole
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 from BlueHole.blenderUtils.uiUtils import show_label as show_label
-
-# Import Operators
 import BlueHole.Operators.dirOp as dirOp
 import BlueHole.Operators.impExpOp as impExpOp
 import BlueHole.Operators.foodOp as foodOp
@@ -32,8 +34,7 @@ import BlueHole.Operators.sendOp as sendOp
 import BlueHole.Operators.sortOp as sortOp
 import BlueHole.Operators.sourceControlOp as sourceControlOp
 import BlueHole.Operators.themeOp as themeOp
-from BlueHole.preferences.prefsCls import *
-
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS

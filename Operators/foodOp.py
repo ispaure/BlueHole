@@ -15,11 +15,12 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# Blender
 import bpy
+
+# Blue Hole
 from BlueHole.blenderUtils.fileUtils import open_url
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

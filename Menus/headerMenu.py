@@ -13,10 +13,13 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
+# Blender
 import bpy
 
-from BlueHole.preferences.prefsCls import *
+# Blue Hole
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS

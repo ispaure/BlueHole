@@ -15,28 +15,23 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# System
 from pathlib import Path
-
 import time
 
+# Blue Hole
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Lib.send2ue.dependencies.remote_execution as remote_execution
 import BlueHole.Utils.env as env
-from BlueHole.preferences.prefsCls import *
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-send_ue_name = 'Send to Unreal'
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
 unreal_response = ''
+send_ue_name = 'Send to Unreal'
 
 
 def trigger_unreal_import(file_path_source):

@@ -15,14 +15,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# System
 import subprocess
 import time
 from pathlib import Path
 
+# Blue Hole
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.fileUtils as fileUtils
 from BlueHole.blenderUtils.debugUtils import *
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

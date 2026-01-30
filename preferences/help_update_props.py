@@ -19,7 +19,7 @@ import bpy
 from bpy.props import *
 
 import BlueHole.blenderUtils.configUtils as configUtils
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-class bc(bpy.types.PropertyGroup):
+class HelpUpdatePG(bpy.types.PropertyGroup):
 
     # UPDATES -----------------------------------------------------------------------------------------
 

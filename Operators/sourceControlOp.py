@@ -15,11 +15,12 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# Blender
 import bpy
+
+# Blue Hole
 import BlueHole.blenderUtils.sourceControlUtils as scUtils
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

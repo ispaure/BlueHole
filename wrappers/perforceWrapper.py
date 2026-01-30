@@ -11,17 +11,22 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# System
 import enum
 from typing import *
+
+# Blender
+import bpy
+
+# Blue Hole
 import BlueHole.wrappers.cmdWrapper as cmdWrapper
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
-import bpy
 from pathlib import Path
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED VARIABLES

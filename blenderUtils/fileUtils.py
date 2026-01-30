@@ -14,15 +14,11 @@ __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-import os
-import sys
 import subprocess
 import webbrowser
 from pathlib import Path
 import zipfile
 from shutil import copyfile
-import urllib.request
-import ssl
 from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree

@@ -19,11 +19,9 @@ __status__ = 'Production'
 from dataclasses import dataclass
 from enum import Enum
 
-# Blender
-
 # Blue Hole
 from BlueHole.blenderUtils.exportUnity import *
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 from BlueHole.envUtils import projectUtils
 
 # ----------------------------------------------------------------------------------------------------------------------

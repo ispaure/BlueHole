@@ -25,7 +25,7 @@ import BlueHole.blenderUtils.sceneUtils as sceneUtils
 import BlueHole.blenderUtils.objectUtils as oUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
-from BlueHole.preferences.prefsCls import *
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

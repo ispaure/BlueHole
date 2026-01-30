@@ -12,12 +12,16 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# System
+import os
+
+# Blender
 import bpy
+
+# Blue Hole
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.exportUnity as exportUnity
-import os
-from BlueHole.preferences.prefsCls import *
-
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED SETTINGS
