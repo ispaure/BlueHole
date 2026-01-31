@@ -137,10 +137,14 @@ class OpenUnityAssetsPath(bpy.types.Operator):
     bl_description = 'Opens Unity Project\'s Assets Path, as specified in the active environment\'s settings.'
 
     def execute(self, context):
-        if filterUtils.filter_platform('win'):
-            fileUtils.open_dir_path(prefs().general.unity_assets_path)
-        else:
-            fileUtils.open_dir_path(prefs().general.unity_assets_path_mac)
+        match filterUtils.get_platform():
+            case OS.WIN:
+                unity_assets_path = prefs().general.unity_assets_path
+            case OS.MAC:
+                unity_assets_path = prefs().general.unity_assets_path_mac
+            case OS.LINUX:
+                unity_assets_path = prefs().general.unity_assets_path_linux
+        fileUtils.open_dir_path(unity_assets_path)
         return {'FINISHED'}
 
 

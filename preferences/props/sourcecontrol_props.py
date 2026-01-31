@@ -21,7 +21,6 @@ from bpy.props import *
 import BlueHole.blenderUtils.filterUtils as filterUtils
 from BlueHole.preferences.prefs import *
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
 
@@ -92,6 +91,22 @@ class SourceControlPG(bpy.types.PropertyGroup):
                                                            ' is missing from MacOS P4V app',
                                              default = '')
 
+    # Override Environment Settings - Single User/Workspace (MacOS)
+    linux_env_setting_p4port: StringProperty(name = 'Server (P4PORT)',
+                                             description = 'Set up environment setting for Linux here, since feature'
+                                                           ' is missing from Linux P4V app',
+                                             default = '')
+
+    linux_env_setting_p4user: StringProperty(name = 'User (P4USER)',
+                                             description = 'Set up environment setting for Linux here, since feature'
+                                                           ' is missing from Linux P4V app',
+                                             default = '')
+
+    linux_env_setting_p4client: StringProperty(name = 'Workspace (P4CLIENT)',
+                                             description = 'Set up environment setting for Linux here, since feature'
+                                                           ' is missing from Linux P4V app',
+                                             default = '')
+
 
 def label_row(path, prop, row, label=''):
     row.label(text=label)
@@ -126,18 +141,17 @@ def draw(preference, context, layout):
             row = column.row()
             row.enabled = enable_rows
             row.label(text='Perforce')
-            if filterUtils.filter_platform('win'):
-                row.prop(preference.sourcecontrol, 'win32_env_override', text='Override P4V Environment Settings')
-
-                if prefs().sc.win32_env_override:
-                    row.prop(preference.sourcecontrol, 'override_mode', text='Override Mode')
-                    row = column.row()
-                    row.enabled = enable_rows
-                    row.label(text="Override Environment Settings:")
-                    row = column.row()
-                    row.enabled = enable_rows
-                    row.prop(preference.sourcecontrol, 'win32_env_setting_p4port', text='Server (P4PORT)')
-                    if prefs().sc.override_mode == 'singleuser-workspace':
+            match filterUtils.get_platform():
+                case filterUtils.OS.WIN:
+                    row.prop(preference.sourcecontrol, 'win32_env_override', text='Override P4V Environment Settings')
+                    if prefs().sc.win32_env_override:
+                        row.prop(preference.sourcecontrol, 'override_mode', text='Override Mode')
+                        row = column.row()
+                        row.enabled = enable_rows
+                        row.label(text="Override Environment Settings:")
+                        row = column.row()
+                        row.enabled = enable_rows
+                        row.prop(preference.sourcecontrol, 'win32_env_setting_p4port', text='Server (P4PORT)')
                         row = column.row()
                         row.enabled = enable_rows
                         row.prop(preference.sourcecontrol, 'win32_env_setting_p4user', text='User (P4USER)')
@@ -149,16 +163,29 @@ def draw(preference, context, layout):
                         row.enabled = enable_rows
                         row.operator('wm.bh_set_p4_env_settings', text='Apply Override Settings')
 
-            # Environment Settings Override (Impacts MacOS Only)
-            if filterUtils.filter_platform('mac'):
-                row = column.row()
-                row.label(text="Environment Settings:")
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.sourcecontrol, 'macos_env_setting_p4port', text='Server (P4PORT)')
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.sourcecontrol, 'macos_env_setting_p4user', text='User (P4USER)')
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.sourcecontrol, 'macos_env_setting_p4client', text='Workspace (P4CLIENT)')
+                # Environment Settings Override (Impacts macOS and Linux)
+                case filterUtils.OS.MAC:
+                    row = column.row()
+                    row.label(text="Environment Settings:")
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.sourcecontrol, 'macos_env_setting_p4port', text='Server (P4PORT)')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.sourcecontrol, 'macos_env_setting_p4user', text='User (P4USER)')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.sourcecontrol, 'macos_env_setting_p4client', text='Workspace (P4CLIENT)')
+
+                case filterUtils.OS.LINUX:
+                    row = column.row()
+                    row.label(text="Environment Settings:")
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.sourcecontrol, 'linux_env_setting_p4port', text='Server (P4PORT)')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.sourcecontrol, 'linux_env_setting_p4user', text='User (P4USER)')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.sourcecontrol, 'linux_env_setting_p4client', text='Workspace (P4CLIENT)')

@@ -19,6 +19,9 @@ import ctypes
 import textwrap
 import sys
 from pathlib import Path
+import BlueHole.blenderUtils.platformUtils as platformUtils
+import subprocess
+import shutil
 
 # Blender
 import bpy
@@ -84,20 +87,86 @@ def show_prompt(title, message, execute_fn=empty_fn):
 
     # Since Blender API doesn't have proper message box that waits on user, we have to get a bit creative.
 
-    if sys.platform == 'win32':  # Solution which only works on Windows
-        rc = show_prompt_windows(message, title)
-        if rc == MbConstants.IDOK:
-            execute_fn()
-            return True
-        elif rc == MbConstants.IDCANCEL:
-            return False
-    else:
-        message = message.replace('"', '')
-        message = message.replace("'", '')
-        if 'OK' in show_prompt_macos(message, title)[0]:
-            execute_fn()
-            return True
-        else:
+    match platformUtils.get_platform():  # Solution which only works on Windows
+        case platformUtils.OS.WIN:
+            rc = show_prompt_windows(message, title)
+            if rc == MbConstants.IDOK:
+                execute_fn()
+                return True
+            elif rc == MbConstants.IDCANCEL:
+                return False
+
+        case platformUtils.OS.MAC:
+            message = message.replace('"', '')
+            message = message.replace("'", '')
+            if 'OK' in show_prompt_macos(message, title)[0]:
+                execute_fn()
+                return True
+            else:
+                return False
+
+        case platformUtils.OS.LINUX:
+            # Minimal sanitization for shell tools
+            safe_title = title.replace('"', '').replace("'", "")
+            safe_message = message.replace('"', '').replace("'", "")
+
+            def run_cmd(args: list[str]) -> int:
+                # Return process returncode; never raises on non-zero.
+                try:
+                    p = subprocess.run(args, capture_output=True, text=True)
+                    return p.returncode
+                except Exception:
+                    return 1
+
+                # 1) KDE: kdialog (0=yes/ok, 1=no/cancel)
+
+            if shutil.which("kdialog"):
+                # --yesno shows Yes/No; good enough for OK/Cancel semantics
+                rc = run_cmd(["kdialog", "--title", safe_title, "--yesno", safe_message])
+                if rc == 0:
+                    execute_fn()
+                    return True
+                return False
+
+                # 2) GNOME: zenity (0=OK, 1=Cancel)
+            if shutil.which("zenity"):
+                rc = run_cmd([
+                    "zenity",
+                    "--question",
+                    "--title", safe_title,
+                    "--text", safe_message,
+                    "--ok-label=OK",
+                    "--cancel-label=Cancel",
+                ])
+                if rc == 0:
+                    execute_fn()
+                    return True
+                return False
+
+                # 3) X11: xmessage (button return codes vary by version; use explicit mapping)
+            if shutil.which("xmessage"):
+                # xmessage returns the "exit code" of the chosen button when mapped as OK:0,Cancel:1
+                rc = run_cmd([
+                    "xmessage",
+                    "-center",
+                    "-title", safe_title,
+                    "-buttons", "OK:0,Cancel:1",
+                    safe_message,
+                ])
+                if rc == 0:
+                    execute_fn()
+                    return True
+                return False
+
+                # 4) Last resort: console prompt (won't block Blender UI if launched from terminal)
+            try:
+                resp = input(f"{safe_title}\n{safe_message}\nType 'ok' to continue, anything else to cancel: ").strip().lower()
+                if resp in ("ok", "o", "yes", "y"):
+                    execute_fn()
+                    return True
+            except Exception:
+                pass
+
             return False
 
 
@@ -116,16 +185,58 @@ def show_message(title, message):
     # Prevent escape sequences
     message = message.replace('\\n', '\n').replace('\\t', '\t')
 
-    if sys.platform == 'win32':
-        class MbConstants:
-            MB_OK = 0
-        ctypes.windll.user32.MessageBoxW(0, message, title, MbConstants.MB_OK)
+    match platformUtils.get_platform():
+        case paltformUtils.OS.WIN:
+            class MbConstants:
+                MB_OK = 0
+            ctypes.windll.user32.MessageBoxW(0, message, title, MbConstants.MB_OK)
 
-    else:  # macOS
-        message = message.replace('"', '').replace("'", '')
-        import subprocess
-        cmd = f"""osascript -e 'Tell application "System Events" to display dialog "{message}" with title "{title}" buttons {{"OK"}} default button "OK"'"""
-        subprocess.run(cmd, shell=True)
+        case platformUtils.OS.MAC:  # macOS
+            message = message.replace('"', '').replace("'", '')
+            import subprocess
+            cmd = f"""osascript -e 'Tell application "System Events" to display dialog "{message}" with title "{title}" buttons {{"OK"}} default button "OK"'"""
+            subprocess.run(cmd, shell=True)
+
+        case platformUtils.OS.LINUX:
+            safe_title = title.replace('"', '').replace("'", "")
+            safe_message = message.replace('"', '').replace("'", "")
+
+            def run_cmd(args: list[str]) -> None:
+                try:
+                    subprocess.run(args, check=False)
+                except Exception:
+                    pass
+
+                # 1) KDE
+
+            if shutil.which("kdialog"):
+                run_cmd(["kdialog", "--title", safe_title, "--msgbox", safe_message])
+                return
+
+                # 2) GNOME
+            if shutil.which("zenity"):
+                run_cmd([
+                    "zenity",
+                    "--info",
+                    "--title", safe_title,
+                    "--text", safe_message,
+                    "--ok-label=OK",
+                ])
+                return
+
+                # 3) X11
+            if shutil.which("xmessage"):
+                run_cmd([
+                    "xmessage",
+                    "-center",
+                    "-title", safe_title,
+                    "-buttons", "OK:0",
+                    safe_message,
+                ])
+                return
+
+                # 4) Fallback: print (non-blocking)
+            print(f"{safe_title}\n{safe_message}")
 
 
 def write_text(layout, text, width = 30, icon = "NONE"):

@@ -188,7 +188,7 @@ def update_env_timer():
         return interval  # skip logic if panel not drawn
 
     # Safe to run expensive logic
-    env_cls = env.get_env_from_prefs_active_env()
+    env_cls = envManager.get_env_from_prefs_active_env()
     env_cls.set_ini_from_pref(addon_preferences)
 
     return interval

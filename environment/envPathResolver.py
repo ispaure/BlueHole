@@ -63,17 +63,16 @@ def get_dir_path_if_valid(path_def: str, path_str: str, quiet: bool) -> Optional
 def get_valid_sc_dir_path(quiet: bool = False) -> Optional[Path]:
     """Attempts to get a valid source content path from the current Blue Hole settings, regardless of OS"""
     path_def = 'Source Content'
-
-    if filterUtils.filter_platform('win'):
-        sc_path_to_attempt_lst = [prefs().env.sc_path,
-                                  prefs().env.sc_path_alternate]
-    elif filterUtils.filter_platform('mac'):
-        sc_path_to_attempt_lst = [prefs().env.sc_path_mac,
-                                  prefs().env.sc_path_mac_alternate]
-    else:
-        msg_os = 'Invalid OS! Blue Hole only supports Windows & macOS at the moment.'
-        log(Severity.CRITICAL, env_tool_name, msg_os)
-        return None
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            sc_path_to_attempt_lst = [prefs().env.sc_path,
+                                      prefs().env.sc_path_alternate]
+        case filterUtils.OS.MAC:
+            sc_path_to_attempt_lst = [prefs().env.sc_path_mac,
+                                      prefs().env.sc_path_mac_alternate]
+        case filterUtils.OS.LINUX:
+            sc_path_to_attempt_lst = [prefs().env.sc_path_linux,
+                                      prefs().env.sc_path_linux_alternate]
 
     # Attempt to get the source content path from the available options
     for sc_path in sc_path_to_attempt_lst:
@@ -95,14 +94,13 @@ def get_valid_unity_asset_dir_path(quiet: bool = False) -> Optional[Path]:
     """Attempts to get a valid unity asset path from the current Blue Hole settings, regardless of OS"""
     path_def = 'Unity Assets'
 
-    if filterUtils.filter_platform('win'):
-        unity_asset_path = prefs().general.unity_assets_path
-    elif filterUtils.filter_platform('mac'):
-        unity_asset_path = prefs().general.unity_assets_path_mac
-    else:
-        msg_os = 'Invalid OS! Blue Hole only supports Windows & macOS at the moment.'
-        log(Severity.CRITICAL, env_tool_name, msg_os)
-        return None
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            unity_asset_path = prefs().general.unity_assets_path
+        case filterUtils.OS.MAC:
+            unity_asset_path = prefs().general.unity_assets_path_mac
+        case filterUtils.OS.LINUX:
+            unity_asset_path = prefs().general.unity_assets_path_linux
 
     # Attempt to get the unity asset path from the available options
     result = get_dir_path_if_valid(path_def, unity_asset_path, quiet)
