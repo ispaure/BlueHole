@@ -122,13 +122,18 @@ class DebugLogger:
             with open(self.log_file, "a") as log_item:
                 log_item.write(full_message_for_print + "\n")
 
-        # If popup, show popup
         if popup:
-            try:
-                import BlueHole.blenderUtils.uiUtils as uiUtils
-                uiUtils.show_message(title, message)
-            except Exception:
-                print('Could not load uiUtils!')
+            print('show popup procedure')
+            from BlueHole.blenderUtils.uiUtils import show_message
+            show_message(title, message)
+            print('show popup procedure done')
+        # # If popup, show popup
+        # if popup:
+        #     try:
+        #         import BlueHole.blenderUtils.uiUtils as uiUtils
+        #         uiUtils.show_message(title, message)
+        #     except Exception:
+        #         print('Could not load uiUtils!')
 
         # If Critical, end application
         if severity == Severity.CRITICAL:

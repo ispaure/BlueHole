@@ -901,7 +901,8 @@ def dialog_box_p4_info():
                                      server_address=p4_info_cls.server_address,
                                      server_uptime=p4_info_cls.server_uptime
                                      )
-    log(Severity.INFO, tool_name, msg)
+
+    log(Severity.INFO, tool_name, msg, popup=True)
     return True
 
 
