@@ -186,7 +186,7 @@ def show_message(title, message):
     message = message.replace('\\n', '\n').replace('\\t', '\t')
 
     match platformUtils.get_platform():
-        case paltformUtils.OS.WIN:
+        case platformUtils.OS.WIN:
             class MbConstants:
                 MB_OK = 0
             ctypes.windll.user32.MessageBoxW(0, message, title, MbConstants.MB_OK)
@@ -198,23 +198,48 @@ def show_message(title, message):
             subprocess.run(cmd, shell=True)
 
         case platformUtils.OS.LINUX:
+            # Mirror show_prompt Linux approach: try GUI tools, then a blocking console fallback.
             safe_title = title.replace('"', '').replace("'", "")
             safe_message = message.replace('"', '').replace("'", "")
 
-            def run_cmd(args: list[str]) -> None:
+            def run_cmd(args: list[str]) -> int:
+                # Return process returncode; never raises on non-zero.
                 try:
-                    subprocess.run(args, check=False)
+                    p = subprocess.run(args, capture_output=True, text=True)
+                    return p.returncode
                 except Exception:
-                    pass
+                    return 1
 
-                # 1) KDE
-
+            # 1) KDE: kdialog (blocks until OK)
             if shutil.which("kdialog"):
-                run_cmd(["kdialog", "--title", safe_title, "--msgbox", safe_message])
+                print("method 1")
+
+                # IMPORTANT: don't rely on outer imports; make it local & explicit
+                import subprocess
+
+                def run_cmd(args: list[str]) -> int:
+                    # Return process returncode; never raises on non-zero.
+                    try:
+                        p = subprocess.run(args, capture_output=True, text=True)
+                        # Debug if it fails (this is what your old code hid)
+                        if p.returncode != 0:
+                            print("kdialog return code:", p.returncode)
+                            if (p.stdout or "").strip():
+                                print("kdialog stdout:", p.stdout.strip())
+                            if (p.stderr or "").strip():
+                                print("kdialog stderr:", p.stderr.strip())
+                        return p.returncode
+                    except Exception as e:
+                        print("kdialog exception:", repr(e))
+                        return 1
+
+                rc = run_cmd(["kdialog", "--title", safe_title, "--msgbox", safe_message])
+                # Regardless of rc, we attempted to show the message; return to avoid falling through.
                 return
 
-                # 2) GNOME
+            # 2) GNOME: zenity (blocks until OK)
             if shutil.which("zenity"):
+                print('method 2')
                 run_cmd([
                     "zenity",
                     "--info",
@@ -224,8 +249,9 @@ def show_message(title, message):
                 ])
                 return
 
-                # 3) X11
+            # 3) X11: xmessage (blocks until OK)
             if shutil.which("xmessage"):
+                print('method3')
                 run_cmd([
                     "xmessage",
                     "-center",
@@ -235,8 +261,15 @@ def show_message(title, message):
                 ])
                 return
 
-                # 4) Fallback: print (non-blocking)
-            print(f"{safe_title}\n{safe_message}")
+            # 4) Last resort: blocking console prompt (best-effort)
+            try:
+                input(f"{safe_title}\n{safe_message}\nPress Enter to continue...")
+                return
+            except Exception:
+                pass
+
+            # Absolute last resort: log (non-blocking)
+            log(Severity.CRITICAL, 'uiUtils: Could not popup message', f"{safe_title}\n{safe_message}")
 
 
 def write_text(layout, text, width = 30, icon = "NONE"):
