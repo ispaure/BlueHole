@@ -26,6 +26,8 @@ from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.environment.envManager as envManager
 from typing import *
+from BlueHole.blenderUtils.platformUtils import *
+import stat
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -446,22 +448,64 @@ def delete_dir(dir_path: Union[str, Path], debug_mode=False):
     else:
         rmtree(str(dir_path))
 
-
 def terminate_blender():
     """
     Shuts down Blender application
     """
     sys.exit(1)
 
-
 def get_computer_name():
     """Gets the computer name (only works on Windows)"""
     return os.environ['COMPUTERNAME']
 
-def get_os_split_char():
-    if filterUtils.filter_platform('win'):
-        return '\\'
-    elif filterUtils.filter_platform('mac'):
-        return '/'
-    else:
-        return None
+def get_os_split_char() -> str:
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            return '\\'
+        case filterUtils.OS.MAC | filterUtils.OS.LINUX:
+            return '/'
+
+def ensure_file_writable_if_exists(file_path: str | Path) -> bool:
+    """
+    Ensures the file is writable by the owner, without removing any
+    existing permissions.
+
+    Returns False if the file does not exist.
+    Raises PermissionError / OSError on failure.
+    """
+    p = Path(file_path)
+
+    if not p.exists() or not p.is_file():
+        return False
+
+    match get_platform():
+        case OS.MAC | OS.LINUX:
+            st = os.stat(p)
+            if not (st.st_mode & stat.S_IWUSR):
+                os.chmod(p, st.st_mode | stat.S_IWUSR)
+
+        case OS.WIN:
+            # Best-effort: clear read-only attribute
+            st = os.stat(p)
+            if not (st.st_mode & stat.S_IWRITE):
+                os.chmod(p, st.st_mode | stat.S_IWRITE)
+
+        case _:
+            raise RuntimeError("Unsupported OS")
+
+    return True
+
+
+def get_user_home_dir() -> Path:
+    """
+    Get the current user's home directory
+    """
+    match get_platform():
+        case OS.WIN | OS.MAC:
+            return Path.home()
+        case OS.LINUX:
+            return Path.home()
+            # import pwd
+            # user = os.getenv("USER")  # Prefer real user
+            # home_dir = Path(pwd.getpwnam(user).pw_dir if user else os.path.expanduser("~"))
+            # return home_dir

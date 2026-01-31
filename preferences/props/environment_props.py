@@ -68,6 +68,18 @@ class EnvironmentPG(bpy.types.PropertyGroup):
                                         'reside. Optional path used as fallback. In case of doubt, ignore.',
                             default='DEFAULT_STR')
 
+    sc_path_linux: StringProperty(name='Source Content Root Path',
+                            subtype='DIR_PATH',
+                            description='Root Directory in which all Source Content Asset Directory Structures '
+                                        'reside. \nNeeds to be set for Send to Unreal & Send to Unity',
+                            default='DEFAULT_STR')
+
+    sc_path_linux_alternate: StringProperty(name='Source Content Root Path (Alternate)',
+                            subtype='DIR_PATH',
+                            description='Root Directory (Alternate) in which all Source Content Asset Directory Structures '
+                                        'reside. Optional path used as fallback. In case of doubt, ignore.',
+                            default='DEFAULT_STR')
+
     # Source Content: Asset Directory Structure
     # Defines the structure for storage of a source content asset (work files such as .blend files, temp .fbx, etc.)
 
@@ -179,25 +191,30 @@ def draw(preference, context, layout):
     row.enabled = enable_rows
     row.label(text="Source Content Root Path: Contains all art source files for your project.")
 
-    if filterUtils.filter_platform('win'):
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
 
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path', text='Source Content')
+        case filterUtils.OS.MAC:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_mac', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
 
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
-
-    elif filterUtils.filter_platform('mac'):
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_mac', text='Source Content')
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+        case filterUtils.OS.LINUX:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_linux', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
 
     # Asset Directory Structure
     box = layout.box()

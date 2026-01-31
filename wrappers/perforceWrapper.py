@@ -65,10 +65,11 @@ class P4Info:
         self.server_license_ip = ''
         self.case_handling = ''
 
+        # Set p4 env settings
+        set_p4_env_settings()  # Sets P4 Environment Settings so they are set for later use. Don't know if I need this anywhere else.
+
         # Update keys
         self.update_fields()
-
-        set_p4_env_settings()  # Sets P4 Environment Settings so they are set for later use. Don't know if I need this anywhere else.
 
     def update_fields(self):
         # Get the information from p4 info
@@ -307,15 +308,13 @@ class P4File:
             normalized_client_root = str(Path(p4_info_cls.client_root))  # Sometime it outputs with / or not, so normalize here.
 
             # If on Windows, should test in lowercase (not be case-sensitive)
-            if filterUtils.filter_platform('win'):
-                client_file_str = self.clientFile.lower()
-                client_root_str = normalized_client_root.lower()
-            elif filterUtils.filter_platform('mac'):
-                client_file_str = self.clientFile
-                client_root_str = normalized_client_root
-            else:
-                log(Severity.CRITICAL, tool_name, 'Unsupported Platform')
-                return
+            match filterUtils.get_platform():
+                case filterUtils.OS.WIN:
+                    client_file_str = self.clientFile.lower()
+                    client_root_str = normalized_client_root.lower()
+                case filterUtils.OS.MAC | filterUtils.OS.LINUX:
+                    client_file_str = self.clientFile
+                    client_root_str = normalized_client_root
 
             if client_file_str.startswith(f'{client_root_str}{fileUtils.get_os_split_char()}'):
                 P4LogMessage().under_ws_root(self.get_display_name())
@@ -916,27 +915,33 @@ def set_p4_env_settings():
     if filterUtils.filter_source_control() and prefs().sc.source_control_solution == 'perforce':
         print('Attempting to set P4 environment settings')
         # If platform is Windows
-        if filterUtils.filter_platform('win'):
-            # If preference set to "Override Environment Settings"
-            if prefs().sc.win32_env_override:
-                print('Override environment settings is ON')
-                if prefs().sc.override_mode == 'singleuser-workspace':
-                    print('Override environment setting is set to singleuser-workspace')
+        match filterUtils.get_platform():
+            case filterUtils.OS.WIN:
+                # If preference set to "Override Environment Settings"
+                if prefs().sc.win32_env_override:
+                    print('Override environment settings is ON')
                     cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
                     cmdWrapper.exec_cmd(cmd_str)
                     cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
                     cmdWrapper.exec_cmd(cmd_str)
                     cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
                     cmdWrapper.exec_cmd(cmd_str)
-        # If Platform is MacOS, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
-        elif filterUtils.filter_platform('mac'):
-            cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
-            cmdWrapper.exec_cmd(cmd_str)
-            cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
-            cmdWrapper.exec_cmd(cmd_str)
-            cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
-            cmdWrapper.exec_cmd(cmd_str)
-
+            case filterUtils.OS.MAC:
+                # If Platform is MacOS, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
+                cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
+                cmdWrapper.exec_cmd(cmd_str)
+                cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
+                cmdWrapper.exec_cmd(cmd_str)
+                cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
+                cmdWrapper.exec_cmd(cmd_str)
+            case filterUtils.OS.LINUX:
+                # If Platform is Linux, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
+                cmd_str = 'p4 set P4USER=' + prefs().sc.linux_env_setting_p4user
+                cmdWrapper.exec_cmd(cmd_str)
+                cmd_str = 'p4 set P4PORT=' + prefs().sc.linux_env_setting_p4port
+                cmdWrapper.exec_cmd(cmd_str)
+                cmd_str = 'p4 set P4CLIENT=' + prefs().sc.linux_env_setting_p4client
+                cmdWrapper.exec_cmd(cmd_str)
 
 class P4UserWorkspace:
     def __init__(self):

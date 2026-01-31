@@ -107,6 +107,14 @@ class _GeneralPrefs:
         self._general.unity_assets_path_mac = value
 
     @property
+    def unity_assets_path_linux(self) -> str:
+        return self._general.unity_assets_path_linux
+
+    @unity_assets_path_linux.setter
+    def unity_assets_path_linux(self, value: str):
+        self._general.unity_assets_path_linux = value
+
+    @property
     def unity_bridge_zero_root_transform(self) -> bool:
         return self._general.unity_bridge_zero_root_transform
 
@@ -184,6 +192,22 @@ class _EnvPrefs:
     @sc_path_mac_alternate.setter
     def sc_path_mac_alternate(self, value: str):
         self._env.sc_path_mac_alternate = value
+
+    @property
+    def sc_path_linux(self) -> str:
+        return self._env.sc_path_linux
+
+    @sc_path_linux.setter
+    def sc_path_linux(self, value: str):
+        self._env.sc_path_linux = value
+
+    @property
+    def sc_path_linux_alternate(self) -> str:
+        return self._env.sc_path_linux_alternate
+
+    @sc_path_linux_alternate.setter
+    def sc_path_linux_alternate(self, value: str):
+        self._env.sc_path_linux_alternate = value
 
     # ------------------- Source Content Directory Structure -------------------
     @property
@@ -376,14 +400,6 @@ class _SCPrefs:
         self._sc.win32_env_override = value
 
     @property
-    def override_mode(self) -> str:
-        return self._sc.override_mode
-
-    @override_mode.setter
-    def override_mode(self, value: str):
-        self._sc.override_mode = value
-
-    @property
     def win32_env_setting_p4port(self) -> str:
         return self._sc.win32_env_setting_p4port
 
@@ -430,6 +446,30 @@ class _SCPrefs:
     @macos_env_setting_p4client.setter
     def macos_env_setting_p4client(self, value: str):
         self._sc.macos_env_setting_p4client = value
+
+    @property
+    def linux_env_setting_p4port(self) -> str:
+        return self._sc.linux_env_setting_p4port
+
+    @linux_env_setting_p4port.setter
+    def linux_env_setting_p4port(self, value: str):
+        self._sc.linux_env_setting_p4port = value
+
+    @property
+    def linux_env_setting_p4user(self) -> str:
+        return self._sc.linux_env_setting_p4user
+
+    @linux_env_setting_p4user.setter
+    def linux_env_setting_p4user(self, value: str):
+        self._sc.linux_env_setting_p4user = value
+
+    @property
+    def linux_env_setting_p4client(self) -> str:
+        return self._sc.linux_env_setting_p4client
+
+    @linux_env_setting_p4client.setter
+    def linux_env_setting_p4client(self, value: str):
+        self._sc.linux_env_setting_p4client = value
 
 
 class _HelpNUpdatePrefs:

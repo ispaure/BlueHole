@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 import addon_utils
 from pathlib import Path
-
+import platform
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
@@ -25,23 +25,11 @@ import BlueHole.blenderUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.environment.envPathResolver as envPathResolver
 from BlueHole.preferences.prefs import *
-
+from enum import Enum
+from BlueHole.blenderUtils.platformUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
-
-def filter_platform(platform):
-    if platform == 'win':
-        if sys.platform == 'win32':
-            return True
-        else:
-            return False
-
-    elif platform == 'mac':
-        if sys.platform != 'win32':
-            return True
-        else:
-            return False
 
 
 def filter_source_control():
@@ -128,9 +116,9 @@ def check_tests(script_name,
 
     def dialog_source_control_connection():
         if not silent_mode:
-            if filter_platform('win'):
-                if prefs().sc.win32_env_override:
-                    if prefs().sc.override_mode == 'singleuser-workspace':
+            match get_platform():
+                case OS.WIN:
+                    if prefs().sc.win32_env_override:
                         msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
                               'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
                               'Perforce Environment Settings. Since you are in override mode, do those steps:\n' \
@@ -139,7 +127,7 @@ def check_tests(script_name,
                               '3. Check the "Override P4V Environment Settings" box\n' \
                               '4. Fill out the three fields (Server, User, Workspace)\n' \
                               '5. Click the Apply Override Settings'
-                    elif prefs().sc.override_mode == 'multiuser-workspace':
+                    else:
                         msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
                               'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
                               'Perforce Environment Settings.\n' \
@@ -148,36 +136,19 @@ def check_tests(script_name,
                               '3. Uncheck the "Use Current Connection for Environment Settings".\n' \
                               '4. Fill out the three fields (Server, User, Workspace)\n' \
                               '5. Press "OK"\n\n' \
-                              'If that still doesn\'t work (and because you are in multiuser-override mode), your settings in Blue Hole environment may be in conflict.:\n' \
+                              'Alternatively:\n' \
                               '1. Open the Blender Preferences (Edit -> Preferences).\n' \
                               '2. Add-ons -> Blue Hole -> Source Control\n' \
                               '3. Check the "Override P4V Environment Settings" box\n' \
-                              '4. See if there is an entry matching your computer name with wrong information and fix it\n' \
+                              '4. Fill out the three fields (Server, User, Workspace)\n' \
                               '5. Try again'
-                    else:
-                        msg = 'ERROR: WRONG SOURCECONTROL WORKSPACE TYPE'
-                else:
+                case OS.MAC | OS.LINUX:
                     msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
                           'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
                           'Perforce Environment Settings.\n' \
-                          '1. Open the P4V Application and log in.\n' \
-                          '2. Connection (Header Menu) -> Environment Settings\n' \
-                          '3. Uncheck the "Use Current Connection for Environment Settings".\n' \
-                          '4. Fill out the three fields (Server, User, Workspace)\n' \
-                          '5. Press "OK"\n\n' \
-                          'Alternatively:\n' \
                           '1. Open the Blender Preferences (Edit -> Preferences).\n' \
                           '2. Add-ons -> Blue Hole -> Source Control\n' \
-                          '3. Check the "Override P4V Environment Settings" box\n' \
-                          '4. Fill out the three fields (Server, User, Workspace)\n' \
-                          '5. Try again'
-            else:
-                msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
-                      'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
-                      'Perforce Environment Settings.\n' \
-                      '1. Open the Blender Preferences (Edit -> Preferences).\n' \
-                      '2. Add-ons -> Blue Hole -> Source Control\n' \
-                      '3. Fill out the three fields (Server, User, Workspace)'
+                          '3. Fill out the three fields (Server, User, Workspace)'
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_blend_location_in_dir_structure():
