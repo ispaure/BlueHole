@@ -13,15 +13,17 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
+# System
 import subprocess
 import time
 from pathlib import Path
 
+# Blue Hole
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.blenderUtils.fileUtils as fileUtils
 from BlueHole.blenderUtils.debugUtils import *
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -30,7 +32,12 @@ cmd_wrapper_name = 'Cmd/Terminal Wrapper'
 
 
 def get_p4_macos_path():
-    return str(Path(fileUtils.get_blue_hole_user_addon_path() + '/Lib/p4'))
+    return str(Path('/Applications', 'p4v.app', 'Contents', 'Resources', 'p4_parallel'))
+    # return str(Path(fileUtils.get_blue_hole_user_addon_path() + '/Lib/p4'))
+
+def get_p4_linux_path():
+    return str(Path(fileUtils.get_user_home_dir(), 'Applications', 'perforce', 'lib', 'P4VResources', 'p4_parallel'))
+    # TODO: User must substitute this for their own path. Give option in settings?
 
 
 def exec_cmd(command):
@@ -68,9 +75,15 @@ def exec_cmd(command):
 
     # If using MacOS, P4 is not recognized (even if part of path) unless Blender is opened with the terminal window
     # shown. Because of that, let's substitute "p4" with the path where "p4" resides in Blue Hole.
-    if 'p4' == command[0:2] and filterUtils.filter_platform('mac'):
-        new_p4_path = get_p4_macos_path()
-        command = '"' + new_p4_path + '"' + command[2:]
+    if 'p4' == command[0:2] and filterUtils.get_platform() in [filterUtils.OS.MAC, filterUtils.OS.LINUX]:
+        match filterUtils.get_platform():
+            case filterUtils.OS.MAC:
+                new_p4_path = get_p4_macos_path()
+                command = f'"{new_p4_path}" {command[2:]}'
+            case filterUtils.OS.LINUX:
+                new_p4_path = get_p4_linux_path()
+                command = f'"{new_p4_path}" {command[2:]}'
+
 
         # Set permissions for executable in case it will be needed later
         exec_cmd(f'chmod +x "{new_p4_path}"')

@@ -17,8 +17,9 @@ __status__ = 'Production'
 import configparser
 
 import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.uiUtils as uiUtils
 from BlueHole.blenderUtils.debugUtils import *
+import BlueHole.wrappers.cmdWrapper as cmdWrapper
+from BlueHole.blenderUtils.platformUtils import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -29,6 +30,7 @@ name = filename = os.path.basename(__file__)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
+
 
 def config_section_map(section, value, cfg_file_path):
     """
@@ -113,7 +115,8 @@ def config_add_variable(section, variable, value, cfg_file_path):
         # After, add its variable and value
         new_lines_lst.append(variable_line_to_add)
 
-    # Write the result to the file
+    fileUtils.ensure_file_writable_if_exists(cfg_file_path)
+
     file = open(cfg_file_path, 'w')
     for line in new_lines_lst:
         file.write(line + '\n')
@@ -147,6 +150,8 @@ def config_set_variable(section, variable, value, cfg_file_path):
                 line_appended_this_round = True
         if not line_appended_this_round:
             new_lines_lst.append(line)
+
+    fileUtils.ensure_file_writable_if_exists(cfg_file_path)
 
     # Write the result to the file
     file = open(cfg_file_path, 'w')

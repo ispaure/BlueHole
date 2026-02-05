@@ -15,10 +15,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# Blender
 import bpy
-import BlueHole.blenderUtils.sortUtils as sortUtils
 
+# Blue Hole
+import BlueHole.blenderUtils.sortUtils as sortUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

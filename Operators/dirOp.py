@@ -15,17 +15,17 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# Blender
 import bpy
+
+# Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.envUtils.projectOpenDirectory as envOpenDirectory
+import BlueHole.blenderUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
 import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.addon as addon
-import BlueHole.Utils.env as env
-
+import BlueHole.environment.envPathResolver as envPathResolver
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -38,7 +38,7 @@ class OpenFinalFolder(bpy.types.Operator):
     bl_description = loc_str('open_final_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_final')
+        projectUtils.open_project_sub_dir('path_final')
         return {'FINISHED'}
 
 
@@ -49,7 +49,7 @@ class OpenReferencesFolder(bpy.types.Operator):
     bl_description = loc_str('open_references_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_references')
+        projectUtils.open_project_sub_dir('path_references')
         return {'FINISHED'}
 
 
@@ -60,7 +60,7 @@ class OpenResourcesFolder(bpy.types.Operator):
     bl_description = loc_str('open_resources_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_resources')
+        projectUtils.open_project_sub_dir('path_resources')
         return {'FINISHED'}
 
 
@@ -71,7 +71,7 @@ class OpenRootFolder(bpy.types.Operator):
     bl_description = loc_str('open_root_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_root')
+        projectUtils.open_project_sub_dir('path_root')
         return {'FINISHED'}
 
 
@@ -101,7 +101,7 @@ class OpenSpeedTreeMeshesFolder(bpy.types.Operator):
     bl_description = loc_str('open_speedtree_msh_folder_tt')
 
     def execute(self, context):
-        envOpenDirectory.open_project_sub_dir('path_speedtree_msh')
+        projectUtils.open_project_sub_dir('path_speedtree_msh')
         return {'FINISHED'}
 
 
@@ -124,7 +124,7 @@ class OpenSourceContentPath(bpy.types.Operator):
     bl_description = 'Opens Source Content Root Path, as specified in the active environment\'s settings.'
 
     def execute(self, context):
-        valid_sc_path = env.BlueHolePrefs().get_valid_sc_dir_path()
+        valid_sc_path = envPathResolver.get_valid_sc_dir_path()
         if valid_sc_path:
             fileUtils.open_dir_path(valid_sc_path)
         return {'FINISHED'}
@@ -137,10 +137,14 @@ class OpenUnityAssetsPath(bpy.types.Operator):
     bl_description = 'Opens Unity Project\'s Assets Path, as specified in the active environment\'s settings.'
 
     def execute(self, context):
-        if filterUtils.filter_platform('win'):
-            fileUtils.open_dir_path(addon.preference().general.unity_assets_path)
-        else:
-            fileUtils.open_dir_path(addon.preference().general.unity_assets_path_mac)
+        match filterUtils.get_platform():
+            case OS.WIN:
+                unity_assets_path = prefs().general.unity_assets_path
+            case OS.MAC:
+                unity_assets_path = prefs().general.unity_assets_path_mac
+            case OS.LINUX:
+                unity_assets_path = prefs().general.unity_assets_path_linux
+        fileUtils.open_dir_path(unity_assets_path)
         return {'FINISHED'}
 
 
@@ -160,9 +164,9 @@ class OpenUnityAssetsCurrentExportPath(bpy.types.Operator):
         if not result:
             return False
         else:
-            unity_exp_dir_path = exportUtils2.get_unity_exp_dir_path()
+            unity_exp_dir_path = envPathResolver.get_unity_exp_dir_path()
             if unity_exp_dir_path:
-                fileUtils.open_dir_path(unity_exp_dir_path)
+                fileUtils.open_dir_path(str(unity_exp_dir_path))
         return {'FINISHED'}
 
 

@@ -15,17 +15,18 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# Blender
 import bpy
+
+# Blue Hole
 import BlueHole.blenderUtils.objectUtils as objectUtils
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
-import BlueHole.blenderUtils.addon as addon
-import BlueHole.envUtils.projectExport as projectExport
+from BlueHole.blenderUtils.export.exportSettingsPresets import *
+import BlueHole.blenderUtils.export.exportHierarchy as exportHierarchy
+import BlueHole.blenderUtils.export.exportIndividual as exportIndividual
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.blenderUtils.uiUtils as uiUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.configUtils as configUtils
 import BlueHole.blenderUtils.importUtils as importUtils
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -42,10 +43,11 @@ class ExportAllHierarchiesToUE(bpy.types.Operator):
         msg = 'Do you really want to export *ALL* Asset Hierarchies? Press OK to confirm.'
         state = uiUtils.show_prompt('Unreal Export', msg)
         if state:
-            exportUtils2.export_asset_hierarchies(selected_only=False,
-                                                  preset='Unreal',
-                                                  is_send=False,
-                                                  skip_sc=False)
+            # Get Unreal Export Profile
+            export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
+            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies.set_hierarchies_from_scene()
+            asset_hierarchies.export(send=False, skip_sc=False)
         return {'FINISHED'}
 
 
@@ -56,10 +58,11 @@ class ExportSelectHierarchiesToUE(bpy.types.Operator):
     bl_description = 'Exports selected hierarchies created with the "Add Asset Hierarchy" tool in FINAL Folder'
 
     def execute(self, context):
-        exportUtils2.export_asset_hierarchies(selected_only=True,
-                                              preset='Unreal',
-                                              is_send=False,
-                                              skip_sc=False)
+        # Get Unreal Export Profile
+        export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
+        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies.set_hierarchies_from_selection()
+        asset_hierarchies.export(send=False, skip_sc=False)
         return {'FINISHED'}
 
 
@@ -68,7 +71,7 @@ class BatchExportSelectedToFinal(bpy.types.Operator):
     bl_label = 'Batch Export (Selection) to FINAL Folder'
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_final')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_final')
         return {'FINISHED'}
 
 
@@ -77,7 +80,7 @@ class BatchExportSelectedToResources(bpy.types.Operator):
     bl_label = 'Batch Export (Selection) to RESOURCES Folder'
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_resources')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_resources')
         return {'FINISHED'}
 
 
@@ -87,7 +90,7 @@ class BatchExportSelectedToSpeedTree_FBX(bpy.types.Operator):
     bl_description = loc_str('export_select_to_speedtree_fbx_tt')
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_speedtree_msh')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh')
         return {'FINISHED'}
 
 
@@ -97,7 +100,7 @@ class BatchExportSelectedToSpeedtreeLR_FBX(bpy.types.Operator):
     bl_description = loc_str('export_select_to_speedtree_fbx_lr_tt')
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_speedtree_msh_lr')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh_lr')
         return {'FINISHED'}
 
 
@@ -107,7 +110,7 @@ class BatchExportSelectedToSpeedtreeHR_FBX(bpy.types.Operator):
     bl_description = loc_str('export_select_to_speedtree_fbx_hr_tt')
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_speedtree_msh_hr')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh_hr')
         return {'FINISHED'}
 
 
@@ -117,7 +120,7 @@ class BatchExportSelectedToBakeFBX(bpy.types.Operator):
     bl_description = loc_str('export_select_to_bake_fbx_tt')
 
     def execute(self, context):
-        projectExport.batch_export_selection_to_project_sub_dir('path_mshbake')
+        exportIndividual.batch_export_selection_to_project_sub_dir('path_mshbake')
         return {'FINISHED'}
 
 
@@ -250,12 +253,12 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         row = column.row()
         row.prop(self, 'preview', expand=True)
         box.label(text=hierarchy_to_create_lst[0])
-        if addon.preference().environment.create_element_render:
-            box.label(text='   ↳ ' + addon.preference().environment.asset_hierarchy_empty_object_meshes)
-        if addon.preference().environment.create_element_collision:
-            box.label(text='   ↳ ' + addon.preference().environment.asset_hierarchy_empty_object_collisions)
-        if addon.preference().environment.create_element_sockets:
-            box.label(text='   ↳ ' + addon.preference().environment.asset_hierarchy_empty_object_sockets)
+        if prefs().env.create_element_render:
+            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_meshes)
+        if prefs().env.create_element_collision:
+            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_collisions)
+        if prefs().env.create_element_sockets:
+            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_sockets)
         if len(hierarchy_to_create_lst) > 1:
             row = column.row()
             box.label(text='...')
@@ -270,7 +273,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         row.prop(self, "include_default_mesh")
         row.prop(self, "dsp_empty_obj_arrows")
         row = column.row()
-        if len(hierarchy_to_create_lst) == 1 and addon.preference().environment.create_element_render:
+        if len(hierarchy_to_create_lst) == 1 and prefs().env.create_element_render:
             row.prop(self, 'include_selected_obj')
 
         # for hierarchy in hierarchy_to_create_lst:
@@ -288,7 +291,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
                     result_hierarchy_name = ''
                     for key, value in self.hierarchy_types.items():
                         if key in self.asset_type:
-                            result_hierarchy_name += exportUtils2.get_hierarchy_prefix_lst()[value]
+                            result_hierarchy_name += exportHierarchy.get_hierarchy_prefix_lst()[value]
                     result_hierarchy_name += self.asset_name
                     result_hierarchy_name += '_' + str(format(item, '02'))
                     result_hierarchy_lst.append(result_hierarchy_name)
@@ -296,7 +299,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
                 result_hierarchy_name = ''
                 for key, value in self.hierarchy_types.items():
                     if key in self.asset_type:
-                        result_hierarchy_name += exportUtils2.get_hierarchy_prefix_lst()[value]
+                        result_hierarchy_name += exportHierarchy.get_hierarchy_prefix_lst()[value]
                 result_hierarchy_name += self.asset_name
                 result_hierarchy_name += '_' + str(format(self.version_suffix, '02'))
                 if len(self.version_suffix_letter) > 0:

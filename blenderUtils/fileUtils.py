@@ -14,22 +14,20 @@ __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-import os
-import sys
 import subprocess
 import webbrowser
 from pathlib import Path
 import zipfile
 from shutil import copyfile
-import urllib.request
-import ssl
 from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.Utils.env as env
+import BlueHole.environment.envManager as envManager
 from typing import *
+from BlueHole.blenderUtils.platformUtils import *
+import stat
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -115,7 +113,7 @@ def get_resource_path_local():
     return bpy.utils.resource_path('LOCAL')
 
 
-def truncate_n_append_str(original_str, truncate_str, append_str):
+def truncate_n_append_str(original_str, truncate_str, append_str) -> str:
     """
     Truncates a string by the length of another string and appends another string at the end
     :param original_str: String to truncate
@@ -139,21 +137,22 @@ def truncate_n_append_str(original_str, truncate_str, append_str):
     return result
 
 
-def open_dir_path(dir_path):
+def open_dir_path(dir_path: Union[str, Path]):
     """
     Opens the directory path that is given as a string
     :param dir_path: Directory to open
     :type dir_path: str
     """
-    if os.path.isdir(dir_path):  # Validate string is in fact a path
+    str_dir_path = str(dir_path)
+    if os.path.isdir(str_dir_path):  # Validate string is in fact a path
         if sys.platform == "win32":
-            os.startfile(dir_path)
+            os.startfile(str_dir_path)
         else:
             opener = "open" if sys.platform == "darwin" else "xdg-open"
-            subprocess.call([opener, dir_path])
+            subprocess.call([opener, str_dir_path])
     else:
         print('ERROR: UNABLE TO OPEN PROJECT DIRECTORY.'
-              '\nAttempted path: ' + dir_path)
+              '\nAttempted path: ' + str_dir_path)
 
 
 def open_url(url):
@@ -244,7 +243,7 @@ def get_current_env_var_path():
     Get the config file path for the current environment.
     :rtype: str
     """
-    return env.get_env_from_prefs_active_env().env_variables_path
+    return envManager.get_env_from_prefs_active_env().env_variables_path
 
 
 def get_default_env_path():
@@ -252,18 +251,18 @@ def get_default_env_path():
     Get the default environment path.
     :rtype: str
     """
-    return env.get_default_env().path
+    return envManager.get_default_env().path
 
 
 def get_default_env_var_path():
     """
     Get the config file path for the default environment
     """
-    return env.get_default_env().env_variables_path
+    return envManager.get_default_env().env_variables_path
 
 
 def get_default_env_msh_guides_path():
-    return Path(env.get_default_env().path, 'msh_scale_guides')
+    return Path(envManager.get_default_env().path, 'msh_scale_guides')
 
 
 def get_file_path_list(dir_name):
@@ -435,7 +434,7 @@ def bool_to_string(bool_value):
         return 'false'
 
 
-def delete_dir(dir_path, debug_mode=False):
+def delete_dir(dir_path: Union[str, Path], debug_mode=False):
     """
     Delete a directory. Be careful when using this function! Test before with a print to see what will be deleted!
     :param dir_path: Directory to delete
@@ -447,8 +446,7 @@ def delete_dir(dir_path, debug_mode=False):
     if debug_mode:
         log(Severity.DEBUG, 'fileUtils.py', f'Would have deleted: "{dir_path}"')
     else:
-        rmtree(dir_path)
-
+        rmtree(str(dir_path))
 
 def terminate_blender():
     """
@@ -456,15 +454,58 @@ def terminate_blender():
     """
     sys.exit(1)
 
-
 def get_computer_name():
     """Gets the computer name (only works on Windows)"""
     return os.environ['COMPUTERNAME']
 
-def get_os_split_char():
-    if filterUtils.filter_platform('win'):
-        return '\\'
-    elif filterUtils.filter_platform('mac'):
-        return '/'
-    else:
-        return None
+def get_os_split_char() -> str:
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            return '\\'
+        case filterUtils.OS.MAC | filterUtils.OS.LINUX:
+            return '/'
+
+def ensure_file_writable_if_exists(file_path: str | Path) -> bool:
+    """
+    Ensures the file is writable by the owner, without removing any
+    existing permissions.
+
+    Returns False if the file does not exist.
+    Raises PermissionError / OSError on failure.
+    """
+    p = Path(file_path)
+
+    if not p.exists() or not p.is_file():
+        return False
+
+    match get_platform():
+        case OS.MAC | OS.LINUX:
+            st = os.stat(p)
+            if not (st.st_mode & stat.S_IWUSR):
+                os.chmod(p, st.st_mode | stat.S_IWUSR)
+
+        case OS.WIN:
+            # Best-effort: clear read-only attribute
+            st = os.stat(p)
+            if not (st.st_mode & stat.S_IWRITE):
+                os.chmod(p, st.st_mode | stat.S_IWRITE)
+
+        case _:
+            raise RuntimeError("Unsupported OS")
+
+    return True
+
+
+def get_user_home_dir() -> Path:
+    """
+    Get the current user's home directory
+    """
+    match get_platform():
+        case OS.WIN | OS.MAC:
+            return Path.home()
+        case OS.LINUX:
+            return Path.home()
+            # import pwd
+            # user = os.getenv("USER")  # Prefer real user
+            # home_dir = Path(pwd.getpwnam(user).pw_dir if user else os.path.expanduser("~"))
+            # return home_dir
