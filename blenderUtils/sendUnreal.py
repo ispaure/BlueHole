@@ -167,6 +167,7 @@ def import_asset(file_path_source, file_path_dest):
             f'if {not is_skeletal}:',
             f'\toptions.mesh_type_to_import = unreal.FBXImportType.FBXIT_STATIC_MESH',
             f'\toptions.static_mesh_import_data.import_mesh_lo_ds = {False}',
+            f'\toptions.static_mesh_import_data.set_editor_property("combine_meshes", True)',
 
             # if this is an animation import
             f'if {include_animation}:',
