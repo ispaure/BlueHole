@@ -13,39 +13,27 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
-import sys
 import addon_utils
 from pathlib import Path
-
-import BlueHole.blenderUtils.addon as addon
+import platform
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.objectUtils as objectUtils
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
-import BlueHole.envUtils.projectUtils as projectUtils
+import BlueHole.blenderUtils.projectUtils as projectUtils
 from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.Utils.env as env
-
+import BlueHole.environment.envPathResolver as envPathResolver
+from BlueHole.preferences.prefs import *
+from enum import Enum
+from BlueHole.blenderUtils.platformUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-def filter_platform(platform):
-    if platform == 'win':
-        if sys.platform == 'win32':
-            return True
-        else:
-            return False
-
-    elif platform == 'mac':
-        if sys.platform != 'win32':
-            return True
-        else:
-            return False
-
 
 def filter_source_control():
-    if addon.preference().sourcecontrol.source_control_enable:
+    if prefs().sc.source_control_enable:
         return True
     else:
         return False
@@ -113,24 +101,24 @@ def check_tests(script_name,
     def dialog_check_blend_exist():
         if silent_mode is False:
             msg = 'Cannot execute script because Blender file is not saved on disk. Save Blender scene and try again.'
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_selection_not_empty():
         if silent_mode is False:
             msg = 'Cannot execute script because selection is empty. Select at least one element and try again.'
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_source_control_enable():
         if silent_mode is False:
             msg = 'Cannot execute script because Source Control is currently disabled in the Blue Hole Add-ons ' \
                   'settings. Enable it and try again.'
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_source_control_connection():
         if not silent_mode:
-            if filter_platform('win'):
-                if addon.preference().sourcecontrol.win32_env_override:
-                    if addon.preference().sourcecontrol.override_mode == 'singleuser-workspace':
+            match get_platform():
+                case OS.WIN:
+                    if prefs().sc.win32_env_override:
                         msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
                               'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
                               'Perforce Environment Settings. Since you are in override mode, do those steps:\n' \
@@ -139,7 +127,7 @@ def check_tests(script_name,
                               '3. Check the "Override P4V Environment Settings" box\n' \
                               '4. Fill out the three fields (Server, User, Workspace)\n' \
                               '5. Click the Apply Override Settings'
-                    elif addon.preference().sourcecontrol.override_mode == 'multiuser-workspace':
+                    else:
                         msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
                               'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
                               'Perforce Environment Settings.\n' \
@@ -148,58 +136,41 @@ def check_tests(script_name,
                               '3. Uncheck the "Use Current Connection for Environment Settings".\n' \
                               '4. Fill out the three fields (Server, User, Workspace)\n' \
                               '5. Press "OK"\n\n' \
-                              'If that still doesn\'t work (and because you are in multiuser-override mode), your settings in Blue Hole environment may be in conflict.:\n' \
+                              'Alternatively:\n' \
                               '1. Open the Blender Preferences (Edit -> Preferences).\n' \
                               '2. Add-ons -> Blue Hole -> Source Control\n' \
                               '3. Check the "Override P4V Environment Settings" box\n' \
-                              '4. See if there is an entry matching your computer name with wrong information and fix it\n' \
+                              '4. Fill out the three fields (Server, User, Workspace)\n' \
                               '5. Try again'
-                    else:
-                        msg = 'ERROR: WRONG SOURCECONTROL WORKSPACE TYPE'
-                else:
+                case OS.MAC | OS.LINUX:
                     msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
                           'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
                           'Perforce Environment Settings.\n' \
-                          '1. Open the P4V Application and log in.\n' \
-                          '2. Connection (Header Menu) -> Environment Settings\n' \
-                          '3. Uncheck the "Use Current Connection for Environment Settings".\n' \
-                          '4. Fill out the three fields (Server, User, Workspace)\n' \
-                          '5. Press "OK"\n\n' \
-                          'Alternatively:\n' \
                           '1. Open the Blender Preferences (Edit -> Preferences).\n' \
                           '2. Add-ons -> Blue Hole -> Source Control\n' \
-                          '3. Check the "Override P4V Environment Settings" box\n' \
-                          '4. Fill out the three fields (Server, User, Workspace)\n' \
-                          '5. Try again'
-            else:
-                msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
-                      'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
-                      'Perforce Environment Settings.\n' \
-                      '1. Open the Blender Preferences (Edit -> Preferences).\n' \
-                      '2. Add-ons -> Blue Hole -> Source Control\n' \
-                      '3. Fill out the three fields (Server, User, Workspace)'
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+                          '3. Fill out the three fields (Server, User, Workspace)'
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_blend_location_in_dir_structure():
         if silent_mode is False:
             msg = 'Cannot execute script because the currently opened Blender file is not located in the sub-folder ' \
                   'specified in the current environments Directory Structure: {sub_folder}. Please relocate the ' \
                   'file and try again.'
-            specified_sub_folder = addon.preference().environment.sc_dir_struct_scenes
+            specified_sub_folder = prefs().env.sc_dir_struct_scenes
             msg = msg.format(sub_folder=specified_sub_folder)
-            log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+            log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_source_content(path):
         msg = 'The Source Content Root Path specified in the Active Environment\'s preferences could ' \
               'not be reached: "{path}". Please create said directory or edit the Active Environment\'s preferences ' \
               'to point to an existing folder.'.format(path=str(path))
-        log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_unity_assets(path):
         msg = 'The Unity Project\'s Assets Path specified in the Active Environment\'s preferences could ' \
               'not be reached: "{}". Please create said directory or edit the Active Environment\'s preferences ' \
               'to point to an existing Unity Assets folder. Example: "C:\\YourUnityProject\\Assets\\"'.format(str(path))
-        log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_blend(sc_path_seek, blend_path_found):
         msg = 'The opened Blender scene file is not located within the Source Content directory path specified in ' \
@@ -209,12 +180,12 @@ def check_tests(script_name,
               'Source Content Root Path to the Unity Project\'s Assets Path. Please move your Blender file or edit ' \
               'the Source Content Root Path in the Active Environment\'s ' \
               'preferences.'.format(sc_path=sc_path_seek, blend_path=blend_path_found)
-        log(Severity.ERROR, script_name, msg, popup=not silent_mode)
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     # Check if Blend exists
     if check_blend_exist:
         if len(fileUtils.get_blend_file_path()) == 0:
-            log(Severity.ERROR, script_name, 'Check Blend Exist Failed')
+            log(Severity.CRITICAL, script_name, 'Check Blend Exist Failed')
             dialog_check_blend_exist()
             return False
         log(Severity.DEBUG, script_name, 'Check Blend Exist Succeeded!')
@@ -223,7 +194,7 @@ def check_tests(script_name,
     if check_blend_loc_in_dir_structure:
         check_result = check_blend_location_in_dir_structure()
         if not check_result:
-            log(Severity.ERROR, script_name, 'Check Blend Location in Directory Structure Failed')
+            log(Severity.CRITICAL, script_name, 'Check Blend Location in Directory Structure Failed')
             dialog_check_blend_location_in_dir_structure()
             return False
         log(Severity.DEBUG, script_name, 'Check Blend Location in Directory Structure Succeeded')
@@ -231,7 +202,7 @@ def check_tests(script_name,
     # Check if selection is not empty
     if check_selection_not_empty:
         if len(objectUtils.get_selection()) == 0:
-            log(Severity.ERROR, script_name, 'Check Selection not Empty Failed')
+            log(Severity.CRITICAL, script_name, 'Check Selection not Empty Failed')
             dialog_check_selection_not_empty()
             return False
         log(Severity.DEBUG, script_name, 'Check Selection not Empty Succeeded')
@@ -239,7 +210,7 @@ def check_tests(script_name,
     # Check if source control is enabled
     if check_source_control_enable:
         if not filter_source_control():
-            log(Severity.ERROR, script_name, 'Check Source Control Enabled: Failed')
+            log(Severity.CRITICAL, script_name, 'Check Source Control Enabled: Failed')
             dialog_source_control_enable()
             return False
         log(Severity.DEBUG, script_name, 'Check Source Control Enabled: Succeeded')
@@ -248,15 +219,14 @@ def check_tests(script_name,
     if check_source_control_connection:
         p4_info_cls = p4Wrapper.P4Info()
         if p4_info_cls.status is False:
-            log(Severity.ERROR, script_name, 'Check Source Control Connection: Failed')
+            log(Severity.CRITICAL, script_name, 'Check Source Control Connection: Failed')
             dialog_source_control_connection()
             return False
         log(Severity.DEBUG, script_name, 'Check Source Control: Succeeded')
 
     # Attempt to get valid source content path
-    bh_prefs_cls = env.BlueHolePrefs()
     if check_source_content_root_path_exist or check_blend_in_source_content:
-        sc_path = bh_prefs_cls.get_valid_sc_dir_path()
+        sc_path = envPathResolver.get_valid_sc_dir_path()
     else:
         sc_path = None
 
@@ -280,7 +250,7 @@ def check_tests(script_name,
 
     # Check that Unity Asset's Path Exists
     if check_unity_assets_path_exist:
-        unity_asset_path = bh_prefs_cls.get_valid_unity_asset_dir_path()
+        unity_asset_path = envPathResolver.get_valid_unity_asset_dir_path()
 
         if not unity_asset_path:
             display_path_error_unity_assets(unity_asset_path)

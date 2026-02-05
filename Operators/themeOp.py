@@ -15,10 +15,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
+# Blender
 import bpy
-import BlueHole.blenderUtils.uiUtils as themeUtils
 
+# Blue Hole
+import BlueHole.blenderUtils.uiUtils as themeUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

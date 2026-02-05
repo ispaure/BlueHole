@@ -13,12 +13,12 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import bpy
 from bpy.props import *
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
-
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -29,7 +29,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-class bc(bpy.types.PropertyGroup):
+class GeneralPG(bpy.types.PropertyGroup):
 
     # EXPORTS: BATCH SELECTION -----------------------------------------------------------------------------------------
 
@@ -74,6 +74,12 @@ class bc(bpy.types.PropertyGroup):
                                                   'set for send to Unity',
                                       default='DEFAULT_STR')
 
+    unity_assets_path_linux: StringProperty(name='Unity Project\'s Assets Path',
+                                          subtype='DIR_PATH',
+                                          description='The Unity Project\'s Assets folder. Needs to be '
+                                                      'set for send to Unity',
+                                          default='DEFAULT_STR')
+
     # Hierarchy Root to 0,0,0
     unity_bridge_zero_root_transform: BoolProperty(name = 'When enabled, sets the hierarchy root transforms to 0 upon export.',
                                                 default = True)
@@ -110,7 +116,7 @@ def label_row(path, prop, row, label=''):
 def draw(preference, context, layout):
 
     # Lay out environment settings
-    enable_rows = addon.preference().environment.active_environment != 'default'
+    enable_rows = prefs().env.active_environment != 'default'
 
     # SEND ASSET HIERARCHIES TO UNREAL
     box = layout.box()
@@ -119,26 +125,30 @@ def draw(preference, context, layout):
     row.enabled = enable_rows
     row.label(text="Send/Export Asset Hierarchies to Unreal")
     # General options
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
 
-    if filterUtils.filter_platform('win'):
+        case filterUtils.OS.MAC:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_mac', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
 
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path', text='Source Content')
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
-
-    elif filterUtils.filter_platform('mac'):
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_mac', text='Source Content')
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+        case filterUtils.OS.LINUX:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_linux', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
 
     row = column.row()
     row.enabled = enable_rows
@@ -159,18 +169,25 @@ def draw(preference, context, layout):
     # General options
     row = column.row()
     row.enabled = enable_rows
-    if filterUtils.filter_platform('win'):
-        row.prop(preference.environment, 'sc_path', text='Source Content')
-        row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
-    elif filterUtils.filter_platform('mac'):
-        row.prop(preference.environment, 'sc_path_mac', text='Source Content')
-        row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            row.prop(preference.environment, 'sc_path', text='Source Content')
+            row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
+        case filterUtils.OS.MAC:
+            row.prop(preference.environment, 'sc_path_mac', text='Source Content')
+            row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+        case filterUtils.OS.LINUX:
+            row.prop(preference.environment, 'sc_path_linux', text='Source Content')
+            row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
     row = column.row()
     row.enabled = enable_rows
-    if filterUtils.filter_platform('win'):
-        row.prop(preference.general, 'unity_assets_path', text='Unity Assets')
-    elif filterUtils.filter_platform('mac'):
-        row.prop(preference.general, 'unity_assets_path_mac', text='Unity Assets')
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            row.prop(preference.general, 'unity_assets_path', text='Unity Assets')
+        case filterUtils.OS.MAC:
+            row.prop(preference.general, 'unity_assets_path_mac', text='Unity Assets')
+        case filterUtils.OS.LINUX:
+            row.prop(preference.general, 'unity_assets_path_linux', text='Unity Assets')
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.general, 'unity_bridge_zero_root_transform', text='Zero Root Transform on Export')

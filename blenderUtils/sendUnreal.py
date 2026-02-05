@@ -13,30 +13,25 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
+# System
 from pathlib import Path
-
 import time
 
+# Blue Hole
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.addon as addon
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.Lib.send2ue.dependencies.remote_execution as remote_execution
-import BlueHole.blenderUtils.exportUtils2 as exportUtils2
-import BlueHole.Utils.env as env
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-send_ue_name = 'Send to Unreal'
+from BlueHole.preferences.prefs import *
+import BlueHole.environment.envPathResolver as envPathResolver
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
 unreal_response = ''
+send_ue_name = 'Blue Hole Bridge to Unreal'
 
 
 def trigger_unreal_import(file_path_source):
@@ -50,7 +45,7 @@ def trigger_unreal_import(file_path_source):
         err_msg = ('The Source Content directory path specified in the active environment\'s env_variables.ini file '
                    'is invalid. Please create said directory or edit env_variables.ini to match your '
                    f'Source Content folder.\n\nAttempted path: "{path}"')
-        show_prompt('Blender to Unreal Bridge', err_msg)
+        log(Severity.CRITICAL, send_ue_name, err_msg, popup=True)
 
     def display_path_error_blend(sc_path, blend_path):
         err_msg = ('The currently opened Blender file is not located within the Source Content directory path '
@@ -58,7 +53,7 @@ def trigger_unreal_import(file_path_source):
                    'or edit the Source Content path from env_variables.ini.\n\nExpected blender path to be '
                    f'within: "{sc_path}"'
                    f'\nFound blender path to be: "{blend_path}"')
-        show_prompt('Blender to Unreal Bridge', err_msg)
+        log(Severity.CRITICAL, send_ue_name, err_msg, popup=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # VALIDATE ENV_VARIABLES.INI has valid SourceContent path for Unreal Bridge,
@@ -66,7 +61,7 @@ def trigger_unreal_import(file_path_source):
 
     # Get SourceContent's directory path from env_variables.ini
     # (the root of where blender files and assets are saved)
-    sc_path = env.BlueHolePrefs().get_valid_sc_dir_path()
+    sc_path = envPathResolver.get_valid_sc_dir_path()
 
     # Validate this path is valid, else throw error
     if not sc_path:
@@ -97,7 +92,7 @@ def trigger_unreal_import(file_path_source):
 
     result = import_asset(str(Path(file_path_source)), str(Path(file_path_dest)))
     if not result:
-        log(Severity.ERROR, send_ue_name, 'Command did not succeed!')
+        log(Severity.CRITICAL, send_ue_name, 'Command did not succeed!')
         return False
 
     log(Severity.DEBUG, send_ue_name, 'Command succeeded!')
@@ -109,7 +104,7 @@ def display_cannot_connect_unreal_error():
           '\n\nPlease make sure:' \
           '\n1)Unreal Editor is opened and has a project loaded.' \
           '\n2)You have followed the setup instructions on the Blue Hole website for the Unreal bridge.'
-    log(Severity.ERROR, send_ue_name, msg, popup=True)
+    log(Severity.CRITICAL, send_ue_name, msg, popup=True)
 
 
 def import_asset(file_path_source, file_path_dest):
@@ -126,7 +121,7 @@ def import_asset(file_path_source, file_path_dest):
     log(Severity.DEBUG, send_ue_name, 'Fetching Properties...')
 
     # Was it a skeletal?
-    sk_prefix = exportUtils2.get_hierarchy_prefix_lst()[2]
+    sk_prefix = prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
     if sk_prefix == file_path_source.split('/')[-1][0:len(sk_prefix)]:
         log(Severity.DEBUG, send_ue_name, 'Export is a Skeletal Mesh')
         is_skeletal = True
@@ -135,7 +130,7 @@ def import_asset(file_path_source, file_path_dest):
         is_skeletal = False
 
     # Is importing animations?
-    include_animation = addon.preference().general.ue_bridge_include_animation
+    include_animation = prefs().general.ue_bridge_include_animation
 
     # Make sure \\ on paths
     file_path_source = file_path_source.replace('\\', '\\\\')
@@ -150,15 +145,15 @@ def import_asset(file_path_source, file_path_dest):
             f'import_task = unreal.AssetImportTask()',
             f'import_task.filename = r"{file_path_source}"',
             f'import_task.destination_path = r"{file_path_dest}"',
-            f'import_task.automated = {addon.preference().general.ue_automated}',
+            f'import_task.automated = {prefs().general.ue_automated}',
             f'import_task.replace_existing = True',
             f'options = unreal.FbxImportUI()',
             f'options.auto_compute_lod_distances = False',
             f'options.lod_number = 0',
             f'options.import_as_skeletal = {is_skeletal}',
             f'options.import_animations = {include_animation}',
-            f'options.import_materials = {addon.preference().general.ue_import_materials}',
-            f'options.import_textures = {addon.preference().general.ue_import_textures}',
+            f'options.import_materials = {prefs().general.ue_import_materials}',
+            f'options.import_textures = {prefs().general.ue_import_textures}',
             f'options.import_mesh = {True}',
             f'options.static_mesh_import_data.generate_lightmap_u_vs = False',
             f'options.lod_distance0 = 1.0',
@@ -172,6 +167,7 @@ def import_asset(file_path_source, file_path_dest):
             f'if {not is_skeletal}:',
             f'\toptions.mesh_type_to_import = unreal.FBXImportType.FBXIT_STATIC_MESH',
             f'\toptions.static_mesh_import_data.import_mesh_lo_ds = {False}',
+            f'\toptions.static_mesh_import_data.set_editor_property("combine_meshes", True)',
 
             # if this is an animation import
             f'if {include_animation}:',

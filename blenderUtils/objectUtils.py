@@ -13,6 +13,7 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import mathutils as mathutils
 
@@ -20,7 +21,7 @@ import bpy
 
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.sceneUtils as sceneUtils
-import BlueHole.blenderUtils.addon as addon
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -137,8 +138,8 @@ def add_asset_hierarchy(hierarchy_lst, include_default_mesh, include_selected_ob
         # Create underlying "Empty" objects.
 
         # Null Meshes
-        if addon.preference().environment.create_element_render:
-            null_meshes_name = addon.preference().environment.asset_hierarchy_empty_object_meshes  # Name
+        if prefs().env.create_element_render:
+            null_meshes_name = prefs().env.asset_hierarchy_empty_object_meshes  # Name
             null_mesh_object = add_object_empty(null_meshes_name, root_object, 3, 0.15, True)  # Create
 
             # Default Cube under Render Empty Object
@@ -153,13 +154,13 @@ def add_asset_hierarchy(hierarchy_lst, include_default_mesh, include_selected_ob
                         selected_obj.parent = null_mesh_object
 
         # Null Collisions
-        if addon.preference().environment.create_element_collision:
-            null_collisions_name = addon.preference().environment.asset_hierarchy_empty_object_collisions
+        if prefs().env.create_element_collision:
+            null_collisions_name = prefs().env.asset_hierarchy_empty_object_collisions
             add_object_empty(null_collisions_name, root_object, 4, 0.05, True)  # Create
 
         # Null Sockets
-        if addon.preference().environment.create_element_sockets:
-            null_sockets_name = addon.preference().environment.asset_hierarchy_empty_object_sockets  # Name
+        if prefs().env.create_element_sockets:
+            null_sockets_name = prefs().env.asset_hierarchy_empty_object_sockets  # Name
             add_object_empty(null_sockets_name, root_object, 5, 0.05, True)  # Create
 
         # Deselect everything

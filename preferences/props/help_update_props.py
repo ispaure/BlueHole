@@ -13,12 +13,13 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import bpy
 from bpy.props import *
 
 import BlueHole.blenderUtils.configUtils as configUtils
-import BlueHole.blenderUtils.addon as addon
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -30,7 +31,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-class bc(bpy.types.PropertyGroup):
+class HelpUpdatePG(bpy.types.PropertyGroup):
 
     # UPDATES -----------------------------------------------------------------------------------------
 
@@ -75,7 +76,7 @@ def draw(preference, context, layout):
     row = column.row()
     row.prop(preference.help_n_update, 'auto_update_addon', text='Automatic Updates')
     row.enabled = False
-    if addon.preference().help_n_update.auto_update_addon:
+    if prefs().help_n_update.auto_update_addon:
         row.prop(preference.help_n_update, 'update_version', text='Version')
     layout.operator('wm.bh_install_addon_only', icon='URL')
     layout.operator("wm.bh_install_deluxe", icon='URL')

@@ -13,14 +13,13 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import bpy
 from bpy.props import *
-from pathlib import Path
-
-import BlueHole.blenderUtils.addon as addon
-import BlueHole.Utils.env as env
+import BlueHole.environment.envManager as envManager
 import BlueHole.blenderUtils.filterUtils as filterUtils
+from BlueHole.preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -32,10 +31,10 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-class bc(bpy.types.PropertyGroup):
+class EnvironmentPG(bpy.types.PropertyGroup):
 
     # Get list of environments
-    env_enum_prop_lst = env.get_env_lst_enum_property()
+    env_enum_prop_lst = envManager.get_env_lst_enum_property()
 
     # Active Environment
     active_environment: EnumProperty(name="Active Environment",
@@ -64,6 +63,18 @@ class bc(bpy.types.PropertyGroup):
                             default='DEFAULT_STR')
 
     sc_path_mac_alternate: StringProperty(name='Source Content Root Path (Alternate)',
+                            subtype='DIR_PATH',
+                            description='Root Directory (Alternate) in which all Source Content Asset Directory Structures '
+                                        'reside. Optional path used as fallback. In case of doubt, ignore.',
+                            default='DEFAULT_STR')
+
+    sc_path_linux: StringProperty(name='Source Content Root Path',
+                            subtype='DIR_PATH',
+                            description='Root Directory in which all Source Content Asset Directory Structures '
+                                        'reside. \nNeeds to be set for Send to Unreal & Send to Unity',
+                            default='DEFAULT_STR')
+
+    sc_path_linux_alternate: StringProperty(name='Source Content Root Path (Alternate)',
                             subtype='DIR_PATH',
                             description='Root Directory (Alternate) in which all Source Content Asset Directory Structures '
                                         'reside. Optional path used as fallback. In case of doubt, ignore.',
@@ -170,17 +181,8 @@ def label_row(path, prop, row, label=''):
 
 def draw(preference, context, layout):
 
-    # # Draw Environment specific settings, if available.
-    # # Determine path to current environment
-    # current_env_path = envUtils.get_env_lst()[addon.preference().environment.active_environment]
-    # # Determine path to preference file
-    # python_module_path = str(Path(current_env_path + '/env_preferences.py'))
-    # imp_module = importUtils.import_python_module_absolute_path(python_module_path)
-    # if imp_module is not None:
-    #     imp_module.draw(preference, context, layout)
-
     # Lay out environment settings
-    enable_rows = addon.preference().environment.active_environment != 'default'
+    enable_rows = prefs().env.active_environment != 'default'
 
     # Source Content Path
     box = layout.box()
@@ -189,25 +191,30 @@ def draw(preference, context, layout):
     row.enabled = enable_rows
     row.label(text="Source Content Root Path: Contains all art source files for your project.")
 
-    if filterUtils.filter_platform('win'):
+    match filterUtils.get_platform():
+        case filterUtils.OS.WIN:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
 
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path', text='Source Content')
+        case filterUtils.OS.MAC:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_mac', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
 
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
-
-    elif filterUtils.filter_platform('mac'):
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_mac', text='Source Content')
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+        case filterUtils.OS.LINUX:
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_linux', text='Source Content')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
 
     # Asset Directory Structure
     box = layout.box()
@@ -269,15 +276,15 @@ def draw(preference, context, layout):
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.environment, 'create_element_render', text='Render')
-    if addon.preference().environment.create_element_render:
+    if prefs().env.create_element_render:
         row.prop(preference.environment, 'asset_hierarchy_empty_object_meshes', text='Name')
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.environment, 'create_element_collision', text='Collision')
-    if addon.preference().environment.create_element_collision:
+    if prefs().env.create_element_collision:
         row.prop(preference.environment, 'asset_hierarchy_empty_object_collisions', text='Name')
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.environment, 'create_element_sockets', text='Socket')
-    if addon.preference().environment.create_element_sockets:
+    if prefs().env.create_element_sockets:
         row.prop(preference.environment, 'asset_hierarchy_empty_object_sockets', text='Name')

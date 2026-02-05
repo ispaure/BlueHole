@@ -13,13 +13,13 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
+# Blender
 import bpy
 
-import BlueHole.blenderUtils.debugUtils as debugUtils
-import BlueHole.blenderUtils.addon as addon
-from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
-
+# Blue Hole
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -29,11 +29,11 @@ bh_name = 'Blue Hole'
 
 # Header Blue Hole Menu
 class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
-    bl_label = f'{bh_name} [' + str(addon.preference().environment.active_environment.lower()) + ']'
+    bl_label = f'{bh_name} [' + str(prefs().env.active_environment.lower()) + ']'
 
     def draw(self, context):
         # import BlueHole.__init__
-        self.bl_label = f'{bh_name} [' + str(addon.preference().environment.active_environment.lower()) + ']'
+        self.bl_label = f'{bh_name} [' + str(prefs().env.active_environment.lower()) + ']'
         layout = self.layout
         layout.operator('wm.set_active_environment')
         layout.menu("BLUE_HOLE_MT_help", icon='HELP')
@@ -47,7 +47,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout.menu("BLUE_HOLE_MT_send", icon='UV_SYNC_SELECT')
         layout.separator()
         # layout.menu("BLUE_HOLE_MT_import_export")
-        if addon.preference().sourcecontrol.source_control_enable:
+        if prefs().sc.source_control_enable:
             layout.menu("BLUE_HOLE_MT_source_control", icon='CHECKMARK')
         layout.menu("BLUE_HOLE_MT_misc")
 

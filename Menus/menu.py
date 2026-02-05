@@ -16,14 +16,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
-import bpy
+# System
 import os
-import BlueHole.blenderUtils.addon as addon
+
+# Blender
+import bpy
+
+# Blue Hole
 from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 from BlueHole.blenderUtils.uiUtils import show_label as show_label
-
-# Import Operators
 import BlueHole.Operators.dirOp as dirOp
 import BlueHole.Operators.impExpOp as impExpOp
 import BlueHole.Operators.foodOp as foodOp
@@ -33,7 +34,7 @@ import BlueHole.Operators.sendOp as sendOp
 import BlueHole.Operators.sortOp as sortOp
 import BlueHole.Operators.sourceControlOp as sourceControlOp
 import BlueHole.Operators.themeOp as themeOp
-
+from BlueHole.preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -48,9 +49,9 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
         layout.operator(impExpOp.SceneAddAssetHierarchy.bl_idname, icon='OUTLINER')
 
         # Environment Folders
-        test_a = os.path.exists(addon.preference().environment.sc_path) or os.path.exists(addon.preference().environment.sc_path_alternate) or os.path.exists(addon.preference().environment.sc_path_mac) or os.path.exists(addon.preference().environment.sc_path_mac_alternate)
-        test_b = os.path.exists(addon.preference().general.unity_assets_path) or os.path.exists(addon.preference().general.unity_assets_path_mac)
-        test_c = addon.preference().sourcecontrol.source_control_enable and addon.preference().sourcecontrol.source_control_solution == 'perforce'
+        test_a = os.path.exists(prefs().env.sc_path) or os.path.exists(prefs().env.sc_path_alternate) or os.path.exists(prefs().env.sc_path_mac) or os.path.exists(prefs().env.sc_path_mac_alternate)
+        test_b = os.path.exists(prefs().general.unity_assets_path) or os.path.exists(prefs().general.unity_assets_path_mac)
+        test_c = prefs().sc.source_control_enable and prefs().sc.source_control_solution == 'perforce'
         if test_a or test_b or test_c:
             layout.separator()
             show_label('ENVIRONMENT', layout)
