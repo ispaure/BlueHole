@@ -16,19 +16,7 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Install PySide6 (Only Custom Library required for Blue Hole -- It's for the User Interface)
-try:
-    from PySide6.QtWidgets import QApplication
-except ImportError:
-    import subprocess
-    import sys
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "PySide6"])
-        from PySide6.QtWidgets import QApplication
-    except Exception as install_error:
-        print("[PIP ERROR] Failed to install PySide6: ", install_error)
-        raise install_error
-# ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 # Import bpy
 import bpy
