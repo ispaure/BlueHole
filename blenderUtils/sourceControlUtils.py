@@ -17,10 +17,9 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
-import BlueHole.wrappers.perforceWrapper as p4Wrapper
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.preferences.prefs import *
+from ..wrappers import perforceWrapper as p4Wrapper
+from . import filterUtils, fileUtils
+from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

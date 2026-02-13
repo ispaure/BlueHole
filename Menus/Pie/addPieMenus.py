@@ -13,9 +13,9 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-from BlueHole.blenderUtils.debugUtils import *
+from ...blenderUtils.debugUtils import *
 import os
-from BlueHole.Menus.Pie.Button import blenderPieButton, machin3PieButton
+from .Button import blenderPieButton, machin3PieButton
 
 
 # ----------------------------------------------------------------------------------------------------------------------

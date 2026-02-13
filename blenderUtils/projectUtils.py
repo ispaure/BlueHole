@@ -19,10 +19,8 @@ __status__ = 'Production'
 from pathlib import Path
 
 # Blue Hole
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.configUtils as configUtils
-from BlueHole.preferences.prefs import *
-import BlueHole.blenderUtils.filterUtils as filterUtils
+from . import fileUtils, configUtils, filterUtils
+from ..preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
-from BlueHole.environment.model import Setting
+from .model import Setting
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

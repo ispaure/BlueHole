@@ -24,9 +24,8 @@ import bpy
 from bpy.props import *
 
 # Blue Hole
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.environment.envManager as envManager
-import BlueHole.environment.model as envModel
+from ..blenderUtils import fileUtils
+from ..environment import envManager, model
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -102,8 +101,8 @@ class WM_OT_AddEnvironment(bpy.types.Operator):
 
     def execute(self, context):
         sanitized_name = self.new_environment_name_str.replace(' ', '_').replace('.', '_')
-        env_cls = envModel.Environment(sanitized_name)
-        env_cls.add_env(envModel.Environment(self.add_based_from_environment))
+        env_cls = model.Environment(sanitized_name)
+        env_cls.add_env(model.Environment(self.add_based_from_environment))
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -141,7 +140,7 @@ class WM_OT_DeleteAnEnvironment(bpy.types.Operator):
         row.label(text='You may want to save your scene before proceeding.')
 
     def execute(self, context):
-        env_cls = envModel.Environment(self.deletable_environments)
+        env_cls = model.Environment(self.deletable_environments)
         env_cls.delete_env()
         return {'FINISHED'}
 

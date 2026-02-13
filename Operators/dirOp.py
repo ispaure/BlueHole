@@ -19,12 +19,10 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.projectUtils as projectUtils
-import BlueHole.wrappers.perforceWrapper as p4Wrapper
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.environment.envPathResolver as envPathResolver
-from BlueHole.preferences.prefs import *
+from ..blenderUtils import fileUtils, projectUtils, filterUtils
+from ..wrappers import perforceWrapper as p4Wrapper
+from ..environment import envPathResolver
+from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

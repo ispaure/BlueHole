@@ -19,7 +19,7 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from BlueHole.preferences.prefs import *
+from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -32,7 +32,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
     bl_label = f'{bh_name} [' + str(prefs().env.active_environment.lower()) + ']'
 
     def draw(self, context):
-        # import BlueHole.__init__
+
         self.bl_label = f'{bh_name} [' + str(prefs().env.active_environment.lower()) + ']'
         layout = self.layout
         layout.operator('wm.set_active_environment')

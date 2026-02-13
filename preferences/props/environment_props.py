@@ -17,9 +17,9 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-import BlueHole.environment.envManager as envManager
-import BlueHole.blenderUtils.filterUtils as filterUtils
-from BlueHole.preferences.prefs import *
+from ...environment import envManager
+from ...blenderUtils import filterUtils
+from ..prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

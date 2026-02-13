@@ -19,9 +19,9 @@ import mathutils as mathutils
 
 import bpy
 
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.sceneUtils as sceneUtils
-from BlueHole.preferences.prefs import *
+from .debugUtils import *
+from . import sceneUtils
+from ..preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

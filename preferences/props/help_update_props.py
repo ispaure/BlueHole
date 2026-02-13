@@ -18,8 +18,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 
-import BlueHole.blenderUtils.configUtils as configUtils
-from BlueHole.preferences.prefs import *
+from ...blenderUtils import configUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -76,7 +75,3 @@ def draw(preference, context, layout):
     row = column.row()
     row.prop(preference.help_n_update, 'auto_update_addon', text='Automatic Updates')
     row.enabled = False
-    if prefs().help_n_update.auto_update_addon:
-        row.prop(preference.help_n_update, 'update_version', text='Version')
-    layout.operator('wm.bh_install_addon_only', icon='URL')
-    layout.operator("wm.bh_install_deluxe", icon='URL')

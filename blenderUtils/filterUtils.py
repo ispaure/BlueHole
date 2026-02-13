@@ -18,15 +18,13 @@ __status__ = 'Production'
 import addon_utils
 from pathlib import Path
 import platform
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.objectUtils as objectUtils
-import BlueHole.wrappers.perforceWrapper as p4Wrapper
-import BlueHole.blenderUtils.projectUtils as projectUtils
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.environment.envPathResolver as envPathResolver
-from BlueHole.preferences.prefs import *
+from . import fileUtils, objectUtils, projectUtils
+from ..wrappers import perforceWrapper
+from .debugUtils import *
+from ..environment import envPathResolver
+from ..preferences.prefs import *
 from enum import Enum
-from BlueHole.blenderUtils.platformUtils import *
+from .platformUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -217,7 +215,7 @@ def check_tests(script_name,
 
     # Check source control connection
     if check_source_control_connection:
-        p4_info_cls = p4Wrapper.P4Info()
+        p4_info_cls = perforceWrapper.P4Info()
         if p4_info_cls.status is False:
             log(Severity.CRITICAL, script_name, 'Check Source Control Connection: Failed')
             dialog_source_control_connection()

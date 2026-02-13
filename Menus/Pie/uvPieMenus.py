@@ -13,11 +13,8 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-from BlueHole.blenderUtils.debugUtils import *
-from .Button import blenderPieButton as blenderPieButton
-from .Button import dreamuvPieButton as dreamuvPieButton
-from .Button import uvtoolkitPieButton as uvtoolkitPieButton
-from .Button import zenuvPieButton as zenuvPieButton
+from ...blenderUtils.debugUtils import *
+from .Button import blenderPieButton, dreamuvPieButton, uvtoolkitPieButton, zenuvPieButton
 
 
 # ----------------------------------------------------------------------------------------------------------------------

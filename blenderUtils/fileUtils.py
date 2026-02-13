@@ -22,11 +22,11 @@ from shutil import copyfile
 from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.environment.envManager as envManager
+from .debugUtils import *
+from . import filterUtils
+from ..environment import envManager
 from typing import *
-from BlueHole.blenderUtils.platformUtils import *
+from .platformUtils import *
 import stat
 
 

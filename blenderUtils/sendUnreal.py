@@ -20,12 +20,11 @@ from pathlib import Path
 import time
 
 # Blue Hole
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.Lib.send2ue.dependencies.remote_execution as remote_execution
-from BlueHole.preferences.prefs import *
-import BlueHole.environment.envPathResolver as envPathResolver
+from .debugUtils import *
+from . import fileUtils, filterUtils
+from ..Lib.send2ue.dependencies import remote_execution
+from ..preferences.prefs import *
+from ..environment import envPathResolver
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

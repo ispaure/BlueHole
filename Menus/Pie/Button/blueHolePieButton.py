@@ -16,9 +16,8 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.environment.envPathResolver as envPathResolver
-from BlueHole.preferences.prefs import *
+from ....blenderUtils.debugUtils import *
+from ....preferences.prefs import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

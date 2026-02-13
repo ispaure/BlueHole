@@ -19,9 +19,9 @@ import os
 import bpy
 
 # Blue Hole
-from BlueHole.blenderUtils.debugUtils import *
-from BlueHole.preferences.prefs import *
-from BlueHole.Menus.Pie.Button import blueHolePieButton
+from ...blenderUtils.debugUtils import *
+from ...preferences.prefs import *
+from .Button import blueHolePieButton
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED SETTINGS

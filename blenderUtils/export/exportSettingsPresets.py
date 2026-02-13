@@ -20,11 +20,11 @@ from dataclasses import dataclass
 from enum import Enum
 
 # Blue Hole
-from BlueHole.blenderUtils.debugUtils import *
-from BlueHole.blenderUtils.export.exportSettings import *
-from BlueHole.preferences.prefs import *
-import BlueHole.blenderUtils.projectUtils as projectUtils
-import BlueHole.environment.envPathResolver as envPathResolver
+from ..debugUtils import *
+from .exportSettings import *
+from ...preferences.prefs import *
+from .. import projectUtils
+from ...environment import envPathResolver
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

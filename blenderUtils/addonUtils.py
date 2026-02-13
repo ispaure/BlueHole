@@ -12,7 +12,7 @@ __status__ = 'Production'
 
 import bpy
 import addon_utils
-import BlueHole.blenderUtils.fileUtils as fileUtils
+from . import fileUtils
 from pathlib import Path
 from typing import *
 

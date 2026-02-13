@@ -19,7 +19,7 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.sortUtils as sortUtils
+from ..blenderUtils import sortUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

@@ -15,8 +15,8 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-import BlueHole.blenderUtils.addonUtils as addonUtils
-from BlueHole.blenderUtils import fileUtils as fileUtils
+from ....blenderUtils import addonUtils
+from ....blenderUtils import fileUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MISC

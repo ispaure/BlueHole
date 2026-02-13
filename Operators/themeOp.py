@@ -19,7 +19,7 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.uiUtils as themeUtils
+from ..blenderUtils import uiUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -31,7 +31,7 @@ class SetThemeBlenderDark(bpy.types.Operator):
     bl_label = "Dark"
 
     def execute(self, context):
-        themeUtils.set_theme('blender_dark')
+        uiUtils.set_theme('blender_dark')
         return {'FINISHED'}
 
 
@@ -41,7 +41,7 @@ class SetThemeBlenderLight(bpy.types.Operator):
     bl_label = "Light"
 
     def execute(self, context):
-        themeUtils.set_theme('blender_light')
+        uiUtils.set_theme('blender_light')
         return {'FINISHED'}
 
 
@@ -51,7 +51,7 @@ class SetThemeDeepGrey(bpy.types.Operator):
     bl_label = "Deep Grey"
 
     def execute(self, context):
-        themeUtils.set_theme('deep_grey')
+        uiUtils.set_theme('deep_grey')
         return {'FINISHED'}
 
 
@@ -61,7 +61,7 @@ class SetThemeMODO(bpy.types.Operator):
     bl_label = "MODO"
 
     def execute(self, context):
-        themeUtils.set_theme('modo')
+        uiUtils.set_theme('modo')
         return {'FINISHED'}
 
 
@@ -71,7 +71,7 @@ class SetThemeSky(bpy.types.Operator):
     bl_label = "Sky"
 
     def execute(self, context):
-        themeUtils.set_theme('sky')
+        uiUtils.set_theme('sky')
         return {'FINISHED'}
 
 
@@ -81,7 +81,7 @@ class SetThemeWhite(bpy.types.Operator):
     bl_label = "White"
 
     def execute(self, context):
-        themeUtils.set_theme('white')
+        uiUtils.set_theme('white')
         return {'FINISHED'}
 
 
@@ -91,7 +91,7 @@ class SetThemeZen(bpy.types.Operator):
     bl_label = "Zen"
 
     def execute(self, context):
-        themeUtils.set_theme('zen')
+        uiUtils.set_theme('zen')
         return {'FINISHED'}
 
 
@@ -101,7 +101,7 @@ class SetThemeZenDark(bpy.types.Operator):
     bl_label = "Zen Dark"
 
     def execute(self, context):
-        themeUtils.set_theme('zen_dark')
+        uiUtils.set_theme('zen_dark')
         return {'FINISHED'}
 
 
