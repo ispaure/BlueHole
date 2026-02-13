@@ -84,4 +84,6 @@ source_control_setting_lst = (
     Setting(pref_path='sourcecontrol.source_control_enable', ini_section='SourceControl', ini_value='enable', var_type=bool),
     Setting(pref_path='sourcecontrol.source_control_error_aborts_exp', ini_section='SourceControl', ini_value='abort_export_on_error', var_type=bool),
     Setting(pref_path='sourcecontrol.win32_env_override', ini_section='Perforce', ini_value='override_env_setting', var_type=bool),
+    Setting(pref_path='sourcecontrol.p4v_app_path_mac', ini_section='Perforce', ini_value='p4v_app_path_mac', var_type=str),
+    Setting(pref_path='sourcecontrol.p4_parallel_path_linux', ini_section='Perforce', ini_value='p4_parallel_path_linux', var_type=str),
 )

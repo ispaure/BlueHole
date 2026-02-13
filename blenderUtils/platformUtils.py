@@ -26,7 +26,7 @@ from enum import Enum
 
 class OS(Enum):
     WIN = 'Windows'
-    MAC = 'Mac'
+    MAC = 'macOS'
     LINUX = 'Linux'
 
 

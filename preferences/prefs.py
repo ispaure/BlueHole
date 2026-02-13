@@ -471,6 +471,22 @@ class _SCPrefs:
     def linux_env_setting_p4client(self, value: str):
         self._sc.linux_env_setting_p4client = value
 
+    @property
+    def p4v_app_path_mac(self) -> str:
+        return self._sc.p4v_app_path_mac
+
+    @p4v_app_path_mac.setter
+    def p4v_app_path_mac(self, value: str):
+        self._sc.p4v_app_path_mac = value
+
+    @property
+    def p4_parallel_path_linux(self) -> str:
+        return self._sc.p4_parallel_path_linux
+
+    @p4_parallel_path_linux.setter
+    def p4_parallel_path_linux(self, value: str):
+        self._sc.p4_parallel_path_linux = value
+
 
 class _HelpNUpdatePrefs:
     def __init__(self, help_n_update):
