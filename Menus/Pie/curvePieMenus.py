@@ -14,6 +14,7 @@ __status__ = 'Production'
 
 import bpy
 from BlueHole.blenderUtils.debugUtils import *
+from BlueHole.Menus.Pie.Button import blenderPieButton
 import os
 
 
@@ -37,21 +38,21 @@ class MT_pie_curve_action(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("curve.split", text="Split", icon='FCURVE')
+        blenderPieButton.split_curve(pie)
         # 6 - RIGHT
-        pie.operator("curve.separate", text="Separate", icon='OUTLINER_OB_CURVE')
+        blenderPieButton.separate_curve(pie)
         # 2 - BOTTOM
-        pie.operator("curve.dissolve_verts", text="Dissolve Vertices", icon='GHOST_DISABLED')
+        blenderPieButton.dissolve_curve_vertices(pie)
         # 8 - TOP
-        pie.operator("curve.smooth_radius", text="Smooth Curve Radius", icon='FULLSCREEN_EXIT')
+        blenderPieButton.smooth_curve_radius(pie)
         # 7 - TOP - LEFT
-        pie.operator("curve.normals_make_consistent", text="Recalculate Handles", icon='HANDLE_FREE')
+        blenderPieButton.recalc_curve_handles(pie)
         # 9 - TOP - RIGHT
-        pie.operator("curve.handle_type_set", text="Set Handle Linear", icon='HANDLE_ALIGNED').type = 'ALIGNED'
+        blenderPieButton.set_handle_linear(pie)
         # 1 - BOTTOM - LEFT
-        pie.operator("curve.switch_direction", text="Switch Direction", icon='CURVE_PATH')
+        blenderPieButton.switch_curve_direction(pie)
         # 3 - BOTTOM - RIGHT
-        pie.operator("curve.cyclic_toggle", text="Toggle Cyclic", icon='CURVE_NCIRCLE')
+        blenderPieButton.toggle_curve_cyclic(pie)
 
 
 # Context: 3D Viewport (Curve)
@@ -64,21 +65,21 @@ class MT_pie_curve_tool(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("curve.make_segment", text="Make Segment", icon='OUTLINER_DATA_CURVE')
+        blenderPieButton.curve_make_segment(pie)
         # 6 - RIGHT
-        pie.operator("curve.extrude_move", text="Extrude Curve and Move", icon='CURVE_BEZCURVE')
+        blenderPieButton.curve_extrude_move(pie)
         # 2 - BOTTOM
-        pie.operator("curve.smooth", text="Smooth", icon='MOD_OFFSET')
+        blenderPieButton.curve_smooth(pie)
         # 8 - TOP
         pie.separator()
         # 7 - TOP - LEFT
-        pie.operator("transform.tilt", text="Tilt", icon='ORIENTATION_GIMBAL')
+        blenderPieButton.transform_tilt(pie)
         # 9 - TOP - RIGHT
-        pie.operator("transform.transform", text="Scale", icon='ORIENTATION_LOCAL').mode = 'CURVE_SHRINKFATTEN'
+        blenderPieButton.transform_curve_scale(pie)
         # 1 - BOTTOM - LEFT
-        pie.operator("curve.decimate", text="Decimate Curve", icon='IPO_LINEAR')
+        blenderPieButton.curve_decimate(pie)
         # 3 - BOTTOM - RIGHT
-        pie.operator("curve.subdivide", text="Subdivide", icon='PARTICLE_POINT')
+        blenderPieButton.curve_subdivide(pie)
 
 
 # Context: 3D Viewport (Curve)
@@ -91,13 +92,13 @@ class MT_pie_curve_hide(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("curve.reveal", text="Reveal Hidden [All]")
+        blenderPieButton.curve_reveal_all(pie)
         # 6 - RIGHT
-        pie.operator("curve.hide", text="Isolate Selection").unselected = True
+        blenderPieButton.curve_isolate_selection(pie)
         # 2 - BOTTOM
         pie.separator()
         # 8 - TOP
-        pie.operator("curve.hide", text="Hide Selection").unselected = False
+        blenderPieButton.curve_hide_selection(pie)
         # 7 - TOP - LEFT
         pie.separator()
         # 9 - TOP - RIGHT

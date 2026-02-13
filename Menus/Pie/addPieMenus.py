@@ -15,6 +15,7 @@ __status__ = 'Production'
 import bpy
 from BlueHole.blenderUtils.debugUtils import *
 import os
+from BlueHole.Menus.Pie.Button import blenderPieButton, machin3PieButton
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -37,28 +38,21 @@ class MT_pie_add(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        button = pie.operator("mesh.primitive_cylinder_add", text="Cylinder", icon='MESH_CYLINDER')
-        button.align = 'CURSOR'
-        button.radius = 0.5
-        button.depth = 1.0
-        button.vertices = 32
+        blenderPieButton.add_cylinder(pie)
         # 6 - RIGHT
-        button_02 = pie.operator("mesh.primitive_cube_add", text="Cube", icon='MESH_CUBE')
-        button_02.align = 'CURSOR'
-        button_02.size = 1.0
+        blenderPieButton.add_cube(pie)
         # 2 - BOTTOM
         pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_add_more.bl_idname
         # 8 - TOP
-        button_03 = pie.operator("mesh.primitive_uv_sphere_add", text="UV Sphere", icon='MATSPHERE')
-        button_03.radius = 0.5
+        blenderPieButton.add_sphere(pie)
         # 7 - TOP - LEFT
-        pie.operator("machin3.quadsphere", text="Quadsphere", icon='MESH_UVSPHERE')
+        machin3PieButton.add_quadsphere()
         # 9 - TOP - RIGHT
-        pie.operator("mesh.primitive_plane_add", text="Plane", icon='MESH_PLANE').size = 1.0
+        blenderPieButton.add_plane(pie)
         # 1 - BOTTOM - LEFT
-        pie.operator("curve.primitive_nurbs_path_add", text="Path", icon='CURVE_PATH')
+        blenderPieButton.add_nurbs_path(pie)
         # 3 - BOTTOM - RIGHT
-        pie.operator("curve.primitive_bezier_curve_add", text="Bezier", icon='CURVE_BEZCURVE')
+        blenderPieButton.add_bezier_curve(pie)
 
 
 # No Hotkey; Submenu
@@ -70,23 +64,21 @@ class MT_pie_add_more(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("object.light_add", text="Point", icon='LIGHT_POINT').type = 'POINT'
+        blenderPieButton.add_light_point(pie)
         # 6 - RIGHT
-        pie.operator("object.light_add", text="Spot", icon='LIGHT_SPOT').type = 'SPOT'
+        blenderPieButton.add_light_spot(pie)
         # 2 - BOTTOM
-        pie.operator("object.text_add", text="Text", icon='OUTLINER_OB_FONT')
+        blenderPieButton.add_text(pie)
         # 8 - TOP
-        pie.operator("object.light_add", text="Area", icon='LIGHT_AREA').type = 'AREA'
+        blenderPieButton.add_light_area(pie)
         # 7 - TOP - LEFT
-        pie.separator()
-        # TODO: Make this one work again
-        # pie.operator("object.lightprobe_add", text="Light Probe", icon='LIGHTPROBE_GRID').type = 'GRID'
+        blenderPieButton.add_light_probe(pie)
         # 9 - TOP - RIGHT
-        pie.operator("object.light_add", text="Sun", icon='LIGHT_SUN').type = 'SUN'
+        blenderPieButton.add_light_sun(pie)
         # 1 - BOTTOM - LEFT
-        pie.operator("object.load_reference_image", text="Reference Image", icon='IMAGE_REFERENCE')
+        blenderPieButton.load_ref_img(pie)
         # 3 - BOTTOM - RIGHT
-        pie.operator("curve.primitive_bezier_circle_add", text="Bezier Circle", icon='CURVE_BEZCIRCLE')
+        blenderPieButton.add_bezier_circle(pie)
 
 
 classes = (MT_pie_add,

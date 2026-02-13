@@ -1,5 +1,5 @@
 """
-Pie Menus pertaining to the DreamUV Addon
+Pie Menu operators pertaining to the DreamUV Addon
 """
 
 # ----------------------------------------------------------------------------------------------------------------------

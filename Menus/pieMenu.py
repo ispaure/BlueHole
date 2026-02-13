@@ -11,14 +11,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 import bpy
-import BlueHole.Menus.Pie.globalPieMenus as globalPieMenus
-import BlueHole.Menus.Pie.meshPieMenus as meshPieMenus
-import BlueHole.Menus.Pie.objectPieMenus as objectPieMenus
-import BlueHole.Menus.Pie.uvPieMenus as uvPieMenus
-import BlueHole.Menus.Pie.curvePieMenus as curvePieMenus
-import BlueHole.Menus.Pie.sculptPieMenus as sculptPieMenus
-import BlueHole.Menus.Pie.addPieMenus as addPieMenus
-
+from BlueHole.Menus.Pie import globalPieMenus, meshPieMenus, objectPieMenus, uvPieMenus, curvePieMenus, sculptPieMenus, addPieMenus
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
