@@ -95,8 +95,15 @@ class P4Info:
 
             if 'Permission denied' in item:
                 self.status = False
-                p4_macos_path = cmdWrapper.get_p4_macos_path()
-                P4ErrorMessage().info_mac_p4_cmd_missing(p4_macos_path)
+                match filterUtils.get_platform():
+                    case filterUtils.OS.WIN:
+                        P4ErrorMessage().info_win_p4_cmd_missing()
+                    case filterUtils.OS.MAC:
+                        p4_macos_path = cmdWrapper.get_p4_macos_path()
+                        P4ErrorMessage().info_mac_p4_cmd_missing(p4_macos_path)
+                    case filterUtils.OS.LINUX:
+                        p4_linux_path = cmdWrapper.get_p4_linux_path()
+                        P4ErrorMessage().info_linux_p4_cmd_missing(p4_linux_path)
                 return
 
             item_split = item.split(": ")
@@ -1012,10 +1019,20 @@ class P4ErrorMessage:
         msg = 'Perforce not recognized. Is Perforce Visual Client Installed? See log for details.'
         self.log_error(msg)
 
+    def info_win_p4_cmd_missing(self):
+        msg = 'Perforce permission denied. Very odd for Windows P4 to have this issue. Investigate P4 executable.'
+        self.log_error(msg)
+
     def info_mac_p4_cmd_missing(self, exec_pth):
-        msg = ('Perforce permission denied. If on macOS, launch executable here once by right-clicking and selecting '
-               '"Open": {}. If that does not work (ex. file opens in TextEdit), you will need to open a terminal '
-               f'window and enter the following followed by the executable\'s path: sudo chmod 755 {exec_pth}')
+        msg = ('Perforce parallel (p4_parallel) permission denied. If on macOS, launch executable here once by '
+               'right-clicking and selecting "Open": {}. If that does not work (ex. file opens in TextEdit), '
+               'you will need to open a terminal window and enter the following followed by the '
+               f'executable\'s path: sudo chmod +x {exec_pth}')
+        self.log_error(msg)
+
+    def info_linux_p4_cmd_missing(self, exec_pth):
+        msg = ('Perforce parallel (p4_parallel) permission denied. If on Linux, you will need to open a terminal '
+               f'window and enter the following followed by the executable\'s path: sudo chmod +x {exec_pth}')
         self.log_error(msg)
 
     def info_server_cannot_connect(self):

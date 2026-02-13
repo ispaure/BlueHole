@@ -19,10 +19,13 @@ __status__ = 'Production'
 import subprocess
 import time
 from pathlib import Path
+import os
 
 # Blue Hole
-from ..blenderUtils import filterUtils, fileUtils
+from ..blenderUtils import filterUtils
+
 from ..blenderUtils.debugUtils import *
+from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -30,13 +33,12 @@ from ..blenderUtils.debugUtils import *
 cmd_wrapper_name = 'Cmd/Terminal Wrapper'
 
 
-def get_p4_macos_path():
-    return str(Path('/Applications', 'p4v.app', 'Contents', 'Resources', 'p4_parallel'))
-    # return str(Path(fileUtils.get_blue_hole_user_addon_path() + '/Lib/p4'))
+def get_p4_macos_path() -> str:
+    return f'{prefs().sc.p4v_app_path_mac}/Contents/Resources/p4_parallel'  # Complete to get p4_parallel path
 
-def get_p4_linux_path():
-    return str(Path(fileUtils.get_user_home_dir(), 'Applications', 'perforce', 'lib', 'P4VResources', 'p4_parallel'))
-    # TODO: User must substitute this for their own path. Give option in settings?
+
+def get_p4_linux_path() -> str:
+    return prefs().sc.p4_parallel_path_linux
 
 
 def exec_cmd(command):
@@ -78,12 +80,16 @@ def exec_cmd(command):
         match filterUtils.get_platform():
             case filterUtils.OS.MAC:
                 new_p4_path = get_p4_macos_path()
-                command = f'"{new_p4_path}" {command[2:]}'
             case filterUtils.OS.LINUX:
                 new_p4_path = get_p4_linux_path()
-                command = f'"{new_p4_path}" {command[2:]}'
-
-
+            case _:
+                return None  # Impossible
+        # Check if path is file, else throw error
+        if not os.path.isfile(new_p4_path):
+            msg = (f'P4 Parallel path "{new_p4_path}" is invalid. Verify that Perforce is installed and, if required, '
+                   f'update this Path in the Blue Hole addon settings (Source Control Tab).')
+            log(Severity.CRITICAL, 'Perforce Command', msg)
+        command = f'"{new_p4_path}" {command[2:]}'
         # Set permissions for executable in case it will be needed later
         exec_cmd(f'chmod +x "{new_p4_path}"')
 
