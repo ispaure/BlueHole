@@ -107,7 +107,7 @@ class MT_pie_global_dirs(bpy.types.Menu):
         # 2 - BOTTOM
         pie.operator("wm.bh_dir_open_final", text="Open FINAL Folder", icon='FILEBROWSER')
         # 8 - TOP
-        pie.operator("wm.bh_dir_open_root", text="Open ROOT Folder", icon='FILEBROWSER')
+        pie.operator("wm.bh_dir_open_scene", text="Open ROOT Folder", icon='FILEBROWSER')
         # 7 - TOP - LEFT
         pie.operator("wm.bh_scene_add_asset_hierarchy", text="Add ASSET HIERARCHY", icon='OUTLINER')
         # 9 - TOP - RIGHT

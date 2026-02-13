@@ -21,7 +21,6 @@ import bpy
 # Blue Hole
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.projectUtils as projectUtils
-from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.wrappers.perforceWrapper as p4Wrapper
 import BlueHole.blenderUtils.filterUtils as filterUtils
 import BlueHole.environment.envPathResolver as envPathResolver
@@ -34,8 +33,8 @@ from BlueHole.preferences.prefs import *
 class OpenFinalFolder(bpy.types.Operator):
 
     bl_idname = "wm.bh_dir_open_final"
-    bl_label = loc_str('open_final_folder')
-    bl_description = loc_str('open_final_folder_tt')
+    bl_label = 'Open FINAL Folder'
+    bl_description = 'Open FINAL Project Folder'
 
     def execute(self, context):
         projectUtils.open_project_sub_dir('path_final')
@@ -45,8 +44,8 @@ class OpenFinalFolder(bpy.types.Operator):
 class OpenReferencesFolder(bpy.types.Operator):
 
     bl_idname = "wm.bh_dir_open_references"
-    bl_label = loc_str('open_references_folder')
-    bl_description = loc_str('open_references_folder_tt')
+    bl_label = 'Open REFERENCE Folder'
+    bl_description = 'Open REFERENCE Project Folder'
 
     def execute(self, context):
         projectUtils.open_project_sub_dir('path_references')
@@ -56,19 +55,19 @@ class OpenReferencesFolder(bpy.types.Operator):
 class OpenResourcesFolder(bpy.types.Operator):
 
     bl_idname = "wm.bh_dir_open_resources"
-    bl_label = loc_str('open_resources_folder')
-    bl_description = loc_str('open_resources_folder_tt')
+    bl_label = 'Open RESOURCE Folder'
+    bl_description = 'Open RESOURCE Project Folder'
 
     def execute(self, context):
         projectUtils.open_project_sub_dir('path_resources')
         return {'FINISHED'}
 
 
-class OpenRootFolder(bpy.types.Operator):
+class OpenSceneFolder(bpy.types.Operator):
 
     bl_idname = "wm.bh_dir_open_root"
-    bl_label = loc_str('open_root_folder')
-    bl_description = loc_str('open_root_folder_tt')
+    bl_label = 'Open SCENE Folder'
+    bl_description = 'Open SCENE Project Folder'
 
     def execute(self, context):
         projectUtils.open_project_sub_dir('path_root')
@@ -78,8 +77,8 @@ class OpenRootFolder(bpy.types.Operator):
 class OpenP4WorkspaceRootFolder(bpy.types.Operator):
 
     bl_idname = "wm.bh_dir_open_workspace_root"
-    bl_label = loc_str('open_workspace_root_folder')
-    bl_description = loc_str('open_workspace_root_folder_tt')
+    bl_label = 'Open WORKSPACE ROOT Folder'
+    bl_description = 'Open WORKSPACE ROOT Folder'
 
     def execute(self, context):
         # Initial checks
@@ -97,8 +96,8 @@ class OpenP4WorkspaceRootFolder(bpy.types.Operator):
 class OpenSpeedTreeMeshesFolder(bpy.types.Operator):
 
     bl_idname = "wm.bh_dir_open_speedtree_msh"
-    bl_label = loc_str('open_speedtree_msh_folder')
-    bl_description = loc_str('open_speedtree_msh_folder_tt')
+    bl_label = 'Open SPEEDTREE MSH Folder'
+    bl_description = 'Open SPEEDTREE MSH Project Folder'
 
     def execute(self, context):
         projectUtils.open_project_sub_dir('path_speedtree_msh')
@@ -108,8 +107,8 @@ class OpenSpeedTreeMeshesFolder(bpy.types.Operator):
 class OpenUserResourcePath(bpy.types.Operator):
 
     bl_idname = "wm.bh_dir_open_user_resource"
-    bl_label = loc_str('open_user_resource_path')
-    bl_description = loc_str('open_user_resource_path_tt')
+    bl_label = 'Open USER RESOURCE Folder'
+    bl_description = 'Open USER RESOURCE Folder'
 
     def execute(self, context):
         appdata_path = fileUtils.get_resource_path_user()
@@ -177,7 +176,7 @@ class OpenUnityAssetsCurrentExportPath(bpy.types.Operator):
 classes = (OpenFinalFolder,
            OpenReferencesFolder,
            OpenResourcesFolder,
-           OpenRootFolder,
+           OpenSceneFolder,
            OpenP4WorkspaceRootFolder,
            OpenSpeedTreeMeshesFolder,
            OpenUserResourcePath,

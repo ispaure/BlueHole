@@ -23,7 +23,6 @@ import BlueHole.blenderUtils.objectUtils as objectUtils
 from BlueHole.blenderUtils.export.exportSettingsPresets import *
 import BlueHole.blenderUtils.export.exportHierarchy as exportHierarchy
 import BlueHole.blenderUtils.export.exportIndividual as exportIndividual
-from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.blenderUtils.importUtils as importUtils
 from BlueHole.preferences.prefs import *
@@ -69,6 +68,7 @@ class ExportSelectHierarchiesToUE(bpy.types.Operator):
 class BatchExportSelectedToFinal(bpy.types.Operator):
     bl_idname = "wm.bh_batch_export_select_to_final"
     bl_label = 'Batch Export (Selection) to FINAL Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the FINAL Folder'
 
     def execute(self, context):
         exportIndividual.batch_export_selection_to_project_sub_dir('path_final')
@@ -86,8 +86,8 @@ class BatchExportSelectedToResources(bpy.types.Operator):
 
 class BatchExportSelectedToSpeedTree_FBX(bpy.types.Operator):
     bl_idname = "wm.bh_batch_export_select_to_speedtree_fbx"
-    bl_label = loc_str('export_select_to_speedtree_fbx')
-    bl_description = loc_str('export_select_to_speedtree_fbx_tt')
+    bl_label = 'Batch Export (Selection) to SPEEDTREE Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH Folder'
 
     def execute(self, context):
         exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh')
@@ -96,8 +96,8 @@ class BatchExportSelectedToSpeedTree_FBX(bpy.types.Operator):
 
 class BatchExportSelectedToSpeedtreeLR_FBX(bpy.types.Operator):
     bl_idname = "wm.bh_batch_export_select_to_speedtree_lr_fbx"
-    bl_label = loc_str('export_select_to_speedtree_fbx_lr')
-    bl_description = loc_str('export_select_to_speedtree_fbx_lr_tt')
+    bl_label = 'Batch Export (Selection) to SPEEDTREE-LR Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> LR Folder'
 
     def execute(self, context):
         exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh_lr')
@@ -106,8 +106,8 @@ class BatchExportSelectedToSpeedtreeLR_FBX(bpy.types.Operator):
 
 class BatchExportSelectedToSpeedtreeHR_FBX(bpy.types.Operator):
     bl_idname = "wm.bh_batch_export_select_to_speedtree_hr_fbx"
-    bl_label = loc_str('export_select_to_speedtree_fbx_hr')
-    bl_description = loc_str('export_select_to_speedtree_fbx_hr_tt')
+    bl_label = 'Batch Export (Selection) to SPEEDTREE-HR Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> HR Folder'
 
     def execute(self, context):
         exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh_hr')
@@ -116,8 +116,8 @@ class BatchExportSelectedToSpeedtreeHR_FBX(bpy.types.Operator):
 
 class BatchExportSelectedToBakeFBX(bpy.types.Operator):
     bl_idname = "wm.bh_batch_export_select_to_bake_fbx"
-    bl_label = loc_str('export_select_to_bake_fbx')
-    bl_description = loc_str('export_select_to_bake_fbx_tt')
+    bl_label = 'Batch Export (Selection) to BAKE Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the MSH BAKE Folder'
 
     def execute(self, context):
         exportIndividual.batch_export_selection_to_project_sub_dir('path_mshbake')
