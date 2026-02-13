@@ -23,7 +23,6 @@ import os
 import bpy
 
 # Blue Hole
-from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 from BlueHole.blenderUtils.uiUtils import show_label as show_label
 import BlueHole.Operators.dirOp as dirOp
 import BlueHole.Operators.impExpOp as impExpOp
@@ -42,7 +41,7 @@ from BlueHole.preferences.prefs import *
 
 # Directories Menu
 class BLUE_HOLE_MT_directories(bpy.types.Menu):
-    bl_label = loc_str('directory_and_hierarchy')
+    bl_label = 'Directories and Hierarchy'
 
     def draw(self, context):
         layout = self.layout
@@ -95,7 +94,7 @@ class BLUE_HOLE_MT_export(bpy.types.Menu):
 
 
 class BLUE_HOLE_MT_food_delivery(bpy.types.Menu):
-    bl_label = loc_str('food_delivery')
+    bl_label = 'Food Delivery'
 
     def draw(self, context):
         layout = self.layout
@@ -104,7 +103,7 @@ class BLUE_HOLE_MT_food_delivery(bpy.types.Menu):
 
 
 class BLUE_HOLE_MT_help(bpy.types.Menu):
-    bl_label = loc_str('help_n_updates')
+    bl_label = 'Help'
 
     def draw(self, context):
         layout = self.layout

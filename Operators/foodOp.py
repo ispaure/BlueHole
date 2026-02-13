@@ -20,7 +20,6 @@ import bpy
 
 # Blue Hole
 from BlueHole.blenderUtils.fileUtils import open_url
-from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -29,7 +28,7 @@ from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 class OrderStHubert(bpy.types.Operator):
 
     bl_idname = "wm.bh_foodorder_sthubert"
-    bl_label = loc_str('food_delivery_order_sthubert')
+    bl_label = 'Order St-Hubert'
 
     def execute(self, context):
         open_url('http://www.st-hubert.com/index.fr.html')
@@ -39,7 +38,7 @@ class OrderStHubert(bpy.types.Operator):
 class OrderUberEats(bpy.types.Operator):
 
     bl_idname = "wm.bh_foodorder_ubereats"
-    bl_label = loc_str('food_delivery_order_uber_eats')
+    bl_label = 'Order Uber Eats'
 
     def execute(self, context):
         open_url('http://www.ubereats.com')

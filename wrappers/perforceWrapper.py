@@ -24,7 +24,6 @@ from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.fileUtils as fileUtils
 import BlueHole.blenderUtils.uiUtils as uiUtils
 import BlueHole.blenderUtils.filterUtils as filterUtils
-from BlueHole.blenderUtils.languageUtils import loc_str as loc_str
 from pathlib import Path
 from BlueHole.preferences.prefs import *
 
@@ -894,13 +893,11 @@ def dialog_box_p4_info():
 
     # If can connect to perforce, proceed.
     p4_info_cls = P4Info()
-    msg = ''
-    msg += loc_str('p4_info').format(user_name=p4_info_cls.user_name,
-                                     client_name=p4_info_cls.client_name,
-                                     client_root=p4_info_cls.client_root,
-                                     server_address=p4_info_cls.server_address,
-                                     server_uptime=p4_info_cls.server_uptime
-                                     )
+    msg = (f'User name: {p4_info_cls.user_name}\n'
+           f'Client name: {p4_info_cls.client_name}\n'
+           f'Client root: {p4_info_cls.client_root}\n'
+           f'Server address: {p4_info_cls.server_address}\n'
+           f'Server uptime: {p4_info_cls.server_uptime}')
 
     log(Severity.INFO, tool_name, msg, popup=True)
     return True
