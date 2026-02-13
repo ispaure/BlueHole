@@ -14,8 +14,7 @@ __status__ = 'Production'
 
 import bpy
 from bpy.app.handlers import persistent
-import BlueHole.blenderUtils.sourceControlUtils as scUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
+from . import sourceControlUtils, fileUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -36,13 +35,13 @@ def load_pre_handler(scene):
 def load_post_handler(scene):
     print("Event: load_post")
     if len(fileUtils.get_blend_file_path()) > 0:
-        scUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
+        sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
 
 
 @persistent
 def save_pre_handler(scene):
     if len(fileUtils.get_blend_file_path()) > 0:
-        scUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
+        sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
     print("Event: save_pre")
 
 

@@ -19,8 +19,8 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.fileUtils as fileUtils
-import BlueHole.blenderUtils.configUtils as configUtils
+from ..blenderUtils import fileUtils, configUtils
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

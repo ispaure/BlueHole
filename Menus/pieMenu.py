@@ -9,9 +9,12 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
-import bpy
-from BlueHole.Menus.Pie import globalPieMenus, meshPieMenus, objectPieMenus, uvPieMenus, curvePieMenus, sculptPieMenus, addPieMenus
+
+# Addon
+from .Pie import globalPieMenus, meshPieMenus, objectPieMenus, uvPieMenus, curvePieMenus, sculptPieMenus, addPieMenus
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER

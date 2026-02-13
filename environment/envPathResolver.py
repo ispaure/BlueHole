@@ -21,10 +21,9 @@ from typing import *
 from pathlib import Path
 
 # Blue Hole
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.preferences.prefs import *
+from ..blenderUtils.debugUtils import *
+from ..blenderUtils import fileUtils, filterUtils
+from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

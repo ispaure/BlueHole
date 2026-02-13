@@ -14,7 +14,7 @@ __status__ = 'Production'
 
 
 import bpy
-from BlueHole.blenderUtils.debugUtils import *
+from ...blenderUtils.debugUtils import *
 from .Button.sculptPieButton import *
 
 

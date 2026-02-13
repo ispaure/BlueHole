@@ -19,7 +19,7 @@ import ctypes
 import textwrap
 import sys
 from pathlib import Path
-import BlueHole.blenderUtils.platformUtils as platformUtils
+from . import platformUtils
 import subprocess
 import shutil
 
@@ -27,10 +27,11 @@ import shutil
 import bpy
 
 # Blue Hole
-import BlueHole.wrappers.cmdWrapper as cmdWrapper
+from ..wrappers import cmdWrapper
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
+
 
 def show_label(label_text, layout):
     layout.label(text='[[[[ ' + label_text + ' ]]]]', icon='KEYTYPE_EXTREME_VEC')
@@ -43,7 +44,7 @@ def set_theme(name):
     :type name: str
     """
     # Import here only (if import at the top it causes cyclical issues)
-    from BlueHole.blenderUtils.fileUtils import get_blue_hole_themes_path as get_blue_hole_themes_path
+    from .fileUtils import get_blue_hole_themes_path as get_blue_hole_themes_path
     # Determine .xml theme preset path, which is slightly different depending if Windows or Unix
     theme_file_path = str(Path(get_blue_hole_themes_path() + '/' + name + '.xml'))
     # Set Current theme as .xml theme preset path

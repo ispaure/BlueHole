@@ -20,10 +20,10 @@ from bpy.props import *
 from bpy.types import AddonPreferences
 
 from .props import general_props, environment_props, sourcecontrol_props, help_update_props
-import BlueHole.environment.envManager as envManager
+from ..environment import envManager
 
 # Import your new prefs API (adjust module path if yours is named differently)
-from BlueHole.preferences.prefs import prefs
+from .prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

@@ -16,10 +16,10 @@ __status__ = 'Production'
 
 import configparser
 
-import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.wrappers.cmdWrapper as cmdWrapper
-from BlueHole.blenderUtils.platformUtils import *
+from . import fileUtils
+from .debugUtils import *
+from ..wrappers import cmdWrapper
+from .platformUtils import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -22,7 +22,7 @@ from pathlib import Path
 import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.fileUtils as fileUtils
+from . import fileUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------

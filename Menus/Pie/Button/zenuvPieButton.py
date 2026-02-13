@@ -15,7 +15,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-import BlueHole.blenderUtils.addonUtils as addonUtils
+from ....blenderUtils import addonUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON

@@ -19,14 +19,10 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from BlueHole.blenderUtils.export.exportSettings import *
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.sceneUtils as sceneUtils
-import BlueHole.blenderUtils.objectUtils as oUtils
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.objectUtils as objectUtils
-from BlueHole.preferences.prefs import *
-import BlueHole.blenderUtils.projectUtils as projectUtils
+from .exportSettings import *
+from ..debugUtils import *
+from .. import sceneUtils, filterUtils, objectUtils, projectUtils
+from ...preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -43,7 +39,7 @@ class ExportMesh:
     def __init__(self, mesh, export_settings: ExportSettings):
         self.mesh = mesh
         self.export_settings: ExportSettings = export_settings
-        self.name = oUtils.get_obj_name(mesh)
+        self.name = objectUtils.get_obj_name(mesh)
         self.path: Optional[Path] = None
         self.__set_path()
 
@@ -81,14 +77,14 @@ class ExportMesh:
         # Save Object Position and Move to 0, 0, 0
         if self.export_settings.zero_root_transform:
             print('is zero root transform')
-            obj_world_translation = oUtils.get_obj_world_translation(self.root)
-            oUtils.set_zero_obj_world_translation(self.root)
+            obj_world_translation = objectUtils.get_obj_world_translation(self.root)
+            objectUtils.set_zero_obj_world_translation(self.root)
         else:
             print('is not zero root transform')
 
         # If Preset Is Unity, Fix Transforms of Root Before Export
         if self.export_settings.engine == Engine.UNITY:
-            oUtils.deselect_all()
+            objectUtils.deselect_all()
             # For export to Unity, tweak rotation of root.
             objectUtils.select_obj_lst([self.mesh])
             bpy.ops.object.transform_apply(rotation=True)
@@ -123,7 +119,7 @@ class ExportMesh:
 
         # Set Object Position to Previous
         if self.export_settings.zero_root_transform:
-            oUtils.set_obj_world_translation(self.mesh, obj_world_translation)
+            objectUtils.set_obj_world_translation(self.mesh, obj_world_translation)
 
         sceneUtils.deselect_all()
 
@@ -134,7 +130,7 @@ class ExportMeshes:
         self.exp_mesh_lst: List[ExportMesh] = []
 
     def set_meshes_from_selection(self):
-        selection_obj_lst = oUtils.get_selection()
+        selection_obj_lst = objectUtils.get_selection()
 
         # Wipe existing list of meshes
         self.exp_mesh_lst = []

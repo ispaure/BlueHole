@@ -21,9 +21,8 @@ import time
 from pathlib import Path
 
 # Blue Hole
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.fileUtils as fileUtils
-from BlueHole.blenderUtils.debugUtils import *
+from ..blenderUtils import filterUtils, fileUtils
+from ..blenderUtils.debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

@@ -15,19 +15,18 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# System
+from typing import *
+
 # Blender
 import bpy
 
 # Blue Hole
-from BlueHole.blenderUtils import sourceControlUtils as scUtils
-from BlueHole.blenderUtils.export.exportSettings import *
-from BlueHole.blenderUtils.debugUtils import *
-import BlueHole.blenderUtils.sceneUtils as sceneUtils
-import BlueHole.blenderUtils.objectUtils as oUtils
-import BlueHole.blenderUtils.filterUtils as filterUtils
-import BlueHole.blenderUtils.objectUtils as objectUtils
-import BlueHole.blenderUtils.sendUnreal as sendUnreal
-from BlueHole.preferences.prefs import *
+from .. import sourceControlUtils as scUtils
+from .exportSettings import *
+from ..debugUtils import *
+from .. import sceneUtils, objectUtils, filterUtils, sendUnreal
+from ...preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -44,7 +43,7 @@ class AssetHierarchy:
     def __init__(self, root, export_settings: ExportSettings):
         self.root = root
         self.export_settings: ExportSettings = export_settings
-        self.name = oUtils.get_obj_name(root)
+        self.name = objectUtils.get_obj_name(root)
         self.path: Optional[Path] = None
         self.render = None
         self.collision = None
@@ -58,9 +57,9 @@ class AssetHierarchy:
 
         # Check that there is only empty-type objects under the root (If Empty Object Render is enabled)
         if self.export_settings.include_render:
-            child_obj_tuple = oUtils.get_obj_child(self.root)
+            child_obj_tuple = objectUtils.get_obj_child(self.root)
             for child_obj in child_obj_tuple:
-                if 'EMPTY' not in oUtils.get_obj_type(child_obj):
+                if 'EMPTY' not in objectUtils.get_obj_type(child_obj):
                     self.critical_rogue_object_directly_under_root(self.root, child_obj)
 
         if self.export_settings.include_render:
@@ -79,10 +78,10 @@ class AssetHierarchy:
             self.socket = self.__get_required_empty_obj(component_name, component_type)
 
     def __get_required_empty_obj(self, component_name: str, component_type: str):
-        child_obj_tuple = oUtils.get_obj_child(self.root)
+        child_obj_tuple = objectUtils.get_obj_child(self.root)
         match_obj = None
         for child_obj in child_obj_tuple:
-            child_name = oUtils.get_obj_name(child_obj).split('.')[0]
+            child_name = objectUtils.get_obj_name(child_obj).split('.')[0]
             if child_name == component_name:
                 if match_obj is None:
                     match_obj = child_obj
@@ -149,14 +148,14 @@ class AssetHierarchy:
         # Save Object Position and Move to 0, 0, 0
         if self.export_settings.zero_root_transform:
             print('is zero root transform')
-            obj_world_translation = oUtils.get_obj_world_translation(self.root)
-            oUtils.set_zero_obj_world_translation(self.root)
+            obj_world_translation = objectUtils.get_obj_world_translation(self.root)
+            objectUtils.set_zero_obj_world_translation(self.root)
         else:
             print('is not zero root transform')
 
         # If Preset Is Unity, Fix Transforms of Root Before Export
         if self.export_settings.engine == Engine.UNITY:
-            oUtils.deselect_all()
+            objectUtils.deselect_all()
             # For export to Unity, tweak rotation of root.
             objectUtils.select_obj_lst([self.root])
             bpy.ops.object.transform_apply(rotation=True)
@@ -191,7 +190,7 @@ class AssetHierarchy:
 
         # Set Object Position to Previous
         if self.export_settings.zero_root_transform:
-            oUtils.set_obj_world_translation(self.root, obj_world_translation)
+            objectUtils.set_obj_world_translation(self.root, obj_world_translation)
 
         sceneUtils.deselect_all()
 
@@ -215,7 +214,7 @@ class AssetHierarchy:
         # Append other stuff
         for component in [self.render, self.collision, self.socket]:
             if component is not None:
-                child_obj_lst = oUtils.get_obj_child_recursive(component)
+                child_obj_lst = objectUtils.get_obj_child_recursive(component)
                 if len(child_obj_lst) > 0 or not prefs().env.exclude_element_if_no_child:
                     obj_lst.append(component)
                     for child_obj in child_obj_lst:
@@ -225,7 +224,7 @@ class AssetHierarchy:
 
         # If render wasn't included, add stuff at the root (but not the excluded components if applicable)
         if not self.export_settings.include_render:
-            obj_full_lst = oUtils.get_obj_child_recursive(self.root)
+            obj_full_lst = objectUtils.get_obj_child_recursive(self.root)
             for obj in obj_full_lst:
                 if obj not in obj_lst and obj not in excl_lst:
                     obj_lst.append(obj)
@@ -237,7 +236,7 @@ class AssetHierarchy:
         if self.collision is None:
             return
 
-        coll_obj_lst = oUtils.get_obj_child_recursive(self.collision)
+        coll_obj_lst = objectUtils.get_obj_child_recursive(self.collision)
         first_mesh_name = self.get_first_mesh_name()
         counter = 1
         for coll_obj in coll_obj_lst:
@@ -247,20 +246,20 @@ class AssetHierarchy:
     def get_first_mesh_name(self) -> str:
         """ Get first mesh name, else sets to 'Template' as fallback. """
         if self.export_settings.include_render:
-            render_obj_child_lst = oUtils.get_obj_child_recursive(self.render)
+            render_obj_child_lst = objectUtils.get_obj_child_recursive(self.render)
             for render_obj in render_obj_child_lst:
                 if objectUtils.get_obj_type(render_obj) == 'MESH':
-                    return oUtils.get_obj_name(render_obj)
+                    return objectUtils.get_obj_name(render_obj)
         else:
             root_obj_lst = objectUtils.get_obj_child(self.root)
             for root_obj in root_obj_lst:
                 if objectUtils.get_obj_type(root_obj) == 'MESH':
-                    return oUtils.get_obj_name(root_obj)
+                    return objectUtils.get_obj_name(root_obj)
         return 'Template'
 
     def critical_rogue_object_directly_under_root(self, root, child):
-        exp_root_name = oUtils.get_obj_name(root)
-        child_name = oUtils.get_obj_name(child)
+        exp_root_name = objectUtils.get_obj_name(root)
+        child_name = objectUtils.get_obj_name(child)
         msg = (f'The object named {child_name} under the Asset Hierarchy "{exp_root_name}" '
                f'is not of type Empty Object. Please move it within one of the Asset Hierarchy\'s '
                f'required Export Element(s) -- or at least within an Empty Object.\n\n'
@@ -292,7 +291,7 @@ class AssetHierarchies:
         self.hierarchies: List[AssetHierarchy] = []
 
     def set_hierarchies_from_selection(self):
-        selection_obj_lst = oUtils.get_selection()
+        selection_obj_lst = objectUtils.get_selection()
         root_obj_lst = self.get_hierarchy_root_from_obj_lst(selection_obj_lst)
         self.__set_hierarchies_from_root_obj_lst(root_obj_lst)
 
@@ -336,12 +335,12 @@ class AssetHierarchies:
         # Go through selection to get list of upmost parents. Only add to list if item is not already there
         for obj in obj_lst:
 
-            upmost_parent_obj = oUtils.get_obj_upmost_parent(obj)
+            upmost_parent_obj = objectUtils.get_obj_upmost_parent(obj)
 
             # Checking if valid root
-            if 'EMPTY' in oUtils.get_obj_type(upmost_parent_obj):  # If Empty, it's a transform
+            if 'EMPTY' in objectUtils.get_obj_type(upmost_parent_obj):  # If Empty, it's a transform
                 for ah_prefix in ah_prefix_lst:
-                    if oUtils.get_obj_name(upmost_parent_obj)[:len(ah_prefix)] == ah_prefix:
+                    if objectUtils.get_obj_name(upmost_parent_obj)[:len(ah_prefix)] == ah_prefix:
                         if upmost_parent_obj not in exp_root_lst:
                             exp_root_lst.append(upmost_parent_obj)
 

@@ -19,8 +19,8 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-import BlueHole.blenderUtils.sourceControlUtils as scUtils
-import BlueHole.wrappers.perforceWrapper as p4Wrapper
+from ..blenderUtils import sourceControlUtils as scUtils
+from ..wrappers import perforceWrapper as p4Wrapper
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

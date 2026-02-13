@@ -23,17 +23,9 @@ import os
 import bpy
 
 # Blue Hole
-from BlueHole.blenderUtils.uiUtils import show_label as show_label
-import BlueHole.Operators.dirOp as dirOp
-import BlueHole.Operators.impExpOp as impExpOp
-import BlueHole.Operators.foodOp as foodOp
-import BlueHole.Operators.helpOp as helpOp
-import BlueHole.Operators.musicOp as musicOp
-import BlueHole.Operators.sendOp as sendOp
-import BlueHole.Operators.sortOp as sortOp
-import BlueHole.Operators.sourceControlOp as sourceControlOp
-import BlueHole.Operators.themeOp as themeOp
-from BlueHole.preferences.prefs import *
+from ..blenderUtils.uiUtils import show_label
+from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, sendOp, sortOp, sourceControlOp, themeOp
+from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -63,7 +55,7 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
 
         layout.separator()
         show_label('SOURCE ASSET', layout)
-        layout.operator(dirOp.OpenRootFolder.bl_idname, icon='FILE_FOLDER')
+        layout.operator(dirOp.OpenSceneFolder.bl_idname, icon='FILE_FOLDER')
         layout.operator(dirOp.OpenReferencesFolder.bl_idname, icon='FILE_FOLDER')
         layout.operator(dirOp.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
         layout.operator(dirOp.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')

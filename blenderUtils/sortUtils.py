@@ -19,8 +19,8 @@ __status__ = 'Production'
 import mathutils as mathutils
 
 # Blue Hole
-import BlueHole.blenderUtils.objectUtils as objectUtils
-from BlueHole.blenderUtils.debugUtils import *
+from . import objectUtils
+from .debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

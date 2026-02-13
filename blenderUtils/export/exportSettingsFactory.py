@@ -21,9 +21,9 @@ from enum import Enum
 from typing import *
 
 # Blue Hole
-from BlueHole.preferences.prefs import *
-import BlueHole.blenderUtils.projectUtils as projectUtils
-from BlueHole.blenderUtils.export.exportSettings import *
+from ...preferences.prefs import *
+from .. import projectUtils
+from .exportSettings import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

@@ -13,10 +13,8 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-import os
-from BlueHole.blenderUtils.debugUtils import *
-from BlueHole.blenderUtils import filterUtils as filterUtils
-import BlueHole.blenderUtils.addonUtils as addonUtils
+from ...blenderUtils.debugUtils import *
+from ...blenderUtils import filterUtils as filterUtils, addonUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------
