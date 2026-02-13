@@ -1,5 +1,5 @@
 """
-Pie Menus pertaining to Blender (Vanilla) for sculpting. These do not rely on external resources.
+Pie Menu operators pertaining to Blender (Vanilla) for sculpting. These do not rely on external resources.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------

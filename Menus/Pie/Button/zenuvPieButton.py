@@ -1,5 +1,5 @@
 """
-Pie Menus pertaining to ZenUV Addon.
+Pie Menu operators pertaining to ZenUV Addon.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------

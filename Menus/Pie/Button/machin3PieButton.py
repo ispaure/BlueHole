@@ -1,5 +1,5 @@
 """
-Pie Menu operators pertaining to the DreamUV Addon
+Pie Menu operators pertaining to Machin3.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -21,8 +21,15 @@ import BlueHole.blenderUtils.addonUtils as addonUtils
 # PIE MENU BUTTON
 
 
-def hotspotter(pie):
-    if addonUtils.is_addon_enabled_and_loaded('DreamUV') or addonUtils.is_addon_enabled_and_loaded('Blender_DreamUV-master'):
-        pie.operator("view3d.dreamuv_hotspotter", text="HotSpotter", icon='UV_DATA')
+
+
+def add_quadsphere(pie):
+    pie.operator("machin3.quadsphere", text="Quadsphere", icon='MESH_UVSPHERE')
+
+
+def straighten(pie):
+    if addonUtils.is_addon_enabled_and_loaded('MACHIN3tools'):
+        pie.operator("machin3.straighten", text="Straighten", icon='THREE_DOTS')
     else:
-        pie.operator("wm.disabled_addon_dreamuv", text="Can't Show; DreamUV add-on disabled!!!", icon='ERROR')
+        pie.operator("wm.disabled_addon_machin3tools", text="Can't Show; MACHIN3tools add-on disabled!!!", icon='ERROR')
+

@@ -1,5 +1,5 @@
 """
-Pie Menus pertaining to the UV Toolkit Addon (NOTE: Pending Deprecation)
+Pie Menu operators pertaining to the UV Toolkit Addon (NOTE: Pending Deprecation)
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -16,7 +16,6 @@ __status__ = 'Production'
 # IMPORTS
 
 import BlueHole.blenderUtils.addonUtils as addonUtils
-from BlueHole.blenderUtils import filterUtils as filterUtils
 from BlueHole.blenderUtils import fileUtils as fileUtils
 
 # ----------------------------------------------------------------------------------------------------------------------

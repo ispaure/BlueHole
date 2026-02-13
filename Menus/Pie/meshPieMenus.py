@@ -16,6 +16,7 @@ import bpy
 import os
 from BlueHole.blenderUtils.debugUtils import *
 import BlueHole.blenderUtils.addonUtils as addonUtils
+from BlueHole.Menus.Pie.Button import blenderPieButton, hardopsPieButton, angleToolPieButton, machin3PieButton, interactiveToolsPieButton
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -47,6 +48,19 @@ class WM_OT_CustomKnifeTool(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class WM_OT_MergeLast(bpy.types.Operator):
+    bl_idname = "wm.bh_merge_last"
+    bl_label = "Merge Last"
+    bl_options = {'INTERNAL'}
+
+    def execute(self, _context):
+        try:
+            bpy.ops.mesh.merge(type='LAST')
+        except:
+            bpy.ops.mesh.merge()
+        return {'FINISHED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENUS
 
@@ -61,13 +75,13 @@ class MT_pie_mesh_hide(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("mesh.reveal", text="Reveal Hidden [All]")
+        blenderPieButton.mesh_reveal_all(pie)
         # 6 - RIGHT
-        pie.operator("mesh.hide", text="Isolate Selection").unselected = True
+        blenderPieButton.mesh_isolate_selection(pie)
         # 2 - BOTTOM
         pie.separator()
         # 8 - TOP
-        pie.operator("mesh.hide", text="Hide Selection").unselected = False
+        blenderPieButton.mesh_hide_selection(pie)
         # 7 - TOP - LEFT
         pie.separator()
         # 9 - TOP - RIGHT
@@ -90,23 +104,21 @@ class MT_pie_mesh_tool(bpy.types.Menu):
         pie = layout.menu_pie()
         # 4 - LEFT
         # TODO: Says no parameter vertex_only, will need to fix this.
-        pie.operator("mesh.bevel", text="Bevel", icon='MOD_BEVEL')
-        # pie.operator("mesh.bevel", text="Bevel", icon='MOD_BEVEL').vertex_only = False
+        blenderPieButton.mesh_bevel(pie)
         # 6 - RIGHT
-        pie.operator("view3d.edit_mesh_extrude_move_normal", text="Extrude and Move on Normals", icon='FACESEL')
+        blenderPieButton.extrude_move_normal(pie)
         # 2 - BOTTOM
-        pie.operator("mesh.inset", text="Inset Faces", icon='SHAPEKEY_DATA')
+        blenderPieButton.mesh_inset_faces(pie)
         # 8 - TOP
-        pie.operator("mesh.loopcut_slide", text="Loop Cut and Slide", icon='MOD_MULTIRES')
+        blenderPieButton.loop_cut_slide(pie)
         # 7 - TOP - LEFT
-        # pie.operator("mesh.knife_tool", text="Knife Topology Tool", icon='SNAP_MIDPOINT')
         pie.operator(WM_OT_CustomKnifeTool.bl_idname, text="Knife Topology Tool", icon='SNAP_MIDPOINT')
         # 9 - TOP - RIGHT
-        pie.operator("view3d.edit_mesh_extrude_move_shrink_fatten", text="Extrude and Move on Individual Normals", icon='MOD_SOLIDIFY')
+        blenderPieButton.extrude_move_shrink_fatten(pie)
         # 1 - BOTTOM - LEFT
-        pie.operator("mesh.bridge_edge_loops", text="Bridge Edge Loops", icon='CLIPUV_DEHLT')
+        blenderPieButton.bridge_edge_loops(pie)
         # 3 - BOTTOM - RIGHT
-        pie.operator("transform.shrink_fatten", text="Shrink/Fatten", icon='MOD_EXPLODE')
+        blenderPieButton.shrink_fatten(pie)
 
 
 # Context: 3D Viewport (Mesh)
@@ -125,72 +137,57 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 4 - LEFT
             pie.operator("wm.bh_merge_last", text="Merge Last", icon='PARTICLES')
             # 6 - RIGHT
-            pie.operator("mesh.merge", text="Merge to Center", icon='FREEZE').type = 'CENTER'
+            blenderPieButton.merge_center(pie)
             # 2 - BOTTOM
             pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_vertex_action_more.bl_idname
             # 8 - TOP
             pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_vertex_action_select.bl_idname
             # 7 - TOP - LEFT
-            if addonUtils.is_addon_enabled_and_loaded('MACHIN3tools'):
-                pie.operator("machin3.straighten", text="Straighten", icon='THREE_DOTS')
-            else:
-                pie.operator("wm.disabled_addon_machin3tools", text="Can't Show; MACHIN3tools add-on disabled!!!", icon='ERROR')
+            machin3PieButton.straighten(pie)
             # 9 - TOP - RIGHT
-            if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-                pie.operator("mesh.quick_pivot", text="Quick Pivot Setup", icon='ORIENTATION_GLOBAL')
-            else:
-                pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!", icon='ERROR')
+            interactiveToolsPieButton.quick_pivot_setup(pie)
             # 1 - BOTTOM - LEFT
-            pie.operator("mesh.remove_doubles", text="Merge by Distance", icon='AUTOMERGE_ON')
+            blenderPieButton.remove_doubles(pie)
             # 3 - BOTTOM - RIGHT
-            pie.operator("mesh.vert_connect_path", text="Connect Path", icon='CON_TRACKTO')
+            blenderPieButton.vert_connect_path(pie)
 
         # Edge Menu
         if active_select_mode == (False, True, False):
             # 4 - LEFT
-            pie.operator("mesh.edge_split", text="Edge Split", icon='SCULPTMODE_HLT')
+            blenderPieButton.edge_split(pie)
             # 6 - RIGHT
-            pie.operator("transform.edge_crease", text="Edge Crease", icon='PARTICLE_PATH')
+            blenderPieButton.edge_crease(pie)
             # 2 - BOTTOM
             pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_edge_action_more.bl_idname
             # 8 - TOP
             pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_edge_action_select.bl_idname
             # 7 - TOP - LEFT
-            pie.operator("mesh.fill_grid", text="Grid Fill", icon='SHAPEKEY_DATA')
+            blenderPieButton.fill_grid(pie)
             # 9 - TOP - RIGHT
-            if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-                pie.operator("mesh.quick_pivot", text="Quick Pivot Setup", icon='ORIENTATION_GLOBAL')
-            else:
-                pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!", icon='ERROR')
+            interactiveToolsPieButton.quick_pivot_setup(pie)
             # 1 - BOTTOM - LEFT
-            pie.operator("mesh.mark_sharp", text="Clear Sharp", icon='NORMALS_FACE').clear = True
+            blenderPieButton.clear_sharp(pie)
             # 3 - BOTTOM - RIGHT
-            pie.operator("mesh.mark_sharp", text="Mark Sharp", icon='NORMALS_VERTEX_FACE').clear = False
+            blenderPieButton.mark_sharp(pie)
 
         # Face Menu
         if active_select_mode == (False, False, True):
             # 4 - LEFT
-            pie.operator("mesh.split", text="Split", icon='MOD_PHYSICS')
+            blenderPieButton.mesh_split(pie)
             # 6 - RIGHT
-            pie.operator("mesh.separate", text="Separate", icon='MOD_PHYSICS').type = 'SELECTED'
+            blenderPieButton.mesh_separate(pie)
             # 2 - BOTTOM
             pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_face_action_more.bl_idname
             # 8 - TOP
             pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_face_action_select.bl_idname
             # 7 - TOP - LEFT
-            if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-                pie.operator("mesh.quick_lattice", text="Quick Lattice", icon='OUTLINER_DATA_LATTICE')
-            else:
-                pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!", icon='ERROR')
+            interactiveToolsPieButton.quick_lattice(pie)
             # 9 - TOP - RIGHT
-            if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-                pie.operator("mesh.quick_pivot", text="Quick Pivot Setup", icon='ORIENTATION_GLOBAL')
-            else:
-                pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!", icon='ERROR')
+            interactiveToolsPieButton.quick_pivot_setup(pie)
             # 1 - BOTTOM - LEFT
-            pie.operator("mesh.remove_doubles", text="Merge by Distance", icon='AUTOMERGE_ON')
+            blenderPieButton.merge_by_distance(pie)
             # 3 - BOTTOM - RIGHT
-            pie.operator("mesh.separate", text="Separate Loose Parts", icon='OUTLINER_DATA_LATTICE').type = 'LOOSE'
+            blenderPieButton.separate_loose_parts(pie)
 
 
 # No Hotkey; Submenu
@@ -206,7 +203,7 @@ class MT_pie_vertex_action_select(bpy.types.Menu):
         # 6 - RIGHT
         pie.separator()
         # 2 - BOTTOM
-        pie.operator("mesh.select_all", text="Invert", icon='OVERLAY').action = 'INVERT'
+        blenderPieButton.invert_select(pie)
         # 8 - TOP
         pie.separator()
         # 7 - TOP - LEFT
@@ -214,9 +211,9 @@ class MT_pie_vertex_action_select(bpy.types.Menu):
         # 9 - TOP - RIGHT
         pie.separator()
         # 1 - BOTTOM - LEFT
-        pie.operator("mesh.select_loose", text="Loose Geometry", icon='MOD_BUILD')
+        blenderPieButton.select_loose_geo(pie)
         # 3 - BOTTOM - RIGHT
-        pie.operator("mesh.select_random", text="Random", icon='GROUP_VERTEX')
+        blenderPieButton.select_random_face(pie)
 
 
 # No Hotkey; Submenu
@@ -230,25 +227,19 @@ class MT_pie_vertex_action_more(bpy.types.Menu):
         # 4 - LEFT
         pie.separator()
         # 6 - RIGHT
-        pie.operator("mesh.symmetrize", text="Symmetrize", icon='MESH_MONKEY')
+        blenderPieButton.mesh_symmetrize(pie)
         # 2 - BOTTOM
-        if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-            pie.operator("mesh.quick_flatten", text="Quick Flatten", icon='FILE_TICK').mode = 1
-        else:
-            pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!", icon='ERROR')
+        interactiveToolsPieButton.quick_flatten(pie)
         # 8 - TOP
-        pie.operator("transform.tosphere", text="To Sphere", icon='MOD_SUBSURF')
+        blenderPieButton.transform_to_sphere(pie)
         # 7 - TOP - LEFT
-        if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-            pie.operator("mesh.quick_lattice", text="Quick Lattice", icon='OUTLINER_DATA_LATTICE')
-        else:
-            pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!", icon='ERROR')
+        interactiveToolsPieButton.quick_lattice(pie)
         # 9 - TOP - RIGHT
         pie.separator()
         # 1 - BOTTOM - LEFT
         pie.separator()
         # 3 - BOTTOM - RIGHT
-        pie.operator('view3d.vertcircle', text='Vertex to Circle')
+        blenderPieButton.vertex_to_circle(pie)
 
 
 # No Hotkey; Submenu
@@ -260,15 +251,15 @@ class MT_pie_edge_action_select(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("mesh.smart_select_ring", text="Smart Ring", icon='ALIGN_FLUSH')
+        blenderPieButton.smart_select_ring(pie)
         # 6 - RIGHT
-        pie.operator("mesh.edges_select_sharp", text="Sharp Edges", icon='SHARPCURVE')
+        blenderPieButton.select_sharp(pie)
         # 2 - BOTTOM
-        pie.operator("mesh.select_all", text="Invert", icon='OVERLAY').action = 'INVERT'
+        blenderPieButton.invert_select(pie)
         # 8 - TOP
-        pie.operator("mesh.smart_select_loop", text="Smart Loop", icon='ALIGN_JUSTIFY')
+        blenderPieButton.smart_select_loop(pie)
         # 7 - TOP - LEFT
-        pie.operator("mesh.loop_to_region", text="Loop Inner-Region", icon='SNAP_FACE')
+        blenderPieButton.loop_inner_region(pie)
         # 9 - TOP - RIGHT
         pie.separator()
         # 1 - BOTTOM - LEFT
@@ -286,24 +277,17 @@ class MT_pie_edge_action_more(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("mesh.edge_rotate", text="Rotate Selected Edge", icon='LOOP_BACK').use_ccw = True
+        blenderPieButton.rotate_selected_edge_ccw(pie)
         # 6 - RIGHT
-        pie.operator("mesh.edge_rotate", text="Rotate Selected Edge", icon='LOOP_FORWARDS').use_ccw = False
+        blenderPieButton.rotate_selected_edge(pie)
         # 2 - BOTTOM
-        if addonUtils.is_addon_enabled_and_loaded('hardops') or addonUtils.is_addon_enabled_and_loaded('HOps'):
-            # TODO: Find equivalent if HardOps not installed
-            pie.operator("hops.edge2curve", text="Quick Pipe", icon='OUTLINER_OB_GREASEPENCIL')
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.quick_pipe(pie)
         # 8 - TOP
-        if addonUtils.is_addon_enabled_and_loaded('angle_tool'):
-            pie.operator("mesh.angle_tool", text="Mesh Angle")
-        else:
-            pie.operator("wm.disabled_addon_mesh_angle", text="Can't Show; Mesh Angle add-on disabled!!!", icon='ERROR')
+        angleToolPieButton.mesh_angle(pie)
         # 7 - TOP - LEFT
-        pie.operator("mesh.merge", text="Collapse").type = 'COLLAPSE'
+        blenderPieButton.collapse_edge(pie)
         # 9 - TOP - RIGHT
-        pie.operator("mesh.subdivide_edgering", text="Subdivide Edge-Ring", icon='MOD_MULTIRES')
+        blenderPieButton.subdivide_edge_ring(pie)
         # 1 - BOTTOM - LEFT
         pie.separator()
         # 3 - BOTTOM - RIGHT
@@ -319,19 +303,19 @@ class MT_pie_face_action_select(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("mesh.select_random", text="Random", icon='GROUP_VERTEX')
+        blenderPieButton.select_random_face(pie)
         # 6 - RIGHT
-        pie.operator("mesh.faces_select_linked_flat", text="Linked Flat Faces", icon='SELECT_EXTEND')
+        blenderPieButton.link_flat_faces(pie)
         # 2 - BOTTOM
-        pie.operator("mesh.select_all", text="Invert", icon='OVERLAY').action = 'INVERT'
+        blenderPieButton.invert_select(pie)
         # 8 - TOP
-        pie.operator("mesh.region_to_loop", text="Boundary Loop", icon='MATPLANE')
+        blenderPieButton.boundary_loop(pie)
         # 7 - TOP - LEFT
         pie.separator()
         # 9 - TOP - RIGHT
         pie.separator()
         # 1 - BOTTOM - LEFT
-        pie.operator("mesh.select_loose", text="Loose Geometry", icon='MOD_BUILD')
+        blenderPieButton.select_loose_geo(pie)
         # 3 - BOTTOM - RIGHT
         pie.separator()
 
@@ -345,24 +329,21 @@ class MT_pie_face_action_more(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("mesh.unsubdivide", text="Un-Subdivide", icon='MATPLANE')
+        blenderPieButton.unsubdivide(pie)
         # 6 - RIGHT
-        pie.operator("mesh.subdivide", text="Subdivide", icon='MESH_GRID')
+        blenderPieButton.subdivide(pie)
         # 2 - BOTTOM
-        pie.operator("mesh.flip_normals", text="Flip", icon='MOD_UVPROJECT')
+        blenderPieButton.flip_normals(pie)
         # 8 - TOP
-        pie.operator('mesh.poke', text='Poke Face')
-        # pie.operator("mesh.customdata_custom_splitnormals_clear", text="Clear Custom Split Normals Data", icon='HOLDOUT_OFF')
+        blenderPieButton.poke_face(pie)
         # 7 - TOP - LEFT
-        pie.operator("mesh.normals_make_consistent", text="Recalculate Normals Outside", icon='MOD_NORMALEDIT').inside = False
+        blenderPieButton.recalculate_normals_outside(pie)
         # 9 - TOP - RIGHT
-        pie.operator("mesh.normals_make_consistent", text="Recalculate Normals Inside", icon='MOD_NORMALEDIT').inside = True
+        blenderPieButton.recalculate_normals_inside(pie)
         # 1 - BOTTOM - LEFT
-        button = pie.operator("mesh.quads_convert_to_tris", text="Triangulate Faces", icon='MOD_TRIANGULATE')
-        button.quad_method = 'BEAUTY'
-        button.ngon_method = 'BEAUTY'
+        blenderPieButton.triangulate_faces(pie)
         # 3 - BOTTOM - RIGHT
-        pie.operator("mesh.tris_convert_to_quads", text="Tris to Quads", icon='MOD_WIREFRAME')
+        blenderPieButton.convert_tris_to_quads(pie)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -370,6 +351,7 @@ class MT_pie_face_action_more(bpy.types.Menu):
 
 # Menu classes
 classes = (WM_OT_CustomKnifeTool,
+           WM_OT_MergeLast,
            MT_pie_mesh_hide,
            MT_pie_mesh_tool,
            MT_pie_mesh_action,

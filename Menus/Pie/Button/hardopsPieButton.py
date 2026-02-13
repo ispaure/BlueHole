@@ -1,5 +1,5 @@
 """
-Pie Menu operators pertaining to the DreamUV Addon
+Pie Menu operators pertaining to HardOps
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,14 +15,16 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# Blue Hole
 import BlueHole.blenderUtils.addonUtils as addonUtils
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON
 
-
-def hotspotter(pie):
-    if addonUtils.is_addon_enabled_and_loaded('DreamUV') or addonUtils.is_addon_enabled_and_loaded('Blender_DreamUV-master'):
-        pie.operator("view3d.dreamuv_hotspotter", text="HotSpotter", icon='UV_DATA')
+def quick_pipe(pie):
+    if addonUtils.is_addon_enabled_and_loaded('hardops') or addonUtils.is_addon_enabled_and_loaded('HOps'):
+        # TODO: Find equivalent if HardOps not installed
+        pie.operator("hops.edge2curve", text="Quick Pipe", icon='OUTLINER_OB_GREASEPENCIL')
     else:
-        pie.operator("wm.disabled_addon_dreamuv", text="Can't Show; DreamUV add-on disabled!!!", icon='ERROR')
+        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
