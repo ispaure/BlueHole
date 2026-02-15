@@ -25,10 +25,6 @@ import bpy
 # Import Blue Hole Scripts
 from .blenderUtils import callbacks
 
-# from .wrappers import perforceWrapper as p4Wrapper
-# from .blenderUtils import fileUtils as fileUtils
-# from .blenderUtils import filterUtils as filterUtils
-
 # Disable use of pySide for UI (rely on OS terminal to create windows instead)
 from .commonUtils import uiUtils
 uiUtils.use_pyside = False
