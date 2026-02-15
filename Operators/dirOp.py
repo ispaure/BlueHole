@@ -19,10 +19,11 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from ..blenderUtils import fileUtils, projectUtils, filterUtils
+from ..blenderUtils import blenderFile, projectUtils, filterUtils
 from ..wrappers import perforceWrapper as p4Wrapper
 from ..environment import envPathResolver
 from ..preferences.prefs import *
+from ..commonUtils import fileUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -109,7 +110,7 @@ class OpenUserResourcePath(bpy.types.Operator):
     bl_description = 'Open USER RESOURCE Folder'
 
     def execute(self, context):
-        appdata_path = fileUtils.get_resource_path_user()
+        appdata_path = blenderFile.get_resource_path_user()
         fileUtils.open_dir_path(appdata_path)
         return {'FINISHED'}
 

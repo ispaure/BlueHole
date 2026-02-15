@@ -14,7 +14,7 @@ __status__ = 'Production'
 
 import bpy
 from ...commonUtils.debugUtils import *
-from ...blenderUtils import filterUtils as filterUtils, addonUtils
+from ...blenderUtils import filterUtils, addonUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -12,7 +12,7 @@ __status__ = 'Production'
 
 import bpy
 import addon_utils
-from . import fileUtils
+from . import blenderFile
 from pathlib import Path
 from typing import *
 
@@ -42,8 +42,8 @@ def is_addon_on_disk(module_name: str) -> bool:
         if extension_profile is None:  # If there isn't a found extension profile, no need to pry further
             return False
         else:
-            extension_path = Path(fileUtils.get_extensions_path(), extension_profile, module_name)
-            if fileUtils.is_path_valid(extension_path):
+            extension_path = Path(blenderFile.get_extensions_path(), extension_profile, module_name)
+            if blenderFile.is_path_valid(extension_path):
                 return True
             else:
                 return False

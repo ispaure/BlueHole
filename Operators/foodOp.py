@@ -19,7 +19,7 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from ..blenderUtils.fileUtils import open_url
+from ..commonUtils.webUtils import open_url
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

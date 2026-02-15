@@ -20,7 +20,7 @@ from typing import *
 from pathlib import Path
 
 # Blue Hole
-from ..blenderUtils import fileUtils
+from ..blenderUtils import blenderFile
 from ..commonUtils.debugUtils import *
 from ..preferences.prefs import *
 from .model import Environment
@@ -85,7 +85,7 @@ def get_env_dict() -> Dict[str, Environment]:
     Deterministic map: environment name -> Environment instance.
     Only includes directories in the BlueHole env folder.
     """
-    env_dir = Path(fileUtils.get_blue_hole_user_env_files_path())
+    env_dir = Path(blenderFile.get_blue_hole_user_env_files_path())
 
     if not env_dir.exists():
         return {}

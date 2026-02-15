@@ -20,11 +20,11 @@ from pathlib import Path
 import bpy
 
 # Blue Hole
-from ..blenderUtils import fileUtils, filterUtils
+from ..blenderUtils import filterUtils
 from ..commonUtils.debugUtils import *
 from ..preferences.prefs import *
 from ..commonUtils.wrappers import cmdShellWrapper
-from ..commonUtils import uiUtils
+from ..commonUtils import uiUtils, fileUtils
 from ..commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -97,13 +97,13 @@ class P4Info:
 
             if 'Permission denied' in item:
                 self.status = False
-                match filterUtils.get_platform():
-                    case filterUtils.OS.WIN:
+                match get_os():
+                    case OS.WIN:
                         P4ErrorMessage().info_win_p4_cmd_missing()
-                    case filterUtils.OS.MAC:
+                    case OS.MAC:
                         p4_macos_path = get_p4_macos_path()
                         P4ErrorMessage().info_mac_p4_cmd_missing(p4_macos_path)
-                    case filterUtils.OS.LINUX:
+                    case OS.LINUX:
                         p4_linux_path = get_p4_linux_path()
                         P4ErrorMessage().info_linux_p4_cmd_missing(p4_linux_path)
                 return
@@ -314,15 +314,15 @@ class P4File:
             normalized_client_root = str(Path(p4_info_cls.client_root))  # Sometime it outputs with / or not, so normalize here.
 
             # If on Windows, should test in lowercase (not be case-sensitive)
-            match filterUtils.get_platform():
-                case filterUtils.OS.WIN:
+            match get_os():
+                case OS.WIN:
                     client_file_str = self.clientFile.lower()
                     client_root_str = normalized_client_root.lower()
-                case filterUtils.OS.MAC | filterUtils.OS.LINUX:
+                case OS.MAC | OS.LINUX:
                     client_file_str = self.clientFile
                     client_root_str = normalized_client_root
 
-            if client_file_str.startswith(f'{client_root_str}{fileUtils.get_os_split_char()}'):
+            if client_file_str.startswith(f'{client_root_str}{fileUtils.get_split_character()}'):
                 P4LogMessage().under_ws_root(self.get_display_name())
                 return True
         P4ErrorMessage(silent).not_under_ws_root(self.get_display_name())
@@ -926,8 +926,8 @@ def set_p4_env_settings():
     if filterUtils.filter_source_control() and prefs().sc.source_control_solution == 'perforce':
         print('Attempting to set P4 environment settings')
         # If platform is Windows
-        match filterUtils.get_platform():
-            case filterUtils.OS.WIN:
+        match get_os():
+            case OS.WIN:
                 # If preference set to "Override Environment Settings"
                 if prefs().sc.win32_env_override:
                     print('Override environment settings is ON')
@@ -937,7 +937,7 @@ def set_p4_env_settings():
                     exec_p4_command(cmd_str)
                     cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
                     exec_p4_command(cmd_str)
-            case filterUtils.OS.MAC:
+            case OS.MAC:
                 # If Platform is MacOS, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
                 cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
                 exec_p4_command(cmd_str)
@@ -945,7 +945,7 @@ def set_p4_env_settings():
                 exec_p4_command(cmd_str)
                 cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
                 exec_p4_command(cmd_str)
-            case filterUtils.OS.LINUX:
+            case OS.LINUX:
                 # If Platform is Linux, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
                 cmd_str = 'p4 set P4USER=' + prefs().sc.linux_env_setting_p4user
                 exec_p4_command(cmd_str)

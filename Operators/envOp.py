@@ -24,8 +24,9 @@ import bpy
 from bpy.props import *
 
 # Blue Hole
-from ..blenderUtils import fileUtils
+from ..blenderUtils import blenderFile
 from ..environment import envManager, model
+from ..commonUtils import webUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -155,9 +156,9 @@ class WM_OT_CustomizeEnvVariables(bpy.types.Operator):
     bl_options = {'INTERNAL'}
 
     def execute(self, _context):
-        env_config_path = fileUtils.get_current_env_var_path()
+        env_config_path = blenderFile.get_current_env_var_path()
         if sys.platform == 'win32':
-            fileUtils.open_url(env_config_path)
+            webUtils.open_url(env_config_path)
         else:
             subprocess.call(['open', '-a', 'TextEdit', env_config_path])
         return {'FINISHED'}

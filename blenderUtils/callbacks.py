@@ -14,7 +14,7 @@ __status__ = 'Production'
 
 import bpy
 from bpy.app.handlers import persistent
-from . import sourceControlUtils, fileUtils
+from . import sourceControlUtils, blenderFile
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -34,13 +34,13 @@ def load_pre_handler(scene):
 @persistent
 def load_post_handler(scene):
     print("Event: load_post")
-    if len(fileUtils.get_blend_file_path()) > 0:
+    if len(blenderFile.get_blend_file_path()) > 0:
         sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
 
 
 @persistent
 def save_pre_handler(scene):
-    if len(fileUtils.get_blend_file_path()) > 0:
+    if len(blenderFile.get_blend_file_path()) > 0:
         sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
     print("Event: save_pre")
 
@@ -48,7 +48,6 @@ def save_pre_handler(scene):
 @persistent
 def save_post_handler(scene):
     print("Event: save_post")
-
 
 
 class OBJECT_OT_dummy(bpy.types.Operator):
