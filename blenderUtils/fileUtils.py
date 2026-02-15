@@ -17,7 +17,6 @@ __status__ = 'Production'
 import subprocess
 import webbrowser
 from pathlib import Path
-import zipfile
 from shutil import copyfile
 from distutils.dir_util import copy_tree
 import bpy
@@ -265,47 +264,6 @@ def get_default_env_msh_guides_path():
     return Path(envManager.get_default_env().path, 'msh_scale_guides')
 
 
-def get_file_path_list(dir_name):
-    """
-    Returns list of all files under a specific directory.
-    :param dir_name: Directory in which to look under
-    :type dir_name: str
-    :rtype: lst
-    """
-    # create a list of file and subdirectories
-    # names in the given directory
-    list_of_files = os.listdir(dir_name)
-    all_files = list()
-    # Iterate over all the entries
-    for entry in list_of_files:
-        # Create full path
-        full_path = os.path.join(dir_name, entry)
-        # If entry is a directory then get the list of files in this directory
-        if os.path.isdir(full_path):
-            all_files = all_files + get_file_path_list(full_path)
-        else:
-            all_files.append(full_path)
-    return all_files
-
-
-def get_dirs_path_list(dir_path):
-    """
-    Returns a list of valid directory paths within a directory
-    :param dir_path: Directory in which to look for directories
-    :type dir_path: str
-    :rtype: lst
-    """
-    dir_path_lst = []
-    # Get list of items within a directory
-    atlas_sub_dir_item_lst = os.listdir(dir_path)
-    # Create a path from items within the directory, and if they are a directory, add them to the directories list.
-    for item in atlas_sub_dir_item_lst:
-        item_dir = dir_path + '/' + item
-        if os.path.isdir(item_dir):
-            dir_path_lst.append(item_dir)
-    return dir_path_lst
-
-
 def write_file(file_path, write_str):
     """
     Creates a file (if not created yet) and writes to it
@@ -335,40 +293,6 @@ def read_file(file_path):
     """
     f = open(file_path, 'r')
     return f.read().splitlines()
-
-
-def zip_file(source, destination):
-    """
-    Create a zip file from the source to the destination.
-    :param source: Source path to compress
-    :type source: str
-    :param destination: Destination path of compressed archive (incl. extension)
-    :type destination: str
-    """
-    def make_zipfile(output_filename, source_dir):
-        relroot = os.path.abspath(os.path.join(source_dir, os.pardir))
-        with zipfile.ZipFile(output_filename, "w", zipfile.ZIP_DEFLATED) as zip:
-            for root, dirs, files in os.walk(source_dir):
-                # add directory (needed for empty dirs)
-                zip.write(root, os.path.relpath(root, relroot))
-                for file in files:
-                    filename = os.path.join(root, file)
-                    if os.path.isfile(filename):  # regular files only
-                        arcname = os.path.join(os.path.relpath(root, relroot), file)
-                        zip.write(filename, arcname)
-    make_zipfile(destination, source)
-
-
-def unzip_file(source_file, destination_dir):
-    """
-    Extracts zip file to desired location.
-    :param source_file: Path to file to extract.
-    :type source_file: str
-    :param destination_dir: Directory to extract into.
-    :type destination_dir: str
-    """
-    with zipfile.ZipFile(source_file, 'r') as zip_ref:
-        zip_ref.extractall(destination_dir)
 
 
 def copy_file(source, destination):

@@ -18,6 +18,7 @@ import configparser
 
 from . import fileUtils
 from ..commonUtils.debugUtils import *
+from ..commonUtils import configUtils
 from .platformUtils import *
 
 
@@ -29,43 +30,6 @@ name = filename = os.path.basename(__file__)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
-
-
-def config_section_map(section, value, cfg_file_path):
-    """
-    Retrieve a value from a section of a config file.
-    :param section: Name of section in which the value you want is found.
-    :type section: str
-    :param value: Name of the value you want to get as return
-    :type value: str
-    :param cfg_file_path: Path to the config file to look into
-    :type cfg_file_path: str
-    :rtype: str
-    """
-    # Read config file
-    config = configparser.ConfigParser(interpolation=None)
-    env_config_filepath = cfg_file_path  # Get path of current env config file
-    config.read(env_config_filepath)
-    config.sections()
-
-    # Retrieve dict
-    dict1 = {}
-    try:
-        options = config.options(section)
-    except:
-        return None
-    for option in options:
-        try:
-            dict1[option] = config.get(section, option)
-            if dict1[option] == -1:
-                DebugPrint("skip: %s" % option)
-        except:
-            print("exception on %s!" % option)
-            dict1[option] = None
-    if value in dict1.keys():
-        return dict1[value]
-    else:
-        return None
 
 
 # TODO: Optimize batching of checks; create class where it only re-triggers file read when I want, so it can get through testing many fields much more quickly.
@@ -168,11 +132,11 @@ def get_current_env_cfg_value(section, value):
     :type value: str
     :rtype: str
     """
-    return_value = config_section_map(section, value, fileUtils.get_current_env_var_path())
+    return_value = configUtils.config_section_map(fileUtils.get_current_env_var_path(), section, value)
     if return_value is not None:
         return return_value
     else:
-        return_value = config_section_map(section, value, fileUtils.get_default_env_var_path())
+        return_value = configUtils.config_section_map(fileUtils.get_default_env_var_path(), section, value)
         if return_value is None:
             msg = 'Could not find value {value} in section {section} in either the current env config file or the ' \
                   'default. Please add missing value to one of those files.'.format(value=value, section=section)
@@ -184,4 +148,4 @@ def get_url_db_value(section, value):
     """
     Retrieve a value from Blue Hole's URL database file
     """
-    return config_section_map(section, value, fileUtils.get_bh_url_db_file_path())
+    return configUtils.config_section_map(fileUtils.get_bh_url_db_file_path(), section, value)
