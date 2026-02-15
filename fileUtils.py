@@ -20,7 +20,6 @@ from pathlib import Path
 from shutil import rmtree, copyfile, move
 
 # Common utilities
-from commonUtils import osUtils
 from .osUtils import *
 from .debugUtils import *
 from .wrappers import cmdShellWrapper
@@ -78,11 +77,13 @@ class TXTFile(File):
         super().__init__(path)
         self.line_lst = []
 
-    def import_line_lst(self):
+    def import_line_lst(self) -> List[str]:
         """
         Import the lines from the text file into self.line_lst
         """
-        self.line_lst = read_file(self.path)
+        with open(self.path, "r", encoding="utf-8-sig") as f:
+            self.line_lst = f.read().splitlines()
+        return self.line_lst
 
     def export(self, path: Union[Path, None] = None):
         """
@@ -96,8 +97,6 @@ class TXTFile(File):
                     f.write(f"{line}\n")
                 else:
                     f.write(line)
-
-
 
 
 def hang_n_terminate():
@@ -205,8 +204,10 @@ def read_file(file_path: Union[str, Path]):
     :type file_path: str
     :rtype: lst
     """
-    f = open(file_path, 'r', encoding='utf-8-sig')
-    return f.read().splitlines()
+    log(Severity.WARNING, 'fileUtils.read_file', 'DEPRECATED METHOD IN USE; RESOLVE!')
+    txt = TXTFile(file_path)
+    txt.import_line_lst()
+    return txt.line_lst
 
 
 def append_line_lst_to_file(line_lst, file_path):
@@ -732,4 +733,35 @@ def get_permission(path: Path):
     # App Run permissions
     log(Severity.DEBUG, tool_name, f'Getting CHMOD+X Permission for "{path}"')
     cmdShellWrapper.exec_cmd(f'chmod +x "{path}"')
+
+
+def ensure_file_writable_if_exists(file_path: str | Path) -> bool:
+    """
+    Ensures the file is writable by the owner, without removing any
+    existing permissions.
+
+    Returns False if the file does not exist.
+    Raises PermissionError / OSError on failure.
+    """
+    p = Path(file_path)
+
+    if not p.exists() or not p.is_file():
+        return False
+
+    match get_os():
+        case OS.MAC | OS.LINUX:
+            st = os.stat(p)
+            if not (st.st_mode & stat.S_IWUSR):
+                os.chmod(p, st.st_mode | stat.S_IWUSR)
+
+        case OS.WIN:
+            # Best-effort: clear read-only attribute
+            st = os.stat(p)
+            if not (st.st_mode & stat.S_IWRITE):
+                os.chmod(p, st.st_mode | stat.S_IWRITE)
+
+        case _:
+            raise RuntimeError("Unsupported OS")
+
+    return True
 
