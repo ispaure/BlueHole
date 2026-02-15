@@ -18,7 +18,7 @@ __status__ = 'Production'
 
 # Blue Hole
 from ..wrappers import perforceWrapper as p4Wrapper
-from . import filterUtils, fileUtils
+from . import filterUtils, blenderFile
 from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ def sc_check_blend(silent_mode=False):
             if not result:
                 return False
 
-            blend_file_path = fileUtils.get_blend_file_path()
+            blend_file_path = blenderFile.get_blend_file_path()
 
             # NEW METHOD KEEPING OLD BEHAVIOR
             blend_p4_file = p4Wrapper.BlendP4File(client_file=blend_file_path)

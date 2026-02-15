@@ -18,13 +18,13 @@ __status__ = 'Production'
 import addon_utils
 from pathlib import Path
 import platform
-from . import fileUtils, objectUtils, projectUtils
+from . import blenderFile, objectUtils, projectUtils
 from ..wrappers import perforceWrapper
 from ..commonUtils.debugUtils import *
 from ..environment import envPathResolver
 from ..preferences.prefs import *
 from enum import Enum
-from .platformUtils import *
+from ..commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -44,9 +44,9 @@ def check_blend_location_in_dir_structure():
     """
 
     expected_location_on_disk = str(Path(projectUtils.get_project_sub_dir(prefs().env.sc_dir_struct_scenes),
-                                         fileUtils.get_blend_file_name() + '.blend'
+                                         blenderFile.get_blend_file_name() + '.blend'
                                          ))
-    blend_location_on_disk = fileUtils.get_blend_file_path()
+    blend_location_on_disk = blenderFile.get_blend_file_path()
     if expected_location_on_disk.replace('\\', '/') == blend_location_on_disk.replace('\\', '/'):
         return True
     else:
@@ -114,7 +114,7 @@ def check_tests(script_name,
 
     def dialog_source_control_connection():
         if not silent_mode:
-            match get_platform():
+            match get_os():
                 case OS.WIN:
                     if prefs().sc.win32_env_override:
                         msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
@@ -182,7 +182,7 @@ def check_tests(script_name,
 
     # Check if Blend exists
     if check_blend_exist:
-        if len(fileUtils.get_blend_file_path()) == 0:
+        if len(blenderFile.get_blend_file_path()) == 0:
             log(Severity.CRITICAL, script_name, 'Check Blend Exist Failed')
             dialog_check_blend_exist()
             return False
@@ -241,7 +241,7 @@ def check_tests(script_name,
             return False
         sc_path_str = str(sc_path)
 
-        blend_path = str(Path(fileUtils.get_blend_directory_path()))
+        blend_path = str(Path(blenderFile.get_blend_directory_path()))
         if sc_path_str not in blend_path:
             display_path_error_blend(sc_path, blend_path)
             return False

@@ -21,6 +21,7 @@ import bpy
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
+
 def get_scene_obj_lst():
     """
     Gather the list of objects within a scene

@@ -16,10 +16,9 @@ __status__ = 'Production'
 
 import configparser
 
-from . import fileUtils
+from . import blenderFile
 from ..commonUtils.debugUtils import *
 from ..commonUtils import configUtils
-from .platformUtils import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -36,4 +35,4 @@ def get_url_db_value(section, value):
     """
     Retrieve a value from Blue Hole's URL database file
     """
-    return configUtils.config_section_map(fileUtils.get_bh_url_db_file_path(), section, value)
+    return configUtils.config_section_map(blenderFile.get_bh_url_db_file_path(), section, value)

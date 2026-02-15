@@ -19,8 +19,9 @@ __status__ = 'Production'
 from pathlib import Path
 
 # Blue Hole
-from . import fileUtils, configUtils, filterUtils
+from . import blenderFile, configUtils, filterUtils
 from ..preferences.prefs import *
+from ..commonUtils import fileUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -35,14 +36,14 @@ def get_project_sub_dir(path_append) -> Path:
     :type path_append: str
     """
     # Find currently opened .blend directory path
-    blend_directory_path = fileUtils.get_blend_directory_path()
+    blend_directory_path = blenderFile.get_blend_directory_path()
 
     # Remove 'path_scenes' from directory, since path_scenes contains
     # the location of the subdirectory in which the .blend file resides
     path_remove = prefs().env.sc_dir_struct_scenes
 
     # Apply the two modifications (truncate & append) we just wrote about to the original .blend file path
-    project_sub_dir: str = fileUtils.truncate_n_append_str(blend_directory_path, path_remove, path_append)
+    project_sub_dir: str = blenderFile.truncate_n_append_str(blend_directory_path, path_remove, path_append)
 
     # If folder path hadn't been created already, make it.
     # Useful in preventing bugs where user haven't created their folders yet.

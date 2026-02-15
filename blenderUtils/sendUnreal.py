@@ -21,7 +21,7 @@ import time
 
 # Blue Hole
 from ..commonUtils.debugUtils import *
-from . import fileUtils, filterUtils
+from . import blenderFile, filterUtils
 from ..Lib.send2ue.dependencies import remote_execution
 from ..preferences.prefs import *
 from ..environment import envPathResolver
@@ -76,7 +76,7 @@ def trigger_unreal_import(file_path_source):
         return False
 
     # Validate currently opened blend file is within SourceContent
-    blend_path = str(Path(fileUtils.get_blend_directory_path()))
+    blend_path = str(Path(blenderFile.get_blend_directory_path()))
     if sc_path_str not in blend_path:
         display_path_error_blend(sc_path_str, blend_path)
         return False

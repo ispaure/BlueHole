@@ -19,7 +19,8 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from ..blenderUtils import fileUtils, configUtils
+from ..blenderUtils import configUtils
+from ..commonUtils.webUtils import open_url
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ class OpenGuide(bpy.types.Operator):
 
     def execute(self, context):
         url = configUtils.get_url_db_value('BlueHoleWebsite', 'home')
-        fileUtils.open_url(url)
+        open_url(url)
         return {'FINISHED'}
 
 
@@ -46,7 +47,7 @@ class OpenKeymapsList(bpy.types.Operator):
 
     def execute(self, context):
         url = configUtils.get_url_db_value('BlueHoleWebsite', 'keymaps')
-        fileUtils.open_url(url)
+        open_url(url)
         return {'FINISHED'}
 
 
@@ -58,7 +59,7 @@ class OpenPieMenusList(bpy.types.Operator):
 
     def execute(self, context):
         url = configUtils.get_url_db_value('BlueHoleWebsite', 'pie_menus')
-        fileUtils.open_url(url)
+        open_url(url)
         return {'FINISHED'}
 
 
@@ -70,7 +71,7 @@ class SubmitFeedback(bpy.types.Operator):
 
     def execute(self, context):
         url = configUtils.get_url_db_value('Contact', 'mail')
-        fileUtils.open_url(url)
+        open_url(url)
         return {'FINISHED'}
 
 
@@ -82,7 +83,7 @@ class JoinBHDiscord(bpy.types.Operator):
 
     def execute(self, context):
         url = configUtils.get_url_db_value('Contact', 'discord')
-        fileUtils.open_url(url)
+        open_url(url)
         return {'FINISHED'}
 
 
@@ -93,7 +94,7 @@ class SendToUnityDoc(bpy.types.Operator):
     bl_description = 'Opens the Documentation for the Blender to Unity Bridge'
 
     def execute(self, context):
-        fileUtils.open_url(configUtils.get_url_db_value('Tutorial', 'unity_bridge'))
+        open_url(configUtils.get_url_db_value('Tutorial', 'unity_bridge'))
         return{'FINISHED'}
 
 
@@ -104,7 +105,7 @@ class SendToUnrealDoc(bpy.types.Operator):
     bl_description = 'Opens the documentation for the Blender to Unreal Bridge'
 
     def execute(self, context):
-        fileUtils.open_url(configUtils.get_url_db_value('Tutorial', 'unreal_bridge'))
+        open_url(configUtils.get_url_db_value('Tutorial', 'unreal_bridge'))
         return{'FINISHED'}
 
 

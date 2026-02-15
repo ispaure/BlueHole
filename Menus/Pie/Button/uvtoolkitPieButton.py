@@ -16,7 +16,7 @@ __status__ = 'Production'
 # IMPORTS
 
 from ....blenderUtils import addonUtils
-from ....blenderUtils import fileUtils
+from ....blenderUtils import blenderFile
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MISC
@@ -27,8 +27,8 @@ def validate_uv_toolkit_and_on_version_2():
     if addonUtils.is_addon_enabled_and_loaded('uv_toolkit'):
         # Validate version of UV Toolkit is 2.0, by looking for a file that is only in version 2.0
         # Reason for this is there are big changes between free and paid and links in menu only work in paid.
-        file_pth_only_2 = fileUtils.get_resource_path_user() + '/scripts/addons/uv_toolkit/operators/export_setting.py'
-        if fileUtils.is_file_path_valid(file_pth_only_2):
+        file_pth_only_2 = blenderFile.get_resource_path_user() + '/scripts/addons/uv_toolkit/operators/export_setting.py'
+        if blenderFile.is_file_path_valid(file_pth_only_2):
             return True
     return False
 

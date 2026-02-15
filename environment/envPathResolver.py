@@ -21,8 +21,9 @@ from pathlib import Path
 
 # Blue Hole
 from ..commonUtils.debugUtils import *
-from ..blenderUtils import fileUtils, filterUtils
+from ..blenderUtils import blenderFile
 from ..preferences.prefs import *
+from ..commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -61,14 +62,14 @@ def get_dir_path_if_valid(path_def: str, path_str: str, quiet: bool) -> Optional
 def get_valid_sc_dir_path(quiet: bool = False) -> Optional[Path]:
     """Attempts to get a valid source content path from the current Blue Hole settings, regardless of OS"""
     path_def = 'Source Content'
-    match filterUtils.get_platform():
-        case filterUtils.OS.WIN:
+    match get_os():
+        case OS.WIN:
             sc_path_to_attempt_lst = [prefs().env.sc_path,
                                       prefs().env.sc_path_alternate]
-        case filterUtils.OS.MAC:
+        case OS.MAC:
             sc_path_to_attempt_lst = [prefs().env.sc_path_mac,
                                       prefs().env.sc_path_mac_alternate]
-        case filterUtils.OS.LINUX:
+        case OS.LINUX:
             sc_path_to_attempt_lst = [prefs().env.sc_path_linux,
                                       prefs().env.sc_path_linux_alternate]
 
@@ -92,12 +93,12 @@ def get_valid_unity_asset_dir_path(quiet: bool = False) -> Optional[Path]:
     """Attempts to get a valid unity asset path from the current Blue Hole settings, regardless of OS"""
     path_def = 'Unity Assets'
 
-    match filterUtils.get_platform():
-        case filterUtils.OS.WIN:
+    match get_os():
+        case OS.WIN:
             unity_asset_path = prefs().general.unity_assets_path
-        case filterUtils.OS.MAC:
+        case OS.MAC:
             unity_asset_path = prefs().general.unity_assets_path_mac
-        case filterUtils.OS.LINUX:
+        case OS.LINUX:
             unity_asset_path = prefs().general.unity_assets_path_linux
 
     # Attempt to get the unity asset path from the available options
@@ -122,7 +123,7 @@ def get_unity_exp_dir_path(quiet: bool = False) -> Optional[Path]:
     # Export Format
 
     # Determine Export Directory
-    blend_dir_path = fileUtils.get_blend_directory_path()
+    blend_dir_path = blenderFile.get_blend_directory_path()
 
     # Get sc path
     sc_path = get_valid_sc_dir_path(quiet)

@@ -45,7 +45,7 @@ def add_collection(name):
     :param name: Collection name
     :type name: str
     """
-    bpy.ops.collection.create(name = name)
+    bpy.ops.collection.create(name=name)
     bpy.context.scene.collection.children.link(bpy.data.collections[name])
     return bpy.data.collections[name]
 

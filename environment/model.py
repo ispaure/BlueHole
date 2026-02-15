@@ -20,9 +20,9 @@ from typing import *
 from pathlib import Path
 
 # Blue Hole
-from ..blenderUtils import fileUtils
+from ..blenderUtils import blenderFile
 from ..commonUtils import configUtils
-from ..blenderUtils import configUtils as configUtilsOld
+from ..commonUtils import fileUtils
 from ..commonUtils.debugUtils import *
 from ..preferences.prefs import *
 from . import envManager
@@ -52,7 +52,7 @@ class Setting:
             return return_value
 
         # Attempt to get value from default environment's path
-        return_value = configUtils.config_section_map(fileUtils.get_default_env_var_path(), section, value)
+        return_value = configUtils.config_section_map(blenderFile.get_default_env_var_path(), section, value)
         if return_value is None:
             msg = 'Could not find value {value} in section {section} in either the current env config file or the ' \
                   'default. Please add missing value to one of those files.'.format(value=value, section=section)
@@ -68,7 +68,7 @@ class Setting:
 
         # 2. Convert to the correct type
         if self.var_type == bool:
-            val = fileUtils.string_to_bool(ini_val_str)
+            val = blenderFile.string_to_bool(ini_val_str)
         elif self.var_type == int:
             val = int(ini_val_str)
         elif self.var_type == float:
@@ -96,7 +96,7 @@ class Setting:
         val = getattr(pref_obj, self.pref_path.split(".")[-1])
         # 2. Convert bools to string if needed
         if self.var_type == bool:
-            val_str = fileUtils.bool_to_string(val)
+            val_str = blenderFile.bool_to_string(val)
         else:
             val_str = str(val)
         # 3. Debug message
@@ -105,7 +105,7 @@ class Setting:
             log(Severity.DEBUG, env_tool_name, msg)
         # 4. Check if key exists in current environment
         current_val = configUtils.config_section_map(path, self.ini_section, self.ini_value)
-        default_val = configUtils.config_section_map(fileUtils.get_default_env_var_path(), self.ini_section, self.ini_value)
+        default_val = configUtils.config_section_map(blenderFile.get_default_env_var_path(), self.ini_section, self.ini_value)
         if current_val is None:
             if val_str == default_val:
                 if show_verbose:
@@ -132,7 +132,7 @@ class Environment:
     """
     def __init__(self, name: str):
         self.name: str = name
-        self.path: Path = Path(fileUtils.get_blue_hole_user_env_files_path(), name)
+        self.path: Path = Path(blenderFile.get_blue_hole_user_env_files_path(), name)
         self.env_variables_path: Path = Path(self.path, 'env_variables.ini')
         self.setting_lst: List[Setting] = []
         self.__initialize_setting_lst()
@@ -181,7 +181,7 @@ class Environment:
         # TODO: Find a way to refresh active_environment in BlueHole.preferences.environment.bc.active_environment
         msg = f'Terminating Blender on Environment Deletion'
         log(Severity.INFO, env_tool_name, msg)
-        fileUtils.terminate_blender()
+        blenderFile.terminate_blender()
 
     def add_env(self, source_env):
         """
@@ -213,11 +213,11 @@ class Environment:
         # CAN BE ADDED!
         log(Severity.INFO, env_tool_name, f'Adding New Environment "{self.name}" based on "{source_env.name}"')
 
-        fileUtils.copy_dir(source_env.path, self.path)
+        blenderFile.copy_dir(source_env.path, self.path)
 
         # Terminate Blender Process
         # TODO: Find a way to refresh active_environment in BlueHole.preferences.environment.bc.active_environment
         msg = f'Terminating Blender on Environment Addition'
         log(Severity.INFO, env_tool_name, msg)
-        fileUtils.terminate_blender()
+        blenderFile.terminate_blender()
         return True

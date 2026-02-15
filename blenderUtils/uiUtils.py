@@ -35,13 +35,8 @@ def set_theme(name):
     :type name: str
     """
     # Import here only (if import at the top it causes cyclical issues)
-    from .fileUtils import get_blue_hole_themes_path as get_blue_hole_themes_path
+    from .blenderFile import get_blue_hole_themes_path
     # Determine .xml theme preset path, which is slightly different depending if Windows or Unix
     theme_file_path = str(Path(get_blue_hole_themes_path() + '/' + name + '.xml'))
     # Set Current theme as .xml theme preset path
     bpy.ops.script.execute_preset(filepath=theme_file_path, menu_idname='USERPREF_MT_interface_theme_presets')
-
-
-def empty_fn():
-    print('runningemptyfn')
-    pass

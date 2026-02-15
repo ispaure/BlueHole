@@ -16,17 +16,14 @@ __status__ = 'Production'
 
 import subprocess
 import webbrowser
-from pathlib import Path
-from shutil import copyfile
 from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree
 from ..commonUtils.debugUtils import *
-from . import filterUtils
 from ..environment import envManager
 from typing import *
-from .platformUtils import *
-import stat
+from ..commonUtils.osUtils import *
+from pathlib import Path
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -154,15 +151,6 @@ def open_dir_path(dir_path: Union[str, Path]):
               '\nAttempted path: ' + str_dir_path)
 
 
-def open_url(url):
-    """
-    Opens URL in web browser
-    :param url: URL
-    :type url: str
-    """
-    webbrowser.open(url)
-
-
 def get_addons_path():
     """
     Get directory path where all add-ons are located.
@@ -284,24 +272,6 @@ def write_file(file_path, write_str):
     f.close()
 
 
-def read_file(file_path):
-    """
-    Returns each line of a text file as part of a list
-    :param file_path: File path to read
-    :type file_path: str
-    :rtype: lst
-    """
-    f = open(file_path, 'r')
-    return f.read().splitlines()
-
-
-def copy_file(source, destination):
-    """
-    Copies file from source to destination.
-    """
-    copyfile(source, destination)
-
-
 def is_path_valid(path):
     """Determines if path given is valid"""
     if os.path.isdir(path):
@@ -372,34 +342,14 @@ def delete_dir(dir_path: Union[str, Path], debug_mode=False):
     else:
         rmtree(str(dir_path))
 
+
 def terminate_blender():
     """
     Shuts down Blender application
     """
     sys.exit(1)
 
+
 def get_computer_name():
     """Gets the computer name (only works on Windows)"""
     return os.environ['COMPUTERNAME']
-
-def get_os_split_char() -> str:
-    match filterUtils.get_platform():
-        case filterUtils.OS.WIN:
-            return '\\'
-        case filterUtils.OS.MAC | filterUtils.OS.LINUX:
-            return '/'
-
-
-def get_user_home_dir() -> Path:
-    """
-    Get the current user's home directory
-    """
-    match get_platform():
-        case OS.WIN | OS.MAC:
-            return Path.home()
-        case OS.LINUX:
-            return Path.home()
-            # import pwd
-            # user = os.getenv("USER")  # Prefer real user
-            # home_dir = Path(pwd.getpwnam(user).pw_dir if user else os.path.expanduser("~"))
-            # return home_dir
