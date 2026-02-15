@@ -22,12 +22,13 @@ __status__ = 'Production'
 # Import bpy
 import bpy
 
-# Import Blue Hole Scripts
-from .blenderUtils import callbacks
-
 # Disable use of pySide for UI (rely on OS terminal to create windows instead)
+# Need to be first import, and throw error in case .commonUtils stuff cannot be accessed.
 from .commonUtils import uiUtils
 uiUtils.use_pyside = False
+
+# Import Blue Hole Scripts
+from .blenderUtils import callbacks
 
 from .preferences import addon_prefs as addon_prefs
 
