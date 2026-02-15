@@ -40,10 +40,6 @@ def get_project_sub_dir(path_append) -> Path:
     # Remove 'path_scenes' from directory, since path_scenes contains
     # the location of the subdirectory in which the .blend file resides
     path_remove = prefs().env.sc_dir_struct_scenes
-    # This gets us to the root of the project directory
-
-    # Append the path we desire to browse into, which was the argument fed to this function.
-    path_append = configUtils.get_current_env_cfg_value("AssetDirectoryStructure", path_append)
 
     # Apply the two modifications (truncate & append) we just wrote about to the original .blend file path
     project_sub_dir: str = fileUtils.truncate_n_append_str(blend_directory_path, path_remove, path_append)

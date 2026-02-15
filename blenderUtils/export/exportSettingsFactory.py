@@ -38,7 +38,7 @@ class ExportSettingsFactory:
         export_set_cls = ExportSettings(
             # EXPORT OPTIONS
             exp_format=preset.get("Format", "FBX"),
-            exp_dir=preset.get("Export Directory", projectUtils.get_project_sub_dir("path_resources")),
+            exp_dir=preset.get("Export Directory", projectUtils.get_project_sub_dir(prefs().env.sc_dir_struct_final)),
             zero_root_transform=preset.get("Zero Root Transform", False),
 
             # INCLUDED ELEMENTS

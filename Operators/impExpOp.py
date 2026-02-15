@@ -69,7 +69,7 @@ class BatchExportSelectedToFinal(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the FINAL Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir('path_final')
+        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_final)
         return {'FINISHED'}
 
 
@@ -78,7 +78,7 @@ class BatchExportSelectedToResources(bpy.types.Operator):
     bl_label = 'Batch Export (Selection) to RESOURCES Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir('path_resources')
+        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_resources)
         return {'FINISHED'}
 
 
@@ -88,7 +88,7 @@ class BatchExportSelectedToSpeedTree_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh')
+        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_st)
         return {'FINISHED'}
 
 
@@ -98,7 +98,7 @@ class BatchExportSelectedToSpeedtreeLR_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> LR Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh_lr')
+        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_st_lr)
         return {'FINISHED'}
 
 
@@ -108,7 +108,7 @@ class BatchExportSelectedToSpeedtreeHR_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> HR Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir('path_speedtree_msh_hr')
+        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_st_hr)
         return {'FINISHED'}
 
 
@@ -118,7 +118,7 @@ class BatchExportSelectedToBakeFBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the MSH BAKE Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir('path_mshbake')
+        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_msh_bake)
         return {'FINISHED'}
 
 

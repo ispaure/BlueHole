@@ -43,7 +43,7 @@ def check_blend_location_in_dir_structure():
     env_variables.ini
     """
 
-    expected_location_on_disk = str(Path(projectUtils.get_project_sub_dir('path_scenes'),
+    expected_location_on_disk = str(Path(projectUtils.get_project_sub_dir(prefs().env.sc_dir_struct_scenes),
                                          fileUtils.get_blend_file_name() + '.blend'
                                          ))
     blend_location_on_disk = fileUtils.get_blend_file_path()

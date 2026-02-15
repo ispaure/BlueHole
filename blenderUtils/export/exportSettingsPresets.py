@@ -67,7 +67,7 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
             preset = ExportSettings(
                 # EXPORT OPTIONS
                 exp_format="FBX",
-                exp_dir=projectUtils.get_project_sub_dir("path_final"),
+                exp_dir=projectUtils.get_project_sub_dir(prefs().env.sc_dir_struct_final),
                 zero_root_transform=prefs().general.ue_bridge_zero_root_transform,
 
                 # INCLUDED ELEMENTS
