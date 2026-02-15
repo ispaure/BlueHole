@@ -20,7 +20,9 @@ from typing import *
 from pathlib import Path
 
 # Blue Hole
-from ..blenderUtils import fileUtils, configUtils
+from ..blenderUtils import fileUtils
+from ..commonUtils import configUtils
+from ..blenderUtils import configUtils as configUtilsOld
 from ..commonUtils.debugUtils import *
 from ..preferences.prefs import *
 from . import envManager
@@ -112,7 +114,7 @@ class Setting:
             else:
                 msg = f'Value missing in active env, different from default. Adding to env_variables.ini.'
                 log(Severity.WARNING, env_tool_name, msg)
-                configUtils.config_add_variable(self.ini_section, self.ini_value, val_str, str(path))
+                configUtilsOld.config_add_variable(self.ini_section, self.ini_value, val_str, str(path))
         else:
             if val_str == current_val:
                 if show_verbose:
@@ -121,7 +123,7 @@ class Setting:
             else:
                 msg = 'Value in env_variables.ini has changed. Updating.'
                 log(Severity.WARNING, env_tool_name, msg)
-                configUtils.config_set_variable(self.ini_section, self.ini_value, val_str, path)
+                configUtilsOld.config_set_variable(self.ini_section, self.ini_value, val_str, path)
 
 
 class Environment:
