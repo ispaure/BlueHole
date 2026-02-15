@@ -19,7 +19,7 @@ import os
 import bpy
 
 # Blue Hole
-from ...blenderUtils.debugUtils import *
+from ...commonUtils.debugUtils import *
 from ...preferences.prefs import *
 from .Button import blueHolePieButton
 

@@ -16,7 +16,7 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
-from ....blenderUtils.debugUtils import *
+from ....commonUtils.debugUtils import *
 from ....preferences.prefs import *
 
 

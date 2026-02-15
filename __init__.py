@@ -3,13 +3,14 @@ Blue Hole is a blender addon that was created and written by Marc-André Voyer f
 
 Highlights are export scripts and Perforce source control integration.
 Official GitHUB: https://www.github.com/ispaure/BlueHole
+Official Website: https://blue-hole.weebly.com
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
-__copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
+__copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
 __license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
@@ -24,9 +25,14 @@ import bpy
 # Import Blue Hole Scripts
 from .blenderUtils import callbacks
 
-from .wrappers import perforceWrapper as p4Wrapper
-from .blenderUtils import fileUtils as fileUtils
-from .blenderUtils import filterUtils as filterUtils
+# from .wrappers import perforceWrapper as p4Wrapper
+# from .blenderUtils import fileUtils as fileUtils
+# from .blenderUtils import filterUtils as filterUtils
+
+# Disable use of pySide for UI (rely on OS terminal to create windows instead)
+from .commonUtils import uiUtils
+uiUtils.use_pyside = False
+
 from .preferences import addon_prefs as addon_prefs
 
 # Import Blue Hole Operators

@@ -24,7 +24,7 @@ import bpy
 # Blue Hole
 from .. import sourceControlUtils as scUtils
 from .exportSettings import *
-from ..debugUtils import *
+from ...commonUtils.debugUtils import *
 from .. import sceneUtils, objectUtils, filterUtils, sendUnreal
 from ...preferences.prefs import *
 

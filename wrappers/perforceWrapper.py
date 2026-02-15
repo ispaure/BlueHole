@@ -1,8 +1,8 @@
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
-__copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
+__copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
 __license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
@@ -20,10 +20,12 @@ from pathlib import Path
 import bpy
 
 # Blue Hole
-from . import cmdWrapper
-from ..blenderUtils import fileUtils, uiUtils, filterUtils
-from ..blenderUtils.debugUtils import *
+from ..blenderUtils import fileUtils, filterUtils
+from ..commonUtils.debugUtils import *
 from ..preferences.prefs import *
+from ..commonUtils.wrappers import cmdShellWrapper
+from ..commonUtils import uiUtils
+from ..commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED VARIABLES
@@ -70,7 +72,7 @@ class P4Info:
 
     def update_fields(self):
         # Get the information from p4 info
-        info_array = cmdWrapper.exec_cmd('p4 info')
+        info_array = exec_p4_command('p4 info')
 
         # If could not get info, set status to False
         if "Perforce client error" in info_array[0]:
@@ -99,10 +101,10 @@ class P4Info:
                     case filterUtils.OS.WIN:
                         P4ErrorMessage().info_win_p4_cmd_missing()
                     case filterUtils.OS.MAC:
-                        p4_macos_path = cmdWrapper.get_p4_macos_path()
+                        p4_macos_path = get_p4_macos_path()
                         P4ErrorMessage().info_mac_p4_cmd_missing(p4_macos_path)
                     case filterUtils.OS.LINUX:
-                        p4_linux_path = cmdWrapper.get_p4_linux_path()
+                        p4_linux_path = get_p4_linux_path()
                         P4ErrorMessage().info_linux_p4_cmd_missing(p4_linux_path)
                 return
 
@@ -368,7 +370,7 @@ class P4File:
 
         # Run command for p4_file
         display_name = self.get_display_name()
-        cmdWrapper.exec_cmd(f'{command} {display_name}')
+        exec_p4_command(f'{command} {display_name}')
     
     def _run_p4_add(self):
         self._callback_pre_add()
@@ -443,8 +445,10 @@ class P4File:
                 self._run_p4_add()
             else:
                 msg = f'File "{self.file_name}" is not marked for add. Do you want to mark for add?'
-                result = uiUtils.show_prompt(tool_name, msg, self._run_p4_add)
-                if not result:
+                msg_box_result = uiUtils.display_msg_box_ok_cancel(tool_name, msg)
+                if msg_box_result:
+                    self._run_p4_add()
+                else:
                     return False
 
         # Get latest on files that are not at latest
@@ -453,8 +457,10 @@ class P4File:
                 self._run_p4_sync()
             else:
                 msg = f'File "{self.file_name}" is not synced to the latest revision. Sync to the latest revision?'
-                result = uiUtils.show_prompt(tool_name, msg, self._run_p4_sync)
-                if not result:
+                msg_box_result = uiUtils.display_msg_box_ok_cancel(tool_name, msg)
+                if msg_box_result:
+                    self._run_p4_sync()
+                else:
                     return False
 
         # Checkout files that re not checked out yet
@@ -463,8 +469,10 @@ class P4File:
                 self._run_p4_edit()
             else:
                 msg = f'File "{self.file_name}" is not checked out. Check out?'
-                result = uiUtils.show_prompt(tool_name, msg, self._run_p4_edit)
-                if not result:
+                msg_box_result = uiUtils.display_msg_box_ok_cancel(tool_name, msg)
+                if result:
+                    self._run_p4_edit()
+                else:
                     return False
 
         # Update fields
@@ -641,7 +649,7 @@ class P4FileGroup:
             call_counter += 1
             log(Severity.DEBUG, tool_name,
                 'Issuing Call (from clientFile) #' + str(call_counter) + ' of ' + str(len(file_path_string_lst)))
-            cmdWrapper.exec_cmd(f'{command} {file_path_string}')
+            exec_p4_command(f'{command} {file_path_string}')
 
         # Run command for p4_file with depotFile (and no clientFile)
         file_path_with_depot_file_dict = self.get_p4_file_with_depot_file_and_no_client_file()
@@ -665,7 +673,7 @@ class P4FileGroup:
             call_counter += 1
             log(Severity.DEBUG, tool_name,
                 'Issuing Call (from depotFile) #' + str(call_counter) + ' of ' + str(len(file_path_string_lst)))
-            cmdWrapper.exec_cmd(f'{command} {file_path_string}')
+            exec_p4_command(f'{command} {file_path_string}')
 
     def open_for_edit(self):
         """
@@ -808,7 +816,7 @@ def p4_fstat_dict(file_path_string, silent_mode=False) -> Optional[List[Dict[str
         file_path_string = '"' + file_path_string + '"'
 
     # Get status of files
-    result_array = cmdWrapper.exec_cmd("p4 fstat {}".format(file_path_string))
+    result_array = exec_p4_command("p4 fstat {}".format(file_path_string))
 
     result_dicts_lst = []
     result_dict = {}
@@ -924,27 +932,27 @@ def set_p4_env_settings():
                 if prefs().sc.win32_env_override:
                     print('Override environment settings is ON')
                     cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
-                    cmdWrapper.exec_cmd(cmd_str)
+                    exec_p4_command(cmd_str)
                     cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
-                    cmdWrapper.exec_cmd(cmd_str)
+                    exec_p4_command(cmd_str)
                     cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
-                    cmdWrapper.exec_cmd(cmd_str)
+                    exec_p4_command(cmd_str)
             case filterUtils.OS.MAC:
                 # If Platform is MacOS, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
                 cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
-                cmdWrapper.exec_cmd(cmd_str)
+                exec_p4_command(cmd_str)
                 cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
-                cmdWrapper.exec_cmd(cmd_str)
+                exec_p4_command(cmd_str)
                 cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
-                cmdWrapper.exec_cmd(cmd_str)
+                exec_p4_command(cmd_str)
             case filterUtils.OS.LINUX:
                 # If Platform is Linux, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
                 cmd_str = 'p4 set P4USER=' + prefs().sc.linux_env_setting_p4user
-                cmdWrapper.exec_cmd(cmd_str)
+                exec_p4_command(cmd_str)
                 cmd_str = 'p4 set P4PORT=' + prefs().sc.linux_env_setting_p4port
-                cmdWrapper.exec_cmd(cmd_str)
+                exec_p4_command(cmd_str)
                 cmd_str = 'p4 set P4CLIENT=' + prefs().sc.linux_env_setting_p4client
-                cmdWrapper.exec_cmd(cmd_str)
+                exec_p4_command(cmd_str)
 
 class P4UserWorkspace:
     def __init__(self):
@@ -1109,3 +1117,44 @@ def create_empty_file(file_path):
     if not os.path.isfile(file_path):
         with open(file_path, 'w') as fp:
             pass
+
+
+def get_p4_macos_path() -> str:
+    return f'{prefs().sc.p4v_app_path_mac}/Contents/Resources/p4_parallel'  # Complete to get p4_parallel path
+
+
+def get_p4_linux_path() -> str:
+    return prefs().sc.p4_parallel_path_linux
+
+
+def exec_p4_command(command: str):
+    """
+    Execute Perforce commands. Based on cmdShellWrapper's exec_cmd,
+    but with a few specific things to ensure proper functioning on macOS and Linux.
+    """
+
+    # Ensures this is used for Perforce commands, else raise exception and recommend using wrapper directly.
+    if not command.startswith('p4 '):
+        msg = (f'Command fed to exec_p4_command should always be Perforce commands (start with "p4 "), however '
+               f'received "{command}" which does not meet this criteria.')
+        log(Severity.CRITICAL, 'Perforce Command', msg)
+
+    # Resolve P4 Path (macOS & Linux need to be pointed to p4_parallel file)
+    p4_path: str = {OS.WIN: 'p4', OS.MAC: get_p4_macos_path(), OS.LINUX: get_p4_linux_path()}[get_os()]
+
+    match get_os():
+        case OS.MAC | OS.LINUX:
+            # p4_parallel path needs to be valid
+            if not os.path.isfile(p4_path):
+                msg = (f'P4 Parallel path "{p4_path}" is invalid. Verify that Perforce is installed and, if required, '
+                       f'update this Path in the Blue Hole addon settings (Source Control Tab).')
+                log(Severity.CRITICAL, 'Perforce Command', msg)
+
+            # Set permissions
+            cmdShellWrapper.exec_cmd(f'chmod +x "{p4_path}"')
+
+            # Replace p4 in command with the path (in quotes)
+            command = f'"{p4_path}" {command[2:]}'
+
+    # Execute the command
+    return cmdShellWrapper.exec_cmd(command, time_out=15)

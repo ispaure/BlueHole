@@ -3,10 +3,10 @@ Operators for send to engines
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
-__copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
+__copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
 __license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
@@ -21,7 +21,7 @@ import bpy
 # Blue Hole
 from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export import exportHierarchy
-from ..blenderUtils import uiUtils
+from ..commonUtils import uiUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -35,7 +35,7 @@ class SendAllHierarchiesToUnity(bpy.types.Operator):
     def execute(self, context):
         # exportUtils.exp_obj_hierarchies_unity(selected_only=False)
         msg = 'Do you really want to send *ALL* Asset Hierarchies to Unity? Press OK to confirm.'
-        state = uiUtils.show_prompt('Unity Export', msg)
+        state = uiUtils.display_msg_box_ok_cancel('Unity Export', msg)
         if state:
             # Get Unity Export Profile
             export_settings = get_export_settings(ExportSettingsPreset.UNITY)
@@ -67,7 +67,7 @@ class SendAllHierarchiesToUnreal(bpy.types.Operator):
     def execute(self, context):
         # exportUtils.exp_obj_hierarchies_unreal(selected_only=False, trigger_import_cmd=True)
         msg = 'Do you really want to send *ALL* Asset Hierarchies to Unreal? Press OK to confirm.'
-        state = uiUtils.show_prompt('Unreal Export', msg)
+        state = uiUtils.display_msg_box_ok_cancel('Unreal Export', msg)
         if state:
             # Get Unreal Export Profile
             export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
