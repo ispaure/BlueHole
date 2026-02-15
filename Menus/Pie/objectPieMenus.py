@@ -13,7 +13,7 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-from ...blenderUtils.debugUtils import *
+from ...commonUtils.debugUtils import *
 from ...blenderUtils import filterUtils as filterUtils, addonUtils
 
 

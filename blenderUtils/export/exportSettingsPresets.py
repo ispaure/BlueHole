@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 # Blue Hole
-from ..debugUtils import *
+from ...commonUtils.debugUtils import *
 from .exportSettings import *
 from ...preferences.prefs import *
 from .. import projectUtils

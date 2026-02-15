@@ -20,7 +20,7 @@ import bpy
 
 # Blue Hole
 from .exportSettings import *
-from ..debugUtils import *
+from ...commonUtils.debugUtils import *
 from .. import sceneUtils, filterUtils, objectUtils, projectUtils
 from ...preferences.prefs import *
 

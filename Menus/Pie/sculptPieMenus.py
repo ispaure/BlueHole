@@ -14,7 +14,7 @@ __status__ = 'Production'
 
 
 import bpy
-from ...blenderUtils.debugUtils import *
+from ...commonUtils.debugUtils import *
 from .Button.sculptPieButton import *
 
 
