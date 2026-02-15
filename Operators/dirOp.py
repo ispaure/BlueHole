@@ -35,7 +35,7 @@ class OpenFinalFolder(bpy.types.Operator):
     bl_description = 'Open FINAL Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir('path_final')
+        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_final)
         return {'FINISHED'}
 
 
@@ -46,7 +46,7 @@ class OpenReferencesFolder(bpy.types.Operator):
     bl_description = 'Open REFERENCE Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir('path_references')
+        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_ref)
         return {'FINISHED'}
 
 
@@ -57,18 +57,18 @@ class OpenResourcesFolder(bpy.types.Operator):
     bl_description = 'Open RESOURCE Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir('path_resources')
+        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_resources)
         return {'FINISHED'}
 
 
 class OpenSceneFolder(bpy.types.Operator):
 
-    bl_idname = "wm.bh_dir_open_root"
+    bl_idname = "wm.bh_dir_open_scene"
     bl_label = 'Open SCENE Folder'
     bl_description = 'Open SCENE Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir('path_root')
+        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_scenes)
         return {'FINISHED'}
 
 
@@ -98,7 +98,7 @@ class OpenSpeedTreeMeshesFolder(bpy.types.Operator):
     bl_description = 'Open SPEEDTREE MSH Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir('path_speedtree_msh')
+        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_st)
         return {'FINISHED'}
 
 
