@@ -47,12 +47,12 @@ class Setting:
     def __config_section_map_from_path_else_default_env(self, section, value, path):
 
         # Attempt to get value from path
-        return_value = configUtils.config_section_map(section, value, path)
+        return_value = configUtils.config_section_map(path, section, value)
         if return_value is not None:
             return return_value
 
         # Attempt to get value from default environment's path
-        return_value = configUtils.config_section_map(section, value, fileUtils.get_default_env_var_path())
+        return_value = configUtils.config_section_map(fileUtils.get_default_env_var_path(), section, value)
         if return_value is None:
             msg = 'Could not find value {value} in section {section} in either the current env config file or the ' \
                   'default. Please add missing value to one of those files.'.format(value=value, section=section)
@@ -104,8 +104,8 @@ class Setting:
             msg = f'Evaluating [{self.ini_section}]: {self.ini_value} which ultimately should be: {val_str}'
             log(Severity.DEBUG, env_tool_name, msg)
         # 4. Check if key exists in current environment
-        current_val = configUtils.config_section_map(self.ini_section, self.ini_value, str(path))
-        default_val = configUtils.config_section_map(self.ini_section, self.ini_value, fileUtils.get_default_env_var_path())
+        current_val = configUtils.config_section_map(path, self.ini_section, self.ini_value)
+        default_val = configUtils.config_section_map(fileUtils.get_default_env_var_path(), self.ini_section, self.ini_value)
         if current_val is None:
             if val_str == default_val:
                 if show_verbose:
