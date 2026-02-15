@@ -114,7 +114,7 @@ class Setting:
             else:
                 msg = f'Value missing in active env, different from default. Adding to env_variables.ini.'
                 log(Severity.WARNING, env_tool_name, msg)
-                configUtilsOld.config_add_variable(self.ini_section, self.ini_value, val_str, str(path))
+                configUtils.config_add_variable(path, self.ini_section, self.ini_value, val_str)
         else:
             if val_str == current_val:
                 if show_verbose:
@@ -123,7 +123,7 @@ class Setting:
             else:
                 msg = 'Value in env_variables.ini has changed. Updating.'
                 log(Severity.WARNING, env_tool_name, msg)
-                configUtilsOld.config_set_variable(self.ini_section, self.ini_value, val_str, path)
+                configUtils.config_set_variable(path, self.ini_section, self.ini_value, val_str)
 
 
 class Environment:
