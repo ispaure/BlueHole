@@ -19,7 +19,7 @@ __status__ = 'Production'
 from pathlib import Path
 
 # Blue Hole
-from . import blenderFile, configUtils, filterUtils
+from . import blenderFile, filterUtils
 from ..preferences.prefs import *
 from ..commonUtils import fileUtils
 

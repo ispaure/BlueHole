@@ -18,7 +18,8 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 
-from ...blenderUtils import configUtils
+from ...blenderUtils import blenderFile
+from ...commonUtils import configUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -60,9 +61,9 @@ def draw(preference, context, layout):
     box.label(text="Support Links:")
     column = box.column()
     row = column.row()
-    row.operator("wm.bh_open_url", text='Guide').url = configUtils.get_url_db_value('BlueHoleWebsite', 'home')
-    row.operator("wm.bh_open_url", text='Keymaps').url = configUtils.get_url_db_value('BlueHoleWebsite', 'keymaps')
-    row.operator("wm.bh_open_url", text='Pie Menus').url = configUtils.get_url_db_value('BlueHoleWebsite', 'pie_menus')
+    row.operator("wm.bh_open_url", text='Guide').url = configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'home')
+    row.operator("wm.bh_open_url", text='Keymaps').url = configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'keymaps')
+    row.operator("wm.bh_open_url", text='Pie Menus').url = configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'pie_menus')
     row = column.row()
     row.operator("wm.bh_help_submit_feedback", text='Submit Feedback', icon='WINDOW')
     row.operator("wm.bh_join_bh_discord", text='Join the Blue Hole Discord', icon='FUND')
