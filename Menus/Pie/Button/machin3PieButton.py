@@ -33,3 +33,9 @@ def straighten(pie):
     else:
         pie.operator("wm.disabled_addon_machin3tools", text="Can't Show; MACHIN3tools add-on disabled!!!", icon='ERROR')
 
+
+def isolate_selection_toggle(pie):
+    if addonUtils.is_addon_enabled_and_loaded('MACHIN3tools'):
+        pie.operator("machin3.focus", text="Isolate Selection [Toggle]").method = 'LOCAL_VIEW'
+    else:
+        pie.operator("wm.disabled_addon_machin3tools", text="Can't Show; MACHIN3tools add-on disabled!!!", icon='ERROR')

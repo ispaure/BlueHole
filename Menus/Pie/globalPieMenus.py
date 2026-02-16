@@ -22,6 +22,7 @@ import bpy
 from ...commonUtils.debugUtils import *
 from ...preferences.prefs import *
 from .Button import blueHolePieButton
+from .utilities import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED SETTINGS
@@ -54,7 +55,7 @@ class MT_pie_global_help(bpy.types.Menu):
         # 9 - TOP - RIGHT
         blueHolePieButton.open_guide(pie)
         # 1 - BOTTOM - LEFT
-        pie.menu(MT_pie_global_theme.bl_idname, text="Themes...", icon='IMAGE_RGB')
+        open_pie_menu(pie, MT_pie_global_theme.bl_idname, 'Themes...', 'IMAGE_RGB')
         # 3 - BOTTOM - RIGHT
         blueHolePieButton.open_pie_menus_list(pie)
 
@@ -120,23 +121,24 @@ class MT_pie_global_import_export(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("wm.call_menu_pie", text="Extra...").name = MT_pie_global_extra.bl_idname
+        open_pie_menu(pie, MT_pie_global_extra.bl_idname, 'Extra...')
         # 6 - RIGHT
-        pie.operator("wm.call_menu_pie", text="Export...", icon='EXPORT').name = MT_pie_global_export.bl_idname
+        open_pie_menu(pie, MT_pie_global_export.bl_idname, 'Export...', 'EXPORT')
         # 2 - BOTTOM
-        pie.operator("wm.call_menu_pie", text="Send...", icon='UV_SYNC_SELECT').name = MT_pie_global_send.bl_idname
+        open_pie_menu(pie, MT_pie_global_send.bl_idname, 'Send...', 'UV_SYNC_SELECT')
         # 8 - TOP
         if prefs().sc.source_control_enable:
-            if prefs().sc.source_control_solution == 'perforce':
-                pie.operator("wm.call_menu_pie", text="Source Control (Perforce)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
-            if prefs().sc.source_control_solution == 'plastic-scm':
-                pie.operator("wm.call_menu_pie", text="Source Control (Plastic SCM)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
-            if prefs().sc.source_control_solution == 'git':
-                pie.operator("wm.call_menu_pie", text="Source Control (Git)...", icon='CHECKMARK').name = MT_pie_global_source_control.bl_idname
+            match prefs().sc.source_control_solution:
+                case 'perforce':
+                    open_pie_menu(pie, MT_pie_global_source_control.bl_idname, 'Source Control (Perforce)...', 'CHECKMARK')
+                case 'plastic-scm':
+                    open_pie_menu(pie, MT_pie_global_source_control.bl_idname, 'Source Control (Plastic SCM)...', 'CHECKMARK')
+                case 'git':
+                    open_pie_menu(pie, MT_pie_global_source_control.bl_idname, 'Source Control (Git)...', 'CHECKMARK')
         else:
             pie.operator("wm.disabled_source_control", text="Can't Show; Source Control disabled!!!", icon='ERROR')
         # 7 - TOP - LEFT
-        pie.operator("wm.call_menu_pie", text="Open Directories...").name = MT_pie_global_dirs.bl_idname
+        open_pie_menu(pie, MT_pie_global_dirs.bl_idname, 'Open Directories...')
         # 9 - TOP - RIGHT
         blueHolePieButton.add_asset_hierarchy(pie)
         # 1 - BOTTOM - LEFT
@@ -166,10 +168,11 @@ class MT_pie_global_extra(bpy.types.Menu):
         # 9 - TOP - RIGHT
         pie.separator()
         # 1 - BOTTOM - LEFT
+        # TODO: Check if this works in vanilla - probably needs an addon and added to "if addon enabled" workflow
         op = pie.operator('wm.tool_set_by_id', text='Select Box X-Ray')
         op.name = 'object_tool.select_box_xray'
         # 3 - BOTTOM - RIGHT
-        pie.operator("arp.arp_export_fbx_panel", text='Auto-Rig Pro FBX Export')
+        pie.separator()
 
 
 # Pie Global-Import/Export

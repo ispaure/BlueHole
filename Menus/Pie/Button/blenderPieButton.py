@@ -14,7 +14,7 @@ __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
-
+import bpy
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON
 
@@ -51,6 +51,76 @@ def add_text(pie):
 
 def load_ref_img(pie):
     pie.operator("object.load_reference_image", text="Reference Image", icon='IMAGE_REFERENCE')
+
+
+def mod_weighted_nrm(pie):
+    pie.operator("object.modifier_add", text="Weighted Normal", icon='NORMALS_VERTEX_FACE').type = 'WEIGHTED_NORMAL'
+
+
+def link_transfer_data(pie):
+    pie.operator("object.make_links_data", text="Link/Transfer Data", icon='NETWORK_DRIVE').type = 'MODIFIERS'
+
+
+def object_reveal_all(pie):
+    pie.operator("object.hide_view_clear", text="Reveal Hidden [All]").select = True
+
+
+def object_hide_selection(pie):
+    pie.operator("object.hide_view_set", text="Hide Selection")
+
+
+def clear_location(pie):
+    pie.operator("object.location_clear", text="Clear Location", icon='FILE_REFRESH').clear_delta = False
+
+
+def object_join(pie):
+    pie.operator("object.join", text="Join", icon='SELECT_EXTEND')
+
+
+def apply_transform(pie):
+    button = pie.operator("object.transform_apply", text="Apply Object Transform", icon='MOD_DATA_TRANSFER')
+    button.location = True
+    button.rotation = True
+    button.scale = True
+
+
+def clear_parent(pie):
+    pie.operator("object.parent_clear", text="Clear Parent", icon='LAYER_USED').type = 'CLEAR_KEEP_TRANSFORM'
+
+
+def make_parent(pie):
+    button_2 = pie.operator("object.parent_set", text="Make Parent", icon='CON_TRACKTO')
+    button_2.type = 'OBJECT'
+    button_2.keep_transform = True
+
+
+def select_children_recursive(pie):
+    pie.operator("object.select_grouped", text="Select Children", icon='PARTICLE_DATA').type = 'CHILDREN_RECURSIVE'
+
+
+def select_parent(pie):
+    pie.operator("object.select_grouped", text="Select Parent", icon='DRIVER').type = 'PARENT'
+
+
+def select_grouped(pie):
+    pie.operator("object.select_grouped", text="Select Grouped", icon='GROUP').type = 'COLLECTION'
+
+
+def object_select_all(pie):
+    # TODO: Check if this does Invert, I don't think it does unless add at end .action = 'INVERT'
+    pie.operator("object.select_all", text="Invert", icon='OVERLAY')
+
+
+def make_instances_real(pie):
+    pie.operator("object.duplicates_make_real", text="Make Instances Real", icon='UNLINKED')
+
+
+def convert_to_curves(pie):
+    pie.operator("object.convert", text="Convert to Curve", icon='MOD_CURVE').target = 'CURVE'
+
+
+def convert_to_mesh(pie):
+    pie.operator("object.convert", text="Convert to Mesh", icon='OUTLINER_OB_CURVE').target = 'MESH'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CURVE
@@ -333,6 +403,17 @@ def mesh_symmetrize(pie):
     pie.operator("mesh.symmetrize", text="Symmetrize", icon='MESH_MONKEY')
 
 
+def mesh_knife_tool(pie):
+    op = pie.operator('mesh.knife_tool', text="Knife Topology Tool", icon='SNAP_MIDPOINT')
+    op.use_occlude_geometry = True
+    op.only_selected = False
+    op.xray = True
+    op.visible_measurements = 'NONE'
+    op.angle_snapping = 'NONE'
+    op.angle_snapping_increment = 0.261799
+    op.wait_for_input = True
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # UV
 
@@ -425,8 +506,8 @@ def vertex_to_circle(pie):
     pie.operator('view3d.vertcircle', text='Vertex to Circle')
 
 
-
-
+def clean_mesh(pie):
+    pie.operator("view3d.clean_mesh", text="Clean", icon='SHADERFX')
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -15,6 +15,7 @@ __status__ = 'Production'
 import bpy
 from ...commonUtils.debugUtils import *
 from .Button import blenderPieButton, hardopsPieButton, angleToolPieButton, machin3PieButton, interactiveToolsPieButton
+from .utilities import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -27,26 +28,29 @@ name = filename = os.path.basename(__file__)
 # OPERATOR
 
 
-class WM_OT_CustomKnifeTool(bpy.types.Operator):
-    """Activates the Custom Knife Tool"""
-    # TODO: Change this into a normal pie.operator using the knowledge I have gained since.
-    bl_idname = "wm.bh_custom_knife_tool"
-    bl_label = ""
-    bl_options = {'INTERNAL'}
-
-    def execute(self, _context):
-        bpy.ops.mesh.knife_tool('INVOKE_DEFAULT',
-                                use_occlude_geometry=True,
-                                only_selected=False,
-                                xray=True,
-                                visible_measurements='NONE',
-                                angle_snapping='NONE',
-                                angle_snapping_increment=0.261799,
-                                wait_for_input=True)
-        return {'FINISHED'}
+# class WM_OT_CustomKnifeTool(bpy.types.Operator):
+#     """Activates the Custom Knife Tool"""
+#     # TODO: Change this into a normal pie.operator using the knowledge I have gained since.
+#     bl_idname = "wm.bh_custom_knife_tool"
+#     bl_label = ""
+#     bl_options = {'INTERNAL'}
+#
+#     def execute(self, _context):
+#         bpy.ops.mesh.knife_tool('INVOKE_DEFAULT',
+#                                 use_occlude_geometry=True,
+#                                 only_selected=False,
+#                                 xray=True,
+#                                 visible_measurements='NONE',
+#                                 angle_snapping='NONE',
+#                                 angle_snapping_increment=0.261799,
+#                                 wait_for_input=True)
+#         return {'FINISHED'}
 
 
 class WM_OT_MergeLast(bpy.types.Operator):
+    """
+    Custom operator for this because the option is not always available which may break the Pie Menus
+    """
     bl_idname = "wm.bh_merge_last"
     bl_label = "Merge Last"
     bl_options = {'INTERNAL'}
@@ -110,7 +114,8 @@ class MT_pie_mesh_tool(bpy.types.Menu):
         # 8 - TOP
         blenderPieButton.loop_cut_slide(pie)
         # 7 - TOP - LEFT
-        pie.operator(WM_OT_CustomKnifeTool.bl_idname, text="Knife Topology Tool", icon='SNAP_MIDPOINT')
+        blenderPieButton.mesh_knife_tool(pie)
+        # pie.operator(WM_OT_CustomKnifeTool.bl_idname, text="Knife Topology Tool", icon='SNAP_MIDPOINT')
         # 9 - TOP - RIGHT
         blenderPieButton.extrude_move_shrink_fatten(pie)
         # 1 - BOTTOM - LEFT
@@ -133,13 +138,13 @@ class MT_pie_mesh_action(bpy.types.Menu):
         # Vertex Menu
         if active_select_mode == (True, False, False):
             # 4 - LEFT
-            pie.operator("wm.bh_merge_last", text="Merge Last", icon='PARTICLES')
+            pie.operator(WM_OT_MergeLast.bl_idname)
             # 6 - RIGHT
             blenderPieButton.merge_center(pie)
             # 2 - BOTTOM
-            pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_vertex_action_more.bl_idname
+            open_pie_menu(pie, MT_pie_vertex_action_more.bl_idname, 'More...')
             # 8 - TOP
-            pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_vertex_action_select.bl_idname
+            open_pie_menu(pie, MT_pie_vertex_action_select.bl_idname, 'Select...')
             # 7 - TOP - LEFT
             machin3PieButton.straighten(pie)
             # 9 - TOP - RIGHT
@@ -156,9 +161,9 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blenderPieButton.edge_crease(pie)
             # 2 - BOTTOM
-            pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_edge_action_more.bl_idname
+            open_pie_menu(pie, MT_pie_edge_action_more.bl_idname, 'More...')
             # 8 - TOP
-            pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_edge_action_select.bl_idname
+            open_pie_menu(pie, MT_pie_edge_action_select.bl_idname, 'Select...')
             # 7 - TOP - LEFT
             blenderPieButton.fill_grid(pie)
             # 9 - TOP - RIGHT
@@ -175,9 +180,9 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blenderPieButton.mesh_separate(pie)
             # 2 - BOTTOM
-            pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_face_action_more.bl_idname
+            open_pie_menu(pie, MT_pie_face_action_more.bl_idname, 'More...')
             # 8 - TOP
-            pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_face_action_select.bl_idname
+            open_pie_menu(pie, MT_pie_face_action_select.bl_idname, 'Select...')
             # 7 - TOP - LEFT
             interactiveToolsPieButton.quick_lattice(pie)
             # 9 - TOP - RIGHT
@@ -348,9 +353,7 @@ class MT_pie_face_action_more(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (WM_OT_CustomKnifeTool,
-           WM_OT_MergeLast,
-           MT_pie_mesh_hide,
+classes = (MT_pie_mesh_hide,
            MT_pie_mesh_tool,
            MT_pie_mesh_action,
            MT_pie_vertex_action_more,
@@ -358,6 +361,8 @@ classes = (WM_OT_CustomKnifeTool,
            MT_pie_edge_action_more,
            MT_pie_edge_action_select,
            MT_pie_face_action_more,
+           # WM_OT_CustomKnifeTool,
+           WM_OT_MergeLast,
            MT_pie_face_action_select)
 
 
