@@ -46,9 +46,13 @@ def add_object_empty(name, parent=None, dsp_type=0, dsp_size=0.15, lock_transfor
     :param name: Name of object
     :type name: str
     :param parent: (Optional) Parent object under which to create empty object. Root if unspecified
-    :type parent: Object (!!-See if can make description here more explicit)
+    :type parent: Object (!!-See if I can make description here more explicit)
     :param dsp_type: Type of icon to display empty object as
     :type dsp_type: int
+    :param dsp_size: Size of the empty object icons
+    :type dsp_size: float
+    :param lock_transform: Lock the transforms of the empty object? (Generally yes for Render/Collision/Socket)
+    :type lock_transform: bool
     :return:
     """
     dsp_type_array = ['PLAIN_AXES', 'ARROWS', 'SINGLE_ARROW', 'CIRCLE', 'CUBE', 'SPHERE', 'CONE', 'IMAGE']
@@ -90,7 +94,7 @@ def add_default_icosphere(name, parent=None):
     """
     new_obj = bpy.ops.mesh.primitive_ico_sphere_add(enter_editmode=False,
                                                     align='WORLD',
-                                                    location=(0,0,1),
+                                                    location=(0, 0, 1),
                                                     scale=(0.9999, 0.9999, 0.9999))
     bpy.context.active_object.name = name
     if parent is not None:
@@ -109,12 +113,6 @@ def add_asset_hierarchy(hierarchy_lst, include_default_mesh, include_selected_ob
     :type include_selected_obj: bool
     :param dsp_arrows: Should the empty objects from the hierarchy display as arrows?
     :type dsp_arrows: bool
-    :param include_element_render: Should an empty object of type render be created in hierarchy
-    :type include_element_render: bool
-    :param include_element_collision: Should an empty object of type collision be created in hierarchy
-    :type include_element_collision: bool
-    :param include_element_sockets: Should an empty object of type sockets be created in hierarchy
-    :type include_element_sockets: bool
     """
     log(Severity.DEBUG, 'Add Asset Hierarchy', 'Executing Add Asset Hierarchy Procedure...')
 
@@ -189,8 +187,8 @@ def get_obj_child_recursive(obj):
     def obj_append_get_child(child_obj):
         """
         Function to execute over and over again as long as Object has children
-        :param obj: Object to execute the function on
-        :type obj: Object
+        :param child_obj: Object to execute the function on
+        :type child_obj: Object
         """
         if child_obj is not obj:
             child_recursive_lst.append(child_obj)
@@ -342,7 +340,7 @@ def get_selection():
     """
     Get current selection of objects.
     """
-    # TODO: Added 2 lines here... idk if itll break something
+    # TODO: Added 2 lines here... idk if it'll break something. <- Figure what that is about
     # # before was just the return
     # view_layer = bpy.context.view_layer
     # obj_active = view_layer.objects.active

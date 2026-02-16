@@ -30,7 +30,6 @@ def get_or_add_collection_if_not_exist(name):
     """
     Gets a collection (if collection with name already exists), else adds a collection (with name)
     :param name: Name of collection to get or create
-    :param type: str
     :return: Collection
     """
     if get_collection(name) is None:

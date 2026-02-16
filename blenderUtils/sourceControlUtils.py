@@ -82,9 +82,9 @@ def sc_check_blend(silent_mode=False):
             # --------------------------------------------------------------------------------
 
         elif prefs().sc.source_control_solution == 'plastic-scm':
-            return True  # By default there is nothing to do for plastic SCM to do its job
+            return True  # By default, there is nothing to do for plastic SCM to do its job
         elif prefs().sc.source_control_solution == 'git':
-            return False  # TODO: Source Control - Git integration
+            return True  # By default, there is nothing to do for GIT to do its job
     else:
         if not silent_mode:
             p4Wrapper.source_control_disabled_dialog()

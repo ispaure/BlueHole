@@ -13,7 +13,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 import bpy
-from bpy.app.handlers import persistent
 from . import sourceControlUtils, blenderFile
 
 
@@ -26,26 +25,26 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-@persistent
+@bpy.app.handlers.persistent
 def load_pre_handler(scene):
     print("Event: load_pre")
 
 
-@persistent
+@bpy.app.handlers.persistent
 def load_post_handler(scene):
     print("Event: load_post")
     if len(blenderFile.get_blend_file_path()) > 0:
         sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
 
 
-@persistent
+@bpy.app.handlers.persistent
 def save_pre_handler(scene):
     if len(blenderFile.get_blend_file_path()) > 0:
         sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
     print("Event: save_pre")
 
 
-@persistent
+@bpy.app.handlers.persistent
 def save_post_handler(scene):
     print("Event: save_post")
 
