@@ -133,24 +133,6 @@ def truncate_n_append_str(original_str, truncate_str, append_str) -> str:
     return result
 
 
-def open_dir_path(dir_path: Union[str, Path]):
-    """
-    Opens the directory path that is given as a string
-    :param dir_path: Directory to open
-    :type dir_path: str
-    """
-    str_dir_path = str(dir_path)
-    if os.path.isdir(str_dir_path):  # Validate string is in fact a path
-        if sys.platform == "win32":
-            os.startfile(str_dir_path)
-        else:
-            opener = "open" if sys.platform == "darwin" else "xdg-open"
-            subprocess.call([opener, str_dir_path])
-    else:
-        print('ERROR: UNABLE TO OPEN PROJECT DIRECTORY.'
-              '\nAttempted path: ' + str_dir_path)
-
-
 def get_addons_path():
     """
     Get directory path where all add-ons are located.
@@ -187,11 +169,11 @@ def get_blue_hole_user_addon_path() -> Optional[str]:
     return str(blue_hole_addon_path)
 
 
-def get_bh_url_db_file_path() -> str:
+def get_url_cfg_path() -> Path:
     """
     Returns the url database file path, which contains URLs for Blue Hole website, doc and tutorials.
     """
-    return str(Path(get_blue_hole_user_addon_path(), 'url_database.ini'))
+    return Path(get_blue_hole_user_addon_path(), 'url_database.ini')
 
 
 def get_blue_hole_themes_path() -> str:

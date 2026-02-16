@@ -19,8 +19,9 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from ..blenderUtils import configUtils
 from ..commonUtils.webUtils import open_url
+from ..commonUtils import configUtils
+from ..blenderUtils import blenderFile
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -34,8 +35,7 @@ class OpenGuide(bpy.types.Operator):
     bl_description = 'Opens the Blue Hole Official Website'
 
     def execute(self, context):
-        url = configUtils.get_url_db_value('BlueHoleWebsite', 'home')
-        open_url(url)
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'home'))
         return {'FINISHED'}
 
 
@@ -46,8 +46,7 @@ class OpenKeymapsList(bpy.types.Operator):
     bl_description = 'Opens the Keymaps List (Only available to Blue Hole Deluxe Users)'
 
     def execute(self, context):
-        url = configUtils.get_url_db_value('BlueHoleWebsite', 'keymaps')
-        open_url(url)
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'keymaps'))
         return {'FINISHED'}
 
 
@@ -58,8 +57,7 @@ class OpenPieMenusList(bpy.types.Operator):
     bl_description = 'Opens the Pie Menus List (Only available to Blue Hole Deluxe Users with Pie Menu Editor addon)'
 
     def execute(self, context):
-        url = configUtils.get_url_db_value('BlueHoleWebsite', 'pie_menus')
-        open_url(url)
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'pie_menus'))
         return {'FINISHED'}
 
 
@@ -70,8 +68,7 @@ class SubmitFeedback(bpy.types.Operator):
     bl_description = 'Send an email to Marc-André Voyer with feedback on Blue Hole'
 
     def execute(self, context):
-        url = configUtils.get_url_db_value('Contact', 'mail')
-        open_url(url)
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Contact', 'mail'))
         return {'FINISHED'}
 
 
@@ -82,8 +79,7 @@ class JoinBHDiscord(bpy.types.Operator):
     bl_description = 'Opens a link to join the Blue Hole Discord Group'
 
     def execute(self, context):
-        url = configUtils.get_url_db_value('Contact', 'discord')
-        open_url(url)
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Contact', 'discord'))
         return {'FINISHED'}
 
 
@@ -94,7 +90,7 @@ class SendToUnityDoc(bpy.types.Operator):
     bl_description = 'Opens the Documentation for the Blender to Unity Bridge'
 
     def execute(self, context):
-        open_url(configUtils.get_url_db_value('Tutorial', 'unity_bridge'))
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Tutorial', 'unity_bridge'))
         return{'FINISHED'}
 
 
@@ -105,7 +101,7 @@ class SendToUnrealDoc(bpy.types.Operator):
     bl_description = 'Opens the documentation for the Blender to Unreal Bridge'
 
     def execute(self, context):
-        open_url(configUtils.get_url_db_value('Tutorial', 'unreal_bridge'))
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Tutorial', 'unreal_bridge'))
         return{'FINISHED'}
 
 
