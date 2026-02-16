@@ -20,11 +20,11 @@ from pathlib import Path
 import platform
 from . import blenderFile, objectUtils, projectUtils
 from ..wrappers import perforceWrapper
-from ..commonUtils.debugUtils import *
+from ..Lib.commonUtils.debugUtils import *
 from ..environment import envPathResolver
 from ..preferences.prefs import *
 from enum import Enum
-from ..commonUtils.osUtils import *
+from ..Lib.commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

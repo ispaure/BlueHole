@@ -18,7 +18,7 @@ __status__ = 'Production'
 # Blender
 import bpy
 from bpy.props import *
-from ..commonUtils.webUtils import open_url
+from ..Lib.commonUtils.webUtils import open_url
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

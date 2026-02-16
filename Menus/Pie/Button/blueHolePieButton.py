@@ -16,7 +16,7 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
-from ....commonUtils.debugUtils import *
+from ....Lib.commonUtils.debugUtils import *
 from ....preferences.prefs import *
 
 

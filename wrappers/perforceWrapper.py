@@ -21,11 +21,11 @@ import bpy
 
 # Blue Hole
 from ..blenderUtils import filterUtils
-from ..commonUtils.debugUtils import *
+from ..Lib.commonUtils.debugUtils import *
 from ..preferences.prefs import *
-from ..commonUtils.wrappers import cmdShellWrapper
-from ..commonUtils import uiUtils, fileUtils
-from ..commonUtils.osUtils import *
+from ..Lib.commonUtils.wrappers import cmdShellWrapper
+from ..Lib.commonUtils import uiUtils, fileUtils
+from ..Lib.commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED VARIABLES

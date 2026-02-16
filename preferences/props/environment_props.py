@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 from ...environment import envManager
-from ...commonUtils.osUtils import *
+from ...Lib.commonUtils.osUtils import *
 from ..prefs import *
 
 

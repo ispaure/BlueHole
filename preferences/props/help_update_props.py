@@ -19,7 +19,7 @@ import bpy
 from bpy.props import *
 
 from ...blenderUtils import blenderFile
-from ...commonUtils import configUtils
+from ...Lib.commonUtils import configUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------

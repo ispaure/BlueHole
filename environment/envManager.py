@@ -21,7 +21,7 @@ from pathlib import Path
 
 # Blue Hole
 from ..blenderUtils import blenderFile
-from ..commonUtils.debugUtils import *
+from ..Lib.commonUtils.debugUtils import *
 from ..preferences.prefs import *
 from .model import Environment
 

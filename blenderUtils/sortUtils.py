@@ -20,7 +20,7 @@ import mathutils as mathutils
 
 # Blue Hole
 from . import objectUtils
-from ..commonUtils.debugUtils import *
+from ..Lib.commonUtils.debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

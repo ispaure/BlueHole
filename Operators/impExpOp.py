@@ -23,7 +23,7 @@ from ..blenderUtils import objectUtils, importUtils
 from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export import exportHierarchy, exportIndividual
 from ..preferences.prefs import *
-from ..commonUtils import uiUtils
+from ..Lib.commonUtils import uiUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------

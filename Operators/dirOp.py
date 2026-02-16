@@ -23,7 +23,7 @@ from ..blenderUtils import blenderFile, projectUtils, filterUtils
 from ..wrappers import perforceWrapper as p4Wrapper
 from ..environment import envPathResolver
 from ..preferences.prefs import *
-from ..commonUtils import fileUtils
+from ..Lib.commonUtils import fileUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

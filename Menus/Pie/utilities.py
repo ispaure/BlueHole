@@ -14,7 +14,7 @@ __status__ = 'Production'
 
 import bpy
 from typing import *
-from ...commonUtils.osUtils import *
+from ...Lib.commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPER FUNCTIONS

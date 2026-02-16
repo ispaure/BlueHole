@@ -19,7 +19,7 @@ import mathutils as mathutils
 
 import bpy
 
-from ..commonUtils.debugUtils import *
+from ..Lib.commonUtils.debugUtils import *
 from . import sceneUtils
 from ..preferences.prefs import *
 

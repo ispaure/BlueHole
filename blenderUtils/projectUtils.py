@@ -21,7 +21,7 @@ from pathlib import Path
 # Blue Hole
 from . import blenderFile, filterUtils
 from ..preferences.prefs import *
-from ..commonUtils import fileUtils
+from ..Lib.commonUtils import fileUtils
 
 
 # ----------------------------------------------------------------------------------------------------------------------

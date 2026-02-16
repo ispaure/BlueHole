@@ -19,8 +19,8 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from ..commonUtils.webUtils import open_url
-from ..commonUtils import configUtils
+from ..Lib.commonUtils.webUtils import open_url
+from ..Lib.commonUtils import configUtils
 from ..blenderUtils import blenderFile
 
 
