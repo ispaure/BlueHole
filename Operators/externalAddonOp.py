@@ -23,99 +23,16 @@ from bpy.props import *
 # OPERATORS
 
 
-class WM_OT_disabled_addon_interactive_tools(bpy.types.Operator):
-    bl_idname = "wm.disabled_addon_interactive_tools"
-    bl_label = "Interactive Tools add-on is not enabled"
-    bl_description = "Interactive Tools add-on is required for this button"
+class WM_OT_disabled_addon(bpy.types.Operator):
+    bl_idname = "wm.disabled_addon"
+    bl_label = "Add-on is missing!"
+    bl_description = "Add-on is required for this button"
 
     open_prefs: bpy.props.BoolProperty(default=True)
 
     def execute(self, context):
-        self.report({'WARNING'}, "Interactive Tools add-on is not enabled. Enable it in Preferences > Add-ons.")
-        if self.open_prefs:
-            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
-        return {'CANCELLED'}
-
-
-class WM_OT_disabled_addon_machin3tools(bpy.types.Operator):
-    bl_idname = "wm.disabled_addon_machin3tools"
-    bl_label = "Interactive Tools add-on is not enabled"
-    bl_description = "Interactive Tools add-on is required for this button"
-
-    open_prefs: bpy.props.BoolProperty(default=True)
-
-    def execute(self, context):
-        self.report({'WARNING'}, "MACHIN3tools add-on is not enabled. Enable it in Preferences > Add-ons.")
-        if self.open_prefs:
-            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
-        return {'CANCELLED'}
-
-
-class WM_OT_disabled_addon_hardops(bpy.types.Operator):
-    bl_idname = "wm.disabled_addon_hardops"
-    bl_label = "HardOps add-on is not enabled"
-    bl_description = "HardOps add-on is required for this button"
-
-    open_prefs: bpy.props.BoolProperty(default=True)
-
-    def execute(self, context):
-        self.report({'WARNING'}, "HardOps add-on is not enabled. Enable it in Preferences > Add-ons.")
-        if self.open_prefs:
-            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
-        return {'CANCELLED'}
-
-
-class WM_OT_disabled_addon_mesh_angle(bpy.types.Operator):
-    bl_idname = "wm.disabled_addon_mesh_angle"
-    bl_label = "Mesh Angle add-on is not enabled"
-    bl_description = "Mesh Angle add-on is required for this button"
-
-    open_prefs: bpy.props.BoolProperty(default=True)
-
-    def execute(self, context):
-        self.report({'WARNING'}, "Mesh Angle add-on is not enabled. Enable it in Preferences > Add-ons.")
-        if self.open_prefs:
-            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
-        return {'CANCELLED'}
-
-
-class WM_OT_disabled_addon_dreamuv(bpy.types.Operator):
-    bl_idname = "wm.disabled_addon_dreamuv"
-    bl_label = "DreamUV add-on is not enabled"
-    bl_description = "DreamUV add-on is required for this button"
-
-    open_prefs: bpy.props.BoolProperty(default=True)
-
-    def execute(self, context):
-        self.report({'WARNING'}, "DreamUV add-on is not enabled. Enable it in Preferences > Add-ons.")
-        if self.open_prefs:
-            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
-        return {'CANCELLED'}
-
-
-class WM_OT_disabled_addon_zen_uv(bpy.types.Operator):
-    bl_idname = "wm.disabled_addon_zen_uv"
-    bl_label = "Zen UV add-on is not enabled"
-    bl_description = "Zen UV add-on is required for this button"
-
-    open_prefs: bpy.props.BoolProperty(default=True)
-
-    def execute(self, context):
-        self.report({'WARNING'}, "Zen UV add-on is not enabled. Enable it in Preferences > Add-ons.")
-        if self.open_prefs:
-            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
-        return {'CANCELLED'}
-
-
-class WM_OT_disabled_addon_uv_toolkit(bpy.types.Operator):
-    bl_idname = "wm.disabled_addon_uv_toolkit"
-    bl_label = "UV Toolkit add-on is not enabled"
-    bl_description = "UV Toolkit add-on is required for this button"
-
-    open_prefs: bpy.props.BoolProperty(default=True)
-
-    def execute(self, context):
-        self.report({'WARNING'}, "UV Toolkit add-on is not enabled. Enable it in Preferences > Add-ons.")
+        msg = "Addon is not enabled or available. Get the missing addon and enable it in Preferences > Add-ons."
+        self.report({'WARNING'}, msg)
         if self.open_prefs:
             bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
         return {'CANCELLED'}
@@ -142,13 +59,7 @@ class ZUV_OT_trim_mode(bpy.types.Operator):
 # REGISTER / UNREGISTER
 
 # List of classes to register/unregister
-classes = (WM_OT_disabled_addon_interactive_tools,
-           WM_OT_disabled_addon_machin3tools,
-           WM_OT_disabled_addon_hardops,
-           WM_OT_disabled_addon_mesh_angle,
-           WM_OT_disabled_addon_dreamuv,
-           WM_OT_disabled_addon_zen_uv,
-           WM_OT_disabled_addon_uv_toolkit,
+classes = (WM_OT_disabled_addon,
            ZUV_OT_trim_mode
            )
 

@@ -12,7 +12,9 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+import bpy
 from typing import *
+from ...commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPER FUNCTIONS
@@ -30,3 +32,42 @@ def open_pie_menu(pie, name: str, text: str, icon: Optional[str]=None):
         pie.operator("wm.call_menu_pie", text=text, icon=icon).name = name
     else:
         pie.operator("wm.call_menu_pie", text=text).name = name
+
+
+def op_exists(op_idname: str) -> bool:
+    """
+    True if operator idname like 'hops.mod_lattice' is registered.
+    """
+    try:
+        cat, name = op_idname.split(".", 1)
+        op = getattr(getattr(bpy.ops, cat), name)
+        op.get_rna_type()   # raises if not registered
+        return True
+    except Exception:
+        return False
+
+
+def pie_op_or_disabled(
+    pie,
+    addon_name: str,
+    op_idname: str,
+    *,
+    text: str,
+    icon: str = 'NONE',
+    props: dict | None = None,
+    platform_lst: List[OS] | None = None
+):
+    if platform_lst is not None:
+        if get_os() not in platform_lst:
+            return pie.operator("wm.disabled_addon", text=f'{text} (Unsupported on {get_os().value})', icon='ERROR')
+
+    if op_exists(op_idname):
+        btn = pie.operator(op_idname, text=text, icon=icon)
+        if btn and props:
+            for k, v in props.items():
+                # if property doesn't exist, avoid raising during draw
+                if hasattr(btn, k):
+                    setattr(btn, k, v)
+        return btn
+
+    return pie.operator("wm.disabled_addon", text=f'{text} (Requires {addon_name})', icon='ERROR')

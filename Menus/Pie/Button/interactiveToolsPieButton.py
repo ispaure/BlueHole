@@ -15,29 +15,57 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ....blenderUtils import addonUtils
+from ..utilities import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON
 
+addon_name = 'InteractiveTools'  # Name of addon to display if button cannot be loaded.
+
 
 def quick_pivot_setup(pie):
-    if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-        pie.operator("mesh.quick_pivot", text="Quick Pivot Setup", icon='ORIENTATION_GLOBAL')
-    else:
-        pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "mesh.quick_pivot",
+        text="Quick Pivot Setup",
+        icon='ORIENTATION_GLOBAL')
 
 
 def quick_lattice(pie):
-    if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-        pie.operator("mesh.quick_lattice", text="Quick Lattice", icon='OUTLINER_DATA_LATTICE')
-    else:
-        pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "mesh.quick_lattice",
+        text="Quick Lattice",
+        icon='OUTLINER_DATA_LATTICE')
 
 
 def quick_flatten(pie):
-    if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-        pie.operator("mesh.quick_flatten", text="Quick Flatten", icon='FILE_TICK').mode = 1
-    else:
-        pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!",
-                     icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "mesh.quick_flatten",
+        text="Quick Flatten",
+        icon='FILE_TICK',
+        props={"mode": 1})
+
+
+def smart_select_ring(pie):
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "mesh.smart_select_ring",
+        text="Smart Ring",
+        icon='ALIGN_FLUSH'
+    )
+
+
+def smart_select_loop(pie):
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "mesh.smart_select_loop",
+        text="Smart Loop",
+        icon='ALIGN_JUSTIFY'
+    )

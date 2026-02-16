@@ -242,7 +242,7 @@ class MT_pie_vertex_action_more(bpy.types.Menu):
         # 1 - BOTTOM - LEFT
         pie.separator()
         # 3 - BOTTOM - RIGHT
-        blenderPieButton.vertex_to_circle(pie)
+        hardopsPieButton.vertex_to_circle(pie)
 
 
 # No Hotkey; Submenu
@@ -254,13 +254,13 @@ class MT_pie_edge_action_select(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        blenderPieButton.smart_select_ring(pie)
+        interactiveToolsPieButton.smart_select_ring(pie)
         # 6 - RIGHT
         blenderPieButton.select_sharp(pie)
         # 2 - BOTTOM
         blenderPieButton.invert_select(pie)
         # 8 - TOP
-        blenderPieButton.smart_select_loop(pie)
+        interactiveToolsPieButton.smart_select_loop(pie)
         # 7 - TOP - LEFT
         blenderPieButton.loop_inner_region(pie)
         # 9 - TOP - RIGHT

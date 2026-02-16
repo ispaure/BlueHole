@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-from ...blenderUtils import filterUtils
+from ...commonUtils.osUtils import *
 from ..prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -125,8 +125,8 @@ def draw(preference, context, layout):
     row.enabled = enable_rows
     row.label(text="Send/Export Asset Hierarchies to Unreal")
     # General options
-    match filterUtils.get_platform():
-        case filterUtils.OS.WIN:
+    match get_os():
+        case OS.WIN:
             row = column.row()
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path', text='Source Content')
@@ -134,7 +134,7 @@ def draw(preference, context, layout):
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
 
-        case filterUtils.OS.MAC:
+        case OS.MAC:
             row = column.row()
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path_mac', text='Source Content')
@@ -142,7 +142,7 @@ def draw(preference, context, layout):
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
 
-        case filterUtils.OS.LINUX:
+        case OS.LINUX:
             row = column.row()
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path_linux', text='Source Content')
@@ -169,24 +169,24 @@ def draw(preference, context, layout):
     # General options
     row = column.row()
     row.enabled = enable_rows
-    match filterUtils.get_platform():
-        case filterUtils.OS.WIN:
+    match get_os():
+        case OS.WIN:
             row.prop(preference.environment, 'sc_path', text='Source Content')
             row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
-        case filterUtils.OS.MAC:
+        case OS.MAC:
             row.prop(preference.environment, 'sc_path_mac', text='Source Content')
             row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
-        case filterUtils.OS.LINUX:
+        case OS.LINUX:
             row.prop(preference.environment, 'sc_path_linux', text='Source Content')
             row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
     row = column.row()
     row.enabled = enable_rows
-    match filterUtils.get_platform():
-        case filterUtils.OS.WIN:
+    match get_os():
+        case OS.WIN:
             row.prop(preference.general, 'unity_assets_path', text='Unity Assets')
-        case filterUtils.OS.MAC:
+        case OS.MAC:
             row.prop(preference.general, 'unity_assets_path_mac', text='Unity Assets')
-        case filterUtils.OS.LINUX:
+        case OS.LINUX:
             row.prop(preference.general, 'unity_assets_path_linux', text='Unity Assets')
     row = column.row()
     row.enabled = enable_rows

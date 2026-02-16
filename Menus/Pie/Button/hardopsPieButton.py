@@ -16,72 +16,110 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
-from ....blenderUtils import addonUtils
+from ..utilities import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON
 
+addon_name = 'Hard Ops'  # Name of addon to display if button cannot be loaded.
+
+
 def quick_pipe(pie):
-    if addonUtils.is_addon_enabled_and_loaded('hardops') or addonUtils.is_addon_enabled_and_loaded('HOps'):
-        # TODO: Find equivalent if HardOps not installed
-        pie.operator("hops.edge2curve", text="Quick Pipe", icon='OUTLINER_OB_GREASEPENCIL')
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.edge2curve",
+        text="Quick Pipe",
+        icon='OUTLINER_OB_GREASEPENCIL')
 
 
 def twist_array(pie):
-    if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-        pie.operator("hops.array_twist", text="Twist Array", icon='ALIASED')
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.array_twist",
+        text="Twist Array",
+        icon='ALIASED')
 
 
 def lattice(pie):
-    if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-        pie.operator("hops.mod_lattice", text="Lattice", icon='MOD_LATTICE')
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.mod_lattice",
+        text="Lattice",
+        icon='MOD_LATTICE')
 
 
 def subdiv_modifier(pie):
-    if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-        pie.operator("hops.mod_subdivision", text="Add Subdivision Modifier", icon='MOD_SUBSURF')
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.mod_subdivision",
+        text="Add Subdivision Modifier",
+        icon='MOD_SUBSURF')
 
 
 def radial_array(pie):
-    if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-        pie.operator("hops.radial_array", text="Radial Array", icon='OUTLINER_DATA_POINTCLOUD')
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.radial_array",
+        text="Radial Array",
+        icon='OUTLINER_DATA_POINTCLOUD')
 
 
 def array(pie):
-    if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-        pie.operator("hops.st3_array", text="Array", icon='MOD_ARRAY')
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.st3_array",
+        text="Array",
+        icon='MOD_ARRAY')
 
 
 def modifier_toggle(pie):
-    if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-        pie.operator('hops.bool_toggle_viewport', text='Modifier Toggle', icon='QUIT').all_modifiers = True
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.bool_toggle_viewport",
+        text="Modifier Toggle",
+        icon='QUIT',
+        props={"all_modifiers": True})
 
 
 def apply_modifier(pie):
-    if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-        pie.operator("hops.mod_apply", text="Apply Modifier", icon='OUTPUT')
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.mod_apply",
+        text="Apply Modifier",
+        icon='OUTPUT')
 
 
 # TODO: Investigate why there is two of this, maybe one is an old command. they both have a button in use in UI
 def apply_modifier_2(pie):
-    if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-        pie.operator("hops.apply_modifiers", text="Apply Modifiers", icon='MODIFIER_DATA')
-    else:
-        pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "hops.apply_modifiers",
+        text="Apply Modifiers",
+        icon='MODIFIER_DATA')
+
+
+def clean_mesh(pie):
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "view3d.clean_mesh",
+        text="Clean",
+        icon='SHADERFX')
+
+
+def vertex_to_circle(pie):
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        'view3d.vertcircle',
+        text='Vertex to Circle')
