@@ -15,6 +15,7 @@ __status__ = 'Production'
 import bpy
 from ...commonUtils.debugUtils import *
 from .Button import blenderPieButton, dreamuvPieButton, uvtoolkitPieButton, zenuvPieButton
+from .utilities import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -99,7 +100,7 @@ class MT_pie_UV_action(bpy.types.Menu):
         # 2 - BOTTOM
         zenuvPieButton.merge_verts(pie)
         # 8 - TOP
-        pie.operator("wm.call_menu_pie", text="Select...", icon='TRIA_UP').name = MT_pie_UV_action_select.bl_idname
+        open_pie_menu(pie, MT_pie_UV_action_select.bl_idname, 'Select...', 'TRIA_UP')
         # 7 - TOP - LEFT
         zenuvPieButton.get_tx_density(pie)
         # 9 - TOP - RIGHT

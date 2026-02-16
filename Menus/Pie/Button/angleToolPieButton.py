@@ -29,4 +29,3 @@ def mesh_angle(pie):
         pie.operator("mesh.angle_tool", text="Mesh Angle")
     else:
         pie.operator("wm.disabled_addon_mesh_angle", text="Can't Show; Angle Tool add-on disabled!!!", icon='ERROR')
-

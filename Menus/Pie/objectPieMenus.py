@@ -15,6 +15,8 @@ __status__ = 'Production'
 import bpy
 from ...commonUtils.debugUtils import *
 from ...blenderUtils import filterUtils, addonUtils
+from .utilities import *
+from .Button import hardopsPieButton, blenderPieButton, machin3PieButton, interactiveToolsPieButton
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -38,39 +40,21 @@ class MT_pie_object_tool(bpy.types.Menu):
         pie = layout.menu_pie()
 
         # 4 - LEFT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            pie.operator("hops.mod_lattice", text="Lattice", icon='MOD_LATTICE')
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.lattice(pie)
         # 6 - RIGHT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            pie.operator("hops.st3_array", text="Array", icon='MOD_ARRAY')
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.array(pie)
         # 2 - BOTTOM
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            pie.operator('hops.bool_toggle_viewport', text='Modifier Toggle', icon='QUIT').all_modifiers = True
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.modifier_toggle(pie)
         # 8 - TOP
-        pie.operator("wm.call_menu_pie", text="Modifiers Options...").name = MT_pie_object_tool_more.bl_idname
+        open_pie_menu(pie, MT_pie_object_tool_more.bl_idname, 'Modifiers Options...')
         # 7 - TOP - LEFT
-        pie.operator("object.modifier_add", text="Weighted Normal", icon='NORMALS_VERTEX_FACE').type = 'WEIGHTED_NORMAL'
+        blenderPieButton.mod_weighted_nrm(pie)
         # 9 - TOP - RIGHT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            pie.operator("hops.array_twist", text="Twist Array", icon='ALIASED')
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.twist_array(pie)
         # 3 - BOTTOM - LEFT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            pie.operator("hops.mod_subdivision", text="Add Subdivision Modifier", icon='MOD_SUBSURF')
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.subdiv_modifier(pie)
         # 1 - BOTTOM - RIGHT
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            pie.operator("hops.radial_array", text="Radial Array", icon='OUTLINER_DATA_POINTCLOUD')
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.radial_array(pie)
 
 
 # No Hotkey; Submenu
@@ -86,12 +70,9 @@ class MT_pie_object_tool_more(bpy.types.Menu):
         # 6 - RIGHT
         pie.separator()
         # 2 - BOTTOM
-        if addonUtils.is_addon_enabled_and_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            pie.operator("hops.mod_apply", text="Apply Modifier", icon='OUTPUT')
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.apply_modifier(pie)
         # 8 - TOP
-        pie.operator("object.make_links_data", text="Link/Transfer Data", icon='NETWORK_DRIVE').type = 'MODIFIERS'
+        blenderPieButton.link_transfer_data(pie)
         # 7 - TOP - LEFT
         pie.separator()
         # 9 - TOP - RIGHT
@@ -112,16 +93,13 @@ class MT_pie_object_hide(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("object.hide_view_clear", text="Reveal Hidden [All]").select = True
+        blenderPieButton.object_reveal_all(pie)
         # 6 - RIGHT
-        if addonUtils.is_addon_enabled_and_loaded('MACHIN3tools'):
-            pie.operator("machin3.focus", text="Isolate Selection [Toggle]").method = 'LOCAL_VIEW'
-        else:
-            pie.operator("wm.disabled_addon_machin3tools", text="Can't Show; MACHIN3tools add-on disabled!!!", icon='ERROR')
+        machin3PieButton.isolate_selection_toggle(pie)
         # 2 - BOTTOM
         pie.separator()
         # 8 - TOP
-        pie.operator("object.hide_view_set", text="Hide Selection")
+        blenderPieButton.object_hide_selection(pie)
         # 7 - TOP - LEFT
         pie.separator()
         # 9 - TOP - RIGHT
@@ -142,30 +120,21 @@ class MT_pie_object_action(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("object.location_clear", text="Clear Location", icon='FILE_REFRESH').clear_delta = False
+        blenderPieButton.clear_location(pie)
         # 6 - RIGHT
-        pie.operator("object.join", text="Join", icon='SELECT_EXTEND')
+        blenderPieButton.object_join(pie)
         # 2 - BOTTOM
-        pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_object_action_more.bl_idname
+        open_pie_menu(pie, MT_pie_object_action_more.bl_idname, 'More...')
         # 8 - TOP
-        pie.operator("wm.call_menu_pie", text="Select...").name = MT_pie_object_action_select.bl_idname
+        open_pie_menu(pie, MT_pie_object_action_select.bl_idname, 'Select...')
         # 7 - TOP - LEFT
-        button = pie.operator("object.transform_apply", text="Apply Object Transform", icon='MOD_DATA_TRANSFER')
-        button.location = True
-        button.rotation = True
-        button.scale = True
+        blenderPieButton.apply_transform(pie)
         # 9 - TOP - RIGHT
-        if addonUtils.is_addon_enabled_and_loaded('interactivetoolsblender'):
-            pie.operator("mesh.quick_pivot", text="Quick Pivot Setup", icon='ORIENTATION_GLOBAL')
-        else:
-            pie.operator("wm.disabled_addon_interactive_tools", text="Can't Show; InteractiveTools add-on disabled!!!",
-                         icon='ERROR')
+        interactiveToolsPieButton.quick_pivot_setup(pie)
         # 1 - BOTTOM - LEFT
-        pie.operator("object.parent_clear", text="Clear Parent", icon='LAYER_USED').type = 'CLEAR_KEEP_TRANSFORM'
+        blenderPieButton.clear_parent(pie)
         # 3 - BOTTOM - RIGHT
-        button_2 = pie.operator("object.parent_set", text="Make Parent", icon='CON_TRACKTO')
-        button_2.type = 'OBJECT'
-        button_2.keep_transform = True
+        blenderPieButton.make_parent(pie)
 
 
 # No Hotkey; Submenu
@@ -177,13 +146,13 @@ class MT_pie_object_action_select(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("object.select_grouped", text="Select Children", icon='PARTICLE_DATA').type = 'CHILDREN_RECURSIVE'
+        blenderPieButton.select_children_recursive(pie)
         # 6 - RIGHT
-        pie.operator("object.select_grouped", text="Select Parent", icon='DRIVER').type = 'PARENT'
+        blenderPieButton.select_parent(pie)
         # 2 - BOTTOM
-        pie.operator("object.select_all", text="Invert", icon='OVERLAY')
+        blenderPieButton.object_select_all(pie)
         # 8 - TOP
-        pie.operator("object.select_grouped", text="Select Grouped", icon='GROUP').type = 'COLLECTION'
+        blenderPieButton.select_grouped(pie)
         # 7 - TOP - LEFT
         pie.separator()
         # 9 - TOP - RIGHT
@@ -203,20 +172,17 @@ class MT_pie_object_action_more(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        pie.operator("view3d.clean_mesh", text="Clean", icon='SHADERFX')
+        blenderPieButton.clean_mesh(pie)
         # 6 - RIGHT
-        if filterUtils.check_addon_loaded('HOps') or addonUtils.is_addon_enabled_and_loaded('hardops'):
-            pie.operator("hops.apply_modifiers", text="Apply Modifiers", icon='MODIFIER_DATA')
-        else:
-            pie.operator("wm.disabled_addon_hardops", text="Can't Show; HardOps add-on disabled!!!", icon='ERROR')
+        hardopsPieButton.apply_modifier_2(pie)
         # 2 - BOTTOM
-        pie.operator("object.duplicates_make_real", text="Make Instances Real", icon='UNLINKED')
+        blenderPieButton.make_instances_real(pie)
         # 8 - TOP
         pie.separator()
         # 7 - TOP - LEFT
-        pie.operator("object.convert", text="Convert to Curve", icon='MOD_CURVE').target = 'CURVE'
+        blenderPieButton.convert_to_curves(pie)
         # 9 - TOP - RIGHT
-        pie.operator("object.convert", text="Convert to Mesh", icon='OUTLINER_OB_CURVE').target = 'MESH'
+        blenderPieButton.convert_to_mesh(pie)
         # 1 - BOTTOM - LEFT
         pie.separator()
         # 3 - BOTTOM - RIGHT

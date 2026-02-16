@@ -15,6 +15,7 @@ __status__ = 'Production'
 import bpy
 from ...commonUtils.debugUtils import *
 import os
+from .utilities import *
 from .Button import blenderPieButton, machin3PieButton
 
 
@@ -42,11 +43,11 @@ class MT_pie_add(bpy.types.Menu):
         # 6 - RIGHT
         blenderPieButton.add_cube(pie)
         # 2 - BOTTOM
-        pie.operator("wm.call_menu_pie", text="More...").name = MT_pie_add_more.bl_idname
+        open_pie_menu(pie, MT_pie_add_more.bl_idname, 'More...')
         # 8 - TOP
         blenderPieButton.add_sphere(pie)
         # 7 - TOP - LEFT
-        machin3PieButton.add_quadsphere()
+        machin3PieButton.add_quadsphere(pie)
         # 9 - TOP - RIGHT
         blenderPieButton.add_plane(pie)
         # 1 - BOTTOM - LEFT
