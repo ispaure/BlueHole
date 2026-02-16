@@ -151,6 +151,7 @@ class AssetHierarchy:
             obj_world_translation = objectUtils.get_obj_world_translation(self.root)
             objectUtils.set_zero_obj_world_translation(self.root)
         else:
+            obj_world_translation = None
             print('is not zero root transform')
 
         # If Preset Is Unity, Fix Transforms of Root Before Export

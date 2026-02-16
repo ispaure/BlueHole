@@ -108,10 +108,7 @@ def display_cannot_connect_unreal_error():
 
 def import_asset(file_path_source, file_path_dest):
     """
-    This function imports an asset to unreal based on the asset data in the provided dictionary.
-
-    :param dict asset_data: A dictionary of import parameters.
-    :param object properties: The property group that contains variables that maintain the addon's correct state.
+    This function imports an asset to unreal
     """
     # start a connection to the engine that lets you send python strings
     remote_exec = remote_execution.RemoteExecution()

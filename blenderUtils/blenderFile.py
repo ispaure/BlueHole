@@ -14,8 +14,6 @@ __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-import subprocess
-import webbrowser
 from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree
