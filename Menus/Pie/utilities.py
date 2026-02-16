@@ -62,7 +62,7 @@ def pie_op_or_disabled(
             return pie.operator("wm.disabled_addon", text=f'{text} (Unsupported on {get_os().value})', icon='ERROR')
 
     if op_exists(op_idname):
-        btn = pie.operator(op_idname, text=text, icon=icon)
+        btn = pie.operator(op_idname, text=f'{text} [{addon_name}]', icon=icon)
         if btn and props:
             for k, v in props.items():
                 # if property doesn't exist, avoid raising during draw
