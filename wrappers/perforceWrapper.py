@@ -1154,7 +1154,7 @@ def exec_p4_command(command: str):
             cmdShellWrapper.exec_cmd(f'chmod +x "{p4_path}"')
 
             # Replace p4 in command with the path (in quotes)
-            command = f'"{p4_path}" {command[2:]}'
+            command = f'"{p4_path}"{command[2:]}'
 
     # Execute the command
     return cmdShellWrapper.exec_cmd(command, time_out=15)
