@@ -106,9 +106,9 @@ def select_grouped(pie):
     pie.operator("object.select_grouped", text="Select Grouped", icon='GROUP').type = 'COLLECTION'
 
 
-def object_select_all(pie):
+def object_invert(pie):
     # TODO: Check if this does Invert, I don't think it does unless add at end .action = 'INVERT'
-    pie.operator("object.select_all", text="Invert", icon='OVERLAY')
+    pie.operator("object.select_all", text="Invert", icon='OVERLAY').action = 'INVERT'
 
 
 def make_instances_real(pie):

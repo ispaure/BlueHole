@@ -149,7 +149,7 @@ class MT_pie_object_action_select(bpy.types.Menu):
         # 6 - RIGHT
         blenderPieButton.select_parent(pie)
         # 2 - BOTTOM
-        blenderPieButton.object_select_all(pie)
+        blenderPieButton.object_invert(pie)
         # 8 - TOP
         blenderPieButton.select_grouped(pie)
         # 7 - TOP - LEFT
