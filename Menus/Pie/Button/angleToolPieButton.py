@@ -17,15 +17,17 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
-from ....blenderUtils import addonUtils
-
+from ..utilities import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON
 
+addon_name = 'Angle Tool / Mesh Angle'  # Name of addon to display if button cannot be loaded.
+
 
 def mesh_angle(pie):
-    if addonUtils.is_addon_enabled_and_loaded('angle_tool'):
-        pie.operator("mesh.angle_tool", text="Mesh Angle")
-    else:
-        pie.operator("wm.disabled_addon_mesh_angle", text="Can't Show; Angle Tool add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "mesh.angle_tool",
+        text="Mesh Angle")

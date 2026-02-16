@@ -15,27 +15,36 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ....blenderUtils import addonUtils
+from ..utilities import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON
 
-
+addon_name = 'MACHIN3tools'  # Name of addon to display if button cannot be loaded.
 
 
 def add_quadsphere(pie):
-    pie.operator("machin3.quadsphere", text="Quadsphere", icon='MESH_UVSPHERE')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "machin3.quadsphere",
+        text="Quadsphere",
+        icon='MESH_UVSPHERE')
 
 
 def straighten(pie):
-    if addonUtils.is_addon_enabled_and_loaded('MACHIN3tools'):
-        pie.operator("machin3.straighten", text="Straighten", icon='THREE_DOTS')
-    else:
-        pie.operator("wm.disabled_addon_machin3tools", text="Can't Show; MACHIN3tools add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "machin3.straighten",
+        text="Straighten",
+        icon='THREE_DOTS')
 
 
 def isolate_selection_toggle(pie):
-    if addonUtils.is_addon_enabled_and_loaded('MACHIN3tools'):
-        pie.operator("machin3.focus", text="Isolate Selection [Toggle]").method = 'LOCAL_VIEW'
-    else:
-        pie.operator("wm.disabled_addon_machin3tools", text="Can't Show; MACHIN3tools add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "machin3.focus",
+        text="Isolate Selection [Toggle]",
+        props={"method": 'LOCAL_VIEW'})

@@ -15,14 +15,19 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ....blenderUtils import addonUtils
+from ..utilities import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON
 
+addon_name = 'DreamUV'  # Name of addon to display if button cannot be loaded.
+
 
 def hotspotter(pie):
-    if addonUtils.is_addon_enabled_and_loaded('DreamUV') or addonUtils.is_addon_enabled_and_loaded('Blender_DreamUV-master'):
-        pie.operator("view3d.dreamuv_hotspotter", text="HotSpotter", icon='UV_DATA')
-    else:
-        pie.operator("wm.disabled_addon_dreamuv", text="Can't Show; DreamUV add-on disabled!!!", icon='ERROR')
+    pie_op_or_disabled(
+        pie,
+        addon_name,
+        "view3d.dreamuv_hotspotter",
+        text="HotSpotter",
+        icon='UV_DATA'
+    )

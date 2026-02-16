@@ -269,14 +269,6 @@ def mesh_bevel(pie):
     pie.operator("mesh.bevel", text="Bevel", icon='MOD_BEVEL')
 
 
-def smart_select_ring(pie):
-    pie.operator("mesh.smart_select_ring", text="Smart Ring", icon='ALIGN_FLUSH')
-
-
-def smart_select_loop(pie):
-    pie.operator("mesh.smart_select_loop", text="Smart Loop", icon='ALIGN_JUSTIFY')
-
-
 def loop_inner_region(pie):
     pie.operator("mesh.loop_to_region", text="Loop Inner-Region", icon='SNAP_FACE')
 
@@ -500,14 +492,6 @@ def extrude_move_normal(pie):
 
 def extrude_move_shrink_fatten(pie):
     pie.operator("view3d.edit_mesh_extrude_move_shrink_fatten", text="Extrude and Move on Individual Normals", icon='MOD_SOLIDIFY')
-
-
-def vertex_to_circle(pie):
-    pie.operator('view3d.vertcircle', text='Vertex to Circle')
-
-
-def clean_mesh(pie):
-    pie.operator("view3d.clean_mesh", text="Clean", icon='SHADERFX')
 
 
 # ----------------------------------------------------------------------------------------------------------------------

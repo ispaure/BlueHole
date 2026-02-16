@@ -14,7 +14,6 @@ __status__ = 'Production'
 
 import bpy
 from ...commonUtils.debugUtils import *
-from ...blenderUtils import filterUtils, addonUtils
 from .utilities import *
 from .Button import hardopsPieButton, blenderPieButton, machin3PieButton, interactiveToolsPieButton
 
@@ -172,7 +171,7 @@ class MT_pie_object_action_more(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        blenderPieButton.clean_mesh(pie)
+        hardopsPieButton.clean_mesh(pie)
         # 6 - RIGHT
         hardopsPieButton.apply_modifier_2(pie)
         # 2 - BOTTOM

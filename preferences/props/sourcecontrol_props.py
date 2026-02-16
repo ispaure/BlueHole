@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 
-from ...blenderUtils import filterUtils
+from ...commonUtils.osUtils import *
 from ..prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -156,20 +156,20 @@ def draw(preference, context, layout):
             row.label(text='Perforce')
 
             # Decide what to display (based on platform)
-            match filterUtils.get_platform():
-                case filterUtils.OS.WIN:
+            match get_os():
+                case OS.WIN:
                     p4_port_var_str = 'win32_env_setting_p4port'
                     p4_user_var_str = 'win32_env_setting_p4user'
                     p4_client_var_str = 'win32_env_setting_p4client'
                     p4_parallel_str = None
                     p4_parallel_name = None
-                case filterUtils.OS.MAC:
+                case OS.MAC:
                     p4_port_var_str = 'macos_env_setting_p4port'
                     p4_user_var_str = 'macos_env_setting_p4user'
                     p4_client_var_str = 'macos_env_setting_p4client'
                     p4_parallel_str = 'p4v_app_path_mac'
                     p4_parallel_name = 'p4v.app'
-                case filterUtils.OS.LINUX:
+                case OS.LINUX:
                     p4_port_var_str = 'linux_env_setting_p4port'
                     p4_user_var_str = 'linux_env_setting_p4user'
                     p4_client_var_str = 'linux_env_setting_p4client'
@@ -179,13 +179,13 @@ def draw(preference, context, layout):
                     return
 
             # Display Row to override (not by default on Windows)
-            if filterUtils.get_platform() == filterUtils.OS.WIN:
+            if get_os() == OS.WIN:
                 row.prop(preference.sourcecontrol, 'win32_env_override', text='Override P4V Environment Settings')
 
             # If Windows set to override or other platform, show fields
-            if prefs().sc.win32_env_override or filterUtils.get_platform() in [filterUtils.OS.MAC, filterUtils.OS.LINUX]:
+            if prefs().sc.win32_env_override or get_os() in [OS.MAC, OS.LINUX]:
                 row = column.row()
-                row.label(text=f"Environment Settings [{filterUtils.get_platform().value}]:")
+                row.label(text=f"Environment Settings [{get_os().value}]:")
                 row = column.row()
                 row.enabled = enable_rows
                 row.prop(preference.sourcecontrol, p4_port_var_str, text='Server (P4PORT)')
@@ -197,7 +197,7 @@ def draw(preference, context, layout):
                 row.prop(preference.sourcecontrol, p4_client_var_str, text='Workspace (P4CLIENT)')
 
             # If macOS or Linux, p4_parallel path
-            if filterUtils.get_platform() in [filterUtils.OS.MAC, filterUtils.OS.LINUX]:
+            if get_os() in [OS.MAC, OS.LINUX]:
                 row = column.row()
                 row.enabled = enable_rows
                 row.prop(preference.sourcecontrol, p4_parallel_str, text=p4_parallel_name)

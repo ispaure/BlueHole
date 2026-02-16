@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 from ...environment import envManager
-from ...blenderUtils import filterUtils
+from ...commonUtils.osUtils import *
 from ..prefs import *
 
 
@@ -191,8 +191,8 @@ def draw(preference, context, layout):
     row.enabled = enable_rows
     row.label(text="Source Content Root Path: Contains all art source files for your project.")
 
-    match filterUtils.get_platform():
-        case filterUtils.OS.WIN:
+    match get_os():
+        case OS.WIN:
             row = column.row()
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path', text='Source Content')
@@ -200,7 +200,7 @@ def draw(preference, context, layout):
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
 
-        case filterUtils.OS.MAC:
+        case OS.MAC:
             row = column.row()
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path_mac', text='Source Content')
@@ -208,7 +208,7 @@ def draw(preference, context, layout):
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
 
-        case filterUtils.OS.LINUX:
+        case OS.LINUX:
             row = column.row()
             row.enabled = enable_rows
             row.prop(preference.environment, 'sc_path_linux', text='Source Content')
