@@ -25,6 +25,7 @@ import bpy
 from ..blenderUtils.uiUtils import show_label
 from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, sendOp, sortOp, sourceControlOp, themeOp
 from ..preferences.prefs import *
+from ..blenderUtils import blenderFile
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -170,8 +171,9 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon = 'CHECKMARK')
-        layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon = 'INFO')
+        if len(blenderFile.get_blend_file_path()) > 0:
+            layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
+        layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon='INFO')
 
 
 class BLUE_HOLE_MT_themes(bpy.types.Menu):

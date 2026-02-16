@@ -51,8 +51,6 @@ def sc_check_blend(silent_mode=False):
     """
     if filterUtils.filter_source_control():
         if prefs().sc.source_control_solution == 'perforce':
-            # # OLD METHOD TO FULLY REMOVE LATER ONCE NEW ONE HAS BEEN THOROUGHLY TESTED
-            # p4Utils.p4_check_blend(silent_mode)
 
             # Just bypass if scene is not on disk (regardless of silent mode)
             result = filterUtils.check_tests('Checkout Blender Scene',

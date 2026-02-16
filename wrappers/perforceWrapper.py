@@ -470,7 +470,7 @@ class P4File:
             else:
                 msg = f'File "{self.file_name}" is not checked out. Check out?'
                 msg_box_result = uiUtils.display_msg_box_ok_cancel(tool_name, msg)
-                if result:
+                if msg_box_result:
                     self._run_p4_edit()
                 else:
                     return False

@@ -183,7 +183,7 @@ def check_tests(script_name,
     # Check if Blend exists
     if check_blend_exist:
         if len(blenderFile.get_blend_file_path()) == 0:
-            log(Severity.CRITICAL, script_name, 'Check Blend Exist Failed')
+            log(Severity.ERROR, script_name, 'Check Blend Exist Failed')
             dialog_check_blend_exist()
             return False
         log(Severity.DEBUG, script_name, 'Check Blend Exist Succeeded!')
@@ -192,7 +192,7 @@ def check_tests(script_name,
     if check_blend_loc_in_dir_structure:
         check_result = check_blend_location_in_dir_structure()
         if not check_result:
-            log(Severity.CRITICAL, script_name, 'Check Blend Location in Directory Structure Failed')
+            log(Severity.ERROR, script_name, 'Check Blend Location in Directory Structure Failed')
             dialog_check_blend_location_in_dir_structure()
             return False
         log(Severity.DEBUG, script_name, 'Check Blend Location in Directory Structure Succeeded')
@@ -200,7 +200,7 @@ def check_tests(script_name,
     # Check if selection is not empty
     if check_selection_not_empty:
         if len(objectUtils.get_selection()) == 0:
-            log(Severity.CRITICAL, script_name, 'Check Selection not Empty Failed')
+            log(Severity.ERROR, script_name, 'Check Selection not Empty Failed')
             dialog_check_selection_not_empty()
             return False
         log(Severity.DEBUG, script_name, 'Check Selection not Empty Succeeded')
@@ -208,7 +208,7 @@ def check_tests(script_name,
     # Check if source control is enabled
     if check_source_control_enable:
         if not filter_source_control():
-            log(Severity.CRITICAL, script_name, 'Check Source Control Enabled: Failed')
+            log(Severity.ERROR, script_name, 'Check Source Control Enabled: Failed')
             dialog_source_control_enable()
             return False
         log(Severity.DEBUG, script_name, 'Check Source Control Enabled: Succeeded')
@@ -217,7 +217,7 @@ def check_tests(script_name,
     if check_source_control_connection:
         p4_info_cls = perforceWrapper.P4Info()
         if p4_info_cls.status is False:
-            log(Severity.CRITICAL, script_name, 'Check Source Control Connection: Failed')
+            log(Severity.ERROR, script_name, 'Check Source Control Connection: Failed')
             dialog_source_control_connection()
             return False
         log(Severity.DEBUG, script_name, 'Check Source Control: Succeeded')
