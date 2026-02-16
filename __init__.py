@@ -24,7 +24,7 @@ import bpy
 
 # Disable use of pySide for UI (rely on OS terminal to create windows instead)
 # Need to be first import, and throw error in case .commonUtils stuff cannot be accessed.
-from .commonUtils import uiUtils
+from .Lib.commonUtils import uiUtils
 uiUtils.use_pyside = False
 
 # Import Blue Hole Scripts

@@ -21,7 +21,7 @@ import bpy
 # Blue Hole
 from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export import exportHierarchy
-from ..commonUtils import uiUtils
+from ..Lib.commonUtils import uiUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

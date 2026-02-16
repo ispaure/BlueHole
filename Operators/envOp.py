@@ -26,7 +26,7 @@ from bpy.props import *
 # Blue Hole
 from ..blenderUtils import blenderFile
 from ..environment import envManager, model
-from ..commonUtils import webUtils
+from ..Lib.commonUtils import webUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

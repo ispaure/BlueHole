@@ -20,10 +20,10 @@ from typing import *
 from pathlib import Path
 
 # Blue Hole
-from ..commonUtils.debugUtils import *
+from ..Lib.commonUtils.debugUtils import *
 from ..blenderUtils import blenderFile
 from ..preferences.prefs import *
-from ..commonUtils.osUtils import *
+from ..Lib.commonUtils.osUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE

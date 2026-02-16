@@ -20,7 +20,7 @@ from pathlib import Path
 import time
 
 # Blue Hole
-from ..commonUtils.debugUtils import *
+from ..Lib.commonUtils.debugUtils import *
 from . import blenderFile, filterUtils
 from ..Lib.send2ue.dependencies import remote_execution
 from ..preferences.prefs import *

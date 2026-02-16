@@ -17,10 +17,10 @@ __status__ = 'Production'
 from distutils.dir_util import copy_tree
 import bpy
 from shutil import rmtree
-from ..commonUtils.debugUtils import *
+from ..Lib.commonUtils.debugUtils import *
 from ..environment import envManager
 from typing import *
-from ..commonUtils.osUtils import *
+from ..Lib.commonUtils.osUtils import *
 from pathlib import Path
 
 

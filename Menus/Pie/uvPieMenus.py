@@ -13,7 +13,7 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-from ...commonUtils.debugUtils import *
+from ...Lib.commonUtils.debugUtils import *
 from .Button import blenderPieButton, dreamuvPieButton, uvtoolkitPieButton, zenuvPieButton
 from .utilities import *
 
