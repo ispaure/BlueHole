@@ -41,17 +41,30 @@ def trigger_unreal_import(file_path_source):
     """
 
     def display_path_error_source_content(path):
-        err_msg = ('The Source Content directory path specified in the active environment\'s env_variables.ini file '
-                   'is invalid. Please create said directory or edit env_variables.ini to match your '
-                   f'Source Content folder.\n\nAttempted path: "{path}"')
+        err_msg = (
+            f'{send_ue_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The Source Content directory path set in the environment settings does not exist.\n\n'
+            f'What to do:\n'
+            f'Update the environment setting to point to your project\'s Source Content folder.\n\n'
+            f'Configured Source Content Path: "{path}"'
+        )
         log(Severity.CRITICAL, send_ue_name, err_msg, popup=True)
 
     def display_path_error_blend(sc_path, blend_path):
-        err_msg = ('The currently opened Blender file is not located within the Source Content directory path '
-                   'specified in the active environment\'s env_variables.ini file. Please move your blender file '
-                   'or edit the Source Content path from env_variables.ini.\n\nExpected blender path to be '
-                   f'within: "{sc_path}"'
-                   f'\nFound blender path to be: "{blend_path}"')
+        err_msg = (
+            f'{send_ue_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The currently opened Blender file is not located within the configured Source Content directory. '
+            f'Blender files must reside inside the Source Content folder to be exported.\n\n'
+            f'What to do:\n'
+            f'Move the Blender file into the Source Content folder, or update the Source Content path '
+            f'in the Environment Settings (Structure tab).\n\n'
+            f'Configured Source Content path:\n'
+            f'"{sc_path}"\n\n'
+            f'Current Blender file path:\n'
+            f'"{blend_path}"'
+        )
         log(Severity.CRITICAL, send_ue_name, err_msg, popup=True)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -99,10 +112,15 @@ def trigger_unreal_import(file_path_source):
 
 
 def display_cannot_connect_unreal_error():
-    msg = 'Blender is not able to communicate with Unreal.' \
-          '\n\nPlease make sure:' \
-          '\n1)Unreal Editor is opened and has a project loaded.' \
-          '\n2)You have followed the setup instructions on the Blue Hole website for the Unreal bridge.'
+    msg = (
+        f'{send_ue_name} connection failed.\n\n'
+        f'What went wrong:\n'
+        f'Blender could not establish communication with Unreal Editor.\n\n'
+        f'What to do:\n'
+        f'Ensure Unreal Editor is open with a project loaded, and verify that the Blue Hole Unreal Bridge '
+        f'is properly installed and configured. See Blue Hole website for details.\n\n'
+        f'Perforce operation aborted.'
+    )
     log(Severity.CRITICAL, send_ue_name, msg, popup=True)
 
 

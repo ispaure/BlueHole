@@ -98,18 +98,38 @@ def check_tests(script_name,
     # ERROR DIALOGUES
     def dialog_check_blend_exist():
         if silent_mode is False:
-            msg = 'Cannot execute script because Blender file is not saved on disk. Save Blender scene and try again.'
+            msg = (
+                f'{script_name} validation failed.\n\n'
+                f'What went wrong:\n'
+                f'The current Blender scene has not been saved to disk. Unsaved scenes cannot be processed.\n\n'
+                f'What to do:\n'
+                f'Save the Blender file, then run the operation again.\n\n'
+                f'Operation aborted.'
+            )
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_selection_not_empty():
         if silent_mode is False:
-            msg = 'Cannot execute script because selection is empty. Select at least one element and try again.'
+            msg = (
+                f'{script_name} validation failed.\n\n'
+                f'What went wrong:\n'
+                f'No objects are currently selected. This operation requires at least one selected object.\n\n'
+                f'What to do:\n'
+                f'Select one or more objects, then run the operation again.\n\n'
+                f'Operation aborted.'
+            )
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_source_control_enable():
         if silent_mode is False:
-            msg = 'Cannot execute script because Source Control is currently disabled in the Blue Hole Add-ons ' \
-                  'settings. Enable it and try again.'
+            msg = (
+                f'{script_name} validation failed.\n\n'
+                f'What went wrong:\n'
+                f'Source Control is currently disabled in the Blue Hole Add-on Settings.\n\n'
+                f'What to do:\n'
+                f'Enable Source Control in the Blue Hole Add-on Settings, then run the operation again.\n\n'
+                f'Operation aborted.'
+            )
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_source_control_connection():
@@ -117,67 +137,97 @@ def check_tests(script_name,
             match get_os():
                 case OS.WIN:
                     if prefs().sc.win32_env_override:
-                        msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
-                              'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
-                              'Perforce Environment Settings. Since you are in override mode, do those steps:\n' \
-                              '1. Open the Blender Preferences (Edit -> Preferences).\n' \
-                              '2. Add-ons -> Blue Hole -> Source Control\n' \
-                              '3. Check the "Override P4V Environment Settings" box\n' \
-                              '4. Fill out the three fields (Server, User, Workspace)\n' \
-                              '5. Click the Apply Override Settings'
+                        msg = (
+                            f'{script_name} connection failed.\n\n'
+                            f'What went wrong:\n'
+                            f'Blue Hole could not connect to the Perforce server using the configured override settings.\n\n'
+                            f'What to do:\n'
+                            f'Verify your network and VPN connection, and ensure the Server, User, and Workspace '
+                            f'fields in the Blue Hole Add-on Settings (Source Control tab) are correct.\n\n'
+                            f'Note: You are currently using Override P4V Environment Settings.'
+                        )
                     else:
-                        msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
-                              'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
-                              'Perforce Environment Settings.\n' \
-                              '1. Open the P4V Application and log in.\n' \
-                              '2. Connection (Header Menu) -> Environment Settings\n' \
-                              '3. Uncheck the "Use Current Connection for Environment Settings".\n' \
-                              '4. Fill out the three fields (Server, User, Workspace)\n' \
-                              '5. Press "OK"\n\n' \
-                              'Alternatively:\n' \
-                              '1. Open the Blender Preferences (Edit -> Preferences).\n' \
-                              '2. Add-ons -> Blue Hole -> Source Control\n' \
-                              '3. Check the "Override P4V Environment Settings" box\n' \
-                              '4. Fill out the three fields (Server, User, Workspace)\n' \
-                              '5. Try again'
+                        msg = (
+                            f'{script_name} connection failed.\n\n'
+                            f'What went wrong:\n'
+                            f'Blue Hole could not connect to the Perforce server.\n\n'
+                            f'What to do:\n'
+                            f'Verify your network and VPN connection, and ensure your Perforce Environment Settings '
+                            f'are correctly configured in P4V or in the Blue Hole Add-on Settings (Source Control tab).\n\n'
+                            f'Note: You may enable "Override P4V Environment Settings" in the Blue Hole Add-on Settings '
+                            f'to manually configure the connection.'
+                        )
+
                 case OS.MAC | OS.LINUX:
-                    msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings. If problem ' \
-                          'persists, restart P4V. \n\nIf that doesn\'t fix the issue, you may need to reconfigure ' \
-                          'Perforce Environment Settings.\n' \
-                          '1. Open the Blender Preferences (Edit -> Preferences).\n' \
-                          '2. Add-ons -> Blue Hole -> Source Control\n' \
-                          '3. Fill out the three fields (Server, User, Workspace)'
+                    msg = (
+                        f'{script_name} connection failed.\n\n'
+                        f'What went wrong:\n'
+                        f'Blue Hole could not connect to the Perforce server.\n\n'
+                        f'What to do:\n'
+                        f'Verify your network and VPN connection, and ensure the Server, User, and Workspace fields '
+                        f'are correctly configured in the Blue Hole Add-on Settings (Source Control tab).'
+                    )
+
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_blend_location_in_dir_structure():
         if silent_mode is False:
-            msg = 'Cannot execute script because the currently opened Blender file is not located in the sub-folder ' \
-                  'specified in the current environments Directory Structure: {sub_folder}. Please relocate the ' \
-                  'file and try again.'
             specified_sub_folder = prefs().env.sc_dir_struct_scenes
-            msg = msg.format(sub_folder=specified_sub_folder)
+
+            msg = (
+                f'{script_name} validation failed.\n\n'
+                f'What went wrong:\n'
+                f'The currently opened Blender file is not located in the required Scenes directory defined '
+                f'in the Environment Settings.\n\n'
+                f'What to do:\n'
+                f'Move the Blender file into the correct Scenes directory, or update the Environment Settings '
+                f'to match your project\'s directory structure.\n\n'
+                f'Configured Scenes directory:\n'
+                f'"{specified_sub_folder}"'
+            )
+
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_source_content(path):
-        msg = 'The Source Content Root Path specified in the Active Environment\'s preferences could ' \
-              'not be reached: "{path}". Please create said directory or edit the Active Environment\'s preferences ' \
-              'to point to an existing folder.'.format(path=str(path))
+        msg = (
+            f'{script_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The configured Source Content Root Path could not be accessed. The directory may not exist or is not reachable.\n\n'
+            f'What to do:\n'
+            f'Create the directory, or update the Environment Settings to point to a valid Source Content folder.\n\n'
+            f'Configured Source Content Root Path:\n'
+            f'"{path}"'
+        )
         log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_unity_assets(path):
-        msg = 'The Unity Project\'s Assets Path specified in the Active Environment\'s preferences could ' \
-              'not be reached: "{}". Please create said directory or edit the Active Environment\'s preferences ' \
-              'to point to an existing Unity Assets folder. Example: "C:\\YourUnityProject\\Assets\\"'.format(str(path))
+        msg = (
+            f'{script_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The configured Unity Assets path could not be accessed. The directory may not exist or is not reachable.\n\n'
+            f'What to do:\n'
+            f'Create the directory, or update the Environment Settings to point to your Unity project\'s Assets folder.\n\n'
+            f'Configured Unity Assets path:\n'
+            f'"{path}"\n\n'
+            f'Example Unity Assets path:\n'
+            f'"C:\\YourUnityProject\\Assets\\"'
+        )
         log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_blend(sc_path_seek, blend_path_found):
-        msg = 'The opened Blender scene file is not located within the Source Content directory path specified in ' \
-              'the Active Environment\'s preferences. ' \
-              '\n\nExpected Blender file within: "{sc_path}"\nFound Blender file at: "{blend_path}"' \
-              '\n\nThis is required because the Send to Unity\'s script mirrors the folder structure from the ' \
-              'Source Content Root Path to the Unity Project\'s Assets Path. Please move your Blender file or edit ' \
-              'the Source Content Root Path in the Active Environment\'s ' \
-              'preferences.'.format(sc_path=sc_path_seek, blend_path=blend_path_found)
+        msg = (
+            f'{script_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The opened Blender file is not located within the configured Source Content directory. '
+            f'This is required to mirror the folder structure into the Unity project during export.\n\n'
+            f'What to do:\n'
+            f'Move the Blender file into the Source Content directory, or update the Environment Settings '
+            f'to point to the correct Source Content folder.\n\n'
+            f'Configured Source Content path:\n'
+            f'"{sc_path_seek}"\n\n'
+            f'Current Blender file path:\n'
+            f'"{blend_path_found}"'
+        )
         log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     # Check if Blend exists
