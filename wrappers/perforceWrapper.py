@@ -77,7 +77,7 @@ class P4Info:
         # If could not get info, set status to False
         if "Perforce client error" in info_array[0]:
             self.status = False
-            P4ErrorMessage().info_perforce_client_error()
+            P4ErrorMessage().info_perforce_client_error(info_array[0])
             return
 
         if "is not recognized" in info_array[0]:
@@ -325,7 +325,7 @@ class P4File:
             if client_file_str.startswith(f'{client_root_str}{fileUtils.get_split_character()}'):
                 P4LogMessage().under_ws_root(self.get_display_name())
                 return True
-        P4ErrorMessage(silent).not_under_ws_root(self.get_display_name())
+        P4ErrorMessage(silent).not_under_ws_root(self.get_display_name(), p4_info_cls.client_root)
         return False
 
     def is_in_client_view(self, silent: bool = False):
@@ -1009,84 +1009,206 @@ class P4ErrorMessage:
 
     # ERRORS (Popup IF NOT SILENT)
     def info_default_connection(self):
-        msg = ('Please properly set the default environment setting in Perforce:\n'
-               '1. Open Perforce (P4V) App\n'
-               '2. Login to your workspace\n'
-               '3. Connection -> Environment Settings\n'
-               '4. Uncheck Use current connection for environment settings.\n'
-               '5. Fill Server, User, Workspace fields accordingly.\n'
-               '6. Press OK\n\n'
-               'Aborting Perforce Scripts!')
+        msg = (
+            f'Perforce configuration failed.\n\n'
+            f'What went wrong:\n'
+            f'Blue Hole could not access the Perforce environment settings. Perforce must have valid Server, User, '
+            f'and Workspace values configured for command-line access.\n\n'
+            f'What to do:\n'
+            f'Open the Perforce (P4V) application and configure the Environment Settings so that Server, User, '
+            f'and Workspace are properly defined.\n\n'
+            f'Note: In P4V, this can be found under Connection → Environment Settings. Ensure '
+            f'"Use current connection for environment settings" is disabled and the fields are manually filled correctly.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
-    def info_perforce_client_error(self):
-        msg = 'Perforce has client error. See log for details.'
+    def info_perforce_client_error(self, error: str):
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'Perforce reported the following client error:\n'
+            f'"{error}"\n\n'
+            f'What to do:\n'
+            f'Verify your Perforce connection, workspace configuration, and file status. '
+            f'Resolve the issue in Perforce (P4V), then try the operation again.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def info_not_recognized(self):
-        msg = 'Perforce not recognized. Is Perforce Visual Client Installed? See log for details.'
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'Perforce could not be found on this system. The Perforce command-line tools are required for '
+            f'Blue Hole to communicate with Perforce.\n\n'
+            f'What to do:\n'
+            f'Ensure Perforce (P4V) is installed and properly configured. Verify that the Perforce command-line '
+            f'tools are available and accessible.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def info_win_p4_cmd_missing(self):
-        msg = 'Perforce permission denied. Very odd for Windows P4 to have this issue. Investigate P4 executable.'
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'The Perforce command-line tool could not be executed due to a permission or access error.\n\n'
+            f'What to do:\n'
+            f'Ensure Perforce is properly installed and that the Perforce executable is accessible. '
+            f'Verify that your system permissions allow execution of the Perforce command-line tools.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def info_mac_p4_cmd_missing(self, exec_pth):
-        msg = ('Perforce parallel (p4_parallel) permission denied. If on macOS, launch executable here once by '
-               'right-clicking and selecting "Open": {}. If that does not work (ex. file opens in TextEdit), '
-               'you will need to open a terminal window and enter the following followed by the '
-               f'executable\'s path: sudo chmod +x {exec_pth}')
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'The Perforce parallel executable could not be run due to a permission restriction. '
+            f'macOS may block executables that have not been explicitly authorized or marked as executable.\n\n'
+            f'What to do:\n'
+            f'Locate the Perforce parallel executable at:\n'
+            f'{exec_pth}\n\n'
+            f'Then do one of the following:\n'
+            f'- Right-click the file in Finder and select "Open" to authorize it.\n'
+            f'- Or open Terminal and run the following command to enable execution:\n'
+            f'sudo chmod +x "{exec_pth}"\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def info_linux_p4_cmd_missing(self, exec_pth):
-        msg = ('Perforce parallel (p4_parallel) permission denied. If on Linux, you will need to open a terminal '
-               f'window and enter the following followed by the executable\'s path: sudo chmod +x {exec_pth}')
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'The Perforce parallel executable could not be run due to a permission restriction. '
+            f'The executable may not have the required execute permissions.\n\n'
+            f'What to do:\n'
+            f'Open a Terminal and run the following command to enable execution:\n'
+            f'sudo chmod +x "{exec_pth}"\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def info_server_cannot_connect(self):
-        msg = 'Could not connect to Perforce Server! Check your Internet and VPN settings.'
+        msg = (
+            f'Perforce connection failed.\n\n'
+            f'What went wrong:\n'
+            f'Blue Hole could not connect to the Perforce server. The server may be unavailable, '
+            f'or your connection settings may be incorrect.\n\n'
+            f'What to do:\n'
+            f'Verify your network and VPN connection, and ensure your Perforce Server and Workspace '
+            f'settings are correct in P4V.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
-    def not_under_ws_root(self, name):
-        msg = f'"{name}" is not under the workspace root.'
+    def not_under_ws_root(self, name, ws_root):
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'The file "{name}" is not located under the current Perforce workspace root "{ws_root}". '
+            f'Perforce can only operate on files that exist within the active workspace.\n\n'
+            f'What to do:\n'
+            f'Move the file into your workspace folder, or update your Perforce workspace settings '
+            f'to include its location.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def not_under_ws_root_elaborate(self, p4_info_cls: P4Info):
-        msg = (f'You cannot send Perforce commands for some file(s) because they are not under your current '
-               f'workspace tree.\n\n'
-               f'Workspace name: "{p4_info_cls.client_name}"\n'
-               f'Workspace root: "{p4_info_cls.client_root}"\n\n'
-               'Suggestions on how to fix:\n'
-               'A) Move designated file(s) under your current workspace tree.\n'
-               'B) If the workspace tree is wrong, check your Perforce Environment Settings.\n'
-               'See log for further details.')
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'One or more files are not located under the current Perforce workspace root. '
+            f'Perforce can only operate on files within the active workspace.\n\n'
+            f'Workspace name: "{p4_info_cls.client_name}"\n\n'
+            f'Workspace root: "{p4_info_cls.client_root}"\n\n'
+            f'What to do:\n'
+            f'Move the affected file(s) into the workspace root, or update your Perforce workspace '
+            f'settings if the root location is incorrect.\n\n'
+            f'Note: See the log for additional details.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def not_in_client_view(self, name):
-        msg = f'"{name}" is not in client view.'
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'The file "{name}" is not included in the current Perforce workspace view. '
+            f'Perforce can only operate on files that are mapped in the active workspace.\n\n'
+            f'What to do:\n'
+            f'Ensure the file is located within a folder mapped by your Perforce workspace, or update your '
+            f'workspace view settings to include its location.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def not_in_client_view_elaborate(self, p4_info_cls: P4Info):
-        msg = ('File(s) could not be checked out as they are not in the Perforce Client\'s view. '
-               f'The current Perforce Workspace\'s ({p4_info_cls.client_name}) Mapping does not include the '
-               f'location for these items on disk. Please configure this from the P4V Application. '
-               f'See log for details.')
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'One or more files are not included in the current Perforce workspace view. '
+            f'The workspace mapping does not include their location on disk, so Perforce cannot operate on them.\n\n'
+            f'Workspace name: "{p4_info_cls.client_name}"\n\n'
+            f'What to do:\n'
+            f'Update your Perforce workspace view to include the file location, or move the files into a folder '
+            f'already mapped by the workspace.\n\n'
+            f'Note: See the log for additional details.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def not_free_from_other_checkouts(self, name):
-        msg = f'"{name}" is free from other checkouts.'
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'The file "{name}" is already checked out by another user. Perforce prevents multiple users '
+            f'from modifying the same file simultaneously.\n\n'
+            f'What to do:\n'
+            f'Wait until the file is checked in by the other user, or contact them to coordinate access.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def not_free_from_other_checkouts_elaborate(self):
-        msg = 'File(s) are checked out by other users. See log for details.'
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'One or more files are already checked out by another user. Perforce prevents multiple users '
+            f'from modifying the same file simultaneously.\n\n'
+            f'What to do:\n'
+            f'Wait until the files are checked in, or contact the users who have them checked out to coordinate access.\n\n'
+            f'Note: See the log for additional details.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def marked_for_delete(self, name):
-        msg = f'"{name}" is not marked for delete.'
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'The file "{name}" is currently marked for deletion in Perforce. Files marked for deletion '
+            f'cannot be checked out or modified.\n\n'
+            f'What to do:\n'
+            f'Revert the delete operation in Perforce (P4V), or restore the file if it was deleted unintentionally.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
     def marked_for_delete_elaborate(self):
-        msg = 'File(s) are marked for delete. See logs for details.'
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'One or more files are currently marked for deletion in Perforce. Files marked for deletion '
+            f'cannot be checked out or modified.\n\n'
+            f'What to do:\n'
+            f'Revert the delete operation in Perforce (P4V), or restore the files if they were deleted unintentionally.\n\n'
+            f'Note: See the log for additional details.\n\n'
+            f'Perforce operation aborted.'
+        )
         self.log_error(msg)
 
 
@@ -1135,8 +1257,15 @@ def exec_p4_command(command: str):
 
     # Ensures this is used for Perforce commands, else raise exception and recommend using wrapper directly.
     if not command.startswith('p4 '):
-        msg = (f'Command fed to exec_p4_command should always be Perforce commands (start with "p4 "), however '
-               f'received "{command}" which does not meet this criteria.')
+        msg = (
+            f'Perforce command execution failed.\n\n'
+            f'What went wrong:\n'
+            f'exec_p4_command can only execute Perforce commands that start with "p4 ". '
+            f'Received: "{command}"\n\n'
+            f'What to do:\n'
+            f'Call cmdShellWrapper.exec_cmd for non-Perforce commands, or pass a valid Perforce command '
+            f'(for example: "p4 info").'
+        )
         log(Severity.CRITICAL, 'Perforce Command', msg)
 
     # Resolve P4 Path (macOS & Linux need to be pointed to p4_parallel file)
@@ -1146,8 +1275,16 @@ def exec_p4_command(command: str):
         case OS.MAC | OS.LINUX:
             # p4_parallel path needs to be valid
             if not os.path.isfile(p4_path):
-                msg = (f'P4 Parallel path "{p4_path}" is invalid. Verify that Perforce is installed and, if required, '
-                       f'update this Path in the Blue Hole addon settings (Source Control Tab).')
+                msg = (
+                    f'Perforce command execution failed.\n\n'
+                    f'What went wrong:\n'
+                    f'The Perforce executable path is invalid:\n'
+                    f'"{p4_path}"\n\n'
+                    f'What to do:\n'
+                    f'Ensure Perforce is installed and that the Perforce executable is available at the path above. '
+                    f'If needed, update the Perforce path in the Blue Hole Addon Settings (Source Control tab).\n\n'
+                    f'Perforce operation aborted.'
+                )
                 log(Severity.CRITICAL, 'Perforce Command', msg)
 
             # Set permissions
