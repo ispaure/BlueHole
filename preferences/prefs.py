@@ -19,12 +19,16 @@ import bpy
 # CODE
 
 bh_addon_name = 'BlueHole'
+def addon_module_name() -> str:
+    # e.g. "BlueHole-beta.preferences" -> "BlueHole-beta"
+    return __package__.split('.', 1)[0]
 
 
-def _addon_prefs(addon_name: str):
+def _addon_prefs():
+    addon_module_name = addon_module_name()
     print('TESTING')
-    print(bpy.context.preferences.addons.keys())
-    return bpy.context.preferences.addons[addon_name].preferences
+    print(addon_module_name)
+    return bpy.context.preferences.addons[addon_module_name].preferences
 
 
 class _GeneralPrefs:
@@ -516,7 +520,7 @@ class _HelpNUpdatePrefs:
 class BHPrefs:
     @property
     def prefs(self):
-        return _addon_prefs(bh_addon_name)
+        return _addon_prefs()
 
     @property
     def general(self):
