@@ -102,12 +102,27 @@ def get_env_dict() -> Dict[str, Environment]:
     return {name: Environment(name) for name in env_names}
 
 
-def get_env_lst_enum_property(exclude_default=False):
+def get_env_lst_enum_property(exclude_default: bool = False):
     """
-    Get list of all environments, as can be used by an enum property.
+    Return environments formatted for use in a Blender EnumProperty.
+
+    Each item is a tuple: (identifier, name, description)
+
+    :param exclude_default: If True, the "default" environment is omitted.
+    :return: List of enum tuples.
     """
-    return [
-        (env, env, '')
-        for env in get_env_dict().keys()
-        if not (exclude_default and env == 'default')
-    ]
+    env_dict = get_env_dict()
+    enum_items = []
+
+    for env_name in env_dict.keys():
+
+        # Skip default environment if requested
+        if exclude_default and env_name == 'default':
+            continue
+
+        enum_items.append((env_name, env_name, ''))
+
+    log(Severity.DEBUG, env_tool_name, 'Getting list of environments')
+    log(Severity.DEBUG, env_tool_name, f'{enum_items}')
+    log(Severity.DEBUG, env_tool_name, 'Done')
+    return enum_items
