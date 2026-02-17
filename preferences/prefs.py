@@ -22,6 +22,8 @@ bh_addon_name = 'BlueHole'
 
 
 def _addon_prefs(addon_name: str):
+    print('TESTING')
+    print(bpy.context.preferences.addons.keys())
     return bpy.context.preferences.addons[addon_name].preferences
 
 
