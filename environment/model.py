@@ -150,6 +150,7 @@ class Environment:
         self.setting_lst += source_control_setting_lst
 
     def set_pref_from_ini(self):
+        log(Severity.DEBUG, 'Environment', 'Setting preferences from .INI file')
         for setting in self.setting_lst:
             setting.set_pref_from_ini(self.env_variables_path)
 
