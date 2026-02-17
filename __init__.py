@@ -110,19 +110,31 @@ def register():
     for file in menu_file_lst:
         file.register()
 
-    # Register Current Env Tools
-    envManager.if_current_env_missing_set_default()  # When a saved environment is no longer available, rever to default
-    env_cls = envManager.get_env_from_prefs_active_env()
-    env_cls.set_pref_from_ini()
-
     # Register Header Menu
     from .Menus import headerMenu
     headerMenu.register()
 
-    # Register timer to update .ini file if modified in Blender Prefs
+    # Schedule init AFTER Blender finishes enabling the addon
+    bpy.app.timers.register(_post_register_init, first_interval=0.0)
+
+
+def _post_register_init():
+    from .preferences.prefs import prefs
+    p = prefs()
+    if not p.is_ready() or p.env is None:
+        return 0.05
+
+    # Now safe: prefs exist
+    envManager.if_current_env_missing_set_default()
+    env_cls = envManager.get_env_from_prefs_active_env()
+    env_cls.set_pref_from_ini()
+
+    # Start your recurring timer ONLY after init is safe
     if not hasattr(bpy.app.timers, "_bluehole_timer_registered"):
         bpy.app.timers.register(update_env_timer, persistent=True)
         bpy.app.timers._bluehole_timer_registered = True
+
+    return None  # stop running
 
 
 # Unregister

@@ -24,16 +24,16 @@ from ..preferences.prefs import *
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
 
-bh_name = 'Blue Hole'
+header_bh_name = 'Blue Hole'
 
 
 # Header Blue Hole Menu
 class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
-    bl_label = f'{bh_name} [' + str(prefs().env.active_environment.lower()) + ']'
+    bl_label = header_bh_name
 
     def draw(self, context):
 
-        self.bl_label = f'{bh_name} [' + str(prefs().env.active_environment.lower()) + ']'
+        self.bl_label = f'{header_bh_name} [' + str(prefs().env.active_environment.lower()) + ']'
         layout = self.layout
         layout.operator('wm.set_active_environment')
         layout.menu("BLUE_HOLE_MT_help", icon='HELP')
