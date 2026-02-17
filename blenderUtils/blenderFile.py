@@ -156,7 +156,6 @@ def get_blue_hole_user_addon_path() -> Optional[str]:
 
     if module and hasattr(module, "__file__"):
         path_str = str(Path(module.__file__).resolve().parent)
-        log(Severity.DEBUG, 'fileUtils.get_blue_hole_user_addon_path', f'Addon path: "{path_str}"')
         return path_str
 
     return None
