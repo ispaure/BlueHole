@@ -27,6 +27,19 @@ from bpy.props import *
 from ..blenderUtils import blenderFile
 from ..environment import envManager, model
 from ..Lib.commonUtils import webUtils
+from ..Lib.commonUtils.debugUtils import *
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# FUNCTIONS
+
+
+def deletable_env_items(self, context):
+    items = envManager.get_env_lst_enum_property(exclude_default=True)
+    if not items:
+        return [("NONE", "No environments to delete", "Only 'default' exists.")]
+    return items
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -115,38 +128,48 @@ class WM_OT_DeleteAnEnvironment(bpy.types.Operator):
     bl_label = "Delete an Environment"
     bl_options = {'INTERNAL'}
 
-    env_items_lst = envManager.get_env_lst_enum_property(exclude_default=True)
-
-    if len(env_items_lst) > 0:
-        deletable_environments: bpy.props.EnumProperty(name="Deletable Environments",
-                                                       description="Defines the project directory structure.",
-                                                       items=env_items_lst,
-                                                       default=env_items_lst[0][0])
-    else:
-        deletable_environments: bpy.props.EnumProperty(name="Deletable Environments",
-                                                       description="Defines the project directory structure.",
-                                                       items=('', '', ''),
-                                                       default='')
+    deletable_environments: bpy.props.EnumProperty(
+        name="Deletable Environments",
+        description="Defines the project directory structure.",
+        items=deletable_env_items,  # callback
+        default=0,                  # ✅ must be int when items is a function
+    )
 
     def draw(self, context):
         layout = self.layout
         box = layout.box()
-        box.label(text='Select an environment and press OK to delete.')
-        column = box.column()
-        row = column.row()
-        row.prop(self, "deletable_environments")
-        row = column.row()
-        row.label(text='WARNING: THIS ACTION WILL SHUT DOWN BLENDER!')
-        row = column.row()
-        row.label(text='You may want to save your scene before proceeding.')
+
+        items = envManager.get_env_lst_enum_property(exclude_default=True)
+        if not items:
+            box.label(text="No environments to delete (only 'default' exists).")
+        else:
+            box.label(text="Select an environment and press OK to delete.")
+            box.prop(self, "deletable_environments")
+
+        box.label(text="WARNING: THIS ACTION WILL SHUT DOWN BLENDER!")
+        box.label(text="You may want to save your scene before proceeding.")
+
+    def invoke(self, context, event):
+        items = envManager.get_env_lst_enum_property(exclude_default=True)
+        if not items:
+            log(Severity.CRITICAL, "Delete Environment",
+                "Cannot delete an environment (no other environment than the default is there).")
+            return {'CANCELLED'}
+
+        # optional: force it to first valid env each time
+        self.deletable_environments = items[0][0]
+
+        return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context):
+        if self.deletable_environments == "NONE":
+            log(Severity.CRITICAL, "Delete Environment",
+                "Cannot delete an environment (no other environment than the default is there).")
+            return {'CANCELLED'}
+
         env_cls = model.Environment(self.deletable_environments)
         env_cls.delete_env()
         return {'FINISHED'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
 
 
 class WM_OT_CustomizeEnvVariables(bpy.types.Operator):
