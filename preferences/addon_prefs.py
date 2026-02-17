@@ -23,7 +23,7 @@ from .props import general_props, environment_props, sourcecontrol_props, help_u
 from ..environment import envManager
 
 # Import your new prefs API (adjust module path if yours is named differently)
-from .prefs import prefs
+from .prefs import prefs, addon_module_name
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -46,7 +46,7 @@ _DRAW_MODULES = {
 
 
 class BlueHole(AddonPreferences):
-    bl_idname = 'BlueHole'
+    bl_idname = addon_module_name()
     _prefs_visible = False
 
     settings: EnumProperty(
