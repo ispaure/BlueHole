@@ -171,9 +171,11 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        if len(blenderFile.get_blend_file_path()) > 0:
-            layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
-        layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon='INFO')
+        if prefs().sc.source_control_solution == 'perforce':
+            layout.operator(helpOp.PerforceDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+            if len(blenderFile.get_blend_file_path()) > 0:
+                layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
+            layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon='INFO')
 
 
 class BLUE_HOLE_MT_themes(bpy.types.Menu):
