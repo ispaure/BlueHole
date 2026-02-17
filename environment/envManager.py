@@ -122,7 +122,4 @@ def get_env_lst_enum_property(exclude_default: bool = False):
 
         enum_items.append((env_name, env_name, ''))
 
-    log(Severity.DEBUG, env_tool_name, 'Getting list of environments')
-    log(Severity.DEBUG, env_tool_name, f'{enum_items}')
-    log(Severity.DEBUG, env_tool_name, 'Done')
     return enum_items
