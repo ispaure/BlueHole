@@ -146,26 +146,20 @@ def get_extensions_path():
 
 def get_blue_hole_user_addon_path() -> Optional[str]:
     """
-    Get directory path of Blue Hole Addon in %AppData%
-    :rtype: str
+    Get the root directory of the BlueHole addon installation.
+    Works regardless of symlinks, zip installs, or extension installs.
     """
 
-    # New method to resolve path (resolves symlinks; preferred)
-    current_dir = Path(__file__).resolve().parent
+    module_name = __package__.split('.')[0]  # "BlueHole"
 
-    # Iterate upward through all parent directories (including root)
-    for parent in [current_dir, *current_dir.parents]:
-        if parent.name == "BlueHole":
-            blue_hole_addon_path = parent
-            break
-    else:
-        blue_hole_addon_path = None  # only reached if "BlueHole" wasn't found
+    module = sys.modules.get(module_name)
 
-    # # OLD METHOD: DOES NOT RESOLVE SYMLINKS, LESS PREFERRED.
-    # blue_hole_addon_path = Path(get_resource_path_user() + "/scripts/addons/BlueHole")
+    if module and hasattr(module, "__file__"):
+        path_str = str(Path(module.__file__).resolve().parent)
+        log(Severity.DEBUG, 'fileUtils.get_blue_hole_user_addon_path', f'Addon path: "{path_str}"')
+        return path_str
 
-    return str(blue_hole_addon_path)
-
+    return None
 
 def get_url_cfg_path() -> Path:
     """
