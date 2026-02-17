@@ -261,28 +261,50 @@ class AssetHierarchy:
     def critical_rogue_object_directly_under_root(self, root, child):
         exp_root_name = objectUtils.get_obj_name(root)
         child_name = objectUtils.get_obj_name(child)
-        msg = (f'The object named {child_name} under the Asset Hierarchy "{exp_root_name}" '
-               f'is not of type Empty Object. Please move it within one of the Asset Hierarchy\'s '
-               f'required Export Element(s) -- or at least within an Empty Object.\n\n'
-               f'Aborting export!')
+        msg = (
+            f'Asset Hierarchy validation failed.\n\n'
+            f'What went wrong:\n'
+            f'"{child_name}" is directly under "{exp_root_name}" but is not an Empty object. '
+            f'Only Empty objects are allowed directly under the Asset Hierarchy root. '
+            f'For example, renderable geometry must be placed under the '
+            f'"{prefs().env.asset_hierarchy_empty_object_meshes}" Empty Object.\n\n'
+            f'What to do:\n'
+            f'Parent "{child_name}" under the appropriate Empty Object within the Asset Hierarchy.\n\n'
+            f'Note: This restriction applies when the "Empty Object Render" option is enabled in the '
+            f'Environment Settings (Structure tab).\n\n'
+            f'Export aborted.'
+        )
+        prefs().env.asset_hierarchy_empty_object_meshes
         log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
 
     def critical_component_missing(self, component_name, component_type):
-        msg = (f'As specified in the Active Environment\'s settings, the Asset Hierarchy Exporter is missing '
-               f'a required Export Element ({component_type}) under "{self.name}", which must be named "{component_name}" '
-               f'(name can have trailing numbers at the end, such as .013).\n\n'
-               f'There are a few solutions:'
-               f'\n- Create the required Empty Object (as requested)'
-               f'\n- Edit Your Active Environment\'s settings to not require the Export Element of type {component_type} (Bridges Tab)'
-               f'\n- The simplest solution is to create a new Asset Hierarchy from scratch using the tool in the Blue Hole Header Menu.\n\n'
-               f'Aborting export!')
+        msg = (
+            f'Asset Hierarchy validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The required Empty Object "{component_name}" ({component_type}) is missing under "{self.name}". '
+            f'This Empty Object is required by the Active Environment settings. '
+            f'The name may include trailing numbers (for example: "{component_name}.013").\n\n'
+            f'What to do:\n'
+            f'Create an Empty object named "{component_name}" under "{self.name}", or recreate the Asset Hierarchy '
+            f'using the Blue Hole Asset Hierarchy creation tool.\n\n'
+            f'Note: Empty Object requirements can be adjusted in the Environment Settings (Structure tab).\n\n'
+            f'Export aborted.'
+        )
         log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
 
     def critical_component_duplicated(self, component_name, component_type):
-        msg = (f'The required Export Element named {component_name} under the Asset Hierarchy "{self.name}" of type: {component_type} '
-               f'is found more than once. This can happen because of the trailing numbers Blender creates (.001, .002). '
-               f'Please fix this issue.\n\n'
-               f'Aborting export!')
+        msg = (
+            f'Asset Hierarchy validation failed.\n\n'
+            f'What went wrong:\n'
+            f'Multiple Empty Objects named "{component_name}" ({component_type}) were found under "{self.name}". '
+            f'Only one Empty Object of this type is allowed. This can occur when Blender creates duplicate names '
+            f'with numeric suffixes (for example: "{component_name}.001", "{component_name}.002").\n\n'
+            f'What to do:\n'
+            f'Ensure only one Empty Object of type "{component_type}" exists under "{self.name}". '
+            f'Remove or rename any duplicates so that only a single valid Empty Object remains.\n\n'
+            f'Export aborted.'
+        )
+
         log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
 
 
@@ -294,14 +316,14 @@ class AssetHierarchies:
     def set_hierarchies_from_selection(self):
         selection_obj_lst = objectUtils.get_selection()
         root_obj_lst = self.get_hierarchy_root_from_obj_lst(selection_obj_lst)
-        self.__set_hierarchies_from_root_obj_lst(root_obj_lst)
+        self.__set_hierarchies_from_root_obj_lst(root_obj_lst, mode='SELECTION')
 
     def set_hierarchies_from_scene(self):
         scene_obj_lst = sceneUtils.get_scene_obj_lst()
         root_obj_lst = self.get_hierarchy_root_from_obj_lst(scene_obj_lst)
-        self.__set_hierarchies_from_root_obj_lst(root_obj_lst)
+        self.__set_hierarchies_from_root_obj_lst(root_obj_lst, mode='ALL')
 
-    def __set_hierarchies_from_root_obj_lst(self, root_obj_lst) -> bool:
+    def __set_hierarchies_from_root_obj_lst(self, root_obj_lst, mode: str) -> bool:
         """ Set the hierarchies from a list of root objects. """
 
         # Wipe existing list of hierarchies
@@ -309,7 +331,11 @@ class AssetHierarchies:
 
         # If no root, throw error
         if len(root_obj_lst) == 0:
-            self.critical_no_hierarchy()
+            match mode:
+                case 'SELECTION':
+                    self.critical_no_hierarchy_selection()
+                case 'ALL':
+                    self.critical_no_hierarchy_root()
             return False
 
         # For each root, make a hierarchy class
@@ -381,19 +407,45 @@ class AssetHierarchies:
         # SET PREVIOUS SELECTION STATE
         view_layer.objects.active = obj_active
 
-    def critical_no_hierarchy(self):
+    def critical_no_hierarchy_root(self):
         # Define the prefix variables first
         static_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh
         kit_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit
         skeletal_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
 
         # Construct the message
-        msg = (f'The {ah_tool_name} could not find an asset hierarchy at the root of the Blender scene. '
-               f'If you haven\'t created an asset hierarchy yet, you can do so from the Blue Hole Header Menu. '
-               f'If you have and it is not being detected, validate that its name starts with one of the prefixes '
-               f'specified in the Active Environment\'s settings. These currently are: "{static_mesh_prefix}", '
-               f'"{kit_prefix}" and "{skeletal_mesh_prefix}".\n\n'
-               f'Aborting export!')
+        msg = (
+            f'{ah_tool_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'No Asset Hierarchy was found {where_missing}. Asset Hierarchies must be created '
+            f'using a valid prefix defined in the Active Environment Settings.\n\n'
+            f'What to do:\n'
+            f'Create a new Asset Hierarchy using the Blue Hole Header Menu, or ensure your existing Asset Hierarchy '
+            f'uses one of the required prefixes.\n\n'
+            f'Valid prefixes:\n'
+            f'"{static_mesh_prefix}", "{kit_prefix}", "{skeletal_mesh_prefix}"\n\n'
+            f'Export aborted.'
+        )
+        log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
+
+    def critical_no_hierarchy_selection(self):
+        # Define the prefix variables first
+        static_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh
+        kit_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit
+        skeletal_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
+
+        # Construct the message
+        msg = (
+            f'{ah_tool_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'No valid Asset Hierarchy was found in the current selection. Asset Hierarchies must exist at the root '
+            f'of the scene and use a valid prefix defined in the Active Environment Settings.\n\n'
+            f'What to do:\n'
+            f'Select at least one Asset Hierarchy at the root of the scene, and ensure its name uses one of the required prefixes.\n\n'
+            f'Valid prefixes:\n'
+            f'"{static_mesh_prefix}", "{kit_prefix}", "{skeletal_mesh_prefix}"\n\n'
+            f'Export aborted.'
+        )
         log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
 
 
