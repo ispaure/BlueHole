@@ -105,6 +105,17 @@ class SendToUnrealDoc(bpy.types.Operator):
         return{'FINISHED'}
 
 
+class PerforceDoc(bpy.types.Operator):
+
+    bl_idname = "wm.bh_perforce_doc"
+    bl_label = '[[[[ ' + 'PERFORCE' + ' ]]]]'
+    bl_description = 'Opens the documentation for Perforce Integration'
+
+    def execute(self, context):
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Tutorial', 'perforce_setup'))
+        return{'FINISHED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -115,7 +126,8 @@ classes = (OpenGuide,
            SubmitFeedback,
            JoinBHDiscord,
            SendToUnityDoc,
-           SendToUnrealDoc)
+           SendToUnrealDoc,
+           PerforceDoc)
 
 
 def register():
