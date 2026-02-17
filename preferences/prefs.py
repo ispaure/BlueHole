@@ -25,10 +25,10 @@ def addon_module_name() -> str:
 
 
 def _addon_prefs():
-    addon_module_name = addon_module_name()
+    addon_name: str = addon_module_name()
     print('TESTING')
-    print(addon_module_name)
-    return bpy.context.preferences.addons[addon_module_name].preferences
+    print(addon_name)
+    return bpy.context.preferences.addons[addon_name].preferences
 
 
 class _GeneralPrefs:
