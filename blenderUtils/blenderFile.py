@@ -140,6 +140,25 @@ def get_addons_path():
     return str(addons_path)
 
 
+def get_presets_path() -> Path:
+    return Path(get_resource_path_user(), 'scripts', 'presets')
+
+
+def get_keyconfig_path() -> Path:
+    """
+    Get directory path where all add-ons are located.
+    :rtype: str
+    """
+    return get_presets_path() / 'keyconfig'
+
+
+def get_userpref_path() -> Path:
+    """
+    Get the path of the user's userpref.
+    """
+    return Path(get_resource_path_user(), 'config', 'userpref.blend')
+
+
 def get_extensions_path():
     return Path(get_resource_path_user(), 'extensions')
 

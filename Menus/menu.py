@@ -23,7 +23,7 @@ import bpy
 
 # Blue Hole
 from ..blenderUtils.uiUtils import show_label
-from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, sendOp, sortOp, sourceControlOp, themeOp
+from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, sendOp, sortOp, sourceControlOp, themeOp, otherOp
 from ..preferences.prefs import *
 from ..blenderUtils import blenderFile
 
@@ -187,6 +187,14 @@ class BLUE_HOLE_MT_themes(bpy.types.Menu):
             layout.operator(cls.bl_idname, icon='IMAGE_RGB_ALPHA')
 
 
+class BLUE_HOLE_MT_update_deluxe(bpy.types.Menu):
+    bl_label = "Updates & Deluxe"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator(otherOp.WM_OT_Apply_Deluxe_Prefs.bl_idname)
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -200,7 +208,8 @@ classes = (BLUE_HOLE_MT_directories,
            BLUE_HOLE_MT_send,
            BLUE_HOLE_MT_sort,
            BLUE_HOLE_MT_source_control,
-           BLUE_HOLE_MT_themes)
+           BLUE_HOLE_MT_themes,
+           BLUE_HOLE_MT_update_deluxe)
 
 
 # Register
