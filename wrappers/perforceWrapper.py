@@ -338,7 +338,7 @@ class P4File:
 
     def is_free_from_other_checkouts(self, silent: bool = False):
         if self.status is P4FileStatus.CHECKOUT_BY_OTHER:
-            P4ErrorMessage(silent).not_free_from_other_checkouts(self.get_display_name())
+            P4ErrorMessage(silent).not_free_from_other_checkouts(self.get_display_name(), self.otherOpen0)
             return False
         else:
             P4LogMessage().free_from_other_checkouts(self.get_display_name())
@@ -433,7 +433,7 @@ class P4File:
             P4ErrorMessage(silent).not_in_client_view_elaborate(p4_info_cls)
             return False
         elif not self.is_free_from_other_checkouts(silent=True):
-            P4ErrorMessage(silent).not_free_from_other_checkouts_elaborate()
+            P4ErrorMessage(silent).not_free_from_other_checkouts_elaborate(self.otherOpen0)
             return False
         elif not self.is_not_marked_for_delete(silent=True):
             P4ErrorMessage(silent).marked_for_delete_elaborate()
@@ -746,15 +746,29 @@ class P4FileGroup:
         return True
 
     def is_free_from_other_checkouts(self) -> bool:
-        # Check if files are checked out by somebody else
-        p4_checked_out_others_lst = []
-        for p4_file in self.__p4_file_lst:
-            if not p4_file.is_free_from_other_checkouts():
-                p4_checked_out_others_lst.append(p4_file)
-        # If at least one file was checked out by others, display error message.
-        if len(p4_checked_out_others_lst) > 0:
-            P4ErrorMessage().not_free_from_other_checkouts_elaborate()
+        p4_checked_out_others_lst = [
+            p4_file for p4_file in self.__p4_file_lst
+            if not p4_file.is_free_from_other_checkouts()
+        ]
+
+        if p4_checked_out_others_lst:
+            # Collect all otherOpen0 strings
+            other_open_strings = [
+                str(p4_file.otherOpen0)
+                for p4_file in p4_checked_out_others_lst
+                if p4_file.otherOpen0
+            ]
+
+            # Remove duplicates while preserving order
+            unique_strings = list(dict.fromkeys(other_open_strings))
+
+            # Join into single string
+            joined_string = ", ".join(unique_strings)
+
+            P4ErrorMessage().not_free_from_other_checkouts_elaborate(joined_string)
+
             return False
+
         return True
 
     def is_not_marked_for_delete(self):
@@ -1161,11 +1175,11 @@ class P4ErrorMessage:
         )
         self.log_error(msg)
 
-    def not_free_from_other_checkouts(self, name):
+    def not_free_from_other_checkouts(self, name, checkout_by: str):
         msg = (
             f'Perforce operation failed.\n\n'
             f'What went wrong:\n'
-            f'The file "{name}" is already checked out by another user. Perforce prevents multiple users '
+            f'The file "{name}" is already checked out by {checkout_by}. Perforce prevents multiple users '
             f'from modifying the same file simultaneously.\n\n'
             f'What to do:\n'
             f'Wait until the file is checked in by the other user, or contact them to coordinate access.\n\n'
@@ -1173,11 +1187,11 @@ class P4ErrorMessage:
         )
         self.log_error(msg)
 
-    def not_free_from_other_checkouts_elaborate(self):
+    def not_free_from_other_checkouts_elaborate(self, checkout_by: str):
         msg = (
             f'Perforce operation failed.\n\n'
             f'What went wrong:\n'
-            f'One or more files are already checked out by another user. Perforce prevents multiple users '
+            f'One or more files are already checked out by {checkout_by}. Perforce prevents multiple users '
             f'from modifying the same file simultaneously.\n\n'
             f'What to do:\n'
             f'Wait until the files are checked in, or contact the users who have them checked out to coordinate access.\n\n'
