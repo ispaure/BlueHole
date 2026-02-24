@@ -19,6 +19,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 from ..Lib.commonUtils.webUtils import open_url
+from ..overlays.deluxe import applyDeluxePrefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -40,22 +41,31 @@ class WM_OT_URLOpen(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
+    """ Apply Blue Hole Deluxe Preferences """
+    bl_idname = "wm.bh_apply_deluxe_prefs"
+    bl_label = "Apply DELUXE Preferences"
+    bl_options = {'INTERNAL'}
+
+    def execute(self, _context):
+        applyDeluxePrefs.apply_deluxe_prefs()
+        return {'FINISHED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 # List of classes to register/unregister
-# classes = (WM_OT_URLOpen,
-#            BH_OT_MOD_Decimate)
+classes = (WM_OT_URLOpen,
+           WM_OT_Apply_Deluxe_Prefs)
 
 
 def register():
-    bpy.utils.register_class(WM_OT_URLOpen)
-    # for cls in classes:
-    #     bpy.utils.register_class(cls)
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
 
 # Unregister
 def unregister():
-    bpy.utils.unregister_class(WM_OT_URLOpen)
-    # for cls in classes:
-    #     bpy.utils.unregister_class(cls)  # Unregister Operators
+    for cls in classes:
+        bpy.utils.unregister_class(cls)  # Unregister Operators

@@ -37,6 +37,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator('wm.set_active_environment')
         layout.menu("BLUE_HOLE_MT_help", icon='HELP')
+        layout.menu("BLUE_HOLE_MT_update_deluxe", icon='UV_SYNC_SELECT')
         layout.separator()
         layout.menu("BLUE_HOLE_MT_directories", icon='OUTLINER')
         # layout.menu("BLUE_HOLE_MT_scene")
