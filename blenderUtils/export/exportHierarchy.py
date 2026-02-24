@@ -27,6 +27,7 @@ from .exportSettings import *
 from ...Lib.commonUtils.debugUtils import *
 from .. import sceneUtils, objectUtils, filterUtils, sendUnreal
 from ...preferences.prefs import *
+from ...Lib.commonUtils import fileUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -178,6 +179,10 @@ class AssetHierarchy:
 
         # Create Directory if it doesn't exist already
         self.path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Make file writable (force if not already writable)
+        if self.path.is_file:
+            fileUtils.make_file_writable(self.path)
 
         # Export scene to FBX
         bpy.ops.export_scene.fbx(filepath=str(self.path),
