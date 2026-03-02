@@ -1321,7 +1321,7 @@ def exec_p4_command(command: str):
                 log(Severity.CRITICAL, 'Perforce Command', msg)
 
             # Set permissions
-            cmdShellWrapper.exec_cmd(f'chmod +x "{p4_path}"')
+            fileUtils.set_executable_permission(p4_path)
 
             # Replace p4 in command with the path (in quotes)
             command = f'"{p4_path}"{command[2:]}'
