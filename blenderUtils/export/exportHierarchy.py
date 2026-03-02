@@ -182,7 +182,8 @@ class AssetHierarchy:
 
         # Make file writable (force if not already writable)
         if self.path.is_file:
-            fileUtils.make_file_writable(self.path)
+            file_cls = fileUtils.File(self.path)
+            file_cls.make_writable()
 
         # Export scene to FBX
         bpy.ops.export_scene.fbx(filepath=str(self.path),
