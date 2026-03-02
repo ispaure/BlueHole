@@ -1321,7 +1321,7 @@ def exec_p4_command(command: str):
                 log(Severity.CRITICAL, 'Perforce Command', msg)
 
             # Set permissions
-            file_cls = fileUtils.File(Path(p4_file))
+            file_cls = fileUtils.File(Path(p4_path))
             file_cls.set_executable_permission()
 
             # Replace p4 in command with the path (in quotes)
