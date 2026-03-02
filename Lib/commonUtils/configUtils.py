@@ -132,7 +132,7 @@ def _bypass_scan_ini(
     # Prefer your existing fileUtils if you want; otherwise read directly.
     try:
         txt = fileUtils.TXTFile(path)
-        txt.import_line_lst()
+        txt.read_lines()
         lines = txt.line_lst
     except Exception:
         # Fallback read
@@ -191,7 +191,7 @@ def config_add_variable(cfg_file_path: Union[str, Path], section: str, variable:
     path = Path(cfg_file_path)
 
     file_cls = fileUtils.TXTFile(path)
-    file_cls.import_line_lst()
+    file_cls.read_lines()
 
     # Normalize to "no trailing newline" per element
     lines_lst = [ln.rstrip("\n") for ln in file_cls.line_lst]
@@ -231,10 +231,8 @@ def config_add_variable(cfg_file_path: Union[str, Path], section: str, variable:
         new_lines_lst.append(section_line)
         new_lines_lst.append(variable_line_to_add)
 
-    fileUtils.ensure_file_writable_if_exists(path)
-
-    with open(path, "w", encoding="utf-8-sig") as f:
-        f.write("\n".join(new_lines_lst) + "\n")
+    file_cls.line_lst = new_lines_lst
+    file_cls.write_lines()
 
 
 def config_set_variable(cfg_file_path: Union[str, Path], section: str, variable: str, value: str):
@@ -247,7 +245,7 @@ def config_set_variable(cfg_file_path: Union[str, Path], section: str, variable:
     path = Path(cfg_file_path)
 
     cfg_file = fileUtils.TXTFile(path)
-    cfg_file.import_line_lst()
+    cfg_file.read_lines()
 
     lines_lst = [ln.rstrip("\n") for ln in cfg_file.line_lst]
 
@@ -280,15 +278,8 @@ def config_set_variable(cfg_file_path: Union[str, Path], section: str, variable:
 
         new_lines_lst.append(ln)
 
-    # Under your assumption, replaced should always be True here.
-    # If you'd prefer a hard fail during refactor, uncomment:
-    # if not replaced:
-    #     raise KeyError(f"Variable '{variable}' not found in section [{section}] ({path})")
-
-    fileUtils.ensure_file_writable_if_exists(path)
-
-    with open(path, "w", encoding="utf-8-sig") as f:
-        f.write("\n".join(new_lines_lst) + "\n")
+    cfg_file.line_lst = new_lines_lst
+    cfg_file.write_lines()
 
 
 def config_set_add_variable(cfg_file_path, section, variable, value):
@@ -315,7 +306,7 @@ def config_remove_section(cfg_file_path, section):
     """
     tool_name = 'config_remove_section'
     cfg_txt_file = fileUtils.TXTFile(cfg_file_path)
-    cfg_txt_file.import_line_lst()
+    cfg_txt_file.read_lines()
     new_line_lst = []
     section_str = f'[{section}]'
     in_right_section = False
@@ -330,4 +321,4 @@ def config_remove_section(cfg_file_path, section):
                 new_line_lst.append(line)
 
     cfg_txt_file.line_lst = new_line_lst
-    cfg_txt_file.export()
+    cfg_txt_file.write_lines()
