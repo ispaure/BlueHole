@@ -89,8 +89,25 @@ class TXTFile(File):
         """
         Export self.line_lst to the given path if provided (else use the current file path)
         """
+        # Ensures there is no \n in lines (exporter already takes care of that). Critical error if that's the case.
+        for i, line in enumerate(self.line_lst):
+            if "\n" in line:
+                log(Severity.CRITICAL,
+                    "TXTFile.export",
+                    f"Slash N found in export on line {i}: {repr(line)}. "
+                    "Please resolve upstream (exporter adds newlines automatically).")
+
+        # Get export path
         export_path = path or self.path
 
+        # Make export dir (if missing)
+        export_dir = export_path.parent
+        export_dir.mkdir(parents=True, exist_ok=True)
+
+        # Ensure file writable if exists
+        ensure_file_writable_if_exists(export_path)
+
+        # Write file
         with open(export_path, "w", encoding="utf-8") as f:
             for i, line in enumerate(self.line_lst):
                 if i < len(self.line_lst) - 1:
@@ -299,6 +316,30 @@ def delete_dir_contents(dir_path):
         delete_file(rem_file)
     if len(get_file_path_list(dir_path)) > 0:
         log(Severity.CRITICAL, 'fileUtils.delete_dir_contents', 'Could not delete every file!')
+
+
+def make_file_writable(path: Path) -> None:
+    """
+    Ensure the given file is writable.
+    Raises FileNotFoundError if the path does not exist.
+    """
+
+    if not path.exists():
+        raise FileNotFoundError(f"Path does not exist: {path}")
+
+    match get_os():
+
+        case OS.WIN:
+            # Remove read-only attribute
+            os.chmod(path, stat.S_IWRITE)
+
+        case OS.MAC | OS.LINUX:
+            # Add user write permission while preserving other bits
+            current_mode = path.stat().st_mode
+            path.chmod(current_mode | stat.S_IWUSR)
+
+        case _:
+            raise RuntimeError(f"Unsupported OS for make_file_writable: {get_os()}")
 
 
 def delete_file(file_path) -> bool:
@@ -545,6 +586,8 @@ def write_file(file_path: Union[str, Path], write_str: Union[str, List[str]]):
     :param write_str: String to write (or List of strings)
     :type write_str: str
     """
+    log(Severity.WARNING, 'fileUtils.write_file', 'DEPRECATED METHOD IN USE; RESOLVE!')
+
     # Get folder in which the file is
     file_dir = Path(file_path).parent
 
@@ -558,10 +601,6 @@ def write_file(file_path: Union[str, Path], write_str: Union[str, List[str]]):
     elif isinstance(write_str, List):
         f.writelines(write_str)
     f.close()
-
-    # If macOS, ensure can be run
-    if not sys.platform == 'win32':
-        subprocess.check_call(['chmod', '+x', file_path])
 
 
 def search_replace_xml(xml_file_path, search_str, replace_str):
@@ -673,10 +712,12 @@ def get_current_working_dir() -> Path:
     cwd_resolved = Path.resolve(cwd)
     return cwd_resolved
 
+
 def get_project_temp_dir() -> Path:
     cwd = get_current_working_dir()
     temp_dir_path = Path(Path(cwd).parent, 'temp')
     return temp_dir_path
+
 
 def get_user_home_dir() -> Path:
     """
@@ -725,7 +766,7 @@ def is_file(path: Path) -> bool:
         return False
 
 
-def get_permission(path: Path):
+def set_executable_permission(path: Path):
     """
     For macOS, gets permission of a file. Helpful if a file won't run or open
     """
@@ -764,4 +805,3 @@ def ensure_file_writable_if_exists(file_path: str | Path) -> bool:
             raise RuntimeError("Unsupported OS")
 
     return True
-
