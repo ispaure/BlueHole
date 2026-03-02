@@ -12,8 +12,6 @@ __status__ = 'Production'
 # IMPORTS
 
 from typing import *
-import os
-import sys
 import stat
 import subprocess
 from pathlib import Path
@@ -155,15 +153,6 @@ class TXTFile(File):
                     f.write(line)
 
 
-def hang_n_terminate():
-    """
-    Hangs the script, quits on keypress
-    :return:
-    """
-    input('Dev-implemented break point! Press key to exit!')
-    sys.exit()
-
-
 def get_file_path_list(dir_name: Union[str, Path], recursive=True, filter_extension=None) -> List[str]:
     """
     Returns list of all files under a specific directory. Properly sorted
@@ -251,15 +240,6 @@ def move_file(src: Path, dest: Path) -> bool:
     except Exception as e:
         log(Severity.CRITICAL, 'fileUtils.move_file', f'Error moving file from \"{src}\" to \"{dest}\": {e}')
         return False
-
-
-def append_line_lst_to_file(line_lst, file_path):
-    """
-    Appends a list of lines to the end of a file
-    """
-    for line in line_lst:
-        with open(file_path, 'a') as f:
-            f.write('\n' + line)
 
 
 def get_dirs_path_list(dir_path: Union[Path, str]):
@@ -466,33 +446,6 @@ def update_symbolic_link(source: Path, destination: Path, allow_destination_dele
         log(Severity.DEBUG, tool_name, msg)
 
 
-def is_hard_link(path: Union[str, Path]):
-    # TODO: This seems to be broken, unsure it even works
-    if isinstance(path, str):
-        path_str = path
-    elif isinstance(path, Path):
-        path_str = str(path)
-    else:
-        print('Wrong type!')
-        return None
-
-    try:
-        # Get file stats
-        stat_info = os.stat(path_str)
-
-        # Check the number of hard links
-        if stat_info.st_nlink > 1:
-            return True
-        else:
-            return False
-    except FileNotFoundError:
-        print(f"File not found: {path_str}")
-        return False
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return False
-
-
 def is_junction(path: Union[str, Path]):
     if get_os() == OS.WIN:
         return junctionUtils.is_junction(path)
@@ -502,13 +455,6 @@ def is_junction(path: Union[str, Path]):
 
 def is_symbolic_link(path: Union[str, Path]):
     if os.path.islink(path):
-        return True
-    else:
-        return False
-
-
-def is_mount(path: Union[str, Path]):
-    if os.path.ismount(path):
         return True
     else:
         return False
@@ -580,48 +526,6 @@ def open_dir_path(dir_path):
               '\nAttempted path: ' + dir_path)
 
 
-def search_replace_xml(xml_file_path, search_str, replace_str):
-    """
-    Search and replace in designated xml file. Overwrites file with results.
-    :param xml_file_path: Path of XML file (must incl. ext.)
-    :type xml_file_path: str
-    :param search_str: String to search for
-    :type search_str: str
-    :param replace_str: String to replace with
-    :type replace_str: str
-    """
-
-    new_line_lst = []
-    reading_file = open(xml_file_path, "r")
-    content = reading_file.read()
-    for line in content.splitlines():  # or whatever arbitrary loop
-        line_decoded = line
-        line_replaced = line_decoded.replace(search_str, replace_str)
-        new_line_lst.append(line_replaced)
-
-    print('THIS FILE HAS LINES: ' + str(len(new_line_lst)))
-    reading_file = open(xml_file_path, 'w')
-
-    current_line_count = 0
-    for line in new_line_lst:
-        current_line_count += 1
-
-        if current_line_count < len(new_line_lst):
-            reading_file.write(line + '\n')
-        else:
-            reading_file.write(line)
-
-    reading_file.close()
-
-
-def write_file_append(file_path, write_str):
-    """
-    Appends text on an additional line in an existing text file
-    """
-    with open(file_path, 'a') as f:
-        f.write('\n' + str(write_str))
-
-
 def rename_file(original_name: Path, new_name: Path, force: bool = False) -> bool:
     """
     Renames a file on disk.
@@ -690,30 +594,11 @@ def get_current_working_dir() -> Path:
     return cwd_resolved
 
 
-def get_project_temp_dir() -> Path:
-    cwd = get_current_working_dir()
-    temp_dir_path = Path(Path(cwd).parent, 'temp')
-    return temp_dir_path
-
-
 def get_user_home_dir() -> Path:
     """
     Get the current user's home directory
     """
     return Path.home()
-
-
-def get_user_documents_dir() -> Path:
-    """
-    Gets the current user's documents directory
-    """
-    op_sys = get_os()
-    match op_sys:
-        case OS.MAC:
-            return Path(get_user_home_dir(), 'Documents')
-        case _:
-            print(f'Platform not suppported for get_user_documents_dir as of yet!')
-            return None
 
 
 def get_user_name() -> str:
@@ -734,10 +619,3 @@ def get_user_appdata_roaming() -> Path:
 
 def get_user_appdata_local() -> Path:
     return Path(os.environ.get('LOCALAPPDATA'))
-
-
-def is_file(path: Path) -> bool:
-    if os.path.isfile(path):
-        return True
-    else:
-        return False
