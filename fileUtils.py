@@ -71,13 +71,43 @@ class File:
         result = delete_file(self.path)
         return result
 
+    def make_writable(self) -> bool:
+        """
+        Ensures the file is writable by the owner, without removing any
+        existing permissions.
+
+        Returns False if the file does not exist.
+        Raises PermissionError / OSError on failure.
+        """
+        p = Path(self.path)
+
+        if not p.exists() or not p.is_file():
+            return True
+
+        match get_os():
+            case OS.MAC | OS.LINUX:
+                st = os.stat(p)
+                if not (st.st_mode & stat.S_IWUSR):
+                    os.chmod(p, st.st_mode | stat.S_IWUSR)
+
+            case OS.WIN:
+                # Best-effort: clear read-only attribute
+                st = os.stat(p)
+                if not (st.st_mode & stat.S_IWRITE):
+                    os.chmod(p, st.st_mode | stat.S_IWRITE)
+
+            case _:
+                raise RuntimeError("Unsupported OS")
+
+        return True
+
 
 class TXTFile(File):
     def __init__(self, path: Path):
         super().__init__(path)
         self.line_lst = []
 
-    def import_line_lst(self) -> List[str]:
+    def read_lines(self) -> List[str]:
         """
         Import the lines from the text file into self.line_lst
         """
@@ -85,7 +115,7 @@ class TXTFile(File):
             self.line_lst = f.read().splitlines()
         return self.line_lst
 
-    def export(self, path: Union[Path, None] = None):
+    def write_lines(self, path: Union[Path, None] = None):
         """
         Export self.line_lst to the given path if provided (else use the current file path)
         """
@@ -105,7 +135,7 @@ class TXTFile(File):
         export_dir.mkdir(parents=True, exist_ok=True)
 
         # Ensure file writable if exists
-        ensure_file_writable_if_exists(export_path)
+        self.make_writable()
 
         # Write file
         with open(export_path, "w", encoding="utf-8") as f:
@@ -212,19 +242,6 @@ def move_file(src: Path, dest: Path) -> bool:
     except Exception as e:
         log(Severity.CRITICAL, 'fileUtils.move_file', f'Error moving file from \"{src}\" to \"{dest}\": {e}')
         return False
-
-
-def read_file(file_path: Union[str, Path]):
-    """
-    Returns each line of a text file as part of a list.
-    :param file_path: File path to read
-    :type file_path: str
-    :rtype: lst
-    """
-    log(Severity.WARNING, 'fileUtils.read_file', 'DEPRECATED METHOD IN USE; RESOLVE!')
-    txt = TXTFile(file_path)
-    txt.import_line_lst()
-    return txt.line_lst
 
 
 def append_line_lst_to_file(line_lst, file_path):
@@ -578,31 +595,6 @@ def open_dir_path(dir_path):
               '\nAttempted path: ' + dir_path)
 
 
-def write_file(file_path: Union[str, Path], write_str: Union[str, List[str]]):
-    """
-    Creates a file (if not created yet) and writes to it
-    :param file_path: Path to write to
-    :type file_path: Union[Path, str]
-    :param write_str: String to write (or List of strings)
-    :type write_str: str
-    """
-    log(Severity.WARNING, 'fileUtils.write_file', 'DEPRECATED METHOD IN USE; RESOLVE!')
-
-    # Get folder in which the file is
-    file_dir = Path(file_path).parent
-
-    # Create directory to store file in, if not created yet
-    Path(file_dir).mkdir(parents=True, exist_ok=True)
-
-    # Write to the file
-    f = open(file_path, 'w+')
-    if isinstance(write_str, str):
-        f.write(write_str)
-    elif isinstance(write_str, List):
-        f.writelines(write_str)
-    f.close()
-
-
 def search_replace_xml(xml_file_path, search_str, replace_str):
     """
     Search and replace in designated xml file. Overwrites file with results.
@@ -774,34 +766,3 @@ def set_executable_permission(path: Path):
     # App Run permissions
     log(Severity.DEBUG, tool_name, f'Getting CHMOD+X Permission for "{path}"')
     cmdShellWrapper.exec_cmd(f'chmod +x "{path}"')
-
-
-def ensure_file_writable_if_exists(file_path: str | Path) -> bool:
-    """
-    Ensures the file is writable by the owner, without removing any
-    existing permissions.
-
-    Returns False if the file does not exist.
-    Raises PermissionError / OSError on failure.
-    """
-    p = Path(file_path)
-
-    if not p.exists() or not p.is_file():
-        return False
-
-    match get_os():
-        case OS.MAC | OS.LINUX:
-            st = os.stat(p)
-            if not (st.st_mode & stat.S_IWUSR):
-                os.chmod(p, st.st_mode | stat.S_IWUSR)
-
-        case OS.WIN:
-            # Best-effort: clear read-only attribute
-            st = os.stat(p)
-            if not (st.st_mode & stat.S_IWRITE):
-                os.chmod(p, st.st_mode | stat.S_IWRITE)
-
-        case _:
-            raise RuntimeError("Unsupported OS")
-
-    return True
