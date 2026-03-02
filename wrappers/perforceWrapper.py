@@ -71,6 +71,14 @@ class P4Info:
         self.update_fields()
 
     def update_fields(self):
+
+        # Check P4 status
+        status_array = exec_p4_command('p4 status')
+        if 'password' in status_array[0] and 'invalid or unset' in status_array[0]:
+            self.status = False
+            P4ErrorMessage().login_token_expired()
+            return
+
         # Get the information from p4 info
         info_array = exec_p4_command('p4 info')
 
@@ -1115,6 +1123,17 @@ class P4ErrorMessage:
             f'Verify your network and VPN connection, and ensure your Perforce Server and Workspace '
             f'settings are correct in P4V.\n\n'
             f'Perforce operation aborted.'
+        )
+        self.log_error(msg)
+
+    def login_token_expired(self):
+        msg = (
+            'Perforce authentication failed.\n\n'
+            'What went wrong:\n'
+            'Blue Hole could not authenticate to the Perforce server. Most likely, the login token is expired.\n\n'
+            'What to do:\n'
+            'Open P4V and re-enter your password in the login prompt when prompted.\n\n'
+            'Perforce operation aborted.'
         )
         self.log_error(msg)
 
