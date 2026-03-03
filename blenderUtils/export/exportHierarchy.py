@@ -23,8 +23,8 @@ from .exportSettings import *
 from ...Lib.commonUtils.debugUtils import *
 from .. import sceneUtils, objectUtils, filterUtils
 from ...preferences.prefs import *
-from containers.assetHierarchyContainer import AssetHierarchyContainer
-from containers.modelContainers import Containers
+from .containers.assetHierarchyContainer import AssetHierarchyContainer
+from .containers.modelContainers import Containers
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -72,10 +72,10 @@ class AssetHierarchies(Containers):
         # Reset
         self.container_lst = []
 
-        # Append list of Asset Hierarchy
-        self.container_lst.append(self.__get_asset_hierarchy_lst_from_obj_lst(obj_lst))
+        # Extend list of Asset Hierarchy
+        self.container_lst.extend(self.__get_asset_hierarchy_lst_from_obj_lst(obj_lst))
 
-        # Append list of Collection Asset Hierarchy
+        # Extend list of Collection Asset Hierarchy
         # TODO: Implement
 
     def __get_asset_hierarchy_lst_from_obj_lst(self, obj_lst):

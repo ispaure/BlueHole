@@ -16,11 +16,12 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
+import bpy
 from ..exportSettings import *
 from ....Lib.commonUtils.debugUtils import *
 from ... import objectUtils
 from ....preferences.prefs import *
-from modelContainer import Container
+from .modelContainer import Container
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -39,12 +40,12 @@ class AssetHierarchyContainer(Container):
         super().__init__(root, export_settings)
 
         # Asset Hierarchy Specific Fields
-        self.render = self.__get_empty_render()
         self.render_name = prefs().env.asset_hierarchy_empty_object_meshes
-        self.collision = self.__get_empty_collision()
+        self.render = self.__get_empty_render()
         self.collision_name = prefs().env.asset_hierarchy_empty_object_collisions
-        self.socket = self.__get_empty_socket()
+        self.collision = self.__get_empty_collision()
         self.socket_name = prefs().env.asset_hierarchy_empty_object_sockets
+        self.socket = self.__get_empty_socket()
 
         # Validate Hierarchy
         self.__validate_container()
@@ -117,13 +118,9 @@ class AssetHierarchyContainer(Container):
 
         # Empty Objects
         # Force set naming (do 3 times — it works) for Render, Collision and Socket Empty Object
-        for _ in range(3):
-            if self.render is not None:
-                self.render.name = self.render_name
-            if self.collision is not None:
-                self.collision.name = self.collision_name
-            if self.socket is not None:
-                self.socket.name = self.socket_name
+        self.__force_name(self.render, self.render_name)
+        self.__force_name(self.collision, self.collision_name)
+        self.__force_name(self.socket, self.socket_name)
 
         # Collisions (If Collision Folder & Preset Enables Rename Collisions)
         if self.collision is not None and self.export_settings.rename_collisions_for_ue:
@@ -133,6 +130,31 @@ class AssetHierarchyContainer(Container):
             for coll_obj in coll_obj_lst:
                 coll_obj.name = f'UCX_{first_mesh_name}_{format(counter, "03")}'
                 counter += 1
+
+    def __force_name(self, obj: bpy.types.Object | None, target_name: str) -> None:
+        if obj is None:
+            return
+
+        existing = bpy.data.objects.get(target_name)
+
+        # If nobody owns the name, just take it
+        if existing is None:
+            obj.name = target_name
+            return
+
+        # If we already own it, nothing to do
+        if existing == obj:
+            return
+
+        # Free the slot
+        tmp_name = f"{target_name}.__tmp__"
+        existing.name = tmp_name
+
+        # Claim the clean name
+        obj.name = target_name
+
+        # Force Blender to suffix the previous owner
+        existing.name = target_name
 
     def _get_obj_lst(self):
 

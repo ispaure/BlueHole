@@ -56,9 +56,9 @@ class Container(ABC):
         name = objectUtils.get_obj_name(self.root)
 
         # Check that the name doesn't have clearly invalid characters
-        for char in self.name:
+        for char in name:
             if char in ['\\', '/', ':']:
-                self.__critical_root_illegal_char()
+                self.__critical_root_illegal_char(name)
 
         return name
 
@@ -165,18 +165,18 @@ class Container(ABC):
     # CRITICAL: CONTAINER IS NOT VALID
     # --------------------------------
 
-    def __critical_root_illegal_char(self):
+    def __critical_root_illegal_char(self, name):
         msg = (
             f'{self.CONTAINER_NAME} Container validation failed.\n\n'
             f'What went wrong:\n'
-            f'The Asset Hierarchy root "{self.name}" contains illegal characters. '
+            f'The Asset Hierarchy root "{name}" contains illegal characters. '
             f'The following characters are not allowed in Asset Hierarchy names: "\\", "/", ":"\n\n'
             f'These characters are restricted because they can cause issues with file paths, '
             f'export operations, and downstream tools such as game engines or source control systems.\n\n'
             f'What to do:\n'
-            f'Rename the Asset Hierarchy root "{self.name}" to remove any illegal characters. '
+            f'Rename the Asset Hierarchy root "{name}" to remove any illegal characters. '
             f'Use only letters, numbers, underscores, and other safe characters.\n\n'
             f'Export aborted.'
         )
 
-        log(Severity.CRITICAL, self.__get_log_name(), msg, popup=True)
+        log(Severity.CRITICAL, f'{self.CONTAINER_NAME}: {name}', msg, popup=True)

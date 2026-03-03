@@ -23,8 +23,8 @@ from .exportSettings import *
 from ...Lib.commonUtils.debugUtils import *
 from .. import sceneUtils, filterUtils, objectUtils, projectUtils
 from ...preferences.prefs import *
-from containers.meshContainer import MeshContainer
-from containers.modelContainers import Containers
+from .containers.meshContainer import MeshContainer
+from .containers.modelContainers import Containers
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -52,8 +52,8 @@ class ExportMeshes(Containers):
 
         # For each selected mesh, make a ExportMesh class
         for obj in selection_obj_lst:
-            export_msh = MeshContainer(obj, self.export_settings)
-            self.container_lst.append(export_msh)
+            mesh_container_cls = MeshContainer(obj, self.export_settings)
+            self.container_lst.append(mesh_container_cls)
 
         # If no selection, throw error
         if len(self.container_lst) == 0:
@@ -111,7 +111,7 @@ def batch_export_selection(exp_dir, exp_format='FBX'):
 
     export_meshes = ExportMeshes(exp_set_cls)
     export_meshes.set_containers_from_selection()
-    export_meshes.export_proc()
+    export_meshes.export_proc(send=False)
 
 
 def batch_export_selection_to_project_sub_dir(path_append):
