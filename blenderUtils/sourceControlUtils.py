@@ -25,26 +25,6 @@ from ..preferences.prefs import *
 # CODE
 
 
-def sc_open_edit_file_path_lst(file_path_lst):
-    """
-    Depending on enabled source control solution, will redirect to proper source control solution
-    """
-    # CHECK IF SOURCE CONTROL IS ENABLED
-    if filterUtils.filter_source_control():
-        if prefs().sc.source_control_solution == 'perforce':
-            p4_file_grp_cls = p4Wrapper.P4FileGroup()
-            for file_path in file_path_lst:
-                p4_file_grp_cls.append_p4_file_to_group_from_client_file(str(file_path))
-            result = p4_file_grp_cls.open_for_edit()
-            return result
-        elif prefs().sc.source_control_solution == 'plastic-scm':
-            return True  # By default there is nothing to do for plastic SCM to do its job
-        elif prefs().sc.source_control_solution == 'git':
-            return False  # TODO: Source Control - Git integration
-    else:
-        return True  # Return True since ran as intended (nothing to do; skip)
-
-
 def sc_check_blend(silent_mode=False):
     """
     Checks out the currently opened scene. Depending on solution, will redirect
