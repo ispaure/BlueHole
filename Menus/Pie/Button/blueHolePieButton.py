@@ -92,16 +92,16 @@ def apply_theme_deep_grey(pie):
 # DIRECTORIES
 
 
-def if_available_open_workspace_or_source_root(pie):
-    if prefs().sc.source_control_enable and prefs().sc.source_control_solution == 'perforce':
-        pie.operator("wm.bh_dir_open_workspace_root", text="Open WORKSPACE ROOT Folder", icon='FILEBROWSER')
-    elif os.path.exists(prefs().general.unity_assets_path) or os.path.exists(prefs().general.unity_assets_path_mac) or os.path.exists(prefs().general.unity_assets_path_linux):
-        pie.operator('wm.bh_dir_open_unity_assets_current_exp_dir', text="Open UNITY ASSETS CURRENT EXPORT Folder",
-                     icon='FILEBROWSER')
-    elif os.path.exists(prefs().env.sc_path) or os.path.exists(prefs().env.sc_path_alternate) or os.path.exists(prefs().env.sc_path_mac) or os.path.exists(prefs().env.sc_path_mac_alternate) or os.path.exists(prefs().env.sc_path_linux) or os.path.exists(prefs().env.sc_path_linux_alternate):
-        pie.operator("wm.bh_dir_open_source_content_root_dir", text="Open SOURCECONTENT ROOT Folder", icon='FILEBROWSER')
-    else:
-        pie.separator()
+def open_workspace_root(pie):
+    pie.operator("wm.bh_dir_open_workspace_root", text="Open WORKSPACE ROOT Folder", icon='FILEBROWSER')
+
+
+def open_unity_assets(pie):
+    pie.operator('wm.bh_dir_open_unity_assets_current_exp_dir', text="Open UNITY ASSETS CURRENT EXPORT Folder", icon='FILEBROWSER')
+
+
+def open_source_content(pie):
+    pie.operator("wm.bh_dir_open_source_content_root_dir", text="Open SOURCECONTENT ROOT Folder", icon='FILEBROWSER')
 
 
 def open_dir_speedtree(pie):
@@ -112,7 +112,7 @@ def open_dir_final(pie):
     pie.operator("wm.bh_dir_open_final", text="Open FINAL Folder", icon='FILEBROWSER')
 
 
-def open_scene_final(pie):
+def open_dir_scene(pie):
     pie.operator("wm.bh_dir_open_scene", text="Open SCENE Folder", icon='FILEBROWSER')
 
 
@@ -140,20 +140,28 @@ def batch_export_selection_resource_folder(pie):
 # SEND
 
 
-def send_unreal_all(pie):
-    pie.operator("wm.bh_send_unreal", text="Send *ALL* (Asset Hierarchies) to Unreal", icon='UV_SYNC_SELECT')
+def send_hierarchy_all_unreal(pie):
+    pie.operator("wm.bh_send_unreal", icon='UV_SYNC_SELECT')
 
 
-def send_unreal_selected(pie):
-    pie.operator("wm.bh_send_selected_unreal", text="Send Selected (Asset Hierarchies) to Unreal", icon='UV_SYNC_SELECT')
+def send_hierarchy_selected_unreal(pie):
+    pie.operator("wm.bh_send_selected_unreal", icon='UV_SYNC_SELECT')
 
 
-def send_unity_all(pie):
-    pie.operator("wm.bh_send_unity", text="Send *ALL* (Asset Hierarchies) to Unity", icon='UV_SYNC_SELECT')
+def send_hierarchy_all_unity(pie):
+    pie.operator("wm.bh_send_unity", icon='UV_SYNC_SELECT')
 
 
-def send_unity_selected(pie):
-    pie.operator("wm.bh_send_selected_unity", text="Send Selected (Asset Hierarchies) to Unity", icon='UV_SYNC_SELECT')
+def send_hierarchy_selected_unity(pie):
+    pie.operator("wm.bh_send_selected_unity", icon='UV_SYNC_SELECT')
+
+
+def export_hierarchy_all(pie):
+    pie.operator("wm.bh_export_all_hierarchies", icon='UV_SYNC_SELECT')
+
+
+def export_hierarchy_selected(pie):
+    pie.operator("wm.bh_export_select_hierarchies", icon='UV_SYNC_SELECT')
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -222,7 +222,7 @@ class AssetHierarchyContainer(Container):
             f'Environment Settings (Structure tab).\n\n'
             f'Export aborted.'
         )
-        log(Severity.CRITICAL, self.__get_log_name(), msg, popup=True)
+        log(Severity.CRITICAL, self._get_log_name(), msg, popup=True)
 
     def __critical_component_missing(self, empty_name: str, empty_type: str):
         msg = (
@@ -237,7 +237,7 @@ class AssetHierarchyContainer(Container):
             f'Note: Empty Object requirements can be adjusted in the Environment Settings (Structure tab).\n\n'
             f'Export aborted.'
         )
-        log(Severity.CRITICAL, self.__get_log_name(), msg, popup=True)
+        log(Severity.CRITICAL, self._get_log_name(), msg, popup=True)
 
     def __critical_component_duplicated(self, empty_name: str, empty_type: str):
         msg = (
@@ -252,4 +252,4 @@ class AssetHierarchyContainer(Container):
             f'Export aborted.'
         )
 
-        log(Severity.CRITICAL, self.__get_log_name(), msg, popup=True)
+        log(Severity.CRITICAL, self._get_log_name(), msg, popup=True)

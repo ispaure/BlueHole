@@ -62,7 +62,7 @@ class Container(ABC):
 
         return name
 
-    def __get_log_name(self) -> str:
+    def _get_log_name(self) -> str:
         return f'{self.CONTAINER_NAME}: {self.name}'
 
     def export_proc(self):

@@ -63,6 +63,39 @@ class ExportSelectHierarchiesToUE(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class ExportAllHierarchies(bpy.types.Operator):
+
+    bl_idname = "wm.bh_export_all_hierarchies"
+    bl_label = "Export (*ALL* Asset Hierarchies) to FINAL Folder"
+    bl_description = 'Exports all hierarchies created with the "Add Asset Hierarchy" tool to the FINAL Folder'
+
+    def execute(self, context):
+        msg = 'Do you really want to export *ALL* Asset Hierarchies? Press OK to confirm.'
+        state = uiUtils.display_msg_box_ok_cancel('Unreal Export', msg)
+        if state:
+            # Get Unreal Export Profile
+            export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
+            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies.set_containers_from_scene()
+            asset_hierarchies.export_proc(send=False, skip_sc=False)
+        return {'FINISHED'}
+
+
+class ExportSelectHierarchies(bpy.types.Operator):
+
+    bl_idname = "wm.bh_export_select_hierarchies"
+    bl_label = "Export (Selected Asset Hierarchies) to FINAL Folder"
+    bl_description = 'Exports selected hierarchies created with the "Add Asset Hierarchy" tool to the FINAL Folder'
+
+    def execute(self, context):
+        # Get Unreal Export Profile
+        export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
+        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies.set_containers_from_selection()
+        asset_hierarchies.export_proc(send=False, skip_sc=False)
+        return {'FINISHED'}
+
+
 class ExportAllHierarchiesToUnity(bpy.types.Operator):
 
     bl_idname = "wm.bh_export_all_hierarchies_unity"
@@ -406,6 +439,8 @@ classes = (ImportGuide_5_6_ScaleMan,
            ImportGuide_5_10_ScaleManCasual,
            ImportGuide_5_10_ScaleManSitting,
            ImportGuide_6_1_ScaleMan,
+           ExportAllHierarchies,
+           ExportSelectHierarchies,
            ExportAllHierarchiesToUE,
            ExportSelectHierarchiesToUE,
            ExportAllHierarchiesToUnity,
