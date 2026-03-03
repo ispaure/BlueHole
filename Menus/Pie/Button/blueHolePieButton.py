@@ -132,6 +132,10 @@ def open_dir_ref(pie):
 # EXPORT
 
 
+def batch_export_selection_resource_folder(pie):
+    pie.operator("wm.bh_batch_export_select_to_resources")
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # SEND
 

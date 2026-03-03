@@ -38,6 +38,7 @@ general_setting_lst = (
     Setting(pref_path='general.ue_automated', ini_section='SendAssetHierarchiesToUnreal', ini_value='is_automated', var_type=bool),
     Setting(pref_path='general.ue_import_materials', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_materials', var_type=bool),
     Setting(pref_path='general.ue_import_textures', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_textures', var_type=bool),
+    Setting(pref_path='general.active_game_engine', ini_section='Engine', ini_value='active_game_engine', var_type=str)
 )
 
 environment_setting_lst = (

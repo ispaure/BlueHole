@@ -72,8 +72,15 @@ class BLUE_HOLE_MT_export(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         show_label('FINAL Folder', layout)
-        layout.operator(impExpOp.ExportAllHierarchiesToUE.bl_idname, icon='EXPORT')
-        layout.operator(impExpOp.ExportSelectHierarchiesToUE.bl_idname, icon='EXPORT')
+        match prefs().general.active_game_engine:
+            case 'unreal':
+                layout.operator(impExpOp.ExportAllHierarchiesToUE.bl_idname, icon='EXPORT')
+                layout.operator(impExpOp.ExportSelectHierarchiesToUE.bl_idname, icon='EXPORT')
+            case 'unity':
+                layout.operator(impExpOp.ExportAllHierarchiesToUnity.bl_idname, icon='EXPORT')
+                layout.operator(impExpOp.ExportSelectHierarchiesToUnity.bl_idname, icon='EXPORT')
+            case _:
+                pass
         layout.operator(impExpOp.BatchExportSelectedToFinal.bl_idname, icon='EXPORT')
         layout.separator()
         show_label('RESOURCES Folder', layout)
@@ -141,18 +148,17 @@ class BLUE_HOLE_MT_send(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         # These options are always available, regardless of active environment
-
-        # Unity
-        layout.operator(helpOp.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
-        layout.operator(sendOp.SendAllHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
-        layout.operator(sendOp.SendSelectedHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
-
-        layout.separator()
-
-        # Unreal
-        layout.operator(helpOp.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
-        layout.operator(sendOp.SendAllHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-        layout.operator(sendOp.SendSelectedHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+        match prefs().general.active_game_engine:
+            case 'unity':
+                # Unity
+                layout.operator(helpOp.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                layout.operator(sendOp.SendAllHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
+                layout.operator(sendOp.SendSelectedHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
+            case 'unreal':
+                # Unreal
+                layout.operator(helpOp.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                layout.operator(sendOp.SendAllHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+                layout.operator(sendOp.SendSelectedHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
 
 
 class BLUE_HOLE_MT_sort(bpy.types.Menu):

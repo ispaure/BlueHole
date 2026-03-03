@@ -31,6 +31,13 @@ show_verbose = True
 
 class GeneralPG(bpy.types.PropertyGroup):
 
+    # Set Game Engine
+    engine_lst = [('unreal', 'Unreal', ''), ('unity', 'Unity', ''), ('disabled', 'Disabled', '')]
+    active_game_engine: EnumProperty(name="Solution",
+                                     description="Defines the game engine used for send/export",
+                                     items=engine_lst,
+                                     default='unreal')
+
     # EXPORTS: BATCH SELECTION -----------------------------------------------------------------------------------------
 
     # Hierarchy Root to 0,0,0
@@ -118,84 +125,97 @@ def draw(preference, context, layout):
     # Lay out environment settings
     enable_rows = prefs().env.active_environment != 'default'
 
-    # SEND ASSET HIERARCHIES TO UNREAL
+    # CHOOSE ENGINE
     box = layout.box()
     column = box.column()
     row = column.row()
     row.enabled = enable_rows
-    row.label(text="Send/Export Asset Hierarchies to Unreal")
-    # General options
-    match get_os():
-        case OS.WIN:
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path', text='Source Content')
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
+    row.prop(preference.general, 'active_game_engine', text='Current Game Engine')
 
-        case OS.MAC:
+    match prefs().general.active_game_engine:
+        case 'unreal':
+            # SEND ASSET HIERARCHIES TO UNREAL
+            box = layout.box()
+            column = box.column()
             row = column.row()
             row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_mac', text='Source Content')
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+            row.label(text="Send/Export Asset Hierarchies to Unreal".upper())
+            # General options
+            match get_os():
+                case OS.WIN:
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.environment, 'sc_path', text='Source Content')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
 
-        case OS.LINUX:
+                case OS.MAC:
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.environment, 'sc_path_mac', text='Source Content')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+
+                case OS.LINUX:
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.environment, 'sc_path_linux', text='Source Content')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
+
             row = column.row()
             row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_linux', text='Source Content')
+            row.prop(preference.general, 'ue_bridge_zero_root_transform', text='Zero Root Transform on Export')
+            row.prop(preference.general, 'ue_bridge_include_animation', text='Include Animation')
             row = column.row()
             row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
+            row.prop(preference.general, 'ue_automated', text='Automated Import')
+            row.prop(preference.general, 'ue_import_textures', text='Import Textures')
+            row.prop(preference.general, 'ue_import_materials', text='Import Materials')
 
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.general, 'ue_bridge_zero_root_transform', text='Zero Root Transform on Export')
-    row.prop(preference.general, 'ue_bridge_include_animation', text='Include Animation')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.general, 'ue_automated', text='Automated Import')
-    row.prop(preference.general, 'ue_import_textures', text='Import Textures')
-    row.prop(preference.general, 'ue_import_materials', text='Import Materials')
+        case 'unity':
+            # EXPORTS: ASSET HIERARCHIES (UNITY)
+            box = layout.box()
+            column = box.column()
+            row = column.row()
+            row.enabled = enable_rows
+            row.label(text="Send Asset Hierarchies to Unity".upper())
+            # General options
+            row = column.row()
+            row.enabled = enable_rows
+            match get_os():
+                case OS.WIN:
+                    row.prop(preference.environment, 'sc_path', text='Source Content')
+                    row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
+                case OS.MAC:
+                    row.prop(preference.environment, 'sc_path_mac', text='Source Content')
+                    row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+                case OS.LINUX:
+                    row.prop(preference.environment, 'sc_path_linux', text='Source Content')
+                    row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
+            row = column.row()
+            row.enabled = enable_rows
+            match get_os():
+                case OS.WIN:
+                    row.prop(preference.general, 'unity_assets_path', text='Unity Assets')
+                case OS.MAC:
+                    row.prop(preference.general, 'unity_assets_path_mac', text='Unity Assets')
+                case OS.LINUX:
+                    row.prop(preference.general, 'unity_assets_path_linux', text='Unity Assets')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.general, 'unity_bridge_zero_root_transform', text='Zero Root Transform on Export')
+            row.prop(preference.general, 'unity_bridge_include_animation', text='Include Animation')
+            row = column.row()
+            row.enabled = enable_rows
+            row.prop(preference.general, 'unity_forward_axis', text='Forward Axis')
+            row.prop(preference.general, 'unity_up_axis', text='Up Axis')
 
-    # EXPORTS: ASSET HIERARCHIES (UNITY)
-    box = layout.box()
-    column = box.column()
-    row = column.row()
-    row.enabled = enable_rows
-    row.label(text="Send Asset Hierarchies to Unity")
-    # General options
-    row = column.row()
-    row.enabled = enable_rows
-    match get_os():
-        case OS.WIN:
-            row.prop(preference.environment, 'sc_path', text='Source Content')
-            row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
-        case OS.MAC:
-            row.prop(preference.environment, 'sc_path_mac', text='Source Content')
-            row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
-        case OS.LINUX:
-            row.prop(preference.environment, 'sc_path_linux', text='Source Content')
-            row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
-    row = column.row()
-    row.enabled = enable_rows
-    match get_os():
-        case OS.WIN:
-            row.prop(preference.general, 'unity_assets_path', text='Unity Assets')
-        case OS.MAC:
-            row.prop(preference.general, 'unity_assets_path_mac', text='Unity Assets')
-        case OS.LINUX:
-            row.prop(preference.general, 'unity_assets_path_linux', text='Unity Assets')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.general, 'unity_bridge_zero_root_transform', text='Zero Root Transform on Export')
-    row.prop(preference.general, 'unity_bridge_include_animation', text='Include Animation')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.general, 'unity_forward_axis', text='Forward Axis')
-    row.prop(preference.general, 'unity_up_axis', text='Up Axis')
+        case _:
+            pass
 
     # EXPORTS: BATCH SELECTION
     box = layout.box()

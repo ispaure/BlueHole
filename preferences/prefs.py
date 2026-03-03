@@ -38,6 +38,17 @@ class _GeneralPrefs:
         self._general = general
 
     # -----------------------------------------------------------
+    # ENGINE SETTINGS
+    # -----------------------------------------------------------
+    @property
+    def active_game_engine(self) -> str:
+        return self._general.active_game_engine
+
+    @active_game_engine.setter
+    def active_game_engine(self, value: str):
+        self._general.active_game_engine = value
+
+    # -----------------------------------------------------------
     # EXPORTS: BATCH SELECTION
     # -----------------------------------------------------------
     @property
