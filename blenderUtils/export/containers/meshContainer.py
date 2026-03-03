@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 # Blue Hole
 from ..exportSettings import *
-from modelContainer import Container
+from .modelContainer import Container
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
