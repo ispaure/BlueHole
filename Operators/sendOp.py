@@ -29,7 +29,7 @@ from ..Lib.commonUtils import uiUtils
 
 class SendAllHierarchiesToUnity(bpy.types.Operator):
     bl_idname = "wm.bh_send_unity"
-    bl_label = "Send *ALL* (Asset Hierarchies)"
+    bl_label = "Send *ALL* (Asset Hierarchies) to UNITY"
     bl_description = 'Sends all asset hierarchies to Unity'
 
     def execute(self, context):
@@ -47,7 +47,7 @@ class SendAllHierarchiesToUnity(bpy.types.Operator):
 
 class SendSelectedHierarchiesToUnity(bpy.types.Operator):
     bl_idname = "wm.bh_send_selected_unity"
-    bl_label = "Send Selected (Asset Hierarchies)"
+    bl_label = "Send Selected (Asset Hierarchies) to UNITY"
     bl_description = 'Sends selected asset hierarchies to Unity'
 
     def execute(self, context):
@@ -61,7 +61,7 @@ class SendSelectedHierarchiesToUnity(bpy.types.Operator):
 
 class SendAllHierarchiesToUnreal(bpy.types.Operator):
     bl_idname = "wm.bh_send_unreal"
-    bl_label = "Send *ALL* (Asset Hierarchies)"
+    bl_label = "Send *ALL* (Asset Hierarchies) to UNREAL"
     bl_description = 'Sends all asset hierarchies to Unreal'
 
     def execute(self, context):
@@ -79,7 +79,7 @@ class SendAllHierarchiesToUnreal(bpy.types.Operator):
 
 class SendSelectedHierarchiesToUnreal(bpy.types.Operator):
     bl_idname = "wm.bh_send_selected_unreal"
-    bl_label = "Send Selected (Asset Hierarchies)"
+    bl_label = "Send Selected (Asset Hierarchies) to UNREAL"
     bl_description = 'Sends selected asset hierarchies to Unreal'
 
     def execute(self, context):
