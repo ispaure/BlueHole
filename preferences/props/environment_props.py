@@ -184,38 +184,6 @@ def draw(preference, context, layout):
     # Lay out environment settings
     enable_rows = prefs().env.active_environment != 'default'
 
-    # Source Content Path
-    box = layout.box()
-    column = box.column()
-    row = column.row()
-    row.enabled = enable_rows
-    row.label(text="Source Content Root Path: Contains all art source files for your project.")
-
-    match get_os():
-        case OS.WIN:
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path', text='Source Content')
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
-
-        case OS.MAC:
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_mac', text='Source Content')
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
-
-        case OS.LINUX:
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_linux', text='Source Content')
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
-
     # Asset Directory Structure
     box = layout.box()
     column = box.column()

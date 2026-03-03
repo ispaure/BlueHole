@@ -121,11 +121,23 @@ class MT_pie_global_import_export(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        open_pie_menu(pie, MT_pie_global_extra.bl_idname, 'Extra...')
+        match prefs().general.active_game_engine:
+            case 'unreal':
+                blueHolePieButton.send_unreal_all(pie)
+            case 'unity':
+                blueHolePieButton.send_unity_all(pie)
+            case _:
+                pie.separator()
         # 6 - RIGHT
-        open_pie_menu(pie, MT_pie_global_export.bl_idname, 'Export...', 'EXPORT')
+        match prefs().general.active_game_engine:
+            case 'unreal':
+                blueHolePieButton.send_unreal_selected(pie)
+            case 'unity':
+                blueHolePieButton.send_unity_selected(pie)
+            case _:
+                pie.separator()
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_global_send.bl_idname, 'Send...', 'UV_SYNC_SELECT')
+        blueHolePieButton.batch_export_selection_resource_folder(pie)
         # 8 - TOP
         if prefs().sc.source_control_enable:
             match prefs().sc.source_control_solution:
@@ -142,7 +154,7 @@ class MT_pie_global_import_export(bpy.types.Menu):
         # 9 - TOP - RIGHT
         blueHolePieButton.add_asset_hierarchy(pie)
         # 1 - BOTTOM - LEFT
-        pie.separator()
+        open_pie_menu(pie, MT_pie_global_extra.bl_idname, 'Extra...')
         # 3 - BOTTOM - RIGHT
         pie.separator()
 

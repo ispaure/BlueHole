@@ -45,7 +45,8 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout.menu("BLUE_HOLE_MT_sort")
         layout.menu("BLUE_HOLE_MT_import", icon='IMPORT')
         layout.menu("BLUE_HOLE_MT_export", icon='EXPORT')
-        layout.menu("BLUE_HOLE_MT_send", icon='UV_SYNC_SELECT')
+        if prefs().general.active_game_engine != 'disabled':
+            layout.menu("BLUE_HOLE_MT_send", icon='UV_SYNC_SELECT')
         layout.separator()
         # layout.menu("BLUE_HOLE_MT_import_export")
         if prefs().sc.source_control_enable:

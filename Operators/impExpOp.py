@@ -34,7 +34,7 @@ class ExportAllHierarchiesToUE(bpy.types.Operator):
 
     bl_idname = "wm.bh_export_all_hierarchies_ue"
     bl_label = "Export (*ALL* Asset Hierarchies) to FINAL Folder for UNREAL"
-    bl_description = 'Exports all hierarchies created with the "Add Asset Hierarchy" tool in FINAL Folder'
+    bl_description = 'Exports all hierarchies created with the "Add Asset Hierarchy" tool to the FINAL Folder'
 
     def execute(self, context):
         msg = 'Do you really want to export *ALL* Asset Hierarchies? Press OK to confirm.'
@@ -52,11 +52,44 @@ class ExportSelectHierarchiesToUE(bpy.types.Operator):
 
     bl_idname = "wm.bh_export_select_hierarchies_ue"
     bl_label = "Export (Selected Asset Hierarchies) to FINAL Folder for UNREAL"
-    bl_description = 'Exports selected hierarchies created with the "Add Asset Hierarchy" tool in FINAL Folder'
+    bl_description = 'Exports selected hierarchies created with the "Add Asset Hierarchy" tool to the FINAL Folder'
 
     def execute(self, context):
         # Get Unreal Export Profile
         export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
+        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies.set_containers_from_selection()
+        asset_hierarchies.export_proc(send=False, skip_sc=False)
+        return {'FINISHED'}
+
+
+class ExportAllHierarchiesToUnity(bpy.types.Operator):
+
+    bl_idname = "wm.bh_export_all_hierarchies_unity"
+    bl_label = "Export (*ALL* Asset Hierarchies) to FINAL Folder for UNITY"
+    bl_description = 'Exports all hierarchies created with the "Add Asset Hierarchy" tool to the FINAL Folder'
+
+    def execute(self, context):
+        msg = 'Do you really want to export *ALL* Asset Hierarchies? Press OK to confirm.'
+        state = uiUtils.display_msg_box_ok_cancel('Unity Export', msg)
+        if state:
+            # Get Unreal Export Profile
+            export_settings = get_export_settings(ExportSettingsPreset.UNITY)
+            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies.set_containers_from_scene()
+            asset_hierarchies.export_proc(send=False, skip_sc=False)
+        return {'FINISHED'}
+
+
+class ExportSelectHierarchiesToUnity(bpy.types.Operator):
+
+    bl_idname = "wm.bh_export_select_hierarchies_unity"
+    bl_label = "Export (Selected Asset Hierarchies) to FINAL Folder for UNITY"
+    bl_description = 'Exports selected hierarchies created with the "Add Asset Hierarchy" tool to the FINAL Folder'
+
+    def execute(self, context):
+        # Get Unreal Export Profile
+        export_settings = get_export_settings(ExportSettingsPreset.UNITY)
         asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
         asset_hierarchies.set_containers_from_selection()
         asset_hierarchies.export_proc(send=False, skip_sc=False)
@@ -375,6 +408,8 @@ classes = (ImportGuide_5_6_ScaleMan,
            ImportGuide_6_1_ScaleMan,
            ExportAllHierarchiesToUE,
            ExportSelectHierarchiesToUE,
+           ExportAllHierarchiesToUnity,
+           ExportSelectHierarchiesToUnity,
            BatchExportSelectedToSpeedTree_FBX,
            BatchExportSelectedToSpeedtreeLR_FBX,
            BatchExportSelectedToSpeedtreeHR_FBX,
