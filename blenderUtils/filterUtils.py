@@ -57,7 +57,7 @@ def check_addon_loaded(addon_name):
     return addon_utils.check(addon_name)[1]
 
 
-def check_tests(script_name,
+def check_tests(script_name, *,
                 check_blend_exist=False,
                 check_blend_loc_in_dir_structure=False,
                 check_selection_not_empty=False,

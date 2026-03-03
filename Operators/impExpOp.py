@@ -43,8 +43,8 @@ class ExportAllHierarchiesToUE(bpy.types.Operator):
             # Get Unreal Export Profile
             export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
             asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
-            asset_hierarchies.set_hierarchies_from_scene()
-            asset_hierarchies.export(send=False, skip_sc=False)
+            asset_hierarchies.set_containers_from_scene()
+            asset_hierarchies.export_proc(send=False, skip_sc=False)
         return {'FINISHED'}
 
 
@@ -58,8 +58,8 @@ class ExportSelectHierarchiesToUE(bpy.types.Operator):
         # Get Unreal Export Profile
         export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
         asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
-        asset_hierarchies.set_hierarchies_from_selection()
-        asset_hierarchies.export(send=False, skip_sc=False)
+        asset_hierarchies.set_containers_from_selection()
+        asset_hierarchies.export_proc(send=False, skip_sc=False)
         return {'FINISHED'}
 
 
