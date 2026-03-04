@@ -204,11 +204,11 @@ class BH_OT_export_containers(bpy.types.Operator):
         to_or_for = "to" if send else "for"
 
         parts: list[str] = []
-        if include_hierarchy:
+        if prefs().container.enable_asset_hierarchy_container and include_hierarchy:
             parts.append(getattr(AssetHierarchyContainerGroup, "CONTAINERS_NAME", "Asset Hierarchies"))
-        if include_collection:
+        if prefs().container.enable_asset_collection_container and include_collection:
             parts.append(getattr(AssetCollectionContainerGroup, "CONTAINERS_NAME", "Asset Collections"))
-        if include_mesh:
+        if prefs().container.enable_asset_mesh_container and include_mesh:
             parts.append(getattr(AssetMeshContainerGroup, "CONTAINERS_NAME", "Asset Meshes"))
 
         if not parts:
@@ -234,9 +234,9 @@ class BH_OT_export_containers(bpy.types.Operator):
 
         # Which container group classes are included
         groups = _selected_container_groups(
-            include_hierarchy=self.include_hierarchy,
-            include_collection=self.include_collection,
-            include_mesh=self.include_mesh,
+            include_hierarchy=self.include_hierarchy and prefs().container.enable_asset_hierarchy_container,
+            include_collection=self.include_collection and prefs().container.enable_asset_collection_container,
+            include_mesh=self.include_mesh and prefs().container.enable_asset_mesh_container,
         )
 
         if not groups:
