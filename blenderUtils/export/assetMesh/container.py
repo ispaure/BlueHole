@@ -18,6 +18,7 @@ __status__ = 'Production'
 # Blue Hole
 from ..exportSettings import *
 from ..model.container import Container
+from ... import objectUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -39,4 +40,10 @@ class AssetMeshContainer(Container):
         pass  # No renames required for MeshContainer
 
     def _get_obj_lst(self):
-        return [self.root]  # MeshContainer only has one object to export
+        obj_lst = [self.root]
+
+        child_obj_lst = objectUtils.get_obj_child_recursive(self.root)
+        if child_obj_lst:
+            obj_lst.extend(child_obj_lst)
+
+        return obj_lst
