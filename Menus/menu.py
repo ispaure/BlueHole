@@ -169,30 +169,34 @@ class BLUE_HOLE_MT_send(bpy.types.Menu):
 
         # Send Containers Operators
         # All Containers - All in Scene
-        label = sendOp.BH_OT_send_containers.build_ui_label(
+        label = sendOp.BH_OT_export_containers.build_ui_label(
             export_preset=export_preset,
+            send=True,
             send_all=True,
             include_hierarchy=True,
             include_collection=True,
             include_mesh=True,
         )
-        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
         op.export_preset = export_preset
+        op.send = True
         op.send_all = True
         op.include_hierarchy = True
         op.include_collection = True
         op.include_mesh = True
 
         # All Containers - In Selection
-        label = sendOp.BH_OT_send_containers.build_ui_label(
+        label = sendOp.BH_OT_export_containers.build_ui_label(
             export_preset=export_preset,
+            send=True,
             send_all=False,
             include_hierarchy=True,
             include_collection=True,
             include_mesh=True,
         )
-        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
         op.export_preset = export_preset
+        op.send = True
         op.send_all = False
         op.include_hierarchy = True
         op.include_collection = True
@@ -220,31 +224,36 @@ class BLUE_HOLE_MT_send_specific(bpy.types.Menu):
         # --------------------------------------------------------------------------------------------------------------
         # ASSET COLLECTIONS
         show_label('ASSET COLLECTIONS', layout)
+
         # Asset Collections - All in Scene
-        label = sendOp.BH_OT_send_containers.build_ui_label(
+        label = sendOp.BH_OT_export_containers.build_ui_label(
             export_preset=export_preset,
+            send=True,
             send_all=True,
             include_hierarchy=False,
             include_collection=True,
             include_mesh=False,
         )
-        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
         op.export_preset = export_preset
+        op.send = True
         op.send_all = True
         op.include_hierarchy = False
         op.include_collection = True
         op.include_mesh = False
 
         # Asset Collections - In Selection
-        label = sendOp.BH_OT_send_containers.build_ui_label(
+        label = sendOp.BH_OT_export_containers.build_ui_label(
             export_preset=export_preset,
+            send=True,
             send_all=False,
             include_hierarchy=False,
             include_collection=True,
             include_mesh=False,
         )
-        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
         op.export_preset = export_preset
+        op.send = True
         op.send_all = False
         op.include_hierarchy = False
         op.include_collection = True
@@ -254,31 +263,36 @@ class BLUE_HOLE_MT_send_specific(bpy.types.Menu):
         # --------------------------------------------------------------------------------------------------------------
         # ASSET HIERARCHIES
         show_label('ASSET HIERARCHIES', layout)
+
         # Asset Hierarchies - All in Scene
-        label = sendOp.BH_OT_send_containers.build_ui_label(
+        label = sendOp.BH_OT_export_containers.build_ui_label(
             export_preset=export_preset,
+            send=True,
             send_all=True,
             include_hierarchy=True,
             include_collection=False,
             include_mesh=False,
         )
-        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
         op.export_preset = export_preset
+        op.send = True
         op.send_all = True
         op.include_hierarchy = True
         op.include_collection = False
         op.include_mesh = False
 
         # Asset Hierarchies - In Selection
-        label = sendOp.BH_OT_send_containers.build_ui_label(
+        label = sendOp.BH_OT_export_containers.build_ui_label(
             export_preset=export_preset,
+            send=True,
             send_all=False,
             include_hierarchy=True,
             include_collection=False,
             include_mesh=False,
         )
-        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
         op.export_preset = export_preset
+        op.send = True
         op.send_all = False
         op.include_hierarchy = True
         op.include_collection = False
@@ -288,36 +302,40 @@ class BLUE_HOLE_MT_send_specific(bpy.types.Menu):
         # --------------------------------------------------------------------------------------------------------------
         # ASSET MESHES
         show_label('ASSET MESHES', layout)
+
         # Asset Meshes - All in Scene
-        label = sendOp.BH_OT_send_containers.build_ui_label(
+        label = sendOp.BH_OT_export_containers.build_ui_label(
             export_preset=export_preset,
+            send=True,
             send_all=True,
             include_hierarchy=False,
             include_collection=False,
             include_mesh=True,
         )
-        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
         op.export_preset = export_preset
+        op.send = True
         op.send_all = True
         op.include_hierarchy = False
         op.include_collection = False
         op.include_mesh = True
 
         # Asset Meshes - In Selection
-        label = sendOp.BH_OT_send_containers.build_ui_label(
+        label = sendOp.BH_OT_export_containers.build_ui_label(
             export_preset=export_preset,
+            send=True,
             send_all=False,
             include_hierarchy=False,
             include_collection=False,
             include_mesh=True,
         )
-        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
         op.export_preset = export_preset
+        op.send = True
         op.send_all = False
         op.include_hierarchy = False
         op.include_collection = False
         op.include_mesh = True
-        layout.separator()
 
 
 class BLUE_HOLE_MT_sort(bpy.types.Menu):

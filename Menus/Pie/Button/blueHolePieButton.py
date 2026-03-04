@@ -153,16 +153,18 @@ def send_all_asset_containers(pie):
             return
 
     # All Containers - All in Scene
-    label = sendOp.BH_OT_send_containers.build_ui_label(
+    label = sendOp.BH_OT_export_containers.build_ui_label(
         export_preset=export_preset,
         send_all=True,
+        send=True,
         include_hierarchy=True,
         include_collection=True,
         include_mesh=True,
     )
-    op = pie.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+    op = pie.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
     op.export_preset = export_preset
     op.send_all = True
+    op.send = True
     op.include_hierarchy = True
     op.include_collection = True
     op.include_mesh = True
@@ -179,16 +181,18 @@ def send_selected_asset_containers(pie):
             return
 
         # All Containers - All in Scene
-    label = sendOp.BH_OT_send_containers.build_ui_label(
+    label = sendOp.BH_OT_export_containers.build_ui_label(
         export_preset=export_preset,
         send_all=False,
+        send=True,
         include_hierarchy=True,
         include_collection=True,
         include_mesh=True,
     )
-    op = pie.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+    op = pie.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
     op.export_preset = export_preset
     op.send_all = False
+    op.send = True
     op.include_hierarchy = True
     op.include_collection = True
     op.include_mesh = True

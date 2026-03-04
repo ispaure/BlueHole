@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 # Blender
 import bpy
-from bpy.props import *
+from bpy.props import BoolProperty, EnumProperty, StringProperty
 
 # Blue Hole
 from typing import Optional, Type
@@ -27,10 +27,6 @@ from ..blenderUtils.export.assetHierarchy.containerGroup import AssetHierarchyCo
 from ..blenderUtils.export.assetCollection.containerGroup import AssetCollectionContainerGroup
 from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGroup
 from ..Lib.commonUtils import uiUtils
-
-# ----------------------------------------------------------------------------------------------------------------------
-# INTERNAL HELPERS
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INTERNAL HELPERS
@@ -56,21 +52,26 @@ def _build_confirm_send_all_dialog(
     *,
     preset: ExportSettingsPreset,
     groups: list[Type],
+    send: bool,
     confirm_title: Optional[str],
     confirm_msg: Optional[str],
 ) -> tuple[str, str]:
     """
     Auto-build confirm dialog strings if not explicitly provided.
     Only used when send_all=True.
+
+    send=True  -> "Send"
+    send=False -> "Export"
     """
     engine = preset.name  # e.g. "UNREAL", "UNITY"
+    verb = "Send" if send else "Export"
 
     # If caller provided both, trust them as-is.
     if confirm_title is not None and confirm_msg is not None:
         return confirm_title, confirm_msg
 
     # Title
-    title = confirm_title or f"{engine} Send"
+    title = confirm_title or f"{engine} {verb}"
 
     # Message override (if provided)
     if confirm_msg:
@@ -81,27 +82,33 @@ def _build_confirm_send_all_dialog(
         return getattr(cls, "CONTAINERS_NAME", cls.__name__)
 
     if not groups:
-        msg = f"No container types selected. Nothing will be sent to {engine}."
+        msg = f"No container types selected. Nothing will be {verb.lower()}ed."
         return title, msg
 
     if len(groups) == 1:
         group_label = _group_name(groups[0])
-        msg = f"Do you really want to send ALL {group_label} to {engine}? Press OK to confirm."
+        msg = f"Do you really want to {verb.lower()} ALL {group_label} for {engine}? Press OK to confirm."
         return title, msg
 
     group_labels = ", ".join(_group_name(g) for g in groups)
-    msg = f"Do you really want to send ALL of these to {engine}? ({group_labels}) Press OK to confirm."
+    msg = f"Do you really want to {verb.lower()} ALL of these for {engine}? ({group_labels}) Press OK to confirm."
     return title, msg
 
 
-def _send_asset_container_no_confirm(
+def _export_asset_container_no_confirm(
+    *,
     preset: ExportSettingsPreset,
     container_group_cls: Type,
     send_all: bool,
+    send: bool,
+    bypass_sc: bool = False,
 ) -> set[str]:
     """
-    Same as your helper but without confirmation.
-    Confirmation is handled once at the mega-operator level.
+    Shared implementation for exporting/sending Asset Containers without confirmation.
+    Confirmation is handled once at the operator level.
+
+    send=True  -> send to engine (bridge)
+    send=False -> export only
     """
     export_settings = get_export_settings(preset)
 
@@ -111,14 +118,14 @@ def _send_asset_container_no_confirm(
     else:
         container_group.set_containers_from_selection()
 
-    container_group.export_proc(send=True, bypass_sc=False)
+    container_group.export_proc(send=send, bypass_sc=bypass_sc)
     return {'FINISHED'}
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MEGA OPERATOR
 
-class BH_OT_send_containers(bpy.types.Operator):
+class BH_OT_export_containers(bpy.types.Operator):
     bl_idname = "wm.bh_send_containers"
     bl_label = "Send Containers"
     bl_description = "Send containers"
@@ -126,17 +133,22 @@ class BH_OT_send_containers(bpy.types.Operator):
     # --- Core behavior ---
     send_all: BoolProperty(
         name="Send All",
-        description="Send containers from the entire scene (otherwise from selection)",
+        description="Use containers from the entire scene (otherwise from selection)",
         default=False,
     )
 
-    # Keep as enum so you can do: op.engine = 'UNREAL'
+    send: BoolProperty(
+        name="Send",
+        description="When enabled, sends to the engine. When disabled, exports only.",
+        default=False,
+    )
+
     export_preset: EnumProperty(
-        name="Engine",
-        description="Target game engine preset",
+        name="Export Preset",
+        description="Target export preset",
         items=[
-            ('UNREAL', "Unreal", "Send using Unreal preset"),
-            ('UNITY', "Unity", "Send using Unity preset"),
+            ('UNREAL', "Unreal", "Use Unreal export preset"),
+            ('UNITY', "Unity", "Use Unity export preset"),
         ],
         default='UNREAL',
     )
@@ -159,12 +171,12 @@ class BH_OT_send_containers(bpy.types.Operator):
     )
 
     # Optional overrides (usually leave blank and let it auto-build)
-    confirm_title: bpy.props.StringProperty(
+    confirm_title: StringProperty(
         name="Confirm Title",
         description="Optional override confirmation title",
         default="",
     )
-    confirm_msg: bpy.props.StringProperty(
+    confirm_msg: StringProperty(
         name="Confirm Message",
         description="Optional override confirmation message",
         default="",
@@ -172,28 +184,30 @@ class BH_OT_send_containers(bpy.types.Operator):
 
     @classmethod
     def build_ui_label(
-            cls,
-            *,
-            export_preset: str,
-            send_all: bool,
-            include_hierarchy: bool,
-            include_collection: bool,
-            include_mesh: bool,
+        cls,
+        *,
+        export_preset: str,
+        send_all: bool,
+        send: bool,
+        include_hierarchy: bool,
+        include_collection: bool,
+        include_mesh: bool,
     ) -> str:
         """
         Build a dynamic UI button label based on operator-like inputs.
-        Intended to be called from Panels before creating the operator button.
+        Intended to be called from Panels/Menus before creating the operator button.
         """
-        engine = export_preset.title()  # 'UNREAL' -> 'Unreal', 'UNITY' -> 'Unity'
+        engine = export_preset.upper()
         scope = "*ALL*" if send_all else "Selected"
+        verb = "Send" if send else "Export"
 
         parts: list[str] = []
         if include_hierarchy:
-            parts.append(AssetHierarchyContainerGroup.CONTAINERS_NAME)
+            parts.append(getattr(AssetHierarchyContainerGroup, "CONTAINERS_NAME", "Asset Hierarchies"))
         if include_collection:
-            parts.append(AssetCollectionContainerGroup.CONTAINERS_NAME)
+            parts.append(getattr(AssetCollectionContainerGroup, "CONTAINERS_NAME", "Asset Collections"))
         if include_mesh:
-            parts.append(AssetMeshContainerGroup.CONTAINERS_NAME)
+            parts.append(getattr(AssetMeshContainerGroup, "CONTAINERS_NAME", "Asset Meshes"))
 
         if not parts:
             what = "Nothing"
@@ -202,7 +216,7 @@ class BH_OT_send_containers(bpy.types.Operator):
         else:
             what = " + ".join(parts)
 
-        return f"Send {scope} ({what}) to {engine.upper()}"
+        return f"{verb} {scope} ({what}) for {engine}"
 
     def execute(self, context):
 
@@ -213,7 +227,7 @@ class BH_OT_send_containers(bpy.types.Operator):
             case 'UNITY':
                 preset = ExportSettingsPreset.UNITY
             case _:
-                log(Severity.CRITICAL, self.bl_idname, 'Invalid Value on "Engine" Parameter')
+                log(Severity.CRITICAL, self.bl_idname, 'Invalid Value on "Export Preset" Parameter')
                 return {'CANCELLED'}
 
         # Which container group classes are included
@@ -223,16 +237,16 @@ class BH_OT_send_containers(bpy.types.Operator):
             include_mesh=self.include_mesh,
         )
 
-        # No types selected => nothing to do (silent cancel or finished; choose what you prefer)
         if not groups:
             self.report({'WARNING'}, "No container types selected.")
             return {'CANCELLED'}
 
-        # Confirm once (not once per container type)
+        # Confirm once (only when operating on ALL containers from the scene)
         if self.send_all:
             title, msg = _build_confirm_send_all_dialog(
                 preset=preset,
                 groups=groups,
+                send=self.send,
                 confirm_title=self.confirm_title or None,
                 confirm_msg=self.confirm_msg or None,
             )
@@ -241,10 +255,12 @@ class BH_OT_send_containers(bpy.types.Operator):
 
         # Run all selected container types
         for group_cls in groups:
-            res = _send_asset_container_no_confirm(
+            res = _export_asset_container_no_confirm(
                 preset=preset,
                 container_group_cls=group_cls,
                 send_all=self.send_all,
+                send=self.send,
+                bypass_sc=False,
             )
             if res == {'CANCELLED'}:
                 return res
@@ -256,7 +272,7 @@ class BH_OT_send_containers(bpy.types.Operator):
 # REGISTER / UNREGISTER
 
 classes = (
-    BH_OT_send_containers,
+    BH_OT_export_containers,
 )
 
 
