@@ -121,7 +121,7 @@ def register():
 def _post_register_init():
     from .preferences.prefs import prefs
     p = prefs()
-    if not p.is_ready() or p.env is None:
+    if not p.is_ready() or p.container is None:
         return 0.05
 
     # Now safe: prefs exist

@@ -40,8 +40,8 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
         layout.operator(impExpOp.SceneAddAssetHierarchy.bl_idname, icon='OUTLINER')
 
         # Environment Folders
-        test_a = os.path.exists(prefs().env.sc_path) or os.path.exists(prefs().env.sc_path_alternate) or os.path.exists(prefs().env.sc_path_mac) or os.path.exists(prefs().env.sc_path_mac_alternate)
-        test_b = os.path.exists(prefs().general.unity_assets_path) or os.path.exists(prefs().general.unity_assets_path_mac)
+        test_a = os.path.exists(prefs().bridge.sc_path) or os.path.exists(prefs().bridge.sc_path_alternate) or os.path.exists(prefs().bridge.sc_path_mac) or os.path.exists(prefs().bridge.sc_path_mac_alternate) or os.path.exists(prefs().bridge.sc_path_linux) or os.path.exists(prefs().bridge.sc_path_linux_alternate)
+        test_b = os.path.exists(prefs().bridge.unity_assets_path) or os.path.exists(prefs().bridge.unity_assets_path_mac)
         test_c = prefs().sc.source_control_enable and prefs().sc.source_control_solution == 'perforce'
         if test_a or test_b or test_c:
             layout.separator()
@@ -72,7 +72,7 @@ class BLUE_HOLE_MT_export(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         show_label('FINAL Folder', layout)
-        match prefs().general.active_game_engine:
+        match prefs().bridge.active_game_engine:
             case 'unreal':
                 layout.operator(impExpOp.ExportAllHierarchiesToUE.bl_idname, icon='EXPORT')
                 layout.operator(impExpOp.ExportSelectHierarchiesToUE.bl_idname, icon='EXPORT')
@@ -148,7 +148,7 @@ class BLUE_HOLE_MT_send(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         # These options are always available, regardless of active environment
-        match prefs().general.active_game_engine:
+        match prefs().bridge.active_game_engine:
             case 'unity':
                 # Unity
                 layout.operator(helpOp.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')

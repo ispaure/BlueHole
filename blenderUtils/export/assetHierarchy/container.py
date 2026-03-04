@@ -40,11 +40,11 @@ class AssetHierarchyContainer(Container):
         super().__init__(root, export_settings)
 
         # Asset Hierarchy Specific Fields
-        self.render_name = prefs().env.asset_hierarchy_empty_object_meshes
+        self.render_name = prefs().container.asset_hierarchy_empty_object_meshes
         self.render = self.__get_empty_render()
-        self.collision_name = prefs().env.asset_hierarchy_empty_object_collisions
+        self.collision_name = prefs().container.asset_hierarchy_empty_object_collisions
         self.collision = self.__get_empty_collision()
-        self.socket_name = prefs().env.asset_hierarchy_empty_object_sockets
+        self.socket_name = prefs().container.asset_hierarchy_empty_object_sockets
         self.socket = self.__get_empty_socket()
 
         # Validate Hierarchy
@@ -170,7 +170,7 @@ class AssetHierarchyContainer(Container):
         for component in [self.render, self.collision, self.socket]:
             if component is not None:
                 child_obj_lst = objectUtils.get_obj_child_recursive(component)
-                if len(child_obj_lst) > 0 or not prefs().env.exclude_element_if_no_child:
+                if len(child_obj_lst) > 0 or not prefs().container.exclude_element_if_no_child:
                     obj_lst.append(component)
                     for child_obj in child_obj_lst:
                         obj_lst.append(child_obj)
@@ -215,7 +215,7 @@ class AssetHierarchyContainer(Container):
             f'"{child_name}" is directly under "{self.name}" but is not an Empty object. '
             f'Only Empty objects are allowed directly under the Asset Hierarchy root. '
             f'For example, renderable geometry must be placed under the '
-            f'"{prefs().env.asset_hierarchy_empty_object_meshes}" Empty Object.\n\n'
+            f'"{prefs().container.asset_hierarchy_empty_object_meshes}" Empty Object.\n\n'
             f'What to do:\n'
             f'Parent "{child_name}" under the appropriate Empty Object within the Asset Hierarchy.\n\n'
             f'Note: This restriction applies when the "Empty Object Render" option is enabled in the '

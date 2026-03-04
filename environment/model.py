@@ -142,11 +142,12 @@ class Environment:
         Add the Settings to the environment's list
         """
         # Import mappings
-        from .mapping import general_setting_lst, environment_setting_lst, source_control_setting_lst
+        from .mapping import directory_setting_lst, bridge_setting_lst, container_setting_lst, source_control_setting_lst
 
         # Add Setting Lists
-        self.setting_lst += general_setting_lst
-        self.setting_lst += environment_setting_lst
+        self.setting_lst += directory_setting_lst
+        self.setting_lst += bridge_setting_lst
+        self.setting_lst += container_setting_lst
         self.setting_lst += source_control_setting_lst
 
     def set_pref_from_ini(self):

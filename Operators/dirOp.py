@@ -36,7 +36,7 @@ class OpenFinalFolder(bpy.types.Operator):
     bl_description = 'Open FINAL Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_final)
+        projectUtils.open_project_sub_dir(prefs().directory.sc_dir_struct_final)
         return {'FINISHED'}
 
 
@@ -47,7 +47,7 @@ class OpenReferencesFolder(bpy.types.Operator):
     bl_description = 'Open REFERENCE Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_ref)
+        projectUtils.open_project_sub_dir(prefs().directory.sc_dir_struct_ref)
         return {'FINISHED'}
 
 
@@ -58,7 +58,7 @@ class OpenResourcesFolder(bpy.types.Operator):
     bl_description = 'Open RESOURCE Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_resources)
+        projectUtils.open_project_sub_dir(prefs().directory.sc_dir_struct_resources)
         return {'FINISHED'}
 
 
@@ -69,7 +69,7 @@ class OpenSceneFolder(bpy.types.Operator):
     bl_description = 'Open SCENE Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_scenes)
+        projectUtils.open_project_sub_dir(prefs().directory.sc_dir_struct_scenes)
         return {'FINISHED'}
 
 
@@ -99,7 +99,7 @@ class OpenSpeedTreeMeshesFolder(bpy.types.Operator):
     bl_description = 'Open SPEEDTREE MSH Project Folder'
 
     def execute(self, context):
-        projectUtils.open_project_sub_dir(prefs().env.sc_dir_struct_st)
+        projectUtils.open_project_sub_dir(prefs().directory.sc_dir_struct_st)
         return {'FINISHED'}
 
 
@@ -137,11 +137,11 @@ class OpenUnityAssetsPath(bpy.types.Operator):
     def execute(self, context):
         match filterUtils.get_platform():
             case OS.WIN:
-                unity_assets_path = prefs().general.unity_assets_path
+                unity_assets_path = prefs().bridge.unity_assets_path
             case OS.MAC:
-                unity_assets_path = prefs().general.unity_assets_path_mac
+                unity_assets_path = prefs().bridge.unity_assets_path_mac
             case OS.LINUX:
-                unity_assets_path = prefs().general.unity_assets_path_linux
+                unity_assets_path = prefs().bridge.unity_assets_path_linux
         fileUtils.open_dir_path(unity_assets_path)
         return {'FINISHED'}
 

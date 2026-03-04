@@ -90,7 +90,7 @@ def batch_export_loose_mesh(path_append):
         # EXPORT OPTIONS
         exp_format='FBX',
         exp_dir=Path(exp_dir),
-        zero_root_transform=prefs().general.exp_select_zero_root_transform,
+        zero_root_transform=prefs().bridge.exp_select_zero_root_transform,
 
         # INCLUDED ELEMENTS
         include_render=False,

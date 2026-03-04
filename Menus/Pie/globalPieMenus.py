@@ -101,7 +101,7 @@ class MT_pie_global_dirs(bpy.types.Menu):
         else:
             pie.separator()
         # 6 - RIGHT
-        match prefs().general.active_game_engine:
+        match prefs().bridge.active_game_engine:
             case 'unreal':
                 blueHolePieButton.open_source_content(pie)
             case 'unity':
@@ -131,7 +131,7 @@ class MT_pie_global_import_export(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        match prefs().general.active_game_engine:
+        match prefs().bridge.active_game_engine:
             case 'unreal':
                 blueHolePieButton.send_hierarchy_all_unreal(pie)
             case 'unity':
@@ -139,7 +139,7 @@ class MT_pie_global_import_export(bpy.types.Menu):
             case 'disabled':
                 blueHolePieButton.export_hierarchy_all(pie)
         # 6 - RIGHT
-        match prefs().general.active_game_engine:
+        match prefs().bridge.active_game_engine:
             case 'unreal':
                 blueHolePieButton.send_hierarchy_selected_unreal(pie)
             case 'unity':

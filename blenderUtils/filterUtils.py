@@ -43,7 +43,7 @@ def check_blend_location_in_dir_structure():
     env_variables.ini
     """
 
-    expected_location_on_disk = str(Path(projectUtils.get_project_sub_dir(prefs().env.sc_dir_struct_scenes),
+    expected_location_on_disk = str(Path(projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_scenes),
                                          blenderFile.get_blend_file_name() + '.blend'
                                          ))
     blend_location_on_disk = blenderFile.get_blend_file_path()
@@ -172,7 +172,7 @@ def check_tests(script_name, *,
 
     def dialog_check_blend_location_in_dir_structure():
         if silent_mode is False:
-            specified_sub_folder = prefs().env.sc_dir_struct_scenes
+            specified_sub_folder = prefs().directory.sc_dir_struct_scenes
 
             msg = (
                 f'{script_name} validation failed.\n\n'

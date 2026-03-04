@@ -137,7 +137,7 @@ class BatchExportSelectedToFinal(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the FINAL Folder'
 
     def execute(self, context):
-        batch_export_loose_mesh(prefs().env.sc_dir_struct_final)
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_final)
         return {'FINISHED'}
 
 
@@ -146,7 +146,7 @@ class BatchExportSelectedToResources(bpy.types.Operator):
     bl_label = 'Batch Export (Selection) to RESOURCES Folder'
 
     def execute(self, context):
-        batch_export_loose_mesh(prefs().env.sc_dir_struct_resources)
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_resources)
         return {'FINISHED'}
 
 
@@ -156,7 +156,7 @@ class BatchExportSelectedToSpeedTree_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH Folder'
 
     def execute(self, context):
-        batch_export_loose_mesh(prefs().env.sc_dir_struct_st)
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_st)
         return {'FINISHED'}
 
 
@@ -166,7 +166,7 @@ class BatchExportSelectedToSpeedtreeLR_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> LR Folder'
 
     def execute(self, context):
-        batch_export_loose_mesh(prefs().env.sc_dir_struct_st_lr)
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_st_lr)
         return {'FINISHED'}
 
 
@@ -176,7 +176,7 @@ class BatchExportSelectedToSpeedtreeHR_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> HR Folder'
 
     def execute(self, context):
-        batch_export_loose_mesh(prefs().env.sc_dir_struct_st_hr)
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_st_hr)
         return {'FINISHED'}
 
 
@@ -186,7 +186,7 @@ class BatchExportSelectedToBakeFBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the MSH BAKE Folder'
 
     def execute(self, context):
-        batch_export_loose_mesh(prefs().env.sc_dir_struct_msh_bake)
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_msh_bake)
         return {'FINISHED'}
 
 
@@ -319,12 +319,12 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         row = column.row()
         row.prop(self, 'preview', expand=True)
         box.label(text=hierarchy_to_create_lst[0])
-        if prefs().env.create_element_render:
-            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_meshes)
-        if prefs().env.create_element_collision:
-            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_collisions)
-        if prefs().env.create_element_sockets:
-            box.label(text='   ↳ ' + prefs().env.asset_hierarchy_empty_object_sockets)
+        if prefs().container.create_element_render:
+            box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_meshes)
+        if prefs().container.create_element_collision:
+            box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_collisions)
+        if prefs().container.create_element_sockets:
+            box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_sockets)
         if len(hierarchy_to_create_lst) > 1:
             row = column.row()
             box.label(text='...')
@@ -339,7 +339,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         row.prop(self, "include_default_mesh")
         row.prop(self, "dsp_empty_obj_arrows")
         row = column.row()
-        if len(hierarchy_to_create_lst) == 1 and prefs().env.create_element_render:
+        if len(hierarchy_to_create_lst) == 1 and prefs().container.create_element_render:
             row.prop(self, 'include_selected_obj')
 
         # for hierarchy in hierarchy_to_create_lst:

@@ -120,7 +120,6 @@ class SourceControlPG(bpy.types.PropertyGroup):
                                            default='DEFAULT_STR')
 
 
-
 def label_row(path, prop, row, label=''):
     row.label(text=label)
     row.prop(path, prop, text='')
@@ -129,7 +128,7 @@ def label_row(path, prop, row, label=''):
 def draw(preference, context, layout):
 
     # Enable edits
-    enable_rows = prefs().env.active_environment != 'default'
+    enable_rows = prefs().general.active_environment != 'default'
 
     box = layout.box()
     column = box.column()
