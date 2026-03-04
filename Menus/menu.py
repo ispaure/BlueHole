@@ -143,7 +143,7 @@ class BLUE_HOLE_MT_music(bpy.types.Menu):
             layout.operator(cls.bl_idname, icon='SOUND')
 
 
-class _BLUE_HOLE_MT_send_base(bpy.types.Menu):
+class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
     """
     Base menu that can render either Send or Export depending on SEND flag.
     Do not register this class.
@@ -153,23 +153,31 @@ class _BLUE_HOLE_MT_send_base(bpy.types.Menu):
     @classmethod
     def build_ui_label(cls) -> str:
         verb = "Send" if cls.SEND else "Export"
-        return f"{verb} (to {prefs().bridge.active_game_engine.upper()})"
+        to_or_for = "to" if cls.SEND else "for"
+        return f"{verb} ({to_or_for} {prefs().bridge.active_game_engine.upper()})"
 
     def _draw_common(self, context, layout):
         # Engine Doc + preset
         match prefs().bridge.active_game_engine:
             case 'unity':
                 export_preset = 'UNITY'
-                layout.operator(helpOp.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                if self.SEND:
+                    layout.operator(helpOp.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                else:
+                    show_label('Directory: FINAL', layout)
             case 'unreal':
                 export_preset = 'UNREAL'
-                layout.operator(helpOp.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                if self.SEND:
+                    layout.operator(helpOp.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                else:
+                    show_label('Directory: FINAL', layout)
             case _:
                 log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
                 return
 
         # Helper to reduce repetition
-        def add_button(*, send_all, include_hierarchy, include_collection, include_mesh, icon='UV_SYNC_SELECT'):
+        def add_button(*, send_all, include_hierarchy, include_collection, include_mesh):
+            icon = 'UV_SYNC_SELECT' if self.SEND else 'EXPORT'
             label = exportSendOp.BH_OT_export_containers.build_ui_label(
                 export_preset=export_preset,
                 send=self.SEND,
@@ -191,8 +199,6 @@ class _BLUE_HOLE_MT_send_base(bpy.types.Menu):
         # All Containers - In Selection
         add_button(send_all=False, include_hierarchy=True, include_collection=True, include_mesh=True)
 
-        layout.separator()
-
         # Submenu for specific container type
         if self.SEND:
             layout.menu("BLUE_HOLE_MT_send_specific")
@@ -200,7 +206,7 @@ class _BLUE_HOLE_MT_send_base(bpy.types.Menu):
             layout.menu("BLUE_HOLE_MT_export_specific")
 
 
-class BLUE_HOLE_MT_send(_BLUE_HOLE_MT_send_base):
+class BLUE_HOLE_MT_send(_BLUE_HOLE_MT_export_base):
     bl_idname = "BLUE_HOLE_MT_send"
     bl_label = "Send (to Game Engine)"
     SEND = True
@@ -209,7 +215,7 @@ class BLUE_HOLE_MT_send(_BLUE_HOLE_MT_send_base):
         self._draw_common(context, self.layout)
 
 
-class BLUE_HOLE_MT_export(_BLUE_HOLE_MT_send_base):
+class BLUE_HOLE_MT_export(_BLUE_HOLE_MT_export_base):
     bl_idname = "BLUE_HOLE_MT_export"
     bl_label = "Export (to Game Engine)"
     SEND = False
@@ -232,6 +238,7 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
                 return
 
         def add_button(title, *, send_all, include_hierarchy, include_collection, include_mesh):
+            icon = 'UV_SYNC_SELECT' if self.SEND else 'EXPORT'
             label = exportSendOp.BH_OT_export_containers.build_ui_label(
                 export_preset=export_preset,
                 send=self.SEND,
@@ -240,7 +247,7 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
                 include_collection=include_collection,
                 include_mesh=include_mesh,
             )
-            op = layout.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+            op = layout.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon=icon)
             op.export_preset = export_preset
             op.send = self.SEND
             op.send_all = send_all

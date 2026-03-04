@@ -45,9 +45,8 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout.separator()
         layout.menu("BLUE_HOLE_MT_sort")
         layout.menu("BLUE_HOLE_MT_import", icon='IMPORT')
-        layout.menu("BLUE_HOLE_MT_export", text=BLUE_HOLE_MT_export.build_ui_label(), icon='EXPORT')
         if prefs().bridge.active_game_engine != 'disabled':
-            label = BLUE_HOLE_MT_send.build_ui_label()
+            layout.menu("BLUE_HOLE_MT_export", text='Export (to DIRECTORY)', icon='EXPORT')
             layout.menu("BLUE_HOLE_MT_send", text=BLUE_HOLE_MT_send.build_ui_label(), icon='UV_SYNC_SELECT')
         layout.separator()
         # layout.menu("BLUE_HOLE_MT_import_export")

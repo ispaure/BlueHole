@@ -86,7 +86,7 @@ class JoinBHDiscord(bpy.types.Operator):
 class SendToUnityDoc(bpy.types.Operator):
 
     bl_idname = "wm.bh_send_unity_doc"
-    bl_label = '[[[[ ' + 'UNITY' + ' ]]]]'
+    bl_label = '[[[[ Engine: UNITY ]]]]'
     bl_description = 'Opens the Documentation for the Blender to Unity Bridge'
 
     def execute(self, context):
@@ -97,7 +97,7 @@ class SendToUnityDoc(bpy.types.Operator):
 class SendToUnrealDoc(bpy.types.Operator):
 
     bl_idname = "wm.bh_send_unreal_doc"
-    bl_label = '[[[[ ' + 'UNREAL' + ' ]]]]'
+    bl_label = '[[[[ Engine: UNREAL ]]]]'
     bl_description = 'Opens the documentation for the Blender to Unreal Bridge'
 
     def execute(self, context):
@@ -108,7 +108,7 @@ class SendToUnrealDoc(bpy.types.Operator):
 class PerforceDoc(bpy.types.Operator):
 
     bl_idname = "wm.bh_perforce_doc"
-    bl_label = '[[[[ ' + 'PERFORCE' + ' ]]]]'
+    bl_label = '[[[[ PERFORCE ]]]]'
     bl_description = 'Opens the documentation for Perforce Integration'
 
     def execute(self, context):
