@@ -200,6 +200,7 @@ class BH_OT_export_containers(bpy.types.Operator):
         engine = export_preset.upper()
         scope = "*ALL*" if send_all else "Selected"
         verb = "Send" if send else "Export"
+        to_or_for = "to" if send else "for"
 
         parts: list[str] = []
         if include_hierarchy:
@@ -216,7 +217,7 @@ class BH_OT_export_containers(bpy.types.Operator):
         else:
             what = " + ".join(parts)
 
-        return f"{verb} {scope} ({what}) for {engine}"
+        return f"{verb} {scope} ({what}) {to_or_for} {engine}"
 
     def execute(self, context):
 
