@@ -301,9 +301,249 @@ class SceneAddAssetMesh(bpy.types.Operator):
     bl_label = "Add Asset Mesh"
     bl_description = "Add Asset Mesh of given name to scene."
 
+    settings: bpy.props.EnumProperty(
+        name='Settings',
+        description='Settings to display',
+        items=[
+            ('NAMEGEN', 'Easy Name Generator', 'Creates mesh name matching naming convention, preventing user error.'),
+            ('MANUAL',  'Manual Name Entry',   'Creates mesh matching user-given name, regardless of naming conventions.'),
+        ],
+        default='NAMEGEN',
+    )
+
+    preview: bpy.props.EnumProperty(
+        name='Preview',
+        items=[('PREVIEW', 'Preview', 'Preview name(s) that will be created.')],
+        default='PREVIEW',
+    )
+
+    # TYPE and their index position (same intent as hierarchy; use your prefix list)
+    mesh_types = {'Mesh Asset': 0, 'Mesh Kit Asset': 1, 'Skeletal Mesh': 2}
+    prefix_items = [(k, k, '') for k in mesh_types.keys()]
+    asset_type: bpy.props.EnumProperty(
+        name='Type',
+        description="The selected mesh type. Affects the name prefix.",
+        items=prefix_items,
+    )
+
+    # NAME
+    asset_name: bpy.props.StringProperty(
+        name='Name',
+        description="Name of the asset. Will be the center part of the mesh name.",
+        default='InsertName',
+    )
+
+    # VERSION BATCH
+    version_batch: bpy.props.BoolProperty(
+        name='Batch',
+        description='When enabled, allows the creation of multiple meshes in one go.',
+        default=False,
+    )
+
+    # VERSION (SINGLE)
+    version_suffix: bpy.props.IntProperty(
+        name='Number',
+        description="Version (number) of the mesh. Affects the name suffix.",
+        default=1,
+    )
+
+    # VERSION SUFFIX_START
+    version_suffix_start: bpy.props.IntProperty(
+        name='Number (Start)',
+        description='When using batch mode, defines the first version (number) to create.',
+        default=1,
+    )
+
+    # VERSION SUFFIX_END
+    version_suffix_end: bpy.props.IntProperty(
+        name='Number (End)',
+        description='When using batch mode, defines the last version (number) to create.',
+        default=1,
+    )
+
+    # VERSION (LETTER)
+    version_suffix_letter: bpy.props.StringProperty(
+        name='Letter',
+        description='Letter(s) suffix at end-of-name.',
+        default='',
+    )
+
+    # INCLUDE DEFAULT MESH
+    include_default_mesh: bpy.props.BoolProperty(
+        name='Include Default Mesh',
+        description='Whether to include the default icosphere mesh as the asset mesh.',
+        default=False,
+    )
+
+    # INCLUDE SELECTED OBJECTS
+    include_selected_obj: bpy.props.BoolProperty(
+        name='Use Selection',
+        description=(
+            "If enabled: "
+            "• 1 selected mesh: rename the active mesh. "
+            "• 2+ selection: create a new Asset Mesh root and parent selection under it."
+        ),
+        default=True,
+    )
+
     def execute(self, context):
-        log(Severity.CRITICAL, self.bl_label, f'{self.bl_label} has not yet been implemented.')
-        return {'CANCELLED'}
+
+        mesh_name_lst = self.result_mesh_name_lst()
+        if not mesh_name_lst:
+            self.report({'WARNING'}, "No mesh name could be generated.")
+            return {'CANCELLED'}
+
+        # Manual mode sanity
+        if self.settings == 'MANUAL' and not self.asset_name.strip():
+            self.report({'WARNING'}, "Name cannot be empty.")
+            return {'CANCELLED'}
+
+        # ---------------------------------------------------------------------
+        # Selection-based creation / rename
+        # ---------------------------------------------------------------------
+        if self.include_selected_obj:
+            sel = list(context.selected_objects)
+            active = context.active_object
+
+            if not sel:
+                self.report({'WARNING'}, "No objects selected.")
+                return {'CANCELLED'}
+
+            # If batch is enabled, we still only use the first generated name
+            target_name = mesh_name_lst[0]
+
+            # Case A: exactly one selected mesh -> rename it
+            if len(sel) == 1 and active and active.type == 'MESH':
+                active.name = target_name
+                active.parent = None  # ensure scene root
+                return {'FINISHED'}
+
+            # Case B: multiple selection -> create a Mesh root, parent selection under it
+            # Create a "mesh container" object (empty mesh datablock so it's still type MESH)
+            mesh_data = bpy.data.meshes.new(target_name)
+            root = bpy.data.objects.new(target_name, mesh_data)
+            context.collection.objects.link(root)
+            root.parent = None  # scene root
+
+            # Parent selection under root (preserve world transforms)
+            inv = root.matrix_world.inverted()
+            for obj in sel:
+                if obj == root:
+                    continue
+                obj.parent = root
+                obj.matrix_parent_inverse = inv
+
+            return {'FINISHED'}
+
+        # ---------------------------------------------------------------------
+        # Non-selection mode: create new mesh object(s)
+        # ---------------------------------------------------------------------
+        created_any = False
+        for mesh_name in mesh_name_lst:
+            if self.include_default_mesh:
+                bpy.ops.mesh.primitive_ico_sphere_add()
+                obj = context.active_object
+                if obj is None:
+                    continue
+                obj.name = mesh_name
+                obj.parent = None
+                created_any = True
+            else:
+                mesh_data = bpy.data.meshes.new(mesh_name)
+                obj = bpy.data.objects.new(mesh_name, mesh_data)
+                context.collection.objects.link(obj)
+                obj.parent = None
+                created_any = True
+
+        return {'FINISHED'} if created_any else {'CANCELLED'}
+
+    def check(self, context):
+        return True
+
+    def draw(self, context):
+        layout = self.layout
+        column = layout.column(align=True)
+        row = column.row(align=True)
+        row.prop(self, 'settings', expand=True)
+
+        # Easy Name Generator Specific
+        if self.settings == 'NAMEGEN':
+            box = layout.box()
+            box.label(text='Prefix')
+            col = box.column()
+            col.prop(self, "asset_type")
+
+        box = layout.box()
+        box.label(text='Name')
+        col = box.column()
+        col.prop(self, "asset_name")
+
+        # Easy Name Generator Specific
+        if self.settings == 'NAMEGEN':
+            box = layout.box()
+            box.label(text='Suffix')
+            col = box.column()
+            col.prop(self, "version_batch")
+            if self.version_batch:
+                col.prop(self, "version_suffix_start")
+                col.prop(self, "version_suffix_end")
+            else:
+                col.prop(self, "version_suffix")
+                col.prop(self, "version_suffix_letter")
+
+        # Preview
+        mesh_to_create_lst = self.result_mesh_name_lst()
+        box = layout.box()
+        col = box.column()
+        col.prop(self, 'preview', expand=True)
+
+        if mesh_to_create_lst:
+            box.label(text=mesh_to_create_lst[0])
+            if len(mesh_to_create_lst) > 1:
+                box.label(text='...')
+                box.label(text=mesh_to_create_lst[-1])
+
+        # Advanced
+        box = layout.box()
+        box.label(text='Advanced Options')
+        col = box.column()
+        row = col.row()
+        row.prop(self, "include_default_mesh")
+        row.prop(self, "include_selected_obj")
+
+    def result_mesh_name_lst(self):
+        """
+        Find full name of meshes to create, from given parameters.
+        Mirrors the Asset Hierarchy naming approach.
+        """
+        result_mesh_name_lst = []
+
+        if self.settings == 'NAMEGEN':
+            # Determine prefix from selected type
+            prefix = ''
+            for key, idx in self.mesh_types.items():
+                if key in self.asset_type:
+                    # Reuse your existing prefix source (same as hierarchies)
+                    prefix = get_hierarchy_prefix_lst()[idx]
+                    break
+
+            if self.version_batch:
+                for i in range(self.version_suffix_start, self.version_suffix_end + 1):
+                    name = f"{prefix}{self.asset_name}_{format(i, '02')}"
+                    result_mesh_name_lst.append(name)
+            else:
+                name = f"{prefix}{self.asset_name}_{format(self.version_suffix, '02')}"
+                if len(self.version_suffix_letter) > 0:
+                    name += f"{self.version_suffix_letter}"
+                result_mesh_name_lst.append(name)
+
+        elif self.settings == 'MANUAL':
+            result_mesh_name_lst.append(self.asset_name)
+
+        return result_mesh_name_lst
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
 
 
 class ImportGuide_5_6_ScaleMan(bpy.types.Operator):
