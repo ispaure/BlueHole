@@ -397,6 +397,7 @@ class SceneAddAssetMesh(bpy.types.Operator):
             "If enabled:\n"
             "• 1 selected mesh: rename the active mesh.\n"
             "• 2+ selected meshes: create a new Asset Mesh root and parent selection under it.\n"
+            "• 0 selected meshes: create a new Asset Mesh root with empty geometry.\n"
             "If disabled: creates a new Asset Mesh root mesh."
         ),
         default=True
@@ -408,22 +409,13 @@ class SceneAddAssetMesh(bpy.types.Operator):
 
     def execute(self, context):
 
-        # If operator is executed without invoke() (scripts/search), auto-disable selection behavior
-        # when there is no selection, to avoid failing by default.
-        if self.include_selected_obj and not context.selected_objects:
-            self.include_selected_obj = False
-
-        # If using selection behavior, never create a default mesh root.
-        if self.include_selected_obj:
-            self.include_default_mesh = False
-
         # Resolve names
         name_lst = self.result_asset_mesh_name_lst()
         if not name_lst:
             self.report({'WARNING'}, "No names generated.")
             return {'CANCELLED'}
 
-        # Selection handling
+        # Selection handling (meshes only)
         sel_meshes = [o for o in context.selected_objects if o.type == 'MESH']
 
         # Batch mode: always create new roots (no special selection behavior)
@@ -438,7 +430,8 @@ class SceneAddAssetMesh(bpy.types.Operator):
         # Single mode:
         nm = name_lst[0]
 
-        if self.include_selected_obj and len(sel_meshes) > 0:
+        # Selection-mode behavior (IMPORTANT: ignore include_default_mesh here)
+        if self.include_selected_obj:
 
             # 1 selected mesh => rename active (or that mesh)
             if len(sel_meshes) == 1:
@@ -450,19 +443,24 @@ class SceneAddAssetMesh(bpy.types.Operator):
                 self.report({'INFO'}, f'Renamed mesh to "{nm}".')
                 return {'FINISHED'}
 
-            # 2+ selected meshes => create root and parent under it
-            root = self._create_asset_mesh_root(context, nm)
-            for o in sel_meshes:
-                # avoid parenting the root to itself if it was selected for some reason
-                if o == root:
-                    continue
-                o.parent = root
-                o.matrix_parent_inverse = root.matrix_world.inverted()
+            # 2+ selected meshes => create empty-geometry root and parent under it
+            if len(sel_meshes) >= 2:
+                root = self._create_asset_mesh_root(context, nm, force_empty_geometry=True)
+                for o in sel_meshes:
+                    if o == root:
+                        continue
+                    o.parent = root
+                    o.matrix_parent_inverse = root.matrix_world.inverted()
 
-            self.report({'INFO'}, f'Created "{nm}" and parented {len(sel_meshes)} mesh(es).')
+                self.report({'INFO'}, f'Created "{nm}" and parented {len(sel_meshes)} mesh(es).')
+                return {'FINISHED'}
+
+            # 0 selected meshes => still in selection-mode: create empty-geometry root
+            self._create_asset_mesh_root(context, nm, force_empty_geometry=True)
+            self.report({'INFO'}, f'Created "{nm}" (empty geometry).')
             return {'FINISHED'}
 
-        # No selection usage => create new root
+        # No selection usage => create new root (default mesh allowed)
         self._create_asset_mesh_root(context, nm)
         self.report({'INFO'}, f'Created "{nm}".')
         return {'FINISHED'}
@@ -531,7 +529,6 @@ class SceneAddAssetMesh(bpy.types.Operator):
         box.label(text='Advanced Options')
         col = box.column()
 
-        # Only show "Use Selection" in non-batch mode (so behavior is predictable)
         if not self.version_batch:
             row = col.row(align=True)
             row.prop(self, "include_selected_obj")
@@ -539,11 +536,6 @@ class SceneAddAssetMesh(bpy.types.Operator):
             sub = row.row(align=True)
             sub.enabled = not self.include_selected_obj
             sub.prop(self, "include_default_mesh")
-
-            if self.include_selected_obj and not context.selected_objects:
-                row = col.row()
-                row.label(text="No selection: a new Asset Mesh root will be created.", icon='INFO')
-
         else:
             row = col.row()
             row.prop(self, "include_default_mesh")
@@ -553,13 +545,8 @@ class SceneAddAssetMesh(bpy.types.Operator):
     # -------------------------------------------------------------------------------------------------
 
     def invoke(self, context, event):
-        # Auto-toggle "Use Selection" based on current selection, each time the dialog opens
-        self.include_selected_obj = bool(context.selected_objects)
-
-        # If using selection behavior, never create a default mesh root.
-        if self.include_selected_obj:
-            self.include_default_mesh = False
-
+        # Default "Use Selection" based on whether there is at least one selected MESH
+        self.include_selected_obj = any(o.type == 'MESH' for o in context.selected_objects)
         return context.window_manager.invoke_props_dialog(self)
 
     def result_asset_mesh_name_lst(self):
@@ -596,28 +583,36 @@ class SceneAddAssetMesh(bpy.types.Operator):
 
         return result_name_lst
 
-    def _create_asset_mesh_root(self, context, name: str) -> bpy.types.Object:
+    def _create_asset_mesh_root(
+        self,
+        context,
+        name: str,
+        *,
+        force_empty_geometry: bool = False,
+    ) -> bpy.types.Object:
         """
         Create an Asset Mesh root object at the scene root.
-        If include_default_mesh is True, create a primitive mesh; otherwise create an empty mesh datablock.
+
+        If force_empty_geometry is True, always create an empty mesh datablock (no geometry),
+        regardless of include_default_mesh.
+
+        Otherwise:
+            If include_default_mesh is True, create a primitive mesh;
+            else create an empty mesh datablock.
         """
-        if self.include_default_mesh:
-            # Create a primitive (cheap + obvious in viewport)
+        if (not force_empty_geometry) and self.include_default_mesh:
             bpy.ops.mesh.primitive_ico_sphere_add()
             obj = context.active_object
             obj.name = name
         else:
-            # Create an empty mesh datablock (valid mesh object, no geometry)
             mesh_data = bpy.data.meshes.new(name=f"{name}_DATA")
             obj = bpy.data.objects.new(name, mesh_data)
             context.collection.objects.link(obj)
             context.view_layer.objects.active = obj
             obj.select_set(True)
 
-        # Ensure it's at scene root (no parent)
         obj.parent = None
         obj.matrix_parent_inverse.identity()
-
         return obj
 
 
