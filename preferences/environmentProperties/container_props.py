@@ -45,9 +45,9 @@ class ContainerPG(bpy.types.PropertyGroup):
         name="Container Type",
         description="Choose which container type settings to display",
         items=[
-            ('HIERARCHY', "Hierarchy", "Asset Hierarchy container settings"),
-            ('MESH', "Mesh", "Asset Mesh container settings"),
-            ('COLLECTION', "Collection", "Asset Collection container settings"),
+            ('HIERARCHY', "Asset Hierarchy", "Asset Hierarchy container settings"),
+            ('MESH', "Asset Mesh", "Asset Mesh container settings"),
+            ('COLLECTION', "Asset Collection", "Asset Collection container settings"),
         ],
         default='HIERARCHY',
     )
