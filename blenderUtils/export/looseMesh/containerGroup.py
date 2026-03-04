@@ -44,7 +44,7 @@ class LooseMeshContainerGroup(ContainerGroup):
     def __init__(self, export_settings: ExportSettings):
         super().__init__(export_settings)
 
-    def set_containers_from_selection(self):
+    def set_containers_from_selection(self, silent_if_empty: bool):
         selection_obj_lst = objectUtils.get_selection()
 
         # Wipe existing list of meshes
@@ -56,13 +56,13 @@ class LooseMeshContainerGroup(ContainerGroup):
             self.container_lst.append(mesh_container_cls)
 
         # If no selection, throw error
-        if len(self.container_lst) == 0:
+        if not silent_if_empty and len(self.container_lst) == 0:
             self.__critical_set_containers_selection_missing()
             return False
 
         return True
 
-    def set_containers_from_scene(self):
+    def set_containers_from_scene(self, silent_if_empty: bool):
         msg = f'Set Containers from Scene unsupported for {self.CONTAINERS_NAME}.'
         log(Severity.CRITICAL, self.CONTAINERS_NAME, msg)
 

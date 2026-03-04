@@ -41,12 +41,12 @@ class ContainerGroup(ABC):
         self.container_lst: List[Container] = []
 
     @abstractmethod
-    def set_containers_from_selection(self):
+    def set_containers_from_selection(self, silent_if_empty: bool):
         """Must be implemented by subclasses to define containers from selection. """
         pass
 
     @abstractmethod
-    def set_containers_from_scene(self):
+    def set_containers_from_scene(self, silent_if_empty: bool):
         """Must be implemented by subclasses to define containers from scene. """
         pass
 
