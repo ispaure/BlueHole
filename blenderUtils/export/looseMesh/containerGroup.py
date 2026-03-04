@@ -112,5 +112,5 @@ def batch_export_loose_mesh(path_append):
         engine=Engine.UNDEFINED)
 
     export_meshes = LooseMeshContainerGroup(exp_set_cls)
-    export_meshes.set_containers_from_selection()
+    export_meshes.set_containers_from_selection(silent_if_empty=False)
     export_meshes.export_proc(send=False)
