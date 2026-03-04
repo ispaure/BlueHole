@@ -101,6 +101,7 @@ def _export_asset_container_no_confirm(
     container_group_cls: Type,
     send_all: bool,
     send: bool,
+    silent_if_empty: bool,
     bypass_sc: bool = False,
 ) -> set[str]:
     """
@@ -114,9 +115,9 @@ def _export_asset_container_no_confirm(
 
     container_group = container_group_cls(export_settings)
     if send_all:
-        container_group.set_containers_from_scene()
+        container_group.set_containers_from_scene(silent_if_empty=silent_if_empty)
     else:
-        container_group.set_containers_from_selection()
+        container_group.set_containers_from_selection(silent_if_empty=silent_if_empty)
 
     container_group.export_proc(send=send, bypass_sc=bypass_sc)
     return {'FINISHED'}
@@ -255,12 +256,14 @@ class BH_OT_export_containers(bpy.types.Operator):
                 return {'CANCELLED'}
 
         # Run all selected container types
+        silent_if_empty = len(groups) > 1
         for group_cls in groups:
             res = _export_asset_container_no_confirm(
                 preset=preset,
                 container_group_cls=group_cls,
                 send_all=self.send_all,
                 send=self.send,
+                silent_if_empty=silent_if_empty,
                 bypass_sc=False,
             )
             if res == {'CANCELLED'}:
