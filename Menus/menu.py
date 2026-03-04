@@ -80,13 +80,32 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
 
 
 class BLUE_HOLE_MT_containers(bpy.types.Menu):
-    bl_label = 'Containers'
+    bl_label = 'Asset Containers'
 
     def draw(self, context):
         layout = self.layout
-        layout.operator(impExpOp.SceneAddAssetCollection.bl_idname, icon='OUTLINER')
-        layout.operator(impExpOp.SceneAddAssetHierarchy.bl_idname, icon='OUTLINER')
-        layout.operator(impExpOp.SceneAddAssetMesh.bl_idname, icon='OUTLINER')
+
+        enabled_collection = prefs().container.enable_asset_collection_container
+        enabled_hierarchy = prefs().container.enable_asset_hierarchy_container
+        enabled_mesh = prefs().container.enable_asset_mesh_container
+
+        if enabled_collection:
+            layout.operator(impExpOp.SceneAddAssetCollection.bl_idname, icon='OUTLINER')
+
+        if enabled_hierarchy:
+            layout.operator(impExpOp.SceneAddAssetHierarchy.bl_idname, icon='OUTLINER')
+
+        if enabled_mesh:
+            layout.operator(impExpOp.SceneAddAssetMesh.bl_idname, icon='OUTLINER')
+
+        if not (enabled_collection or enabled_hierarchy or enabled_mesh):
+            row = layout.row()
+            row.enabled = False
+            row.operator(
+                "wm.bh_disabled_notice",
+                text="All Asset Container types are disabled in Preferences",
+                icon='ERROR'
+            )
 
 
 class BLUE_HOLE_MT_food_delivery(bpy.types.Menu):
@@ -257,6 +276,20 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
                 log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
                 return
 
+        enabled_collection = prefs().container.enable_asset_collection_container
+        enabled_hierarchy = prefs().container.enable_asset_hierarchy_container
+        enabled_mesh = prefs().container.enable_asset_mesh_container
+
+        if not (enabled_collection or enabled_hierarchy or enabled_mesh):
+            row = layout.row()
+            row.enabled = False
+            row.operator(
+                "wm.bh_disabled_notice",
+                text="All Asset Container types are disabled in Preferences",
+                icon='ERROR'
+            )
+            return
+
         def add_button(title, *, send_all, include_hierarchy, include_collection, include_mesh):
             icon = 'UV_SYNC_SELECT' if self.SEND else 'EXPORT'
             label = exportSendOp.BH_OT_export_containers.build_ui_label(
@@ -276,21 +309,24 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
             op.include_mesh = include_mesh
 
         # Collections
-        show_label('ASSET COLLECTIONS', layout)
-        add_button("Collections All",      send_all=True,  include_hierarchy=False, include_collection=True,  include_mesh=False)
-        add_button("Collections Selected", send_all=False, include_hierarchy=False, include_collection=True,  include_mesh=False)
-        layout.separator()
+        if enabled_collection:
+            show_label('ASSET COLLECTIONS', layout)
+            add_button("Collections All",      send_all=True,  include_hierarchy=False, include_collection=True,  include_mesh=False)
+            add_button("Collections Selected", send_all=False, include_hierarchy=False, include_collection=True,  include_mesh=False)
+            layout.separator()
 
         # Hierarchies
-        show_label('ASSET HIERARCHIES', layout)
-        add_button("Hierarchies All",      send_all=True,  include_hierarchy=True,  include_collection=False, include_mesh=False)
-        add_button("Hierarchies Selected", send_all=False, include_hierarchy=True,  include_collection=False, include_mesh=False)
-        layout.separator()
+        if enabled_hierarchy:
+            show_label('ASSET HIERARCHIES', layout)
+            add_button("Hierarchies All",      send_all=True,  include_hierarchy=True,  include_collection=False, include_mesh=False)
+            add_button("Hierarchies Selected", send_all=False, include_hierarchy=True,  include_collection=False, include_mesh=False)
+            layout.separator()
 
         # Meshes
-        show_label('ASSET MESHES', layout)
-        add_button("Meshes All",      send_all=True,  include_hierarchy=False, include_collection=False, include_mesh=True)
-        add_button("Meshes Selected", send_all=False, include_hierarchy=False, include_collection=False, include_mesh=True)
+        if enabled_mesh:
+            show_label('ASSET MESHES', layout)
+            add_button("Meshes All",      send_all=True,  include_hierarchy=False, include_collection=False, include_mesh=True)
+            add_button("Meshes Selected", send_all=False, include_hierarchy=False, include_collection=False, include_mesh=True)
 
 
 class BLUE_HOLE_MT_send_specific(_BLUE_HOLE_MT_specific_base):
