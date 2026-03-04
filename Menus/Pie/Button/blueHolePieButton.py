@@ -140,20 +140,20 @@ def batch_export_selection_resource_folder(pie):
 # SEND
 
 
-def send_hierarchy_all_unreal(pie):
-    pie.operator("wm.bh_send_unreal", icon='UV_SYNC_SELECT')
+def send_all_all_containers_unreal(pie):
+    pie.operator("wm.bh_send_all_containers_unreal", icon='UV_SYNC_SELECT')
 
 
-def send_hierarchy_selected_unreal(pie):
-    pie.operator("wm.bh_send_selected_unreal", icon='UV_SYNC_SELECT')
+def send_selected_all_containers_unreal(pie):
+    pie.operator("wm.bh_send_selected_all_containers_unreal", icon='UV_SYNC_SELECT')
 
 
-def send_hierarchy_all_unity(pie):
-    pie.operator("wm.bh_send_unity", icon='UV_SYNC_SELECT')
+def send_all_all_containers_unity(pie):
+    pie.operator("wm.bh_send_all_containers_unity", icon='UV_SYNC_SELECT')
 
 
-def send_hierarchy_selected_unity(pie):
-    pie.operator("wm.bh_send_selected_unity", icon='UV_SYNC_SELECT')
+def send_selected_all_containers_unity(pie):
+    pie.operator("wm.bh_send_selected_all_containers_unity", icon='UV_SYNC_SELECT')
 
 
 def export_hierarchy_all(pie):
