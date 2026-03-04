@@ -284,6 +284,28 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self)
 
 
+class SceneAddAssetCollection(bpy.types.Operator):
+
+    bl_idname = "wm.bh_scene_add_asset_collection"
+    bl_label = "Add Asset Collection"
+    bl_description = "Add Asset Collection of given name to scene."
+
+    def execute(self, context):
+        log(Severity.CRITICAL, self.bl_label, f'{self.bl_label} has not yet been implemented.')
+        return {'CANCELLED'}
+
+
+class SceneAddAssetMesh(bpy.types.Operator):
+
+    bl_idname = "wm.bh_scene_add_asset_mesh"
+    bl_label = "Add Asset Mesh"
+    bl_description = "Add Asset Mesh of given name to scene."
+
+    def execute(self, context):
+        log(Severity.CRITICAL, self.bl_label, f'{self.bl_label} has not yet been implemented.')
+        return {'CANCELLED'}
+
+
 class ImportGuide_5_6_ScaleMan(bpy.types.Operator):
 
     bl_idname = "wm.bh_imp_guide_5_6_scaleman"
@@ -350,7 +372,9 @@ classes = (ImportGuide_5_6_ScaleMan,
            BatchExportSelectedToFinal,
            BatchExportSelectedToBakeFBX,
            BatchExportSelectedToResources,
-           SceneAddAssetHierarchy)
+           SceneAddAssetHierarchy,
+           SceneAddAssetCollection,
+           SceneAddAssetMesh)
 
 
 def register():

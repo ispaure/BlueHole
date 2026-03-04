@@ -34,37 +34,50 @@ from ..Lib.commonUtils.debugUtils import *
 
 # Directories Menu
 class BLUE_HOLE_MT_directories(bpy.types.Menu):
-    bl_label = 'Directories and Hierarchy'
+    bl_label = 'Directories'
 
     def draw(self, context):
         layout = self.layout
-        layout.operator(impExpOp.SceneAddAssetHierarchy.bl_idname, icon='OUTLINER')
 
-        # Environment Folders
-        test_a = os.path.exists(prefs().bridge.sc_path) or os.path.exists(prefs().bridge.sc_path_alternate) or os.path.exists(prefs().bridge.sc_path_mac) or os.path.exists(prefs().bridge.sc_path_mac_alternate) or os.path.exists(prefs().bridge.sc_path_linux) or os.path.exists(prefs().bridge.sc_path_linux_alternate)
-        test_b = os.path.exists(prefs().bridge.unity_assets_path) or os.path.exists(prefs().bridge.unity_assets_path_mac)
-        test_c = prefs().sc.source_control_enable and prefs().sc.source_control_solution == 'perforce'
-        if test_a or test_b or test_c:
-            layout.separator()
-            show_label('ENVIRONMENT', layout)
-            if test_a:
-                layout.operator(dirOp.OpenSourceContentPath.bl_idname, icon='FILE_FOLDER')
-            if test_b:
-                layout.operator(dirOp.OpenUnityAssetsPath.bl_idname, icon='FILE_FOLDER')
-            if test_c:
-                layout.operator(dirOp.OpenP4WorkspaceRootFolder.bl_idname, icon='FILE_FOLDER')
-
-        layout.separator()
-        show_label('SOURCE ASSET', layout)
+        # SCENE
+        show_label('SCENE', layout)
         layout.operator(dirOp.OpenSceneFolder.bl_idname, icon='FILE_FOLDER')
         layout.operator(dirOp.OpenReferencesFolder.bl_idname, icon='FILE_FOLDER')
         layout.operator(dirOp.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
         layout.operator(dirOp.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')
         layout.operator(dirOp.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
+
+        # ENGINE
+        if prefs().bridge.active_game_engine in ['unreal', 'unity']:
+            if os.path.exists(prefs().bridge.sc_path) or os.path.exists(prefs().bridge.sc_path_alternate) or os.path.exists(prefs().bridge.sc_path_mac) or os.path.exists(prefs().bridge.sc_path_mac_alternate) or os.path.exists(prefs().bridge.sc_path_linux) or os.path.exists(prefs().bridge.sc_path_linux_alternate):
+                layout.separator()
+                show_label('ENGINE', layout)
+                layout.operator(dirOp.OpenSourceContentPath.bl_idname, icon='FILE_FOLDER')
+            if prefs().bridge.active_game_engine == 'unity':
+                if os.path.exists(prefs().bridge.unity_assets_path) or os.path.exists(prefs().bridge.unity_assets_path_mac) or os.path.exists(prefs().bridge.unity_assets_path_linux):
+                    layout.operator(dirOp.OpenUnityAssetsPath.bl_idname, icon='FILE_FOLDER')
+
+        # SOURCE CONTROL
+        if prefs().sc.source_control_enable:
+            if prefs().sc.source_control_solution == 'perforce':
+                layout.separator()
+                show_label('SOURCE CONTROL', layout)
+                layout.operator(dirOp.OpenP4WorkspaceRootFolder.bl_idname, icon='FILE_FOLDER')
+
+        # CONFIG
         layout.separator()
         show_label('CONFIG', layout)
         layout.operator(dirOp.OpenUserResourcePath.bl_idname, icon='FILE_FOLDER')
 
+
+class BLUE_HOLE_MT_containers(bpy.types.Menu):
+    bl_label = 'Containers'
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator(impExpOp.SceneAddAssetCollection.bl_idname, icon='OUTLINER')
+        layout.operator(impExpOp.SceneAddAssetHierarchy.bl_idname, icon='OUTLINER')
+        layout.operator(impExpOp.SceneAddAssetMesh.bl_idname, icon='OUTLINER')
 
 
 class BLUE_HOLE_MT_food_delivery(bpy.types.Menu):
@@ -343,6 +356,7 @@ classes = (BLUE_HOLE_MT_directories,
            BLUE_HOLE_MT_send,
            BLUE_HOLE_MT_send_specific,
            BLUE_HOLE_MT_sort,
+           BLUE_HOLE_MT_containers,
            BLUE_HOLE_MT_source_control,
            BLUE_HOLE_MT_themes,
            BLUE_HOLE_MT_update_deluxe)
