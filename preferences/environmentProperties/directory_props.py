@@ -74,33 +74,88 @@ def draw(preference, context, layout):
     # Lay out environment settings
     enable_rows = prefs().general.active_environment != 'default'
 
-    # Asset Directory Structure
+    # -------------------------------------------------------------------------------------------------
+    # DIRECTORY STRUCTURE TAB
+    # -------------------------------------------------------------------------------------------------
     box = layout.box()
     column = box.column()
+
     row = column.row()
     row.enabled = enable_rows
-    row.label(text='Source Asset Directory: Define your working files\' directory structure.')
+    row.label(text='Defines the sub-directory layout for the Blender scene and its exported assets and containers.')
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.environment, 'sc_dir_struct_scenes', text='Scenes')
+    row.label(text='Fields left blank correspond to the root of your current structure.')
+
+    # -------------------------------------------------------------------------------------------------
+    # BLENDER (.BLEND)
+    # -------------------------------------------------------------------------------------------------
+    box = layout.box()
+    column = box.column()
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.environment, 'sc_dir_struct_resources', text='Resources')
+    row.label(text='BLENDER (.BLEND)')
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.environment, 'sc_dir_struct_st', text='SpeedTree Fronds')
+    row.prop(preference.directory, 'sc_dir_struct_scenes', text='Scenes')
+
+    # -------------------------------------------------------------------------------------------------
+    # WORKING FILES
+    # -------------------------------------------------------------------------------------------------
+    box = layout.box()
+    column = box.column()
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.environment, 'sc_dir_struct_st_lr', text='(ST Low Res)')
+    row.label(text='WORKING FILES')
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.environment, 'sc_dir_struct_st_hr', text='(ST High Res)')
+    row.prop(preference.directory, 'sc_dir_struct_resources', text='Resources')
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.environment, 'sc_dir_struct_ref', text='References')
+    row.prop(preference.directory, 'sc_dir_struct_ref', text='References')
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.environment, 'sc_dir_struct_final', text='Final Exports')
+    row.prop(preference.directory, 'sc_dir_struct_msh_bake', text='Mesh Bakes')
+
+    # -------------------------------------------------------------------------------------------------
+    # SPEEDTREE EXPORTS
+    # -------------------------------------------------------------------------------------------------
+    box_2 = box.box()
+    column = box_2.column()
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.environment, 'sc_dir_struct_msh_bake', text='Mesh Bakes')
+    row.label(text='SPEEDTREE EXPORTS')
+
+    row = column.row()
+    row.enabled = enable_rows
+    row.prop(preference.directory, 'sc_dir_struct_st', text='SpeedTree Fronds')
+
+    row = column.row()
+    row.enabled = enable_rows
+    row.prop(preference.directory, 'sc_dir_struct_st_lr', text='SpeedTree Fronds (Low Res)')
+
+    row = column.row()
+    row.enabled = enable_rows
+    row.prop(preference.directory, 'sc_dir_struct_st_hr', text='SpeedTree Fronds (High Res)')
+
+    # -------------------------------------------------------------------------------------------------
+    # SEND & EXPORTS
+    # -------------------------------------------------------------------------------------------------
+    box = layout.box()
+    column = box.column()
+
+    row = column.row()
+    row.enabled = enable_rows
+    row.label(text='SEND & EXPORTS')
+
+    row = column.row()
+    row.enabled = enable_rows
+    row.prop(preference.directory, 'sc_dir_struct_final', text='Final')

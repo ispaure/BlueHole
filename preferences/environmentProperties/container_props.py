@@ -30,6 +30,28 @@ show_verbose = True
 # CODE
 
 class ContainerPG(bpy.types.PropertyGroup):
+
+    active_container_group_tab: EnumProperty(
+        name="Container Group",
+        description="Choose which container group settings to display",
+        items=[
+            ('ASSET', "Asset Containers", "Asset container identification and structure rules"),
+            ('LOOSE', "Loose Mesh", "Loose Mesh batch export (no container required)"),
+        ],
+        default='ASSET',
+    )
+
+    active_container_settings_tab: EnumProperty(
+        name="Container Type",
+        description="Choose which container type settings to display",
+        items=[
+            ('HIERARCHY', "Hierarchy", "Asset Hierarchy container settings"),
+            ('MESH', "Mesh", "Asset Mesh container settings"),
+            ('COLLECTION', "Collection", "Asset Collection container settings"),
+        ],
+        default='HIERARCHY',
+    )
+
     # Asset Hierarchy Structure
     asset_hierarchy_struct_prefix_static_mesh: StringProperty(name='Static Mesh',
                                                               description='Prefix for Asset Hierarchies created with '
@@ -98,44 +120,169 @@ def draw(preference, context, layout):
     # Lay out environment settings
     enable_rows = prefs().general.active_environment != 'default'
 
-    # Asset Directory Structure
+    # -------------------------------------------------------------------------------------------------
+    # CONTAINERS (Tab Intro)
+    # -------------------------------------------------------------------------------------------------
     box = layout.box()
     column = box.column()
 
-    # Asset Hierarchy Structure
+    row = column.row()
+    row.enabled = enable_rows
+    row.label(text='Containers define how scene objects are grouped into exportable assets.')
+
+    row = column.row()
+    row.enabled = enable_rows
+    row.label(text='This tab controls container identification (prefixes) and container structure rules.')
+
+    row = column.row()
+    row.enabled = enable_rows
+    row.label(text='Use the Blue Hole header menu to create containers.')
+
+    # -------------------------------------------------------------------------------------------------
+    # CONTAINER GROUP TABS (Asset Containers / Loose Mesh)
+    # -------------------------------------------------------------------------------------------------
     box = layout.box()
     column = box.column()
+
     row = column.row()
     row.enabled = enable_rows
-    row.label(text='Asset Hierarchy: Define the structure of individually exported containers.')
-    row = column.row()
-    row.enabled = enable_rows
-    row.label(text='Prefixes')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.container, 'asset_hierarchy_struct_prefix_static_mesh', text='Static Mesh')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.container, 'asset_hierarchy_struct_prefix_static_mesh_kit', text='Static Mesh Kit')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.container, 'asset_hierarchy_struct_prefix_skeletal_mesh', text='Skeletal Mesh')
-    row = column.row()
-    row.enabled = enable_rows
-    row.label(text='Empty Objects: ')
-    row.prop(preference.container, 'exclude_element_if_no_child', text='Exclude if no Child')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.container, 'create_element_render', text='Render')
-    if prefs().container.create_element_render:
-        row.prop(preference.container, 'asset_hierarchy_empty_object_meshes', text='Name')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.container, 'create_element_collision', text='Collision')
-    if prefs().container.create_element_collision:
-        row.prop(preference.container, 'asset_hierarchy_empty_object_collisions', text='Name')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.container, 'create_element_sockets', text='Socket')
-    if prefs().container.create_element_sockets:
-        row.prop(preference.container, 'asset_hierarchy_empty_object_sockets', text='Name')
+    row.prop(preference.container, 'active_container_group_tab', expand=True)
+
+    active_group = preference.container.active_container_group_tab
+
+    # -------------------------------------------------------------------------------------------------
+    # ASSET CONTAINERS
+    # -------------------------------------------------------------------------------------------------
+    if active_group == 'ASSET':
+
+        box = layout.box()
+        column = box.column()
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='Asset Containers define exportable assets at the scene root.')
+
+        # -------------------------------------------------------------------------------------------------
+        # ASSET CONTAINERS - REQUIRED PREFIXES
+        # -------------------------------------------------------------------------------------------------
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='Asset Containers are detected when their root name starts with one of these prefixes.')
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.prop(preference.container, 'asset_hierarchy_struct_prefix_static_mesh', text='Static Mesh Prefix')
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.prop(preference.container, 'asset_hierarchy_struct_prefix_static_mesh_kit', text='Static Mesh Kit Prefix')
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.prop(preference.container, 'asset_hierarchy_struct_prefix_skeletal_mesh', text='Skeletal Mesh Prefix')
+
+        # Spacer
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='')
+
+        # -------------------------------------------------------------------------------------------------
+        # CONTAINER TYPE TABS (Hierarchy / Mesh / Collection)
+        # -------------------------------------------------------------------------------------------------
+        tab_row = column.row()
+        tab_row.enabled = enable_rows
+        tab_row.prop(preference.container, 'active_container_settings_tab', expand=True)
+
+        active_tab = preference.container.active_container_settings_tab
+
+        # -------------------------------------------------------------------------------------------------
+        # ACTIVE ASSET CONTAINER SETTINGS
+        # -------------------------------------------------------------------------------------------------
+        if active_tab == 'HIERARCHY':
+
+            box_2 = box.box()
+            column2 = box_2.column()
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.label(text='Requirements: Empty object at the scene root (must use a valid prefix).')
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.label(text='Optional child Empty objects:')
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.prop(preference.container, 'create_element_render', text='Render [Nests Visual Meshes]')
+            if prefs().container.create_element_render:
+                row.prop(preference.container, 'asset_hierarchy_empty_object_meshes', text='Name')
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.prop(preference.container, 'create_element_collision', text='Collision [Nests Collisions]')
+            if prefs().container.create_element_collision:
+                row.prop(preference.container, 'asset_hierarchy_empty_object_collisions', text='Name')
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.prop(preference.container, 'create_element_sockets', text='Sockets [Nests Sockets]')
+            if prefs().container.create_element_sockets:
+                row.prop(preference.container, 'asset_hierarchy_empty_object_sockets', text='Name')
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.label(text='Child group behavior:')
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.prop(preference.container, 'exclude_element_if_no_child', text='Exclude empty child groups from export')
+
+        elif active_tab == 'MESH':
+
+            box_2 = box.box()
+            column2 = box_2.column()
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.label(text='Requirements: Mesh object at the scene root (must use a valid prefix).')
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.label(text='No structure rules for this container type.')
+
+        elif active_tab == 'COLLECTION':
+
+            box_2 = box.box()
+            column2 = box_2.column()
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.label(text='Requirements: Collection at the scene root (must use a valid prefix).')
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.label(text='No structure rules for this container type.')
+
+    # -------------------------------------------------------------------------------------------------
+    # LOOSE MESH (Batch Export)
+    # -------------------------------------------------------------------------------------------------
+    elif active_group == 'LOOSE':
+
+        box = layout.box()
+        column = box.column()
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='Exports each selected mesh as its own file. No prefixes or container structure required.')
+
+        # Optional: keep a settings sub-box for visual symmetry
+        box_2 = box.box()
+        column = box_2.column()
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='SETTINGS')
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='No settings for Loose Mesh.')

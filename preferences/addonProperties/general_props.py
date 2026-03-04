@@ -19,6 +19,7 @@ import bpy
 from bpy.props import *
 from ...Lib.commonUtils.osUtils import *
 from ..prefs import *
+from ...environment import envManager
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

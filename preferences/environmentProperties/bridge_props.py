@@ -30,6 +30,17 @@ show_verbose = True
 # CODE
 
 class BridgePG(bpy.types.PropertyGroup):
+
+    active_container_group_tab: EnumProperty(
+        name="Container Group",
+        description="Choose which container group settings to display",
+        items=[
+            ('ASSET', "Asset Containers", "Asset container identification and structure rules"),
+            ('LOOSE', "Loose Mesh", "Loose Mesh batch export (no container required)"),
+        ],
+        default='ASSET',
+    )
+
     # Set Game Engine
     engine_lst = [('unreal', 'Unreal', ''), ('unity', 'Unity', ''), ('disabled', 'Disabled', '')]
     active_game_engine: EnumProperty(name="Solution",
@@ -164,104 +175,164 @@ def draw(preference, context, layout):
     # Lay out environment settings
     enable_rows = prefs().general.active_environment != 'default'
 
-    # CHOOSE ENGINE
+    # -------------------------------------------------------------------------------------------------
+    # CONTAINER GROUP TABS (Asset Containers / Loose Mesh)
+    # Note: This file keeps settings shared across all Asset Container types (Hierarchy/Mesh/Collection).
+    # -------------------------------------------------------------------------------------------------
     box = layout.box()
     column = box.column()
+
     row = column.row()
     row.enabled = enable_rows
-    row.prop(preference.bridge, 'active_game_engine', text='Current Game Engine')
+    row.prop(preference.bridge, 'active_container_group_tab', expand=True)
 
-    match prefs().bridge.active_game_engine:
-        case 'unreal':
-            # SEND ASSET HIERARCHIES TO UNREAL
-            box = layout.box()
-            column = box.column()
-            row = column.row()
-            row.enabled = enable_rows
-            row.label(text="Send/Export Asset Hierarchies to Unreal".upper())
-            # General options
-            match get_os():
-                case OS.WIN:
-                    row = column.row()
-                    row.enabled = enable_rows
-                    row.prop(preference.bridge, 'sc_path', text='Source Content')
-                    row = column.row()
-                    row.enabled = enable_rows
-                    row.prop(preference.bridge, 'sc_path_alternate', text='Source Content (Alternate)')
+    active_group = preference.bridge.active_container_group_tab
 
-                case OS.MAC:
-                    row = column.row()
-                    row.enabled = enable_rows
-                    row.prop(preference.bridge, 'sc_path_mac', text='Source Content')
-                    row = column.row()
-                    row.enabled = enable_rows
-                    row.prop(preference.bridge, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+    # -------------------------------------------------------------------------------------------------
+    # ASSET CONTAINERS (Engine Bridge Settings)
+    # -------------------------------------------------------------------------------------------------
+    if active_group == 'ASSET':
 
-                case OS.LINUX:
-                    row = column.row()
-                    row.enabled = enable_rows
-                    row.prop(preference.bridge, 'sc_path_linux', text='Source Content')
-                    row = column.row()
-                    row.enabled = enable_rows
-                    row.prop(preference.bridge, 'sc_path_linux_alternate', text='Source Content (Alternate)')
+        # ---------------------------------------------------------------------------------------------
+        # ENGINE (Asset Containers)
+        # ---------------------------------------------------------------------------------------------
+        box = layout.box()
+        column = box.column()
 
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.bridge, 'ue_bridge_zero_root_transform', text='Zero Root Transform on Export')
-            row.prop(preference.bridge, 'ue_bridge_include_animation', text='Include Animation')
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.bridge, 'ue_automated', text='Automated Import')
-            row.prop(preference.bridge, 'ue_import_textures', text='Import Textures')
-            row.prop(preference.bridge, 'ue_import_materials', text='Import Materials')
+        row = column.row()
+        row.enabled = enable_rows
+        row.prop(preference.bridge, 'active_game_engine', text='Current Game Engine')
 
-        case 'unity':
-            # EXPORTS: ASSET HIERARCHIES (UNITY)
-            box = layout.box()
-            column = box.column()
-            row = column.row()
-            row.enabled = enable_rows
-            row.label(text="Send Asset Hierarchies to Unity".upper())
-            # General options
-            row = column.row()
-            row.enabled = enable_rows
-            match get_os():
-                case OS.WIN:
-                    row.prop(preference.environment, 'sc_path', text='Source Content')
-                    row.prop(preference.environment, 'sc_path_alternate', text='Source Content (Alternate)')
-                case OS.MAC:
-                    row.prop(preference.environment, 'sc_path_mac', text='Source Content')
-                    row.prop(preference.environment, 'sc_path_mac_alternate', text='Source Content (Alternate)')
-                case OS.LINUX:
-                    row.prop(preference.environment, 'sc_path_linux', text='Source Content')
-                    row.prop(preference.environment, 'sc_path_linux_alternate', text='Source Content (Alternate)')
-            row = column.row()
-            row.enabled = enable_rows
-            match get_os():
-                case OS.WIN:
-                    row.prop(preference.bridge, 'unity_assets_path', text='Unity Assets')
-                case OS.MAC:
-                    row.prop(preference.bridge, 'unity_assets_path_mac', text='Unity Assets')
-                case OS.LINUX:
-                    row.prop(preference.bridge, 'unity_assets_path_linux', text='Unity Assets')
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.bridge, 'unity_bridge_zero_root_transform', text='Zero Root Transform on Export')
-            row.prop(preference.bridge, 'unity_bridge_include_animation', text='Include Animation')
-            row = column.row()
-            row.enabled = enable_rows
-            row.prop(preference.bridge, 'unity_forward_axis', text='Forward Axis')
-            row.prop(preference.bridge, 'unity_up_axis', text='Up Axis')
+        match prefs().bridge.active_game_engine:
 
-        case _:
-            pass
+            # -----------------------------------------------------------------------------------------
+            # UNREAL
+            # -----------------------------------------------------------------------------------------
+            case 'unreal':
+                box = layout.box()
+                column = box.column()
 
-    # EXPORTS: BATCH SELECTION
-    box = layout.box()
-    column = box.column()
-    row = column.row()
-    row.enabled = enable_rows
-    row.label(text='Export Batch Selection to FBX (ex. for SpeedTree Fronds)')
-    row = column.row()
-    row.enabled = enable_rows
-    row.prop(preference.bridge, 'exp_select_zero_root_transform', text='Zero Root Transform on Export')
+                row = column.row()
+                row.enabled = enable_rows
+                row.label(text="SEND / EXPORT ASSET CONTAINERS TO UNREAL")
+
+                # Source Content paths (per-OS)
+                match get_os():
+                    case OS.WIN:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_alternate', text='Source Content (Alternate)')
+
+                    case OS.MAC:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_mac', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+
+                    case OS.LINUX:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_linux', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_linux_alternate', text='Source Content (Alternate)')
+
+                # Export behavior
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_bridge_zero_root_transform', text='Zero Root Transform on Export')
+                row.prop(preference.bridge, 'ue_bridge_include_animation', text='Include Animation')
+
+                # Import behavior
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_automated', text='Automated Import')
+                row.prop(preference.bridge, 'ue_import_textures', text='Import Textures')
+                row.prop(preference.bridge, 'ue_import_materials', text='Import Materials')
+
+            # -----------------------------------------------------------------------------------------
+            # UNITY
+            # -----------------------------------------------------------------------------------------
+            case 'unity':
+                box = layout.box()
+                column = box.column()
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.label(text="SEND / EXPORT ASSET CONTAINERS TO UNITY")
+
+                # Source Content paths (per-OS)
+                match get_os():
+                    case OS.WIN:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path', text='Source Content')
+                        row.prop(preference.bridge, 'sc_path_alternate', text='Source Content (Alternate)')
+
+                    case OS.MAC:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_mac', text='Source Content')
+                        row.prop(preference.bridge, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+
+                    case OS.LINUX:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_linux', text='Source Content')
+                        row.prop(preference.bridge, 'sc_path_linux_alternate', text='Source Content (Alternate)')
+
+                # Unity Assets path (per-OS)
+                row = column.row()
+                row.enabled = enable_rows
+                match get_os():
+                    case OS.WIN:
+                        row.prop(preference.bridge, 'unity_assets_path', text='Unity Assets')
+                    case OS.MAC:
+                        row.prop(preference.bridge, 'unity_assets_path_mac', text='Unity Assets')
+                    case OS.LINUX:
+                        row.prop(preference.bridge, 'unity_assets_path_linux', text='Unity Assets')
+
+                # Export behavior
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'unity_bridge_zero_root_transform', text='Zero Root Transform on Export')
+                row.prop(preference.bridge, 'unity_bridge_include_animation', text='Include Animation')
+
+                # Axis conversion
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'unity_forward_axis', text='Forward Axis')
+                row.prop(preference.bridge, 'unity_up_axis', text='Up Axis')
+
+            case _:
+                pass
+
+    # -------------------------------------------------------------------------------------------------
+    # LOOSE MESH (Batch Export)
+    # -------------------------------------------------------------------------------------------------
+    elif active_group == 'LOOSE':
+
+        box = layout.box()
+        column = box.column()
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='LOOSE MESH (Batch Export)')
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='Exports each selected mesh as its own file. No prefixes or container structure required.')
+
+        # -------------------------------------------------------------------------------------------------
+        # BATCH SELECTION (Loose Mesh)
+        # -------------------------------------------------------------------------------------------------
+        box = layout.box()
+        column = box.column()
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='BATCH SELECTION EXPORT')
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='Exports the current selection to FBX (one file per selected mesh).')
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.prop(preference.bridge, 'exp_select_zero_root_transform', text='Zero Root Transform on Export')
