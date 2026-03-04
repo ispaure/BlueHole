@@ -413,6 +413,10 @@ class SceneAddAssetMesh(bpy.types.Operator):
         if self.include_selected_obj and not context.selected_objects:
             self.include_selected_obj = False
 
+        # If using selection behavior, never create a default mesh root.
+        if self.include_selected_obj:
+            self.include_default_mesh = False
+
         # Resolve names
         name_lst = self.result_asset_mesh_name_lst()
         if not name_lst:
@@ -527,17 +531,22 @@ class SceneAddAssetMesh(bpy.types.Operator):
         box.label(text='Advanced Options')
         col = box.column()
 
-        row = col.row()
-        row.prop(self, "include_default_mesh")
-
         # Only show "Use Selection" in non-batch mode (so behavior is predictable)
         if not self.version_batch:
-            row = col.row()
+            row = col.row(align=True)
             row.prop(self, "include_selected_obj")
+
+            sub = row.row(align=True)
+            sub.enabled = not self.include_selected_obj
+            sub.prop(self, "include_default_mesh")
 
             if self.include_selected_obj and not context.selected_objects:
                 row = col.row()
                 row.label(text="No selection: a new Asset Mesh root will be created.", icon='INFO')
+
+        else:
+            row = col.row()
+            row.prop(self, "include_default_mesh")
 
     # -------------------------------------------------------------------------------------------------
     # HELPERS
@@ -546,6 +555,11 @@ class SceneAddAssetMesh(bpy.types.Operator):
     def invoke(self, context, event):
         # Auto-toggle "Use Selection" based on current selection, each time the dialog opens
         self.include_selected_obj = bool(context.selected_objects)
+
+        # If using selection behavior, never create a default mesh root.
+        if self.include_selected_obj:
+            self.include_default_mesh = False
+
         return context.window_manager.invoke_props_dialog(self)
 
     def result_asset_mesh_name_lst(self):
