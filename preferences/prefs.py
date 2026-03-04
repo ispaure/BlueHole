@@ -174,6 +174,22 @@ class _BridgePrefs:
     def ue_import_textures(self, value: bool):
         self._bridge.ue_import_textures = value
 
+    @property
+    def ue_enable_send_override(self) -> bool:
+        return self._bridge.ue_enable_send_override
+
+    @ue_enable_send_override.setter
+    def ue_enable_send_override(self, value: bool):
+        self._bridge.ue_enable_send_override = value
+
+    @property
+    def ue_op_send_override(self) -> str:
+        return self._bridge.ue_op_send_override
+
+    @ue_op_send_override.setter
+    def ue_op_send_override(self, value: str):
+        self._bridge.ue_op_send_override = value
+
     # -----------------------------------------------------------
     # EXPORTS: ASSET HIERARCHIES (UNITY)
     # -----------------------------------------------------------

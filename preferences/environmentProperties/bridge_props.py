@@ -113,6 +113,27 @@ class BridgePG(bpy.types.PropertyGroup):
     # Import Textures
     ue_import_textures: BoolProperty(name='Enable import of textures in Unreal.', default=False)
 
+    # Override Send operator
+    ue_enable_send_override: BoolProperty(
+        name="Override Send to Unreal",
+        description="Use a custom operator instead of Blue Hole's default Unreal send",
+        default=False
+    )
+
+    ue_op_send_override: StringProperty(
+        name="Send to Unreal Override Operator",
+        description=(
+            "Operator IDName to run instead of Blue Hole's default Unreal send "
+            "(example: wm.my_send_unreal). "
+            "This operator will be executed once for every Asset Container being sent. "
+            "It will receive a StringProperty named 'path' containing the full file path "
+            "to the exported FBX file for that container. "
+            "The override operator is responsible for communicating with Unreal and "
+            "triggering the asset import using this exported file."
+        ),
+        default=""
+    )
+
     # ------------------------------------------------------------------------------------------------------------------
 
     # EXPORTS: ASSET HIERARCHIES (UNITY) -------------------------------------------------------------------------------
@@ -245,6 +266,23 @@ def draw(preference, context, layout):
                 row.prop(preference.bridge, 'ue_import_textures', text='Import Textures')
                 row.prop(preference.bridge, 'ue_import_materials', text='Import Materials')
 
+                # -----------------------------------------------------------------------------------------
+                # OVERRIDE SEND OPERATOR
+                # -----------------------------------------------------------------------------------------
+                box_2 = box.box()
+                column = box_2.column()
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.label(text='OVERRIDE SEND OPERATOR')
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_enable_send_override', text='Override Send to Unreal')
+
+                if prefs().bridge.ue_enable_send_override:
+                    row.prop(preference.bridge, 'ue_op_send_override', text='Operator IDName')
+
             # -----------------------------------------------------------------------------------------
             # UNITY
             # -----------------------------------------------------------------------------------------
@@ -257,16 +295,19 @@ def draw(preference, context, layout):
                     case OS.WIN:
                         row = column.row(); row.enabled = enable_rows
                         row.prop(preference.bridge, 'sc_path', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
                         row.prop(preference.bridge, 'sc_path_alternate', text='Source Content (Alternate)')
 
                     case OS.MAC:
                         row = column.row(); row.enabled = enable_rows
                         row.prop(preference.bridge, 'sc_path_mac', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
                         row.prop(preference.bridge, 'sc_path_mac_alternate', text='Source Content (Alternate)')
 
                     case OS.LINUX:
                         row = column.row(); row.enabled = enable_rows
                         row.prop(preference.bridge, 'sc_path_linux', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
                         row.prop(preference.bridge, 'sc_path_linux_alternate', text='Source Content (Alternate)')
 
                 # Unity Assets path (per-OS)
