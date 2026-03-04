@@ -215,16 +215,44 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
             op.include_collection = include_collection
             op.include_mesh = include_mesh
 
-        # All Containers - All in Scene
-        add_button(send_all=True,  include_hierarchy=True, include_collection=True, include_mesh=True)
-        # All Containers - In Selection
-        add_button(send_all=False, include_hierarchy=True, include_collection=True, include_mesh=True)
+        enabled_hierarchy = prefs().container.enable_asset_hierarchy_container
+        enabled_collection = prefs().container.enable_asset_collection_container
+        enabled_mesh = prefs().container.enable_asset_mesh_container
 
-        # Submenu for specific container type
-        if self.SEND:
-            layout.menu("BLUE_HOLE_MT_send_specific")
+        enabled_count = int(enabled_hierarchy) + int(enabled_collection) + int(enabled_mesh)
+
+        if enabled_count >= 1:
+            # All Containers - All in Scene (only include enabled types)
+            add_button(
+                send_all=True,
+                include_hierarchy=enabled_hierarchy,
+                include_collection=enabled_collection,
+                include_mesh=enabled_mesh,
+            )
+
+            # All Containers - In Selection (only include enabled types)
+            add_button(
+                send_all=False,
+                include_hierarchy=enabled_hierarchy,
+                include_collection=enabled_collection,
+                include_mesh=enabled_mesh,
+            )
+
+            # Submenu for specific container types (only useful if 2+ enabled)
+            if enabled_count >= 2:
+                if self.SEND:
+                    layout.menu("BLUE_HOLE_MT_send_specific")
+                else:
+                    layout.menu("BLUE_HOLE_MT_export_specific")
+
         else:
-            layout.menu("BLUE_HOLE_MT_export_specific")
+            row = layout.row()
+            row.enabled = False
+            row.operator(
+                "wm.bh_disabled_notice",
+                text="All Asset Container types are disabled in Preferences",
+                icon='ERROR'
+            )
 
         # --------------------------------------------------------------------------------------------------------------
         # RESOURCE SECTION

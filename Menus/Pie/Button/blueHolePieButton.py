@@ -218,6 +218,11 @@ def send_all_asset_containers(pie):
             log(Severity.CRITICAL, 'Blue Hole Pie Menu', 'Unsupported Active Game Engine')
             return
 
+    enabled_hierarchy = prefs().container.enable_asset_hierarchy_container
+    enabled_collection = prefs().container.enable_asset_collection_container
+    enabled_mesh = prefs().container.enable_asset_mesh_container
+    any_enabled = enabled_hierarchy or enabled_collection or enabled_mesh
+
     # All Containers - All in Scene
     label = exportSendOp.BH_OT_export_containers.build_ui_label(
         export_preset=export_preset,
@@ -228,15 +233,7 @@ def send_all_asset_containers(pie):
         include_mesh=True,
     )
 
-    if blenderFile.is_blend_file_saved():
-        op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send_all = True
-        op.send = True
-        op.include_hierarchy = True
-        op.include_collection = True
-        op.include_mesh = True
-    else:
+    if not blenderFile.is_blend_file_saved():
         col = pie.column()
         col.enabled = False
         col.operator(
@@ -244,6 +241,25 @@ def send_all_asset_containers(pie):
             text="Save the .blend file to enable send operations",
             icon='ERROR'
         )
+        return
+
+    if not any_enabled:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            exportSendOp.BH_OT_export_containers.bl_idname,
+            text="All Asset Container types are disabled in Preferences",
+            icon='ERROR'
+        )
+        return
+
+    op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+    op.export_preset = export_preset
+    op.send_all = True
+    op.send = True
+    op.include_hierarchy = True
+    op.include_collection = True
+    op.include_mesh = True
 
 
 def send_selected_asset_containers(pie):
@@ -257,6 +273,11 @@ def send_selected_asset_containers(pie):
             log(Severity.CRITICAL, 'Blue Hole Pie Menu', 'Unsupported Active Game Engine')
             return
 
+    enabled_hierarchy = prefs().container.enable_asset_hierarchy_container
+    enabled_collection = prefs().container.enable_asset_collection_container
+    enabled_mesh = prefs().container.enable_asset_mesh_container
+    any_enabled = enabled_hierarchy or enabled_collection or enabled_mesh
+
     # All Containers - In Selection
     label = exportSendOp.BH_OT_export_containers.build_ui_label(
         export_preset=export_preset,
@@ -267,15 +288,7 @@ def send_selected_asset_containers(pie):
         include_mesh=True,
     )
 
-    if blenderFile.is_blend_file_saved():
-        op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send_all = False
-        op.send = True
-        op.include_hierarchy = True
-        op.include_collection = True
-        op.include_mesh = True
-    else:
+    if not blenderFile.is_blend_file_saved():
         col = pie.column()
         col.enabled = False
         col.operator(
@@ -283,16 +296,30 @@ def send_selected_asset_containers(pie):
             text="Save the .blend file to enable send operations",
             icon='ERROR'
         )
+        return
+
+    if not any_enabled:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            exportSendOp.BH_OT_export_containers.bl_idname,
+            text="All Asset Container types are disabled in Preferences",
+            icon='ERROR'
+        )
+        return
+
+    op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+    op.export_preset = export_preset
+    op.send_all = False
+    op.send = True
+    op.include_hierarchy = True
+    op.include_collection = True
+    op.include_mesh = True
 
 
 def export_hierarchy_all(pie):
 
-    if blenderFile.is_blend_file_saved():
-        pie.operator(
-            "wm.bh_export_all_hierarchies",
-            icon='UV_SYNC_SELECT'
-        )
-    else:
+    if not blenderFile.is_blend_file_saved():
         col = pie.column()
         col.enabled = False
         col.operator(
@@ -300,16 +327,27 @@ def export_hierarchy_all(pie):
             text="Save the .blend file to enable export operations",
             icon='ERROR'
         )
+        return
+
+    if not prefs().container.enable_asset_hierarchy_container:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_export_all_hierarchies",
+            text="Asset Hierarchy containers are disabled in Preferences",
+            icon='ERROR'
+        )
+        return
+
+    pie.operator(
+        "wm.bh_export_all_hierarchies",
+        icon='UV_SYNC_SELECT'
+    )
 
 
 def export_hierarchy_selected(pie):
 
-    if blenderFile.is_blend_file_saved():
-        pie.operator(
-            "wm.bh_export_select_hierarchies",
-            icon='UV_SYNC_SELECT'
-        )
-    else:
+    if not blenderFile.is_blend_file_saved():
         col = pie.column()
         col.enabled = False
         col.operator(
@@ -317,6 +355,22 @@ def export_hierarchy_selected(pie):
             text="Save the .blend file to enable export operations",
             icon='ERROR'
         )
+        return
+
+    if not prefs().container.enable_asset_hierarchy_container:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_export_select_hierarchies",
+            text="Asset Hierarchy containers are disabled in Preferences",
+            icon='ERROR'
+        )
+        return
+
+    pie.operator(
+        "wm.bh_export_select_hierarchies",
+        icon='UV_SYNC_SELECT'
+    )
 
 
 # ----------------------------------------------------------------------------------------------------------------------
