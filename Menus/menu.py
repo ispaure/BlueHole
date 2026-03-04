@@ -66,32 +66,6 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
         layout.operator(dirOp.OpenUserResourcePath.bl_idname, icon='FILE_FOLDER')
 
 
-# Export Menu
-class BLUE_HOLE_MT_export_old(bpy.types.Menu):
-    bl_label = "Export (to Source Asset Dir.)"
-
-    def draw(self, context):
-        layout = self.layout
-        show_label('FINAL Folder', layout)
-        match prefs().bridge.active_game_engine:
-            case 'unreal':
-                layout.operator(impExpOp.ExportAllHierarchiesToUE.bl_idname, icon='EXPORT')
-                layout.operator(impExpOp.ExportSelectHierarchiesToUE.bl_idname, icon='EXPORT')
-            case 'unity':
-                layout.operator(impExpOp.ExportAllHierarchiesToUnity.bl_idname, icon='EXPORT')
-                layout.operator(impExpOp.ExportSelectHierarchiesToUnity.bl_idname, icon='EXPORT')
-            case _:
-                pass
-        layout.operator(impExpOp.BatchExportSelectedToFinal.bl_idname, icon='EXPORT')
-        layout.separator()
-        show_label('RESOURCES Folder', layout)
-        layout.operator(impExpOp.BatchExportSelectedToResources.bl_idname, icon='EXPORT')
-        layout.separator()
-        show_label('SPEEDTREE FRONDS Folder', layout)
-        layout.operator(impExpOp.BatchExportSelectedToSpeedTree_FBX.bl_idname, icon='EXPORT')
-        layout.operator(impExpOp.BatchExportSelectedToSpeedtreeLR_FBX.bl_idname, icon='EXPORT')
-        layout.operator(impExpOp.BatchExportSelectedToSpeedtreeHR_FBX.bl_idname, icon='EXPORT')
-
 
 class BLUE_HOLE_MT_food_delivery(bpy.types.Menu):
     bl_label = 'Food Delivery'
@@ -157,6 +131,9 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
         return f"{verb} ({to_or_for} {prefs().bridge.active_game_engine.upper()})"
 
     def _draw_common(self, context, layout):
+
+        # --------------------------------------------------------------------------------------------------------------
+        # ENGINE / FINAL SECTION
         # Engine Doc + preset
         match prefs().bridge.active_game_engine:
             case 'unity':
@@ -174,6 +151,9 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
             case _:
                 log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
                 return
+
+        if not self.SEND:  # If not sending, offer button to open the folder
+            layout.operator(dirOp.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
 
         # Helper to reduce repetition
         def add_button(*, send_all, include_hierarchy, include_collection, include_mesh):
@@ -204,6 +184,24 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
             layout.menu("BLUE_HOLE_MT_send_specific")
         else:
             layout.menu("BLUE_HOLE_MT_export_specific")
+
+        # --------------------------------------------------------------------------------------------------------------
+        # RESOURCE SECTION
+        if not self.SEND:
+            layout.separator()
+            show_label('Directory: RESOURCES', layout)
+            layout.operator(dirOp.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(impExpOp.BatchExportSelectedToResources.bl_idname, icon='EXPORT')
+
+        # --------------------------------------------------------------------------------------------------------------
+        # SPEEDTREE SECTION
+        if not self.SEND:
+            layout.separator()
+            show_label('Directory: SPEEDTREE', layout)
+            layout.operator(dirOp.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(impExpOp.BatchExportSelectedToSpeedTree_FBX.bl_idname, icon='EXPORT')
+            layout.operator(impExpOp.BatchExportSelectedToSpeedtreeLR_FBX.bl_idname, icon='EXPORT')
+            layout.operator(impExpOp.BatchExportSelectedToSpeedtreeHR_FBX.bl_idname, icon='EXPORT')
 
 
 class BLUE_HOLE_MT_send(_BLUE_HOLE_MT_export_base):
@@ -338,7 +336,6 @@ class BLUE_HOLE_MT_update_deluxe(bpy.types.Menu):
 classes = (BLUE_HOLE_MT_directories,
            BLUE_HOLE_MT_export,
            BLUE_HOLE_MT_export_specific,
-           BLUE_HOLE_MT_export_old,
            BLUE_HOLE_MT_food_delivery,
            BLUE_HOLE_MT_help,
            BLUE_HOLE_MT_import,
