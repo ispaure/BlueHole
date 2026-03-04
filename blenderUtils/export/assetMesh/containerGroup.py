@@ -51,9 +51,9 @@ class AssetMeshContainerGroup(AssetContainerGroup):
         """
         # Get list of hierarchy prefixes
         ah_prefix_lst: List[str] = [
-            prefs().env.asset_hierarchy_struct_prefix_static_mesh,
-            prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit,
-            prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
+            prefs().container.asset_hierarchy_struct_prefix_static_mesh,
+            prefs().container.asset_hierarchy_struct_prefix_static_mesh_kit,
+            prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh
         ]
 
         # Export Root List

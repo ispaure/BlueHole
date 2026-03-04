@@ -135,7 +135,7 @@ def import_asset(file_path_source, file_path_dest):
     log(Severity.DEBUG, send_ue_name, 'Fetching Properties...')
 
     # Was it a skeletal?
-    sk_prefix = prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
+    sk_prefix = prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh
     if sk_prefix == file_path_source.split('/')[-1][0:len(sk_prefix)]:
         log(Severity.DEBUG, send_ue_name, 'Export is a Skeletal Mesh')
         is_skeletal = True
@@ -144,7 +144,7 @@ def import_asset(file_path_source, file_path_dest):
         is_skeletal = False
 
     # Is importing animations?
-    include_animation = prefs().general.ue_bridge_include_animation
+    include_animation = prefs().bridge.ue_bridge_include_animation
 
     # Make sure \\ on paths
     file_path_source = file_path_source.replace('\\', '\\\\')
@@ -159,15 +159,15 @@ def import_asset(file_path_source, file_path_dest):
             f'import_task = unreal.AssetImportTask()',
             f'import_task.filename = r"{file_path_source}"',
             f'import_task.destination_path = r"{file_path_dest}"',
-            f'import_task.automated = {prefs().general.ue_automated}',
+            f'import_task.automated = {prefs().bridge.ue_automated}',
             f'import_task.replace_existing = True',
             f'options = unreal.FbxImportUI()',
             f'options.auto_compute_lod_distances = False',
             f'options.lod_number = 0',
             f'options.import_as_skeletal = {is_skeletal}',
             f'options.import_animations = {include_animation}',
-            f'options.import_materials = {prefs().general.ue_import_materials}',
-            f'options.import_textures = {prefs().general.ue_import_textures}',
+            f'options.import_materials = {prefs().bridge.ue_import_materials}',
+            f'options.import_textures = {prefs().bridge.ue_import_textures}',
             f'options.import_mesh = {True}',
             f'options.static_mesh_import_data.generate_lightmap_u_vs = False',
             f'options.lod_distance0 = 1.0',

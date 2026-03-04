@@ -23,51 +23,55 @@ from .model import Setting
 # CODE
 
 
-general_setting_lst = (
-    # ------------------- General -------------------
-    Setting(pref_path='general.unity_assets_path', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path', var_type=str),
-    Setting(pref_path='general.unity_assets_path_mac', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path_mac', var_type=str),
-    Setting(pref_path='general.unity_assets_path_linux', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path_linux', var_type=str),
-    Setting(pref_path='general.unity_forward_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='forward_axis', var_type=str),
-    Setting(pref_path='general.unity_up_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='up_axis', var_type=str),
-    Setting(pref_path='general.exp_select_zero_root_transform', ini_section='ExportBatchSelectionToFBX', ini_value='zero_root_transform', var_type=bool),
-    Setting(pref_path='general.ue_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnreal', ini_value='zero_root_transform', var_type=bool),
-    Setting(pref_path='general.ue_bridge_include_animation', ini_section='SendAssetHierarchiesToUnreal', ini_value='include_animation', var_type=bool),
-    Setting(pref_path='general.unity_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnity', ini_value='zero_root_transform', var_type=bool),
-    Setting(pref_path='general.unity_bridge_include_animation', ini_section='SendAssetHierarchiesToUnity', ini_value='include_animation', var_type=bool),
-    Setting(pref_path='general.ue_automated', ini_section='SendAssetHierarchiesToUnreal', ini_value='is_automated', var_type=bool),
-    Setting(pref_path='general.ue_import_materials', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_materials', var_type=bool),
-    Setting(pref_path='general.ue_import_textures', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_textures', var_type=bool),
-    Setting(pref_path='general.active_game_engine', ini_section='Engine', ini_value='active_game_engine', var_type=str)
+bridge_setting_lst = (
+    Setting(pref_path='bridge.sc_path', ini_section='SourceContent', ini_value='sc_root_path', var_type=str),
+    Setting(pref_path='bridge.sc_path_alternate', ini_section='SourceContent', ini_value='sc_root_path_alternate', var_type=str),
+    Setting(pref_path='bridge.sc_path_mac', ini_section='SourceContent', ini_value='sc_root_path_mac', var_type=str),
+    Setting(pref_path='bridge.sc_path_mac_alternate', ini_section='SourceContent', ini_value='sc_root_path_mac_alternate', var_type=str),
+    Setting(pref_path='bridge.sc_path_linux', ini_section='SourceContent', ini_value='sc_root_path_linux', var_type=str),
+    Setting(pref_path='bridge.sc_path_linux_alternate', ini_section='SourceContent', ini_value='sc_root_path_linux_alternate', var_type=str),
+    Setting(pref_path='bridge.unity_assets_path', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path', var_type=str),
+    Setting(pref_path='bridge.unity_assets_path_mac', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path_mac', var_type=str),
+    Setting(pref_path='bridge.unity_assets_path_linux', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path_linux', var_type=str),
+    Setting(pref_path='bridge.unity_forward_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='forward_axis', var_type=str),
+    Setting(pref_path='bridge.unity_up_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='up_axis', var_type=str),
+    Setting(pref_path='bridge.exp_select_zero_root_transform', ini_section='ExportBatchSelectionToFBX', ini_value='zero_root_transform', var_type=bool),
+    Setting(pref_path='bridge.ue_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnreal', ini_value='zero_root_transform', var_type=bool),
+    Setting(pref_path='bridge.ue_bridge_include_animation', ini_section='SendAssetHierarchiesToUnreal', ini_value='include_animation', var_type=bool),
+    Setting(pref_path='bridge.unity_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnity', ini_value='zero_root_transform', var_type=bool),
+    Setting(pref_path='bridge.unity_bridge_include_animation', ini_section='SendAssetHierarchiesToUnity', ini_value='include_animation', var_type=bool),
+    Setting(pref_path='bridge.ue_automated', ini_section='SendAssetHierarchiesToUnreal', ini_value='is_automated', var_type=bool),
+    Setting(pref_path='bridge.ue_import_materials', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_materials', var_type=bool),
+    Setting(pref_path='bridge.ue_import_textures', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_textures', var_type=bool),
+    Setting(pref_path='bridge.active_game_engine', ini_section='Engine', ini_value='active_game_engine', var_type=str)
 )
 
-environment_setting_lst = (
-    # ------------------- Environment -------------------
-    Setting(pref_path='environment.sc_path', ini_section='SourceContent', ini_value='sc_root_path', var_type=str),
-    Setting(pref_path='environment.sc_path_alternate', ini_section='SourceContent', ini_value='sc_root_path_alternate', var_type=str),
-    Setting(pref_path='environment.sc_path_mac', ini_section='SourceContent', ini_value='sc_root_path_mac', var_type=str),
-    Setting(pref_path='environment.sc_path_mac_alternate', ini_section='SourceContent', ini_value='sc_root_path_mac_alternate', var_type=str),
-    Setting(pref_path='environment.sc_path_linux', ini_section='SourceContent', ini_value='sc_root_path_linux', var_type=str),
-    Setting(pref_path='environment.sc_path_linux_alternate', ini_section='SourceContent', ini_value='sc_root_path_linux_alternate', var_type=str),
-    Setting(pref_path='environment.sc_dir_struct_scenes', ini_section='AssetDirectoryStructure', ini_value='path_scenes', var_type=str),
-    Setting(pref_path='environment.sc_dir_struct_resources', ini_section='AssetDirectoryStructure', ini_value='path_resources', var_type=str),
-    Setting(pref_path='environment.sc_dir_struct_st', ini_section='AssetDirectoryStructure', ini_value='path_speedtree_msh', var_type=str),
-    Setting(pref_path='environment.sc_dir_struct_st_hr', ini_section='AssetDirectoryStructure', ini_value='path_speedtree_msh_hr', var_type=str),
-    Setting(pref_path='environment.sc_dir_struct_st_lr', ini_section='AssetDirectoryStructure', ini_value='path_speedtree_msh_lr', var_type=str),
-    Setting(pref_path='environment.sc_dir_struct_ref', ini_section='AssetDirectoryStructure', ini_value='path_references', var_type=str),
-    Setting(pref_path='environment.sc_dir_struct_final', ini_section='AssetDirectoryStructure', ini_value='path_final', var_type=str),
-    Setting(pref_path='environment.sc_dir_struct_msh_bake', ini_section='AssetDirectoryStructure', ini_value='path_mshbake', var_type=str),
-    Setting(pref_path='environment.asset_hierarchy_struct_prefix_static_mesh', ini_section='AssetHierarchyStructure', ini_value='prefix_static_mesh', var_type=str),
-    Setting(pref_path='environment.asset_hierarchy_struct_prefix_static_mesh_kit', ini_section='AssetHierarchyStructure', ini_value='prefix_static_mesh_kit', var_type=str),
-    Setting(pref_path='environment.asset_hierarchy_struct_prefix_skeletal_mesh', ini_section='AssetHierarchyStructure', ini_value='prefix_skeletal_mesh', var_type=str),
-    Setting(pref_path='environment.asset_hierarchy_empty_object_meshes', ini_section='AssetHierarchyStructure', ini_value='null_render', var_type=str),
-    Setting(pref_path='environment.asset_hierarchy_empty_object_collisions', ini_section='AssetHierarchyStructure', ini_value='null_collision', var_type=str),
-    Setting(pref_path='environment.asset_hierarchy_empty_object_sockets', ini_section='AssetHierarchyStructure', ini_value='null_socket', var_type=str),
-    Setting(pref_path='environment.create_element_render', ini_section='AssetHierarchyStructure', ini_value='create_null_render', var_type=bool),
-    Setting(pref_path='environment.create_element_collision', ini_section='AssetHierarchyStructure', ini_value='create_null_collision', var_type=bool),
-    Setting(pref_path='environment.create_element_sockets', ini_section='AssetHierarchyStructure', ini_value='create_null_socket', var_type=bool),
-    Setting(pref_path='environment.exclude_element_if_no_child', ini_section='AssetHierarchyStructure', ini_value='exclude_null_if_no_child', var_type=bool),
+
+directory_setting_lst = (
+    Setting(pref_path='directory.sc_dir_struct_scenes', ini_section='AssetDirectoryStructure', ini_value='path_scenes', var_type=str),
+    Setting(pref_path='directory.sc_dir_struct_resources', ini_section='AssetDirectoryStructure', ini_value='path_resources', var_type=str),
+    Setting(pref_path='directory.sc_dir_struct_st', ini_section='AssetDirectoryStructure', ini_value='path_speedtree_msh', var_type=str),
+    Setting(pref_path='directory.sc_dir_struct_st_hr', ini_section='AssetDirectoryStructure', ini_value='path_speedtree_msh_hr', var_type=str),
+    Setting(pref_path='directory.sc_dir_struct_st_lr', ini_section='AssetDirectoryStructure', ini_value='path_speedtree_msh_lr', var_type=str),
+    Setting(pref_path='directory.sc_dir_struct_ref', ini_section='AssetDirectoryStructure', ini_value='path_references', var_type=str),
+    Setting(pref_path='directory.sc_dir_struct_final', ini_section='AssetDirectoryStructure', ini_value='path_final', var_type=str),
+    Setting(pref_path='directory.sc_dir_struct_msh_bake', ini_section='AssetDirectoryStructure', ini_value='path_mshbake', var_type=str),
 )
+
+
+container_setting_lst = (
+    Setting(pref_path='container.asset_hierarchy_struct_prefix_static_mesh', ini_section='AssetHierarchyStructure', ini_value='prefix_static_mesh', var_type=str),
+    Setting(pref_path='container.asset_hierarchy_struct_prefix_static_mesh_kit', ini_section='AssetHierarchyStructure', ini_value='prefix_static_mesh_kit', var_type=str),
+    Setting(pref_path='container.asset_hierarchy_struct_prefix_skeletal_mesh', ini_section='AssetHierarchyStructure', ini_value='prefix_skeletal_mesh', var_type=str),
+    Setting(pref_path='container.asset_hierarchy_empty_object_meshes', ini_section='AssetHierarchyStructure', ini_value='null_render', var_type=str),
+    Setting(pref_path='container.asset_hierarchy_empty_object_collisions', ini_section='AssetHierarchyStructure', ini_value='null_collision', var_type=str),
+    Setting(pref_path='container.asset_hierarchy_empty_object_sockets', ini_section='AssetHierarchyStructure', ini_value='null_socket', var_type=str),
+    Setting(pref_path='container.create_element_render', ini_section='AssetHierarchyStructure', ini_value='create_null_render', var_type=bool),
+    Setting(pref_path='container.create_element_collision', ini_section='AssetHierarchyStructure', ini_value='create_null_collision', var_type=bool),
+    Setting(pref_path='container.create_element_sockets', ini_section='AssetHierarchyStructure', ini_value='create_null_socket', var_type=bool),
+    Setting(pref_path='container.exclude_element_if_no_child', ini_section='AssetHierarchyStructure', ini_value='exclude_null_if_no_child', var_type=bool),
+)
+
 
 source_control_setting_lst = (
     # ------------------- SourceControl -------------------

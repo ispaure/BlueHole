@@ -33,7 +33,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
 
     def draw(self, context):
 
-        self.bl_label = f'{header_bh_name} [' + str(prefs().env.active_environment.lower()) + ']'
+        self.bl_label = f'{header_bh_name} [' + str(prefs().general.active_environment.lower()) + ']'
         layout = self.layout
         layout.operator('wm.set_active_environment')
         layout.menu("BLUE_HOLE_MT_help", icon='HELP')
@@ -45,7 +45,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout.menu("BLUE_HOLE_MT_sort")
         layout.menu("BLUE_HOLE_MT_import", icon='IMPORT')
         layout.menu("BLUE_HOLE_MT_export", icon='EXPORT')
-        if prefs().general.active_game_engine != 'disabled':
+        if prefs().bridge.active_game_engine != 'disabled':
             layout.menu("BLUE_HOLE_MT_send", icon='UV_SYNC_SELECT')
         layout.separator()
         # layout.menu("BLUE_HOLE_MT_import_export")

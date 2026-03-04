@@ -19,7 +19,8 @@ import bpy
 from bpy.props import *
 from bpy.types import AddonPreferences
 
-from .props import general_props, environment_props, sourcecontrol_props, help_update_props
+from .addonProperties import general_props, help_update_props
+from .environmentProperties import bridge_props, container_props, directory_props, sourcecontrol_props
 from ..environment import envManager
 
 # Import your new prefs API (adjust module path if yours is named differently)
@@ -33,13 +34,12 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-# Dictionary of environments with preferences file
-env_preferences = {}
 
 # Explicit mapping: enum key -> module with a draw() function
 _DRAW_MODULES = {
-    "ENVIRONMENT": environment_props,
-    "GENERAL": general_props,
+    "DIRECTORY": directory_props,
+    "CONTAINER": container_props,
+    "BRIDGE": bridge_props,
     "SOURCECONTROL": sourcecontrol_props,
     "HELP_N_UPDATE": help_update_props,
 }
@@ -53,23 +53,21 @@ class BlueHole(AddonPreferences):
         name='Settings',
         description='Settings to display',
         items=[
-            ('ENVIRONMENT', 'Structure', ''),
-            ('GENERAL', 'Bridges', ''),
+            ('DIRECTORY', 'Directory', ''),
+            ('CONTAINER', 'Container', ''),
+            ('BRIDGE', 'Bridge', ''),
             ('SOURCECONTROL', 'Source Control', ''),
             ('HELP_N_UPDATE', 'Help & Updates', ''),
         ],
-        default='ENVIRONMENT'
+        default='DIRECTORY'
     )
 
     general: PointerProperty(type=general_props.GeneralPG)
-    environment: PointerProperty(type=environment_props.EnvironmentPG)
-    sourcecontrol: PointerProperty(type=sourcecontrol_props.SourceControlPG)
     help_n_update: PointerProperty(type=help_update_props.HelpUpdatePG)
-
-    # For environments with known preference files:
-    for key, value in env_preferences.items():
-        if key == 'c3_prod':
-            c3_prod: PointerProperty(type=value)
+    directory: PointerProperty(type=directory_props.DirectoryPG)
+    container: PointerProperty(type=container_props.ContainerPG)
+    bridge: PointerProperty(type=bridge_props.BridgePG)
+    sourcecontrol: PointerProperty(type=sourcecontrol_props.SourceControlPG)
 
     def draw(self, context):
         BlueHole._prefs_visible = True
@@ -77,7 +75,7 @@ class BlueHole(AddonPreferences):
 
         # Set Active Environment
         box = layout.box()
-        msg = "Active Environment: " + prefs().env.active_environment
+        msg = "Active Environment: " + prefs().general.active_environment
         column = box.column()
         row = column.row()
         row.label(text=msg.upper())
@@ -86,7 +84,7 @@ class BlueHole(AddonPreferences):
         row.operator('wm.add_environment', text='Create Env.', icon='PRESET_NEW')
         if len(envManager.get_env_lst_enum_property(exclude_default=True)) > 0:
             row.operator('wm.delete_environment', text='Delete Env.', icon='REMOVE')
-        if prefs().env.active_environment == 'default':
+        if prefs().general.active_environment == 'default':
             row = column.row()
             row.label(text='The settings for the default environment are locked.')
             row = column.row()
@@ -109,23 +107,21 @@ class BlueHole(AddonPreferences):
 
 classes = (
     general_props.GeneralPG,        # sub PropertyGroups before others
-    environment_props.EnvironmentPG,
-    sourcecontrol_props.SourceControlPG,
     help_update_props.HelpUpdatePG,
+    directory_props.DirectoryPG,
+    container_props.ContainerPG,
+    bridge_props.BridgePG,
+    sourcecontrol_props.SourceControlPG,
     BlueHole
 )
 
 
 # Registration
 def register():
-    for key, val in env_preferences.items():
-        bpy.utils.register_class(val)
     for cls in classes:
         bpy.utils.register_class(cls)
 
 
 def unregister():
-    for key, val in env_preferences.items():
-        bpy.utils.unregister_class(val)
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

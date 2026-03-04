@@ -102,9 +102,9 @@ class AssetContainerGroup(ContainerGroup):
 
     def __critical_set_containers_scene_missing(self):
         # Define the prefix variables first
-        static_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh
-        kit_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit
-        skeletal_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
+        static_mesh_prefix = prefs().container.asset_hierarchy_struct_prefix_static_mesh
+        kit_prefix = prefs().container.asset_hierarchy_struct_prefix_static_mesh_kit
+        skeletal_mesh_prefix = prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh
 
         # Collect prefixes
         prefixes = [
@@ -136,9 +136,9 @@ class AssetContainerGroup(ContainerGroup):
 
     def __critical_set_containers_selection_missing(self):
         # Define the prefix variables first
-        static_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh
-        kit_prefix = prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit
-        skeletal_mesh_prefix = prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
+        static_mesh_prefix = prefs().container.asset_hierarchy_struct_prefix_static_mesh
+        kit_prefix = prefs().container.asset_hierarchy_struct_prefix_static_mesh_kit
+        skeletal_mesh_prefix = prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh
 
         # Construct the message
         msg = (
@@ -159,7 +159,7 @@ def get_hierarchy_prefix_lst():
     """
     Returns list of hierarchy prefix
     """
-    prefix_lst = [prefs().env.asset_hierarchy_struct_prefix_static_mesh,
-                  prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit,
-                  prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh]
+    prefix_lst = [prefs().container.asset_hierarchy_struct_prefix_static_mesh,
+                  prefs().container.asset_hierarchy_struct_prefix_static_mesh_kit,
+                  prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh]
     return prefix_lst

@@ -36,7 +36,7 @@ def get_env_from_prefs_active_env() -> Environment:
     """
     Gets an Environment class that matches the current one that's active (per the Blender Blue Hole Preferences)
     """
-    env_name = prefs().env.active_environment
+    env_name = prefs().general.active_environment
     return Environment(env_name)
 
 
@@ -44,7 +44,7 @@ def set_pref_current_env(env_name: str):
     """
     Sets the current environment from a name string
     """
-    prefs().env.active_environment = env_name
+    prefs().general.active_environment = env_name
 
 
 def get_default_env():
@@ -53,12 +53,12 @@ def get_default_env():
 
 def set_env_to_default():
     log(Severity.DEBUG, env_tool_name, 'Setting Active Environment to Default')
-    prefs().env.active_environment = 'default'
+    prefs().general.active_environment = 'default'
 
 
 def if_current_env_missing_set_default():
     def current_env_exists():
-        current_env = prefs().env.active_environment
+        current_env = prefs().general.active_environment
 
         # If length of active_environment field is 0, Blue Hole was most likely newly installed (need to set to default)
         if len(current_env) == 0:

@@ -40,7 +40,7 @@ def get_project_sub_dir(path_append) -> Path:
 
     # Remove 'path_scenes' from directory, since path_scenes contains
     # the location of the subdirectory in which the .blend file resides
-    path_remove = prefs().env.sc_dir_struct_scenes
+    path_remove = prefs().directory.sc_dir_struct_scenes
 
     # Apply the two modifications (truncate & append) we just wrote about to the original .blend file path
     project_sub_dir: str = blenderFile.truncate_n_append_str(blend_directory_path, path_remove, path_append)

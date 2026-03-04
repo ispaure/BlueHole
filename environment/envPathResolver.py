@@ -64,14 +64,14 @@ def get_valid_sc_dir_path(quiet: bool = False) -> Optional[Path]:
     path_def = 'Source Content'
     match get_os():
         case OS.WIN:
-            sc_path_to_attempt_lst = [prefs().env.sc_path,
-                                      prefs().env.sc_path_alternate]
+            sc_path_to_attempt_lst = [prefs().bridge.sc_path,
+                                      prefs().bridge.sc_path_alternate]
         case OS.MAC:
-            sc_path_to_attempt_lst = [prefs().env.sc_path_mac,
-                                      prefs().env.sc_path_mac_alternate]
+            sc_path_to_attempt_lst = [prefs().bridge.sc_path_mac,
+                                      prefs().bridge.sc_path_mac_alternate]
         case OS.LINUX:
-            sc_path_to_attempt_lst = [prefs().env.sc_path_linux,
-                                      prefs().env.sc_path_linux_alternate]
+            sc_path_to_attempt_lst = [prefs().bridge.sc_path_linux,
+                                      prefs().bridge.sc_path_linux_alternate]
 
     # Attempt to get the source content path from the available options
     for sc_path in sc_path_to_attempt_lst:
@@ -95,11 +95,11 @@ def get_valid_unity_asset_dir_path(quiet: bool = False) -> Optional[Path]:
 
     match get_os():
         case OS.WIN:
-            unity_asset_path = prefs().general.unity_assets_path
+            unity_asset_path = prefs().bridge.unity_assets_path
         case OS.MAC:
-            unity_asset_path = prefs().general.unity_assets_path_mac
+            unity_asset_path = prefs().bridge.unity_assets_path_mac
         case OS.LINUX:
-            unity_asset_path = prefs().general.unity_assets_path_linux
+            unity_asset_path = prefs().bridge.unity_assets_path_linux
 
     # Attempt to get the unity asset path from the available options
     result = get_dir_path_if_valid(path_def, unity_asset_path, quiet)

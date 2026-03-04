@@ -38,19 +38,19 @@ class ExportSettingsFactory:
         export_set_cls = ExportSettings(
             # EXPORT OPTIONS
             exp_format=preset.get("Format", "FBX"),
-            exp_dir=preset.get("Export Directory", projectUtils.get_project_sub_dir(prefs().env.sc_dir_struct_final)),
+            exp_dir=preset.get("Export Directory", projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_final)),
             zero_root_transform=preset.get("Zero Root Transform", False),
 
             # INCLUDED ELEMENTS
-            include_render=included.get("Render", prefs().env.create_element_render),
-            include_collision=included.get("Collision", prefs().env.create_element_collision),
-            include_socket=included.get("Socket", prefs().env.create_element_sockets),
+            include_render=included.get("Render", prefs().container.create_element_render),
+            include_collision=included.get("Collision", prefs().container.create_element_collision),
+            include_socket=included.get("Socket", prefs().container.create_element_sockets),
 
             # FBX SPECIFIC OPTIONS
             axis_up=preset.get("Axis Up", "Z"),
             axis_fwd=preset.get("Axis Forward", "-Y"),
             mesh_smooth_type=preset.get("Mesh Smooth Type", "OFF"),
-            bake_anim=preset.get("Bake Animation", prefs().general.ue_bridge_include_animation),
+            bake_anim=preset.get("Bake Animation", prefs().bridge.ue_bridge_include_animation),
             apply_scale_options=preset.get("Apply Scale Option", "FBX_SCALE_NONE"),
             rename_collisions_for_ue=preset.get("Rename Collisions for UE", False),
 
