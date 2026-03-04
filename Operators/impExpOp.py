@@ -24,6 +24,8 @@ from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export.looseMesh.containerGroup import batch_export_loose_mesh
 from ..blenderUtils.export.model.assetContainerGroup import get_hierarchy_prefix_lst
 from ..blenderUtils.export.assetHierarchy.containerGroup import AssetHierarchyContainerGroup
+from ..blenderUtils.export.assetCollection.containerGroup import AssetCollectionContainerGroup
+from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGroup
 from ..preferences.prefs import *
 from ..Lib.commonUtils import uiUtils
 

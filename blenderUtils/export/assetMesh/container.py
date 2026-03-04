@@ -29,6 +29,9 @@ show_verbose = True
 
 
 class AssetMeshContainer(Container):
+
+    CONTAINER_NAME = 'Asset Mesh'
+
     def __init__(self, mesh, export_settings: ExportSettings):
         super().__init__(mesh, export_settings)
 
