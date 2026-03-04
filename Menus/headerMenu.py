@@ -20,6 +20,7 @@ import bpy
 
 # Blue Hole
 from ..preferences.prefs import *
+from ..blenderUtils import blenderFile
 from .menu import BLUE_HOLE_MT_export, BLUE_HOLE_MT_send
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -46,9 +47,30 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout.separator()
         layout.menu("BLUE_HOLE_MT_sort")
         layout.menu("BLUE_HOLE_MT_import", icon='IMPORT')
-        if prefs().bridge.active_game_engine != 'disabled':
+        layout.separator()
+
+        # Export/Send only when engine selected AND scene saved
+        engine_ok = prefs().bridge.active_game_engine != 'disabled'
+        scene_saved = blenderFile.is_blend_file_saved()
+
+        if engine_ok and scene_saved:
             layout.menu("BLUE_HOLE_MT_export", text='Export (to DIRECTORY)', icon='EXPORT')
             layout.menu("BLUE_HOLE_MT_send", text=BLUE_HOLE_MT_send.build_ui_label(), icon='UV_SYNC_SELECT')
+
+        elif not scene_saved:
+            col = layout.column()
+            col.enabled = False
+            col.operator("wm.bh_disabled_notice",
+                         text='Save the .blend file to enable Export/Send',
+                         icon='ERROR')
+
+        elif not engine_ok:
+            col = layout.column()
+            col.enabled = False
+            col.operator("wm.bh_disabled_notice",
+                         text='Select a Game Engine to enable Export/Send',
+                         icon='ERROR')
+
         layout.separator()
         # layout.menu("BLUE_HOLE_MT_import_export")
         if prefs().sc.source_control_enable:

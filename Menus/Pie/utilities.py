@@ -59,7 +59,13 @@ def pie_op_or_disabled(
 ):
     if platform_lst is not None:
         if get_os() not in platform_lst:
-            return pie.operator("wm.disabled_addon", text=f'{text} (Unsupported on {get_os().value})', icon='ERROR')
+            col = pie.column()
+            col.enabled = False
+            return col.operator(
+                "wm.disabled_addon",
+                text=f'{text} (Unsupported on {get_os().value})',
+                icon='ERROR'
+            )
 
     if op_exists(op_idname):
         btn = pie.operator(op_idname, text=f'{text} [{addon_name}]', icon=icon)
@@ -70,4 +76,10 @@ def pie_op_or_disabled(
                     setattr(btn, k, v)
         return btn
 
-    return pie.operator("wm.disabled_addon", text=f'{text} (Requires {addon_name})', icon='ERROR')
+    col = pie.column()
+    col.enabled = False
+    return col.operator(
+        "wm.disabled_addon",
+        text=f'{text} (Requires {addon_name})',
+        icon='ERROR'
+    )

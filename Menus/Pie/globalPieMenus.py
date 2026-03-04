@@ -156,7 +156,7 @@ class MT_pie_global_import_export(bpy.types.Menu):
                 case 'git':
                     open_pie_menu(pie, MT_pie_global_source_control.bl_idname, 'Source Control (Git)...', 'CHECKMARK')
         else:
-            pie.operator("wm.disabled_source_control", text="Can't Show; Source Control disabled!!!", icon='ERROR')
+            blueHolePieButton.sc_disabled(pie)
         # 9 - TOP - RIGHT
         blueHolePieButton.add_asset_hierarchy(pie)
         # 1 - BOTTOM - LEFT
@@ -230,7 +230,7 @@ class MT_pie_global_send(bpy.types.Menu):
         # 4 - LEFT
         blueHolePieButton.send_all_asset_containers(pie)
         # 6 - RIGHT
-        blueHolePieButton.send_all_all_containers_unity(pie)
+        pie.separator()
         # 2 - BOTTOM
         pie.separator()
         # 8 - TOP
@@ -242,7 +242,7 @@ class MT_pie_global_send(bpy.types.Menu):
         # 1 - BOTTOM - LEFT
         blueHolePieButton.send_selected_asset_containers(pie)
         # 3 - BOTTOM - RIGHT
-        blueHolePieButton.send_selected_all_containers_unity(pie)
+        pie.separator()
 
 
 # Pie Global-Source Control
