@@ -21,6 +21,8 @@ import bpy
 # Blue Hole
 from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export.assetHierarchy.containerGroup import AssetHierarchyContainerGroup
+from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGroup
+from ..blenderUtils.export.assetCollection.containerGroup import AssetCollectionContainerGroup
 from ..Lib.commonUtils import uiUtils
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -201,7 +201,7 @@ def draw(preference, context, layout):
 
         row = column.row()
         row.enabled = enable_rows
-        row.prop(preference.bridge, 'active_game_engine', text='Current Game Engine')
+        row.prop(preference.bridge, 'active_game_engine', text='Selected Game Engine')
 
         match prefs().bridge.active_game_engine:
 
@@ -211,10 +211,6 @@ def draw(preference, context, layout):
             case 'unreal':
                 box = layout.box()
                 column = box.column()
-
-                row = column.row()
-                row.enabled = enable_rows
-                row.label(text="SEND / EXPORT ASSET CONTAINERS TO UNREAL")
 
                 # Source Content paths (per-OS)
                 match get_os():
@@ -255,10 +251,6 @@ def draw(preference, context, layout):
             case 'unity':
                 box = layout.box()
                 column = box.column()
-
-                row = column.row()
-                row.enabled = enable_rows
-                row.label(text="SEND / EXPORT ASSET CONTAINERS TO UNITY")
 
                 # Source Content paths (per-OS)
                 match get_os():
@@ -313,25 +305,7 @@ def draw(preference, context, layout):
 
         row = column.row()
         row.enabled = enable_rows
-        row.label(text='LOOSE MESH (Batch Export)')
-
-        row = column.row()
-        row.enabled = enable_rows
         row.label(text='Exports each selected mesh as its own file. No prefixes or container structure required.')
-
-        # -------------------------------------------------------------------------------------------------
-        # BATCH SELECTION (Loose Mesh)
-        # -------------------------------------------------------------------------------------------------
-        box = layout.box()
-        column = box.column()
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.label(text='BATCH SELECTION EXPORT')
-
-        row = column.row()
-        row.enabled = enable_rows
-        row.label(text='Exports the current selection to FBX (one file per selected mesh).')
 
         row = column.row()
         row.enabled = enable_rows

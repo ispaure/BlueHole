@@ -29,6 +29,9 @@ show_verbose = True
 
 
 class LooseMeshContainer(Container):
+
+    CONTAINER_NAME = 'Loose Mesh'
+
     def __init__(self, mesh, export_settings: ExportSettings):
         super().__init__(mesh, export_settings)
 

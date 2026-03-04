@@ -24,13 +24,14 @@ from ..model.container import Container
 
 show_verbose = True
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
 
-class AssetMeshContainer(Container):
+class AssetCollectionContainer(Container):
 
-    CONTAINER_NAME = 'Asset Mesh'
+    CONTAINER_NAME = 'Asset Collection'
 
     def __init__(self, mesh, export_settings: ExportSettings):
         super().__init__(mesh, export_settings)
