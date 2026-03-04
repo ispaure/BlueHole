@@ -21,7 +21,9 @@ import bpy
 # Blue Hole
 from ..blenderUtils import objectUtils, importUtils
 from ..blenderUtils.export.exportSettingsPresets import *
-from ..blenderUtils.export import exportHierarchy, exportIndividual
+from ..blenderUtils.export.looseMesh.containerGroup import batch_export_loose_mesh
+from ..blenderUtils.export.model.assetContainerGroup import get_hierarchy_prefix_lst
+from ..blenderUtils.export.assetHierarchy.containerGroup import AssetHierarchyContainerGroup
 from ..preferences.prefs import *
 from ..Lib.commonUtils import uiUtils
 
@@ -42,9 +44,9 @@ class ExportAllHierarchiesToUE(bpy.types.Operator):
         if state:
             # Get Unreal Export Profile
             export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
-            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
             asset_hierarchies.set_containers_from_scene()
-            asset_hierarchies.export_proc(send=False, skip_sc=False)
+            asset_hierarchies.export_proc(send=False, bypass_sc=False)
         return {'FINISHED'}
 
 
@@ -57,9 +59,9 @@ class ExportSelectHierarchiesToUE(bpy.types.Operator):
     def execute(self, context):
         # Get Unreal Export Profile
         export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
-        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
         asset_hierarchies.set_containers_from_selection()
-        asset_hierarchies.export_proc(send=False, skip_sc=False)
+        asset_hierarchies.export_proc(send=False, bypass_sc=False)
         return {'FINISHED'}
 
 
@@ -75,9 +77,9 @@ class ExportAllHierarchies(bpy.types.Operator):
         if state:
             # Get Unreal Export Profile
             export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
-            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
             asset_hierarchies.set_containers_from_scene()
-            asset_hierarchies.export_proc(send=False, skip_sc=False)
+            asset_hierarchies.export_proc(send=False, bypass_sc=False)
         return {'FINISHED'}
 
 
@@ -90,9 +92,9 @@ class ExportSelectHierarchies(bpy.types.Operator):
     def execute(self, context):
         # Get Unreal Export Profile
         export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
-        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
         asset_hierarchies.set_containers_from_selection()
-        asset_hierarchies.export_proc(send=False, skip_sc=False)
+        asset_hierarchies.export_proc(send=False, bypass_sc=False)
         return {'FINISHED'}
 
 
@@ -108,9 +110,9 @@ class ExportAllHierarchiesToUnity(bpy.types.Operator):
         if state:
             # Get Unreal Export Profile
             export_settings = get_export_settings(ExportSettingsPreset.UNITY)
-            asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+            asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
             asset_hierarchies.set_containers_from_scene()
-            asset_hierarchies.export_proc(send=False, skip_sc=False)
+            asset_hierarchies.export_proc(send=False, bypass_sc=False)
         return {'FINISHED'}
 
 
@@ -123,9 +125,9 @@ class ExportSelectHierarchiesToUnity(bpy.types.Operator):
     def execute(self, context):
         # Get Unreal Export Profile
         export_settings = get_export_settings(ExportSettingsPreset.UNITY)
-        asset_hierarchies = exportHierarchy.AssetHierarchies(export_settings)
+        asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
         asset_hierarchies.set_containers_from_selection()
-        asset_hierarchies.export_proc(send=False, skip_sc=False)
+        asset_hierarchies.export_proc(send=False, bypass_sc=False)
         return {'FINISHED'}
 
 
@@ -135,7 +137,7 @@ class BatchExportSelectedToFinal(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the FINAL Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_final)
+        batch_export_loose_mesh(prefs().env.sc_dir_struct_final)
         return {'FINISHED'}
 
 
@@ -144,7 +146,7 @@ class BatchExportSelectedToResources(bpy.types.Operator):
     bl_label = 'Batch Export (Selection) to RESOURCES Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_resources)
+        batch_export_loose_mesh(prefs().env.sc_dir_struct_resources)
         return {'FINISHED'}
 
 
@@ -154,7 +156,7 @@ class BatchExportSelectedToSpeedTree_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_st)
+        batch_export_loose_mesh(prefs().env.sc_dir_struct_st)
         return {'FINISHED'}
 
 
@@ -164,7 +166,7 @@ class BatchExportSelectedToSpeedtreeLR_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> LR Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_st_lr)
+        batch_export_loose_mesh(prefs().env.sc_dir_struct_st_lr)
         return {'FINISHED'}
 
 
@@ -174,7 +176,7 @@ class BatchExportSelectedToSpeedtreeHR_FBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> HR Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_st_hr)
+        batch_export_loose_mesh(prefs().env.sc_dir_struct_st_hr)
         return {'FINISHED'}
 
 
@@ -184,7 +186,7 @@ class BatchExportSelectedToBakeFBX(bpy.types.Operator):
     bl_description = 'Batch exports selected meshes using their names as file names in the MSH BAKE Folder'
 
     def execute(self, context):
-        exportIndividual.batch_export_selection_to_project_sub_dir(prefs().env.sc_dir_struct_msh_bake)
+        batch_export_loose_mesh(prefs().env.sc_dir_struct_msh_bake)
         return {'FINISHED'}
 
 
@@ -355,7 +357,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
                     result_hierarchy_name = ''
                     for key, value in self.hierarchy_types.items():
                         if key in self.asset_type:
-                            result_hierarchy_name += exportHierarchy.get_hierarchy_prefix_lst()[value]
+                            result_hierarchy_name += get_hierarchy_prefix_lst()[value]
                     result_hierarchy_name += self.asset_name
                     result_hierarchy_name += '_' + str(format(item, '02'))
                     result_hierarchy_lst.append(result_hierarchy_name)
@@ -363,7 +365,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
                 result_hierarchy_name = ''
                 for key, value in self.hierarchy_types.items():
                     if key in self.asset_type:
-                        result_hierarchy_name += exportHierarchy.get_hierarchy_prefix_lst()[value]
+                        result_hierarchy_name += get_hierarchy_prefix_lst()[value]
                 result_hierarchy_name += self.asset_name
                 result_hierarchy_name += '_' + str(format(self.version_suffix, '02'))
                 if len(self.version_suffix_letter) > 0:

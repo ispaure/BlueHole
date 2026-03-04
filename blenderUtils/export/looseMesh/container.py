@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 # Blue Hole
 from ..exportSettings import *
-from .modelContainer import Container
+from ..model.container import Container
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -28,7 +28,7 @@ show_verbose = True
 # CODE
 
 
-class MeshContainer(Container):
+class LooseMeshContainer(Container):
     def __init__(self, mesh, export_settings: ExportSettings):
         super().__init__(mesh, export_settings)
 

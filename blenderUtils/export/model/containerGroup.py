@@ -28,11 +28,11 @@ from ..exportSettings import *
 from ....Lib.commonUtils.debugUtils import *
 from ... import sceneUtils, objectUtils, filterUtils, sendUnreal
 from ....preferences.prefs import *
-from .modelContainer import Container
+from .container import Container
 from ....wrappers import perforceWrapper as p4Wrapper
 
 
-class Containers(ABC):
+class ContainerGroup(ABC):
 
     CONTAINERS_NAME = 'Model'
 
@@ -50,7 +50,7 @@ class Containers(ABC):
         """Must be implemented by subclasses to define containers from scene. """
         pass
 
-    def export_proc(self, *, send: bool, skip_sc: bool = False):
+    def export_proc(self, *, send: bool, bypass_sc: bool = False):
 
         log(Severity.INFO, self.CONTAINERS_NAME, f'Initiating Export of {len(self.container_lst)} Containers...')
 
@@ -59,7 +59,7 @@ class Containers(ABC):
             return False
 
         # Source Control
-        if not skip_sc:
+        if not bypass_sc:
             sc_result = self.__export_source_control_proc()
             if not sc_result:
                 if prefs().sc.source_control_error_aborts_exp:

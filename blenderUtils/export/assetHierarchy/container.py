@@ -21,7 +21,7 @@ from ..exportSettings import *
 from ....Lib.commonUtils.debugUtils import *
 from ... import objectUtils
 from ....preferences.prefs import *
-from .modelContainer import Container
+from ..model.container import Container
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
