@@ -39,7 +39,7 @@ ah_tool_name = 'Asset Individual Exporter (V3)'
 
 class AssetMeshContainerGroup(AssetContainerGroup):
 
-    CONTAINERS_NAME = 'Asset Mesh'
+    CONTAINERS_NAME = 'Asset Meshes'
     CONTAINER_CLASS = AssetMeshContainer
 
     def __init__(self, export_settings: ExportSettings):

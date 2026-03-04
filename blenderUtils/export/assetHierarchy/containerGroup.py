@@ -38,7 +38,7 @@ ah_tool_name = 'Asset Hierarchy Exporter (V3)'
 
 class AssetHierarchyContainerGroup(AssetContainerGroup):
 
-    CONTAINERS_NAME = 'Asset Hierarchy'
+    CONTAINERS_NAME = 'Asset Hierarchies'
     CONTAINER_CLASS = AssetHierarchyContainer
 
     def __init__(self, export_settings: ExportSettings):

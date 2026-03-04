@@ -18,6 +18,7 @@ __status__ = 'Production'
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
 from ....preferences.prefs import *
+from ....Operators import sendOp
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -140,20 +141,57 @@ def batch_export_selection_resource_folder(pie):
 # SEND
 
 
-def send_all_all_containers_unreal(pie):
-    pie.operator("wm.bh_send_all_containers_unreal", icon='UV_SYNC_SELECT')
+def send_all_asset_containers(pie):
+
+    match prefs().bridge.active_game_engine:
+        case 'unity':
+            export_preset = 'UNITY'
+        case 'unreal':
+            export_preset = 'UNREAL'
+        case _:
+            log(Severity.CRITICAL, 'Blue Hole Pie Menu', 'Unsupported Active Game Engine')
+            return
+
+    # All Containers - All in Scene
+    label = sendOp.BH_OT_send_containers.build_ui_label(
+        export_preset=export_preset,
+        send_all=True,
+        include_hierarchy=True,
+        include_collection=True,
+        include_mesh=True,
+    )
+    op = pie.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+    op.export_preset = export_preset
+    op.send_all = True
+    op.include_hierarchy = True
+    op.include_collection = True
+    op.include_mesh = True
 
 
-def send_selected_all_containers_unreal(pie):
-    pie.operator("wm.bh_send_selected_all_containers_unreal", icon='UV_SYNC_SELECT')
+def send_selected_asset_containers(pie):
+    match prefs().bridge.active_game_engine:
+        case 'unity':
+            export_preset = 'UNITY'
+        case 'unreal':
+            export_preset = 'UNREAL'
+        case _:
+            log(Severity.CRITICAL, 'Blue Hole Pie Menu', 'Unsupported Active Game Engine')
+            return
 
-
-def send_all_all_containers_unity(pie):
-    pie.operator("wm.bh_send_all_containers_unity", icon='UV_SYNC_SELECT')
-
-
-def send_selected_all_containers_unity(pie):
-    pie.operator("wm.bh_send_selected_all_containers_unity", icon='UV_SYNC_SELECT')
+        # All Containers - All in Scene
+    label = sendOp.BH_OT_send_containers.build_ui_label(
+        export_preset=export_preset,
+        send_all=False,
+        include_hierarchy=True,
+        include_collection=True,
+        include_mesh=True,
+    )
+    op = pie.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+    op.export_preset = export_preset
+    op.send_all = False
+    op.include_hierarchy = True
+    op.include_collection = True
+    op.include_mesh = True
 
 
 def export_hierarchy_all(pie):

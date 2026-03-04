@@ -132,20 +132,16 @@ class MT_pie_global_import_export(bpy.types.Menu):
         pie = layout.menu_pie()
         # 4 - LEFT
         match prefs().bridge.active_game_engine:
-            case 'unreal':
-                blueHolePieButton.send_all_all_containers_unreal(pie)
-            case 'unity':
-                blueHolePieButton.send_all_all_containers_unity(pie)
             case 'disabled':
                 blueHolePieButton.export_hierarchy_all(pie)
+            case _:
+                blueHolePieButton.send_all_asset_containers(pie)
         # 6 - RIGHT
         match prefs().bridge.active_game_engine:
-            case 'unreal':
-                blueHolePieButton.send_selected_all_containers_unreal(pie)
-            case 'unity':
-                blueHolePieButton.send_selected_all_containers_unity(pie)
             case 'disabled':
                 blueHolePieButton.export_hierarchy_selected(pie)
+            case _:
+                blueHolePieButton.send_selected_asset_containers(pie)
         # 2 - BOTTOM
         open_pie_menu(pie, MT_pie_global_extra.bl_idname, 'More...')
         # 8 - TOP
@@ -232,7 +228,7 @@ class MT_pie_global_send(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        blueHolePieButton.send_all_all_containers_unreal(pie)
+        blueHolePieButton.send_all_asset_containers(pie)
         # 6 - RIGHT
         blueHolePieButton.send_all_all_containers_unity(pie)
         # 2 - BOTTOM
@@ -244,7 +240,7 @@ class MT_pie_global_send(bpy.types.Menu):
         # 9 - TOP - RIGHT
         pie.separator()
         # 1 - BOTTOM - LEFT
-        blueHolePieButton.send_selected_all_containers_unreal(pie)
+        blueHolePieButton.send_selected_asset_containers(pie)
         # 3 - BOTTOM - RIGHT
         blueHolePieButton.send_selected_all_containers_unity(pie)
 

@@ -26,6 +26,7 @@ from ..blenderUtils.uiUtils import show_label
 from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, sendOp, sortOp, sourceControlOp, themeOp, otherOp
 from ..preferences.prefs import *
 from ..blenderUtils import blenderFile
+from ..Lib.commonUtils.debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -145,62 +146,178 @@ class BLUE_HOLE_MT_music(bpy.types.Menu):
 class BLUE_HOLE_MT_send(bpy.types.Menu):
     bl_label = "Send (to Game Engine)"
 
+    @classmethod
+    def build_ui_label(cls) -> str:
+        """
+        Build menu label based on the active engine.
+        """
+        return f"Send (to {prefs().bridge.active_game_engine.upper()})"
+
     def draw(self, context):
         layout = self.layout
-        # These options are always available, regardless of active environment
+
         match prefs().bridge.active_game_engine:
             case 'unity':
-                # Unity
-                # TODO: Switch these for send all types of containers
+                export_preset = 'UNITY'
                 layout.operator(helpOp.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
-                layout.operator(sendOp.SendAllContainersToUnity.bl_idname, icon='UV_SYNC_SELECT')
-                layout.operator(sendOp.SendSelectedContainersToUnity.bl_idname, icon='UV_SYNC_SELECT')
-                layout.separator()
-                layout.menu("BLUE_HOLE_MT_send_specific_unity")
             case 'unreal':
-                # Unreal
-                # TODO: Switch these for send all types of containers
+                export_preset = 'UNREAL'
                 layout.operator(helpOp.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
-                layout.operator(sendOp.SendAllContainersToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-                layout.operator(sendOp.SendSelectedContainersToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-                layout.separator()
-                layout.menu("BLUE_HOLE_MT_send_specific_unreal")
+            case _:
+                log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
+                return
+
+        # Send Containers Operators
+        # All Containers - All in Scene
+        label = sendOp.BH_OT_send_containers.build_ui_label(
+            export_preset=export_preset,
+            send_all=True,
+            include_hierarchy=True,
+            include_collection=True,
+            include_mesh=True,
+        )
+        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = True
+        op.include_hierarchy = True
+        op.include_collection = True
+        op.include_mesh = True
+
+        # All Containers - In Selection
+        label = sendOp.BH_OT_send_containers.build_ui_label(
+            export_preset=export_preset,
+            send_all=False,
+            include_hierarchy=True,
+            include_collection=True,
+            include_mesh=True,
+        )
+        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = False
+        op.include_hierarchy = True
+        op.include_collection = True
+        op.include_mesh = True
+
+        layout.separator()
+        # Submenu to send specific Asset Container types
+        layout.menu("BLUE_HOLE_MT_send_specific")
 
 
-class BLUE_HOLE_MT_send_specific_unreal(bpy.types.Menu):
-    bl_label = "Send Specific Container Type"
+class BLUE_HOLE_MT_send_specific(bpy.types.Menu):
+    bl_label = "Specific Asset Container"
 
     def draw(self, context):
         layout = self.layout
-        show_label('COLLECTIONS', layout)
-        layout.operator(sendOp.SendAllCollectionsToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-        layout.operator(sendOp.SendSelectedCollectionsToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-        layout.separator()
-        show_label('HIERARCHIES', layout)
-        layout.operator(sendOp.SendAllHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-        layout.operator(sendOp.SendSelectedHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-        layout.separator()
-        show_label('MESHES', layout)
-        layout.operator(sendOp.SendAllMeshesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-        layout.operator(sendOp.SendSelectedMeshesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+        match prefs().bridge.active_game_engine:
+            case 'unity':
+                export_preset = 'UNITY'
+            case 'unreal':
+                export_preset = 'UNREAL'
+            case _:
+                log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
+                return
 
+        # --------------------------------------------------------------------------------------------------------------
+        # ASSET COLLECTIONS
+        show_label('ASSET COLLECTIONS', layout)
+        # Asset Collections - All in Scene
+        label = sendOp.BH_OT_send_containers.build_ui_label(
+            export_preset=export_preset,
+            send_all=True,
+            include_hierarchy=False,
+            include_collection=True,
+            include_mesh=False,
+        )
+        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = True
+        op.include_hierarchy = False
+        op.include_collection = True
+        op.include_mesh = False
 
-class BLUE_HOLE_MT_send_specific_unity(bpy.types.Menu):
-    bl_label = "Send Specific Container Type"
+        # Asset Collections - In Selection
+        label = sendOp.BH_OT_send_containers.build_ui_label(
+            export_preset=export_preset,
+            send_all=False,
+            include_hierarchy=False,
+            include_collection=True,
+            include_mesh=False,
+        )
+        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = False
+        op.include_hierarchy = False
+        op.include_collection = True
+        op.include_mesh = False
+        layout.separator()
 
-    def draw(self, context):
-        layout = self.layout
-        show_label('COLLECTIONS', layout)
-        layout.operator(sendOp.SendAllCollectionsToUnity.bl_idname, icon='UV_SYNC_SELECT')
-        layout.operator(sendOp.SendSelectedCollectionsToUnity.bl_idname, icon='UV_SYNC_SELECT')
+        # --------------------------------------------------------------------------------------------------------------
+        # ASSET HIERARCHIES
+        show_label('ASSET HIERARCHIES', layout)
+        # Asset Hierarchies - All in Scene
+        label = sendOp.BH_OT_send_containers.build_ui_label(
+            export_preset=export_preset,
+            send_all=True,
+            include_hierarchy=True,
+            include_collection=False,
+            include_mesh=False,
+        )
+        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = True
+        op.include_hierarchy = True
+        op.include_collection = False
+        op.include_mesh = False
+
+        # Asset Hierarchies - In Selection
+        label = sendOp.BH_OT_send_containers.build_ui_label(
+            export_preset=export_preset,
+            send_all=False,
+            include_hierarchy=True,
+            include_collection=False,
+            include_mesh=False,
+        )
+        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = False
+        op.include_hierarchy = True
+        op.include_collection = False
+        op.include_mesh = False
         layout.separator()
-        show_label('HIERARCHIES', layout)
-        layout.operator(sendOp.SendAllHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
-        layout.operator(sendOp.SendSelectedHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
+
+        # --------------------------------------------------------------------------------------------------------------
+        # ASSET MESHES
+        show_label('ASSET MESHES', layout)
+        # Asset Meshes - All in Scene
+        label = sendOp.BH_OT_send_containers.build_ui_label(
+            export_preset=export_preset,
+            send_all=True,
+            include_hierarchy=False,
+            include_collection=False,
+            include_mesh=True,
+        )
+        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = True
+        op.include_hierarchy = False
+        op.include_collection = False
+        op.include_mesh = True
+
+        # Asset Meshes - In Selection
+        label = sendOp.BH_OT_send_containers.build_ui_label(
+            export_preset=export_preset,
+            send_all=False,
+            include_hierarchy=False,
+            include_collection=False,
+            include_mesh=True,
+        )
+        op = layout.operator(sendOp.BH_OT_send_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = False
+        op.include_hierarchy = False
+        op.include_collection = False
+        op.include_mesh = True
         layout.separator()
-        show_label('MESHES', layout)
-        layout.operator(sendOp.SendAllMeshesToUnity.bl_idname, icon='UV_SYNC_SELECT')
-        layout.operator(sendOp.SendSelectedMeshesToUnity.bl_idname, icon='UV_SYNC_SELECT')
 
 
 class BLUE_HOLE_MT_sort(bpy.types.Menu):
@@ -254,8 +371,7 @@ classes = (BLUE_HOLE_MT_directories,
            BLUE_HOLE_MT_import,
            BLUE_HOLE_MT_music,
            BLUE_HOLE_MT_send,
-           BLUE_HOLE_MT_send_specific_unreal,
-           BLUE_HOLE_MT_send_specific_unity,
+           BLUE_HOLE_MT_send_specific,
            BLUE_HOLE_MT_sort,
            BLUE_HOLE_MT_source_control,
            BLUE_HOLE_MT_themes,

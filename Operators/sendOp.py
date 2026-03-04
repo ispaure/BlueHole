@@ -17,6 +17,7 @@ __status__ = 'Production'
 
 # Blender
 import bpy
+from bpy.props import *
 
 # Blue Hole
 from typing import Optional, Type
@@ -31,31 +32,77 @@ from ..Lib.commonUtils import uiUtils
 # INTERNAL HELPERS
 
 
-def _send_asset_container(
+# ----------------------------------------------------------------------------------------------------------------------
+# INTERNAL HELPERS
+
+
+def _selected_container_groups(
+    *,
+    include_hierarchy: bool,
+    include_collection: bool,
+    include_mesh: bool,
+) -> list[Type]:
+    groups: list[Type] = []
+    if include_hierarchy:
+        groups.append(AssetHierarchyContainerGroup)
+    if include_collection:
+        groups.append(AssetCollectionContainerGroup)
+    if include_mesh:
+        groups.append(AssetMeshContainerGroup)
+    return groups
+
+
+def _build_confirm_send_all_dialog(
+    *,
+    preset: ExportSettingsPreset,
+    groups: list[Type],
+    confirm_title: Optional[str],
+    confirm_msg: Optional[str],
+) -> tuple[str, str]:
+    """
+    Auto-build confirm dialog strings if not explicitly provided.
+    Only used when send_all=True.
+    """
+    engine = preset.name  # e.g. "UNREAL", "UNITY"
+
+    # If caller provided both, trust them as-is.
+    if confirm_title is not None and confirm_msg is not None:
+        return confirm_title, confirm_msg
+
+    # Title
+    title = confirm_title or f"{engine} Send"
+
+    # Message override (if provided)
+    if confirm_msg:
+        return title, confirm_msg
+
+    # Helper: get display name from container group class
+    def _group_name(cls: Type) -> str:
+        return getattr(cls, "CONTAINERS_NAME", cls.__name__)
+
+    if not groups:
+        msg = f"No container types selected. Nothing will be sent to {engine}."
+        return title, msg
+
+    if len(groups) == 1:
+        group_label = _group_name(groups[0])
+        msg = f"Do you really want to send ALL {group_label} to {engine}? Press OK to confirm."
+        return title, msg
+
+    group_labels = ", ".join(_group_name(g) for g in groups)
+    msg = f"Do you really want to send ALL of these to {engine}? ({group_labels}) Press OK to confirm."
+    return title, msg
+
+
+def _send_asset_container_no_confirm(
     preset: ExportSettingsPreset,
     container_group_cls: Type,
     send_all: bool,
-    *,
-    confirm_title: Optional[str] = None,
-    confirm_msg: Optional[str] = None,
 ) -> set[str]:
     """
-    Shared implementation for sending Asset Containers.
-
-    preset: Export settings preset (UNREAL / UNITY)
-    container_group_cls: one of
-        - AssetHierarchyContainerGroup
-        - AssetCollectionContainerGroup
-        - AssetMeshContainerGroup
-    send_all: True => containers from scene (+ confirmation)
-              False => containers from selection (no confirmation)
+    Same as your helper but without confirmation.
+    Confirmation is handled once at the mega-operator level.
     """
-    if send_all:
-        title = confirm_title or "Confirm Send"
-        msg = confirm_msg or "Do you want to continue?"
-        if not uiUtils.display_msg_box_ok_cancel(title, msg):
-            return {'CANCELLED'}
-
     export_settings = get_export_settings(preset)
 
     container_group = container_group_cls(export_settings)
@@ -69,323 +116,138 @@ def _send_asset_container(
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# OPERATORS (Wrappers - keep existing bl_idname)
-# NOTE: bl_idname values below follow your existing naming pattern for hierarchies.
-#       Adjust the new ones if you already have established ids for Collection/Mesh.
+# MEGA OPERATOR
 
+class BH_OT_send_containers(bpy.types.Operator):
+    bl_idname = "wm.bh_send_containers"
+    bl_label = "Send Containers"
+    bl_description = "Send containers"
 
-# ----------------------------
-# ASSET HIERARCHIES
-# ----------------------------
+    # --- Core behavior ---
+    send_all: BoolProperty(
+        name="Send All",
+        description="Send containers from the entire scene (otherwise from selection)",
+        default=False,
+    )
 
-class SendAllHierarchiesToUnity(bpy.types.Operator):
-    bl_idname = "wm.bh_send_unity"
-    bl_label = "Send *ALL* (Asset Hierarchies) to UNITY"
-    bl_description = 'Sends all asset hierarchies to Unity'
+    # Keep as enum so you can do: op.engine = 'UNREAL'
+    export_preset: EnumProperty(
+        name="Engine",
+        description="Target game engine preset",
+        items=[
+            ('UNREAL', "Unreal", "Send using Unreal preset"),
+            ('UNITY', "Unity", "Send using Unity preset"),
+        ],
+        default='UNREAL',
+    )
 
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetHierarchyContainerGroup,
-            send_all=True,
-            confirm_title='Unity Export',
-            confirm_msg='Do you really want to send *ALL* Asset Hierarchies to Unity? Press OK to confirm.',
-        )
+    # --- Container type selection ---
+    include_hierarchy: BoolProperty(
+        name="Asset Hierarchy",
+        description="Include Asset Hierarchy containers",
+        default=True,
+    )
+    include_collection: BoolProperty(
+        name="Asset Collection",
+        description="Include Asset Collection containers",
+        default=True,
+    )
+    include_mesh: BoolProperty(
+        name="Asset Mesh",
+        description="Include Asset Mesh containers",
+        default=True,
+    )
 
+    # Optional overrides (usually leave blank and let it auto-build)
+    confirm_title: bpy.props.StringProperty(
+        name="Confirm Title",
+        description="Optional override confirmation title",
+        default="",
+    )
+    confirm_msg: bpy.props.StringProperty(
+        name="Confirm Message",
+        description="Optional override confirmation message",
+        default="",
+    )
 
-class SendSelectedHierarchiesToUnity(bpy.types.Operator):
-    bl_idname = "wm.bh_send_selected_unity"
-    bl_label = "Send Selected (Asset Hierarchies) to UNITY"
-    bl_description = 'Sends selected asset hierarchies to Unity'
+    @classmethod
+    def build_ui_label(
+            cls,
+            *,
+            export_preset: str,
+            send_all: bool,
+            include_hierarchy: bool,
+            include_collection: bool,
+            include_mesh: bool,
+    ) -> str:
+        """
+        Build a dynamic UI button label based on operator-like inputs.
+        Intended to be called from Panels before creating the operator button.
+        """
+        engine = export_preset.title()  # 'UNREAL' -> 'Unreal', 'UNITY' -> 'Unity'
+        scope = "*ALL*" if send_all else "Selected"
 
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetHierarchyContainerGroup,
-            send_all=False,
-        )
+        parts: list[str] = []
+        if include_hierarchy:
+            parts.append(AssetHierarchyContainerGroup.CONTAINERS_NAME)
+        if include_collection:
+            parts.append(AssetCollectionContainerGroup.CONTAINERS_NAME)
+        if include_mesh:
+            parts.append(AssetMeshContainerGroup.CONTAINERS_NAME)
 
+        if not parts:
+            what = "Nothing"
+        elif len(parts) == 3:
+            what = "Asset Containers"
+        else:
+            what = " + ".join(parts)
 
-class SendAllHierarchiesToUnreal(bpy.types.Operator):
-    bl_idname = "wm.bh_send_unreal"
-    bl_label = "Send *ALL* (Asset Hierarchies) to UNREAL"
-    bl_description = 'Sends all asset hierarchies to Unreal'
-
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetHierarchyContainerGroup,
-            send_all=True,
-            confirm_title='Unreal Export',
-            confirm_msg='Do you really want to send *ALL* Asset Hierarchies to Unreal? Press OK to confirm.',
-        )
-
-
-class SendSelectedHierarchiesToUnreal(bpy.types.Operator):
-    bl_idname = "wm.bh_send_selected_unreal"
-    bl_label = "Send Selected (Asset Hierarchies) to UNREAL"
-    bl_description = 'Sends selected asset hierarchies to Unreal'
-
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetHierarchyContainerGroup,
-            send_all=False,
-        )
-
-
-# ----------------------------
-# ASSET COLLECTIONS
-# ----------------------------
-
-class SendAllCollectionsToUnity(bpy.types.Operator):
-    bl_idname = "wm.bh_send_collection_unity"
-    bl_label = "Send *ALL* (Asset Collections) to UNITY"
-    bl_description = 'Sends all asset collections to Unity'
-
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetCollectionContainerGroup,
-            send_all=True,
-            confirm_title='Unity Export',
-            confirm_msg='Do you really want to send *ALL* Asset Collections to Unity? Press OK to confirm.',
-        )
-
-
-class SendSelectedCollectionsToUnity(bpy.types.Operator):
-    bl_idname = "wm.bh_send_selected_collection_unity"
-    bl_label = "Send Selected (Asset Collections) to UNITY"
-    bl_description = 'Sends selected asset collections to Unity'
-
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetCollectionContainerGroup,
-            send_all=False,
-        )
-
-
-class SendAllCollectionsToUnreal(bpy.types.Operator):
-    bl_idname = "wm.bh_send_collection_unreal"
-    bl_label = "Send *ALL* (Asset Collections) to UNREAL"
-    bl_description = 'Sends all asset collections to Unreal'
+        return f"Send {scope} ({what}) to {engine.upper()}"
 
     def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetCollectionContainerGroup,
-            send_all=True,
-            confirm_title='Unreal Export',
-            confirm_msg='Do you really want to send *ALL* Asset Collections to Unreal? Press OK to confirm.',
+
+        # Map enum -> preset
+        match self.export_preset:
+            case 'UNREAL':
+                preset = ExportSettingsPreset.UNREAL
+            case 'UNITY':
+                preset = ExportSettingsPreset.UNITY
+            case _:
+                log(Severity.CRITICAL, self.bl_idname, 'Invalid Value on "Engine" Parameter')
+                return {'CANCELLED'}
+
+        # Which container group classes are included
+        groups = _selected_container_groups(
+            include_hierarchy=self.include_hierarchy,
+            include_collection=self.include_collection,
+            include_mesh=self.include_mesh,
         )
 
+        # No types selected => nothing to do (silent cancel or finished; choose what you prefer)
+        if not groups:
+            self.report({'WARNING'}, "No container types selected.")
+            return {'CANCELLED'}
 
-class SendSelectedCollectionsToUnreal(bpy.types.Operator):
-    bl_idname = "wm.bh_send_selected_collection_unreal"
-    bl_label = "Send Selected (Asset Collections) to UNREAL"
-    bl_description = 'Sends selected asset collections to Unreal'
+        # Confirm once (not once per container type)
+        if self.send_all:
+            title, msg = _build_confirm_send_all_dialog(
+                preset=preset,
+                groups=groups,
+                confirm_title=self.confirm_title or None,
+                confirm_msg=self.confirm_msg or None,
+            )
+            if not uiUtils.display_msg_box_ok_cancel(title, msg):
+                return {'CANCELLED'}
 
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetCollectionContainerGroup,
-            send_all=False,
-        )
-
-
-# ----------------------------
-# ASSET MESHES
-# ----------------------------
-
-class SendAllMeshesToUnity(bpy.types.Operator):
-    bl_idname = "wm.bh_send_mesh_unity"
-    bl_label = "Send *ALL* (Asset Meshes) to UNITY"
-    bl_description = 'Sends all asset meshes to Unity'
-
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetMeshContainerGroup,
-            send_all=True,
-            confirm_title='Unity Export',
-            confirm_msg='Do you really want to send *ALL* Asset Meshes to Unity? Press OK to confirm.',
-        )
-
-
-class SendSelectedMeshesToUnity(bpy.types.Operator):
-    bl_idname = "wm.bh_send_selected_mesh_unity"
-    bl_label = "Send Selected (Asset Meshes) to UNITY"
-    bl_description = 'Sends selected asset meshes to Unity'
-
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetMeshContainerGroup,
-            send_all=False,
-        )
-
-
-class SendAllMeshesToUnreal(bpy.types.Operator):
-    bl_idname = "wm.bh_send_mesh_unreal"
-    bl_label = "Send *ALL* (Asset Meshes) to UNREAL"
-    bl_description = 'Sends all asset meshes to Unreal'
-
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetMeshContainerGroup,
-            send_all=True,
-            confirm_title='Unreal Export',
-            confirm_msg='Do you really want to send *ALL* Asset Meshes to Unreal? Press OK to confirm.',
-        )
-
-
-class SendSelectedMeshesToUnreal(bpy.types.Operator):
-    bl_idname = "wm.bh_send_selected_mesh_unreal"
-    bl_label = "Send Selected (Asset Meshes) to UNREAL"
-    bl_description = 'Sends selected asset meshes to Unreal'
-
-    def execute(self, context):
-        return _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetMeshContainerGroup,
-            send_all=False,
-        )
-
-
-# ----------------------------
-# ALL TYPES (Hierarchies + Collections + Meshes)
-# ----------------------------
-
-class SendAllContainersToUnity(bpy.types.Operator):
-    bl_idname = "wm.bh_send_all_containers_unity"
-    bl_label = "Send *ALL* (All Container Types) to UNITY"
-    bl_description = "Sends *ALL* Asset Hierarchies, Asset Collections, and Asset Meshes to Unity"
-
-    def execute(self, context):
-        # Hierarchies
-        _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetHierarchyContainerGroup,
-            send_all=True,
-            confirm_title='Unity Export',
-            confirm_msg='Do you really want to send *ALL* Asset Hierarchies to Unity? Press OK to confirm.',
-        )
-
-        # Collections
-        _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetCollectionContainerGroup,
-            send_all=True,
-            confirm_title='Unity Export',
-            confirm_msg='Do you really want to send *ALL* Asset Collections to Unity? Press OK to confirm.',
-        )
-
-        # Meshes
-        _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetMeshContainerGroup,
-            send_all=True,
-            confirm_title='Unity Export',
-            confirm_msg='Do you really want to send *ALL* Asset Meshes to Unity? Press OK to confirm.',
-        )
-
-        return {'FINISHED'}
-
-
-class SendSelectedContainersToUnity(bpy.types.Operator):
-    bl_idname = "wm.bh_send_selected_all_containers_unity"
-    bl_label = "Send Selected (All Container Types) to UNITY"
-    bl_description = "Sends selected Asset Hierarchies, Asset Collections, and Asset Meshes to Unity"
-
-    def execute(self, context):
-        # Hierarchies
-        _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetHierarchyContainerGroup,
-            send_all=False,
-        )
-
-        # Collections
-        _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetCollectionContainerGroup,
-            send_all=False,
-        )
-
-        # Meshes
-        _send_asset_container(
-            ExportSettingsPreset.UNITY,
-            AssetMeshContainerGroup,
-            send_all=False,
-        )
-
-        return {'FINISHED'}
-
-
-class SendAllContainersToUnreal(bpy.types.Operator):
-    bl_idname = "wm.bh_send_all_containers_unreal"
-    bl_label = "Send *ALL* (All Container Types) to UNREAL"
-    bl_description = "Sends *ALL* Asset Hierarchies, Asset Collections, and Asset Meshes to Unreal"
-
-    def execute(self, context):
-        # Hierarchies
-        _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetHierarchyContainerGroup,
-            send_all=True,
-            confirm_title='Unreal Export',
-            confirm_msg='Do you really want to send *ALL* Asset Hierarchies to Unreal? Press OK to confirm.',
-        )
-
-        # Collections
-        _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetCollectionContainerGroup,
-            send_all=True,
-            confirm_title='Unreal Export',
-            confirm_msg='Do you really want to send *ALL* Asset Collections to Unreal? Press OK to confirm.',
-        )
-
-        # Meshes
-        _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetMeshContainerGroup,
-            send_all=True,
-            confirm_title='Unreal Export',
-            confirm_msg='Do you really want to send *ALL* Asset Meshes to Unreal? Press OK to confirm.',
-        )
-
-        return {'FINISHED'}
-
-
-class SendSelectedContainersToUnreal(bpy.types.Operator):
-    bl_idname = "wm.bh_send_selected_all_containers_unreal"
-    bl_label = "Send Selected (All Container Types) to UNREAL"
-    bl_description = "Sends selected Asset Hierarchies, Asset Collections, and Asset Meshes to Unreal"
-
-    def execute(self, context):
-        # Hierarchies
-        _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetHierarchyContainerGroup,
-            send_all=False,
-        )
-
-        # Collections
-        _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetCollectionContainerGroup,
-            send_all=False,
-        )
-
-        # Meshes
-        _send_asset_container(
-            ExportSettingsPreset.UNREAL,
-            AssetMeshContainerGroup,
-            send_all=False,
-        )
+        # Run all selected container types
+        for group_cls in groups:
+            res = _send_asset_container_no_confirm(
+                preset=preset,
+                container_group_cls=group_cls,
+                send_all=self.send_all,
+            )
+            if res == {'CANCELLED'}:
+                return res
 
         return {'FINISHED'}
 
@@ -394,29 +256,7 @@ class SendSelectedContainersToUnreal(bpy.types.Operator):
 # REGISTER / UNREGISTER
 
 classes = (
-    # Hierarchies
-    SendAllHierarchiesToUnity,
-    SendSelectedHierarchiesToUnity,
-    SendAllHierarchiesToUnreal,
-    SendSelectedHierarchiesToUnreal,
-
-    # Collections
-    SendAllCollectionsToUnity,
-    SendSelectedCollectionsToUnity,
-    SendAllCollectionsToUnreal,
-    SendSelectedCollectionsToUnreal,
-
-    # Meshes
-    SendAllMeshesToUnity,
-    SendSelectedMeshesToUnity,
-    SendAllMeshesToUnreal,
-    SendSelectedMeshesToUnreal,
-
-    # All
-    SendAllContainersToUnity,
-    SendSelectedContainersToUnity,
-    SendAllContainersToUnreal,
-    SendSelectedContainersToUnreal,
+    BH_OT_send_containers,
 )
 
 

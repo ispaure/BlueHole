@@ -42,6 +42,9 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
     match preset:
         case ExportSettingsPreset.UNITY:
             preset = ExportSettings(
+                # NAME
+                name='Unity',
+
                 # EXPORT OPTIONS
                 exp_format="FBX",
                 exp_dir=envPathResolver.get_unity_exp_dir_path(),
@@ -65,6 +68,9 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
 
         case ExportSettingsPreset.UNREAL:
             preset = ExportSettings(
+                # NAME
+                name='Unreal',
+
                 # EXPORT OPTIONS
                 exp_format="FBX",
                 exp_dir=projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_final),

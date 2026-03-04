@@ -32,6 +32,9 @@ class Engine(Enum):
 
 @dataclass(frozen=True, kw_only=True)
 class ExportSettings:
+    # Export Preset Name
+    name: str
+
     # General Export Settings
     exp_dir: Path
     exp_format: str
