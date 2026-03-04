@@ -1,5 +1,5 @@
 """
-The March 2026 refactor of exportUtils2. Once done, the old one should be removed and this one used instead.
+The March 2026 refactor of exportUtils2, but only section about individual asset exports.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,31 +15,25 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
-from typing import *
+# Blender
+import bpy
 
 # Blue Hole
-from .exportSettings import *
-from ...Lib.commonUtils.debugUtils import *
-from .. import sceneUtils, objectUtils, filterUtils
-from ...preferences.prefs import *
-from .containers.assetHierarchyContainer import AssetHierarchyContainer
-from .containers.modelContainers import Containers
+from abc import abstractmethod
+from ..exportSettings import *
+from ....Lib.commonUtils.debugUtils import *
+from ....preferences.prefs import *
+from ... import filterUtils, sceneUtils, objectUtils
+from .containerGroup import ContainerGroup
 
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-ah_tool_name = 'Asset Hierarchy Exporter (V3)'
+class AssetContainerGroup(ContainerGroup):
 
-
-class AssetHierarchies(Containers):
-
-    CONTAINERS_NAME = 'Asset Hierarchies'
+    CONTAINERS_NAME = 'Asset'
+    CONTAINER_CLASS = None
 
     def __init__(self, export_settings: ExportSettings):
         super().__init__(export_settings)
@@ -50,7 +44,7 @@ class AssetHierarchies(Containers):
         obj_lst = objectUtils.get_selection()
 
         # Set Container from Object List
-        self.__set_containers_from_obj_lst(obj_lst)
+        self._set_containers_from_obj_lst(obj_lst)
 
         # Throw error if no containers
         if len(self.container_lst) == 0:
@@ -62,62 +56,28 @@ class AssetHierarchies(Containers):
         obj_lst = sceneUtils.get_scene_obj_lst()
 
         # Set Container from Object List
-        self.__set_containers_from_obj_lst(obj_lst)
+        self._set_containers_from_obj_lst(obj_lst)
 
         # Throw error if no containers
         if len(self.container_lst) == 0:
             self.__critical_set_containers_scene_missing()
 
-    def __set_containers_from_obj_lst(self, obj_lst):
+    def _set_containers_from_obj_lst(self, obj_lst):
         # Reset
         self.container_lst = []
 
-        # Extend list of Asset Hierarchy
-        self.container_lst.extend(self.__get_asset_hierarchy_lst_from_obj_lst(obj_lst))
+        # Get hierarchy roots
+        root_obj_lst = self._get_root_lst_from_obj_lst(obj_lst)
 
-        # Extend list of Collection Asset Hierarchy
-        # TODO: Implement
-
-    def __get_asset_hierarchy_lst_from_obj_lst(self, obj_lst):
-
-        # Get root objects
-        root_obj_lst = self.__get_hierarchy_root_lst_from_obj_lst(obj_lst)
-
-        container_lst = []
         # For each root, make a hierarchy class
         for root_obj in root_obj_lst:
-            hierarchy = AssetHierarchyContainer(root_obj, self.export_settings)
-            container_lst.append(hierarchy)
+            hierarchy = self.CONTAINER_CLASS(root_obj, self.export_settings)
+            self.container_lst.append(hierarchy)
 
-        return container_lst
-
-    def __get_hierarchy_root_lst_from_obj_lst(self, obj_lst):
-        """
-        Returns a List of hierarchy roots from a selection
-        """
-        # Get list of hierarchy prefixes
-        ah_prefix_lst: List[str] = [
-            prefs().env.asset_hierarchy_struct_prefix_static_mesh,
-            prefs().env.asset_hierarchy_struct_prefix_static_mesh_kit,
-            prefs().env.asset_hierarchy_struct_prefix_skeletal_mesh
-        ]
-
-        # Export Root List
-        exp_root_lst = []
-
-        # Go through selection to get list of upmost parents. Only add to list if item is not already there
-        for obj in obj_lst:
-
-            upmost_parent_obj = objectUtils.get_obj_upmost_parent(obj)
-
-            # Checking if valid root
-            if 'EMPTY' in objectUtils.get_obj_type(upmost_parent_obj):  # If Empty, it's a transform
-                for ah_prefix in ah_prefix_lst:
-                    if objectUtils.get_obj_name(upmost_parent_obj)[:len(ah_prefix)] == ah_prefix:
-                        if upmost_parent_obj not in exp_root_lst:
-                            exp_root_lst.append(upmost_parent_obj)
-
-        return exp_root_lst
+    @abstractmethod
+    def _get_root_lst_from_obj_lst(self, obj_lst):
+        """Must be implemented by subclasses to define containers from scene. """
+        pass
 
     def _export_checks(self, send: bool):
         # Validate Source Content
@@ -161,7 +121,7 @@ class AssetHierarchies(Containers):
 
         # Construct the message
         msg = (
-            f'{ah_tool_name} validation failed.\n\n'
+            f'{self.CONTAINERS_NAME} validation failed.\n\n'
             f'What went wrong:\n'
             f'No Asset Hierarchy was found. Asset Hierarchies must be created '
             f'using a valid prefix defined in the Active Environment Settings.\n\n'
@@ -172,7 +132,7 @@ class AssetHierarchies(Containers):
             f'Export aborted.'
         )
 
-        log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
+        log(Severity.CRITICAL, self.CONTAINERS_NAME, msg, popup=True)
 
     def __critical_set_containers_selection_missing(self):
         # Define the prefix variables first
@@ -182,7 +142,7 @@ class AssetHierarchies(Containers):
 
         # Construct the message
         msg = (
-            f'{ah_tool_name} validation failed.\n\n'
+            f'{self.CONTAINERS_NAME} validation failed.\n\n'
             f'What went wrong:\n'
             f'No valid Asset Hierarchy was found in the current selection. Asset Hierarchies must exist at the root '
             f'of the scene and use a valid prefix defined in the Active Environment Settings.\n\n'
@@ -192,7 +152,7 @@ class AssetHierarchies(Containers):
             f'"{static_mesh_prefix}", "{kit_prefix}", "{skeletal_mesh_prefix}"\n\n'
             f'Export aborted.'
         )
-        log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
+        log(Severity.CRITICAL, self.CONTAINERS_NAME, msg, popup=True)
 
 
 def get_hierarchy_prefix_lst():

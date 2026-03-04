@@ -19,12 +19,12 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from .exportSettings import *
-from ...Lib.commonUtils.debugUtils import *
-from .. import sceneUtils, filterUtils, objectUtils, projectUtils
-from ...preferences.prefs import *
-from .containers.meshContainer import MeshContainer
-from .containers.modelContainers import Containers
+from ..exportSettings import *
+from ....Lib.commonUtils.debugUtils import *
+from ... import objectUtils, projectUtils
+from ....preferences.prefs import *
+from .container import LooseMeshContainer
+from ..model.containerGroup import ContainerGroup
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -37,7 +37,7 @@ show_verbose = True
 ah_tool_name = 'Asset Individual Exporter (V3)'
 
 
-class ExportMeshes(Containers):
+class LooseMeshContainerGroup(ContainerGroup):
 
     CONTAINERS_NAME = 'Meshes'
 
@@ -52,7 +52,7 @@ class ExportMeshes(Containers):
 
         # For each selected mesh, make a ExportMesh class
         for obj in selection_obj_lst:
-            mesh_container_cls = MeshContainer(obj, self.export_settings)
+            mesh_container_cls = LooseMeshContainer(obj, self.export_settings)
             self.container_lst.append(mesh_container_cls)
 
         # If no selection, throw error
@@ -75,21 +75,20 @@ class ExportMeshes(Containers):
         log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
 
 
-def batch_export_selection(exp_dir, exp_format='FBX'):
+def batch_export_loose_mesh(path_append):
     """
-    Batch exports selection as one file per object. Will connect to source control if enabled in user preferences.
-    :param exp_dir: Export Directory for Export
-    :type exp_dir: str
-    :param exp_format: File Format for Export
-    :type exp_format: str
+    Exports selected asset files in desired location, relative to open project.
+    :param path_append: Specifies directory to export to. Has to be an entry of
+                        env_variables.ini under "DirectoryStructure" section.
+    :type path_append: str
     """
-
-    tool_name = 'Batch Export Selection to ' + exp_format
+    # Get path of desired subproject directory to export to
+    exp_dir = str(projectUtils.get_project_sub_dir(path_append))
 
     # Create ExportSettings Class
     exp_set_cls = ExportSettings(
         # EXPORT OPTIONS
-        exp_format=exp_format,
+        exp_format='FBX',
         exp_dir=Path(exp_dir),
         zero_root_transform=prefs().general.exp_select_zero_root_transform,
 
@@ -109,21 +108,6 @@ def batch_export_selection(exp_dir, exp_format='FBX'):
         # ENGINE
         engine=Engine.UNDEFINED)
 
-    export_meshes = ExportMeshes(exp_set_cls)
+    export_meshes = LooseMeshContainerGroup(exp_set_cls)
     export_meshes.set_containers_from_selection()
     export_meshes.export_proc(send=False)
-
-
-def batch_export_selection_to_project_sub_dir(path_append):
-    """
-    Exports selected asset files in desired location, relative to open project.
-    :param path_append: Specifies directory to export to. Has to be an entry of
-                        env_variables.ini under "DirectoryStructure" section.
-    :type path_append: str
-    """
-    # Get path of desired sub project directory to export to
-    export_dir = str(projectUtils.get_project_sub_dir(path_append))
-
-    # Batch export selection to FBX. Connects to source control
-    batch_export_selection(export_dir, exp_format='FBX')
-    # exportUtils.batch_export_selected_as_fbx(export_dir)
