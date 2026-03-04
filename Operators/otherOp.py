@@ -20,6 +20,7 @@ import bpy
 from bpy.props import *
 from ..Lib.commonUtils.webUtils import open_url
 from ..overlays.deluxe import applyDeluxePrefs
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -52,12 +53,31 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class BH_OT_set_active_container_settings_tab(bpy.types.Operator):
+    bl_idname = "wm.bh_set_active_container_settings_tab"
+    bl_label = "Set Container Settings Tab"
+    bl_options = {'INTERNAL'}
+
+    tab: StringProperty(name="Tab", default="")
+
+    def execute(self, context):
+        # Use the *actual* addon preferences instance
+        addon = context.preferences.addons.get(__package__.split('.')[0])
+        if not addon:
+            self.report({'ERROR'}, 'Addon preferences not found')
+            return {'CANCELLED'}
+
+        addon.preferences.container.active_container_settings_tab = self.tab
+        return {'FINISHED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 # List of classes to register/unregister
 classes = (WM_OT_URLOpen,
-           WM_OT_Apply_Deluxe_Prefs)
+           WM_OT_Apply_Deluxe_Prefs,
+           BH_OT_set_active_container_settings_tab)
 
 
 def register():

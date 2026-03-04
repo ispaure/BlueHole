@@ -31,6 +31,32 @@ show_verbose = True
 
 class ContainerPG(bpy.types.PropertyGroup):
 
+    # -------------------------------------------------------------------------------------------------
+    # ENABLE ASSET CONTAINER TYPES
+    # -------------------------------------------------------------------------------------------------
+
+    enable_asset_hierarchy_container: BoolProperty(
+        name="Asset Hierarchy",
+        description="Enable Asset Hierarchy containers for this environment",
+        default=True
+    )
+
+    enable_asset_mesh_container: BoolProperty(
+        name="Asset Mesh",
+        description="Enable Asset Mesh containers for this environment",
+        default=True
+    )
+
+    enable_asset_collection_container: BoolProperty(
+        name="Asset Collection",
+        description="Enable Asset Collection containers for this environment",
+        default=True
+    )
+
+    # -------------------------------------------------------------------------------------------------
+    # UI - REMEMBER ACTIVE SUBMENUS
+    # -------------------------------------------------------------------------------------------------
+
     active_container_group_tab: EnumProperty(
         name="Container Group",
         description="Choose which container group settings to display",
@@ -45,69 +71,112 @@ class ContainerPG(bpy.types.PropertyGroup):
         name="Container Type",
         description="Choose which container type settings to display",
         items=[
-            ('HIERARCHY', "Asset Hierarchy", "Asset Hierarchy container settings"),
-            ('MESH', "Asset Mesh", "Asset Mesh container settings"),
+            ('HIERARCHY',  "Asset Hierarchy",  "Asset Hierarchy container settings"),
+            ('MESH',       "Asset Mesh",       "Asset Mesh container settings"),
             ('COLLECTION', "Asset Collection", "Asset Collection container settings"),
         ],
         default='HIERARCHY',
     )
 
-    # Asset Hierarchy Structure
-    asset_hierarchy_struct_prefix_static_mesh: StringProperty(name='Static Mesh',
-                                                              description='Prefix for Asset Hierarchies created with '
-                                                                          'static mesh type',
-                                                              default='DEFAULT_STR')
+    # -------------------------------------------------------------------------------------------------
+    # ASSET HIERARCHY STRUCTURE
+    # -------------------------------------------------------------------------------------------------
 
-    asset_hierarchy_struct_prefix_static_mesh_kit: StringProperty(name='Static Mesh Kit',
-                                                                  description='Prefix for Asset Hierarchies created '
-                                                                              'with static mesh kit type',
-                                                                  default='DEFAULT_STR')
+    asset_hierarchy_struct_prefix_static_mesh: StringProperty(
+        name="Static Mesh",
+        description="Prefix for Asset Hierarchies created with static mesh type",
+        default='DEFAULT_STR'
+    )
 
-    asset_hierarchy_struct_prefix_skeletal_mesh: StringProperty(name='Skeletal Mesh',
-                                                                description='Prefix for Asset Hierarchies created '
-                                                                            'with skeletal mesh kit type',
-                                                                default='DEFAULT_STR')
+    asset_hierarchy_struct_prefix_static_mesh_kit: StringProperty(
+        name="Static Mesh Kit",
+        description="Prefix for Asset Hierarchies created with static mesh kit type",
+        default='DEFAULT_STR'
+    )
 
+    asset_hierarchy_struct_prefix_skeletal_mesh: StringProperty(
+        name="Skeletal Mesh",
+        description="Prefix for Asset Hierarchies created with skeletal mesh kit type",
+        default='DEFAULT_STR'
+    )
+
+    # -------------------------------------------------------------------------------------------------
     # EXCLUDE IF NO CHILDREN
+    # -------------------------------------------------------------------------------------------------
 
-    descript_msg = 'When enabled, excludes elements from being part of the export if they are empty. For example, if ' \
-                   'Empty Object "Collision" is found to have no children underneath it, even though it is present in' \
-                   ' the Asset Hierarchy, it will not be part of the exported file. This is cleaner and the ' \
-                   'recommended method for Unity as there is less bloat.'
-    exclude_element_if_no_child: BoolProperty(name='Exclude Element if no Child',
-                                              description=descript_msg)
+    descript_msg = (
+        'When enabled, excludes elements from being part of the export if they are empty. '
+        'For example, if Empty Object "Collision" is found to have no children underneath it, '
+        'even though it is present in the Asset Hierarchy, it will not be part of the exported file. '
+        'This is cleaner and the recommended method for Unity as there is less bloat.'
+    )
 
-    # CREATE ELEMENT: RENDER
-    create_element_render: BoolProperty(name='Render',
-                                        description='Whether to include "Render" as part of new asset hierarchies and whether to require it upon export',
-                                        default=True)
+    exclude_element_if_no_child: BoolProperty(
+        name="Exclude Element if no Child",
+        description=descript_msg
+    )
 
-    # CREATE ELEMENT: COLLISION
-    create_element_collision: BoolProperty(name='Collision',
-                                           description='Whether to include "Collision" as part of new asset hierarchies and whether to require it upon export',
-                                           default=True)
+    # -------------------------------------------------------------------------------------------------
+    # CREATE ELEMENTS
+    # -------------------------------------------------------------------------------------------------
 
-    # CREATE ELEMENT: SOCKETS
-    create_element_sockets: BoolProperty(name='Sockets',
-                                         description='Whether to include "Sockets" as part of new asset hierarchies and whether to require it upon export',
-                                         default=False)
+    create_element_render: BoolProperty(
+        name="Render",
+        description=(
+            'Whether to include "Render" as part of new asset hierarchies and '
+            'whether to require it upon export'
+        ),
+        default=True
+    )
 
+    create_element_collision: BoolProperty(
+        name="Collision",
+        description=(
+            'Whether to include "Collision" as part of new asset hierarchies and '
+            'whether to require it upon export'
+        ),
+        default=True
+    )
+
+    create_element_sockets: BoolProperty(
+        name="Sockets",
+        description=(
+            'Whether to include "Sockets" as part of new asset hierarchies and '
+            'whether to require it upon export'
+        ),
+        default=False
+    )
+
+    # -------------------------------------------------------------------------------------------------
     # NAME ELEMENTS
+    # -------------------------------------------------------------------------------------------------
 
-    asset_hierarchy_empty_object_meshes: StringProperty(name='Render Meshes',
-                                                        description='Name of empty object within asset hierarchy '
-                                                                    'which will contain rendered meshes',
-                                                        default='DEFAULT_STR')
+    asset_hierarchy_empty_object_meshes: StringProperty(
+        name="Render Meshes",
+        description=(
+            "Name of empty object within asset hierarchy "
+            "which will contain rendered meshes"
+        ),
+        default='DEFAULT_STR'
+    )
 
-    asset_hierarchy_empty_object_collisions: StringProperty(name='Collision Meshes',
-                                                            description='Name of empty object within asset hierarchy '
-                                                                        'which will contain collision meshes',
-                                                            default='DEFAULT_STR')
+    asset_hierarchy_empty_object_collisions: StringProperty(
+        name="Collision Meshes",
+        description=(
+            "Name of empty object within asset hierarchy "
+            "which will contain collision meshes"
+        ),
+        default='DEFAULT_STR'
+    )
 
-    asset_hierarchy_empty_object_sockets: StringProperty(name='Sockets',
-                                                         description='Name of empty object within asset hierarchy '
-                                                                     'which will contain sockets',
-                                                         default='DEFAULT_STR')
+    asset_hierarchy_empty_object_sockets: StringProperty(
+        name="Sockets",
+        description=(
+            "Name of empty object within asset hierarchy "
+            "which will contain sockets"
+        ),
+        default='DEFAULT_STR'
+    )
 
 
 def label_row(path, prop, row, label=''):
@@ -187,13 +256,74 @@ def draw(preference, context, layout):
         row.label(text='')
 
         # -------------------------------------------------------------------------------------------------
+        # ENABLE ASSET CONTAINER TYPES
+        # -------------------------------------------------------------------------------------------------
+        box_enable = box.box()
+        column_enable = box_enable.column()
+
+        row = column_enable.row()
+        row.enabled = enable_rows
+        row.label(text='Enabled Asset Container Types:')
+
+        row = column_enable.row(align=True)
+        row.enabled = enable_rows
+        row.prop(preference.container, 'enable_asset_hierarchy_container', text='Hierarchy')
+        row.prop(preference.container, 'enable_asset_mesh_container', text='Mesh')
+        row.prop(preference.container, 'enable_asset_collection_container', text='Collection')
+
+        # Spacer
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='')
+
+        # -------------------------------------------------------------------------------------------------
         # CONTAINER TYPE TABS (Hierarchy / Mesh / Collection)
         # -------------------------------------------------------------------------------------------------
-        tab_row = column.row()
-        tab_row.enabled = enable_rows
-        tab_row.prop(preference.container, 'active_container_settings_tab', expand=True)
+        enabled_hierarchy = prefs().container.enable_asset_hierarchy_container
+        enabled_mesh = prefs().container.enable_asset_mesh_container
+        enabled_collection = prefs().container.enable_asset_collection_container
 
+        allowed_tabs: list[str] = []
+        if enabled_hierarchy:
+            allowed_tabs.append('HIERARCHY')
+        if enabled_mesh:
+            allowed_tabs.append('MESH')
+        if enabled_collection:
+            allowed_tabs.append('COLLECTION')
+
+        # Edge case: nothing enabled
+        if not allowed_tabs:
+            box_2 = box.box()
+            column2 = box_2.column()
+
+            row = column2.row()
+            row.enabled = enable_rows
+            row.label(text='No Asset Container types are enabled for this environment.', icon='ERROR')
+            return
+
+        # Auto-fallback if current selection is disabled
         active_tab = preference.container.active_container_settings_tab
+        if active_tab not in allowed_tabs:
+            preference.container.active_container_settings_tab = allowed_tabs[0]
+            active_tab = preference.container.active_container_settings_tab
+
+        tab_row = column.row(align=True)
+        tab_row.enabled = enable_rows
+
+        def _tab_button(tab_id: str, label: str):
+            btn = tab_row.operator(
+                "wm.bh_set_active_container_settings_tab",
+                text=label,
+                depress=(active_tab == tab_id),
+            )
+            btn.tab = tab_id
+
+        if enabled_hierarchy:
+            _tab_button('HIERARCHY', 'Asset Hierarchy')
+        if enabled_mesh:
+            _tab_button('MESH', 'Asset Mesh')
+        if enabled_collection:
+            _tab_button('COLLECTION', 'Asset Collection')
 
         # -------------------------------------------------------------------------------------------------
         # ACTIVE ASSET CONTAINER SETTINGS

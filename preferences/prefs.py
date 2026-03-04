@@ -324,6 +324,32 @@ class _ContainerPrefs:
     def __init__(self, container):
         self._container = container
 
+    # ------------------- Asset Container Types -------------------
+
+    @property
+    def enable_asset_hierarchy_container(self) -> bool:
+        return self._container.enable_asset_hierarchy_container
+
+    @enable_asset_hierarchy_container.setter
+    def enable_asset_hierarchy_container(self, value: bool):
+        self._container.enable_asset_hierarchy_container = value
+
+    @property
+    def enable_asset_mesh_container(self) -> bool:
+        return self._container.enable_asset_mesh_container
+
+    @enable_asset_mesh_container.setter
+    def enable_asset_mesh_container(self, value: bool):
+        self._container.enable_asset_mesh_container = value
+
+    @property
+    def enable_asset_collection_container(self) -> bool:
+        return self._container.enable_asset_collection_container
+
+    @enable_asset_collection_container.setter
+    def enable_asset_collection_container(self, value: bool):
+        self._container.enable_asset_collection_container = value
+
     # ------------------- Asset Hierarchy Structure -------------------
     @property
     def asset_hierarchy_struct_prefix_static_mesh(self) -> str:

@@ -62,16 +62,35 @@ directory_setting_lst = (
 
 
 container_setting_lst = (
+
+    # -------------------------------------------------------------------------------------------------
+    # AssetHierarchyStructure
+    # -------------------------------------------------------------------------------------------------
+    Setting(pref_path='container.enable_asset_hierarchy_container', ini_section='AssetHierarchyStructure', ini_value='enable_asset_hierarchy_container', var_type=bool),
+
     Setting(pref_path='container.asset_hierarchy_struct_prefix_static_mesh', ini_section='AssetHierarchyStructure', ini_value='prefix_static_mesh', var_type=str),
     Setting(pref_path='container.asset_hierarchy_struct_prefix_static_mesh_kit', ini_section='AssetHierarchyStructure', ini_value='prefix_static_mesh_kit', var_type=str),
     Setting(pref_path='container.asset_hierarchy_struct_prefix_skeletal_mesh', ini_section='AssetHierarchyStructure', ini_value='prefix_skeletal_mesh', var_type=str),
+
     Setting(pref_path='container.asset_hierarchy_empty_object_meshes', ini_section='AssetHierarchyStructure', ini_value='null_render', var_type=str),
     Setting(pref_path='container.asset_hierarchy_empty_object_collisions', ini_section='AssetHierarchyStructure', ini_value='null_collision', var_type=str),
     Setting(pref_path='container.asset_hierarchy_empty_object_sockets', ini_section='AssetHierarchyStructure', ini_value='null_socket', var_type=str),
+
     Setting(pref_path='container.create_element_render', ini_section='AssetHierarchyStructure', ini_value='create_null_render', var_type=bool),
     Setting(pref_path='container.create_element_collision', ini_section='AssetHierarchyStructure', ini_value='create_null_collision', var_type=bool),
     Setting(pref_path='container.create_element_sockets', ini_section='AssetHierarchyStructure', ini_value='create_null_socket', var_type=bool),
+
     Setting(pref_path='container.exclude_element_if_no_child', ini_section='AssetHierarchyStructure', ini_value='exclude_null_if_no_child', var_type=bool),
+
+    # -------------------------------------------------------------------------------------------------
+    # AssetMeshStructure
+    # -------------------------------------------------------------------------------------------------
+    Setting(pref_path='container.enable_asset_mesh_container', ini_section='AssetMeshStructure', ini_value='enable_asset_mesh_container', var_type=bool),
+
+    # -------------------------------------------------------------------------------------------------
+    # AssetCollectionStructure
+    # -------------------------------------------------------------------------------------------------
+    Setting(pref_path='container.enable_asset_collection_container', ini_section='AssetCollectionStructure', ini_value='enable_asset_collection_container', var_type=bool),
 )
 
 
