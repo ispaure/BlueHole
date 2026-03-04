@@ -250,15 +250,10 @@ def draw(preference, context, layout):
         row.enabled = enable_rows
         row.prop(preference.container, 'asset_hierarchy_struct_prefix_skeletal_mesh', text='Skeletal Mesh Prefix')
 
-        # Spacer
-        row = column.row()
-        row.enabled = enable_rows
-        row.label(text='')
-
         # -------------------------------------------------------------------------------------------------
         # ENABLE ASSET CONTAINER TYPES
         # -------------------------------------------------------------------------------------------------
-        box_enable = box.box()
+        box_enable = column.box()
         column_enable = box_enable.column()
 
         row = column_enable.row()
@@ -271,17 +266,12 @@ def draw(preference, context, layout):
         row.prop(preference.container, 'enable_asset_mesh_container', text='Mesh')
         row.prop(preference.container, 'enable_asset_collection_container', text='Collection')
 
-        # Spacer
-        row = column.row()
-        row.enabled = enable_rows
-        row.label(text='')
-
         # -------------------------------------------------------------------------------------------------
         # CONTAINER TYPE TABS (Hierarchy / Mesh / Collection)
         # -------------------------------------------------------------------------------------------------
-        enabled_hierarchy = prefs().container.enable_asset_hierarchy_container
-        enabled_mesh = prefs().container.enable_asset_mesh_container
-        enabled_collection = prefs().container.enable_asset_collection_container
+        enabled_hierarchy = preference.container.enable_asset_hierarchy_container
+        enabled_mesh = preference.container.enable_asset_mesh_container
+        enabled_collection = preference.container.enable_asset_collection_container
 
         allowed_tabs: list[str] = []
         if enabled_hierarchy:
