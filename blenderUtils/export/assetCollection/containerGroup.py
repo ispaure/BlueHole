@@ -39,7 +39,7 @@ ah_tool_name = 'Asset Individual Exporter (V3)'
 
 class AssetCollectionContainerGroup(AssetContainerGroup):
 
-    CONTAINERS_NAME = 'Asset Collection'
+    CONTAINERS_NAME = 'Asset Collections'
     CONTAINER_CLASS = AssetCollectionContainer
 
     def __init__(self, export_settings: ExportSettings):

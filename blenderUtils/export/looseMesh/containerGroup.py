@@ -87,6 +87,9 @@ def batch_export_loose_mesh(path_append):
 
     # Create ExportSettings Class
     exp_set_cls = ExportSettings(
+        # NAME
+        name='Loose Mesh',
+
         # EXPORT OPTIONS
         exp_format='FBX',
         exp_dir=Path(exp_dir),
