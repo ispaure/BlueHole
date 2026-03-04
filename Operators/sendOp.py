@@ -19,14 +19,49 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
+from typing import *
 from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export.assetHierarchy.containerGroup import AssetHierarchyContainerGroup
-from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGroup
 from ..blenderUtils.export.assetCollection.containerGroup import AssetCollectionContainerGroup
+from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGroup
 from ..Lib.commonUtils import uiUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
-# OPERATORS
+# INTERNAL HELPERS
+
+
+def _send_asset_container(preset: ExportSettingsPreset,
+                          send_all: bool, *,
+                          confirm_title: Optional[str] = None,
+                          confirm_msg: Optional[str] = None
+                          ) -> set[str]:
+    """
+    Shared implementation for sending Asset Hierarchies.
+
+    preset: Export settings preset (UNREAL / UNITY)
+    send_all: True => containers from scene (+ confirmation)
+              False => containers from selection (no confirmation)
+    """
+    if send_all:
+        title = confirm_title or "Confirm Send"
+        msg = confirm_msg or "Do you want to continue?"
+        if not uiUtils.display_msg_box_ok_cancel(title, msg):
+            return {'CANCELLED'}
+
+    export_settings = get_export_settings(preset)
+
+    asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
+    if send_all:
+        asset_hierarchies.set_containers_from_scene()
+    else:
+        asset_hierarchies.set_containers_from_selection()
+
+    asset_hierarchies.export_proc(send=True, bypass_sc=False)
+    return {'FINISHED'}
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# OPERATORS (Wrappers - keep existing bl_idname)
 
 
 class SendAllHierarchiesToUnity(bpy.types.Operator):
@@ -35,16 +70,12 @@ class SendAllHierarchiesToUnity(bpy.types.Operator):
     bl_description = 'Sends all asset hierarchies to Unity'
 
     def execute(self, context):
-        # exportUtils.exp_obj_hierarchies_unity(selected_only=False)
-        msg = 'Do you really want to send *ALL* Asset Hierarchies to Unity? Press OK to confirm.'
-        state = uiUtils.display_msg_box_ok_cancel('Unity Export', msg)
-        if state:
-            # Get Unity Export Profile
-            export_settings = get_export_settings(ExportSettingsPreset.UNITY)
-            asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
-            asset_hierarchies.set_containers_from_scene()
-            asset_hierarchies.export_proc(send=True, bypass_sc=False)
-        return {'FINISHED'}
+        return _send_asset_container(
+            ExportSettingsPreset.UNITY,
+            send_all=True,
+            confirm_title='Unity Export',
+            confirm_msg='Do you really want to send *ALL* Asset Hierarchies to Unity? Press OK to confirm.',
+        )
 
 
 class SendSelectedHierarchiesToUnity(bpy.types.Operator):
@@ -53,12 +84,10 @@ class SendSelectedHierarchiesToUnity(bpy.types.Operator):
     bl_description = 'Sends selected asset hierarchies to Unity'
 
     def execute(self, context):
-        # Get Unity Export Profile
-        export_settings = get_export_settings(ExportSettingsPreset.UNITY)
-        asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
-        asset_hierarchies.set_containers_from_selection()
-        asset_hierarchies.export_proc(send=True, bypass_sc=False)
-        return {'FINISHED'}
+        return _send_asset_container(
+            ExportSettingsPreset.UNITY,
+            send_all=False
+        )
 
 
 class SendAllHierarchiesToUnreal(bpy.types.Operator):
@@ -67,16 +96,12 @@ class SendAllHierarchiesToUnreal(bpy.types.Operator):
     bl_description = 'Sends all asset hierarchies to Unreal'
 
     def execute(self, context):
-        # exportUtils.exp_obj_hierarchies_unreal(selected_only=False, trigger_import_cmd=True)
-        msg = 'Do you really want to send *ALL* Asset Hierarchies to Unreal? Press OK to confirm.'
-        state = uiUtils.display_msg_box_ok_cancel('Unreal Export', msg)
-        if state:
-            # Get Unreal Export Profile
-            export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
-            asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
-            asset_hierarchies.set_containers_from_scene()
-            asset_hierarchies.export_proc(send=True, bypass_sc=False)
-        return {'FINISHED'}
+        return _send_asset_container(
+            ExportSettingsPreset.UNREAL,
+            send_all=True,
+            confirm_title='Unreal Export',
+            confirm_msg='Do you really want to send *ALL* Asset Hierarchies to Unreal? Press OK to confirm.',
+        )
 
 
 class SendSelectedHierarchiesToUnreal(bpy.types.Operator):
@@ -85,23 +110,21 @@ class SendSelectedHierarchiesToUnreal(bpy.types.Operator):
     bl_description = 'Sends selected asset hierarchies to Unreal'
 
     def execute(self, context):
-        # Get Unreal Export Profile
-        export_settings = get_export_settings(ExportSettingsPreset.UNREAL)
-        asset_hierarchies = AssetHierarchyContainerGroup(export_settings)
-        asset_hierarchies.set_containers_from_selection()
-        asset_hierarchies.export_proc(send=True, bypass_sc=False)
-        return {'FINISHED'}
+        return _send_asset_container(
+            ExportSettingsPreset.UNREAL,
+            send_all=False
+        )
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
-# List of classes to register/unregister
-classes = (SendAllHierarchiesToUnity,
-           SendSelectedHierarchiesToUnity,
-           SendAllHierarchiesToUnreal,
-           SendSelectedHierarchiesToUnreal
-           )
+classes = (
+    SendAllHierarchiesToUnity,
+    SendSelectedHierarchiesToUnity,
+    SendAllHierarchiesToUnreal,
+    SendSelectedHierarchiesToUnreal,
+)
 
 
 def register():
@@ -109,7 +132,6 @@ def register():
         bpy.utils.register_class(cls)
 
 
-# Unregister
 def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)  # Unregister Operators
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
