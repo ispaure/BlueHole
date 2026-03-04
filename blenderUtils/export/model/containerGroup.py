@@ -76,8 +76,35 @@ class ContainerGroup(ABC):
         # Exporting hierarchies
         for container in self.container_lst:
             container.export_proc()
+
             if send and self.export_settings.engine == Engine.UNREAL:
-                sendUnreal.trigger_unreal_import(str(container.path))
+
+                # Override Send operator (per-container)
+                if prefs().bridge.ue_enable_send_override and prefs().bridge.ue_op_send_override:
+                    op_idname = prefs().bridge.ue_op_send_override.strip()
+
+                    # Expect "category.op_name" (ex: "wm.my_send_unreal")
+                    if "." not in op_idname:
+                        log(Severity.CRITICAL, self.__class__.__name__, f'Invalid operator idname: "{op_idname}"')
+                        raise ValueError(f'Invalid operator idname: "{op_idname}"')
+
+                    cat, op = op_idname.split(".", 1)
+
+                    # Call operator and pass FBX file path
+                    try:
+                        res = getattr(getattr(bpy.ops, cat), op)(path=str(container.path))
+                    except Exception as e:
+                        log(Severity.CRITICAL, self.__class__.__name__,
+                            f'Failed to run override operator "{op_idname}": {e}')
+                        raise
+
+                    # Optional: if you want to treat operator cancel as a hard-stop
+                    if res == {'CANCELLED'}:
+                        return {'CANCELLED'}
+
+                else:
+                    # Default behavior
+                    sendUnreal.trigger_unreal_import(str(container.path))
 
         # Set Previous selection state
         view_layer.objects.active = obj_active
