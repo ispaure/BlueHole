@@ -33,18 +33,7 @@ from .blenderUtils import callbacks
 from .preferences import addon_prefs as addon_prefs
 
 # Import Blue Hole Operators
-from .Operators import dirOp as dirOp
-from .Operators import envOp as envOp
-from .Operators import externalAddonOp as externalAddonOp
-from .Operators import foodOp as foodOp
-from .Operators import helpOp as helpOp
-from .Operators import impExpOp as impExpOp
-from .Operators import musicOp as musicOp
-from .Operators import otherOp as otherOp
-from .Operators import sendOp as sendOp
-from .Operators import sortOp as sortOp
-from .Operators import sourceControlOp as sourceControlOp
-from .Operators import themeOp as themeOp
+from .Operators import dirOp, envOp, externalAddonOp, foodOp, helpOp, impExpOp, musicOp, otherOp, exportSendOp, sortOp, sourceControlOp, themeOp
 
 # Import Env Utils
 from .environment import envManager as envManager
@@ -86,7 +75,7 @@ operator_file_lst = (dirOp,
                      impExpOp,
                      musicOp,
                      otherOp,
-                     sendOp,
+                     exportSendOp,
                      sortOp,
                      sourceControlOp,
                      themeOp)

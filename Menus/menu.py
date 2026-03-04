@@ -23,7 +23,7 @@ import bpy
 
 # Blue Hole
 from ..blenderUtils.uiUtils import show_label
-from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, sendOp, sortOp, sourceControlOp, themeOp, otherOp
+from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, exportSendOp, sortOp, sourceControlOp, themeOp, otherOp
 from ..preferences.prefs import *
 from ..blenderUtils import blenderFile
 from ..Lib.commonUtils.debugUtils import *
@@ -67,7 +67,7 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
 
 
 # Export Menu
-class BLUE_HOLE_MT_export(bpy.types.Menu):
+class BLUE_HOLE_MT_export_old(bpy.types.Menu):
     bl_label = "Export (to Source Asset Dir.)"
 
     def draw(self, context):
@@ -143,19 +143,20 @@ class BLUE_HOLE_MT_music(bpy.types.Menu):
             layout.operator(cls.bl_idname, icon='SOUND')
 
 
-class BLUE_HOLE_MT_send(bpy.types.Menu):
-    bl_label = "Send (to Game Engine)"
+class _BLUE_HOLE_MT_send_base(bpy.types.Menu):
+    """
+    Base menu that can render either Send or Export depending on SEND flag.
+    Do not register this class.
+    """
+    SEND: bool = True  # overridden by subclasses
 
     @classmethod
     def build_ui_label(cls) -> str:
-        """
-        Build menu label based on the active engine.
-        """
-        return f"Send (to {prefs().bridge.active_game_engine.upper()})"
+        verb = "Send" if cls.SEND else "Export"
+        return f"{verb} (to {prefs().bridge.active_game_engine.upper()})"
 
-    def draw(self, context):
-        layout = self.layout
-
+    def _draw_common(self, context, layout):
+        # Engine Doc + preset
         match prefs().bridge.active_game_engine:
             case 'unity':
                 export_preset = 'UNITY'
@@ -167,51 +168,60 @@ class BLUE_HOLE_MT_send(bpy.types.Menu):
                 log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
                 return
 
-        # Send Containers Operators
-        # All Containers - All in Scene
-        label = sendOp.BH_OT_export_containers.build_ui_label(
-            export_preset=export_preset,
-            send=True,
-            send_all=True,
-            include_hierarchy=True,
-            include_collection=True,
-            include_mesh=True,
-        )
-        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send = True
-        op.send_all = True
-        op.include_hierarchy = True
-        op.include_collection = True
-        op.include_mesh = True
+        # Helper to reduce repetition
+        def add_button(*, send_all, include_hierarchy, include_collection, include_mesh, icon='UV_SYNC_SELECT'):
+            label = exportSendOp.BH_OT_export_containers.build_ui_label(
+                export_preset=export_preset,
+                send=self.SEND,
+                send_all=send_all,
+                include_hierarchy=include_hierarchy,
+                include_collection=include_collection,
+                include_mesh=include_mesh,
+            )
+            op = layout.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon=icon)
+            op.export_preset = export_preset
+            op.send = self.SEND
+            op.send_all = send_all
+            op.include_hierarchy = include_hierarchy
+            op.include_collection = include_collection
+            op.include_mesh = include_mesh
 
+        # All Containers - All in Scene
+        add_button(send_all=True,  include_hierarchy=True, include_collection=True, include_mesh=True)
         # All Containers - In Selection
-        label = sendOp.BH_OT_export_containers.build_ui_label(
-            export_preset=export_preset,
-            send=True,
-            send_all=False,
-            include_hierarchy=True,
-            include_collection=True,
-            include_mesh=True,
-        )
-        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send = True
-        op.send_all = False
-        op.include_hierarchy = True
-        op.include_collection = True
-        op.include_mesh = True
+        add_button(send_all=False, include_hierarchy=True, include_collection=True, include_mesh=True)
 
         layout.separator()
-        # Submenu to send specific Asset Container types
-        layout.menu("BLUE_HOLE_MT_send_specific")
+
+        # Submenu for specific container type
+        if self.SEND:
+            layout.menu("BLUE_HOLE_MT_send_specific")
+        else:
+            layout.menu("BLUE_HOLE_MT_export_specific")
 
 
-class BLUE_HOLE_MT_send_specific(bpy.types.Menu):
-    bl_label = "Specific Asset Container"
+class BLUE_HOLE_MT_send(_BLUE_HOLE_MT_send_base):
+    bl_idname = "BLUE_HOLE_MT_send"
+    bl_label = "Send (to Game Engine)"
+    SEND = True
 
     def draw(self, context):
-        layout = self.layout
+        self._draw_common(context, self.layout)
+
+
+class BLUE_HOLE_MT_export(_BLUE_HOLE_MT_send_base):
+    bl_idname = "BLUE_HOLE_MT_export"
+    bl_label = "Export (to Game Engine)"
+    SEND = False
+
+    def draw(self, context):
+        self._draw_common(context, self.layout)
+
+
+class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
+    SEND: bool = True  # overridden
+
+    def _draw_specific(self, context, layout):
         match prefs().bridge.active_game_engine:
             case 'unity':
                 export_preset = 'UNITY'
@@ -221,121 +231,57 @@ class BLUE_HOLE_MT_send_specific(bpy.types.Menu):
                 log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
                 return
 
-        # --------------------------------------------------------------------------------------------------------------
-        # ASSET COLLECTIONS
+        def add_button(title, *, send_all, include_hierarchy, include_collection, include_mesh):
+            label = exportSendOp.BH_OT_export_containers.build_ui_label(
+                export_preset=export_preset,
+                send=self.SEND,
+                send_all=send_all,
+                include_hierarchy=include_hierarchy,
+                include_collection=include_collection,
+                include_mesh=include_mesh,
+            )
+            op = layout.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+            op.export_preset = export_preset
+            op.send = self.SEND
+            op.send_all = send_all
+            op.include_hierarchy = include_hierarchy
+            op.include_collection = include_collection
+            op.include_mesh = include_mesh
+
+        # Collections
         show_label('ASSET COLLECTIONS', layout)
-
-        # Asset Collections - All in Scene
-        label = sendOp.BH_OT_export_containers.build_ui_label(
-            export_preset=export_preset,
-            send=True,
-            send_all=True,
-            include_hierarchy=False,
-            include_collection=True,
-            include_mesh=False,
-        )
-        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send = True
-        op.send_all = True
-        op.include_hierarchy = False
-        op.include_collection = True
-        op.include_mesh = False
-
-        # Asset Collections - In Selection
-        label = sendOp.BH_OT_export_containers.build_ui_label(
-            export_preset=export_preset,
-            send=True,
-            send_all=False,
-            include_hierarchy=False,
-            include_collection=True,
-            include_mesh=False,
-        )
-        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send = True
-        op.send_all = False
-        op.include_hierarchy = False
-        op.include_collection = True
-        op.include_mesh = False
+        add_button("Collections All",      send_all=True,  include_hierarchy=False, include_collection=True,  include_mesh=False)
+        add_button("Collections Selected", send_all=False, include_hierarchy=False, include_collection=True,  include_mesh=False)
         layout.separator()
 
-        # --------------------------------------------------------------------------------------------------------------
-        # ASSET HIERARCHIES
+        # Hierarchies
         show_label('ASSET HIERARCHIES', layout)
-
-        # Asset Hierarchies - All in Scene
-        label = sendOp.BH_OT_export_containers.build_ui_label(
-            export_preset=export_preset,
-            send=True,
-            send_all=True,
-            include_hierarchy=True,
-            include_collection=False,
-            include_mesh=False,
-        )
-        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send = True
-        op.send_all = True
-        op.include_hierarchy = True
-        op.include_collection = False
-        op.include_mesh = False
-
-        # Asset Hierarchies - In Selection
-        label = sendOp.BH_OT_export_containers.build_ui_label(
-            export_preset=export_preset,
-            send=True,
-            send_all=False,
-            include_hierarchy=True,
-            include_collection=False,
-            include_mesh=False,
-        )
-        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send = True
-        op.send_all = False
-        op.include_hierarchy = True
-        op.include_collection = False
-        op.include_mesh = False
+        add_button("Hierarchies All",      send_all=True,  include_hierarchy=True,  include_collection=False, include_mesh=False)
+        add_button("Hierarchies Selected", send_all=False, include_hierarchy=True,  include_collection=False, include_mesh=False)
         layout.separator()
 
-        # --------------------------------------------------------------------------------------------------------------
-        # ASSET MESHES
+        # Meshes
         show_label('ASSET MESHES', layout)
+        add_button("Meshes All",      send_all=True,  include_hierarchy=False, include_collection=False, include_mesh=True)
+        add_button("Meshes Selected", send_all=False, include_hierarchy=False, include_collection=False, include_mesh=True)
 
-        # Asset Meshes - All in Scene
-        label = sendOp.BH_OT_export_containers.build_ui_label(
-            export_preset=export_preset,
-            send=True,
-            send_all=True,
-            include_hierarchy=False,
-            include_collection=False,
-            include_mesh=True,
-        )
-        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send = True
-        op.send_all = True
-        op.include_hierarchy = False
-        op.include_collection = False
-        op.include_mesh = True
 
-        # Asset Meshes - In Selection
-        label = sendOp.BH_OT_export_containers.build_ui_label(
-            export_preset=export_preset,
-            send=True,
-            send_all=False,
-            include_hierarchy=False,
-            include_collection=False,
-            include_mesh=True,
-        )
-        op = layout.operator(sendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-        op.export_preset = export_preset
-        op.send = True
-        op.send_all = False
-        op.include_hierarchy = False
-        op.include_collection = False
-        op.include_mesh = True
+class BLUE_HOLE_MT_send_specific(_BLUE_HOLE_MT_specific_base):
+    bl_idname = "BLUE_HOLE_MT_send_specific"
+    bl_label = "Specific Asset Container"
+    SEND = True
+
+    def draw(self, context):
+        self._draw_specific(context, self.layout)
+
+
+class BLUE_HOLE_MT_export_specific(_BLUE_HOLE_MT_specific_base):
+    bl_idname = "BLUE_HOLE_MT_export_specific"
+    bl_label = "Specific Asset Container"
+    SEND = False
+
+    def draw(self, context):
+        self._draw_specific(context, self.layout)
 
 
 class BLUE_HOLE_MT_sort(bpy.types.Menu):
@@ -384,6 +330,8 @@ class BLUE_HOLE_MT_update_deluxe(bpy.types.Menu):
 # Menu classes
 classes = (BLUE_HOLE_MT_directories,
            BLUE_HOLE_MT_export,
+           BLUE_HOLE_MT_export_specific,
+           BLUE_HOLE_MT_export_old,
            BLUE_HOLE_MT_food_delivery,
            BLUE_HOLE_MT_help,
            BLUE_HOLE_MT_import,

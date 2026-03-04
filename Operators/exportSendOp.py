@@ -127,8 +127,8 @@ def _export_asset_container_no_confirm(
 
 class BH_OT_export_containers(bpy.types.Operator):
     bl_idname = "wm.bh_send_containers"
-    bl_label = "Send Containers"
-    bl_description = "Send containers"
+    bl_label = "Export/Send Containers"
+    bl_description = "Master Operator for Export/Send Operations"
 
     # --- Core behavior ---
     send_all: BoolProperty(

@@ -20,7 +20,7 @@ import bpy
 
 # Blue Hole
 from ..preferences.prefs import *
-from .menu import BLUE_HOLE_MT_send
+from .menu import BLUE_HOLE_MT_export, BLUE_HOLE_MT_send
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -45,10 +45,10 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout.separator()
         layout.menu("BLUE_HOLE_MT_sort")
         layout.menu("BLUE_HOLE_MT_import", icon='IMPORT')
-        layout.menu("BLUE_HOLE_MT_export", icon='EXPORT')
+        layout.menu("BLUE_HOLE_MT_export", text=BLUE_HOLE_MT_export.build_ui_label(), icon='EXPORT')
         if prefs().bridge.active_game_engine != 'disabled':
             label = BLUE_HOLE_MT_send.build_ui_label()
-            layout.menu("BLUE_HOLE_MT_send", text=label, icon='UV_SYNC_SELECT')
+            layout.menu("BLUE_HOLE_MT_send", text=BLUE_HOLE_MT_send.build_ui_label(), icon='UV_SYNC_SELECT')
         layout.separator()
         # layout.menu("BLUE_HOLE_MT_import_export")
         if prefs().sc.source_control_enable:
