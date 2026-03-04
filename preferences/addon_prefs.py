@@ -55,7 +55,7 @@ class BlueHole(AddonPreferences):
         items=[
             ('DIRECTORY', 'Directory', ''),
             ('CONTAINER', 'Container', ''),
-            ('BRIDGE', 'Bridge', ''),
+            ('BRIDGE', 'Send & Export', ''),
             ('SOURCECONTROL', 'Source Control', ''),
             ('HELP_N_UPDATE', 'Help & Updates', ''),
         ],
