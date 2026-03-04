@@ -38,6 +38,15 @@ class WM_OT_disabled_addon(bpy.types.Operator):
         return {'CANCELLED'}
 
 
+class BH_OT_disabled_notice(bpy.types.Operator):
+    bl_idname = "wm.bh_disabled_notice"
+    bl_label = "Disabled"
+    bl_description = "Disabled"
+
+    def execute(self, context):
+        return {'CANCELLED'}
+
+
 class ZUV_OT_trim_mode(bpy.types.Operator):
     bl_idname = "zuv.set_trim_tool"
     bl_label = "Trim Select Mode"
@@ -60,6 +69,7 @@ class ZUV_OT_trim_mode(bpy.types.Operator):
 
 # List of classes to register/unregister
 classes = (WM_OT_disabled_addon,
+           BH_OT_disabled_notice,
            ZUV_OT_trim_mode
            )
 

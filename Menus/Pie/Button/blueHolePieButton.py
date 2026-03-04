@@ -19,6 +19,7 @@ __status__ = 'Production'
 from ....Lib.commonUtils.debugUtils import *
 from ....preferences.prefs import *
 from ....Operators import exportSendOp
+from ....blenderUtils import blenderFile
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -106,19 +107,72 @@ def open_source_content(pie):
 
 
 def open_dir_speedtree(pie):
-    pie.operator("wm.bh_dir_open_speedtree_msh", text="Open SPEEDTREE MSH Folder", icon='FILEBROWSER')
+
+    if blenderFile.is_blend_file_saved():
+        pie.operator(
+            "wm.bh_dir_open_speedtree_msh",
+            text="Open SPEEDTREE MSH Folder",
+            icon='FILEBROWSER'
+        )
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_dir_open_speedtree_msh",
+            text="Save the .blend file to enable opening scene folders",
+            icon='ERROR'
+        )
 
 
 def open_dir_final(pie):
-    pie.operator("wm.bh_dir_open_final", text="Open FINAL Folder", icon='FILEBROWSER')
+    if blenderFile.is_blend_file_saved():
+        pie.operator(
+            "wm.bh_dir_open_final",
+            text="Open FINAL Folder",
+            icon='FILEBROWSER'
+        )
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_dir_open_final",
+            text="Save the .blend file to enable opening scene folders",
+            icon='ERROR'
+        )
 
 
 def open_dir_scene(pie):
-    pie.operator("wm.bh_dir_open_scene", text="Open SCENE Folder", icon='FILEBROWSER')
+    if blenderFile.is_blend_file_saved():
+        pie.operator(
+            "wm.bh_dir_open_scene",
+            text="Open SCENE Folder",
+            icon='FILEBROWSER'
+        )
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_dir_open_scene",
+            text="Save the .blend file to enable opening scene folders",
+            icon='ERROR'
+        )
 
 
 def open_dir_res(pie):
-    pie.operator("wm.bh_dir_open_resources", text="Open RESOURCES Folder", icon='FILEBROWSER')
+    if blenderFile.is_blend_file_saved():
+        pie.operator(
+            "wm.bh_dir_open_resources",
+            text="Open RESOURCES Folder",
+            icon='FILEBROWSER'
+        )
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_dir_open_resources",
+            text="Save the .blend file to enable opening scene folders",
+            icon='ERROR'
+        )
 
 
 def open_dir_user_res(pie):
@@ -134,7 +188,19 @@ def open_dir_ref(pie):
 
 
 def batch_export_selection_resource_folder(pie):
-    pie.operator("wm.bh_batch_export_select_to_resources")
+
+    if blenderFile.is_blend_file_saved():
+        pie.operator(
+            "wm.bh_batch_export_select_to_resources"
+        )
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_batch_export_select_to_resources",
+            text="Save the .blend file to enable export operations",
+            icon='ERROR'
+        )
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -161,16 +227,27 @@ def send_all_asset_containers(pie):
         include_collection=True,
         include_mesh=True,
     )
-    op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-    op.export_preset = export_preset
-    op.send_all = True
-    op.send = True
-    op.include_hierarchy = True
-    op.include_collection = True
-    op.include_mesh = True
+
+    if blenderFile.is_blend_file_saved():
+        op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = True
+        op.send = True
+        op.include_hierarchy = True
+        op.include_collection = True
+        op.include_mesh = True
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            exportSendOp.BH_OT_export_containers.bl_idname,
+            text="Save the .blend file to enable send operations",
+            icon='ERROR'
+        )
 
 
 def send_selected_asset_containers(pie):
+
     match prefs().bridge.active_game_engine:
         case 'unity':
             export_preset = 'UNITY'
@@ -180,7 +257,7 @@ def send_selected_asset_containers(pie):
             log(Severity.CRITICAL, 'Blue Hole Pie Menu', 'Unsupported Active Game Engine')
             return
 
-        # All Containers - All in Scene
+    # All Containers - In Selection
     label = exportSendOp.BH_OT_export_containers.build_ui_label(
         export_preset=export_preset,
         send_all=False,
@@ -189,21 +266,57 @@ def send_selected_asset_containers(pie):
         include_collection=True,
         include_mesh=True,
     )
-    op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
-    op.export_preset = export_preset
-    op.send_all = False
-    op.send = True
-    op.include_hierarchy = True
-    op.include_collection = True
-    op.include_mesh = True
+
+    if blenderFile.is_blend_file_saved():
+        op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+        op.export_preset = export_preset
+        op.send_all = False
+        op.send = True
+        op.include_hierarchy = True
+        op.include_collection = True
+        op.include_mesh = True
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            exportSendOp.BH_OT_export_containers.bl_idname,
+            text="Save the .blend file to enable send operations",
+            icon='ERROR'
+        )
 
 
 def export_hierarchy_all(pie):
-    pie.operator("wm.bh_export_all_hierarchies", icon='UV_SYNC_SELECT')
+
+    if blenderFile.is_blend_file_saved():
+        pie.operator(
+            "wm.bh_export_all_hierarchies",
+            icon='UV_SYNC_SELECT'
+        )
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_export_all_hierarchies",
+            text="Save the .blend file to enable export operations",
+            icon='ERROR'
+        )
 
 
 def export_hierarchy_selected(pie):
-    pie.operator("wm.bh_export_select_hierarchies", icon='UV_SYNC_SELECT')
+
+    if blenderFile.is_blend_file_saved():
+        pie.operator(
+            "wm.bh_export_select_hierarchies",
+            icon='UV_SYNC_SELECT'
+        )
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_export_select_hierarchies",
+            text="Save the .blend file to enable export operations",
+            icon='ERROR'
+        )
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -211,11 +324,35 @@ def export_hierarchy_selected(pie):
 
 
 def perforce_checkout(pie):
-    pie.operator("wm.bh_p4_check_out_blend", text="Check Out Current Blend Scene", icon='CHECKMARK')
+
+    if blenderFile.is_blend_file_saved():
+        pie.operator(
+            "wm.bh_p4_check_out_blend",
+            text="Check Out Current Blend Scene",
+            icon='CHECKMARK'
+        )
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_p4_check_out_blend",
+            text="Save the .blend file to enable source control operations",
+            icon='ERROR'
+        )
 
 
 def perforce_server_info(pie):
     pie.operator("wm.bh_p4_display_server_info", text="Display Server Info", icon='INFO')
+
+
+def sc_disabled(pie):
+    col = pie.column()
+    col.enabled = False
+    col.operator(
+        "wm.disabled_source_control",
+        text="Can't Show; Source Control disabled!!!",
+        icon='ERROR'
+    )
 
 
 # ----------------------------------------------------------------------------------------------------------------------

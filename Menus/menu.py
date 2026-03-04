@@ -41,11 +41,20 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
 
         # SCENE
         show_label('SCENE', layout)
-        layout.operator(dirOp.OpenSceneFolder.bl_idname, icon='FILE_FOLDER')
-        layout.operator(dirOp.OpenReferencesFolder.bl_idname, icon='FILE_FOLDER')
-        layout.operator(dirOp.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
-        layout.operator(dirOp.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')
-        layout.operator(dirOp.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
+        if blenderFile.is_blend_file_saved():
+            layout.operator(dirOp.OpenSceneFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(dirOp.OpenReferencesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(dirOp.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(dirOp.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(dirOp.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
+        else:
+            col = layout.column()
+            col.enabled = False
+            col.operator(
+                "wm.bh_disabled_notice",
+                text='Save the .blend file to enable opening scene folders',
+                icon='ERROR'
+            )
 
         # ENGINE
         if prefs().bridge.active_game_engine in ['unreal', 'unity']:
@@ -320,9 +329,18 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
         layout = self.layout
         if prefs().sc.source_control_solution == 'perforce':
             layout.operator(helpOp.PerforceDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
-            if len(blenderFile.get_blend_file_path()) > 0:
-                layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
             layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon='INFO')
+
+            if blenderFile.is_blend_file_saved():
+                layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
+            else:
+                col = layout.column()
+                col.enabled = False
+                col.operator(
+                    "wm.bh_disabled_notice",
+                    text='Save the .blend file to enable checkout',
+                    icon='ERROR'
+                )
 
 
 class BLUE_HOLE_MT_themes(bpy.types.Menu):
