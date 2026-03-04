@@ -133,17 +133,17 @@ class MT_pie_global_import_export(bpy.types.Menu):
         # 4 - LEFT
         match prefs().bridge.active_game_engine:
             case 'unreal':
-                blueHolePieButton.send_hierarchy_all_unreal(pie)
+                blueHolePieButton.send_all_all_containers_unreal(pie)
             case 'unity':
-                blueHolePieButton.send_hierarchy_all_unity(pie)
+                blueHolePieButton.send_all_all_containers_unity(pie)
             case 'disabled':
                 blueHolePieButton.export_hierarchy_all(pie)
         # 6 - RIGHT
         match prefs().bridge.active_game_engine:
             case 'unreal':
-                blueHolePieButton.send_hierarchy_selected_unreal(pie)
+                blueHolePieButton.send_selected_all_containers_unreal(pie)
             case 'unity':
-                blueHolePieButton.send_hierarchy_selected_unity(pie)
+                blueHolePieButton.send_selected_all_containers_unity(pie)
             case 'disabled':
                 blueHolePieButton.export_hierarchy_selected(pie)
         # 2 - BOTTOM
@@ -232,9 +232,9 @@ class MT_pie_global_send(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        blueHolePieButton.send_hierarchy_all_unreal(pie)
+        blueHolePieButton.send_all_all_containers_unreal(pie)
         # 6 - RIGHT
-        blueHolePieButton.send_hierarchy_all_unity(pie)
+        blueHolePieButton.send_all_all_containers_unity(pie)
         # 2 - BOTTOM
         pie.separator()
         # 8 - TOP
@@ -244,9 +244,9 @@ class MT_pie_global_send(bpy.types.Menu):
         # 9 - TOP - RIGHT
         pie.separator()
         # 1 - BOTTOM - LEFT
-        blueHolePieButton.send_hierarchy_selected_unreal(pie)
+        blueHolePieButton.send_selected_all_containers_unreal(pie)
         # 3 - BOTTOM - RIGHT
-        blueHolePieButton.send_hierarchy_selected_unity(pie)
+        blueHolePieButton.send_selected_all_containers_unity(pie)
 
 
 # Pie Global-Source Control

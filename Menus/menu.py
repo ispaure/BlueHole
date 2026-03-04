@@ -151,14 +151,56 @@ class BLUE_HOLE_MT_send(bpy.types.Menu):
         match prefs().bridge.active_game_engine:
             case 'unity':
                 # Unity
+                # TODO: Switch these for send all types of containers
                 layout.operator(helpOp.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
-                layout.operator(sendOp.SendAllHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
-                layout.operator(sendOp.SendSelectedHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
+                layout.operator(sendOp.SendAllContainersToUnity.bl_idname, icon='UV_SYNC_SELECT')
+                layout.operator(sendOp.SendSelectedContainersToUnity.bl_idname, icon='UV_SYNC_SELECT')
+                layout.separator()
+                layout.menu("BLUE_HOLE_MT_send_specific_unity")
             case 'unreal':
                 # Unreal
+                # TODO: Switch these for send all types of containers
                 layout.operator(helpOp.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
-                layout.operator(sendOp.SendAllHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
-                layout.operator(sendOp.SendSelectedHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+                layout.operator(sendOp.SendAllContainersToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+                layout.operator(sendOp.SendSelectedContainersToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+                layout.separator()
+                layout.menu("BLUE_HOLE_MT_send_specific_unreal")
+
+
+class BLUE_HOLE_MT_send_specific_unreal(bpy.types.Menu):
+    bl_label = "Send Specific Container Type"
+
+    def draw(self, context):
+        layout = self.layout
+        show_label('COLLECTIONS', layout)
+        layout.operator(sendOp.SendAllCollectionsToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+        layout.operator(sendOp.SendSelectedCollectionsToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+        layout.separator()
+        show_label('HIERARCHIES', layout)
+        layout.operator(sendOp.SendAllHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+        layout.operator(sendOp.SendSelectedHierarchiesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+        layout.separator()
+        show_label('MESHES', layout)
+        layout.operator(sendOp.SendAllMeshesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+        layout.operator(sendOp.SendSelectedMeshesToUnreal.bl_idname, icon='UV_SYNC_SELECT')
+
+
+class BLUE_HOLE_MT_send_specific_unity(bpy.types.Menu):
+    bl_label = "Send Specific Container Type"
+
+    def draw(self, context):
+        layout = self.layout
+        show_label('COLLECTIONS', layout)
+        layout.operator(sendOp.SendAllCollectionsToUnity.bl_idname, icon='UV_SYNC_SELECT')
+        layout.operator(sendOp.SendSelectedCollectionsToUnity.bl_idname, icon='UV_SYNC_SELECT')
+        layout.separator()
+        show_label('HIERARCHIES', layout)
+        layout.operator(sendOp.SendAllHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
+        layout.operator(sendOp.SendSelectedHierarchiesToUnity.bl_idname, icon='UV_SYNC_SELECT')
+        layout.separator()
+        show_label('MESHES', layout)
+        layout.operator(sendOp.SendAllMeshesToUnity.bl_idname, icon='UV_SYNC_SELECT')
+        layout.operator(sendOp.SendSelectedMeshesToUnity.bl_idname, icon='UV_SYNC_SELECT')
 
 
 class BLUE_HOLE_MT_sort(bpy.types.Menu):
@@ -212,6 +254,8 @@ classes = (BLUE_HOLE_MT_directories,
            BLUE_HOLE_MT_import,
            BLUE_HOLE_MT_music,
            BLUE_HOLE_MT_send,
+           BLUE_HOLE_MT_send_specific_unreal,
+           BLUE_HOLE_MT_send_specific_unity,
            BLUE_HOLE_MT_sort,
            BLUE_HOLE_MT_source_control,
            BLUE_HOLE_MT_themes,
