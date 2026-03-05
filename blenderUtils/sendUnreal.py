@@ -24,7 +24,8 @@ from ..Lib.commonUtils.debugUtils import *
 from . import blenderFile, filterUtils
 from ..Lib.send2ue.dependencies import remote_execution
 from ..preferences.prefs import *
-from ..environment import envPathResolver
+from ..wrappers.sourceContentPath import get_valid_source_content_path
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -73,7 +74,7 @@ def trigger_unreal_import(file_path_source):
 
     # Get SourceContent's directory path from env_variables.ini
     # (the root of where blender files and assets are saved)
-    sc_path = envPathResolver.get_valid_sc_dir_path()
+    sc_path = get_valid_source_content_path()
 
     # Validate this path is valid, else throw error
     if not sc_path:

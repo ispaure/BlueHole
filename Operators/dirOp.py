@@ -24,6 +24,7 @@ from ..wrappers import perforceWrapper as p4Wrapper
 from ..environment import envPathResolver
 from ..preferences.prefs import *
 from ..Lib.commonUtils import fileUtils
+from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -122,7 +123,7 @@ class OpenSourceContentPath(bpy.types.Operator):
     bl_description = 'Opens Source Content Root Path, as specified in the active environment\'s settings.'
 
     def execute(self, context):
-        valid_sc_path = envPathResolver.get_valid_sc_dir_path()
+        valid_sc_path = get_valid_source_content_path()
         if valid_sc_path:
             fileUtils.open_dir_path(valid_sc_path)
         return {'FINISHED'}

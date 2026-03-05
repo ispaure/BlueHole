@@ -28,6 +28,7 @@ from ..blenderUtils import blenderFile
 from ..environment import envManager, model
 from ..Lib.commonUtils import webUtils
 from ..Lib.commonUtils.debugUtils import *
+from ..wrappers import sourceContentPath
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,6 +73,7 @@ class WM_OT_SetActiveEnvironment(bpy.types.Operator):
         envManager.set_pref_current_env(self.active_environment)
         env_cls = envManager.get_env_from_prefs_active_env()
         env_cls.set_pref_from_ini()
+        sourceContentPath._valid_sc_path = None  # Reset currently found sc path (may now be out of date)
         return {'FINISHED'}
 
     def invoke(self, context, event):

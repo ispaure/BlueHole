@@ -25,6 +25,7 @@ from ..environment import envPathResolver
 from ..preferences.prefs import *
 from enum import Enum
 from ..Lib.commonUtils.osUtils import *
+from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -274,7 +275,7 @@ def check_tests(script_name, *,
 
     # Attempt to get valid source content path
     if check_source_content_root_path_exist or check_blend_in_source_content:
-        sc_path = envPathResolver.get_valid_sc_dir_path()
+        sc_path = get_valid_source_content_path()
     else:
         sc_path = None
 
