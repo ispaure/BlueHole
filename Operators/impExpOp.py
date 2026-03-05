@@ -93,10 +93,20 @@ class BatchExportSelectedToBakeFBX(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class _BH_NameGenMixin:
+class _BH_NameGenUIMixin:
     """
-    Shared name-generation logic for Asset Hierarchy / Asset Mesh.
-    Keeps behavior identical across operators, while allowing different build rules.
+    Shared name-generation + shared UI blocks for Asset Hierarchy / Asset Mesh.
+
+    What it covers:
+    - settings / preview
+    - prefix (Type)
+    - name
+    - suffix (batch/version)
+    - preview box
+
+    What it does NOT cover:
+    - operator-specific advanced options + structure hints
+    - operator-specific execute behavior
     """
 
     # TYPE and their index position (see env_variables.ini > ObjectHierarchyStructure > prefixes)
@@ -170,6 +180,10 @@ class _BH_NameGenMixin:
         default=''
     )
 
+    # -------------------------------------------------------------------------------------------------
+    # SHARED NAMEGEN
+    # -------------------------------------------------------------------------------------------------
+
     def _build_name_lst(self) -> list[str]:
         """
         Shared NAMEGEN/MANUAL name generation.
@@ -206,12 +220,63 @@ class _BH_NameGenMixin:
 
         return result_name_lst
 
+    # -------------------------------------------------------------------------------------------------
+    # SHARED UI BLOCKS
+    # -------------------------------------------------------------------------------------------------
+
+    def _draw_settings_tabs(self, layout):
+        column = layout.column(align=True)
+        row = column.row(align=True)
+        row.prop(self, 'settings', expand=True)
+
+    def _draw_prefix_box(self, layout):
+        if self.settings != 'NAMEGEN':
+            return
+        box = layout.box()
+        box.label(text='Prefix')
+        col = box.column()
+        col.prop(self, "asset_type")
+
+    def _draw_name_box(self, layout):
+        box = layout.box()
+        box.label(text='Name')
+        col = box.column()
+        col.prop(self, "asset_name")
+
+    def _draw_suffix_box(self, layout):
+        if self.settings != 'NAMEGEN':
+            return
+        box = layout.box()
+        box.label(text='Suffix')
+        col = box.column()
+        col.prop(self, "version_batch")
+        if self.version_batch:
+            col.prop(self, "version_suffix_start")
+            col.prop(self, "version_suffix_end")
+        else:
+            col.prop(self, "version_suffix")
+            col.prop(self, "version_suffix_letter")
+
+    def _draw_preview_box(self, layout, name_lst: list[str]):
+        box = layout.box()
+        col = box.column()
+        row = col.row()
+        row.prop(self, 'preview', expand=True)
+
+        if name_lst:
+            box.label(text=name_lst[0])
+            if len(name_lst) > 1:
+                box.label(text='...')
+                box.label(text=name_lst[-1])
+        else:
+            box.label(text="(No names generated)", icon='ERROR')
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
 
 
-class SceneAddAssetHierarchy(bpy.types.Operator, _BH_NameGenMixin):
+class SceneAddAssetHierarchy(bpy.types.Operator, _BH_NameGenUIMixin):
 
     bl_idname = "wm.bh_scene_add_asset_hierarchy"
     bl_label = "Create Asset Hierarchy"
@@ -273,66 +338,35 @@ class SceneAddAssetHierarchy(bpy.types.Operator, _BH_NameGenMixin):
 
     def draw(self, context):
         layout = self.layout
-        column = layout.column(align=True)
-        row = column.row(align=True)
-        row.prop(self, 'settings', expand=True)
 
-        # Easy Name Generator Specific
-        if self.settings == 'NAMEGEN':
-            box = layout.box()
-            box.label(text='Prefix')
-            col = box.column()
-            col.prop(self, "asset_type")
+        self._draw_settings_tabs(layout)
+        self._draw_prefix_box(layout)
+        self._draw_name_box(layout)
+        self._draw_suffix_box(layout)
 
-        box = layout.box()
-        box.label(text='Name')
-        col = box.column()
-        col.prop(self, "asset_name")
-
-        # Easy Name Generator Specific
-        if self.settings == 'NAMEGEN':
-            box = layout.box()
-            box.label(text='Suffix')
-            col = box.column()
-            col.prop(self, "version_batch")
-            if self.version_batch:
-                col.prop(self, "version_suffix_start")
-                col.prop(self, "version_suffix_end")
-            else:
-                col.prop(self, "version_suffix")
-                col.prop(self, "version_suffix_letter")
-
-        # DISPLAY LIST OF HIERARCHIES TO CREATE
         hierarchy_to_create_lst = self._build_name_lst()
-        box = layout.box()
-        col = box.column()
+        self._draw_preview_box(layout, hierarchy_to_create_lst)
 
-        row = col.row()
-        row.prop(self, 'preview', expand=True)
-
+        # Extra preview lines: structure
         if hierarchy_to_create_lst:
-            box.label(text=hierarchy_to_create_lst[0])
+            # Attach structure hint under the *preview* box (last created box)
+            # We cannot reliably "re-open" that box, so we create a small extra box for structure hints.
+            box_struct = layout.box()
             if prefs().container.create_element_render:
-                box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_meshes)
+                box_struct.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_meshes)
             if prefs().container.create_element_collision:
-                box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_collisions)
+                box_struct.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_collisions)
             if prefs().container.create_element_sockets:
-                box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_sockets)
-            if len(hierarchy_to_create_lst) > 1:
-                box.label(text='...')
-                box.label(text=hierarchy_to_create_lst[-1])
-        else:
-            box.label(text="(No names generated)", icon='ERROR')
+                box_struct.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_sockets)
 
         # DISPLAY ADVANCED OPTIONS
         box = layout.box()
         box.label(text='Advanced Options')
         col = box.column()
 
-        # Row 1: Use Selection + Include Default Mesh (side-by-side, like AddAssetMesh)
+        # Row 1: Use Selection + Include Default Mesh
         row = col.row(align=True)
 
-        # Only meaningful when creating a single hierarchy and Render is enabled
         can_use_selection = (len(hierarchy_to_create_lst) == 1) and prefs().container.create_element_render
         row.enabled = can_use_selection
         row.prop(self, 'include_selected_obj')
@@ -377,15 +411,11 @@ class SceneAddAssetCollection(bpy.types.Operator):
         return {'CANCELLED'}
 
 
-class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenMixin):
+class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenUIMixin):
 
     bl_idname = "wm.bh_scene_add_asset_mesh"
     bl_label = "Create Asset Mesh"
     bl_description = "Create Asset Mesh of given name to scene."
-
-    # -------------------------------------------------------------------------------------------------
-    # CONTENT
-    # -------------------------------------------------------------------------------------------------
 
     include_default_mesh: bpy.props.BoolProperty(
         name='Include Default Mesh',
@@ -405,10 +435,6 @@ class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenMixin):
         default=True
     )
 
-    # -------------------------------------------------------------------------------------------------
-    # EXECUTE
-    # -------------------------------------------------------------------------------------------------
-
     def execute(self, context):
 
         name_lst = self._build_name_lst()
@@ -416,10 +442,8 @@ class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenMixin):
             self.report({'WARNING'}, "No names generated.")
             return {'CANCELLED'}
 
-        # Selection handling (meshes only)
         sel_meshes = [o for o in context.selected_objects if o.type == 'MESH']
 
-        # Batch mode: always create new roots (no special selection behavior)
         if self.version_batch:
             created = 0
             for nm in name_lst:
@@ -430,7 +454,6 @@ class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenMixin):
 
         nm = name_lst[0]
 
-        # Selection-mode behavior (IMPORTANT: ignore include_default_mesh here)
         if self.include_selected_obj:
 
             if len(sel_meshes) == 1:
@@ -438,7 +461,6 @@ class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenMixin):
                 obj.name = nm
                 obj.parent = None
                 obj.matrix_parent_inverse.identity()
-
                 self.report({'INFO'}, f'Renamed mesh to "{nm}".')
                 return {'FINISHED'}
 
@@ -449,7 +471,6 @@ class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenMixin):
                         continue
                     o.parent = root
                     o.matrix_parent_inverse = root.matrix_world.inverted()
-
                 self.report({'INFO'}, f'Created "{nm}" and parented {len(sel_meshes)} mesh(es).')
                 return {'FINISHED'}
 
@@ -457,66 +478,24 @@ class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenMixin):
             self.report({'INFO'}, f'Created "{nm}" (empty geometry).')
             return {'FINISHED'}
 
-        # No selection usage => create new root (default mesh allowed)
         self._create_asset_mesh_root(context, nm)
         self.report({'INFO'}, f'Created "{nm}".')
         return {'FINISHED'}
-
-    # -------------------------------------------------------------------------------------------------
-    # UI
-    # -------------------------------------------------------------------------------------------------
 
     def check(self, context):
         return True
 
     def draw(self, context):
         layout = self.layout
-        column = layout.column(align=True)
-        row = column.row(align=True)
-        row.prop(self, 'settings', expand=True)
 
-        # Easy Name Generator Specific
-        if self.settings == 'NAMEGEN':
-            box = layout.box()
-            box.label(text='Prefix')
-            col = box.column()
-            col.prop(self, "asset_type")
+        self._draw_settings_tabs(layout)
+        self._draw_prefix_box(layout)
+        self._draw_name_box(layout)
+        self._draw_suffix_box(layout)
 
-        box = layout.box()
-        box.label(text='Name')
-        col = box.column()
-        col.prop(self, "asset_name")
-
-        # Easy Name Generator Specific
-        if self.settings == 'NAMEGEN':
-            box = layout.box()
-            box.label(text='Suffix')
-            col = box.column()
-            col.prop(self, "version_batch")
-
-            if self.version_batch:
-                col.prop(self, "version_suffix_start")
-                col.prop(self, "version_suffix_end")
-            else:
-                col.prop(self, "version_suffix")
-                col.prop(self, "version_suffix_letter")
-
-        # Preview
         name_lst = self._build_name_lst()
-        box = layout.box()
-        col = box.column()
-        row = col.row()
-        row.prop(self, 'preview', expand=True)
+        self._draw_preview_box(layout, name_lst)
 
-        if name_lst:
-            box.label(text=name_lst[0])
-            if len(name_lst) > 1:
-                box.label(text='...')
-                box.label(text=name_lst[-1])
-        else:
-            box.label(text="(No names generated)", icon='ERROR')
-
-        # Advanced Options
         box = layout.box()
         box.label(text='Advanced Options')
         col = box.column()
@@ -531,12 +510,7 @@ class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenMixin):
         else:
             col.prop(self, "include_default_mesh")
 
-    # -------------------------------------------------------------------------------------------------
-    # HELPERS
-    # -------------------------------------------------------------------------------------------------
-
     def invoke(self, context, event):
-        # Default "Use Selection" based on whether there is at least one selected MESH
         self.include_selected_obj = any(o.type == 'MESH' for o in context.selected_objects)
         return context.window_manager.invoke_props_dialog(self)
 
