@@ -24,6 +24,7 @@ from ..Lib.commonUtils.debugUtils import *
 from ..blenderUtils import blenderFile
 from ..preferences.prefs import *
 from ..Lib.commonUtils.osUtils import *
+from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -126,7 +127,7 @@ def get_unity_exp_dir_path(quiet: bool = False) -> Optional[Path]:
     blend_dir_path = blenderFile.get_blend_directory_path()
 
     # Get sc path
-    sc_path = get_valid_sc_dir_path(quiet)
+    sc_path = get_valid_source_content_path()
     if not sc_path:
         return None
     else:
