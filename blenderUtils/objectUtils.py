@@ -133,23 +133,29 @@ def add_asset_hierarchy(hierarchy_lst, include_default_mesh, include_selected_ob
         else:
             root_object = add_object_empty(hierarchy, None, 0, 0.2)
 
+        # Decide where exportable content should go:
+        # - If Render group exists, content goes under it.
+        # - Otherwise, content goes directly under the root.
+        content_parent_obj = root_object
+
         # Create underlying "Empty" objects.
 
         # Null Meshes
         if prefs().container.create_element_render:
             null_meshes_name = prefs().container.asset_hierarchy_empty_object_meshes  # Name
             null_mesh_object = add_object_empty(null_meshes_name, root_object, 3, 0.15, True)  # Create
+            content_parent_obj = null_mesh_object
 
-            # Default Cube under Render Empty Object
-            if include_default_mesh:
-                default_cube_suffix = '_placeHolderMesh01'
-                add_default_icosphere(hierarchy + default_cube_suffix, null_mesh_object)
+        # Default placeholder mesh (goes under content parent: Render if enabled, else root)
+        if include_default_mesh:
+            default_cube_suffix = '_placeHolderMesh01'
+            add_default_icosphere(hierarchy + default_cube_suffix, content_parent_obj)
 
-            # If there is a single hierarchy and defined to include selection
-            if len(hierarchy_lst) == 1 and include_selected_obj:
-                if len(selected_obj_lst) > 0:
-                    for selected_obj in selected_obj_lst:
-                        selected_obj.parent = null_mesh_object
+        # If there is a single hierarchy and defined to include selection
+        if len(hierarchy_lst) == 1 and include_selected_obj:
+            if len(selected_obj_lst) > 0:
+                for selected_obj in selected_obj_lst:
+                    selected_obj.parent = content_parent_obj
 
         # Null Collisions
         if prefs().container.create_element_collision:
