@@ -89,14 +89,29 @@ class BLUE_HOLE_MT_containers(bpy.types.Menu):
         enabled_hierarchy = prefs().container.enable_asset_hierarchy_container
         enabled_mesh = prefs().container.enable_asset_mesh_container
 
+        has_selection = len(context.selected_objects) > 0
+        suffix = " (From Selection)" if has_selection else ""
+
         if enabled_collection:
-            layout.operator(impExpOp.SceneAddAssetCollection.bl_idname, icon='OUTLINER')
+            layout.operator(
+                impExpOp.SceneAddAssetCollection.bl_idname,
+                text=f"Create Asset Collection{suffix}",
+                icon='OUTLINER'
+            )
 
         if enabled_hierarchy:
-            layout.operator(impExpOp.SceneAddAssetHierarchy.bl_idname, icon='OUTLINER')
+            layout.operator(
+                impExpOp.SceneAddAssetHierarchy.bl_idname,
+                text=f"Create Asset Hierarchy{suffix}",
+                icon='OUTLINER'
+            )
 
         if enabled_mesh:
-            layout.operator(impExpOp.SceneAddAssetMesh.bl_idname, icon='OUTLINER')
+            layout.operator(
+                impExpOp.SceneAddAssetMesh.bl_idname,
+                text=f"Create Asset Mesh{suffix}",
+                icon='OUTLINER'
+            )
 
         if not (enabled_collection or enabled_hierarchy or enabled_mesh):
             row = layout.row()

@@ -26,7 +26,7 @@ from .menu import BLUE_HOLE_MT_export, BLUE_HOLE_MT_send
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
 
-header_bh_name = 'Blue Hole'
+header_bh_name = '𝐁𝐋𝐔𝐄 𝐇𝐎𝐋𝐄'
 
 
 # Header Blue Hole Menu

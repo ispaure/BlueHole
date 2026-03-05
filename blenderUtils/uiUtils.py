@@ -25,7 +25,7 @@ import bpy
 
 
 def show_label(label_text, layout):
-    layout.label(text='[[[[ ' + label_text + ' ]]]]', icon='KEYTYPE_EXTREME_VEC')
+    layout.label(text='【 ' + label_text + ' 】', icon='KEYTYPE_EXTREME_VEC')
 
 
 def set_theme(name):
