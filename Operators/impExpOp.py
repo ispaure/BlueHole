@@ -293,57 +293,116 @@ class _BH_NameGenUIMixin:
 # OPERATORS
 
 
-class SceneAddAssetHierarchy(bpy.types.Operator, _BH_NameGenUIMixin):
+class SceneAddAssetHierarchy(bpy.types.Operator):
 
     bl_idname = "wm.bh_scene_add_asset_hierarchy"
     bl_label = "Create Asset Hierarchy"
-    bl_description = 'Create Asset Hierarchy of given name to scene, in which objects are placed.'
+    bl_description = "Create an Asset Hierarchy in the scene."
 
-    # INCLUDE DEFAULT MESH
+    settings: bpy.props.EnumProperty(
+        name='Settings',
+        description='Settings to display',
+        items=[
+            ('NAMEGEN', 'Easy Name Generator',
+             'Creates hierarchy name matching naming convention, preventing user error.'),
+            ('MANUAL', 'Manual Name Entry',
+             'Creates hierarchy matching user-given name, regardless if it matches naming conventions or not.'),
+        ],
+        default='NAMEGEN'
+    )
+
+    preview: bpy.props.EnumProperty(
+        name='Preview',
+        items=[('PREVIEW', 'Preview', 'Preview name of Hierarchies that will be created.')],
+        default='PREVIEW'
+    )
+
+    # TYPE and their index position (see env_variables.ini > ObjectHierarchyStructure > prefixes)
+    hierarchy_types = {'Mesh Asset': 0, 'Mesh Kit Asset': 1, 'Skeletal Mesh': 2}
+    prefix_items = []
+    for key in hierarchy_types.keys():
+        prefix_items.append((key, key, ''))
+
+    asset_type: bpy.props.EnumProperty(
+        name='Type',
+        description="Affects the hierarchy name's prefix",
+        items=prefix_items
+    )
+
+    # NAME
+    asset_name: bpy.props.StringProperty(
+        name='Name',
+        description="Name of the asset. Will be the center part of the hierarchy name",
+        default='InsertName'
+    )
+
+    # VERSION BATCH
+    version_batch: bpy.props.BoolProperty(
+        name='Batch',
+        description='When enabled, allows the creation of multiple hierarchies in one go',
+        default=False
+    )
+
+    # VERSION (SINGLE)
+    version_suffix: bpy.props.IntProperty(
+        name='Number',
+        description="Version (number). Affects the hierarchy name's suffix",
+        default=1
+    )
+
+    # VERSION SUFFIX_START
+    version_suffix_start: bpy.props.IntProperty(
+        name='Number (Start)',
+        description='When using batch mode, defines the first version (number) to create',
+        default=1
+    )
+
+    # VERSION SUFFIX_END
+    version_suffix_end: bpy.props.IntProperty(
+        name='Number (End)',
+        description='When using batch mode, defines the last version (number) to create',
+        default=1
+    )
+
+    # VERSION (LETTER)
+    version_suffix_letter: bpy.props.StringProperty(
+        name='Letter',
+        description='Letter(s) suffix at end-of-name.',
+        default=''
+    )
+
+    # CONTENT
     include_default_mesh: bpy.props.BoolProperty(
         name='Include Default Mesh',
         description='Whether to include the default icosphere mesh as part of the hierarchy',
         default=False
     )
 
-    # DISPLAY EMPTY OBJECTS AS ARROWS
     dsp_empty_obj_arrows: bpy.props.BoolProperty(
         name='Display as Arrows',
         description='When set to true, display Empty Objects as XYZ Arrows',
         default=True
     )
 
-    # USE SELECTION
     include_selected_obj: bpy.props.BoolProperty(
         name='Use Selection',
         description=(
-            "When enabled, parents the current selection under the hierarchy's Render group.\n"
+            "When enabled, parents the current selection under the hierarchy.\n"
             "If disabled, a hierarchy is created without using the current selection."
         ),
         default=False
     )
 
     # -------------------------------------------------------------------------------------------------
-    # PREVIEW EXTRA LINES
+    # EXECUTE
     # -------------------------------------------------------------------------------------------------
-
-    def _preview_extra_lines(self, context, name_lst: list[str]) -> list[str]:
-        lines: list[str] = []
-
-        if prefs().container.create_element_render:
-            lines.append(prefs().container.asset_hierarchy_empty_object_meshes)
-        if prefs().container.create_element_collision:
-            lines.append(prefs().container.asset_hierarchy_empty_object_collisions)
-        if prefs().container.create_element_sockets:
-            lines.append(prefs().container.asset_hierarchy_empty_object_sockets)
-
-        return lines
 
     def execute(self, context):
 
-        # If Render group isn't enabled in prefs, selection cannot be placed "in Render".
-        if not prefs().container.create_element_render:
-            self.include_selected_obj = False
+        name_lst = self.result_hierarchy_lst()
+        if not name_lst:
+            self.report({'WARNING'}, "No names generated.")
+            return {'CANCELLED'}
 
         # If user enabled selection but there is no selection, don't fail by default.
         if self.include_selected_obj and not context.selected_objects:
@@ -353,66 +412,150 @@ class SceneAddAssetHierarchy(bpy.types.Operator, _BH_NameGenUIMixin):
         if self.include_selected_obj:
             self.include_default_mesh = False
 
-        hierarchy_to_create_lst = self._build_name_lst()
-        if not hierarchy_to_create_lst:
-            self.report({'WARNING'}, "No names generated.")
-            return {'CANCELLED'}
-
         objectUtils.add_asset_hierarchy(
-            hierarchy_to_create_lst,
+            name_lst,
             self.include_default_mesh,
             self.include_selected_obj,
             self.dsp_empty_obj_arrows
         )
         return {'FINISHED'}
 
+    # -------------------------------------------------------------------------------------------------
+    # UI
+    # -------------------------------------------------------------------------------------------------
+
     def check(self, context):
         return True
 
     def draw(self, context):
         layout = self.layout
+        column = layout.column(align=True)
 
-        self._draw_settings_tabs(layout)
-        self._draw_prefix_box(layout)
-        self._draw_name_box(layout)
-        self._draw_suffix_box(layout)
+        row = column.row(align=True)
+        row.prop(self, 'settings', expand=True)
 
-        hierarchy_to_create_lst = self._build_name_lst()
-        self._draw_preview_box(layout, context, hierarchy_to_create_lst)
+        # Easy Name Generator Specific
+        if self.settings == 'NAMEGEN':
+            box = layout.box()
+            box.label(text='Prefix')
+            col = box.column()
+            row = col.row()
+            row.prop(self, "asset_type")
 
-        # DISPLAY ADVANCED OPTIONS
+        box = layout.box()
+        box.label(text='Name')
+        col = box.column()
+        row = col.row()
+        row.prop(self, "asset_name")
+
+        # Easy Name Generator Specific
+        if self.settings == 'NAMEGEN':
+            box = layout.box()
+            box.label(text='Suffix')
+            col = box.column()
+
+            row = col.row()
+            row.prop(self, "version_batch")
+
+            if self.version_batch:
+                row = col.row()
+                row.prop(self, "version_suffix_start")
+                row = col.row()
+                row.prop(self, "version_suffix_end")
+            else:
+                row = col.row()
+                row.prop(self, "version_suffix")
+                row = col.row()
+                row.prop(self, "version_suffix_letter")
+
+        # Preview
+        hierarchy_to_create_lst = self.result_hierarchy_lst()
+        box = layout.box()
+        col = box.column()
+
+        row = col.row()
+        row.prop(self, 'preview', expand=True)
+
+        if hierarchy_to_create_lst:
+            box.label(text=hierarchy_to_create_lst[0])
+
+            # Show structure preview (now always valid: content goes under Render if enabled, else root)
+            if prefs().container.create_element_render:
+                box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_meshes)
+            if prefs().container.create_element_collision:
+                box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_collisions)
+            if prefs().container.create_element_sockets:
+                box.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_sockets)
+
+            if len(hierarchy_to_create_lst) > 1:
+                box.label(text='...')
+                box.label(text=hierarchy_to_create_lst[-1])
+
+        # Advanced Options
         box = layout.box()
         box.label(text='Advanced Options')
         col = box.column()
 
-        # Row 1: Use Selection + Include Default Mesh
         row = col.row(align=True)
-
-        can_use_selection = (len(hierarchy_to_create_lst) == 1) and prefs().container.create_element_render
-        row.enabled = can_use_selection
         row.prop(self, 'include_selected_obj')
 
         sub = row.row(align=True)
-        sub.enabled = (not self.include_selected_obj)
+        sub.enabled = not self.include_selected_obj
         sub.prop(self, "include_default_mesh")
 
-        # Row 2: Display as arrows
-        col.prop(self, "dsp_empty_obj_arrows")
+        row = col.row()
+        row.prop(self, "dsp_empty_obj_arrows")
 
-        # Helpful hints
-        if (len(hierarchy_to_create_lst) == 1) and prefs().container.create_element_render:
-            if self.include_selected_obj and not context.selected_objects:
-                hint = col.row()
-                hint.label(text="No selection detected: selection will be ignored.", icon='INFO')
-        else:
+        if self.include_selected_obj and not context.selected_objects:
+            hint = col.row()
+            hint.label(text="No selection detected: selection will be ignored.", icon='INFO')
+
+        if self.version_batch and self.include_selected_obj:
             hint = col.row()
             hint.enabled = False
-            hint.label(text='Use Selection requires a single hierarchy and "Render" enabled in Container prefs.', icon='INFO')
+            hint.label(text="Use Selection only applies meaningfully when creating a single hierarchy.", icon='INFO')
+
+    # -------------------------------------------------------------------------------------------------
+    # HELPERS
+    # -------------------------------------------------------------------------------------------------
+
+    def result_hierarchy_lst(self):
+        """
+        Find full name of hierarchies to create, from given parameters.
+        """
+        result_hierarchy_lst = []
+
+        if self.settings == 'NAMEGEN':
+
+            def _prefix() -> str:
+                p = ''
+                for key, idx in self.hierarchy_types.items():
+                    if key in self.asset_type:
+                        p += get_hierarchy_prefix_lst()[idx]
+                return p
+
+            if self.version_batch:
+                for item in range(self.version_suffix_start, self.version_suffix_end + 1):
+                    nm = _prefix()
+                    nm += self.asset_name
+                    nm += '_' + str(format(item, '02'))
+                    result_hierarchy_lst.append(nm)
+            else:
+                nm = _prefix()
+                nm += self.asset_name
+                nm += '_' + str(format(self.version_suffix, '02'))
+                if len(self.version_suffix_letter) > 0:
+                    nm += '' + self.version_suffix_letter
+                result_hierarchy_lst.append(nm)
+
+        elif self.settings == 'MANUAL':
+            result_hierarchy_lst.append(self.asset_name)
+
+        return result_hierarchy_lst
 
     def invoke(self, context, event):
-        # Auto-toggle "Use Selection" based on selection each time the dialog opens.
-        # Only enable by default when Render is enabled (because selection targets Render group).
-        self.include_selected_obj = bool(context.selected_objects) and prefs().container.create_element_render
+        # Default "Use Selection" based on whether there is a selection
+        self.include_selected_obj = bool(context.selected_objects)
 
         # If Use Selection is defaulted on, default mesh should not be used.
         if self.include_selected_obj:
