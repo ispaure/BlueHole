@@ -20,7 +20,7 @@ import bpy
 from bpy.props import *
 from ..Lib.commonUtils.webUtils import open_url
 from ..overlays.deluxe import applyDeluxePrefs
-from ..preferences.prefs import prefs
+from ..blenderUtils.toolUtils import tool_set
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -71,13 +71,46 @@ class BH_OT_set_active_container_settings_tab(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class BH_OT_tool_select_box_xray_object(bpy.types.Operator):
+    bl_idname = "wm.bh_tool_select_box_xray_object"
+    bl_label = "Select Box XRay (Object) / Fallback"
+    bl_description = "Set Select Box XRay tool if available, else Blender Select Box"
+
+    def execute(self, context):
+        # Prefer addon tool
+        if tool_set("object_tool.select_box_xray"):
+            return {'FINISHED'}
+
+        # Fallback to Blender default
+        tool_set("builtin.select_box")
+        return {'FINISHED'}
+
+
+class BH_OT_tool_select_box_xray_mesh(bpy.types.Operator):
+    bl_idname = "wm.bh_tool_select_box_xray_mesh"
+    bl_label = "Select Box XRay (Mesh) / Fallback"
+    bl_description = "Set Select Box XRay tool if available, else Blender Select Box"
+
+    def execute(self, context):
+        # Prefer addon tool (Edit Mesh)
+        if tool_set("mesh_tool.select_box_xray"):
+            return {'FINISHED'}
+
+        # Fallback to Blender default
+        tool_set("builtin.select_box")
+        return {'FINISHED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 # List of classes to register/unregister
 classes = (WM_OT_URLOpen,
            WM_OT_Apply_Deluxe_Prefs,
-           BH_OT_set_active_container_settings_tab)
+           BH_OT_set_active_container_settings_tab,
+           BH_OT_tool_select_box_xray_object,
+           BH_OT_tool_select_box_xray_mesh
+           )
 
 
 def register():
