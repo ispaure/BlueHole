@@ -81,6 +81,7 @@ class ContainerGroup(ABC):
 
                 # Override Send operator (per-container)
                 if prefs().bridge.ue_enable_send_override and prefs().bridge.ue_op_send_override:
+                    log(Severity.WARNING, self.CONTAINERS_NAME, f'Send to Unreal override from operator: "{prefs().bridge.ue_op_send_override}"')
                     op_idname = prefs().bridge.ue_op_send_override.strip()
 
                     # Expect "category.op_name" (ex: "wm.my_send_unreal")
