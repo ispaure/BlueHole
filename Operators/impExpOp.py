@@ -96,77 +96,125 @@ class BatchExportSelectedToBakeFBX(bpy.types.Operator):
 class SceneAddAssetHierarchy(bpy.types.Operator):
 
     bl_idname = "wm.bh_scene_add_asset_hierarchy"
-    bl_label = "Add Asset Hierarchy"
-    bl_description = 'Add Asset Hierarchy of given name to scene, in which objects are placed.'
+    bl_label = "Create Asset Hierarchy"
+    bl_description = 'Create Asset Hierarchy of given name to scene, in which objects are placed.'
 
     settings: bpy.props.EnumProperty(
-        name = 'Settings',
-        description = 'Settings to display',
-        items = [('NAMEGEN', 'Easy Name Generator', 'Creates hierarchy name matching naming convention, preventing user error.'),
-                 ('MANUAL', 'Manual Name Entry', 'Creates hierarchy matching user-given name, regardless if it matches naming conventions or not.')],
-        default = 'NAMEGEN')
+        name='Settings',
+        description='Settings to display',
+        items=[
+            ('NAMEGEN', 'Easy Name Generator',
+             'Creates hierarchy name matching naming convention, preventing user error.'),
+            ('MANUAL', 'Manual Name Entry',
+             'Creates hierarchy matching user-given name, regardless if it matches naming conventions or not.'),
+        ],
+        default='NAMEGEN'
+    )
 
-    preview: bpy.props.EnumProperty(name='Preview',items=[('PREVIEW', 'Preview', 'Preview name of Hierarchies that will be created.')], default='PREVIEW')
+    preview: bpy.props.EnumProperty(
+        name='Preview',
+        items=[('PREVIEW', 'Preview', 'Preview name of Hierarchies that will be created.')],
+        default='PREVIEW'
+    )
 
     # TYPE and their index position (see env_variables.ini > ObjectHierarchyStructure > prefixes)
     hierarchy_types = {'Mesh Asset': 0, 'Mesh Kit Asset': 1, 'Skeletal Mesh': 2}
     prefix_items = []
     for key in hierarchy_types.keys():
         prefix_items.append((key, key, ''))
-    asset_type: bpy.props.EnumProperty(name='Type',
-                                        description='The selected type of mesh. Affects the hierarchy name\'s prefix',
-                                        items=prefix_items)
+
+    asset_type: bpy.props.EnumProperty(
+        name='Type',
+        description='The selected type of mesh. Affects the hierarchy name\'s prefix',
+        items=prefix_items
+    )
 
     # NAME
-    asset_name: bpy.props.StringProperty(name='Name',
-                                          description='Name of the asset for which the hierarchy is created. Will be the center part of the hierarchy name',
-                                          default='InsertName')
+    asset_name: bpy.props.StringProperty(
+        name='Name',
+        description='Name of the asset for which the hierarchy is created. Will be the center part of the hierarchy name',
+        default='InsertName'
+    )
 
     # VERSION BATCH
-    version_batch: bpy.props.BoolProperty(name='Batch',
-                                           description='When enabled, allows the creation of multiple hierarchies in one go',
-                                           default=False)
+    version_batch: bpy.props.BoolProperty(
+        name='Batch',
+        description='When enabled, allows the creation of multiple hierarchies in one go',
+        default=False
+    )
 
     # VERSION (SINGLE)
-    version_suffix: bpy.props.IntProperty(name='Number',
-                                           description='Version (number) of the hierarchy. Affects the hierarchy name\'s suffix',
-                                           default=1)
+    version_suffix: bpy.props.IntProperty(
+        name='Number',
+        description='Version (number) of the hierarchy. Affects the hierarchy name\'s suffix',
+        default=1
+    )
 
     # VERSION SUFFIX_START
-    version_suffix_start: bpy.props.IntProperty(name='Number (Start)',
-                                                 description='When using batch mode, defines the first version (number) to create',
-                                                 default=1)
+    version_suffix_start: bpy.props.IntProperty(
+        name='Number (Start)',
+        description='When using batch mode, defines the first version (number) to create',
+        default=1
+    )
 
     # VERSION SUFFIX_END
-    version_suffix_end: bpy.props.IntProperty(name='Number (End)',
-                                               description='When using batch mode, defines the last version (number) to create',
-                                               default=1)
+    version_suffix_end: bpy.props.IntProperty(
+        name='Number (End)',
+        description='When using batch mode, defines the last version (number) to create',
+        default=1
+    )
 
     # VERSION (LETTER)
-    version_suffix_letter: bpy.props.StringProperty(name='Letter',
-                                                     description='Letter(s) suffix at end-of-name.',
-                                                     default='')
+    version_suffix_letter: bpy.props.StringProperty(
+        name='Letter',
+        description='Letter(s) suffix at end-of-name.',
+        default=''
+    )
 
     # INCLUDE DEFAULT MESH
-    include_default_mesh: bpy.props.BoolProperty(name='Include Default Mesh',
-                                                  description='Whether to include the default icosphere mesh as part of the hierarchy',
-                                                  default=False)
+    include_default_mesh: bpy.props.BoolProperty(
+        name='Include Default Mesh',
+        description='Whether to include the default icosphere mesh as part of the hierarchy',
+        default=False
+    )
 
     # DISPLAY EMPTY OBJECTS AS ARROWS
-    dsp_empty_obj_arrows: bpy.props.BoolProperty(name='Display as Arrows',
-                                                  description='When set to true, display Empty Objects as XYZ Arrows',
-                                                  default=True)
+    dsp_empty_obj_arrows: bpy.props.BoolProperty(
+        name='Display as Arrows',
+        description='When set to true, display Empty Objects as XYZ Arrows',
+        default=True
+    )
 
-    # INCLUDE SELECTED OBJECTS
-    include_selected_obj: bpy.props.BoolProperty(name='Include Selection in Render',
-                                                  description='Whether to parent currently selected objects as part of the hierarchy.',
-                                                  default=True)
+    # USE SELECTION
+    include_selected_obj: bpy.props.BoolProperty(
+        name='Use Selection',
+        description=(
+            "When enabled, parents the current selection under the hierarchy's Render group.\n"
+            "If disabled, a hierarchy is created without using the current selection."
+        ),
+        default=False
+    )
 
     def execute(self, context):
-        objectUtils.add_asset_hierarchy(self.result_hierarchy_lst(),
-                                        self.include_default_mesh,
-                                        self.include_selected_obj,
-                                        self.dsp_empty_obj_arrows)
+
+        # If Render group isn't enabled in prefs, selection cannot be placed "in Render".
+        if not prefs().container.create_element_render:
+            self.include_selected_obj = False
+
+        # If user enabled selection but there is no selection, don't fail by default.
+        if self.include_selected_obj and not context.selected_objects:
+            self.include_selected_obj = False
+
+        # If using selection, default mesh should never be used (even if previously checked).
+        if self.include_selected_obj:
+            self.include_default_mesh = False
+
+        objectUtils.add_asset_hierarchy(
+            self.result_hierarchy_lst(),
+            self.include_default_mesh,
+            self.include_selected_obj,
+            self.dsp_empty_obj_arrows
+        )
         return {'FINISHED'}
 
     def check(self, context):
@@ -178,11 +226,8 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         row = column.row(align=True)
         row.prop(self, 'settings', expand=True)
 
-        # DISPLAY PARAMETERS
-
         # Easy Name Generator Specific
         if self.settings == 'NAMEGEN':
-            # Create box for prefix
             box = layout.box()
             box.label(text='Prefix')
             column = box.column()
@@ -197,7 +242,6 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
 
         # Easy Name Generator Specific
         if self.settings == 'NAMEGEN':
-            # Create box for suffix
             box = layout.box()
             box.label(text='Suffix')
             column = box.column()
@@ -238,16 +282,33 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         box = layout.box()
         box.label(text='Advanced Options')
         column = box.column()
-        row = column.row()
-        row.prop(self, "include_default_mesh")
-        row.prop(self, "dsp_empty_obj_arrows")
-        row = column.row()
-        if len(hierarchy_to_create_lst) == 1 and prefs().container.create_element_render:
-            row.prop(self, 'include_selected_obj')
 
-        # for hierarchy in hierarchy_to_create_lst:
-        #     row = column.row()
-        #     box.label(text=hierarchy)
+        # Row 1: Use Selection + Include Default Mesh (side-by-side, like AddAssetMesh)
+        row = column.row(align=True)
+
+        # Only meaningful when creating a single hierarchy and Render is enabled
+        can_use_selection = (len(hierarchy_to_create_lst) == 1) and prefs().container.create_element_render
+        row.enabled = can_use_selection
+        row.prop(self, 'include_selected_obj')
+
+        sub = row.row(align=True)
+        # When using selection, default mesh should not apply
+        sub.enabled = (not self.include_selected_obj)
+        sub.prop(self, "include_default_mesh")
+
+        # Row 2: Display as arrows
+        row = column.row()
+        row.prop(self, "dsp_empty_obj_arrows")
+
+        # Helpful hints
+        if len(hierarchy_to_create_lst) == 1 and prefs().container.create_element_render:
+            if self.include_selected_obj and not context.selected_objects:
+                hint = column.row()
+                hint.label(text="No selection detected: selection will be ignored.", icon='INFO')
+        else:
+            hint = column.row()
+            hint.enabled = False
+            hint.label(text='Use Selection requires a single hierarchy and "Render" enabled in Container prefs.', icon='INFO')
 
     def result_hierarchy_lst(self):
         """
@@ -281,14 +342,22 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
         return result_hierarchy_lst
 
     def invoke(self, context, event):
+        # Auto-toggle "Use Selection" based on selection each time the dialog opens.
+        # Only enable by default when Render is enabled (because selection targets Render group).
+        self.include_selected_obj = bool(context.selected_objects) and prefs().container.create_element_render
+
+        # If Use Selection is defaulted on, default mesh should not be used.
+        if self.include_selected_obj:
+            self.include_default_mesh = False
+
         return context.window_manager.invoke_props_dialog(self)
 
 
 class SceneAddAssetCollection(bpy.types.Operator):
 
     bl_idname = "wm.bh_scene_add_asset_collection"
-    bl_label = "Add Asset Collection"
-    bl_description = "Add Asset Collection of given name to scene."
+    bl_label = "Create Asset Collection"
+    bl_description = "Create Asset Collection of given name to scene."
 
     def execute(self, context):
         log(Severity.CRITICAL, self.bl_label, f'{self.bl_label} has not yet been implemented.')
@@ -298,8 +367,8 @@ class SceneAddAssetCollection(bpy.types.Operator):
 class SceneAddAssetMesh(bpy.types.Operator):
 
     bl_idname = "wm.bh_scene_add_asset_mesh"
-    bl_label = "Add Asset Mesh"
-    bl_description = "Add Asset Mesh of given name to scene."
+    bl_label = "Create Asset Mesh"
+    bl_description = "Create Asset Mesh of given name to scene."
 
     # -------------------------------------------------------------------------------------------------
     # UI MODE
