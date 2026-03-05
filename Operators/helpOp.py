@@ -91,7 +91,7 @@ class SendToUnityDoc(bpy.types.Operator):
 
     def execute(self, context):
         open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Tutorial', 'unity_bridge'))
-        return{'FINISHED'}
+        return {'FINISHED'}
 
 
 class SendToUnrealDoc(bpy.types.Operator):
@@ -102,7 +102,7 @@ class SendToUnrealDoc(bpy.types.Operator):
 
     def execute(self, context):
         open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Tutorial', 'unreal_bridge'))
-        return{'FINISHED'}
+        return {'FINISHED'}
 
 
 class PerforceDoc(bpy.types.Operator):
@@ -113,7 +113,7 @@ class PerforceDoc(bpy.types.Operator):
 
     def execute(self, context):
         open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Tutorial', 'perforce_setup'))
-        return{'FINISHED'}
+        return {'FINISHED'}
 
 
 # ----------------------------------------------------------------------------------------------------------------------
