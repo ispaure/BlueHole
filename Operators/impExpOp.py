@@ -102,7 +102,7 @@ class _BH_NameGenUIMixin:
     - prefix (Type)
     - name
     - suffix (batch/version)
-    - preview box
+    - preview box (with optional extra lines)
 
     What it does NOT cover:
     - operator-specific advanced options + structure hints
@@ -257,7 +257,19 @@ class _BH_NameGenUIMixin:
             col.prop(self, "version_suffix")
             col.prop(self, "version_suffix_letter")
 
-    def _draw_preview_box(self, layout, name_lst: list[str]):
+    def _preview_extra_lines(self, context, name_lst: list[str]) -> list[str]:
+        """
+        Optional hook: subclasses can override to inject extra preview lines
+        displayed under the main preview name.
+
+        Return a list of lines (strings). Each will be rendered indented.
+        """
+        return []
+
+    def _draw_preview_box(self, layout, context, name_lst: list[str]):
+        """
+        Preview box showing first/last name, plus optional extra lines.
+        """
         box = layout.box()
         col = box.column()
         row = col.row()
@@ -265,6 +277,11 @@ class _BH_NameGenUIMixin:
 
         if name_lst:
             box.label(text=name_lst[0])
+
+            extra_lines = self._preview_extra_lines(context, name_lst)
+            for ln in extra_lines:
+                box.label(text='   ↳ ' + ln)
+
             if len(name_lst) > 1:
                 box.label(text='...')
                 box.label(text=name_lst[-1])
@@ -306,6 +323,22 @@ class SceneAddAssetHierarchy(bpy.types.Operator, _BH_NameGenUIMixin):
         default=False
     )
 
+    # -------------------------------------------------------------------------------------------------
+    # PREVIEW EXTRA LINES
+    # -------------------------------------------------------------------------------------------------
+
+    def _preview_extra_lines(self, context, name_lst: list[str]) -> list[str]:
+        lines: list[str] = []
+
+        if prefs().container.create_element_render:
+            lines.append(prefs().container.asset_hierarchy_empty_object_meshes)
+        if prefs().container.create_element_collision:
+            lines.append(prefs().container.asset_hierarchy_empty_object_collisions)
+        if prefs().container.create_element_sockets:
+            lines.append(prefs().container.asset_hierarchy_empty_object_sockets)
+
+        return lines
+
     def execute(self, context):
 
         # If Render group isn't enabled in prefs, selection cannot be placed "in Render".
@@ -345,19 +378,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator, _BH_NameGenUIMixin):
         self._draw_suffix_box(layout)
 
         hierarchy_to_create_lst = self._build_name_lst()
-        self._draw_preview_box(layout, hierarchy_to_create_lst)
-
-        # Extra preview lines: structure
-        if hierarchy_to_create_lst:
-            # Attach structure hint under the *preview* box (last created box)
-            # We cannot reliably "re-open" that box, so we create a small extra box for structure hints.
-            box_struct = layout.box()
-            if prefs().container.create_element_render:
-                box_struct.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_meshes)
-            if prefs().container.create_element_collision:
-                box_struct.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_collisions)
-            if prefs().container.create_element_sockets:
-                box_struct.label(text='   ↳ ' + prefs().container.asset_hierarchy_empty_object_sockets)
+        self._draw_preview_box(layout, context, hierarchy_to_create_lst)
 
         # DISPLAY ADVANCED OPTIONS
         box = layout.box()
@@ -494,7 +515,7 @@ class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenUIMixin):
         self._draw_suffix_box(layout)
 
         name_lst = self._build_name_lst()
-        self._draw_preview_box(layout, name_lst)
+        self._draw_preview_box(layout, context, name_lst)
 
         box = layout.box()
         box.label(text='Advanced Options')
