@@ -290,10 +290,17 @@ def check_tests(script_name, *,
         if not sc_path:
             display_path_error_source_content(sc_path)
             return False
-        sc_path_str = str(sc_path)
 
-        blend_path = str(Path(blenderFile.get_blend_directory_path()))
-        if sc_path_str not in blend_path:
+        # If on Windows, should test in lowercase (not be case-sensitive)
+        match get_os():
+            case OS.WIN:
+                sc_path_str = str(sc_path).lower()
+                blend_path = str(Path(blenderFile.get_blend_directory_path())).lower()
+            case OS.MAC | OS.LINUX:
+                sc_path_str = str(sc_path)
+                blend_path = str(Path(blenderFile.get_blend_directory_path()))
+
+        if not blend_path.startswith(sc_path_str):
             display_path_error_blend(sc_path, blend_path)
             return False
 
