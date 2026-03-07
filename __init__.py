@@ -39,8 +39,7 @@ from .Operators import dirOp, envOp, externalAddonOp, foodOp, helpOp, impExpOp, 
 from .environment import envManager as envManager
 
 # Import Menus
-from .Menus import menu as menu
-from .Menus import pieMenu as pieMenu
+from .Menus import menu, pieMenu, file_menu_override
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PLUGIN INFO
@@ -80,7 +79,7 @@ operator_file_lst = (dirOp,
                      sourceControlOp,
                      themeOp)
 
-menu_file_lst = (menu, pieMenu)
+menu_file_lst = (menu, pieMenu, file_menu_override)
 
 
 # Register

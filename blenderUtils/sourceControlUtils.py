@@ -18,14 +18,14 @@ __status__ = 'Production'
 
 # Blue Hole
 from ..wrappers import perforceWrapper as p4Wrapper
-from . import filterUtils, blenderFile
+from . import filterUtils
 from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
 
-def sc_check_blend(silent_mode=False):
+def sc_check_blend(blend_file_path: str, silent_mode=False):
     """
     Checks out the currently opened scene. Depending on solution, will redirect
     """
@@ -47,8 +47,6 @@ def sc_check_blend(silent_mode=False):
                                              silent_mode=silent_mode)
             if not result:
                 return False
-
-            blend_file_path = blenderFile.get_blend_file_path()
 
             # NEW METHOD KEEPING OLD BEHAVIOR
             blend_p4_file = p4Wrapper.BlendP4File(client_file=blend_file_path)
