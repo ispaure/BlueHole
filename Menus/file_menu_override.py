@@ -1,5 +1,11 @@
 """
-Override Blender File menu to place Blue Hole Save As directly under Save As
+Full Override of the Blender File menu to place "Blue Hole Save As" directly under Save.
+This is required for proper source control on Save As operations.
+
+NOTE:
+This file overrides Blender's TOPBAR_MT_file.draw.
+If Blender updates the File menu in a future version,
+this file may need to be updated to match.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
