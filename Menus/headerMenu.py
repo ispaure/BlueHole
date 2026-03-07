@@ -51,7 +51,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
 
         # Export/Send only when engine selected AND scene saved
         engine_ok = prefs().bridge.active_game_engine != 'disabled'
-        scene_saved = blenderFile.is_blend_file_saved()
+        scene_saved = blenderFile.has_blend_filepath()
 
         if engine_ok and scene_saved:
             layout.menu("BLUE_HOLE_MT_export", text='Export (to DIRECTORY)', icon='EXPORT')

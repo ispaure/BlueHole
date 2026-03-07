@@ -27,13 +27,13 @@ def load_pre_handler(dummy):
 @bpy.app.handlers.persistent
 def load_post_handler(dummy):
     print("Event: load_post")
-    if len(blenderFile.get_blend_file_path()) > 0:
+    if blenderFile.has_blend_filepath():
         sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
 
 
 @bpy.app.handlers.persistent
 def save_pre_handler(dummy):
-    if len(blenderFile.get_blend_file_path()) > 0:
+    if blenderFile.has_blend_filepath():
         sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
     print("Event: save_pre")
 
