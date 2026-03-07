@@ -23,7 +23,6 @@ from .addonProperties import general_props, help_update_props
 from .environmentProperties import bridge_props, container_props, directory_props, sourcecontrol_props
 from ..environment import envManager
 
-# Import your new prefs API (adjust module path if yours is named differently)
 from .prefs import prefs, addon_module_name
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -36,11 +35,14 @@ show_verbose = True
 
 
 # Explicit mapping: enum key -> module with a draw() function
-_DRAW_MODULES = {
+_ENV_DRAW_MODULES = {
     "DIRECTORY": directory_props,
     "CONTAINER": container_props,
     "BRIDGE": bridge_props,
     "SOURCECONTROL": sourcecontrol_props,
+}
+
+_GENERAL_DRAW_MODULES = {
     "HELP_N_UPDATE": help_update_props,
 }
 
@@ -49,17 +51,35 @@ class BlueHole(AddonPreferences):
     bl_idname = addon_module_name()
     _prefs_visible = False
 
-    settings: EnumProperty(
-        name='Settings',
-        description='Settings to display',
+    main_settings: EnumProperty(
+        name='Settings Category',
+        description='Main settings category to display',
+        items=[
+            ('ENVIRONMENT', 'Environment Settings', ''),
+            ('GENERAL_ADDON', 'General Addon Settings', ''),
+        ],
+        default='ENVIRONMENT'
+    )
+
+    environment_settings: EnumProperty(
+        name='Environment Settings',
+        description='Environment settings to display',
         items=[
             ('DIRECTORY', 'Directory', ''),
             ('CONTAINER', 'Container', ''),
             ('BRIDGE', 'Send & Export', ''),
             ('SOURCECONTROL', 'Source Control', ''),
-            ('HELP_N_UPDATE', 'Help & Updates', ''),
         ],
         default='DIRECTORY'
+    )
+
+    general_addon_settings: EnumProperty(
+        name='General Addon Settings',
+        description='General addon settings to display',
+        items=[
+            ('HELP_N_UPDATE', 'Help & Updates', ''),
+        ],
+        default='HELP_N_UPDATE'
     )
 
     general: PointerProperty(type=general_props.GeneralPG)
@@ -73,36 +93,70 @@ class BlueHole(AddonPreferences):
         BlueHole._prefs_visible = True
         layout = self.layout
 
-        # Set Active Environment
-        box = layout.box()
-        msg = "Active Environment: " + prefs().general.active_environment
-        column = box.column()
-        row = column.row()
-        row.label(text=msg.upper())
-        row = column.row()
-        row.operator('wm.set_active_environment', text='Set Active Env.', icon='PRESET')
-        row.operator('wm.add_environment', text='Create Env.', icon='PRESET_NEW')
-        if len(envManager.get_env_lst_enum_property(exclude_default=True)) > 0:
-            row.operator('wm.delete_environment', text='Delete Env.', icon='REMOVE')
-        if prefs().general.active_environment == 'default':
-            row = column.row()
-            row.label(text='The settings for the default environment are locked.')
-            row = column.row()
-            row.label(text='Create or set a different active environment to edit settings.')
-
-        # Show tabs
+        # Main section tabs
         column = layout.column(align=True)
         row = column.row(align=True)
-        row.prop(self, 'settings', expand=True)
+        row.prop(self, 'main_settings', expand=True)
 
-        # Draw selected panel
-        box = column.box()
-        module = _DRAW_MODULES.get(self.settings)
-        if module is None:
-            box.label(text=f'Unknown settings panel: {self.settings}')
-            return
+        # ------------------------------------------------------------------------------------------------------------------
+        # ENVIRONMENT SETTINGS
+        if self.main_settings == 'ENVIRONMENT':
 
-        module.draw(self, context, box)
+            # Environment controls
+            box = layout.box()
+            column = box.column()
+
+            msg = "Active Environment: " + prefs().general.active_environment
+            row = column.row()
+            row.label(text=msg.upper())
+
+            row = column.row()
+            row.operator('wm.set_active_environment', text='Set Active Env.', icon='PRESET')
+            row.operator('wm.add_environment', text='Create Env.', icon='PRESET_NEW')
+            if len(envManager.get_env_lst_enum_property(exclude_default=True)) > 0:
+                row.operator('wm.delete_environment', text='Delete Env.', icon='REMOVE')
+
+            if prefs().general.active_environment == 'default':
+                row = column.row()
+                row.label(text='The settings for the default environment are locked.')
+                row = column.row()
+                row.label(text='Create or set a different active environment to edit settings.')
+
+            # Environment sub-tabs
+            column = layout.column(align=True)
+            row = column.row(align=True)
+            row.prop(self, 'environment_settings', expand=True)
+
+            # Draw selected environment panel
+            box = column.box()
+            module = _ENV_DRAW_MODULES.get(self.environment_settings)
+            if module is None:
+                box.label(text=f'Unknown environment settings panel: {self.environment_settings}')
+                return
+
+            module.draw(self, context, box)
+
+        # ------------------------------------------------------------------------------------------------------------------
+        # GENERAL ADDON SETTINGS
+        elif self.main_settings == 'GENERAL_ADDON':
+
+            # General addon sub-tabs
+            column = layout.column(align=True)
+            row = column.row(align=True)
+            row.prop(self, 'general_addon_settings', expand=True)
+
+            # Draw selected general addon panel
+            box = column.box()
+            module = _GENERAL_DRAW_MODULES.get(self.general_addon_settings)
+            if module is None:
+                box.label(text=f'Unknown general addon settings panel: {self.general_addon_settings}')
+                return
+
+            module.draw(self, context, box)
+
+        else:
+            box = layout.box()
+            box.label(text=f'Unknown main settings category: {self.main_settings}')
 
 
 classes = (

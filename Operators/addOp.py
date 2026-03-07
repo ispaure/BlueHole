@@ -232,7 +232,7 @@ class _BH_NameGenUIMixin:
 class SceneAddAssetHierarchy(bpy.types.Operator):
 
     bl_idname = "wm.bh_scene_add_asset_hierarchy"
-    bl_label = "Create Asset Hierarchy"
+    bl_label = "Asset Hierarchy"
     bl_description = "Create an Asset Hierarchy in the scene."
 
     settings: bpy.props.EnumProperty(
@@ -503,7 +503,7 @@ class SceneAddAssetHierarchy(bpy.types.Operator):
 class SceneAddAssetCollection(bpy.types.Operator):
 
     bl_idname = "wm.bh_scene_add_asset_collection"
-    bl_label = "Create Asset Collection"
+    bl_label = "Asset Collection"
     bl_description = "Create Asset Collection of given name to scene."
 
     def execute(self, context):
@@ -514,7 +514,7 @@ class SceneAddAssetCollection(bpy.types.Operator):
 class SceneAddAssetMesh(bpy.types.Operator, _BH_NameGenUIMixin):
 
     bl_idname = "wm.bh_scene_add_asset_mesh"
-    bl_label = "Create Asset Mesh"
+    bl_label = "Asset Mesh"
     bl_description = "Create Asset Mesh of given name to scene."
 
     include_default_mesh: bpy.props.BoolProperty(

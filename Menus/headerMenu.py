@@ -54,7 +54,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
             col.enabled = False
             col.operator(
                 "wm.bh_disabled_notice",
-                text="Save the .blend file to Export/Send",
+                text="Save .blend file to Export/Send",
                 icon='ERROR'
             )
         elif not engine_ok:
