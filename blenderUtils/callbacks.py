@@ -1,4 +1,4 @@
-"""Callbacks to integrate source control to Blender Open/Load/Save"""
+""" Callbacks to integrate source control to Blender Open/Load/Save """
 
 # ----------------------------------------------------------------------------------------------------------------------
 # AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
@@ -14,76 +14,41 @@ __status__ = 'Production'
 
 import bpy
 from . import sourceControlUtils, blenderFile
-import time
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
+
 @bpy.app.handlers.persistent
-def load_pre_handler(scene):
+def load_pre_handler(dummy):
     print("Event: load_pre")
 
 
 @bpy.app.handlers.persistent
-def load_post_handler(scene):
+def load_post_handler(dummy):
     print("Event: load_post")
     if len(blenderFile.get_blend_file_path()) > 0:
         sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
 
 
 @bpy.app.handlers.persistent
-def save_pre_handler(scene):
+def save_pre_handler(dummy):
     if len(blenderFile.get_blend_file_path()) > 0:
         sourceControlUtils.sc_check_blend(silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
     print("Event: save_pre")
 
 
 @bpy.app.handlers.persistent
-def save_post_handler(scene):
+def save_post_handler(dummy):
     print("Event: save_post")
-
-
-class OBJECT_OT_dummy(bpy.types.Operator):
-    """Tooltip"""
-    bl_idname = "object.dummy"
-    bl_label = "Dummy operator"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        print("Dummy operator executing")
-        return {'FINISHED'}
-
-
-def call_load_handlers(scene):
-
-    for func in bpy.app.handlers.load_pre:
-        func(scene)
-
-    for func in bpy.app.handlers.load_post:
-        func(scene)
-
-    print("Load handlers called (should only occur on addon enabling / reload)")
-
-    # bpy.app.handlers.scene_update_post.remove(call_load_handlers)
 
 
 def register():
     print("Registering callbacks...")
-    # other stuff here!
     bpy.app.handlers.load_pre.append(load_pre_handler)
     bpy.app.handlers.load_post.append(load_post_handler)
     bpy.app.handlers.save_pre.append(save_pre_handler)
     bpy.app.handlers.save_post.append(save_post_handler)
-
-    # # supposedly not needed anymore and throws errors
-    # bpy.app.handlers.depsgraph_update_post.append(call_load_handlers)
 
 
 def unregister():
