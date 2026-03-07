@@ -42,8 +42,8 @@ def get_blend_file_path():
     return bpy.data.filepath
 
 
-def is_blend_file_saved():
-    return True if len(get_blend_file_path()) > 0 else False
+def has_blend_filepath():
+    return get_blend_file_path() != ""
 
 
 def open_blend_file(file_path):

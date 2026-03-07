@@ -108,7 +108,7 @@ def open_source_content(pie):
 
 def open_dir_speedtree(pie):
 
-    if blenderFile.is_blend_file_saved():
+    if blenderFile.has_blend_filepath():
         pie.operator(
             "wm.bh_dir_open_speedtree_msh",
             text="Open SPEEDTREE MSH Folder",
@@ -125,7 +125,7 @@ def open_dir_speedtree(pie):
 
 
 def open_dir_final(pie):
-    if blenderFile.is_blend_file_saved():
+    if blenderFile.has_blend_filepath():
         pie.operator(
             "wm.bh_dir_open_final",
             text="Open FINAL Folder",
@@ -142,7 +142,7 @@ def open_dir_final(pie):
 
 
 def open_dir_scene(pie):
-    if blenderFile.is_blend_file_saved():
+    if blenderFile.has_blend_filepath():
         pie.operator(
             "wm.bh_dir_open_scene",
             text="Open SCENE Folder",
@@ -159,7 +159,7 @@ def open_dir_scene(pie):
 
 
 def open_dir_res(pie):
-    if blenderFile.is_blend_file_saved():
+    if blenderFile.has_blend_filepath():
         pie.operator(
             "wm.bh_dir_open_resources",
             text="Open RESOURCES Folder",
@@ -189,7 +189,7 @@ def open_dir_ref(pie):
 
 def batch_export_selection_resource_folder(pie):
 
-    if blenderFile.is_blend_file_saved():
+    if blenderFile.has_blend_filepath():
         pie.operator(
             "wm.bh_batch_export_select_to_resources"
         )
@@ -233,7 +233,7 @@ def send_all_asset_containers(pie):
         include_mesh=True,
     )
 
-    if not blenderFile.is_blend_file_saved():
+    if not blenderFile.has_blend_filepath():
         col = pie.column()
         col.enabled = False
         col.operator(
@@ -288,7 +288,7 @@ def send_selected_asset_containers(pie):
         include_mesh=True,
     )
 
-    if not blenderFile.is_blend_file_saved():
+    if not blenderFile.has_blend_filepath():
         col = pie.column()
         col.enabled = False
         col.operator(
@@ -319,7 +319,7 @@ def send_selected_asset_containers(pie):
 
 def export_hierarchy_all(pie):
 
-    if not blenderFile.is_blend_file_saved():
+    if not blenderFile.has_blend_filepath():
         col = pie.column()
         col.enabled = False
         col.operator(
@@ -347,7 +347,7 @@ def export_hierarchy_all(pie):
 
 def export_hierarchy_selected(pie):
 
-    if not blenderFile.is_blend_file_saved():
+    if not blenderFile.has_blend_filepath():
         col = pie.column()
         col.enabled = False
         col.operator(
@@ -379,7 +379,7 @@ def export_hierarchy_selected(pie):
 
 def perforce_checkout(pie):
 
-    if blenderFile.is_blend_file_saved():
+    if blenderFile.has_blend_filepath():
         pie.operator(
             "wm.bh_p4_check_out_blend",
             text="Check Out Current Blend Scene",

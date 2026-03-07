@@ -41,7 +41,7 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
 
         # SCENE
         show_label('SCENE', layout)
-        if blenderFile.is_blend_file_saved():
+        if blenderFile.has_blend_filepath():
             layout.operator(dirOp.OpenSceneFolder.bl_idname, icon='FILE_FOLDER')
             layout.operator(dirOp.OpenReferencesFolder.bl_idname, icon='FILE_FOLDER')
             layout.operator(dirOp.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
@@ -410,7 +410,7 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
             layout.operator(helpOp.PerforceDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
             layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon='INFO')
 
-            if blenderFile.is_blend_file_saved():
+            if blenderFile.has_blend_filepath():
                 layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
             else:
                 col = layout.column()
