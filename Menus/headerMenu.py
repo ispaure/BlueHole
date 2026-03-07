@@ -38,25 +38,17 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         self.bl_label = f'{header_bh_name} [' + str(prefs().general.active_environment.lower()) + ']'
         layout = self.layout
         layout.operator('wm.set_active_environment')
-        layout.menu("BLUE_HOLE_MT_help", icon='HELP')
-        layout.menu("BLUE_HOLE_MT_update_deluxe", icon='UV_SYNC_SELECT')
-        layout.separator()
-        layout.menu("BLUE_HOLE_MT_containers", icon='OUTLINER')
         layout.menu("BLUE_HOLE_MT_directories", icon='FILE_FOLDER')
-        # layout.menu("BLUE_HOLE_MT_scene")
-        layout.separator()
-        layout.menu("BLUE_HOLE_MT_sort")
-        layout.menu("BLUE_HOLE_MT_import", icon='IMPORT')
+        layout.menu("BLUE_HOLE_MT_containers", icon='OUTLINER')
+
         layout.separator()
 
         # Export/Send only when engine selected AND scene saved
         engine_ok = prefs().bridge.active_game_engine != 'disabled'
         scene_saved = blenderFile.has_blend_filepath()
-
         if engine_ok and scene_saved:
-            layout.menu("BLUE_HOLE_MT_export", text='Export (to DIRECTORY)', icon='EXPORT')
             layout.menu("BLUE_HOLE_MT_send", text=BLUE_HOLE_MT_send.build_ui_label(), icon='UV_SYNC_SELECT')
-
+            layout.menu("BLUE_HOLE_MT_export", text='Export (to DIRECTORY)', icon='EXPORT')
         elif not scene_saved:
             col = layout.column()
             col.enabled = False
@@ -65,7 +57,6 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
                 text="Save the .blend file to Export/Send",
                 icon='ERROR'
             )
-
         elif not engine_ok:
             col = layout.column()
             col.enabled = False
@@ -74,12 +65,18 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
                 text="Select a Game Engine to Export/Send",
                 icon='ERROR'
             )
-
         layout.separator()
+
+        layout.menu("BLUE_HOLE_MT_import", icon='IMPORT')
         # layout.menu("BLUE_HOLE_MT_import_export")
         if prefs().sc.source_control_enable:
             layout.menu("BLUE_HOLE_MT_source_control", icon='CHECKMARK')
         layout.menu("BLUE_HOLE_MT_misc")
+
+        layout.separator()
+
+        layout.menu("BLUE_HOLE_MT_help", icon='HELP')
+        layout.menu("BLUE_HOLE_MT_update_deluxe", icon='UV_SYNC_SELECT')
 
     def menu_draw(self, context):
         self.layout.menu("BLUE_HOLE_MT_top_menu")
@@ -105,6 +102,7 @@ class BLUE_HOLE_MT_misc(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+        layout.menu("BLUE_HOLE_MT_sort")
         layout.menu("BLUE_HOLE_MT_themes", icon='IMAGE_RGB_ALPHA')
         layout.menu("BLUE_HOLE_MT_food_delivery", icon='TEMP')
         layout.menu("BLUE_HOLE_MT_music", icon='SOUND')

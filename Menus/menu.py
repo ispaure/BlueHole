@@ -265,7 +265,7 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
             row.enabled = False
             row.operator(
                 "wm.bh_disabled_notice",
-                text="All Asset Containers disabled in Preferences",
+                text="Asset Containers disabled in Preferences",
                 icon='ERROR'
             )
 
@@ -374,7 +374,7 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
 
 class BLUE_HOLE_MT_send_specific(_BLUE_HOLE_MT_specific_base):
     bl_idname = "BLUE_HOLE_MT_send_specific"
-    bl_label = "Specific Asset Container"
+    bl_label = "Send Specific Type"
     SEND = True
 
     def draw(self, context):
@@ -383,7 +383,7 @@ class BLUE_HOLE_MT_send_specific(_BLUE_HOLE_MT_specific_base):
 
 class BLUE_HOLE_MT_export_specific(_BLUE_HOLE_MT_specific_base):
     bl_idname = "BLUE_HOLE_MT_export_specific"
-    bl_label = "Specific Asset Container"
+    bl_label = "Export Specific Type"
     SEND = False
 
     def draw(self, context):
@@ -408,7 +408,6 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
         layout = self.layout
         if prefs().sc.source_control_solution == 'perforce':
             layout.operator(helpOp.PerforceDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
-            layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon='INFO')
 
             if blenderFile.has_blend_filepath():
                 layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
@@ -420,6 +419,8 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
                     text='Save .blend file to enable checkout',
                     icon='ERROR'
                 )
+
+            layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon='INFO')
 
 
 class BLUE_HOLE_MT_themes(bpy.types.Menu):
