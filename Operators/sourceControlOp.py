@@ -76,7 +76,7 @@ class WM_OT_disabled_source_control(bpy.types.Operator):
 class BHSaveAsMainfile(bpy.types.Operator, ExportHelper):
     bl_idname = "wm.bh_save_as_mainfile"
     bl_label = "Save As"
-    bl_description = "Save the current Blender file with Blue Hole source control checks"
+    bl_description = "Save the current Blender file with Blue Hole Source Control integration"
 
     filename_ext = ".blend"
     filter_glob: StringProperty(default="*.blend", options={'HIDDEN'})

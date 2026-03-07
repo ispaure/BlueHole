@@ -33,13 +33,14 @@ from .blenderUtils import callbacks
 from .preferences import addon_prefs as addon_prefs
 
 # Import Blue Hole Operators
-from .Operators import dirOp, envOp, externalAddonOp, foodOp, helpOp, impExpOp, musicOp, otherOp, exportSendOp, sortOp, sourceControlOp, themeOp
+from .Operators import dirOp, envOp, externalAddonOp, foodOp, helpOp, impExpOp, musicOp, otherOp, exportSendOp, sortOp, sourceControlOp, themeOp, addOp
 
 # Import Env Utils
 from .environment import envManager as envManager
 
 # Import Menus
 from .Menus import menu, pieMenu, file_menu_override
+from .Menus.Append import VIEW3D_MT_add
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PLUGIN INFO
@@ -77,9 +78,10 @@ operator_file_lst = (dirOp,
                      exportSendOp,
                      sortOp,
                      sourceControlOp,
-                     themeOp)
+                     themeOp,
+                     addOp)
 
-menu_file_lst = (menu, pieMenu, file_menu_override)
+menu_file_lst = (menu, pieMenu, file_menu_override, VIEW3D_MT_add)
 
 
 # Register
@@ -137,11 +139,11 @@ def unregister():
     from .Menus import headerMenu
     headerMenu.unregister()
 
-    # Register operators
+    # Unregister operators
     for file in operator_file_lst:
         file.unregister()
 
-    # Register menus
+    # Unregister menus
     for file in menu_file_lst:
         file.unregister()
 
