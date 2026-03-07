@@ -49,28 +49,30 @@ def draw_topbar_mt_file_blue_hole(self, context):
 
     # --------------------------------------------------------------------------------------------------------------
     # RECOVER
-    layout.separator()
     layout.menu("TOPBAR_MT_file_recover", text="Recover")
 
     # --------------------------------------------------------------------------------------------------------------
     # SAVE
     layout.separator()
     layout.operator("wm.save_mainfile", text="Save", icon='FILE_TICK')
-    layout.operator("wm.save_as_mainfile", text="Save As...")
+    # layout.operator("wm.save_as_mainfile", text="Save As...")
     layout.operator("wm.bh_save_as_mainfile", text="Save As (Blue Hole)...")
     layout.operator("wm.save_as_mainfile", text="Save Copy...").copy = True
+    layout.operator("wm.save_mainfile", text="Save Incremental").incremental = True
 
     # --------------------------------------------------------------------------------------------------------------
-    # LINK / APPEND
+    # LINK / APPEND / DATA PREVIEWS
     layout.separator()
     layout.operator("wm.link", text="Link...", icon='LINK_BLEND')
     layout.operator("wm.append", text="Append...", icon='APPEND_BLEND')
+    layout.operator("wm.previews_batch_generate", text="Data Previews")
 
     # --------------------------------------------------------------------------------------------------------------
-    # IMPORT / EXPORT
+    # IMPORT / EXPORT / EXPORT ALL COLLECTIONS
     layout.separator()
     layout.menu("TOPBAR_MT_file_import", text="Import")
     layout.menu("TOPBAR_MT_file_export", text="Export")
+    layout.operator("wm.collection_export_all", text="Export All Collections")
 
     # --------------------------------------------------------------------------------------------------------------
     # EXTERNAL DATA / CLEANUP
