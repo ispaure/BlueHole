@@ -190,7 +190,7 @@ def draw(preference, context, layout):
     enable_rows = prefs().general.active_environment != 'default'
 
     # -------------------------------------------------------------------------------------------------
-    # CONTAINERS (Tab Intro)
+    # CONTAINERS - SINGLE OUTER BOX
     # -------------------------------------------------------------------------------------------------
     box = layout.box()
     column = box.column()
@@ -210,9 +210,6 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # CONTAINER GROUP TABS (Asset Containers / Loose Mesh)
     # -------------------------------------------------------------------------------------------------
-    box = layout.box()
-    column = box.column()
-
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.container, 'active_container_group_tab', expand=True)
@@ -223,9 +220,6 @@ def draw(preference, context, layout):
     # ASSET CONTAINERS
     # -------------------------------------------------------------------------------------------------
     if active_group == 'ASSET':
-
-        box = layout.box()
-        column = box.column()
 
         row = column.row()
         row.enabled = enable_rows
@@ -283,10 +277,7 @@ def draw(preference, context, layout):
 
         # Edge case: nothing enabled
         if not allowed_tabs:
-            box_2 = box.box()
-            column2 = box_2.column()
-
-            row = column2.row()
+            row = column.row()
             row.enabled = enable_rows
             row.label(text='No Asset Container types are enabled for this environment.', icon='ERROR')
             return
@@ -318,10 +309,10 @@ def draw(preference, context, layout):
         # -------------------------------------------------------------------------------------------------
         # ACTIVE ASSET CONTAINER SETTINGS
         # -------------------------------------------------------------------------------------------------
-        if active_tab == 'HIERARCHY':
+        box_2 = column.box()
+        column2 = box_2.column()
 
-            box_2 = box.box()
-            column2 = box_2.column()
+        if active_tab == 'HIERARCHY':
 
             row = column2.row()
             row.enabled = enable_rows
@@ -359,9 +350,6 @@ def draw(preference, context, layout):
 
         elif active_tab == 'MESH':
 
-            box_2 = box.box()
-            column2 = box_2.column()
-
             row = column2.row()
             row.enabled = enable_rows
             row.label(text='Requirements: Mesh object at the scene root (must use a valid prefix).')
@@ -371,9 +359,6 @@ def draw(preference, context, layout):
             row.label(text='No structure rules for this container type.')
 
         elif active_tab == 'COLLECTION':
-
-            box_2 = box.box()
-            column2 = box_2.column()
 
             row = column2.row()
             row.enabled = enable_rows
@@ -388,21 +373,17 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     elif active_group == 'LOOSE':
 
-        box = layout.box()
-        column = box.column()
-
         row = column.row()
         row.enabled = enable_rows
         row.label(text='Exports each selected mesh as its own file. No prefixes or container structure required.')
 
-        # Optional: keep a settings sub-box for visual symmetry
-        box_2 = box.box()
-        column = box_2.column()
+        box_2 = column.box()
+        column2 = box_2.column()
 
-        row = column.row()
+        row = column2.row()
         row.enabled = enable_rows
         row.label(text='SETTINGS')
 
-        row = column.row()
+        row = column2.row()
         row.enabled = enable_rows
         row.label(text='No settings for Loose Mesh.')
