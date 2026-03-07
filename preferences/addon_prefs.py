@@ -43,6 +43,7 @@ _ENV_DRAW_MODULES = {
 }
 
 _GENERAL_DRAW_MODULES = {
+    "GENERAL": general_props,
     "HELP_N_UPDATE": help_update_props,
 }
 
@@ -77,9 +78,10 @@ class BlueHole(AddonPreferences):
         name='General Addon Settings',
         description='General addon settings to display',
         items=[
+            ('GENERAL', 'General Settings', ''),
             ('HELP_N_UPDATE', 'Help & Updates', ''),
         ],
-        default='HELP_N_UPDATE'
+        default='GENERAL'
     )
 
     general: PointerProperty(type=general_props.GeneralPG)
