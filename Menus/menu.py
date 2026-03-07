@@ -23,7 +23,7 @@ import bpy
 
 # Blue Hole
 from ..blenderUtils.uiUtils import show_label
-from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, exportSendOp, sortOp, sourceControlOp, themeOp, otherOp
+from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, exportSendOp, sortOp, sourceControlOp, themeOp, otherOp, addOp
 from ..preferences.prefs import *
 from ..blenderUtils import blenderFile
 from ..Lib.commonUtils.debugUtils import *
@@ -81,6 +81,7 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
 
 class BLUE_HOLE_MT_containers(bpy.types.Menu):
     bl_label = 'Asset Containers'
+    bl_idname = "BLUE_HOLE_MT_containers"
 
     def draw(self, context):
         layout = self.layout
@@ -94,21 +95,21 @@ class BLUE_HOLE_MT_containers(bpy.types.Menu):
 
         if enabled_collection:
             layout.operator(
-                impExpOp.SceneAddAssetCollection.bl_idname,
+                addOp.SceneAddAssetCollection.bl_idname,
                 text=f"Create Asset Collection{suffix}",
                 icon='OUTLINER'
             )
 
         if enabled_hierarchy:
             layout.operator(
-                impExpOp.SceneAddAssetHierarchy.bl_idname,
+                addOp.SceneAddAssetHierarchy.bl_idname,
                 text=f"Create Asset Hierarchy{suffix}",
                 icon='OUTLINER'
             )
 
         if enabled_mesh:
             layout.operator(
-                impExpOp.SceneAddAssetMesh.bl_idname,
+                addOp.SceneAddAssetMesh.bl_idname,
                 text=f"Create Asset Mesh{suffix}",
                 icon='OUTLINER'
             )
