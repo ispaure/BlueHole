@@ -119,7 +119,7 @@ def open_dir_speedtree(pie):
         col.enabled = False
         col.operator(
             "wm.bh_dir_open_speedtree_msh",
-            text="Save the .blend file to enable opening scene folders",
+            text="Save .blend file to open Scene folders",
             icon='ERROR'
         )
 
@@ -136,7 +136,7 @@ def open_dir_final(pie):
         col.enabled = False
         col.operator(
             "wm.bh_dir_open_final",
-            text="Save the .blend file to enable opening scene folders",
+            text="Save .blend file to open Scene folders",
             icon='ERROR'
         )
 
@@ -153,7 +153,7 @@ def open_dir_scene(pie):
         col.enabled = False
         col.operator(
             "wm.bh_dir_open_scene",
-            text="Save the .blend file to enable opening scene folders",
+            text="Save .blend file to open Scene folders",
             icon='ERROR'
         )
 
@@ -170,7 +170,7 @@ def open_dir_res(pie):
         col.enabled = False
         col.operator(
             "wm.bh_dir_open_resources",
-            text="Save the .blend file to enable opening scene folders",
+            text="Save .blend file to open Scene folders",
             icon='ERROR'
         )
 
@@ -198,7 +198,7 @@ def batch_export_selection_resource_folder(pie):
         col.enabled = False
         col.operator(
             "wm.bh_batch_export_select_to_resources",
-            text="Save the .blend file to enable export operations",
+            text="Save the .blend file to Export",
             icon='ERROR'
         )
 
@@ -238,7 +238,7 @@ def send_all_asset_containers(pie):
         col.enabled = False
         col.operator(
             exportSendOp.BH_OT_export_containers.bl_idname,
-            text="Save the .blend file to enable send operations",
+            text="Save the .blend file to Send",
             icon='ERROR'
         )
         return
@@ -248,7 +248,7 @@ def send_all_asset_containers(pie):
         col.enabled = False
         col.operator(
             exportSendOp.BH_OT_export_containers.bl_idname,
-            text="All Asset Container types are disabled in Preferences",
+            text="All Asset Containers disabled in Preferences",
             icon='ERROR'
         )
         return
@@ -293,7 +293,7 @@ def send_selected_asset_containers(pie):
         col.enabled = False
         col.operator(
             exportSendOp.BH_OT_export_containers.bl_idname,
-            text="Save the .blend file to enable send operations",
+            text="Save the .blend file to Send",
             icon='ERROR'
         )
         return
@@ -303,7 +303,7 @@ def send_selected_asset_containers(pie):
         col.enabled = False
         col.operator(
             exportSendOp.BH_OT_export_containers.bl_idname,
-            text="All Asset Container types are disabled in Preferences",
+            text="All Asset Containers disabled in Preferences",
             icon='ERROR'
         )
         return
@@ -324,7 +324,7 @@ def export_hierarchy_all(pie):
         col.enabled = False
         col.operator(
             "wm.bh_export_all_hierarchies",
-            text="Save the .blend file to enable export operations",
+            text="Save the .blend file to Export",
             icon='ERROR'
         )
         return
@@ -334,7 +334,7 @@ def export_hierarchy_all(pie):
         col.enabled = False
         col.operator(
             "wm.bh_export_all_hierarchies",
-            text="Asset Hierarchy containers are disabled in Preferences",
+            text="All Asset Containers disabled in Preferences",
             icon='ERROR'
         )
         return
@@ -352,7 +352,7 @@ def export_hierarchy_selected(pie):
         col.enabled = False
         col.operator(
             "wm.bh_export_select_hierarchies",
-            text="Save the .blend file to enable export operations",
+            text="Save the .blend file to Export",
             icon='ERROR'
         )
         return
@@ -362,7 +362,7 @@ def export_hierarchy_selected(pie):
         col.enabled = False
         col.operator(
             "wm.bh_export_select_hierarchies",
-            text="Asset Hierarchy containers are disabled in Preferences",
+            text="All Asset Containers disabled in Preferences",
             icon='ERROR'
         )
         return
@@ -390,7 +390,7 @@ def perforce_checkout(pie):
         col.enabled = False
         col.operator(
             "wm.bh_p4_check_out_blend",
-            text="Save the .blend file to enable source control operations",
+            text="Save .blend file to enable checkout",
             icon='ERROR'
         )
 

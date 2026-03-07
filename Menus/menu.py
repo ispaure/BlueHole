@@ -52,7 +52,7 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
             col.enabled = False
             col.operator(
                 "wm.bh_disabled_notice",
-                text='Save the .blend file to enable opening scene folders',
+                text='Save .blend file to open Scene folders',
                 icon='ERROR'
             )
 
@@ -118,7 +118,7 @@ class BLUE_HOLE_MT_containers(bpy.types.Menu):
             row.enabled = False
             row.operator(
                 "wm.bh_disabled_notice",
-                text="All Asset Container types are disabled in Preferences",
+                text="All Asset Containers disabled in Preferences",
                 icon='ERROR'
             )
 
@@ -265,7 +265,7 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
             row.enabled = False
             row.operator(
                 "wm.bh_disabled_notice",
-                text="All Asset Container types are disabled in Preferences",
+                text="All Asset Containers disabled in Preferences",
                 icon='ERROR'
             )
 
@@ -328,7 +328,7 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
             row.enabled = False
             row.operator(
                 "wm.bh_disabled_notice",
-                text="All Asset Container types are disabled in Preferences",
+                text="All Asset Containers disabled in Preferences",
                 icon='ERROR'
             )
             return
@@ -417,7 +417,7 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
                 col.enabled = False
                 col.operator(
                     "wm.bh_disabled_notice",
-                    text='Save the .blend file to enable checkout',
+                    text='Save .blend file to enable checkout',
                     icon='ERROR'
                 )
 
