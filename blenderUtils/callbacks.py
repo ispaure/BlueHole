@@ -13,6 +13,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 
 import bpy
+import time
 from . import sourceControlUtils, blenderFile
 
 
@@ -139,6 +140,9 @@ class WM_OT_bh_sc_startup_check(bpy.types.Operator):
             _log("Startup SC operator cancelled: no blend file")
             return {'CANCELLED'}
 
+        # Give OS window manager a moment to stabilize focus
+        time.sleep(1.0)
+
         try:
             sourceControlUtils.sc_check_blend(
                 silent_mode=False
@@ -193,6 +197,7 @@ def save_post_handler(scene):
 # DEV HELPER
 
 def call_load_handlers(scene):
+
     for func in bpy.app.handlers.load_pre:
         func(scene)
 
