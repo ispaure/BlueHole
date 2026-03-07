@@ -56,7 +56,7 @@ class BlueHole(AddonPreferences):
         description='Main settings category to display',
         items=[
             ('ENVIRONMENT', 'Environment Settings', ''),
-            ('GENERAL_ADDON', 'General Addon Settings', ''),
+            ('GENERAL_ADDON', 'Addon Settings', ''),
         ],
         default='ENVIRONMENT'
     )
@@ -102,7 +102,7 @@ class BlueHole(AddonPreferences):
         # ENVIRONMENT SETTINGS
         if self.main_settings == 'ENVIRONMENT':
 
-            # Environment controls
+            # One single box for all environment UI
             box = layout.box()
             column = box.column()
 
@@ -122,19 +122,17 @@ class BlueHole(AddonPreferences):
                 row = column.row()
                 row.label(text='Create or set a different active environment to edit settings.')
 
-            # Environment sub-tabs
-            column = layout.column(align=True)
+            # Environment sub-tabs inside the same box
             row = column.row(align=True)
             row.prop(self, 'environment_settings', expand=True)
 
-            # Draw selected environment panel
-            box = column.box()
+            # Draw selected environment panel inside the same box
             module = _ENV_DRAW_MODULES.get(self.environment_settings)
             if module is None:
-                box.label(text=f'Unknown environment settings panel: {self.environment_settings}')
+                column.label(text=f'Unknown environment settings panel: {self.environment_settings}')
                 return
 
-            module.draw(self, context, box)
+            module.draw(self, context, column)
 
         # ------------------------------------------------------------------------------------------------------------------
         # GENERAL ADDON SETTINGS
