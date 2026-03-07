@@ -60,16 +60,20 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         elif not scene_saved:
             col = layout.column()
             col.enabled = False
-            col.operator("wm.bh_disabled_notice",
-                         text='Save the .blend file to enable Export/Send',
-                         icon='ERROR')
+            col.operator(
+                "wm.bh_disabled_notice",
+                text="Save the .blend file to Export/Send",
+                icon='ERROR'
+            )
 
         elif not engine_ok:
             col = layout.column()
             col.enabled = False
-            col.operator("wm.bh_disabled_notice",
-                         text='Select a Game Engine to enable Export/Send',
-                         icon='ERROR')
+            col.operator(
+                "wm.bh_disabled_notice",
+                text="Select a Game Engine to Export/Send",
+                icon='ERROR'
+            )
 
         layout.separator()
         # layout.menu("BLUE_HOLE_MT_import_export")
