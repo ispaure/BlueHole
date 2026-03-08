@@ -31,7 +31,45 @@ from ....blenderUtils import blenderFile
 
 
 def add_asset_hierarchy(pie):
-    pie.operator("wm.bh_scene_add_asset_hierarchy", text="Add ASSET HIERARCHY", icon='OUTLINER')
+    if prefs().container.enable_asset_hierarchy_container:
+        pie.operator("wm.bh_scene_add_asset_hierarchy")
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_scene_add_asset_hierarchy",
+            text="Hierarchy Containers disabled in Preferences",
+            icon='ERROR'
+        )
+        return
+
+
+def add_asset_collection(pie):
+    if prefs().container.enable_asset_collection_container:
+        pie.operator("wm.bh_scene_add_asset_collection")
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_scene_add_asset_collection",
+            text="Collection Containers disabled in Preferences",
+            icon='ERROR'
+        )
+        return
+
+
+def add_asset_mesh(pie):
+    if prefs().container.enable_asset_mesh_container:
+        pie.operator("wm.bh_scene_add_asset_mesh")
+    else:
+        col = pie.column()
+        col.enabled = False
+        col.operator(
+            "wm.bh_scene_add_asset_mesh",
+            text="Mesh Containers disabled in Preferences",
+            icon='ERROR'
+        )
+        return
 
 
 # ----------------------------------------------------------------------------------------------------------------------
