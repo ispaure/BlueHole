@@ -16,10 +16,13 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
+import rna_keymap_ui
+
 from bpy.props import *
 from ...Lib.commonUtils.osUtils import *
 from ..prefs import *
 from ...environment import envManager
+from ..addon_keymap import find_pie_menu_keymap, PIE_GLOBAL_IMPORT_EXPORT
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -43,46 +46,22 @@ class GeneralPG(bpy.types.PropertyGroup):
     )
 
 
-def _is_pie_menu_bound(menu_idname: str) -> bool:
+def _draw_pie_menu_keymap(column, context, menu_idname: str, label: str):
     """
-    Returns True if the given pie menu is bound to any active keymap item.
-
-    Checks for wm.call_menu_pie operators whose 'name' property matches
-    the provided menu idname.
+    Draw one real Blender keymap entry for the given pie menu.
     """
-    wm = bpy.context.window_manager
-    kc = wm.keyconfigs.user
+    kc, km, kmi = find_pie_menu_keymap(menu_idname, keymap_name='3D View')
 
-    if kc is None:
-        return False
+    if kc is None or km is None or kmi is None:
+        row = column.row()
+        row.label(text=f'{label}: shortcut not found.', icon='ERROR')
+        return
 
-    for km in kc.keymaps:
-        for kmi in km.keymap_items:
-            if kmi.idname != 'wm.call_menu_pie':
-                continue
-
-            if not kmi.active:
-                continue
-
-            if getattr(kmi.properties, 'name', None) == menu_idname:
-                return True
-
-    return False
-
-
-def _draw_pie_menu_status_row(column, menu_idname: str, label: str):
-    """
-    Draw one row showing whether a pie menu currently has a keybinding.
-    """
-    is_bound = _is_pie_menu_bound(menu_idname)
-
-    row = column.row(align=True)
+    row = column.row()
     row.label(text=label)
 
-    if is_bound:
-        row.label(text='Bound', icon='CHECKMARK')
-    else:
-        row.label(text='Not Bound', icon='ERROR')
+    column.context_pointer_set('keymap', km)
+    rna_keymap_ui.draw_kmi([], kc, km, kmi, column, 0)
 
 
 def draw(preference, context, layout):
@@ -108,10 +87,11 @@ def draw(preference, context, layout):
     row.label(text='Pie Menus')
 
     row = column_pie.row()
-    row.label(text='Shows whether each Blue Hole pie menu is currently bound to a shortcut.')
+    row.label(text='Edit Blue Hole shortcut bindings directly from here.')
 
-    _draw_pie_menu_status_row(
+    _draw_pie_menu_keymap(
         column_pie,
-        menu_idname="BLUEHOLE_MT_pie_global_import_export",
+        context,
+        menu_idname=PIE_GLOBAL_IMPORT_EXPORT,
         label='Global Import / Export'
     )
