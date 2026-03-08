@@ -160,7 +160,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
     PieKeymapDef(
         menu_idname=uvPieMenus.MT_pie_UV_cursor.bl_idname,
         keymap_name='UV Editor',
-        space_type='IMAGE_EDITOR',
+        space_type='EMPTY',
         key='RIGHTMOUSE',
         ctrl=True,
         shift=True,
@@ -168,7 +168,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
     PieKeymapDef(
         menu_idname=uvPieMenus.MT_pie_UV_action_uvspecial.bl_idname,
         keymap_name='UV Editor',
-        space_type='IMAGE_EDITOR',
+        space_type='EMPTY',
         key='RIGHTMOUSE',
         ctrl=True,
         shift=True,
@@ -177,14 +177,14 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
     PieKeymapDef(
         menu_idname=uvPieMenus.MT_pie_UV_tool.bl_idname,
         keymap_name='UV Editor',
-        space_type='IMAGE_EDITOR',
+        space_type='EMPTY',
         key='RIGHTMOUSE',
         shift=True,
     ),
     PieKeymapDef(
         menu_idname=uvPieMenus.MT_pie_UV_action.bl_idname,
         keymap_name='UV Editor',
-        space_type='IMAGE_EDITOR',
+        space_type='EMPTY',
         key='RIGHTMOUSE',
         ctrl=True,
     ),
