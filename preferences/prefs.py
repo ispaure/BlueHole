@@ -49,6 +49,26 @@ class _GeneralPrefs:
         self._general.active_environment = value
 
 
+class _PiePrefs:
+    """
+    Wrapper for Blue Hole general preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, general):
+        self._pie = pie
+
+    # -----------------------------------------------------------
+    # GENERAL PROPS
+    # -----------------------------------------------------------
+    @property
+    def enable_pie_menus(self) -> str:
+        return self._pie.enable_pie_menus
+
+    @enable_pie_menus.setter
+    def enable_pie_menus(self, value: str):
+        self._pie.enable_pie_menus = value
+
+
 class _BridgePrefs:
     """
     Wrapper for Blue Hole general preferences to provide
@@ -619,6 +639,11 @@ class BHPrefs:
     def sc(self):
         p = self.prefs
         return None if p is None else _SCPrefs(p.sourcecontrol)
+
+    @property
+    def pie(self):
+        p = self.prefs
+        return None if p is None else _PiePrefs(p.pie)
 
     @property
     def help_n_update(self):
