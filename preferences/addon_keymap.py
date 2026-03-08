@@ -17,6 +17,7 @@ __status__ = 'Production'
 
 from dataclasses import dataclass
 import bpy
+from ..Lib.commonUtils.debugUtils import *
 
 from ..Menus.pieMenu import (
     addPieMenus,
@@ -112,55 +113,6 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
         alt=True,
     ),
 
-    # CURVE
-    PieKeymapDef(
-        menu_idname=curvePieMenus.MT_pie_curve_tool.bl_idname,
-        keymap_name='Curve',
-        space_type='VIEW_3D',
-        key='RIGHTMOUSE',
-        shift=True,
-    ),
-    PieKeymapDef(
-        menu_idname=curvePieMenus.MT_pie_curve_action.bl_idname,
-        keymap_name='Curve',
-        space_type='VIEW_3D',
-        key='RIGHTMOUSE',
-        ctrl=True,
-    ),
-    PieKeymapDef(
-        menu_idname=curvePieMenus.MT_pie_curve_hide.bl_idname,
-        keymap_name='Curve',
-        space_type='VIEW_3D',
-        key='S',
-        shift=True,
-        repeat=True,
-    ),
-
-    # SCULPT
-    PieKeymapDef(
-        menu_idname=sculptPieMenus.MT_pie_sculpt_action.bl_idname,
-        keymap_name='Sculpt',
-        space_type='VIEW_3D',
-        key='RIGHTMOUSE',
-        ctrl=True,
-    ),
-    PieKeymapDef(
-        menu_idname=sculptPieMenus.MT_pie_sculpt_tool.bl_idname,
-        keymap_name='Sculpt',
-        space_type='VIEW_3D',
-        key='RIGHTMOUSE',
-        shift=True,
-    ),
-    PieKeymapDef(
-        menu_idname=sculptPieMenus.MT_pie_sculpt_simulation.bl_idname,
-        keymap_name='Sculpt',
-        space_type='VIEW_3D',
-        key='RIGHTMOUSE',
-        ctrl=True,
-        shift=True,
-        alt=True,
-    ),
-
     # MESH
     PieKeymapDef(
         menu_idname=meshPieMenus.MT_pie_mesh_action.bl_idname,
@@ -236,6 +188,55 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
         key='RIGHTMOUSE',
         ctrl=True,
     ),
+
+    # CURVE
+    PieKeymapDef(
+        menu_idname=curvePieMenus.MT_pie_curve_tool.bl_idname,
+        keymap_name='Curve',
+        space_type='VIEW_3D',
+        key='RIGHTMOUSE',
+        shift=True,
+    ),
+    PieKeymapDef(
+        menu_idname=curvePieMenus.MT_pie_curve_action.bl_idname,
+        keymap_name='Curve',
+        space_type='VIEW_3D',
+        key='RIGHTMOUSE',
+        ctrl=True,
+    ),
+    PieKeymapDef(
+        menu_idname=curvePieMenus.MT_pie_curve_hide.bl_idname,
+        keymap_name='Curve',
+        space_type='VIEW_3D',
+        key='S',
+        shift=True,
+        repeat=True,
+    ),
+
+    # SCULPT
+    PieKeymapDef(
+        menu_idname=sculptPieMenus.MT_pie_sculpt_action.bl_idname,
+        keymap_name='Sculpt',
+        space_type='VIEW_3D',
+        key='RIGHTMOUSE',
+        ctrl=True,
+    ),
+    PieKeymapDef(
+        menu_idname=sculptPieMenus.MT_pie_sculpt_tool.bl_idname,
+        keymap_name='Sculpt',
+        space_type='VIEW_3D',
+        key='RIGHTMOUSE',
+        shift=True,
+    ),
+    PieKeymapDef(
+        menu_idname=sculptPieMenus.MT_pie_sculpt_simulation.bl_idname,
+        keymap_name='Sculpt',
+        space_type='VIEW_3D',
+        key='RIGHTMOUSE',
+        ctrl=True,
+        shift=True,
+        alt=True,
+    ),
 ]
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -271,16 +272,11 @@ def _find_menu_def(menu_idname: str) -> PieKeymapDef | None:
 
 
 def _new_keymap(kc, pie_def: PieKeymapDef):
-    km = kc.keymaps.get(pie_def.keymap_name)
-
-    if km is None:
-        km = kc.keymaps.new(
-            name=pie_def.keymap_name,
-            space_type=pie_def.space_type,
-            region_type=pie_def.region_type,
-        )
-
-    return km
+    return kc.keymaps.new(
+        name=pie_def.keymap_name,
+        space_type=pie_def.space_type,
+        region_type=pie_def.region_type,
+    )
 
 
 def _remove_existing_menu_from_keyconfig(kc, pie_def: PieKeymapDef):
@@ -310,17 +306,24 @@ def _remove_existing_menu_from_keyconfig(kc, pie_def: PieKeymapDef):
 
 
 def ensure_pie_menu_keymap(pie_def: PieKeymapDef):
+    print(f'[BH] ensure start | {pie_def.keymap_name} | {pie_def.menu_idname}')
+
     wm = bpy.context.window_manager
+    print(f'[BH] wm = {wm}')
     if wm is None:
+        print('[BH] wm is None')
         return None, None, False
 
     kc = wm.keyconfigs.addon
+    print(f'[BH] kc.addon = {kc}')
     if kc is None:
+        print('[BH] kc.addon is None')
         return None, None, False
 
     _remove_existing_menu_from_keyconfig(kc, pie_def)
 
     km = _new_keymap(kc, pie_def)
+    print(f'[BH] km = {km.name if km else None}')
 
     kmi = km.keymap_items.new(
         'wm.call_menu_pie',
@@ -337,6 +340,7 @@ def ensure_pie_menu_keymap(pie_def: PieKeymapDef):
         kmi.repeat = pie_def.repeat
 
     addon_keymaps.append((km, kmi))
+    print(f'[BH] created | {km.name} | {kmi.idname} | {kmi.properties.name}')
     return km, kmi, True
 
 
@@ -397,9 +401,11 @@ def get_all_pie_menu_defs() -> list[PieKeymapDef]:
 # REGISTER
 
 def register():
+    log(Severity.INFO, 'Blue Hole Addon Keymaps', 'Registering Keymaps...')
     unregister()
     for pie_def in PIE_MENU_DEFS:
         ensure_pie_menu_keymap(pie_def)
+    log(Severity.INFO, 'Blue Hole Addon Keymaps', 'Registering Keymaps completed!')
 
 
 def unregister():

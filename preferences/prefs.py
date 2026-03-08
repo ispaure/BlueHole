@@ -26,7 +26,10 @@ def addon_module_name() -> str:
 
 def _addon_prefs():
     addon_name: str = addon_module_name()
-    return bpy.context.preferences.addons[addon_name].preferences
+    addon = bpy.context.preferences.addons.get(addon_name)
+    if addon is None:
+        return None
+    return addon.preferences
 
 
 class _GeneralPrefs:
@@ -51,21 +54,21 @@ class _GeneralPrefs:
 
 class _PiePrefs:
     """
-    Wrapper for Blue Hole general preferences to provide
+    Wrapper for Blue Hole pie menu preferences to provide
     live access to Blender properties with attribute-style syntax.
     """
-    def __init__(self, general):
+    def __init__(self, pie):
         self._pie = pie
 
     # -----------------------------------------------------------
     # GENERAL PROPS
     # -----------------------------------------------------------
     @property
-    def enable_pie_menus(self) -> str:
+    def enable_pie_menus(self) -> bool:
         return self._pie.enable_pie_menus
 
     @enable_pie_menus.setter
-    def enable_pie_menus(self, value: str):
+    def enable_pie_menus(self, value: bool):
         self._pie.enable_pie_menus = value
 
 
@@ -651,11 +654,5 @@ class BHPrefs:
         return None if p is None else _HelpNUpdatePrefs(p.help_n_update)
 
 
-_BH_PREFS = None
-
-
 def prefs() -> BHPrefs:
-    global _BH_PREFS
-    if _BH_PREFS is None:
-        _BH_PREFS = BHPrefs()
-    return _BH_PREFS
+    return BHPrefs()
