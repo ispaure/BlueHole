@@ -49,9 +49,10 @@ class MT_pie_add(bpy.types.Menu):
         # 7 - TOP - LEFT
         machin3PieButton.add_quadsphere(pie)
         # 9 - TOP - RIGHT
-        blenderPieButton.add_plane(pie)
+        open_pie_menu(pie, "BLUEHOLE_MT_add_asset_container", 'Asset Containers...')
         # 1 - BOTTOM - LEFT
-        blenderPieButton.add_nurbs_path(pie)
+        blenderPieButton.add_plane(pie)
+        # blenderPieButton.add_nurbs_path(pie) TODO: Find new spot for this one
         # 3 - BOTTOM - RIGHT
         blenderPieButton.add_bezier_curve(pie)
 
