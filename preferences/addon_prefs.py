@@ -19,7 +19,7 @@ import bpy
 from bpy.props import *
 from bpy.types import AddonPreferences
 
-from .addonProperties import general_props, help_update_props
+from .addonProperties import general_props, pie_props, help_update_props
 from .environmentProperties import bridge_props, container_props, directory_props, sourcecontrol_props
 from ..environment import envManager
 from . import addon_keymap
@@ -45,6 +45,7 @@ _ENV_DRAW_MODULES = {
 
 _GENERAL_DRAW_MODULES = {
     "GENERAL": general_props,
+    "PIE": pie_props,
     "HELP_N_UPDATE": help_update_props,
 }
 
@@ -80,12 +81,14 @@ class BlueHole(AddonPreferences):
         description='General addon settings to display',
         items=[
             ('GENERAL', 'General Settings', ''),
+            ('PIE', 'Pie Menus', ''),
             ('HELP_N_UPDATE', 'Help & Updates', ''),
         ],
         default='GENERAL'
     )
 
     general: PointerProperty(type=general_props.GeneralPG)
+    pie: PointerProperty(type=pie_props.PiePG)
     help_n_update: PointerProperty(type=help_update_props.HelpUpdatePG)
     directory: PointerProperty(type=directory_props.DirectoryPG)
     container: PointerProperty(type=container_props.ContainerPG)
@@ -162,6 +165,7 @@ class BlueHole(AddonPreferences):
 
 classes = (
     general_props.GeneralPG,        # sub PropertyGroups before others
+    pie_props.PiePG,
     help_update_props.HelpUpdatePG,
     directory_props.DirectoryPG,
     container_props.ContainerPG,
@@ -175,10 +179,14 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    addon_keymap.register()
+    try:
+        if prefs().pie.enable_pie_menus:
+            addon_keymap.register()
+    except Exception:
+        pass
 
 
 def unregister():
+    addon_keymap.unregister()
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-    addon_keymap.unregister()

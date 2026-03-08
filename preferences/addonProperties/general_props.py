@@ -22,7 +22,7 @@ from bpy.props import *
 from ...Lib.commonUtils.osUtils import *
 from ..prefs import *
 from ...environment import envManager
-from ..addon_keymap import find_pie_menu_keymap, PIE_GLOBAL_IMPORT_EXPORT
+from ..addon_keymap import find_pie_menu_keymap, get_all_pie_menu_defs, PieKeymapDef
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -46,24 +46,6 @@ class GeneralPG(bpy.types.PropertyGroup):
     )
 
 
-def _draw_pie_menu_keymap(column, context, menu_idname: str, label: str):
-    """
-    Draw one real Blender keymap entry for the given pie menu.
-    """
-    kc, km, kmi = find_pie_menu_keymap(menu_idname, keymap_name='3D View')
-
-    if kc is None or km is None or kmi is None:
-        row = column.row()
-        row.label(text=f'{label}: shortcut not found.', icon='ERROR')
-        return
-
-    row = column.row()
-    row.label(text=label)
-
-    column.context_pointer_set('keymap', km)
-    rna_keymap_ui.draw_kmi([], kc, km, kmi, column, 0)
-
-
 def draw(preference, context, layout):
     """
     Draw general addon settings.
@@ -77,21 +59,5 @@ def draw(preference, context, layout):
     row = column.row()
     row.label(text='These settings apply to the addon itself rather than a specific environment.')
 
-    # -------------------------------------------------------------------------------------------------
-    # PIE MENUS
-    # -------------------------------------------------------------------------------------------------
-    box_pie = column.box()
-    column_pie = box_pie.column()
-
-    row = column_pie.row()
-    row.label(text='Pie Menus')
-
-    row = column_pie.row()
-    row.label(text='Edit Blue Hole shortcut bindings directly from here.')
-
-    _draw_pie_menu_keymap(
-        column_pie,
-        context,
-        menu_idname=PIE_GLOBAL_IMPORT_EXPORT,
-        label='Global Import / Export'
-    )
+    row = column.row()
+    row.label(text='No option provided for now.')
