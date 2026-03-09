@@ -52,13 +52,6 @@ def sc_check_blend(blend_file_path: str, silent_mode=False):
             blend_p4_file = p4Wrapper.BlendP4File(client_file=blend_file_path)
             blend_p4_file.open_blend_for_edit(silent_mode)
 
-            # # NEW METHOD GENERIC
-            # p4_file_grp_cls = p4Wrapper.P4FileGroup()
-            # p4_file_grp_cls.append_p4_file_to_group_from_client_file(blend_file_path)
-            # result = p4_file_grp_cls.open_for_edit()
-            # return result
-            # --------------------------------------------------------------------------------
-
         elif prefs().sc.source_control_solution == 'plastic-scm':
             return True  # By default, there is nothing to do for plastic SCM to do its job
         elif prefs().sc.source_control_solution == 'git':

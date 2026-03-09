@@ -212,6 +212,14 @@ def get_blue_hole_user_env_files_path() -> Path:
     return Path(get_blue_hole_user_addon_path(), 'envFiles')
 
 
+def get_blue_hole_lib_path() -> Path:
+    """
+    Get the environments path in Blue Hole (AppData)
+    :rtype: str
+    """
+    return Path(get_blue_hole_user_addon_path(), 'Lib')
+
+
 def get_blue_hole_local_env_files_path() -> str:
     """
     Get the environments path in Blue Hole (Blender install dir)

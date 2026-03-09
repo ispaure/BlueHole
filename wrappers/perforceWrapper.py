@@ -20,7 +20,7 @@ from pathlib import Path
 import bpy
 
 # Blue Hole
-from ..blenderUtils import filterUtils
+from ..blenderUtils import filterUtils, blenderFile
 from ..Lib.commonUtils.debugUtils import *
 from ..preferences.prefs import *
 from ..Lib.commonUtils.wrappers import cmdShellWrapper
@@ -166,20 +166,20 @@ class P4FileStatus(enum.Enum):
 
 
 class P4File:
-    def __init__(self, client_file: Union[str, None] = None, depot_file: Union[str, None] = None):
+    def __init__(self, client_file: Optional[str] = None, depot_file: Optional[str] = None):
         # Set fields (if they were given, else is None
-        self.depotFile: Union[str, None] = depot_file
-        self.clientFile: Union[str, None] = client_file
+        self.depotFile: Optional[str] = depot_file
+        self.clientFile: Optional[str] = client_file
         # If both are none, this is a critical error and script should be prevented from progressing further!
         if self.depotFile is None and self.clientFile is None:
             P4CriticalMessage().p4_file_client_or_depot_path_required(group=False)
 
         # Set fields to their defaults
-        self.status: Union[P4FileStatus, None] = None
-        self.file_name: Union[str, None] = None
+        self.status: Optional[P4FileStatus] = None
+        self.file_name: Optional[str] = None
         self.isMapped: bool = False
         self.notInClientView: bool = False
-        self.headAction: Union[str, None] = None
+        self.headAction: Optional[str] = None
         self.headType = None
         self.headTime = None
         self.headRev = None
@@ -374,7 +374,7 @@ class P4File:
 
         # If add command, create file before checkout if doesn't exist (may be created later)
         if 'p4 add' in command and self.clientFile is not None:
-            create_empty_file(self.clientFile)
+            create_empty_binary_file(self.clientFile)
 
         # Run command for p4_file
         display_name = self.get_display_name()
@@ -648,7 +648,7 @@ class P4FileGroup:
         if 'p4 add' in command:
             for p4_file in filtered_file_path_with_client_file_dict.values():
                 if not os.path.isfile(p4_file.clientFile):
-                    create_empty_file(p4_file.clientFile)
+                    create_empty_binary_file(p4_file.clientFile)
         # Create string
         file_path_string_lst = self.append_lst_to_string_max_length(filtered_file_path_with_client_file_dict.keys(), ' ', 1000, quotation_marks=True)
         call_counter = 0
@@ -1262,16 +1262,19 @@ class P4CriticalMessage:
         self.log_critical(msg)
 
 
-def create_empty_file(file_path):
+def create_empty_binary_file(file_path):
     """
-    Creates an empty file at desired filepath, if it does not exist yet.
+    Creates an empty binary file at desired filepath, if it does not exist yet.
+    It's important it's binary, else Perforce may treat it as a text file and when it gets
+    stomped by a .blend/.fbx file it will export in a way that backfires.
     """
     # Create directory (if it doesn't exist yet)
     Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
     # Create File
     if not os.path.isfile(file_path):
-        with open(file_path, 'w') as fp:
-            pass
+        fileUtils.copy_file(blenderFile.get_blue_hole_lib_path() / 'binary_template.bin', file_path)
+        # with open(file_path, 'w') as fp:
+        #     pass
 
 
 def get_p4_macos_path() -> str:
