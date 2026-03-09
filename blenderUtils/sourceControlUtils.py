@@ -25,32 +25,33 @@ from ..preferences.prefs import *
 # CODE
 
 
-def sc_check_blend(blend_file_path: str, silent_mode=False):
+def sc_check_blend(blend_file_path: str, allow_sync, silent_mode=False):
     """
     Checks out the currently opened scene. Depending on solution, will redirect
     """
     if filterUtils.filter_source_control():
         if prefs().sc.source_control_solution == 'perforce':
 
-            # Just bypass if scene is not on disk (regardless of silent mode)
-            result = filterUtils.check_tests('Checkout Blender Scene',
-                                             check_blend_exist=True,
-                                             silent_mode=True)
-            if not result:
-                return False
-
-            # -------------------------------------------------------------------------------
-            # NEW METHOD
-            result = filterUtils.check_tests('Checkout Blender Scene',
-                                             check_blend_exist=True,
-                                             check_source_control_enable=True,
-                                             silent_mode=silent_mode)
-            if not result:
-                return False
+            # Tests normally done later, don't know if I really need this here?! Already bypassing non-existing scenes by default.
+            # # Just bypass if scene is not on disk (regardless of silent mode)
+            # result = filterUtils.check_tests('Checkout Blender Scene',
+            #                                  check_blend_exist=True,
+            #                                  silent_mode=True)
+            # if not result:
+            #     return False
+            #
+            # # -------------------------------------------------------------------------------
+            # # NEW METHOD
+            # result = filterUtils.check_tests('Checkout Blender Scene',
+            #                                  check_blend_exist=True,
+            #                                  check_source_control_enable=True,
+            #                                  silent_mode=silent_mode)
+            # if not result:
+            #     return False
 
             # NEW METHOD KEEPING OLD BEHAVIOR
             blend_p4_file = p4Wrapper.BlendP4File(client_file=blend_file_path)
-            blend_p4_file.open_blend_for_edit(silent_mode)
+            blend_p4_file.open_blend_for_edit(allow_sync, silent_mode)
 
         elif prefs().sc.source_control_solution == 'plastic-scm':
             return True  # By default, there is nothing to do for plastic SCM to do its job

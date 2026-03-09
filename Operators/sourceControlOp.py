@@ -34,7 +34,7 @@ class P4CheckOutCurrentScene(bpy.types.Operator):
     bl_label = "Check Out Current Blend Scene"
 
     def execute(self, context):
-        sourceControlUtils.sc_check_blend(blenderFile.get_blend_file_path())
+        sourceControlUtils.sc_check_blend(blenderFile.get_blend_file_path(), allow_sync=False, silent_mode=False)
         return {'FINISHED'}
 
 
@@ -109,7 +109,7 @@ class BHSaveAsMainfile(bpy.types.Operator, ExportHelper):
 
         blend_path = self.filepath
 
-        sourceControlUtils.sc_check_blend(blend_path, silent_mode=False)
+        sourceControlUtils.sc_check_blend(blend_path, allow_sync=False, silent_mode=False)
 
         callbacks.SKIP_NEXT_SAVE_PRE_SC_CHECK = True
 

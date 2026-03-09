@@ -36,7 +36,7 @@ def load_post_handler(dummy):
     log(Severity.DEBUG, 'Callback Event: load_post', f'Blender Filepath: "{blenderFile.get_blend_file_path()}"')
     print("Event: load_post")
     if blenderFile.has_blend_filepath():
-        sourceControlUtils.sc_check_blend(blenderFile.get_blend_file_path(), silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
+        sourceControlUtils.sc_check_blend(blenderFile.get_blend_file_path(), allow_sync=True, silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
 
 
 @bpy.app.handlers.persistent
@@ -52,7 +52,7 @@ def save_pre_handler(dummy):
         return
 
     if blenderFile.has_blend_filepath():
-        sourceControlUtils.sc_check_blend(blenderFile.get_blend_file_path(), silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
+        sourceControlUtils.sc_check_blend(blenderFile.get_blend_file_path(), allow_sync=False, silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
 
 
 @bpy.app.handlers.persistent
