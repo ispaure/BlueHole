@@ -417,7 +417,7 @@ class P4File:
     def _callback_post_edit(self):
         pass
     
-    def open_for_edit(self, silent: bool = False):
+    def open_for_edit(self, silent: bool = False, allow_sync: bool = True):
         
         msg = ('P4File.open_for_edit: Running single-file open_for_edit, which is costly to run in a loop. Please only use for explicit checkout'
                'requiring user interaction. For batch checkout, use P4FileGroup.open_for_edit instead as it is more optimized!')
@@ -461,6 +461,9 @@ class P4File:
 
         # Get latest on files that are not at latest
         if self.status in [P4FileStatus.NOT_LATEST_REVISION]:
+            if not allow_sync:
+                P4ErrorMessage(silent).not_latest_and_not_allow_sync(self.get_display_name())
+                return False
             if silent:
                 self._run_p4_sync()
             else:
@@ -508,7 +511,7 @@ class BlendP4File(P4File):
             log(Severity.CRITICAL, tool_name, f'BlendP4File: Meant to receive a client_file with a .BLEND extension. Invalid Path: {client_file}')
         super().__init__(client_file, depot_file)
 
-    def open_blend_for_edit(self, silent: bool = False):
+    def open_blend_for_edit(self, allow_sync: bool, silent: bool = False):
         # Initial Checks
         check_result = filterUtils.check_tests('Check Out Current Blend Scene',
                                                check_blend_exist=True,
@@ -518,7 +521,7 @@ class BlendP4File(P4File):
         if not check_result:
             return False
 
-        super().open_for_edit(silent=silent)
+        super().open_for_edit(silent=silent, allow_sync=allow_sync)
 
     def _callback_post_sync(self):
         bpy.ops.wm.open_mainfile(filepath=self.clientFile)
@@ -1239,6 +1242,21 @@ class P4ErrorMessage:
             f'cannot be checked out or modified.\n\n'
             f'What to do:\n'
             f'Revert the delete operation in Perforce (P4V), or restore the files if they were deleted unintentionally.\n\n'
+            f'Note: See the log for additional details.\n\n'
+            f'Perforce operation aborted.'
+        )
+        self.log_error(msg)
+
+    def not_latest_and_not_allow_sync(self, name):
+        msg = (
+            f'Perforce operation failed.\n\n'
+            f'What went wrong:\n'
+            f'The file "{name}" is not synced to the latest revision in the Perforce depot. '
+            f'This operation does not allow automatic synchronization to prevent overwriting '
+            f'local changes or performing unsafe updates.\n\n'
+            f'What to do:\n'
+            f'Sync the file to the latest revision using Perforce (P4V) before attempting this '
+            f'operation again.\n\n'
             f'Note: See the log for additional details.\n\n'
             f'Perforce operation aborted.'
         )
