@@ -22,11 +22,12 @@ from bpy.props import BoolProperty, EnumProperty, StringProperty
 # Blue Hole
 from typing import Optional, Type
 
-from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export.assetHierarchy.containerGroup import AssetHierarchyContainerGroup
 from ..blenderUtils.export.assetCollection.containerGroup import AssetCollectionContainerGroup
 from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGroup
-from ..Lib.commonUtils import uiUtils
+from ..blenderUtils.export.exportSettingsPresets import *
+from ..blenderUtils.export.looseMesh.containerGroup import batch_export_loose_mesh
+from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INTERNAL HELPERS
@@ -272,11 +273,76 @@ class BH_OT_export_containers(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class BatchExportSelectedToFinal(bpy.types.Operator):
+    bl_idname = "wm.bh_batch_export_select_to_final"
+    bl_label = 'Batch Export (Selection) to FINAL Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the FINAL Folder'
+
+    def execute(self, context):
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_final)
+        return {'FINISHED'}
+
+
+class BatchExportSelectedToResources(bpy.types.Operator):
+    bl_idname = "wm.bh_batch_export_select_to_resources"
+    bl_label = 'Batch Export (Selection) to RESOURCES Folder'
+
+    def execute(self, context):
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_resources)
+        return {'FINISHED'}
+
+
+class BatchExportSelectedToSpeedTree_FBX(bpy.types.Operator):
+    bl_idname = "wm.bh_batch_export_select_to_speedtree_fbx"
+    bl_label = 'Batch Export (Selection) to SPEEDTREE Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH Folder'
+
+    def execute(self, context):
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_st)
+        return {'FINISHED'}
+
+
+class BatchExportSelectedToSpeedtreeLR_FBX(bpy.types.Operator):
+    bl_idname = "wm.bh_batch_export_select_to_speedtree_lr_fbx"
+    bl_label = 'Batch Export (Selection) to SPEEDTREE-LR Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> LR Folder'
+
+    def execute(self, context):
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_st_lr)
+        return {'FINISHED'}
+
+
+class BatchExportSelectedToSpeedtreeHR_FBX(bpy.types.Operator):
+    bl_idname = "wm.bh_batch_export_select_to_speedtree_hr_fbx"
+    bl_label = 'Batch Export (Selection) to SPEEDTREE-HR Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the SPEEDTREE MSH -> HR Folder'
+
+    def execute(self, context):
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_st_hr)
+        return {'FINISHED'}
+
+
+class BatchExportSelectedToBakeFBX(bpy.types.Operator):
+    bl_idname = "wm.bh_batch_export_select_to_bake_fbx"
+    bl_label = 'Batch Export (Selection) to BAKE Folder'
+    bl_description = 'Batch exports selected meshes using their names as file names in the MSH BAKE Folder'
+
+    def execute(self, context):
+        batch_export_loose_mesh(prefs().directory.sc_dir_struct_msh_bake)
+        return {'FINISHED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 classes = (
     BH_OT_export_containers,
+    BatchExportSelectedToSpeedTree_FBX,
+    BatchExportSelectedToSpeedtreeLR_FBX,
+    BatchExportSelectedToSpeedtreeHR_FBX,
+    BatchExportSelectedToFinal,
+    BatchExportSelectedToBakeFBX,
+    BatchExportSelectedToResources
 )
 
 

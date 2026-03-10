@@ -18,7 +18,7 @@ __status__ = 'Production'
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
 from ....preferences.prefs import *
-from ....Operators import exportSendOp
+from ....operators import export_send_ops
 from ....blenderUtils import blenderFile
 
 
@@ -262,7 +262,7 @@ def send_all_asset_containers(pie):
     any_enabled = enabled_hierarchy or enabled_collection or enabled_mesh
 
     # All Containers - All in Scene
-    label = exportSendOp.BH_OT_export_containers.build_ui_label(
+    label = export_send_ops.BH_OT_export_containers.build_ui_label(
         export_preset=export_preset,
         send_all=True,
         send=True,
@@ -275,7 +275,7 @@ def send_all_asset_containers(pie):
         col = pie.column()
         col.enabled = False
         col.operator(
-            exportSendOp.BH_OT_export_containers.bl_idname,
+            export_send_ops.BH_OT_export_containers.bl_idname,
             text="Save the .blend file to Send",
             icon='ERROR'
         )
@@ -285,13 +285,13 @@ def send_all_asset_containers(pie):
         col = pie.column()
         col.enabled = False
         col.operator(
-            exportSendOp.BH_OT_export_containers.bl_idname,
+            export_send_ops.BH_OT_export_containers.bl_idname,
             text="All Asset Containers disabled in Preferences",
             icon='ERROR'
         )
         return
 
-    op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+    op = pie.operator(export_send_ops.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
     op.export_preset = export_preset
     op.send_all = True
     op.send = True
@@ -317,7 +317,7 @@ def send_selected_asset_containers(pie):
     any_enabled = enabled_hierarchy or enabled_collection or enabled_mesh
 
     # All Containers - In Selection
-    label = exportSendOp.BH_OT_export_containers.build_ui_label(
+    label = export_send_ops.BH_OT_export_containers.build_ui_label(
         export_preset=export_preset,
         send_all=False,
         send=True,
@@ -330,7 +330,7 @@ def send_selected_asset_containers(pie):
         col = pie.column()
         col.enabled = False
         col.operator(
-            exportSendOp.BH_OT_export_containers.bl_idname,
+            export_send_ops.BH_OT_export_containers.bl_idname,
             text="Save the .blend file to Send",
             icon='ERROR'
         )
@@ -340,13 +340,13 @@ def send_selected_asset_containers(pie):
         col = pie.column()
         col.enabled = False
         col.operator(
-            exportSendOp.BH_OT_export_containers.bl_idname,
+            export_send_ops.BH_OT_export_containers.bl_idname,
             text="All Asset Containers disabled in Preferences",
             icon='ERROR'
         )
         return
 
-    op = pie.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
+    op = pie.operator(export_send_ops.BH_OT_export_containers.bl_idname, text=label, icon='UV_SYNC_SELECT')
     op.export_preset = export_preset
     op.send_all = False
     op.send = True

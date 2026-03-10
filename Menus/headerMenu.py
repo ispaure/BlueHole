@@ -21,7 +21,7 @@ import bpy
 # Blue Hole
 from ..preferences.prefs import *
 from ..blenderUtils import blenderFile
-from .menu import BLUE_HOLE_MT_export, BLUE_HOLE_MT_send
+from .menu import BLUE_HOLE_MT_send
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
