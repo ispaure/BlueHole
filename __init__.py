@@ -33,7 +33,7 @@ from .blenderUtils import callbacks
 from .preferences import addon_prefs as addon_prefs
 
 # Import Blue Hole Operators
-from .Operators import dirOp, envOp, externalAddonOp, foodOp, helpOp, impExpOp, musicOp, otherOp, exportSendOp, sortOp, sourceControlOp, themeOp, addOp
+from .operators import operators_register
 
 # Import Env Utils
 from .environment import envManager as envManager
@@ -49,7 +49,7 @@ bl_info = {"name": "Blue Hole",
            "author": "Marc-André Voyer",
            "description": "",
            "blender": (4, 5, 1),
-           "version": (6, 3, 9),
+           "version": (6, 3, 10),
            "location": "",
            "warning": "",
            "category": "Generic"
@@ -67,19 +67,6 @@ show_verbose = True
 
 # Classes
 # Operators in List
-operator_file_lst = (dirOp,
-                     envOp,
-                     externalAddonOp,
-                     foodOp,
-                     helpOp,
-                     impExpOp,
-                     musicOp,
-                     otherOp,
-                     exportSendOp,
-                     sortOp,
-                     sourceControlOp,
-                     themeOp,
-                     addOp)
 
 menu_file_lst = (menu, pieMenu, file_menu_override, VIEW3D_MT_add)
 
@@ -93,8 +80,8 @@ def register():
     addon_prefs.register()
 
     # Register operators
-    for file in operator_file_lst:
-        file.register()
+
+    operators_register.register()
 
     # Register menus
     for file in menu_file_lst:
@@ -140,8 +127,7 @@ def unregister():
     headerMenu.unregister()
 
     # Unregister operators
-    for file in operator_file_lst:
-        file.unregister()
+    operators_register.unregister()
 
     # Unregister menus
     for file in menu_file_lst:

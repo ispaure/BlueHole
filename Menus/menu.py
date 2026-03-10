@@ -23,7 +23,23 @@ import bpy
 
 # Blue Hole
 from ..blenderUtils.uiUtils import show_label
-from ..Operators import dirOp, impExpOp, foodOp, helpOp, musicOp, exportSendOp, sortOp, sourceControlOp, themeOp, otherOp, addOp
+from ..operators import (
+    add_ops,
+    box_xray_ops,
+    directory_ops,
+    environment_ops,
+    export_send_ops,
+    external_addon_ops,
+    food_ops,
+    help_ops,
+    import_ops,
+    music_ops,
+    other_ops,
+    save_ops,
+    sort_ops,
+    source_control_ops,
+    theme_ops,
+)
 from ..preferences.prefs import *
 from ..blenderUtils import blenderFile
 from ..Lib.commonUtils.debugUtils import *
@@ -42,11 +58,11 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
         # SCENE
         show_label('SCENE', layout)
         if blenderFile.has_blend_filepath():
-            layout.operator(dirOp.OpenSceneFolder.bl_idname, icon='FILE_FOLDER')
-            layout.operator(dirOp.OpenReferencesFolder.bl_idname, icon='FILE_FOLDER')
-            layout.operator(dirOp.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
-            layout.operator(dirOp.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')
-            layout.operator(dirOp.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(directory_ops.OpenSceneFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(directory_ops.OpenReferencesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(directory_ops.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(directory_ops.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(directory_ops.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
         else:
             col = layout.column()
             col.enabled = False
@@ -61,22 +77,22 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
             if os.path.exists(prefs().bridge.sc_path) or os.path.exists(prefs().bridge.sc_path_alternate) or os.path.exists(prefs().bridge.sc_path_mac) or os.path.exists(prefs().bridge.sc_path_mac_alternate) or os.path.exists(prefs().bridge.sc_path_linux) or os.path.exists(prefs().bridge.sc_path_linux_alternate):
                 layout.separator()
                 show_label('ENGINE', layout)
-                layout.operator(dirOp.OpenSourceContentPath.bl_idname, icon='FILE_FOLDER')
+                layout.operator(directory_ops.OpenSourceContentPath.bl_idname, icon='FILE_FOLDER')
             if prefs().bridge.active_game_engine == 'unity':
                 if os.path.exists(prefs().bridge.unity_assets_path) or os.path.exists(prefs().bridge.unity_assets_path_mac) or os.path.exists(prefs().bridge.unity_assets_path_linux):
-                    layout.operator(dirOp.OpenUnityAssetsPath.bl_idname, icon='FILE_FOLDER')
+                    layout.operator(directory_ops.OpenUnityAssetsPath.bl_idname, icon='FILE_FOLDER')
 
         # SOURCE CONTROL
         if prefs().sc.source_control_enable:
             if prefs().sc.source_control_solution == 'perforce':
                 layout.separator()
                 show_label('SOURCE CONTROL', layout)
-                layout.operator(dirOp.OpenP4WorkspaceRootFolder.bl_idname, icon='FILE_FOLDER')
+                layout.operator(directory_ops.OpenP4WorkspaceRootFolder.bl_idname, icon='FILE_FOLDER')
 
         # CONFIG
         layout.separator()
         show_label('CONFIG', layout)
-        layout.operator(dirOp.OpenUserResourcePath.bl_idname, icon='FILE_FOLDER')
+        layout.operator(directory_ops.OpenUserResourcePath.bl_idname, icon='FILE_FOLDER')
 
 
 class BLUE_HOLE_MT_containers(bpy.types.Menu):
@@ -95,21 +111,21 @@ class BLUE_HOLE_MT_containers(bpy.types.Menu):
 
         if enabled_collection:
             layout.operator(
-                addOp.SceneAddAssetCollection.bl_idname,
+                add_ops.SceneAddAssetCollection.bl_idname,
                 text=f"Asset Collection{suffix}",
                 icon='OUTLINER_COLLECTION'
             )
 
         if enabled_hierarchy:
             layout.operator(
-                addOp.SceneAddAssetHierarchy.bl_idname,
+                add_ops.SceneAddAssetHierarchy.bl_idname,
                 text=f"Asset Hierarchy{suffix}",
                 icon='OUTLINER_OB_EMPTY'
             )
 
         if enabled_mesh:
             layout.operator(
-                addOp.SceneAddAssetMesh.bl_idname,
+                add_ops.SceneAddAssetMesh.bl_idname,
                 text=f"Asset Mesh{suffix}",
                 icon='MESH_CUBE'
             )
@@ -129,7 +145,7 @@ class BLUE_HOLE_MT_food_delivery(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for cls in foodOp.classes:
+        for cls in food_ops.classes:
             layout.operator(cls.bl_idname, icon='TEMP')
 
 
@@ -141,14 +157,14 @@ class BLUE_HOLE_MT_help(bpy.types.Menu):
 
         # Show Documentation Section
         show_label('DOCUMENTATION', layout)
-        layout.operator(helpOp.OpenGuide.bl_idname, icon='URL')
-        layout.operator(helpOp.OpenKeymapsList.bl_idname, icon='URL')
-        layout.operator(helpOp.OpenPieMenusList.bl_idname, icon='URL')
+        layout.operator(help_ops.OpenGuide.bl_idname, icon='URL')
+        layout.operator(help_ops.OpenKeymapsList.bl_idname, icon='URL')
+        layout.operator(help_ops.OpenPieMenusList.bl_idname, icon='URL')
 
         # Show Submit Feedback Button
         layout.separator()
-        layout.operator(helpOp.SubmitFeedback.bl_idname, icon='WINDOW')
-        layout.operator(helpOp.JoinBHDiscord.bl_idname, icon='FUND')
+        layout.operator(help_ops.SubmitFeedback.bl_idname, icon='WINDOW')
+        layout.operator(help_ops.JoinBHDiscord.bl_idname, icon='FUND')
 
 
 class BLUE_HOLE_MT_import(bpy.types.Menu):
@@ -158,11 +174,11 @@ class BLUE_HOLE_MT_import(bpy.types.Menu):
         layout = self.layout
         show_label('SCALE GUIDES', layout)
         # layout.menu("BLUE_HOLE_MT_import_scale_guides")
-        layout.operator(impExpOp.ImportGuide_5_6_ScaleMan.bl_idname, icon='IMPORT')
-        layout.operator(impExpOp.ImportGuide_5_10_ScaleMan.bl_idname, icon='IMPORT')
-        layout.operator(impExpOp.ImportGuide_5_10_ScaleManCasual.bl_idname, icon='IMPORT')
-        layout.operator(impExpOp.ImportGuide_5_10_ScaleManSitting.bl_idname, icon='IMPORT')
-        layout.operator(impExpOp.ImportGuide_6_1_ScaleMan.bl_idname, icon='IMPORT')
+        layout.operator(import_ops.ImportGuide_5_6_ScaleMan.bl_idname, icon='IMPORT')
+        layout.operator(import_ops.ImportGuide_5_10_ScaleMan.bl_idname, icon='IMPORT')
+        layout.operator(import_ops.ImportGuide_5_10_ScaleManCasual.bl_idname, icon='IMPORT')
+        layout.operator(import_ops.ImportGuide_5_10_ScaleManSitting.bl_idname, icon='IMPORT')
+        layout.operator(import_ops.ImportGuide_6_1_ScaleMan.bl_idname, icon='IMPORT')
 
 
 class BLUE_HOLE_MT_music(bpy.types.Menu):
@@ -170,7 +186,7 @@ class BLUE_HOLE_MT_music(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for cls in musicOp.classes:
+        for cls in music_ops.classes:
             layout.operator(cls.bl_idname, icon='SOUND')
 
 
@@ -196,13 +212,13 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
             case 'unity':
                 export_preset = 'UNITY'
                 if self.SEND:
-                    layout.operator(helpOp.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                    layout.operator(help_ops.SendToUnityDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
                 else:
                     show_label('Directory: FINAL', layout)
             case 'unreal':
                 export_preset = 'UNREAL'
                 if self.SEND:
-                    layout.operator(helpOp.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                    layout.operator(help_ops.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
                 else:
                     show_label('Directory: FINAL', layout)
             case _:
@@ -210,12 +226,12 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
                 return
 
         if not self.SEND:  # If not sending, offer button to open the folder
-            layout.operator(dirOp.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(directory_ops.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
 
         # Helper to reduce repetition
         def add_button(*, send_all, include_hierarchy, include_collection, include_mesh):
             icon = 'UV_SYNC_SELECT' if self.SEND else 'EXPORT'
-            label = exportSendOp.BH_OT_export_containers.build_ui_label(
+            label = export_send_ops.BH_OT_export_containers.build_ui_label(
                 export_preset=export_preset,
                 send=self.SEND,
                 send_all=send_all,
@@ -223,7 +239,7 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
                 include_collection=include_collection,
                 include_mesh=include_mesh,
             )
-            op = layout.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon=icon)
+            op = layout.operator(export_send_ops.BH_OT_export_containers.bl_idname, text=label, icon=icon)
             op.export_preset = export_preset
             op.send = self.SEND
             op.send_all = send_all
@@ -275,18 +291,18 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
         if not self.SEND:
             layout.separator()
             show_label('Directory: RESOURCES', layout)
-            layout.operator(dirOp.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
-            layout.operator(impExpOp.BatchExportSelectedToResources.bl_idname, icon='EXPORT')
+            layout.operator(directory_ops.OpenResourcesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(export_send_ops.BatchExportSelectedToResources.bl_idname, icon='EXPORT')
 
         # --------------------------------------------------------------------------------------------------------------
         # SPEEDTREE SECTION
         if not self.SEND:
             layout.separator()
             show_label('Directory: SPEEDTREE', layout)
-            layout.operator(dirOp.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')
-            layout.operator(impExpOp.BatchExportSelectedToSpeedTree_FBX.bl_idname, icon='EXPORT')
-            layout.operator(impExpOp.BatchExportSelectedToSpeedtreeLR_FBX.bl_idname, icon='EXPORT')
-            layout.operator(impExpOp.BatchExportSelectedToSpeedtreeHR_FBX.bl_idname, icon='EXPORT')
+            layout.operator(directory_ops.OpenSpeedTreeMeshesFolder.bl_idname, icon='FILE_FOLDER')
+            layout.operator(export_send_ops.BatchExportSelectedToSpeedTree_FBX.bl_idname, icon='EXPORT')
+            layout.operator(export_send_ops.BatchExportSelectedToSpeedtreeLR_FBX.bl_idname, icon='EXPORT')
+            layout.operator(export_send_ops.BatchExportSelectedToSpeedtreeHR_FBX.bl_idname, icon='EXPORT')
 
 
 class BLUE_HOLE_MT_send(_BLUE_HOLE_MT_export_base):
@@ -336,7 +352,7 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
 
         def add_button(title, *, send_all, include_hierarchy, include_collection, include_mesh):
             icon = 'UV_SYNC_SELECT' if self.SEND else 'EXPORT'
-            label = exportSendOp.BH_OT_export_containers.build_ui_label(
+            label = export_send_ops.BH_OT_export_containers.build_ui_label(
                 export_preset=export_preset,
                 send=self.SEND,
                 send_all=send_all,
@@ -344,7 +360,7 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
                 include_collection=include_collection,
                 include_mesh=include_mesh,
             )
-            op = layout.operator(exportSendOp.BH_OT_export_containers.bl_idname, text=label, icon=icon)
+            op = layout.operator(export_send_ops.BH_OT_export_containers.bl_idname, text=label, icon=icon)
             op.export_preset = export_preset
             op.send = self.SEND
             op.send_all = send_all
@@ -396,10 +412,10 @@ class BLUE_HOLE_MT_sort(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator(sortOp.SortSelectionOnWorldAxis.bl_idname)
-        layout.operator(sortOp.SearchReplaceNameSelection.bl_idname)
-        layout.operator(sortOp.BatchRenameSelection.bl_idname)
-        layout.operator(sortOp.FlipLastUnderscores.bl_idname)
+        layout.operator(sort_ops.SortSelectionOnWorldAxis.bl_idname)
+        layout.operator(sort_ops.SearchReplaceNameSelection.bl_idname)
+        layout.operator(sort_ops.BatchRenameSelection.bl_idname)
+        layout.operator(sort_ops.FlipLastUnderscores.bl_idname)
 
 
 class BLUE_HOLE_MT_source_control(bpy.types.Menu):
@@ -408,10 +424,10 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         if prefs().sc.source_control_solution == 'perforce':
-            layout.operator(helpOp.PerforceDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+            layout.operator(help_ops.PerforceDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
 
             if blenderFile.has_blend_filepath():
-                layout.operator(sourceControlOp.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
+                layout.operator(source_control_ops.P4CheckOutCurrentScene.bl_idname, icon='CHECKMARK')
             else:
                 col = layout.column()
                 col.enabled = False
@@ -421,7 +437,7 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
                     icon='ERROR'
                 )
 
-            layout.operator(sourceControlOp.P4DisplayServerInfo.bl_idname, icon='INFO')
+            layout.operator(source_control_ops.P4DisplayServerInfo.bl_idname, icon='INFO')
 
 
 class BLUE_HOLE_MT_themes(bpy.types.Menu):
@@ -429,7 +445,7 @@ class BLUE_HOLE_MT_themes(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        for cls in themeOp.classes:
+        for cls in theme_ops.classes:
             layout.operator(cls.bl_idname, icon='IMAGE_RGB_ALPHA')
 
 
@@ -438,7 +454,7 @@ class BLUE_HOLE_MT_update_deluxe(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator(otherOp.WM_OT_Apply_Deluxe_Prefs.bl_idname)
+        layout.operator(other_ops.WM_OT_Apply_Deluxe_Prefs.bl_idname)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -16,13 +16,9 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-import rna_keymap_ui
 
 from bpy.props import *
-from ...Lib.commonUtils.osUtils import *
-from ..prefs import *
 from ...environment import envManager
-from ..addon_keymap import find_pie_menu_keymap, get_all_pie_menu_defs, PieKeymapDef
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

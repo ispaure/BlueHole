@@ -21,7 +21,7 @@ import bpy
 # Blue Hole
 from typing import *
 from ..exportSettings import *
-from ... import objectUtils, projectUtils
+from ... import objectUtils
 from ....preferences.prefs import *
 from .container import AssetCollectionContainer
 from ..model.assetContainerGroup import AssetContainerGroup
