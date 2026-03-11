@@ -1,7 +1,7 @@
 """
 Blue Hole is a blender addon that was created and written by Marc-André Voyer for Environment Artists.
 
-Highlights are export scripts and Perforce source control integration.
+Highlights are Perforce integration and Bridge to Unity/Unreal
 Official GitHUB: https://www.github.com/ispaure/BlueHole
 Official Website: https://blue-hole.weebly.com
 """
@@ -23,22 +23,14 @@ __status__ = 'Production'
 import bpy
 
 # Disable use of pySide for UI (rely on OS terminal to create windows instead)
-# Need to be first import, and throw error in case .commonUtils stuff cannot be accessed.
 from .Lib.commonUtils import uiUtils
 uiUtils.use_pyside = False
 
 # Import Blue Hole Scripts
 from .blenderUtils import callbacks
-
 from .preferences import addon_prefs as addon_prefs
-
-# Import Blue Hole Operators
 from .operators import operators_register
-
-# Import Env Utils
 from .environment import envManager as envManager
-
-# Import Menus
 from .ui.menus import menus_register
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -71,16 +63,9 @@ show_verbose = True
 # Register
 def register():
 
-    # Register Callbacks
     callbacks.register()
-
-    # Register preferences
     addon_prefs.register()
-
-    # Register operators
     operators_register.register()
-
-    # Register menus
     menus_register.register()
 
     # Schedule init AFTER Blender finishes enabling the addon
@@ -108,16 +93,10 @@ def _post_register_init():
 
 # Unregister
 def unregister():
-    # Unregister Callbacks
+
     callbacks.unregister()
-
-    # Unregister preferences
     addon_prefs.unregister()
-
-    # Unregister operators
     operators_register.unregister()
-
-    # Unregister menus
     menus_register.unregister()
 
     # Unregister timer
