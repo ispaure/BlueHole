@@ -19,7 +19,7 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from ....operators import add_ops
+from ....operators import add_ops, external_addon_ops
 from ....preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ class BLUE_HOLE_MT_containers(bpy.types.Menu):
             row = layout.row()
             row.enabled = False
             row.operator(
-                "wm.bh_disabled_notice",
+                external_addon_ops.BH_OT_disabled_notice.bl_idname,
                 text="All Asset Containers disabled in Preferences",
                 icon='ERROR'
             )

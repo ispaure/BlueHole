@@ -18,6 +18,10 @@ __status__ = 'Production'
 # Blender
 import bpy
 
+
+# Blue Hole
+from . import sort_menu, theme_menu, food_menu, music_menu
+
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
 
@@ -28,10 +32,10 @@ class BLUE_HOLE_MT_misc(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.menu("BLUE_HOLE_MT_sort")
-        layout.menu("BLUE_HOLE_MT_themes", icon='IMAGE_RGB_ALPHA')
-        layout.menu("BLUE_HOLE_MT_food_delivery", icon='TEMP')
-        layout.menu("BLUE_HOLE_MT_music", icon='SOUND')
+        layout.menu(sort_menu.BLUE_HOLE_MT_sort.bl_idname)
+        layout.menu(theme_menu.BLUE_HOLE_MT_themes.bl_idname, icon='IMAGE_RGB_ALPHA')
+        layout.menu(food_menu.BLUE_HOLE_MT_food_delivery.bl_idname, icon='TEMP')
+        layout.menu(music_menu.BLUE_HOLE_MT_music.bl_idname, icon='SOUND')
 
 
 # ----------------------------------------------------------------------------------------------------------------------

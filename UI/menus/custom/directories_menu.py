@@ -20,7 +20,7 @@ import bpy
 
 # Blue Hole
 from ....blenderUtils.uiUtils import show_label
-from ....operators import directory_ops
+from ....operators import directory_ops, external_addon_ops
 from ....preferences.prefs import *
 from ....blenderUtils import blenderFile
 from ....Lib.commonUtils.debugUtils import *
@@ -48,7 +48,7 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
             col = layout.column()
             col.enabled = False
             col.operator(
-                "wm.bh_disabled_notice",
+                external_addon_ops.BH_OT_disabled_notice.bl_idname,
                 text='Save .blend file to open Scene folders',
                 icon='ERROR'
             )

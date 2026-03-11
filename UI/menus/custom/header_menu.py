@@ -21,6 +21,7 @@ import bpy
 # Blue Hole
 from ....preferences.prefs import *
 from ....blenderUtils import blenderFile
+from ....operators import external_addon_ops, environment_ops
 from . import (
     containers_menu,
     directories_menu,
@@ -47,7 +48,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
 
         self.bl_label = f'{header_bh_name} [' + str(prefs().general.active_environment.lower()) + ']'
         layout = self.layout
-        layout.operator('wm.set_active_environment')
+        layout.operator(environment_ops.WM_OT_SetActiveEnvironment.bl_idname)
         layout.menu(directories_menu.BLUE_HOLE_MT_directories.bl_idname, icon='FILE_FOLDER')
         layout.menu(containers_menu.BLUE_HOLE_MT_containers.bl_idname, icon='OUTLINER')
 
@@ -63,7 +64,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
             col = layout.column()
             col.enabled = False
             col.operator(
-                "wm.bh_disabled_notice",
+                external_addon_ops.BH_OT_disabled_notice.bl_idname,
                 text="Save .blend file to Export/Send",
                 icon='ERROR'
             )
@@ -71,7 +72,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
             col = layout.column()
             col.enabled = False
             col.operator(
-                "wm.bh_disabled_notice",
+                external_addon_ops.BH_OT_disabled_notice.bl_idname,
                 text="Select a Game Engine to Export/Send",
                 icon='ERROR'
             )
@@ -89,7 +90,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout.menu(update_menus.BLUE_HOLE_MT_update_deluxe.bl_idname, icon='UV_SYNC_SELECT')
 
     def menu_draw(self, context):
-        self.layout.menu("BLUE_HOLE_MT_top_menu")
+        self.layout.menu("BLUE_HOLE_MT_top_menu")  # Don't replace by self.bl_idname, does not work for some reason.
 
 
 # ----------------------------------------------------------------------------------------------------------------------
