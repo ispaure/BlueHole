@@ -31,7 +31,7 @@ name = filename = os.path.basename(__file__)
 
 # Context: 3D Viewport Sculpt
 # Hotkey: Shift+RMB
-class MT_pie_sculpt_tool(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_tool(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_tool"
     bl_label = "Blue Hole: Sculpt > General"
 
@@ -40,25 +40,25 @@ class MT_pie_sculpt_tool(bpy.types.Menu):
         pie = layout.menu_pie()
 
         # 4 - LEFT
-        open_pie_menu(pie, MT_pie_sculpt_tool_FlattenPinch, text='Flatten/Pinch...', icon='TRIA_LEFT')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_flattenpinch, text='Flatten/Pinch...', icon='TRIA_LEFT')
         # 6 - RIGHT
         pie.separator()
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_sculpt_tool_Grab, text='Grab...', icon='TRIA_DOWN')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_grab, text='Grab...', icon='TRIA_DOWN')
         # 8 - TOP
-        open_pie_menu(pie, MT_pie_sculpt_tool_clayblob, text='Clay/Blob...', icon='TRIA_UP')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_clayblob, text='Clay/Blob...', icon='TRIA_UP')
         # 7 - TOP LEFT
         pie.separator()
         # 9 - TOP RIGHT
-        open_pie_menu(pie, MT_pie_sculpt_tool_Draw, text='Draw...')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_draw, text='Draw...')
         # 1 - BOTTOM LEFT
-        open_pie_menu(pie, MT_pie_sculpt_tool_Misc, text='Misc...')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_misc, text='Misc...')
         # 3 - BOTTOM RIGHT
         pie.separator()
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_tool_clayblob(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_tool_clayblob(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_tool_clayblob"
     bl_label = "Blue Hole: Sculpt > General > Clay/Blob"
 
@@ -85,7 +85,7 @@ class MT_pie_sculpt_tool_clayblob(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_tool_Draw(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_tool_draw(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_tool_draw"
     bl_label = "Blue Hole: Sculpt > General > Draw"
 
@@ -112,7 +112,7 @@ class MT_pie_sculpt_tool_Draw(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_tool_FlattenPinch(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_tool_flattenpinch(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_tool_flattenpinch"
     bl_label = "Blue Hole: Sculpt > General > Flatten/Pinch"
 
@@ -140,7 +140,7 @@ class MT_pie_sculpt_tool_FlattenPinch(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_tool_Grab(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_tool_grab(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_tool_grab"
     bl_label = "Blue Hole: Sculpt > General > Grab"
 
@@ -153,7 +153,7 @@ class MT_pie_sculpt_tool_Grab(bpy.types.Menu):
         # 6 - RIGHT
         brush(pie, BlenderBrush.ELASTIC_SNAKE_HOOK)
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_sculpt_tool_NudgeThumb, text='Nudge/Thumb...', icon='TRIA_DOWN')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_nudgethumb, text='Nudge/Thumb...', icon='TRIA_DOWN')
         # 8 - TOP
         brush(pie, BlenderBrush.GRAB_SILHOUETTE)
         # 7 - TOP LEFT
@@ -167,7 +167,7 @@ class MT_pie_sculpt_tool_Grab(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_tool_NudgeThumb(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_tool_nudgethumb(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_tool_nudgethumb"
     bl_label = "Blue Hole: Sculpt > General > Grab > Nudge/Thumb"
 
@@ -194,7 +194,7 @@ class MT_pie_sculpt_tool_NudgeThumb(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_tool_Misc(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_tool_misc(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_tool_misc"
     bl_label = "Blue Hole: Sculpt > General > Misc"
 
@@ -222,7 +222,7 @@ class MT_pie_sculpt_tool_Misc(bpy.types.Menu):
 
 # Context: 3D Viewport Sculpt
 # Hotkey: Ctrl+RMB
-class MT_pie_sculpt_action(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_action(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_action"
     bl_label = "Blue Hole: Sculpt > Paint"
 
@@ -234,7 +234,7 @@ class MT_pie_sculpt_action(bpy.types.Menu):
         # 6 - RIGHT
         brush(pie, BlenderBrush.PAINT_HARD)
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_sculpt_action_Blend, text='Blend/Blur...', icon='TRIA_DOWN')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_action_blend, text='Blend/Blur...', icon='TRIA_DOWN')
         # 8 - TOP
         brush(pie, BlenderBrush.PAINT_SQUARE)
         # 7 - TOP - LEFT
@@ -248,7 +248,7 @@ class MT_pie_sculpt_action(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_action_Blend(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_action_blend(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_action_blend"
     bl_label = "Blue Hole: Sculpt > Paint > Blend"
 
@@ -275,7 +275,7 @@ class MT_pie_sculpt_action_Blend(bpy.types.Menu):
 
 # Context: 3D Viewport Sculpt
 # Hotkey: Ctrl+Alt+Shift+RMB
-class MT_pie_sculpt_simulation(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_simulation(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_simulation"
     bl_label = "Blue Hole: Sculpt > Simulation"
 
@@ -283,7 +283,7 @@ class MT_pie_sculpt_simulation(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        open_pie_menu(pie, MT_pie_sculpt_simulation_ExpandContract, text='Expand/Contract...', icon='TRIA_LEFT')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_simulation_expandcontract, text='Expand/Contract...', icon='TRIA_LEFT')
         # 6 - RIGHT
         brush(pie, BlenderBrush.GRAB_CLOTH)
         # 2 - BOTTOM
@@ -295,13 +295,13 @@ class MT_pie_sculpt_simulation(bpy.types.Menu):
         # 9 - TOP - RIGHT
         brush(pie, BlenderBrush.GRAB_RANDOM_CLOTH)
         # 1 - BOTTOM - LEFT
-        open_pie_menu(pie, MT_pie_sculpt_simulation_BendStretchTwist, text='Bend/Stretch/Twist...')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist, text='Bend/Stretch/Twist...')
         # 3 - BOTTOM - RIGHT
         brush(pie, BlenderBrush.PINCH_FOLDS_CLOTH)
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_simulation_BendStretchTwist(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist"
     bl_label = "Blue Hole: Sculpt > Simulation > Bend/Stretch/Twist"
 
@@ -327,7 +327,7 @@ class MT_pie_sculpt_simulation_BendStretchTwist(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_sculpt_simulation_ExpandContract(bpy.types.Menu):
+class BLUEHOLE_MT_pie_sculpt_simulation_expandcontract(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_simulation_expandcontract"
     bl_label = "Blue Hole: Sculpt > Simulation > Expand/Contract"
 
@@ -356,18 +356,18 @@ class MT_pie_sculpt_simulation_ExpandContract(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (MT_pie_sculpt_tool,
-           MT_pie_sculpt_tool_Draw,
-           MT_pie_sculpt_tool_Grab,
-           MT_pie_sculpt_tool_clayblob,
-           MT_pie_sculpt_tool_NudgeThumb,
-           MT_pie_sculpt_tool_FlattenPinch,
-           MT_pie_sculpt_tool_Misc,
-           MT_pie_sculpt_action,
-           MT_pie_sculpt_action_Blend,
-           MT_pie_sculpt_simulation,
-           MT_pie_sculpt_simulation_BendStretchTwist,
-           MT_pie_sculpt_simulation_ExpandContract)
+classes = (BLUEHOLE_MT_pie_sculpt_tool,
+           BLUEHOLE_MT_pie_sculpt_tool_draw,
+           BLUEHOLE_MT_pie_sculpt_tool_grab,
+           BLUEHOLE_MT_pie_sculpt_tool_clayblob,
+           BLUEHOLE_MT_pie_sculpt_tool_nudgethumb,
+           BLUEHOLE_MT_pie_sculpt_tool_flattenpinch,
+           BLUEHOLE_MT_pie_sculpt_tool_misc,
+           BLUEHOLE_MT_pie_sculpt_action,
+           BLUEHOLE_MT_pie_sculpt_action_blend,
+           BLUEHOLE_MT_pie_sculpt_simulation,
+           BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist,
+           BLUEHOLE_MT_pie_sculpt_simulation_expandcontract)
 
 
 def register():

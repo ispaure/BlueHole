@@ -61,19 +61,19 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
 
     # WINDOW
     PieKeymapDef(
-        menu_idname=global_pies.MT_pie_global_help.bl_idname,
+        menu_idname=global_pies.BLUEHOLE_MT_pie_global_help.bl_idname,
         keymap_name='Window',
         space_type='EMPTY',
         key='F1',
     ),
     PieKeymapDef(
-        menu_idname=directories_pies.MT_pie_global_dirs.bl_idname,
+        menu_idname=directories_pies.BLUEHOLE_MT_pie_global_dirs.bl_idname,
         keymap_name='Window',
         space_type='EMPTY',
         key='F3',
     ),
     PieKeymapDef(
-        menu_idname=import_export_pies.MT_pie_global_import_export.bl_idname,
+        menu_idname=import_export_pies.BLUEHOLE_MT_pie_global_import_export.bl_idname,
         keymap_name='Window',
         space_type='EMPTY',
         key='RIGHTMOUSE',
@@ -84,21 +84,21 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
 
     # OBJECT MODE
     PieKeymapDef(
-        menu_idname=object_pies.MT_pie_object_action.bl_idname,
+        menu_idname=object_pies.BLUEHOLE_MT_pie_object_action.bl_idname,
         keymap_name='Object Mode',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         ctrl=True,
     ),
     PieKeymapDef(
-        menu_idname=object_pies.MT_pie_object_tool.bl_idname,
+        menu_idname=object_pies.BLUEHOLE_MT_pie_object_tool.bl_idname,
         keymap_name='Object Mode',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=object_pies.MT_pie_object_hide.bl_idname,
+        menu_idname=object_pies.BLUEHOLE_MT_pie_object_hide.bl_idname,
         keymap_name='Object Mode',
         space_type='EMPTY',
         key='S',
@@ -106,7 +106,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=import_export_pies.MT_pie_global_import_export.bl_idname,
+        menu_idname=import_export_pies.BLUEHOLE_MT_pie_global_import_export.bl_idname,
         keymap_name='Object Mode',
         space_type='EMPTY',
         key='RIGHTMOUSE',
@@ -117,21 +117,21 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
 
     # MESH
     PieKeymapDef(
-        menu_idname=mesh_pies.MT_pie_mesh_action.bl_idname,
+        menu_idname=mesh_pies.BLUEHOLE_MT_pie_mesh_action.bl_idname,
         keymap_name='Mesh',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         ctrl=True,
     ),
     PieKeymapDef(
-        menu_idname=mesh_pies.MT_pie_mesh_tool.bl_idname,
+        menu_idname=mesh_pies.BLUEHOLE_MT_pie_mesh_tool.bl_idname,
         keymap_name='Mesh',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=mesh_pies.MT_pie_mesh_hide.bl_idname,
+        menu_idname=mesh_pies.BLUEHOLE_MT_pie_mesh_hide.bl_idname,
         keymap_name='Mesh',
         space_type='EMPTY',
         key='S',
@@ -139,7 +139,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=uv_pies.MT_pie_mesh_action_uvspecial.bl_idname,
+        menu_idname=uv_pies.BLUEHOLE_MT_pie_mesh_action_uvspecial.bl_idname,
         keymap_name='Mesh',
         space_type='EMPTY',
         key='RIGHTMOUSE',
@@ -150,7 +150,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
 
     # 3D VIEW
     PieKeymapDef(
-        menu_idname=add_pies.MT_pie_add.bl_idname,
+        menu_idname=add_pies.BLUEHOLE_MT_pie_add.bl_idname,
         keymap_name='3D View',
         space_type='VIEW_3D',
         key='A',
@@ -160,7 +160,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
 
     # UV EDITOR
     PieKeymapDef(
-        menu_idname=uv_pies.MT_pie_UV_cursor.bl_idname,
+        menu_idname=uv_pies.BLUEHOLE_MT_pie_UV_cursor.bl_idname,
         keymap_name='UV Editor',
         space_type='EMPTY',
         key='RIGHTMOUSE',
@@ -168,7 +168,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=uv_pies.MT_pie_UV_action_uvspecial.bl_idname,
+        menu_idname=uv_pies.BLUEHOLE_MT_pie_UV_action_uvspecial.bl_idname,
         keymap_name='UV Editor',
         space_type='EMPTY',
         key='RIGHTMOUSE',
@@ -177,14 +177,14 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
         alt=True,
     ),
     PieKeymapDef(
-        menu_idname=uv_pies.MT_pie_UV_tool.bl_idname,
+        menu_idname=uv_pies.BLUEHOLE_MT_pie_UV_tool.bl_idname,
         keymap_name='UV Editor',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=uv_pies.MT_pie_UV_action.bl_idname,
+        menu_idname=uv_pies.BLUEHOLE_MT_pie_UV_action.bl_idname,
         keymap_name='UV Editor',
         space_type='EMPTY',
         key='RIGHTMOUSE',
@@ -193,21 +193,21 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
 
     # CURVE
     PieKeymapDef(
-        menu_idname=curve_pies.MT_pie_curve_tool.bl_idname,
+        menu_idname=curve_pies.BLUEHOLE_MT_pie_curve_tool.bl_idname,
         keymap_name='Curve',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=curve_pies.MT_pie_curve_action.bl_idname,
+        menu_idname=curve_pies.BLUEHOLE_MT_pie_curve_action.bl_idname,
         keymap_name='Curve',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         ctrl=True,
     ),
     PieKeymapDef(
-        menu_idname=curve_pies.MT_pie_curve_hide.bl_idname,
+        menu_idname=curve_pies.BLUEHOLE_MT_pie_curve_hide.bl_idname,
         keymap_name='Curve',
         space_type='EMPTY',
         key='S',
@@ -217,21 +217,21 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
 
     # SCULPT
     PieKeymapDef(
-        menu_idname=sculpt_pies.MT_pie_sculpt_action.bl_idname,
+        menu_idname=sculpt_pies.BLUEHOLE_MT_pie_sculpt_action.bl_idname,
         keymap_name='Sculpt',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         ctrl=True,
     ),
     PieKeymapDef(
-        menu_idname=sculpt_pies.MT_pie_sculpt_tool.bl_idname,
+        menu_idname=sculpt_pies.BLUEHOLE_MT_pie_sculpt_tool.bl_idname,
         keymap_name='Sculpt',
         space_type='EMPTY',
         key='RIGHTMOUSE',
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=sculpt_pies.MT_pie_sculpt_simulation.bl_idname,
+        menu_idname=sculpt_pies.BLUEHOLE_MT_pie_sculpt_simulation.bl_idname,
         keymap_name='Sculpt',
         space_type='EMPTY',
         key='RIGHTMOUSE',

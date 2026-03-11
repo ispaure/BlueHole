@@ -30,7 +30,7 @@ name = filename = os.path.basename(__file__)
 # PIE MENUS
 
 
-class MT_pie_global_dirs(bpy.types.Menu):
+class BLUEHOLE_MT_pie_global_dirs(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_global_dirs"
     bl_label = "Blue Hole: Directories"
 
@@ -69,7 +69,7 @@ class MT_pie_global_dirs(bpy.types.Menu):
 
 # Menu classes
 classes = (
-    MT_pie_global_dirs,
+    BLUEHOLE_MT_pie_global_dirs,
 )
 
 

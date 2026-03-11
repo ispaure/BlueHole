@@ -32,7 +32,7 @@ name = filename = os.path.basename(__file__)
 
 # Context: 3D Viewport (Global)
 # Hotkey: Shift + A + Drag Mouse in any direction
-class MT_pie_add(bpy.types.Menu):
+class BLUEHOLE_MT_pie_add(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_add"
     bl_label = "Blue Hole: Add"
 
@@ -44,13 +44,13 @@ class MT_pie_add(bpy.types.Menu):
         # 6 - RIGHT
         blender_entries.add_cube(pie)
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_add_more, text='More...')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_add_more, text='More...')
         # 8 - TOP
         blender_entries.add_sphere(pie)
         # 7 - TOP - LEFT
         machin3_entries.add_quadsphere(pie)
         # 9 - TOP - RIGHT
-        open_pie_menu(pie, MT_pie_global_add_asset_container, text='Asset Containers...')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_add_asset_container, text='Asset Containers...')
         # 1 - BOTTOM - LEFT
         blender_entries.add_plane(pie)
         # blender_entries.add_nurbs_path(pie) TODO: Find new spot for this one
@@ -59,7 +59,7 @@ class MT_pie_add(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_add_more(bpy.types.Menu):
+class BLUEHOLE_MT_pie_add_more(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_add_more"
     bl_label = "Blue Hole: Add > More"
 
@@ -84,8 +84,8 @@ class MT_pie_add_more(bpy.types.Menu):
         blender_entries.add_bezier_circle(pie)
 
 
-class MT_pie_global_add_asset_container(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_add_asset_container"
+class BLUEHOLE_MT_pie_add_asset_container(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_pie_add_asset_container"
     bl_label = "Asset Containers"
 
     def draw(self, context):
@@ -109,9 +109,9 @@ class MT_pie_global_add_asset_container(bpy.types.Menu):
         pie.separator()
 
 
-classes = (MT_pie_add,
-           MT_pie_add_more,
-           MT_pie_global_add_asset_container)
+classes = (BLUEHOLE_MT_pie_add,
+           BLUEHOLE_MT_pie_add_more,
+           BLUEHOLE_MT_pie_add_asset_container)
 
 
 def register():

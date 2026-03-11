@@ -31,7 +31,7 @@ name = filename = os.path.basename(__file__)
 
 # Context: 3D Viewport (Object Mode)
 # Hotkey: Shift+RMB
-class MT_pie_object_tool(bpy.types.Menu):
+class BLUEHOLE_MT_pie_object_tool(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_object_tool"
     bl_label = "Blue Hole: Object > Tools (Modifiers)"
 
@@ -46,7 +46,7 @@ class MT_pie_object_tool(bpy.types.Menu):
         # 2 - BOTTOM
         hardops_entries.modifier_toggle(pie)
         # 8 - TOP
-        open_pie_menu(pie, MT_pie_object_tool_more, text='Modifiers Options...')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_object_tool_more, text='Modifiers Options...')
         # 7 - TOP - LEFT
         blender_entries.mod_weighted_nrm(pie)
         # 9 - TOP - RIGHT
@@ -58,7 +58,7 @@ class MT_pie_object_tool(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_object_tool_more(bpy.types.Menu):
+class BLUEHOLE_MT_pie_object_tool_more(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_object_tool_more"
     bl_label = "Blue Hole: Object > Tools (Modifiers) > More"
 
@@ -85,7 +85,7 @@ class MT_pie_object_tool_more(bpy.types.Menu):
 
 # Context: 3D Viewport (Mesh)
 # Hotkey: Shift + S + Drag Mouse in any direction
-class MT_pie_object_hide(bpy.types.Menu):
+class BLUEHOLE_MT_pie_object_hide(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_object_hide"
     bl_label = "Blue Hole: Object > Hide"
 
@@ -112,7 +112,7 @@ class MT_pie_object_hide(bpy.types.Menu):
 
 # Context: 3D Viewport (Object Mode)
 # Hotkey: Ctrl+RMB
-class MT_pie_object_action(bpy.types.Menu):
+class BLUEHOLE_MT_pie_object_action(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_object_action"
     bl_label = "Blue Hole: Object > Action"
 
@@ -124,9 +124,9 @@ class MT_pie_object_action(bpy.types.Menu):
         # 6 - RIGHT
         blender_entries.object_join(pie)
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_object_action_more, text='More...')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_object_action_more, text='More...')
         # 8 - TOP
-        open_pie_menu(pie, MT_pie_object_action_select, text='Select...')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_object_action_select, text='Select...')
         # 7 - TOP - LEFT
         blender_entries.apply_transform(pie)
         # 9 - TOP - RIGHT
@@ -138,7 +138,7 @@ class MT_pie_object_action(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_object_action_select(bpy.types.Menu):
+class BLUEHOLE_MT_pie_object_action_select(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_object_action_select"
     bl_label = "Blue Hole: Object > Action > Select"
 
@@ -164,7 +164,7 @@ class MT_pie_object_action_select(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_object_action_more(bpy.types.Menu):
+class BLUEHOLE_MT_pie_object_action_more(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_object_action_more"
     bl_label = "Blue Hole: Object > Action > More"
 
@@ -193,12 +193,12 @@ class MT_pie_object_action_more(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (MT_pie_object_hide,
-           MT_pie_object_tool,
-           MT_pie_object_tool_more,
-           MT_pie_object_action,
-           MT_pie_object_action_select,
-           MT_pie_object_action_more)
+classes = (BLUEHOLE_MT_pie_object_hide,
+           BLUEHOLE_MT_pie_object_tool,
+           BLUEHOLE_MT_pie_object_tool_more,
+           BLUEHOLE_MT_pie_object_action,
+           BLUEHOLE_MT_pie_object_action_select,
+           BLUEHOLE_MT_pie_object_action_more)
 
 
 def register():

@@ -30,7 +30,7 @@ name = filename = os.path.basename(__file__)
 
 
 # Pie Global-Import/Export
-class MT_pie_global_source_control(bpy.types.Menu):
+class BLUEHOLE_MT_pie_global_source_control(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_global_source_control"
     bl_label = "Blue Hole: Source Control"
 
@@ -60,7 +60,7 @@ class MT_pie_global_source_control(bpy.types.Menu):
 
 # Menu classes
 classes = (
-    MT_pie_global_source_control,
+    BLUEHOLE_MT_pie_global_source_control,
 )
 
 
