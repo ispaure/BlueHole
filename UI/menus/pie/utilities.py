@@ -20,18 +20,37 @@ from ....Lib.commonUtils.osUtils import *
 # HELPER FUNCTIONS
 
 
-def open_pie_menu(pie, name: str, text: str, icon: Optional[str]=None):
-    # This method opens a small line, not a regular pie menu
-    # if icon is not None:
-    #     pie.menu(name, text=text, icon=icon)
-    # else:
-    #     pie.menu(name, text=text)
+def open_pie_menu(
+    pie,
+    menu_cls: Type[bpy.types.Menu],
+    *,
+    text: Optional[str] = None,
+    icon: Optional[str] = None
+):
+    """
+    Adds a pie entry that opens another pie menu.
 
-    # This method opens up a proper pie menu
-    if icon is not None:
-        pie.operator("wm.call_menu_pie", text=text, icon=icon).name = name
-    else:
-        pie.operator("wm.call_menu_pie", text=text).name = name
+    Parameters
+    ----------
+    pie : UILayout
+        The pie layout returned from layout.menu_pie().
+    menu_cls : Type[bpy.types.Menu]
+        The menu class to open.
+    text : Optional[str]
+        Label shown in the UI. Defaults to menu_cls.bl_label.
+    icon : Optional[str]
+        Blender icon name.
+    """
+
+    if text is None:
+        text = menu_cls.bl_label
+
+    kwargs = {"text": text}
+    if icon:
+        kwargs["icon"] = icon
+
+    op = pie.operator("wm.call_menu_pie", **kwargs)
+    op.name = menu_cls.bl_idname
 
 
 def op_exists(op_idname: str) -> bool:

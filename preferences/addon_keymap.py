@@ -22,7 +22,9 @@ from ..Lib.commonUtils.debugUtils import *
 from ..ui.menus.pie import (
     add_pies,
     curve_pies,
+    directories_pies,
     global_pies,
+    import_export_pies,
     mesh_pies,
     object_pies,
     sculpt_pies,
@@ -65,13 +67,13 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
         key='F1',
     ),
     PieKeymapDef(
-        menu_idname=global_pies.MT_pie_global_dirs.bl_idname,
+        menu_idname=directories_pies.MT_pie_global_dirs.bl_idname,
         keymap_name='Window',
         space_type='EMPTY',
         key='F3',
     ),
     PieKeymapDef(
-        menu_idname=global_pies.MT_pie_global_import_export.bl_idname,
+        menu_idname=import_export_pies.MT_pie_global_import_export.bl_idname,
         keymap_name='Window',
         space_type='EMPTY',
         key='RIGHTMOUSE',
@@ -104,7 +106,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
         shift=True,
     ),
     PieKeymapDef(
-        menu_idname=global_pies.MT_pie_global_import_export.bl_idname,
+        menu_idname=import_export_pies.MT_pie_global_import_export.bl_idname,
         keymap_name='Object Mode',
         space_type='EMPTY',
         key='RIGHTMOUSE',

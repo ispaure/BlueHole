@@ -16,7 +16,7 @@ import bpy
 from ....Lib.commonUtils.debugUtils import *
 import os
 from .utilities import *
-from .entries import blender_entries
+from .entries import blender_entries, addon_entries
 from .entries.third_party import machin3_entries
 
 
@@ -44,13 +44,13 @@ class MT_pie_add(bpy.types.Menu):
         # 6 - RIGHT
         blender_entries.add_cube(pie)
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_add_more.bl_idname, 'More...')
+        open_pie_menu(pie, MT_pie_add_more, text='More...')
         # 8 - TOP
         blender_entries.add_sphere(pie)
         # 7 - TOP - LEFT
         machin3_entries.add_quadsphere(pie)
         # 9 - TOP - RIGHT
-        open_pie_menu(pie, "BLUEHOLE_MT_add_asset_container", 'Asset Containers...')
+        open_pie_menu(pie, MT_pie_global_add_asset_container, text='Asset Containers...')
         # 1 - BOTTOM - LEFT
         blender_entries.add_plane(pie)
         # blender_entries.add_nurbs_path(pie) TODO: Find new spot for this one
@@ -84,8 +84,34 @@ class MT_pie_add_more(bpy.types.Menu):
         blender_entries.add_bezier_circle(pie)
 
 
+class MT_pie_global_add_asset_container(bpy.types.Menu):
+    bl_idname = "BLUEHOLE_MT_add_asset_container"
+    bl_label = "Asset Containers"
+
+    def draw(self, context):
+        layout = self.layout
+        pie = layout.menu_pie()
+        # 4 - LEFT
+        pie.separator()
+        # 6 - RIGHT
+        addon_entries.add_asset_hierarchy(pie)
+        # 2 - BOTTOM
+        addon_entries.add_asset_mesh(pie)
+        # 8 - TOP
+        addon_entries.add_asset_collection(pie)
+        # 7 - TOP - LEFT
+        pie.separator()
+        # 9 - TOP - RIGHT
+        pie.separator()
+        # 1 - BOTTOM - LEFT
+        pie.separator()
+        # 3 - BOTTOM - RIGHT
+        pie.separator()
+
+
 classes = (MT_pie_add,
-           MT_pie_add_more)
+           MT_pie_add_more,
+           MT_pie_global_add_asset_container)
 
 
 def register():

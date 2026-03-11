@@ -46,7 +46,7 @@ class MT_pie_object_tool(bpy.types.Menu):
         # 2 - BOTTOM
         hardops_entries.modifier_toggle(pie)
         # 8 - TOP
-        open_pie_menu(pie, MT_pie_object_tool_more.bl_idname, 'Modifiers Options...')
+        open_pie_menu(pie, MT_pie_object_tool_more, text='Modifiers Options...')
         # 7 - TOP - LEFT
         blender_entries.mod_weighted_nrm(pie)
         # 9 - TOP - RIGHT
@@ -124,9 +124,9 @@ class MT_pie_object_action(bpy.types.Menu):
         # 6 - RIGHT
         blender_entries.object_join(pie)
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_object_action_more.bl_idname, 'More...')
+        open_pie_menu(pie, MT_pie_object_action_more, text='More...')
         # 8 - TOP
-        open_pie_menu(pie, MT_pie_object_action_select.bl_idname, 'Select...')
+        open_pie_menu(pie, MT_pie_object_action_select, text='Select...')
         # 7 - TOP - LEFT
         blender_entries.apply_transform(pie)
         # 9 - TOP - RIGHT

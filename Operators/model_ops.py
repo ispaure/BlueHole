@@ -1,5 +1,5 @@
 """
-Register and unregister all operator modules.
+Modeling Operators
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,56 +15,52 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from . import (
-    add_ops,
-    box_xray_ops,
-    directory_ops,
-    environment_ops,
-    export_send_ops,
-    external_addon_ops,
-    food_ops,
-    help_ops,
-    import_ops,
-    model_ops,
-    music_ops,
-    other_ops,
-    save_ops,
-    sort_ops,
-    source_control_ops,
-    theme_ops,
-)
+# Blender
+import bpy
+
+# Blue Hole
+from ..blenderUtils import importUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
-# MODULES
+# OPERATORS
 
-OPERATOR_MODULES = (
-    add_ops,
-    box_xray_ops,
-    directory_ops,
-    environment_ops,
-    export_send_ops,
-    external_addon_ops,
-    food_ops,
-    help_ops,
-    import_ops,
-    model_ops,
-    music_ops,
-    other_ops,
-    save_ops,
-    sort_ops,
-    source_control_ops,
-    theme_ops,
-)
+
+# IMPORT
+class WM_OT_MergeLast(bpy.types.Operator):
+    """
+    Custom operator for this because the option is not always available which may break the Pie Menus
+    """
+    bl_idname = "wm.bh_merge_last"
+    bl_label = "Merge Last"
+    bl_options = {'INTERNAL'}
+
+    def execute(self, _context):
+        try:
+            bpy.ops.mesh.merge(type='LAST')
+        except:
+            bpy.ops.mesh.merge()
+        return {'FINISHED'}
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
+# List of classes to register/unregister
+
+classes = (
+    WM_OT_MergeLast,
+)
+
 
 def register():
-    for module in OPERATOR_MODULES:
-        module.register()
+    # Register Operators
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
 
+# Unregister
 def unregister():
-    for module in reversed(OPERATOR_MODULES):
-        module.unregister()
+    # Unregister Operators
+    for cls in classes:
+        bpy.utils.unregister_class(cls)  # Unregister Operators
+
