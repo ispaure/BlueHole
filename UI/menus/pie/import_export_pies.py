@@ -47,17 +47,9 @@ class MT_pie_global_import_export(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        match prefs().bridge.active_game_engine:
-            case 'disabled':
-                addon_entries.export_hierarchy_all(pie)
-            case _:
-                addon_entries.send_all_asset_containers(pie)
+        addon_entries.send_all_asset_containers(pie)
         # 6 - RIGHT
-        match prefs().bridge.active_game_engine:
-            case 'disabled':
-                addon_entries.export_hierarchy_selected(pie)
-            case _:
-                addon_entries.send_selected_asset_containers(pie)
+        addon_entries.send_selected_asset_containers(pie)
         # 2 - BOTTOM
         open_pie_menu(pie, MT_pie_global_extra, text='More...')
         # 8 - TOP
