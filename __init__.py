@@ -39,8 +39,7 @@ from .operators import operators_register
 from .environment import envManager as envManager
 
 # Import Menus
-from .Menus import menu, pieMenu, file_menu_override
-from .Menus.Append import VIEW3D_MT_add
+from .ui.menus import menus_register
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PLUGIN INFO
@@ -68,28 +67,21 @@ show_verbose = True
 # Classes
 # Operators in List
 
-menu_file_lst = (menu, pieMenu, file_menu_override, VIEW3D_MT_add)
-
 
 # Register
 def register():
 
     # Register Callbacks
     callbacks.register()
+
     # Register preferences
     addon_prefs.register()
 
     # Register operators
-
     operators_register.register()
 
     # Register menus
-    for file in menu_file_lst:
-        file.register()
-
-    # Register Header Menu
-    from .Menus import headerMenu
-    headerMenu.register()
+    menus_register.register()
 
     # Schedule init AFTER Blender finishes enabling the addon
     bpy.app.timers.register(_post_register_init, first_interval=0.0)
@@ -122,16 +114,11 @@ def unregister():
     # Unregister preferences
     addon_prefs.unregister()
 
-    # Unregister Header Menu
-    from .Menus import headerMenu
-    headerMenu.unregister()
-
     # Unregister operators
     operators_register.unregister()
 
     # Unregister menus
-    for file in menu_file_lst:
-        file.unregister()
+    menus_register.unregister()
 
     # Unregister timer
     bpy.app.timers.unregister(update_env_timer)
