@@ -40,19 +40,19 @@ class MT_pie_sculpt_tool(bpy.types.Menu):
         pie = layout.menu_pie()
 
         # 4 - LEFT
-        open_pie_menu(pie, MT_pie_sculpt_tool_FlattenPinch.bl_idname, 'Flatten/Pinch...', 'TRIA_LEFT')
+        open_pie_menu(pie, MT_pie_sculpt_tool_FlattenPinch, text='Flatten/Pinch...', icon='TRIA_LEFT')
         # 6 - RIGHT
         pie.separator()
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_sculpt_tool_Grab.bl_idname, 'Grab...', 'TRIA_DOWN')
+        open_pie_menu(pie, MT_pie_sculpt_tool_Grab, text='Grab...', icon='TRIA_DOWN')
         # 8 - TOP
-        open_pie_menu(pie, MT_pie_sculpt_tool_clayblob.bl_idname, 'Clay/Blob...', 'TRIA_UP')
+        open_pie_menu(pie, MT_pie_sculpt_tool_clayblob, text='Clay/Blob...', icon='TRIA_UP')
         # 7 - TOP LEFT
         pie.separator()
         # 9 - TOP RIGHT
-        open_pie_menu(pie, MT_pie_sculpt_tool_Draw.bl_idname, 'Draw...')
+        open_pie_menu(pie, MT_pie_sculpt_tool_Draw, text='Draw...')
         # 1 - BOTTOM LEFT
-        open_pie_menu(pie, MT_pie_sculpt_tool_Misc.bl_idname, 'Misc...')
+        open_pie_menu(pie, MT_pie_sculpt_tool_Misc, text='Misc...')
         # 3 - BOTTOM RIGHT
         pie.separator()
 
@@ -153,7 +153,7 @@ class MT_pie_sculpt_tool_Grab(bpy.types.Menu):
         # 6 - RIGHT
         brush(pie, BlenderBrush.ELASTIC_SNAKE_HOOK)
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_sculpt_tool_NudgeThumb.bl_idname, 'Nudge/Thumb...', 'TRIA_DOWN')
+        open_pie_menu(pie, MT_pie_sculpt_tool_NudgeThumb, text='Nudge/Thumb...', icon='TRIA_DOWN')
         # 8 - TOP
         brush(pie, BlenderBrush.GRAB_SILHOUETTE)
         # 7 - TOP LEFT
@@ -234,7 +234,7 @@ class MT_pie_sculpt_action(bpy.types.Menu):
         # 6 - RIGHT
         brush(pie, BlenderBrush.PAINT_HARD)
         # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_sculpt_action_Blend.bl_idname, 'Blend/Blur...', 'TRIA_DOWN')
+        open_pie_menu(pie, MT_pie_sculpt_action_Blend, text='Blend/Blur...', icon='TRIA_DOWN')
         # 8 - TOP
         brush(pie, BlenderBrush.PAINT_SQUARE)
         # 7 - TOP - LEFT
@@ -283,7 +283,7 @@ class MT_pie_sculpt_simulation(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        open_pie_menu(pie, MT_pie_sculpt_simulation_ExpandContract.bl_idname, 'Expand/Contract...', 'TRIA_LEFT')
+        open_pie_menu(pie, MT_pie_sculpt_simulation_ExpandContract, text='Expand/Contract...', icon='TRIA_LEFT')
         # 6 - RIGHT
         brush(pie, BlenderBrush.GRAB_CLOTH)
         # 2 - BOTTOM
@@ -295,7 +295,7 @@ class MT_pie_sculpt_simulation(bpy.types.Menu):
         # 9 - TOP - RIGHT
         brush(pie, BlenderBrush.GRAB_RANDOM_CLOTH)
         # 1 - BOTTOM - LEFT
-        open_pie_menu(pie, MT_pie_sculpt_simulation_BendStretchTwist.bl_idname, 'Bend/Stretch/Twist...')
+        open_pie_menu(pie, MT_pie_sculpt_simulation_BendStretchTwist, text='Bend/Stretch/Twist...')
         # 3 - BOTTOM - RIGHT
         brush(pie, BlenderBrush.PINCH_FOLDS_CLOTH)
 

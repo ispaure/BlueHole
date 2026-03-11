@@ -16,10 +16,13 @@ __status__ = 'Production'
 from . import (
     add_pies,
     curve_pies,
+    directories_pies,
     global_pies,
+    import_export_pies,
     mesh_pies,
     object_pies,
     sculpt_pies,
+    source_control_pies,
     uv_pies,
 )
 
@@ -30,10 +33,13 @@ from . import (
 PIE_MODULES = (
     add_pies,
     curve_pies,
+    directories_pies,
     global_pies,
+    import_export_pies,
     mesh_pies,
     object_pies,
     sculpt_pies,
+    source_control_pies,
     uv_pies,
 )
 

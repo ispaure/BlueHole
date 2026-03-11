@@ -12,16 +12,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
-import os
-from unittest import case
-
 # Blender
 import bpy
 
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
-from ....preferences.prefs import *
 from .entries import addon_entries
 from .utilities import *
 
@@ -56,7 +51,7 @@ class MT_pie_global_help(bpy.types.Menu):
         # 9 - TOP - RIGHT
         addon_entries.open_guide(pie)
         # 1 - BOTTOM - LEFT
-        open_pie_menu(pie, MT_pie_global_theme.bl_idname, 'Themes...', 'IMAGE_RGB')
+        open_pie_menu(pie, MT_pie_global_theme, text='Themes...', icon='IMAGE_RGB')
         # 3 - BOTTOM - RIGHT
         addon_entries.open_pie_menus_list(pie)
 
@@ -85,191 +80,6 @@ class MT_pie_global_theme(bpy.types.Menu):
         addon_entries.apply_theme_white(pie)
         # 3 - BOTTOM - RIGHT
         addon_entries.apply_theme_deep_grey(pie)
-
-
-# Pie Global-Directories
-class MT_pie_global_dirs(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_global_dirs"
-    bl_label = "Blue Hole: Directories"
-
-    def draw(self, context):
-        layout = self.layout
-        pie = layout.menu_pie()
-        # 4 - LEFT
-        if prefs().sc.source_control_enable and prefs().sc.source_control_solution == 'perforce':
-            addon_entries.open_workspace_root(pie)
-        else:
-            pie.separator()
-        # 6 - RIGHT
-        match prefs().bridge.active_game_engine:
-            case 'unreal':
-                addon_entries.open_source_content(pie)
-            case 'unity':
-                addon_entries.open_unity_assets(pie)
-            case 'disabled':
-                pie.separator()
-        # 2 - BOTTOM
-        addon_entries.open_dir_final(pie)
-        # 8 - TOP
-        addon_entries.open_dir_scene(pie)
-        # 7 - TOP - LEFT
-        pie.separator()
-        # 9 - TOP - RIGHT
-        pie.separator()
-        # 1 - BOTTOM - LEFT
-        addon_entries.open_dir_user_res(pie)
-        # 3 - BOTTOM - RIGHT
-        addon_entries.open_dir_res(pie)
-
-
-# Pie Global-Import/Export
-class MT_pie_global_import_export(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_global_import_export"
-    bl_label = "Blue Hole: Import/Export"
-
-    def draw(self, context):
-        layout = self.layout
-        pie = layout.menu_pie()
-        # 4 - LEFT
-        match prefs().bridge.active_game_engine:
-            case 'disabled':
-                addon_entries.export_hierarchy_all(pie)
-            case _:
-                addon_entries.send_all_asset_containers(pie)
-        # 6 - RIGHT
-        match prefs().bridge.active_game_engine:
-            case 'disabled':
-                addon_entries.export_hierarchy_selected(pie)
-            case _:
-                addon_entries.send_selected_asset_containers(pie)
-        # 2 - BOTTOM
-        open_pie_menu(pie, MT_pie_global_extra.bl_idname, 'More...')
-        # 8 - TOP
-        open_pie_menu(pie, MT_pie_global_dirs.bl_idname, 'Open Directories...')
-        # 7 - TOP - LEFT
-        if prefs().sc.source_control_enable:
-            match prefs().sc.source_control_solution:
-                case 'perforce':
-                    open_pie_menu(pie, MT_pie_global_source_control.bl_idname, 'Source Control (Perforce)...', 'CHECKMARK')
-                case 'plastic-scm':
-                    open_pie_menu(pie, MT_pie_global_source_control.bl_idname, 'Source Control (Plastic SCM)...', 'CHECKMARK')
-                case 'git':
-                    open_pie_menu(pie, MT_pie_global_source_control.bl_idname, 'Source Control (Git)...', 'CHECKMARK')
-        else:
-            addon_entries.sc_disabled(pie)
-        # 9 - TOP - RIGHT
-        open_pie_menu(pie, "BLUEHOLE_MT_add_asset_container", 'Asset Containers...')
-        # 1 - BOTTOM - LEFT
-        addon_entries.batch_export_selection_resource_folder(pie)
-        # 3 - BOTTOM - RIGHT
-        pie.separator()
-
-
-# Pie Global-Import/Export
-class MT_pie_global_extra(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_global_extra"
-    bl_label = "Blue Hole: Extra"
-
-    def draw(self, context):
-        layout = self.layout
-        pie = layout.menu_pie()
-        # 4 - LEFT
-        pie.separator()
-        # 6 - RIGHT
-        pie.separator()
-        # 2 - BOTTOM
-        pie.separator()
-        # 8 - TOP
-        pie.separator()
-        # 7 - TOP - LEFT
-        pie.separator()
-        # 9 - TOP - RIGHT
-        pie.separator()
-        # 1 - BOTTOM - LEFT
-        # TODO: Check if this works in vanilla - probably needs an addon and added to "if addon enabled" workflow
-        op = pie.operator('wm.tool_set_by_id', text='Select Box X-Ray')
-        op.name = 'object_tool.select_box_xray'
-        # 3 - BOTTOM - RIGHT
-        pie.separator()
-
-
-# Pie Global-Import/Export
-class MT_pie_global_export(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_global_export"
-    bl_label = "Blue Hole: Export"
-
-    def draw(self, context):
-        layout = self.layout
-        pie = layout.menu_pie()
-        # 4 - LEFT
-        pie.separator()
-        # 6 - RIGHT
-        pie.separator()
-        # 2 - BOTTOM
-        pie.separator()
-        # 8 - TOP
-        pie.separator()
-        # 7 - TOP - LEFT
-        pie.separator()
-        # 9 - TOP - RIGHT
-        pie.separator()
-        # 1 - BOTTOM - LEFT
-        pie.separator()
-        # 3 - BOTTOM - RIGHT
-        pie.separator()
-
-
-# Pie Global-Send
-class MT_pie_global_add_asset_container(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_add_asset_container"
-    bl_label = "Asset Containers"
-
-    def draw(self, context):
-        layout = self.layout
-        pie = layout.menu_pie()
-        # 4 - LEFT
-        pie.separator()
-        # 6 - RIGHT
-        addon_entries.add_asset_hierarchy(pie)
-        # 2 - BOTTOM
-        addon_entries.add_asset_mesh(pie)
-        # 8 - TOP
-        addon_entries.add_asset_collection(pie)
-        # 7 - TOP - LEFT
-        pie.separator()
-        # 9 - TOP - RIGHT
-        pie.separator()
-        # 1 - BOTTOM - LEFT
-        pie.separator()
-        # 3 - BOTTOM - RIGHT
-        pie.separator()
-
-
-# Pie Global-Source Control
-class MT_pie_global_source_control(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_global_source_control"
-    bl_label = "Blue Hole: Source Control"
-
-    def draw(self, context):
-        layout = self.layout
-        pie = layout.menu_pie()
-        # 4 - LEFT
-        pie.separator()
-        # 6 - RIGHT
-        pie.separator()
-        # 2 - BOTTOM
-        pie.separator()
-        # 8 - TOP
-        addon_entries.perforce_checkout(pie)
-        # 7 - TOP - LEFT
-        pie.separator()
-        # 9 - TOP - RIGHT
-        addon_entries.perforce_server_info(pie)
-        # 1 - BOTTOM - LEFT
-        pie.separator()
-        # 3 - BOTTOM - RIGHT
-        pie.separator()
-
 
 # Pie Global-Order
 class MT_pie_global_order(bpy.types.Menu):
@@ -301,15 +111,11 @@ class MT_pie_global_order(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (MT_pie_global_help,
-           MT_pie_global_theme,
-           MT_pie_global_dirs,
-           MT_pie_global_import_export,
-           MT_pie_global_export,
-           MT_pie_global_add_asset_container,
-           MT_pie_global_source_control,
-           MT_pie_global_order,
-           MT_pie_global_extra)
+classes = (
+    MT_pie_global_help,
+    MT_pie_global_theme,
+    MT_pie_global_order,
+)
 
 
 def register():

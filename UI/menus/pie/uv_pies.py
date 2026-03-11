@@ -101,7 +101,7 @@ class MT_pie_UV_action(bpy.types.Menu):
         # 2 - BOTTOM
         zenuv_entries.merge_verts(pie)
         # 8 - TOP
-        open_pie_menu(pie, MT_pie_UV_action_select.bl_idname, 'Select...', 'TRIA_UP')
+        open_pie_menu(pie, MT_pie_UV_action_select, text='Select...', icon='TRIA_UP')
         # 7 - TOP - LEFT
         zenuv_entries.get_tx_density(pie)
         # 9 - TOP - RIGHT

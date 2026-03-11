@@ -14,6 +14,7 @@ __status__ = 'Production'
 
 import bpy
 from ....Lib.commonUtils.debugUtils import *
+from ....operators.model_ops import WM_OT_MergeLast
 from .entries import blender_entries
 from .entries.third_party import hardops_entries, angle_tool_entries, machin3_entries, interactivetools_entries
 from .utilities import *
@@ -23,26 +24,6 @@ from .utilities import *
 # USER DEFINED SETTINGS
 
 name = filename = os.path.basename(__file__)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# OPERATOR
-
-
-class WM_OT_MergeLast(bpy.types.Operator):
-    """
-    Custom operator for this because the option is not always available which may break the Pie Menus
-    """
-    bl_idname = "wm.bh_merge_last"
-    bl_label = "Merge Last"
-    bl_options = {'INTERNAL'}
-
-    def execute(self, _context):
-        try:
-            bpy.ops.mesh.merge(type='LAST')
-        except:
-            bpy.ops.mesh.merge()
-        return {'FINISHED'}
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -124,9 +105,9 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.merge_center(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, MT_pie_vertex_action_more.bl_idname, 'More...')
+            open_pie_menu(pie, MT_pie_vertex_action_more, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, MT_pie_vertex_action_select.bl_idname, 'Select...')
+            open_pie_menu(pie, MT_pie_vertex_action_select, text='Select...')
             # 7 - TOP - LEFT
             machin3_entries.straighten(pie)
             # 9 - TOP - RIGHT
@@ -143,9 +124,9 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.edge_crease(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, MT_pie_edge_action_more.bl_idname, 'More...')
+            open_pie_menu(pie, MT_pie_edge_action_more, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, MT_pie_edge_action_select.bl_idname, 'Select...')
+            open_pie_menu(pie, MT_pie_edge_action_select, text='Select...')
             # 7 - TOP - LEFT
             blender_entries.fill_grid(pie)
             # 9 - TOP - RIGHT
@@ -162,9 +143,9 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.mesh_separate(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, MT_pie_face_action_more.bl_idname, 'More...')
+            open_pie_menu(pie, MT_pie_face_action_more, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, MT_pie_face_action_select.bl_idname, 'Select...')
+            open_pie_menu(pie, MT_pie_face_action_select, text='Select...')
             # 7 - TOP - LEFT
             interactivetools_entries.quick_lattice(pie)
             # 9 - TOP - RIGHT
@@ -335,17 +316,17 @@ class MT_pie_face_action_more(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (MT_pie_mesh_hide,
-           MT_pie_mesh_tool,
-           MT_pie_mesh_action,
-           MT_pie_vertex_action_more,
-           MT_pie_vertex_action_select,
-           MT_pie_edge_action_more,
-           MT_pie_edge_action_select,
-           MT_pie_face_action_more,
-           # WM_OT_CustomKnifeTool,
-           WM_OT_MergeLast,
-           MT_pie_face_action_select)
+classes = (
+    MT_pie_mesh_hide,
+    MT_pie_mesh_tool,
+    MT_pie_mesh_action,
+    MT_pie_vertex_action_more,
+    MT_pie_vertex_action_select,
+    MT_pie_edge_action_more,
+    MT_pie_edge_action_select,
+    MT_pie_face_action_more,
+    MT_pie_face_action_select,
+)
 
 
 def register():
