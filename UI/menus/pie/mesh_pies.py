@@ -32,7 +32,7 @@ name = filename = os.path.basename(__file__)
 
 # Context: 3D Viewport (Mesh)
 # Hotkey: Shift + S + Drag Mouse in any direction
-class MT_pie_mesh_hide(bpy.types.Menu):
+class BLUEHOLE_MT_pie_mesh_hide(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_mesh_hide"
     bl_label = "Blue Hole Pie Menu: Mesh > Hide"
 
@@ -60,7 +60,7 @@ class MT_pie_mesh_hide(bpy.types.Menu):
 # Context: 3D Viewport (Mesh)
 # Hotkey: Shift + RMB
 # Changes options displayed if Vertex/Edge/Face Mode
-class MT_pie_mesh_tool(bpy.types.Menu):
+class BLUEHOLE_MT_pie_mesh_tool(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_mesh_tool"
     bl_label = "Blue Hole: Mesh > Tools"
 
@@ -89,7 +89,7 @@ class MT_pie_mesh_tool(bpy.types.Menu):
 
 # Context: 3D Viewport (Mesh)
 # Hotkey: Ctrl + RMB
-class MT_pie_mesh_action(bpy.types.Menu):
+class BLUEHOLE_MT_pie_mesh_action(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_mesh_action"
     bl_label = "Blue Hole: Mesh > Action"
 
@@ -105,9 +105,9 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.merge_center(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, MT_pie_vertex_action_more, text='More...')
+            open_pie_menu(pie, BLUEHOLE_MT_pie_vertex_action_more, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, MT_pie_vertex_action_select, text='Select...')
+            open_pie_menu(pie, BLUEHOLE_MT_pie_vertex_action_select, text='Select...')
             # 7 - TOP - LEFT
             machin3_entries.straighten(pie)
             # 9 - TOP - RIGHT
@@ -124,9 +124,9 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.edge_crease(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, MT_pie_edge_action_more, text='More...')
+            open_pie_menu(pie, BLUEHOLE_MT_pie_edge_action_more, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, MT_pie_edge_action_select, text='Select...')
+            open_pie_menu(pie, BLUEHOLE_MT_pie_edge_action_select, text='Select...')
             # 7 - TOP - LEFT
             blender_entries.fill_grid(pie)
             # 9 - TOP - RIGHT
@@ -143,9 +143,9 @@ class MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.mesh_separate(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, MT_pie_face_action_more, text='More...')
+            open_pie_menu(pie, BLUEHOLE_MT_pie_face_action_more, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, MT_pie_face_action_select, text='Select...')
+            open_pie_menu(pie, BLUEHOLE_MT_pie_face_action_select, text='Select...')
             # 7 - TOP - LEFT
             interactivetools_entries.quick_lattice(pie)
             # 9 - TOP - RIGHT
@@ -157,7 +157,7 @@ class MT_pie_mesh_action(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_vertex_action_select(bpy.types.Menu):
+class BLUEHOLE_MT_pie_vertex_action_select(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_vertex_action_select"
     bl_label = "Blue Hole: Vertex > Action > Select"
 
@@ -183,7 +183,7 @@ class MT_pie_vertex_action_select(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_vertex_action_more(bpy.types.Menu):
+class BLUEHOLE_MT_pie_vertex_action_more(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_vertex_action_more"
     bl_label = "Blue Hole: Vertex > Action > More"
 
@@ -209,7 +209,7 @@ class MT_pie_vertex_action_more(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_edge_action_select(bpy.types.Menu):
+class BLUEHOLE_MT_pie_edge_action_select(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_edge_action_select"
     bl_label = "Blue Hole: Edge > Action > Select"
 
@@ -235,7 +235,7 @@ class MT_pie_edge_action_select(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_edge_action_more(bpy.types.Menu):
+class BLUEHOLE_MT_pie_edge_action_more(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_edge_action_more"
     bl_label = "Blue Hole: Edge > Action > More"
 
@@ -261,7 +261,7 @@ class MT_pie_edge_action_more(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_face_action_select(bpy.types.Menu):
+class BLUEHOLE_MT_pie_face_action_select(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_face_action_select"
     bl_label = "Blue Hole: Face > Action > Select"
 
@@ -287,7 +287,7 @@ class MT_pie_face_action_select(bpy.types.Menu):
 
 
 # No Hotkey; Submenu
-class MT_pie_face_action_more(bpy.types.Menu):
+class BLUEHOLE_MT_pie_face_action_more(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_face_action_more"
     bl_label = "Blue Hole: Face > Action > More"
 
@@ -317,15 +317,15 @@ class MT_pie_face_action_more(bpy.types.Menu):
 
 # Menu classes
 classes = (
-    MT_pie_mesh_hide,
-    MT_pie_mesh_tool,
-    MT_pie_mesh_action,
-    MT_pie_vertex_action_more,
-    MT_pie_vertex_action_select,
-    MT_pie_edge_action_more,
-    MT_pie_edge_action_select,
-    MT_pie_face_action_more,
-    MT_pie_face_action_select,
+    BLUEHOLE_MT_pie_mesh_hide,
+    BLUEHOLE_MT_pie_mesh_tool,
+    BLUEHOLE_MT_pie_mesh_action,
+    BLUEHOLE_MT_pie_vertex_action_more,
+    BLUEHOLE_MT_pie_vertex_action_select,
+    BLUEHOLE_MT_pie_edge_action_more,
+    BLUEHOLE_MT_pie_edge_action_select,
+    BLUEHOLE_MT_pie_face_action_more,
+    BLUEHOLE_MT_pie_face_action_select,
 )
 
 

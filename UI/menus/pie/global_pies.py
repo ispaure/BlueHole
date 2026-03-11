@@ -31,7 +31,7 @@ name = filename = os.path.basename(__file__)
 
 
 # Pie Global-Help
-class MT_pie_global_help(bpy.types.Menu):
+class BLUEHOLE_MT_pie_global_help(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_global_help"
     bl_label = "Blue Hole: Help"
 
@@ -51,13 +51,13 @@ class MT_pie_global_help(bpy.types.Menu):
         # 9 - TOP - RIGHT
         addon_entries.open_guide(pie)
         # 1 - BOTTOM - LEFT
-        open_pie_menu(pie, MT_pie_global_theme, text='Themes...', icon='IMAGE_RGB')
+        open_pie_menu(pie, BLUEHOLE_MT_pie_global_theme, text='Themes...', icon='IMAGE_RGB')
         # 3 - BOTTOM - RIGHT
         addon_entries.open_pie_menus_list(pie)
 
 
 # Pie Global-Theme
-class MT_pie_global_theme(bpy.types.Menu):
+class BLUEHOLE_MT_pie_global_theme(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_global_theme"
     bl_label = "Blue Hole: Theme"
 
@@ -82,7 +82,7 @@ class MT_pie_global_theme(bpy.types.Menu):
         addon_entries.apply_theme_deep_grey(pie)
 
 # Pie Global-Order
-class MT_pie_global_order(bpy.types.Menu):
+class BLUEHOLE_MT_pie_global_order(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_global_order"
     bl_label = "Blue Hole: Order"
 
@@ -112,9 +112,9 @@ class MT_pie_global_order(bpy.types.Menu):
 
 # Menu classes
 classes = (
-    MT_pie_global_help,
-    MT_pie_global_theme,
-    MT_pie_global_order,
+    BLUEHOLE_MT_pie_global_help,
+    BLUEHOLE_MT_pie_global_theme,
+    BLUEHOLE_MT_pie_global_order,
 )
 
 
