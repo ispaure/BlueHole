@@ -22,7 +22,6 @@ from bpy.types import AddonPreferences
 from .addonProperties import general_props, pie_props, help_update_props
 from .environmentProperties import bridge_props, container_props, directory_props, sourcecontrol_props
 from ..environment import envManager
-from . import addon_keymap
 
 from .prefs import prefs, addon_module_name
 
@@ -179,14 +178,8 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    try:
-        if prefs().pie.enable_pie_menus:
-            addon_keymap.register()
-    except Exception:
-        pass
 
 
 def unregister():
-    addon_keymap.unregister()
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

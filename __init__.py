@@ -32,6 +32,7 @@ from .preferences import addon_prefs as addon_prefs
 from .operators import operators_register
 from .environment import envManager as envManager
 from .ui.menus import menus_register
+from .keymaps import keymaps_register
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PLUGIN INFO
@@ -67,6 +68,7 @@ def register():
     addon_prefs.register()
     operators_register.register()
     menus_register.register()
+    keymaps_register.register()
 
     # Schedule init AFTER Blender finishes enabling the addon
     bpy.app.timers.register(_post_register_init, first_interval=0.0)
@@ -94,10 +96,12 @@ def _post_register_init():
 # Unregister
 def unregister():
 
-    callbacks.unregister()
-    addon_prefs.unregister()
-    operators_register.unregister()
+    keymaps_register.unregister()
     menus_register.unregister()
+    operators_register.unregister()
+    addon_prefs.unregister()
+    callbacks.unregister()
+
 
     # Unregister timer
     bpy.app.timers.unregister(update_env_timer)

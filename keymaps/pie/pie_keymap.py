@@ -17,9 +17,9 @@ __status__ = 'Production'
 
 from dataclasses import dataclass
 import bpy
-from ..Lib.commonUtils.debugUtils import *
+from ...Lib.commonUtils.debugUtils import *
 
-from ..ui.menus.pie import (
+from ...ui.menus.pie import (
     add_pies,
     curve_pies,
     directories_pies,
