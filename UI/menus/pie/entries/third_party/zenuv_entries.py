@@ -17,6 +17,7 @@ __status__ = 'Production'
 
 from ...utilities import *
 from ......Lib.commonUtils.osUtils import *
+from ......operators.external_addon_ops import ZUV_OT_trim_mode
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENU BUTTON
@@ -29,7 +30,7 @@ def select_trim_tool(pie):
     pie_op_or_disabled(
         pie,
         addon_name,
-        "zuv.set_trim_tool",
+        ZUV_OT_trim_mode.bl_idname,
         text="Select Trim Tool",
         icon='QUIT'
     )
