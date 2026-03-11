@@ -15,11 +15,8 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from .pie import pie_keymap
+from .pie import pie_keymaps_register
 from ..preferences.prefs import prefs
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
@@ -28,10 +25,10 @@ from ..preferences.prefs import prefs
 def register():
     try:
         if prefs().pie.enable_pie_menus:
-            pie_keymap.register()
+            pie_keymaps_register.register()
     except Exception:
         pass
 
 
 def unregister():
-    pie_keymap.unregister()
+    pie_keymaps_register.unregister()
