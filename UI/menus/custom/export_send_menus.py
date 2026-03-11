@@ -20,7 +20,7 @@ import bpy
 
 # Blue Hole
 from ....blenderUtils.uiUtils import show_label
-from ....operators import directory_ops, export_send_ops, help_ops
+from ....operators import directory_ops, export_send_ops, help_ops, external_addon_ops
 from ....preferences.prefs import *
 from ....Lib.commonUtils.debugUtils import *
 
@@ -111,15 +111,15 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
             # Submenu for specific container types (only useful if 2+ enabled)
             if enabled_count >= 2:
                 if self.SEND:
-                    layout.menu("BLUE_HOLE_MT_send_specific")
+                    layout.menu(BLUE_HOLE_MT_send_specific.bl_idname)
                 else:
-                    layout.menu("BLUE_HOLE_MT_export_specific")
+                    layout.menu(BLUE_HOLE_MT_export_specific.bl_idname)
 
         else:
             row = layout.row()
             row.enabled = False
             row.operator(
-                "wm.bh_disabled_notice",
+                external_addon_ops.BH_OT_disabled_notice.bl_idname,
                 text="Asset Containers disabled in Preferences",
                 icon='ERROR'
             )
@@ -182,7 +182,7 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
             row = layout.row()
             row.enabled = False
             row.operator(
-                "wm.bh_disabled_notice",
+                external_addon_ops.BH_OT_disabled_notice.bl_idname,
                 text="All Asset Containers disabled in Preferences",
                 icon='ERROR'
             )

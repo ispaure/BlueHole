@@ -26,6 +26,7 @@ import bpy
 
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
+from ....operators import save_ops
 
 # ----------------------------------------------------------------------------------------------------------------------
 # GLOBALS
@@ -62,7 +63,7 @@ def draw_topbar_mt_file_blue_hole(self, context):
     layout.separator()
     layout.operator("wm.save_mainfile", text="Save", icon='FILE_TICK')
     # layout.operator("wm.save_as_mainfile", text="Save As...")
-    layout.operator("wm.bh_save_as_mainfile", text="Save As...")
+    layout.operator(save_ops.BHSaveAsMainfile.bl_idname, text="Save As...")
     layout.operator("wm.save_as_mainfile", text="Save Copy...").copy = True
     layout.operator("wm.save_mainfile", text="Save Incremental").incremental = True
 

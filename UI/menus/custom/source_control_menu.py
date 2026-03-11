@@ -19,7 +19,7 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from ....operators import help_ops, source_control_ops
+from ....operators import help_ops, source_control_ops, external_addon_ops
 from ....preferences.prefs import *
 from ....blenderUtils import blenderFile
 
@@ -42,7 +42,7 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
                 col = layout.column()
                 col.enabled = False
                 col.operator(
-                    "wm.bh_disabled_notice",
+                    external_addon_ops.BH_OT_disabled_notice.bl_idname,
                     text='Save .blend file to enable checkout',
                     icon='ERROR'
                 )
