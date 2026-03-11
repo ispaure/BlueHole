@@ -1,5 +1,5 @@
 """
-This manages the keymaps.
+Blue Hole pie keymap subsystem.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,20 +15,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from .pie import pie_keymaps_register
-from ..preferences.prefs import prefs
-
-# ----------------------------------------------------------------------------------------------------------------------
-# REGISTER / UNREGISTER
-
-
-def register():
-    try:
-        if prefs().pie.enable_pie_menus:
-            pie_keymaps_register.register()
-    except Exception:
-        pass
-
-
-def unregister():
-    pie_keymaps_register.unregister()
+from . import pie_keymaps_register
+from .pie_keymaps_defs import PieKeymapDef, get_all_pie_menu_defs
+from .pie_keymaps_lookup import find_pie_menu_def, find_pie_menu_keymap

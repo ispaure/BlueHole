@@ -19,7 +19,11 @@ import bpy
 import rna_keymap_ui
 
 from bpy.props import *
-from ...keymaps.pie.pie_keymap import find_pie_menu_keymap, get_all_pie_menu_defs, PieKeymapDef
+from ...keymaps.pie import (
+    PieKeymapDef,
+    find_pie_menu_keymap,
+    get_all_pie_menu_defs,
+)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -34,12 +38,12 @@ def _update_enable_pie_menus(self, context):
     """
     Enable or disable Blue Hole pie menu keymaps.
     """
-    from ...keymaps.pie import pie_keymap
+    from ...keymaps.pie import pie_keymaps_register
 
     if self.enable_pie_menus:
-        pie_keymap.register()
+        pie_keymaps_register.register()
     else:
-        pie_keymap.unregister()
+        pie_keymaps_register.unregister()
 
 
 class PiePG(bpy.types.PropertyGroup):
