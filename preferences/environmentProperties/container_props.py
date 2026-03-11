@@ -156,7 +156,7 @@ class ContainerPG(bpy.types.PropertyGroup):
             "Name of empty object within asset hierarchy "
             "which will contain rendered meshes"
         ),
-        default='DEFAULT_STR'
+        default='Render'
     )
 
     asset_hierarchy_empty_object_collisions: StringProperty(
@@ -165,7 +165,7 @@ class ContainerPG(bpy.types.PropertyGroup):
             "Name of empty object within asset hierarchy "
             "which will contain collision meshes"
         ),
-        default='DEFAULT_STR'
+        default='Collision'
     )
 
     asset_hierarchy_empty_object_sockets: StringProperty(
@@ -174,7 +174,7 @@ class ContainerPG(bpy.types.PropertyGroup):
             "Name of empty object within asset hierarchy "
             "which will contain sockets"
         ),
-        default='DEFAULT_STR'
+        default='Socket'
     )
 
 
