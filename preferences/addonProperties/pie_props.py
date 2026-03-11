@@ -60,9 +60,6 @@ def draw(preference, context, layout):
     column_pie = box_pie.column()
 
     row = column_pie.row()
-    row.label(text='Pie Menus')
-
-    row = column_pie.row()
     row.prop(preference.pie, 'enable_pie_menus')
 
     if not preference.pie.enable_pie_menus:
@@ -81,7 +78,7 @@ def draw(preference, context, layout):
         column_section = box_section.column()
 
         row = column_section.row()
-        row.label(text=keymap_name)
+        row.label(text=keymap_name.upper())
 
         for pie_def in pie_defs:
             _draw_pie_menu_keymap(

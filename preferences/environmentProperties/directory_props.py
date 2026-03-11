@@ -31,36 +31,36 @@ show_verbose = True
 class DirectoryPG(bpy.types.PropertyGroup):
     sc_dir_struct_scenes: StringProperty(name='Scenes',
                                          description='Subdirectory storing .blend scene files',
-                                         default='DEFAULT_STR')
+                                         default='')
 
     sc_dir_struct_resources: StringProperty(name='Resources',
                                             description='Subdirectory storing temporary work files',
-                                            default='DEFAULT_STR')
+                                            default='RES')
 
     sc_dir_struct_st: StringProperty(name='Speedtree Fronds',
                                      description='Subdirectory for exporting SpeedTree fronds',
-                                     default='DEFAULT_STR')
+                                     default='RES/ST')
 
     sc_dir_struct_st_hr: StringProperty(name='Speedtree Fronds (High Res)',
                                         description='Subdirectory for exporting SpeedTree fronds (High-Resolution)',
-                                        default='DEFAULT_STR')
+                                        default='RES/ST/HR')
 
     sc_dir_struct_st_lr: StringProperty(name='Speedtree Fronds (Low Res)',
                                         description='Subdirectory for exporting SpeedTree fronds (Low-Resolution)',
-                                        default='DEFAULT_STR')
+                                        default='RES/ST/LR')
 
     sc_dir_struct_ref: StringProperty(name='References',
                                       description='Subdirectory for storing visual references (images, pureRef, etc.)',
-                                      default='DEFAULT_STR')
+                                      default='RES/REF')
 
     sc_dir_struct_final: StringProperty(name='Final Exports',
                                         description='Subdirectory for final exported .FBX (ie. for Send to Unreal)',
-                                        default='DEFAULT_STR')
+                                        default='')
 
     sc_dir_struct_msh_bake: StringProperty(name='Mesh Bakes',
                                            description='Subdirectory to export meshes for detail baking '
                                                        'outside Blender',
-                                           default='DEFAULT_STR')
+                                           default='RES/BAKE')
 
 
 def label_row(path, prop, row, label=''):

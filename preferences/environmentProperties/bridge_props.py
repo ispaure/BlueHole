@@ -53,37 +53,37 @@ class BridgePG(bpy.types.PropertyGroup):
                             subtype='DIR_PATH',
                             description='Root Directory in which all Source Content Asset Directory Structures '
                                         'reside. \nNeeds to be set for Send to Unreal & Send to Unity',
-                            default='DEFAULT_STR')
+                            default='<Define Path Here>')
 
     sc_path_alternate: StringProperty(name='Source Content Root Path (Alternate)',
                                       subtype='DIR_PATH',
                                       description='Root Directory (Alternate) in which all Source Content Asset Directory Structures '
                                                   'reside. Optional path used as fallback. In case of doubt, ignore.',
-                                      default='DEFAULT_STR')
+                                      default='<Define Alternate Path Here (Optional)>')
 
     sc_path_mac: StringProperty(name='Source Content Root Path',
                                 subtype='DIR_PATH',
                                 description='Root Directory in which all Source Content Asset Directory Structures '
                                             'reside. \nNeeds to be set for Send to Unreal & Send to Unity',
-                                default='DEFAULT_STR')
+                                default='<Define Path Here>')
 
     sc_path_mac_alternate: StringProperty(name='Source Content Root Path (Alternate)',
                                           subtype='DIR_PATH',
                                           description='Root Directory (Alternate) in which all Source Content Asset Directory Structures '
                                                       'reside. Optional path used as fallback. In case of doubt, ignore.',
-                                          default='DEFAULT_STR')
+                                          default='<Define Alternate Path Here (Optional)>')
 
     sc_path_linux: StringProperty(name='Source Content Root Path',
                                   subtype='DIR_PATH',
                                   description='Root Directory in which all Source Content Asset Directory Structures '
                                               'reside. \nNeeds to be set for Send to Unreal & Send to Unity',
-                                  default='DEFAULT_STR')
+                                  default='<Define Path Here>')
 
     sc_path_linux_alternate: StringProperty(name='Source Content Root Path (Alternate)',
                                             subtype='DIR_PATH',
                                             description='Root Directory (Alternate) in which all Source Content Asset Directory Structures '
                                                         'reside. Optional path used as fallback. In case of doubt, ignore.',
-                                            default='DEFAULT_STR')
+                                            default='<Define Alternate Path Here (Optional)>')
 
     # EXPORTS: BATCH SELECTION -----------------------------------------------------------------------------------------
 
