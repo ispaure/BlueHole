@@ -23,18 +23,16 @@ from bpy.props import *
 # OPERATORS
 
 
-class WM_OT_disabled_addon(bpy.types.Operator):
-    bl_idname = "wm.disabled_addon"
-    bl_label = "Add-on is missing!"
-    bl_description = "Add-on is required for this button"
+class WM_OT_unsupported_os(bpy.types.Operator):
+    bl_idname = "wm.unsupported_os"
+    bl_label = "Unsupported OS!"
+    bl_description = "This button is unsupported on this platform!"
 
     open_prefs: bpy.props.BoolProperty(default=True)
 
     def execute(self, context):
-        msg = "Addon is not enabled or available. Get the missing addon and enable it in Preferences > Add-ons."
+        msg = "Button is unsupported on this platform!"
         self.report({'WARNING'}, msg)
-        if self.open_prefs:
-            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
         return {'CANCELLED'}
 
 
@@ -44,6 +42,19 @@ class BH_OT_disabled_notice(bpy.types.Operator):
     bl_description = "Disabled"
 
     def execute(self, context):
+        return {'CANCELLED'}
+
+
+class BH_OT_addon_missing(bpy.types.Operator):
+    bl_idname = "wm.bh_addon_missing"
+    bl_label = "Add-on Missing"
+    bl_description = "An add-on is missing"
+
+    def execute(self, context):
+        msg = "Addon is not enabled or available. Get the missing addon and enable it in Preferences > Add-ons."
+        self.report({'WARNING'}, msg)
+        if self.open_prefs:
+            bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
         return {'CANCELLED'}
 
 
@@ -68,7 +79,8 @@ class ZUV_OT_trim_mode(bpy.types.Operator):
 # REGISTER / UNREGISTER
 
 # List of classes to register/unregister
-classes = (WM_OT_disabled_addon,
+classes = (WM_OT_unsupported_os,
+           BH_OT_addon_missing,
            BH_OT_disabled_notice,
            ZUV_OT_trim_mode
            )

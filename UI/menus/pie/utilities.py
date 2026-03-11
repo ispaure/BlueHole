@@ -15,6 +15,7 @@ __status__ = 'Production'
 import bpy
 from typing import *
 from ....Lib.commonUtils.osUtils import *
+from ....operators import external_addon_ops
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPER FUNCTIONS
@@ -81,7 +82,7 @@ def pie_op_or_disabled(
             col = pie.column()
             col.enabled = False
             return col.operator(
-                "wm.disabled_addon",
+                external_addon_ops.WM_OT_unsupported_os.bl_idname,
                 text=f'{text} (Unsupported on {get_os().value})',
                 icon='ERROR'
             )
@@ -98,7 +99,7 @@ def pie_op_or_disabled(
     col = pie.column()
     col.enabled = False
     return col.operator(
-        "wm.disabled_addon",
+        external_addon_ops.BH_OT_addon_missing.bl_idname,
         text=f'{text} (Requires {addon_name})',
         icon='ERROR'
     )

@@ -48,17 +48,6 @@ class P4DisplayServerInfo(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class WM_OT_SetP4EnvSettings(bpy.types.Operator):
-    """Set Perforce Environment Settings"""
-    bl_idname = "wm.bh_set_p4_env_settings"
-    bl_label = "Set Perforce Environment Settings"
-    bl_options = {'INTERNAL'}
-
-    def execute(self, _context):
-        p4Wrapper.set_p4_env_settings()
-        return {'FINISHED'}
-
-
 class WM_OT_disabled_source_control(bpy.types.Operator):
     bl_idname = "wm.disabled_source_control"
     bl_label = "Source Control is Disabled!"
@@ -80,7 +69,6 @@ class WM_OT_disabled_source_control(bpy.types.Operator):
 classes = (
     P4CheckOutCurrentScene,
     P4DisplayServerInfo,
-    WM_OT_SetP4EnvSettings,
     WM_OT_disabled_source_control,
 )
 

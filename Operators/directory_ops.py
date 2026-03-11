@@ -24,6 +24,7 @@ from ..wrappers import perforceWrapper as p4Wrapper
 from ..environment import envPathResolver
 from ..preferences.prefs import *
 from ..Lib.commonUtils import fileUtils
+from ..Lib.commonUtils.osUtils import get_os, OS
 from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -136,14 +137,12 @@ class OpenUnityAssetsPath(bpy.types.Operator):
     bl_description = 'Opens Unity Project\'s Assets Path, as specified in the active environment\'s settings.'
 
     def execute(self, context):
-        match filterUtils.get_platform():
-            case OS.WIN:
-                unity_assets_path = prefs().bridge.unity_assets_path
-            case OS.MAC:
-                unity_assets_path = prefs().bridge.unity_assets_path_mac
-            case OS.LINUX:
-                unity_assets_path = prefs().bridge.unity_assets_path_linux
-        fileUtils.open_dir_path(unity_assets_path)
+        unity_assets_path_os_dict = {
+            OS.WIN: prefs().bridge.unity_assets_path,
+            OS.MAC: prefs().bridge.unity_assets_path_mac,
+            OS.LINUX: prefs().bridge.unity_assets_path_linux
+        }
+        fileUtils.open_dir_path(unity_assets_path_os_dict[get_os()])
         return {'FINISHED'}
 
 
