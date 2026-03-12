@@ -1,9 +1,9 @@
 """
-The March 2026 refactor of exportUtils2. Once done, the old one should be removed and this one used instead.
+March 2026 refactor of exportUtils2 for Asset Hierarchy exports.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
@@ -26,11 +26,6 @@ from .container import AssetHierarchyContainer
 from ..model.assetContainerGroup import AssetContainerGroup
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-# ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
 ah_tool_name = 'Asset Hierarchy Exporter (V3)'
@@ -46,25 +41,23 @@ class AssetHierarchyContainerGroup(AssetContainerGroup):
 
     def _get_root_lst_from_obj_lst(self, obj_lst):
         """
-        Returns a List of hierarchy roots from a selection
+        Return a list of valid Asset Hierarchy roots from an object list.
         """
-        # Get list of hierarchy prefixes
         ah_prefix_lst: List[str] = [
             prefs().container.asset_hierarchy_struct_prefix_static_mesh,
             prefs().container.asset_hierarchy_struct_prefix_static_mesh_kit,
-            prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh
+            prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh,
         ]
 
-        # Export Root List
         exp_root_lst = []
 
-        # Go through selection to get list of upmost parents. Only add to list if item is not already there
+        # Go through objects to get the list of upmost parents.
+        # Only add an item if it is not already present and uses a valid prefix.
         for obj in obj_lst:
-
             upmost_parent_obj = objectUtils.get_obj_upmost_parent(obj)
 
-            # Checking if valid root
-            if 'EMPTY' in objectUtils.get_obj_type(upmost_parent_obj):  # If Empty, it's a transform
+            # Check whether the root is a valid hierarchy root.
+            if 'EMPTY' in objectUtils.get_obj_type(upmost_parent_obj):
                 for ah_prefix in ah_prefix_lst:
                     if objectUtils.get_obj_name(upmost_parent_obj)[:len(ah_prefix)] == ah_prefix:
                         if upmost_parent_obj not in exp_root_lst:

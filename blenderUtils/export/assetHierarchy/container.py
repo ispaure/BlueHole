@@ -1,9 +1,9 @@
 """
-March 2026 refactor: Asset Hierarchy Container
+March 2026 refactor: Asset Hierarchy Container.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
@@ -24,11 +24,6 @@ from ....preferences.prefs import *
 from ..model.container import Container
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-# ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
 
@@ -39,7 +34,7 @@ class AssetHierarchyContainer(Container):
     def __init__(self, root, export_settings: ExportSettings):
         super().__init__(root, export_settings)
 
-        # Asset Hierarchy Specific Fields
+        # Asset Hierarchy specific fields
         self.render_name = prefs().container.asset_hierarchy_empty_object_meshes
         self.render = self.__get_empty_render()
         self.collision_name = prefs().container.asset_hierarchy_empty_object_collisions
@@ -47,25 +42,31 @@ class AssetHierarchyContainer(Container):
         self.socket_name = prefs().container.asset_hierarchy_empty_object_sockets
         self.socket = self.__get_empty_socket()
 
-        # Validate Hierarchy
+        # Validate hierarchy
         self.__validate_container()
 
     def __get_empty_render(self):
-        """ If "Render Included", Get the "Render" Empty Object at the root of the container """
+        """
+        If render is included, get the Render Empty object at the root of the container.
+        """
         if not self.export_settings.include_render:
             return None
 
         return self.__get_root_empty_object(self.render_name, empty_type='Render')
 
     def __get_empty_collision(self):
-        """ If "Collision Included", Get the "Collision" Empty Object at the root of the container """
+        """
+        If collision is included, get the Collision Empty object at the root of the container.
+        """
         if not self.export_settings.include_collision:
             return None
 
         return self.__get_root_empty_object(self.collision_name, empty_type='Collision')
 
     def __get_empty_socket(self):
-        """ If "Socket Included", Get the "Socket" Empty Object at the root of the container """
+        """
+        If socket is included, get the Socket Empty object at the root of the container.
+        """
         if not self.export_settings.include_socket:
             return None
 
@@ -73,14 +74,16 @@ class AssetHierarchyContainer(Container):
 
     def __get_root_empty_object(self, empty_name: str, empty_type: str):
         """
-        Get an Empty Object at the root of the container.
-        Raises:
-            - critical_component_missing if no match found
-            - critical_component_duplicated if more than one match found
-        Note: Matching ignores Blender numeric suffixes (e.g. "Render.001").
+        Get an Empty object at the root of the container.
 
-        :param empty_name: Base name of the Empty to search for (numeric suffixes like ".001" are ignored).
-        :param empty_type: Human-readable component type used in error messages ("Render", "Collision" or "Socket")
+        Raises:
+            - critical_component_missing if no match is found
+            - critical_component_duplicated if more than one match is found
+
+        Note: Matching ignores Blender numeric suffixes (for example: "Render.001").
+
+        :param empty_name: Base name of the Empty to search for
+        :param empty_type: Human-readable component type used in error messages
         """
         children = objectUtils.get_obj_child(self.root)
 
@@ -102,31 +105,33 @@ class AssetHierarchyContainer(Container):
         Validate container structure for export.
 
         If render export is enabled, the container root must contain only
-        Empty objects (no meshes or other object types directly under root).
+        Empty objects directly under it.
         """
         if not self.export_settings.include_render:
             return
 
-        offenders = [obj for obj in objectUtils.get_obj_child(self.root)
-                     if objectUtils.get_obj_type(obj) != 'EMPTY']
+        offenders = [
+            obj for obj in objectUtils.get_obj_child(self.root)
+            if objectUtils.get_obj_type(obj) != 'EMPTY'
+        ]
 
         if offenders:
             offender_names = [objectUtils.get_obj_name(obj) for obj in offenders]
             self.__critical_rogue_object_directly_under_root(', '.join(offender_names))
 
     def _rename_before_export(self):
-
-        # Empty Objects
-        # Force set naming (do 3 times — it works) for Render, Collision and Socket Empty Object
+        # Empty objects
+        # Force naming for Render, Collision, and Socket Empty objects
         self.__force_name(self.render, self.render_name)
         self.__force_name(self.collision, self.collision_name)
         self.__force_name(self.socket, self.socket_name)
 
-        # Collisions (If Collision Folder & Preset Enables Rename Collisions)
+        # Collisions (if Collision folder exists and preset enables collision renaming)
         if self.collision is not None and self.export_settings.rename_collisions_for_ue:
             coll_obj_lst = objectUtils.get_obj_child_recursive(self.collision)
             first_mesh_name = self.__get_first_mesh_name()
             counter = 1
+
             for coll_obj in coll_obj_lst:
                 coll_obj.name = f'UCX_{first_mesh_name}_{format(counter, "03")}'
                 counter += 1
@@ -157,16 +162,16 @@ class AssetHierarchyContainer(Container):
         existing.name = target_name
 
     def _get_obj_lst(self):
-
         # Wipe existing object list
         obj_lst = []
+
         # Create exclusion list
         excl_lst = []
 
         # Add root
         obj_lst.append(self.root)
 
-        # Append other stuff
+        # Append other components
         for component in [self.render, self.collision, self.socket]:
             if component is not None:
                 child_obj_lst = objectUtils.get_obj_child_recursive(component)
@@ -177,7 +182,8 @@ class AssetHierarchyContainer(Container):
                 else:
                     excl_lst.append(component)
 
-        # If render wasn't included, add stuff at the root (but not the excluded components if applicable)
+        # If render was not included, add objects from the root
+        # except excluded components when applicable
         if not self.export_settings.include_render:
             obj_full_lst = objectUtils.get_obj_child_recursive(self.root)
             for obj in obj_full_lst:
@@ -187,7 +193,9 @@ class AssetHierarchyContainer(Container):
         return obj_lst
 
     def __get_first_mesh_name(self) -> str:
-        """ Get first mesh name, else sets to 'Template' as fallback. """
+        """
+        Get the first mesh name, otherwise return "Template" as a fallback.
+        """
         if self.export_settings.include_render:
             render_obj_child_lst = objectUtils.get_obj_child_recursive(self.render)
             for render_obj in render_obj_child_lst:
@@ -198,14 +206,11 @@ class AssetHierarchyContainer(Container):
             for root_obj in root_obj_lst:
                 if objectUtils.get_obj_type(root_obj) == 'MESH':
                     return objectUtils.get_obj_name(root_obj)
+
         return 'Template'
 
-    # ----------------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
     # CRITICAL ERROR MESSAGES
-
-    # --------------------------------
-    # CRITICAL: HIERARCHY IS NOT VALID
-    # --------------------------------
 
     def __critical_rogue_object_directly_under_root(self, child):
         child_name = objectUtils.get_obj_name(child)
