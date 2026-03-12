@@ -1,5 +1,5 @@
 """
-Open Directory within project.
+Open directories within the project.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,14 +15,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
 from pathlib import Path
 
-# Blue Hole
 from . import blenderFile, filterUtils
-from ..preferences.prefs import *
 from ..Lib.commonUtils import fileUtils
-
+from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -30,24 +27,20 @@ from ..Lib.commonUtils import fileUtils
 
 def get_project_sub_dir(path_append) -> Path:
     """
-    Gets desired project directory (based on project from the opened Blender scene)
-    :param path_append: Specifies directory to get. Has to be an entry of
-                        env_variables.ini under "DirectoryStructure" section.
-    :type path_append: str
+    Get a project subdirectory based on the currently opened Blender scene.
+
+    :param path_append: Directory to get. Must be an entry from the "DirectoryStructure"
+        section of env_variables.ini.
     """
-    # Find currently opened .blend directory path
     blend_directory_path = blenderFile.get_blend_directory_path()
 
-    # Remove 'path_scenes' from directory, since path_scenes contains
-    # the location of the subdirectory in which the .blend file resides
+    # Remove the configured Scenes subdirectory from the current blend path,
+    # then append the requested project subdirectory.
     path_remove = prefs().directory.sc_dir_struct_scenes
-
-    # Apply the two modifications (truncate & append) we just wrote about to the original .blend file path
     project_sub_dir: str = blenderFile.truncate_n_append_str(blend_directory_path, path_remove, path_append)
 
-    # If folder path hadn't been created already, make it.
-    # Useful in preventing bugs where user haven't created their folders yet.
-    project_sub_dir_path: Path = Path(project_sub_dir)
+    # Create the folder if it does not already exist.
+    project_sub_dir_path = Path(project_sub_dir)
     project_sub_dir_path.mkdir(parents=True, exist_ok=True)
 
     return project_sub_dir_path
@@ -55,21 +48,17 @@ def get_project_sub_dir(path_append) -> Path:
 
 def open_project_sub_dir(path_append):
     """
-    Opens desired project directory of currently opened Blender scene
-    :param path_append: Specifies directory to open. Has to be an entry of
-                        env_variables.ini under "DirectoryStructure" section.
-    :type path_append: str
-    """
+    Open a project subdirectory for the currently opened Blender scene.
 
-    # Initial checks
-    check_result = filterUtils.check_tests('Open Asset Directory',
-                                           check_blend_exist=True,
-                                           check_blend_loc_in_dir_structure=True)
-    if not check_result:
+    :param path_append: Directory to open. Must be an entry from the "DirectoryStructure"
+        section of env_variables.ini.
+    """
+    if not filterUtils.check_tests(
+        'Open Asset Directory',
+        check_blend_exist=True,
+        check_blend_loc_in_dir_structure=True,
+    ):
         return False
 
-    # Get path of desired sub project directory
     dir_to_open = get_project_sub_dir(path_append)
-
-    # If valid, open the filepath.
     fileUtils.open_dir_path(dir_to_open)

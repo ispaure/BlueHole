@@ -1,4 +1,4 @@
-""" Callbacks to integrate source control to Blender Open/Load/Save """
+"""Callbacks to integrate source control with Blender open/load/save events."""
 
 # ----------------------------------------------------------------------------------------------------------------------
 # AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
@@ -11,9 +11,11 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import bpy
-from . import sourceControlUtils, blenderFile
+
+from . import blenderFile, sourceControlUtils
 from ..Lib.commonUtils.debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -28,15 +30,18 @@ SKIP_NEXT_SAVE_PRE_SC_CHECK: bool = False
 @bpy.app.handlers.persistent
 def load_pre_handler(dummy):
     log(Severity.DEBUG, 'Callback Event: load_pre', f'Blender Filepath: "{blenderFile.get_blend_file_path()}"')
-    print("Event: load_pre")
 
 
 @bpy.app.handlers.persistent
 def load_post_handler(dummy):
     log(Severity.DEBUG, 'Callback Event: load_post', f'Blender Filepath: "{blenderFile.get_blend_file_path()}"')
-    print("Event: load_post")
+
     if blenderFile.has_blend_filepath():
-        sourceControlUtils.sc_check_blend(blenderFile.get_blend_file_path(), allow_sync=True, silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
+        sourceControlUtils.sc_check_blend(
+            blenderFile.get_blend_file_path(),
+            allow_sync=True,
+            silent_mode=False,
+        )
 
 
 @bpy.app.handlers.persistent
@@ -44,7 +49,6 @@ def save_pre_handler(dummy):
     global SKIP_NEXT_SAVE_PRE_SC_CHECK
 
     log(Severity.DEBUG, 'Callback Event: save_pre', f'Blender Filepath: "{blenderFile.get_blend_file_path()}"')
-    print("Event: save_pre")
 
     if SKIP_NEXT_SAVE_PRE_SC_CHECK:
         SKIP_NEXT_SAVE_PRE_SC_CHECK = False
@@ -52,17 +56,20 @@ def save_pre_handler(dummy):
         return
 
     if blenderFile.has_blend_filepath():
-        sourceControlUtils.sc_check_blend(blenderFile.get_blend_file_path(), allow_sync=False, silent_mode=False)  # Checks status with perforce and prompt to get latest, checkout, etc.
+        sourceControlUtils.sc_check_blend(
+            blenderFile.get_blend_file_path(),
+            allow_sync=False,
+            silent_mode=False,
+        )
 
 
 @bpy.app.handlers.persistent
 def save_post_handler(dummy):
     log(Severity.DEBUG, 'Callback Event: save_post', f'Blender Filepath: "{blenderFile.get_blend_file_path()}"')
-    print("Event: save_post")
 
 
 def register():
-    print("Registering callbacks...")
+    log(Severity.DEBUG, 'callbacks.register', 'Registering callbacks...')
     bpy.app.handlers.load_pre.append(load_pre_handler)
     bpy.app.handlers.load_post.append(load_post_handler)
     bpy.app.handlers.save_pre.append(save_pre_handler)
@@ -70,7 +77,7 @@ def register():
 
 
 def unregister():
-    print("Unregistering callbacks...")
+    log(Severity.DEBUG, 'callbacks.unregister', 'Unregistering callbacks...')
     bpy.app.handlers.load_pre.remove(load_pre_handler)
     bpy.app.handlers.load_post.remove(load_post_handler)
     bpy.app.handlers.save_pre.remove(save_pre_handler)

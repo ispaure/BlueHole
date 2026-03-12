@@ -1,5 +1,5 @@
 """
-Import utilities for Blue Hole
+Import utilities for Blue Hole.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,21 +15,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
 from pathlib import Path
 
-# Blender
 import bpy
 
-# Blue Hole
 from . import blenderFile
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = False
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -37,19 +27,21 @@ show_verbose = False
 # TODO: Add additional environment-specific mesh guides.
 
 
-def import_fbx_obj(import_path):
-    # Determine if mesh is fbx or obj
+def import_fbx_obj(import_path: str) -> None:
+    """
+    Import a mesh file as either FBX or OBJ based on its file extension.
+    """
     file_ext = import_path.split('.')[-1]
+
     if 'fbx' in file_ext.lower():
-        bpy.ops.import_scene.fbx(filepath=import_path)  # Import mesh as FBX
+        bpy.ops.import_scene.fbx(filepath=import_path)
     else:
-        bpy.ops.wm.obj_import(filepath=import_path)  # Import mesh as OBJ
+        bpy.ops.wm.obj_import(filepath=import_path)
 
 
-def import_default_env_scale_guide(mesh_name):
-
-    # Get import path for the mesh
+def import_default_env_scale_guide(mesh_name: str) -> None:
+    """
+    Import a scale guide mesh from the default environment mesh guides directory.
+    """
     import_path = str(Path(blenderFile.get_default_env_msh_guides_path(), mesh_name))
-
-    # import fbx or obj, whatever mesh_name is
     import_fbx_obj(import_path)

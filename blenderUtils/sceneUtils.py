@@ -15,7 +15,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# Blender
 import bpy
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -24,25 +23,27 @@ import bpy
 
 def get_scene_obj_lst():
     """
-    Gather the list of objects within a scene
+    Gather the objects within the current scene.
     """
     return bpy.context.scene.collection.all_objects
 
 
 def set_object_mode():
     """
-    Set the mode to object mode, regardless of current context
+    Set the mode to Object Mode, regardless of current context.
     """
     scene_lst = get_scene_obj_lst()
     scene_msh_amt = 0
+
     for obj in scene_lst:
         if 'MESH' in obj.type:
             scene_msh_amt += 1
-    # If scene is empty, already in a sort-of object mode. Will throw error if try to set it.
+
+    # If the scene is empty, Blender will throw an error when trying to switch mode.
     if scene_msh_amt > 0:
         try:
             bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-        except:
+        except Exception:
             pass
 
 
@@ -52,6 +53,6 @@ def reset_scene():
 
 def deselect_all():
     """
-    Deselects everything (for Object Mode)
+    Deselect everything in Object Mode.
     """
     bpy.ops.object.select_all(action='DESELECT')

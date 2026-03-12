@@ -1,5 +1,5 @@
 """
-Object utilities for Blue Hole
+Object utilities for Blue Hole.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,55 +15,46 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-import mathutils as mathutils
+import mathutils
 
 import bpy
 
 from ..Lib.commonUtils.debugUtils import *
-from . import sceneUtils
 from ..preferences.prefs import *
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
+from . import sceneUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
+
 def deselect_all():
     """
-    Deselects everything
+    Deselect all objects.
     """
     bpy.ops.object.select_all(action='DESELECT')
 
 
 def add_object_empty(name, parent=None, dsp_type=0, dsp_size=0.15, lock_transform=False):
     """
-    Adds an "Empty" object with given hierarchy_lst
+    Add an Empty object with the given settings.
+
     :param name: Name of object
-    :type name: str
-    :param parent: (Optional) Parent object under which to create empty object. Root if unspecified
-    :type parent: Object (!!-See if I can make description here more explicit)
-    :param dsp_type: Type of icon to display empty object as
-    :type dsp_type: int
-    :param dsp_size: Size of the empty object icons
-    :type dsp_size: float
-    :param lock_transform: Lock the transforms of the empty object? (Generally yes for Render/Collision/Socket)
-    :type lock_transform: bool
-    :return:
+    :param parent: Optional parent object under which to create the empty
+    :param dsp_type: Type of icon to display the empty object as
+    :param dsp_size: Size of the empty object icon
+    :param lock_transform: Lock the transforms of the empty object
     """
     dsp_type_array = ['PLAIN_AXES', 'ARROWS', 'SINGLE_ARROW', 'CIRCLE', 'CUBE', 'SPHERE', 'CONE', 'IMAGE']
+
     new_obj = bpy.data.objects.new(name, None)
     new_obj.empty_display_size = dsp_size
-    # Display mode
     new_obj.empty_display_type = dsp_type_array[dsp_type]
+
     bpy.context.scene.collection.objects.link(new_obj)
-    # Parent
+
     if parent is not None:
         new_obj.parent = parent
+
     if lock_transform:
         new_obj.lock_location[0] = True
         new_obj.lock_location[1] = True
@@ -74,58 +65,57 @@ def add_object_empty(name, parent=None, dsp_type=0, dsp_size=0.15, lock_transfor
         new_obj.lock_scale[0] = True
         new_obj.lock_scale[1] = True
         new_obj.lock_scale[2] = True
+
     return new_obj
 
 
 def add_cube(name, parent=None):
     """
-    Adds a primitive cube to the scene.
+    Add a primitive cube to the scene.
     """
     new_obj = bpy.ops.mesh.primitive_cube_add()
     bpy.context.active_object.name = name
+
     if parent is not None:
         bpy.context.active_object.parent = parent
+
     return new_obj
 
 
 def add_default_icosphere(name, parent=None):
     """
-    Adds an icosphere to the scene.
+    Add an icosphere to the scene.
     """
-    new_obj = bpy.ops.mesh.primitive_ico_sphere_add(enter_editmode=False,
-                                                    align='WORLD',
-                                                    location=(0, 0, 1),
-                                                    scale=(0.9999, 0.9999, 0.9999))
+    new_obj = bpy.ops.mesh.primitive_ico_sphere_add(
+        enter_editmode=False,
+        align='WORLD',
+        location=(0, 0, 1),
+        scale=(0.9999, 0.9999, 0.9999),
+    )
     bpy.context.active_object.name = name
+
     if parent is not None:
         bpy.context.active_object.parent = parent
+
     return new_obj
 
 
 def add_asset_hierarchy(hierarchy_lst, include_default_mesh, include_selected_obj, dsp_arrows=True):
     """
-    Creates an asset hierarchy from the given name. This asset hierarchy is to be used for sending to other DDC & UE.
-    :param hierarchy_lst: Lst of name of root of object hierarchies
-    :type hierarchy_lst: lst
+    Create an asset hierarchy from the given names. This asset hierarchy is used for sending to DDC and UE.
+
+    :param hierarchy_lst: List of root object hierarchy names
     :param include_default_mesh: Should the default icosphere mesh be created inside the new hierarchy?
-    :type include_default_mesh: bool
     :param include_selected_obj: Should the selected objects be moved to the new hierarchy?
-    :type include_selected_obj: bool
     :param dsp_arrows: Should the empty objects from the hierarchy display as arrows?
-    :type dsp_arrows: bool
     """
     log(Severity.DEBUG, 'Add Asset Hierarchy', 'Executing Add Asset Hierarchy Procedure...')
 
-    # Set to Object Mode
     sceneUtils.set_object_mode()
 
-    # Create "Empty" Object Type at root, with given hierarchy_lst
     for hierarchy in hierarchy_lst:
-
-        # Get selection
         selected_obj_lst = get_selection()
 
-        # Deselect everything
         deselect_all()
 
         if dsp_arrows:
@@ -138,66 +128,52 @@ def add_asset_hierarchy(hierarchy_lst, include_default_mesh, include_selected_ob
         # - Otherwise, content goes directly under the root.
         content_parent_obj = root_object
 
-        # Create underlying "Empty" objects.
-
-        # Null Meshes
         if prefs().container.create_element_render:
-            null_meshes_name = prefs().container.asset_hierarchy_empty_object_meshes  # Name
-            null_mesh_object = add_object_empty(null_meshes_name, root_object, 3, 0.15, True)  # Create
+            null_meshes_name = prefs().container.asset_hierarchy_empty_object_meshes
+            null_mesh_object = add_object_empty(null_meshes_name, root_object, 3, 0.15, True)
             content_parent_obj = null_mesh_object
 
-        # Default placeholder mesh (goes under content parent: Render if enabled, else root)
+        # Default placeholder mesh goes under content parent: Render if enabled, otherwise root.
         if include_default_mesh:
             default_cube_suffix = '_placeHolderMesh01'
             add_default_icosphere(hierarchy + default_cube_suffix, content_parent_obj)
 
-        # If there is a single hierarchy and defined to include selection
         if len(hierarchy_lst) == 1 and include_selected_obj:
             if len(selected_obj_lst) > 0:
                 for selected_obj in selected_obj_lst:
                     selected_obj.parent = content_parent_obj
 
-        # Null Collisions
         if prefs().container.create_element_collision:
             null_collisions_name = prefs().container.asset_hierarchy_empty_object_collisions
-            add_object_empty(null_collisions_name, root_object, 4, 0.05, True)  # Create
+            add_object_empty(null_collisions_name, root_object, 4, 0.05, True)
 
-        # Null Sockets
         if prefs().container.create_element_sockets:
-            null_sockets_name = prefs().container.asset_hierarchy_empty_object_sockets  # Name
-            add_object_empty(null_sockets_name, root_object, 5, 0.05, True)  # Create
+            null_sockets_name = prefs().container.asset_hierarchy_empty_object_sockets
+            add_object_empty(null_sockets_name, root_object, 5, 0.05, True)
 
-        # Deselect everything
         deselect_all()
 
 
 def get_obj_child(obj):
     """
-    Get list of children
-    :param obj: Object to get list of children from
-    :type obj: Object
-    :rtype: lst of Objects
+    Get the direct children of an object.
     """
     return obj.children
 
 
 def get_obj_child_recursive(obj):
     """
-    Get list of children objects (recursive)
-    :param obj: Object to get list of children (recursively) from
-    :type obj: Object
-    :rtype: lst of Objects
+    Get the children of an object recursively.
     """
     child_recursive_lst = []
 
     def obj_append_get_child(child_obj):
         """
-        Function to execute over and over again as long as Object has children
-        :param child_obj: Object to execute the function on
-        :type child_obj: Object
+        Recursively append child objects to the list.
         """
         if child_obj is not obj:
             child_recursive_lst.append(child_obj)
+
         child_obj_lst = get_obj_child(child_obj)
         if len(child_obj_lst) > 0:
             for child in child_obj_lst:
@@ -209,56 +185,61 @@ def get_obj_child_recursive(obj):
 
 def get_obj_parent(obj):
     """
-    Returns the parent object of an object
+    Return the parent object of an object.
     """
     return obj.parent
 
 
 def get_obj_upmost_parent(obj):
+    """
+    Return the top-most parent of an object.
+    """
     obj_parent = get_obj_parent(obj)
     if obj_parent is not None:
         return get_obj_upmost_parent(obj_parent)
-    else:
-        return obj
+
+    return obj
 
 
 def get_obj_root_lst_type_empty():
     """
-    Get a list of the objects at the root of the scene of type 'EMPTY'
+    Get a list of root scene objects of type EMPTY.
     """
     scene_obj_lst = sceneUtils.get_scene_obj_lst()
     scene_root_lst = []
+
     for scene_obj in scene_obj_lst:
         upmost_parent_obj = get_obj_upmost_parent(scene_obj)
         if upmost_parent_obj not in scene_root_lst:
             if 'EMPTY' in get_obj_type(upmost_parent_obj):
                 scene_root_lst.append(upmost_parent_obj)
+
     return scene_root_lst
 
 
 def delete_obj(obj):
     """
-    Delete an object
+    Delete an object.
     """
     if obj.type == 'MESH':
         # bpy.context.scene.objects.unlink(obj)
         # bpy.data.meshes.remove(obj.data)
         pass
+
     bpy.data.objects.remove(obj)
 
 
 def delete_obj_lst(obj_lst):
     """
-    Delete an object
+    Delete a list of objects.
     """
-
     for obj in obj_lst:
         delete_obj(obj)
 
 
 def delete_obj_recursive(obj):
     """
-    Deletes an object as well as everything else underneath it in the hierarchy
+    Delete an object and everything underneath it in the hierarchy.
     """
     obj_del_lst = get_obj_child_recursive(obj)
     obj_del_lst.append(obj)
@@ -267,36 +248,30 @@ def delete_obj_recursive(obj):
 
 def get_obj_type(obj):
     """
-    Returns the object type of an object
-    :param obj: Object to get type of
-    :type obj: Object
-    :rtype: str
+    Return the object type.
     """
     return obj.type
 
 
 def get_obj_name(obj):
     """
-    Returns the hierarchy_lst of an object
-    :param obj: Object to get the hierarchy_lst of
-    :type obj: Object
-    :rtype: str
+    Return the name of an object.
     """
     return obj.name
 
 
 def set_obj_name(obj, name):
     """
-    Sets the name of an object
+    Set the name of an object.
     """
     obj.name = name
 
 
 def select_obj_lst(obj_lst):
     """
-    Selects all objects in a list
-    :param obj_lst: List of Objects to select
-    :type obj_lst: lst
+    Select all objects in a list.
+
+    :param obj_lst: List of objects to select
     """
     for obj in obj_lst:
         obj.select_set(True)
@@ -304,10 +279,9 @@ def select_obj_lst(obj_lst):
 
 def get_obj_by_name(name):
     """
-    Gets Blender Object from given hierarchy_lst
-    :param name: Name of the Object that will be returned
-    :type name: str
-    :rtype: Object
+    Get a Blender object by name.
+
+    :param name: Name of the object to return
     """
     scene_obj_lst = sceneUtils.get_scene_obj_lst()
     for obj in scene_obj_lst:
@@ -317,26 +291,24 @@ def get_obj_by_name(name):
 
 def get_obj_world_translation(obj):
     """
-    Get world translation of given object.
-    rtype: Vector?
+    Get the world translation of an object.
     """
     return obj.matrix_world.to_translation()
 
 
 def set_obj_world_translation(obj, vector_xyz):
     """
-    Set world translation of given object.
+    Set the world translation of an object.
+
     :param obj: Object
-    :type obj: Object
-    :param vector_xyz: Vector with X, Y, Z translations
-    :type vector_xyz: mathUtils.Vector
+    :param vector_xyz: Vector with X, Y, and Z translations
     """
     obj.location = vector_xyz
 
 
 def set_zero_obj_world_translation(obj):
     """
-    Set world translation of given object to 0, 0, 0.
+    Set the world translation of an object to 0, 0, 0.
     """
     vector_zero_translation = mathutils.Vector((0, 0, 0))
     set_obj_world_translation(obj, vector_zero_translation)
@@ -344,7 +316,7 @@ def set_zero_obj_world_translation(obj):
 
 def get_selection():
     """
-    Get current selection of objects.
+    Get the current object selection.
     """
     # TODO: Added 2 lines here... idk if it'll break something. <- Figure what that is about
     # # before was just the return

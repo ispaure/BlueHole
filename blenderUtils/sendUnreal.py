@@ -15,17 +15,14 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
 from pathlib import Path
 import time
 
-# Blue Hole
 from ..Lib.commonUtils.debugUtils import *
-from . import blenderFile, filterUtils
 from ..Lib.send2ue.dependencies import remote_execution
 from ..preferences.prefs import *
 from ..wrappers.sourceContentPath import get_valid_source_content_path
-
+from . import blenderFile, filterUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -36,9 +33,9 @@ send_ue_name = 'Blue Hole Bridge to Unreal'
 
 def trigger_unreal_import(file_path_source):
     """
-    Send import command to Unreal (from file path source, to destination)
+    Send an import command to Unreal from the given source file path.
+
     :param file_path_source: Source file to import
-    :type file_path_source: str
     """
 
     def display_path_error_source_content(path):
@@ -68,35 +65,22 @@ def trigger_unreal_import(file_path_source):
         )
         log(Severity.CRITICAL, send_ue_name, err_msg, popup=True)
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # VALIDATE ENV_VARIABLES.INI has valid SourceContent path for Unreal Bridge,
-    # and that current .blend file is within.
-
-    # Get SourceContent's directory path from env_variables.ini
-    # (the root of where blender files and assets are saved)
+    # Validate Source Content path from env_variables.ini and ensure the current .blend file is within it.
     sc_path = get_valid_source_content_path()
 
-    # Validate this path is valid, else throw error
     if not sc_path:
         display_path_error_source_content(sc_path)
         return False
-    else:
-        sc_path_str = str(sc_path)
 
-    # Validate that currently opened blend file has location on disk.
-    check_result = filterUtils.check_tests('Export Asset Hierarchy',
-                                           check_blend_exist=True)
-    if not check_result:
+    sc_path_str = str(sc_path)
+
+    if not filterUtils.check_tests('Export Asset Hierarchy', check_blend_exist=True):
         return False
 
-    # Validate currently opened blend file is within SourceContent
     blend_path = str(Path(blenderFile.get_blend_directory_path()))
     if sc_path_str not in blend_path:
         display_path_error_blend(sc_path_str, blend_path)
         return False
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Know everything is valid, send command to Unreal.
 
     file_path_dest = file_path_source.replace(sc_path_str, '/Game')
 
@@ -127,15 +111,13 @@ def display_cannot_connect_unreal_error():
 
 def import_asset(file_path_source, file_path_dest):
     """
-    This function imports an asset to unreal
+    Import an asset into Unreal.
     """
-    # start a connection to the engine that lets you send python strings
     remote_exec = remote_execution.RemoteExecution()
     remote_exec.start()
-    # Fetch properties
+
     log(Severity.DEBUG, send_ue_name, 'Fetching Properties...')
 
-    # Was it a skeletal?
     sk_prefix = prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh
     if sk_prefix == file_path_source.split('/')[-1][0:len(sk_prefix)]:
         log(Severity.DEBUG, send_ue_name, 'Export is a Skeletal Mesh')
@@ -144,16 +126,12 @@ def import_asset(file_path_source, file_path_dest):
         log(Severity.DEBUG, send_ue_name, 'Export is a Static Mesh')
         is_skeletal = False
 
-    # Is importing animations?
     include_animation = prefs().bridge.ue_bridge_include_animation
 
-    # Make sure \\ on paths
     file_path_source = file_path_source.replace('\\', '\\\\')
     file_path_dest = file_path_dest.replace('\\', '/')
-
     file_path_dest = file_path_dest[0:-len(file_path_dest.split('/')[-1])]
 
-    # send over the python code as a string
     run_unreal_python_commands(
         remote_exec,
         '\n'.join([
@@ -173,22 +151,21 @@ def import_asset(file_path_source, file_path_dest):
             f'options.static_mesh_import_data.generate_lightmap_u_vs = False',
             f'options.lod_distance0 = 1.0',
 
-            # if this is a skeletal mesh import
+            # Skeletal mesh import
             f'if {is_skeletal}:',
             f'\toptions.mesh_type_to_import = unreal.FBXImportType.FBXIT_SKELETAL_MESH',
             f'\toptions.skeletal_mesh_import_data.import_mesh_lo_ds = {False}',
 
-            # if this is an static mesh import
+            # Static mesh import
             f'if {not is_skeletal}:',
             f'\toptions.mesh_type_to_import = unreal.FBXImportType.FBXIT_STATIC_MESH',
             f'\toptions.static_mesh_import_data.import_mesh_lo_ds = {False}',
             f'\toptions.static_mesh_import_data.set_editor_property("combine_meshes", True)',
 
-            # if this is an animation import
+            # Animation import
             f'if {include_animation}:',
             f'\tskeleton_asset = unreal.load_asset(r"{file_path_dest}")',
 
-            # if a skeleton can be loaded from the provided path
             f'\tif skeleton_asset:',
             f'\t\toptions.set_editor_property("skeleton", skeleton_asset)',
             f'\t\toptions.set_editor_property("original_import_type", unreal.FBXImportType.FBXIT_ANIMATION)',
@@ -197,48 +174,42 @@ def import_asset(file_path_source, file_path_dest):
             f'\telse:',
             f'\t\traise RuntimeError("Unreal could not find a skeleton here: {file_path_dest}")',
 
-            # assign the options object to the import task and import the asset
             f'import_task.options = options',
             f'unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([import_task])',
 
-            # check for a that the game asset imported correctly if the import object name as is False
+            # Check for an import failure if needed
             f'if {False}:',
             f'\tgame_asset = unreal.load_asset(r"{file_path_dest}")',
             f'\tif not game_asset:',
             f'\t\traise RuntimeError("Multiple roots are found in the bone hierarchy. Unreal will only support a single root bone.")',
-        ]))
+        ])
+    )
 
-    # if there is an error report it
     if unreal_response:
         if unreal_response['result'] != 'None':
             display_cannot_connect_unreal_error()
             return False
+
     return True
 
 
 def run_unreal_python_commands(remote_exec, commands, failed_connection_attempts=0):
     """
-    This function finds the open unreal editor with remote connection enabled, and sends it python commands.
+    Find the open Unreal Editor with remote connection enabled and send it Python commands.
 
-    :param object remote_exec: A RemoteExecution instance.
-    :param str commands: A formatted string of python commands that will be run by the engine.
-    :param int failed_connection_attempts: A counter that keeps track of how many times an editor connection attempt
-    was made.
+    :param remote_exec: A RemoteExecution instance
+    :param commands: A formatted string of Python commands to run in the engine
+    :param failed_connection_attempts: Counter tracking how many connection attempts were made
     """
-    # wait a tenth of a second before attempting to connect
     time.sleep(0.1)
+
     try:
-        # default ue remote connection address 239.0.0.1:6766
         for node in remote_exec.remote_nodes:
             remote_exec.open_command_connection(node.get("node_id"))
 
-        # if a connection is made
         if remote_exec.has_command_connection():
-            # run the import commands and save the response in the global unreal_response variable
             global unreal_response
             unreal_response = remote_exec.run_command(commands, unattended=False)
-
-        # otherwise make an other attempt to connect to the engine
         else:
             if failed_connection_attempts < 10:
                 run_unreal_python_commands(remote_exec, commands, failed_connection_attempts + 1)
@@ -246,8 +217,7 @@ def run_unreal_python_commands(remote_exec, commands, failed_connection_attempts
                 remote_exec.stop()
                 display_cannot_connect_unreal_error()
                 return False
-
-    # shutdown the connection
     finally:
         remote_exec.stop()
+
     return True
