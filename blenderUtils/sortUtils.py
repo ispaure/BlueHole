@@ -1,5 +1,5 @@
 """
-Sort utilities for Blue Hole
+Sort utilities for Blue Hole.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,17 +15,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
-import mathutils as mathutils
+import mathutils
+import os
 
-# Blue Hole
 from . import objectUtils
 from ..Lib.commonUtils.debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# GLOBALS
 
-show_verbose = True
 sort_utils_name = filename = os.path.basename(__file__)
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -34,41 +32,29 @@ sort_utils_name = filename = os.path.basename(__file__)
 
 def sort_selected(world_axis, distance, second_world_axis=None, item_amt_per_row=None):
     """
-    Sorts selected Objects pivot points on axis with distance.
-    :param world_axis: World Axis ('X', 'Y' or 'Z') on which to sort Objects, starting at 0, 0, 0.
-    :type world_axis: str
-    :param distance: Distance at which to separate pivot points of Objects
-    :type distance: float
-    :param second_world_axis: (Optional; 2D Sort) World Axis ('X', 'Y', or 'Z') on which to sort Objects (subsequent rows).
-    :type second_world_axis: str
-    :param item_amt_per_row: (Optional; 2D sort) Items to have for each row (before switching to next row)
-    :type item_amt_per_row: int
+    Sort selected object pivot points on an axis using the given distance.
+
+    :param world_axis: World axis ('X', 'Y', or 'Z') on which to sort objects, starting at 0, 0, 0
+    :param distance: Distance at which to separate object pivot points
+    :param second_world_axis: Optional second world axis for 2D sorting
+    :param item_amt_per_row: Optional item count per row for 2D sorting
     """
-    # Get selection
     obj_sel = objectUtils.get_selection()
 
-    # Store selection in dictionary
     obj_sel_dict = {}
     obj_name_lst = []
     for obj in obj_sel:
         obj_sel_dict[obj.name] = obj
         obj_name_lst.append(obj.name)
 
-    # Sort selection alphabetically
     obj_name_lst.sort()
 
-    # Counter
     counter = 0
 
-    # For objects in the selection
     for obj_name in obj_name_lst:
-        # Find distance
         sort_distance = counter * distance
 
-        # Subsequent rows
-        # TODO Implement.
-
-        # Get translation
+        # TODO: Implement subsequent rows.
         if world_axis == 'X':
             translation_vector = mathutils.Vector((sort_distance, 0, 0))
         elif world_axis == 'Y':
@@ -79,18 +65,15 @@ def sort_selected(world_axis, distance, second_world_axis=None, item_amt_per_row
             log(Severity.ERROR, 'Sort Selection Tool', 'World Axis is Invalid!')
             return False
 
-        # Set translation
         objectUtils.set_obj_world_translation(obj_sel_dict[obj_name], translation_vector)
-
-        # Add 1 to counter
         counter += 1
 
-    # When done, return True
     return True
+
 
 def search_replace_name_selected(search, replace):
     """
-    Search and replace name of selected objects
+    Search and replace text in the names of selected objects.
     """
     obj_sel = objectUtils.get_selection()
     for obj in obj_sel:
@@ -99,29 +82,34 @@ def search_replace_name_selected(search, replace):
 
 
 def flip_text_last_underscore():
+    """
+    Flip the last two underscore-separated parts of selected object names.
+    """
     obj_sel = objectUtils.get_selection()
     for obj in obj_sel:
         obj_name = objectUtils.get_obj_name(obj)
         obj_name_lst = obj_name.split('_')
         obj_name_reconstruct = ''
+
         for item in obj_name_lst[:-2]:
             obj_name_reconstruct += item
             obj_name_reconstruct += '_'
+
         obj_name_reconstruct += obj_name_lst[-1]
         obj_name_reconstruct += '_'
         obj_name_reconstruct += obj_name_lst[-2]
-        print('DEBUG RECONSTRUCTED NAME IS!!!!!!!!!!!!!!!')
-        print(obj_name_reconstruct)
+
+        log(Severity.DEBUG, sort_utils_name, f'Reconstructed name: "{obj_name_reconstruct}"')
         obj.name = obj_name_reconstruct
 
 
 def batch_rename_selected(name, padding):
     """
-    Batch renames selected objects with given name and padding parameter (Mesh_01, Mesh_02 sort of thing)
-    :param name: Base name to be given to objects
-    :type name: str
-    :param padding: Padding type (string!)
-    :type padding: str
+    Batch rename selected objects using the given name and padding parameter
+    (for example: Mesh_01, Mesh_02).
+
+    :param name: Base name to assign to objects
+    :param padding: Padding type
     """
 
     def no_input_name():
@@ -131,8 +119,6 @@ def batch_rename_selected(name, padding):
     def no_selection():
         msg = 'No object was selected for the operation. Select at least one object and try again.'
         log(Severity.ERROR, sort_utils_name, msg)
-
-    tool_name = 'Batch Rename (Selected)'
 
     current_sel = objectUtils.get_selection()
 
@@ -152,7 +138,11 @@ def batch_rename_selected(name, padding):
         elif len(current_sel) <= 999:
             padding = 3
         else:
-            print('This script was not made to work with more than 999 objects. Please adjust the script if needed')
+            log(
+                Severity.ERROR,
+                sort_utils_name,
+                'This script was not made to work with more than 999 objects. Please adjust the script if needed.',
+            )
             return False
 
     counter = 1
@@ -160,12 +150,14 @@ def batch_rename_selected(name, padding):
         if str(padding) == '1':
             item.name = name + '_' + str(counter)
             counter += 1
+
         if str(padding) == '2':
             if counter <= 9:
                 item.name = name + '_0' + str(counter)
             elif counter <= 99:
                 item.name = name + '_' + str(counter)
             counter += 1
+
         if str(padding) == '3':
             if counter <= 9:
                 item.name = name + '_00' + str(counter)
@@ -175,7 +167,4 @@ def batch_rename_selected(name, padding):
                 item.name = name + '_' + str(counter)
             counter += 1
 
-    # Achieved successfully
     return True
-
-

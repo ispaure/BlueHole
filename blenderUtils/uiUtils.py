@@ -1,5 +1,5 @@
 """
-User Interface (UI) Functions for Blue Hole
+User Interface (UI) functions for Blue Hole.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -17,7 +17,6 @@ __status__ = 'Production'
 
 from pathlib import Path
 
-# Blender
 import bpy
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -31,12 +30,15 @@ def show_label(label_text, layout):
 def set_theme(name):
     """
     Set Blender to the chosen theme.
-    :param name: Name of the theme file to be set (without extension)
-    :type name: str
+
+    :param name: Name of the theme file (without extension)
     """
-    # Import here only (if import at the top it causes cyclical issues)
+    # Import locally to avoid circular imports
     from .blenderFile import get_blue_hole_themes_path
-    # Determine .xml theme preset path, which is slightly different depending if Windows or Unix
-    theme_file_path = str(Path(get_blue_hole_themes_path() + '/' + name + '.xml'))
-    # Set Current theme as .xml theme preset path
-    bpy.ops.script.execute_preset(filepath=theme_file_path, menu_idname='USERPREF_MT_interface_theme_presets')
+
+    theme_file_path = str(Path(get_blue_hole_themes_path()) / f'{name}.xml')
+
+    bpy.ops.script.execute_preset(
+        filepath=theme_file_path,
+        menu_idname='USERPREF_MT_interface_theme_presets',
+    )
