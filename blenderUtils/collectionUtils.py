@@ -13,49 +13,43 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
+# IMPORTS
 
 import bpy
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-def get_or_add_collection_if_not_exist(name):
+
+def get_or_add_collection_if_not_exist(name: str):
     """
-    Gets a collection (if collection with name already exists), else adds a collection (with name)
+    Get a collection by name, or create it if it does not exist.
+
     :param name: Name of collection to get or create
     :return: Collection
     """
-    if get_collection(name) is None:
+    collection = get_collection(name)
+    if collection is None:
         return add_collection(name)
-    else:
-        return get_collection(name)
+
+    return collection
 
 
-def add_collection(name):
+def add_collection(name: str):
     """
-    Create collection with given name
+    Create a collection with the given name.
+
     :param name: Collection name
-    :type name: str
     """
     bpy.ops.collection.create(name=name)
     bpy.context.scene.collection.children.link(bpy.data.collections[name])
     return bpy.data.collections[name]
 
 
-def get_collection(name):
+def get_collection(name: str):
     """
-    Get a collection object by name
+    Get a collection object by name.
+
     :param name: Name of collection to get
-    :type name: str
     """
-    if bpy.data.collections.get(name):
-        return bpy.data.collections.get(name)
-    else:
-        return None
+    return bpy.data.collections.get(name)

@@ -17,14 +17,13 @@ __status__ = 'Production'
 
 import addon_utils
 from pathlib import Path
-import platform
+
 from . import blenderFile, objectUtils, projectUtils
-from ..wrappers import perforceWrapper
 from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.osUtils import *
 from ..environment import envPathResolver
 from ..preferences.prefs import *
-from enum import Enum
-from ..Lib.commonUtils.osUtils import *
+from ..wrappers import perforceWrapper
 from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -32,26 +31,23 @@ from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 
 def filter_source_control():
-    if prefs().sc.source_control_enable:
-        return True
-    else:
-        return False
+    return prefs().sc.source_control_enable
 
 
 def check_blend_location_in_dir_structure():
     """
-    Validates if yes or not the currently opened scene is in the right sub-folder according to DirectoryStructure in
-    env_variables.ini
+    Validate whether the currently opened scene is in the correct sub-folder according to DirectoryStructure in
+    env_variables.ini.
     """
-
-    expected_location_on_disk = str(Path(projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_scenes),
-                                         blenderFile.get_blend_file_name() + '.blend'
-                                         ))
+    expected_location_on_disk = str(
+        Path(
+            projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_scenes),
+            blenderFile.get_blend_file_name() + '.blend',
+        )
+    )
     blend_location_on_disk = blenderFile.get_blend_file_path()
-    if expected_location_on_disk.replace('\\', '/') == blend_location_on_disk.replace('\\', '/'):
-        return True
-    else:
-        return False
+
+    return expected_location_on_disk.replace('\\', '/') == blend_location_on_disk.replace('\\', '/')
 
 
 def check_addon_loaded(addon_name):
@@ -70,35 +66,27 @@ def check_tests(script_name, *,
                 silent_mode=False
                 ):
     """
-    Performs a series of tests and returns a warning and false result if something fails. Normally ran at beginning of
-    a script to determine whether it should attempt to run or not.
-    :param script_name: Name of script that is attempting the checks. This will show up as the title of the message
-                        box should an exception occur.
-    :type script_name: str
-    :param check_blend_exist: Check to see if currently opened blend file is saved on disk
-    :type check_blend_exist: bool
-    :param check_blend_loc_in_dir_structure: Check to see if currently opened blend file is saved in right location
-                                                  in regards to the DirectoryStructure of the current environment.
-    :type check_blend_loc_in_dir_structure: bool
-    :param check_selection_not_empty: Check to see if there is at least one item selected
-    :type check_selection_not_empty: bool
-    :param check_source_control_enable: Check to see if source control is enabled
-    :type check_source_control_enable: bool
-    :param check_source_control_connection: Check to see if connection can be established to source control
-    :type check_source_control_connection: bool
-    :param check_source_content_root_path_exist: Check to see if Source Content Root Path Exists as specified
-    :type check_source_content_root_path_exist: bool
-    :param check_blend_in_source_content: Check to see if the Blender file is within Source Content
-    :type check_blend_in_source_content: bool
-    :param check_unity_assets_path_exist: Check to see if Unity Project's Assets Path Exists
-    :type check_unity_assets_path_exist: bool
-    :param silent_mode: If silent mode is true, do not show dialog box on errors.
-    :type silent_mode: bool
+    Perform a series of tests and return False if any validation fails.
+
+    This is normally run at the beginning of a script to determine whether it should proceed.
+
+    :param script_name: Name of the script attempting the checks. This appears as the title of the message box if an
+        exception occurs.
+    :param check_blend_exist: Check whether the currently opened blend file is saved on disk.
+    :param check_blend_loc_in_dir_structure: Check whether the currently opened blend file is saved in the correct
+        location according to the DirectoryStructure of the current environment.
+    :param check_selection_not_empty: Check whether at least one object is selected.
+    :param check_source_control_enable: Check whether source control is enabled.
+    :param check_source_control_connection: Check whether a connection can be established to source control.
+    :param check_source_content_root_path_exist: Check whether the Source Content Root Path exists.
+    :param check_blend_in_source_content: Check whether the Blender file is within Source Content.
+    :param check_unity_assets_path_exist: Check whether the Unity project's Assets path exists.
+    :param silent_mode: If True, do not show dialog boxes on errors.
     """
 
     # ERROR DIALOGUES
     def dialog_check_blend_exist():
-        if silent_mode is False:
+        if not silent_mode:
             msg = (
                 f'{script_name} validation failed.\n\n'
                 f'What went wrong:\n'
@@ -110,7 +98,7 @@ def check_tests(script_name, *,
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_selection_not_empty():
-        if silent_mode is False:
+        if not silent_mode:
             msg = (
                 f'{script_name} validation failed.\n\n'
                 f'What went wrong:\n'
@@ -122,7 +110,7 @@ def check_tests(script_name, *,
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_source_control_enable():
-        if silent_mode is False:
+        if not silent_mode:
             msg = (
                 f'{script_name} validation failed.\n\n'
                 f'What went wrong:\n'
@@ -172,7 +160,7 @@ def check_tests(script_name, *,
             log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def dialog_check_blend_location_in_dir_structure():
-        if silent_mode is False:
+        if not silent_mode:
             specified_sub_folder = prefs().directory.sc_dir_struct_scenes
 
             msg = (
@@ -231,7 +219,7 @@ def check_tests(script_name, *,
         )
         log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
-    # Check if Blend exists
+    # Check if blend exists
     if check_blend_exist:
         if len(blenderFile.get_blend_file_path()) == 0:
             log(Severity.ERROR, script_name, 'Check Blend Exist Failed')
@@ -239,7 +227,7 @@ def check_tests(script_name, *,
             return False
         log(Severity.DEBUG, script_name, 'Check Blend Exist Succeeded!')
 
-    # Check if Blend scene in proper sub-folder
+    # Check if blend scene is in the proper sub-folder
     if check_blend_loc_in_dir_structure:
         check_result = check_blend_location_in_dir_structure()
         if not check_result:
@@ -279,19 +267,18 @@ def check_tests(script_name, *,
     else:
         sc_path = None
 
-    # Check Source Content Root Path Exists
+    # Check Source Content Root Path exists
     if check_source_content_root_path_exist:
         if not sc_path:
             display_path_error_source_content(sc_path)
             return False
 
-    # Check Blender File is within Source Content
+    # Check Blender file is within Source Content
     if check_blend_in_source_content:
         if not sc_path:
             display_path_error_source_content(sc_path)
             return False
 
-        # If on Windows, should test in lowercase (not be case-sensitive)
         match get_os():
             case OS.WIN:
                 sc_path_str = str(sc_path).lower()
@@ -304,7 +291,7 @@ def check_tests(script_name, *,
             display_path_error_blend(sc_path, blend_path)
             return False
 
-    # Check that Unity Asset's Path Exists
+    # Check that Unity Assets path exists
     if check_unity_assets_path_exist:
         unity_asset_path = envPathResolver.get_valid_unity_asset_dir_path()
 
@@ -312,5 +299,4 @@ def check_tests(script_name, *,
             display_path_error_unity_assets(unity_asset_path)
             return False
 
-    # Reached the end, so return True
     return True
