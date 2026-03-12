@@ -1,12 +1,14 @@
 """
-Export Settings for Asset Hierarchy Exports. Created in January 2026, alongside the exportUtils3 refactor.
+Export settings presets for Asset Hierarchy exports.
+
+Introduced in January 2026 alongside the exportUtils3 refactor.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
-__copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
+__copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
 __license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
@@ -15,16 +17,13 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
-from dataclasses import dataclass
 from enum import Enum
 
-# Blue Hole
 from ...Lib.commonUtils.debugUtils import *
-from .exportSettings import *
+from ...environment import envPathResolver
 from ...preferences.prefs import *
 from .. import projectUtils
-from ...environment import envPathResolver
+from .exportSettings import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -37,13 +36,18 @@ class ExportSettingsPreset(Enum):
 
 def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
     """
-    Made this a get, because we need to get the correct settings at that specific point and not at initial plugin init.
+    Resolve the ExportSettings for the given preset.
+
+    This is evaluated at call time instead of plugin initialization
+    because preferences and environment paths may change during runtime.
     """
+
     match preset:
+
         case ExportSettingsPreset.UNITY:
-            preset = ExportSettings(
+            export_settings = ExportSettings(
                 # NAME
-                name='Unity',
+                name="Unity",
 
                 # EXPORT OPTIONS
                 exp_format="FBX",
@@ -64,12 +68,13 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
                 rename_collisions_for_ue=False,
 
                 # ENGINE
-                engine=Engine.UNITY)
+                engine=Engine.UNITY,
+            )
 
         case ExportSettingsPreset.UNREAL:
-            preset = ExportSettings(
+            export_settings = ExportSettings(
                 # NAME
-                name='Unreal',
+                name="Unreal",
 
                 # EXPORT OPTIONS
                 exp_format="FBX",
@@ -90,8 +95,10 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
                 rename_collisions_for_ue=True,
 
                 # ENGINE
-                engine=Engine.UNREAL)
-        case _:
-            log(Severity.CRITICAL, 'ExportSettingsPreset', 'Requested invalid ExportSettingsPreset')
+                engine=Engine.UNREAL,
+            )
 
-    return preset
+        case _:
+            log(Severity.CRITICAL, "ExportSettingsPreset", "Requested invalid ExportSettingsPreset")
+
+    return export_settings

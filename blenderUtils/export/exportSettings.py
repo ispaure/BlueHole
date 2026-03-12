@@ -1,12 +1,14 @@
 """
-Export Settings for Asset Hierarchy Exports. Created in January 2026, alongside the exportUtils3 refactor.
+Export settings for Asset Hierarchy exports.
+
+Introduced in January 2026 alongside the exportUtils3 refactor.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
-__copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
+__copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
 __license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
@@ -15,7 +17,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -53,5 +54,5 @@ class ExportSettings:
     apply_scale_options: str
     rename_collisions_for_ue: bool
 
-    # Engine
+    # Target Engine
     engine: Engine

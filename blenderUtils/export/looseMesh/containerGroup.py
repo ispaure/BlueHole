@@ -1,9 +1,9 @@
 """
-The March 2026 refactor of exportUtils2, but only section about individual asset exports.
+March 2026 refactor of exportUtils2 for loose mesh exports.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
@@ -25,11 +25,7 @@ from ... import objectUtils, projectUtils
 from ....preferences.prefs import *
 from .container import LooseMeshContainer
 from ..model.containerGroup import ContainerGroup
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
+from pathlib import Path
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -50,7 +46,7 @@ class LooseMeshContainerGroup(ContainerGroup):
         # Wipe existing list of meshes
         self.container_lst = []
 
-        # For each selected mesh, make a ExportMesh class
+        # For each selected mesh, create a LooseMeshContainer
         for obj in selection_obj_lst:
             mesh_container_cls = LooseMeshContainer(obj, self.export_settings)
             self.container_lst.append(mesh_container_cls)
@@ -66,26 +62,25 @@ class LooseMeshContainerGroup(ContainerGroup):
         msg = f'Set Containers from Scene unsupported for {self.CONTAINERS_NAME}.'
         log(Severity.CRITICAL, self.CONTAINERS_NAME, msg)
 
-    # ----------------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
     # CRITICAL ERROR MESSAGES
 
     def __critical_set_containers_selection_missing(self):
-        # Construct the message
         msg = f'The {ah_tool_name} could not export meshes because the selection was empty. Aborting export!'
         log(Severity.CRITICAL, ah_tool_name, msg, popup=True)
 
 
 def batch_export_loose_mesh(path_append):
     """
-    Exports selected asset files in desired location, relative to open project.
-    :param path_append: Specifies directory to export to. Has to be an entry of
-                        env_variables.ini under "DirectoryStructure" section.
-    :type path_append: str
+    Export selected mesh files to the desired location relative to the open project.
+
+    :param path_append: Directory to export to. Must be an entry from the
+        "DirectoryStructure" section of env_variables.ini.
     """
     # Get path of desired subproject directory to export to
     exp_dir = str(projectUtils.get_project_sub_dir(path_append))
 
-    # Create ExportSettings Class
+    # Create ExportSettings class
     exp_set_cls = ExportSettings(
         # NAME
         name='Loose Mesh',
@@ -101,15 +96,16 @@ def batch_export_loose_mesh(path_append):
         include_socket=False,
 
         # FBX SPECIFIC OPTIONS
-        axis_up="Z",
-        axis_fwd="-Y",
-        mesh_smooth_type="FACE",
+        axis_up='Z',
+        axis_fwd='-Y',
+        mesh_smooth_type='FACE',
         bake_anim=False,
-        apply_scale_options="FBX_SCALE_NONE",
-        rename_collisions_for_ue=False,  # adjust if needed
+        apply_scale_options='FBX_SCALE_NONE',
+        rename_collisions_for_ue=False,
 
         # ENGINE
-        engine=Engine.UNDEFINED)
+        engine=Engine.UNDEFINED,
+    )
 
     export_meshes = LooseMeshContainerGroup(exp_set_cls)
     export_meshes.set_containers_from_selection(silent_if_empty=False)

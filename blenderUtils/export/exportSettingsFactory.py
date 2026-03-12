@@ -1,12 +1,14 @@
 """
-Export Settings for Asset Hierarchy Exports. Created in January 2026, alongside the exportUtils3 refactor.
+Factory utilities for creating ExportSettings instances from preset dictionaries.
+
+Introduced alongside the exportUtils3 refactor (January 2026).
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
-__copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
+__copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
 __license__ = "MIT License"
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
@@ -15,12 +17,10 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
 from dataclasses import dataclass
 from enum import Enum
 from typing import *
 
-# Blue Hole
 from ...preferences.prefs import *
 from .. import projectUtils
 from .exportSettings import *
@@ -30,15 +30,24 @@ from .exportSettings import *
 
 
 class ExportSettingsFactory:
-    """ Create an ExportSettings class from a dictionary. Kept for legacy / keep existing behavior. """
+    """
+    Create an ExportSettings instance from a dictionary preset.
+
+    This factory is kept for legacy compatibility and preserves existing behavior.
+    """
+
     @staticmethod
     def from_dict(preset: Mapping[str, Any], *, engine: Engine) -> ExportSettings:
+
         included = preset.get("Included Elements", {})
 
         export_set_cls = ExportSettings(
             # EXPORT OPTIONS
             exp_format=preset.get("Format", "FBX"),
-            exp_dir=preset.get("Export Directory", projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_final)),
+            exp_dir=preset.get(
+                "Export Directory",
+                projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_final),
+            ),
             zero_root_transform=preset.get("Zero Root Transform", False),
 
             # INCLUDED ELEMENTS
@@ -54,5 +63,7 @@ class ExportSettingsFactory:
             apply_scale_options=preset.get("Apply Scale Option", "FBX_SCALE_NONE"),
             rename_collisions_for_ue=preset.get("Rename Collisions for UE", False),
 
-            engine=engine)
+            engine=engine,
+        )
+
         return export_set_cls

@@ -1,9 +1,9 @@
 """
-March 2026 refactor: Mesh Container
+March 2026 refactor: Loose Mesh Container.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
@@ -15,14 +15,8 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# Blue Hole
 from ..exportSettings import *
 from ..model.container import Container
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -36,7 +30,7 @@ class LooseMeshContainer(Container):
         super().__init__(mesh, export_settings)
 
     def _rename_before_export(self):
-        pass  # No renames required for MeshContainer
+        pass  # No renames required for LooseMeshContainer
 
     def _get_obj_lst(self):
-        return [self.root]  # MeshContainer only has one object to export
+        return [self.root]  # LooseMeshContainer only exports one object

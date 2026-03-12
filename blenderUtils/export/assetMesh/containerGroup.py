@@ -1,9 +1,9 @@
 """
-The March 2026 refactor of exportUtils2, but only section about individual asset exports.
+March 2026 refactor of exportUtils2 for individual asset mesh exports.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://blue-hole.weebly.com
+# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
@@ -15,21 +15,12 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# Blender
-import bpy
-
-# Blue Hole
 from typing import *
 from ..exportSettings import *
 from ... import objectUtils
 from ....preferences.prefs import *
 from .container import AssetMeshContainer
 from ..model.assetContainerGroup import AssetContainerGroup
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -47,24 +38,23 @@ class AssetMeshContainerGroup(AssetContainerGroup):
 
     def _get_root_lst_from_obj_lst(self, obj_lst):
         """
-        Returns a List of mesh roots from a selection
+        Return a list of valid mesh roots from an object list.
         """
-        # Get list of hierarchy prefixes
         ah_prefix_lst: List[str] = [
             prefs().container.asset_hierarchy_struct_prefix_static_mesh,
             prefs().container.asset_hierarchy_struct_prefix_static_mesh_kit,
-            prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh
+            prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh,
         ]
 
-        # Export Root List
         exp_root_lst = []
 
-        # Go through selection to get list of upmost parents. Only add to list if item is not already there
+        # Go through objects to get the list of upmost parents.
+        # Only add an item if it is not already present and uses a valid prefix.
         for obj in obj_lst:
             upmost_parent_obj = objectUtils.get_obj_upmost_parent(obj)
 
-            # Checking if valid root
-            if 'MESH' in objectUtils.get_obj_type(upmost_parent_obj):  # If Empty, it's a transform
+            # Check whether the root is a valid mesh root.
+            if 'MESH' in objectUtils.get_obj_type(upmost_parent_obj):
                 for ah_prefix in ah_prefix_lst:
                     if objectUtils.get_obj_name(upmost_parent_obj)[:len(ah_prefix)] == ah_prefix:
                         if upmost_parent_obj not in exp_root_lst:

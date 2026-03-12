@@ -1,6 +1,5 @@
 """
-This specifies the mappings for Environment Preferences: It specifies how data in the .INI configuration files ties to
-the Blue Hole blender preferences.
+Mappings between Blue Hole environment preferences and .ini configuration values.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -16,7 +15,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# Blue Hole
 from .model import Setting
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -30,22 +28,27 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.sc_path_mac_alternate', ini_section='SourceContent', ini_value='sc_root_path_mac_alternate', var_type=str),
     Setting(pref_path='bridge.sc_path_linux', ini_section='SourceContent', ini_value='sc_root_path_linux', var_type=str),
     Setting(pref_path='bridge.sc_path_linux_alternate', ini_section='SourceContent', ini_value='sc_root_path_linux_alternate', var_type=str),
+
     Setting(pref_path='bridge.unity_assets_path', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path', var_type=str),
     Setting(pref_path='bridge.unity_assets_path_mac', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path_mac', var_type=str),
     Setting(pref_path='bridge.unity_assets_path_linux', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path_linux', var_type=str),
     Setting(pref_path='bridge.unity_forward_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='forward_axis', var_type=str),
     Setting(pref_path='bridge.unity_up_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='up_axis', var_type=str),
+
     Setting(pref_path='bridge.exp_select_zero_root_transform', ini_section='ExportBatchSelectionToFBX', ini_value='zero_root_transform', var_type=bool),
+
     Setting(pref_path='bridge.ue_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnreal', ini_value='zero_root_transform', var_type=bool),
     Setting(pref_path='bridge.ue_bridge_include_animation', ini_section='SendAssetHierarchiesToUnreal', ini_value='include_animation', var_type=bool),
-    Setting(pref_path='bridge.unity_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnity', ini_value='zero_root_transform', var_type=bool),
-    Setting(pref_path='bridge.unity_bridge_include_animation', ini_section='SendAssetHierarchiesToUnity', ini_value='include_animation', var_type=bool),
     Setting(pref_path='bridge.ue_automated', ini_section='SendAssetHierarchiesToUnreal', ini_value='is_automated', var_type=bool),
     Setting(pref_path='bridge.ue_import_materials', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_materials', var_type=bool),
     Setting(pref_path='bridge.ue_import_textures', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_textures', var_type=bool),
     Setting(pref_path='bridge.ue_enable_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_send_override', var_type=bool),
     Setting(pref_path='bridge.ue_op_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_send_override', var_type=str),
-    Setting(pref_path='bridge.active_game_engine', ini_section='Engine', ini_value='active_game_engine', var_type=str)
+
+    Setting(pref_path='bridge.unity_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnity', ini_value='zero_root_transform', var_type=bool),
+    Setting(pref_path='bridge.unity_bridge_include_animation', ini_section='SendAssetHierarchiesToUnity', ini_value='include_animation', var_type=bool),
+
+    Setting(pref_path='bridge.active_game_engine', ini_section='Engine', ini_value='active_game_engine', var_type=str),
 )
 
 
@@ -62,7 +65,6 @@ directory_setting_lst = (
 
 
 container_setting_lst = (
-
     # -------------------------------------------------------------------------------------------------
     # AssetHierarchyStructure
     # -------------------------------------------------------------------------------------------------
@@ -95,19 +97,22 @@ container_setting_lst = (
 
 
 source_control_setting_lst = (
-    # ------------------- SourceControl -------------------
     Setting(pref_path='sourcecontrol.win32_env_setting_p4port', ini_section='Perforce', ini_value='win32_env_setting_p4port', var_type=str),
     Setting(pref_path='sourcecontrol.win32_env_setting_p4user', ini_section='Perforce', ini_value='win32_env_setting_p4user', var_type=str),
     Setting(pref_path='sourcecontrol.win32_env_setting_p4client', ini_section='Perforce', ini_value='win32_env_setting_p4client', var_type=str),
+
     Setting(pref_path='sourcecontrol.macos_env_setting_p4port', ini_section='Perforce', ini_value='macos_env_setting_p4port', var_type=str),
     Setting(pref_path='sourcecontrol.macos_env_setting_p4user', ini_section='Perforce', ini_value='macos_env_setting_p4user', var_type=str),
     Setting(pref_path='sourcecontrol.macos_env_setting_p4client', ini_section='Perforce', ini_value='macos_env_setting_p4client', var_type=str),
+
     Setting(pref_path='sourcecontrol.linux_env_setting_p4port', ini_section='Perforce', ini_value='linux_env_setting_p4port', var_type=str),
     Setting(pref_path='sourcecontrol.linux_env_setting_p4user', ini_section='Perforce', ini_value='linux_env_setting_p4user', var_type=str),
     Setting(pref_path='sourcecontrol.linux_env_setting_p4client', ini_section='Perforce', ini_value='linux_env_setting_p4client', var_type=str),
+
     Setting(pref_path='sourcecontrol.source_control_solution', ini_section='SourceControl', ini_value='solution', var_type=str),
     Setting(pref_path='sourcecontrol.source_control_enable', ini_section='SourceControl', ini_value='enable', var_type=bool),
     Setting(pref_path='sourcecontrol.source_control_error_aborts_exp', ini_section='SourceControl', ini_value='abort_export_on_error', var_type=bool),
+
     Setting(pref_path='sourcecontrol.win32_env_override', ini_section='Perforce', ini_value='override_env_setting', var_type=bool),
     Setting(pref_path='sourcecontrol.p4v_app_path_mac', ini_section='Perforce', ini_value='p4v_app_path_mac', var_type=str),
     Setting(pref_path='sourcecontrol.p4_parallel_path_linux', ini_section='Perforce', ini_value='p4_parallel_path_linux', var_type=str),
