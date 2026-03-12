@@ -1,6 +1,5 @@
 """
-Main point of contact for source control scripts. They might get redirected to the proper source control solutions
-afterwards.
+Utility functions for setting Blender tools.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -16,7 +15,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# Blue Hole
 import bpy
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -25,12 +23,15 @@ import bpy
 
 def tool_set(tool_id: str) -> bool:
     """
-    Try to set a tool by id. Returns True if it succeeded, False otherwise.
+    Attempt to set a Blender tool by ID.
+
+    :param tool_id: Tool identifier
+    :return: True if the tool was successfully activated, otherwise False
     """
     try:
-        # operator returns {'FINISHED'} or {'CANCELLED'}
+        # Operator returns {'FINISHED'} or {'CANCELLED'}
         res = bpy.ops.wm.tool_set_by_id(name=tool_id)
         return 'FINISHED' in res
     except Exception:
-        # Tool not found / not available in this build/context
+        # Tool not found or unavailable in the current build/context
         return False

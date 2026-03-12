@@ -1,5 +1,5 @@
 """
-Update description
+Environment manager utilities for Blue Hole.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,11 +15,9 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-# System
-from typing import *
 from pathlib import Path
+from typing import *
 
-# Blue Hole
 from ..blenderUtils import blenderFile
 from ..Lib.commonUtils.debugUtils import *
 from ..preferences.prefs import *
@@ -34,7 +32,7 @@ env_tool_name = filename = os.path.basename(__file__)
 
 def get_env_from_prefs_active_env() -> Environment:
     """
-    Gets an Environment class that matches the current one that's active (per the Blender Blue Hole Preferences)
+    Get the Environment instance matching the environment currently active in Blue Hole preferences.
     """
     env_name = prefs().general.active_environment
     return Environment(env_name)
@@ -42,38 +40,47 @@ def get_env_from_prefs_active_env() -> Environment:
 
 def set_pref_current_env(env_name: str):
     """
-    Sets the current environment from a name string
+    Set the current active environment from a name string.
     """
     prefs().general.active_environment = env_name
 
 
 def get_default_env():
+    """
+    Get the default environment.
+    """
     return Environment('default')
 
 
 def set_env_to_default():
+    """
+    Set the active environment to the default environment.
+    """
     log(Severity.DEBUG, env_tool_name, 'Setting Active Environment to Default')
     prefs().general.active_environment = 'default'
 
 
 def if_current_env_missing_set_default():
+    """
+    Set the active environment to default if the current environment is missing or invalid.
+    """
+
     def current_env_exists():
         current_env = prefs().general.active_environment
 
-        # If length of active_environment field is 0, Blue Hole was most likely newly installed (need to set to default)
+        # If active_environment is empty, Blue Hole was most likely newly installed.
         if len(current_env) == 0:
             msg = 'Current Env is Unset (0 char length)'
             log(Severity.ERROR, env_tool_name, msg)
             return False
 
-        # If there is length, see if env_variables.ini file exists on disk for that environment
+        # If an environment is set, verify that its env_variables.ini file exists on disk.
         env_cls = Environment(current_env)
         if not os.path.isfile(env_cls.env_variables_path):
             msg = f'Current ({env_cls.name}) Env\'s env_variables.ini file is missing from disk!'
             log(Severity.ERROR, env_tool_name, msg)
             return False
 
-        # Environment exists
         return True
 
     if not current_env_exists():
@@ -82,23 +89,22 @@ def if_current_env_missing_set_default():
 
 def get_env_dict() -> Dict[str, Environment]:
     """
-    Deterministic map: environment name -> Environment instance.
-    Only includes directories in the BlueHole env folder.
+    Return a deterministic map of environment name to Environment instance.
+
+    Only directories inside the Blue Hole environment folder are included.
     """
     env_dir = Path(blenderFile.get_blue_hole_user_env_files_path())
 
     if not env_dir.exists():
         return {}
 
-    # Filter directories: no hidden or dotted names
     env_names: List[str] = [
         p.name
         for p in env_dir.iterdir()
         if p.is_dir() and not p.name.startswith('.') and '.' not in p.name
     ]
-    env_names.sort(key=lambda s: s.casefold())  # case-insensitive sort
+    env_names.sort(key=lambda s: s.casefold())
 
-    # Return a dict of name -> Environment instance
     return {name: Environment(name) for name in env_names}
 
 
@@ -108,15 +114,13 @@ def get_env_lst_enum_property(exclude_default: bool = False):
 
     Each item is a tuple: (identifier, name, description)
 
-    :param exclude_default: If True, the "default" environment is omitted.
-    :return: List of enum tuples.
+    :param exclude_default: If True, omit the "default" environment
+    :return: List of enum tuples
     """
     env_dict = get_env_dict()
     enum_items = []
 
     for env_name in env_dict.keys():
-
-        # Skip default environment if requested
         if exclude_default and env_name == 'default':
             continue
 
