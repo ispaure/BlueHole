@@ -47,21 +47,21 @@ class MeshKeymapPG(bpy.types.PropertyGroup):
     enable_mesh_keymaps: BoolProperty(
         name='Enable Mesh Keymaps',
         description='Enable Blue Hole mesh keymaps',
-        default=False,
+        default=True,
         update=_update_enable_mesh_keymaps
     )
 
     enable_mesh_selection_grow_shrink: BoolProperty(
         name='Enable Grow / Shrink Selection',
         description='Enable Blue Hole mesh selection grow and shrink shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_mesh_selection_grow_shrink
     )
 
     enable_mesh_modeling_shortcuts: BoolProperty(
         name='Enable Modeling Shortcuts',
         description='Enable Blue Hole mesh modeling shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_mesh_modeling_shortcuts
     )
 

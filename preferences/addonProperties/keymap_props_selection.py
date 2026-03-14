@@ -47,15 +47,15 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
     enable_selection_keymaps: BoolProperty(
         name='Enable Selection Keymaps',
         description='Enable Blue Hole selection keymaps',
-        default=False,
+        default=True,
         update=_update_enable_selection_keymaps
     )
 
-    enable_selection_grow_shrink: BoolProperty(
-        name='Enable Grow / Shrink Selection',
-        description='Enable Blue Hole selection grow and shrink shortcuts',
-        default=False,
-        # update=_update_enable_selection_grow_shrink
+    enable_selection_more_less: BoolProperty(
+        name='Enable More / Less Selection',
+        description='Enable Blue Hole "Select More/Less" shortcuts',
+        default=True,
+        # update=_update_enable_selection_more_less
     )
 
 
@@ -75,7 +75,7 @@ def draw(preference, context, layout):
         return
 
     row = column_selection.row()
-    row.prop(preference.keymap.selection, 'enable_selection_grow_shrink')
+    row.prop(preference.keymap.selection, 'enable_selection_more_less')
 
     row = column_selection.row()
     row.label(text='Selection keymap settings will appear here.')

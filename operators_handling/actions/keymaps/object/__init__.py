@@ -1,6 +1,5 @@
 """
-UV keymap operator actions for Blue Hole.
-Acts as the public entry point for all UV-related keymap actions.
+Object keymap action modules.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -16,17 +15,18 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from .uv import get_all_uv_actions
+# ----------------------------------------------------------------------------------------------------------------------
+# ACTION GROUPS
+
+_OBJECT_ACTIONS = (
+)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PUBLIC API
 
 
-def get_uv_actions():
+def get_all_object_actions():
     """
-    Return all UV OperatorAction objects.
+    Return all object-related OperatorAction objects.
     """
-    return get_all_uv_actions()
-
-
-UV_ACTIONS = get_uv_actions()
+    return _OBJECT_ACTIONS

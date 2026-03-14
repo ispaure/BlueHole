@@ -47,28 +47,28 @@ class ObjectKeymapPG(bpy.types.PropertyGroup):
     enable_object_keymaps: BoolProperty(
         name='Enable Object Keymaps',
         description='Enable Blue Hole object keymaps',
-        default=False,
+        default=True,
         update=_update_enable_object_keymaps
     )
 
     enable_object_selection_shortcuts: BoolProperty(
         name='Enable Object Selection Shortcuts',
         description='Enable Blue Hole object selection shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_object_selection_shortcuts
     )
 
     enable_object_action_shortcuts: BoolProperty(
         name='Enable Object Action Shortcuts',
         description='Enable Blue Hole object action shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_object_action_shortcuts
     )
 
     enable_object_tool_shortcuts: BoolProperty(
         name='Enable Object Tool Shortcuts',
         description='Enable Blue Hole object tool shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_object_tool_shortcuts
     )
 

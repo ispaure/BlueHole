@@ -47,28 +47,28 @@ class PipelineKeymapPG(bpy.types.PropertyGroup):
     enable_pipeline_keymaps: BoolProperty(
         name='Enable Pipeline Keymaps',
         description='Enable Blue Hole pipeline keymaps',
-        default=False,
+        default=True,
         update=_update_enable_pipeline_keymaps
     )
 
     enable_pipeline_export_shortcuts: BoolProperty(
         name='Enable Export Shortcuts',
         description='Enable Blue Hole export shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_pipeline_export_shortcuts
     )
 
     enable_pipeline_send_shortcuts: BoolProperty(
         name='Enable Send Shortcuts',
         description='Enable Blue Hole send shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_pipeline_send_shortcuts
     )
 
     enable_pipeline_container_shortcuts: BoolProperty(
         name='Enable Container Shortcuts',
         description='Enable Blue Hole asset container shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_pipeline_container_shortcuts
     )
 

@@ -1,5 +1,5 @@
 """
-Registration and runtime management for Blue Hole pie menu keymaps.
+Registration and runtime management for Blue Hole sculpt keymaps.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ from ...operators_handling.operator_action import (
     remove_matching_action_kmis,
     unregister_registered_keymaps,
 )
-from ...operators_handling.actions.pie_actions import PIE_ACTIONS
+from ...operators_handling.actions.keymaps.sculpt_actions import get_sculpt_actions
 from ...preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
 
-registered_pie_keymaps = []
+registered_sculpt_keymaps = []
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
@@ -69,6 +69,19 @@ def ensure_action_keymaps(action):
     return register_operator_action_keymaps(kc, action)
 
 
+def get_enabled_sculpt_actions():
+    """
+    Return the list of sculpt actions that should currently be registered.
+    """
+    actions = []
+
+    if not prefs().keymap.sculpt.enable_sculpt_keymaps:
+        return actions
+
+    actions.extend(get_sculpt_actions())
+    return actions
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -76,16 +89,17 @@ def ensure_action_keymaps(action):
 def register():
     unregister()
 
-    if not prefs().pie.enable_pie_menus:
+    actions = get_enabled_sculpt_actions()
+    if not actions:
         return
 
-    log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps...')
+    log(Severity.INFO, 'Blue Hole Sculpt Keymaps', 'Registering sculpt keymaps...')
 
-    for action in PIE_ACTIONS:
-        registered_pie_keymaps.extend(ensure_action_keymaps(action))
+    for action in actions:
+        registered_sculpt_keymaps.extend(ensure_action_keymaps(action))
 
-    log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps completed!')
+    log(Severity.INFO, 'Blue Hole Sculpt Keymaps', 'Registering sculpt keymaps completed!')
 
 
 def unregister():
-    unregister_registered_keymaps(registered_pie_keymaps)
+    unregister_registered_keymaps(registered_sculpt_keymaps)
