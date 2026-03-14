@@ -19,11 +19,10 @@ import bpy
 import rna_keymap_ui
 
 from bpy.props import *
-from ...keymaps.pie import (
-    PieKeymapDef,
-    find_pie_menu_keymap,
-    get_all_pie_menu_defs,
-)
+
+from ...operators_handling.actions.pie_actions import PIE_ACTIONS
+from ...operators_handling.operator_action import OperatorAction
+from ...keymaps.keymap_utils import get_keyconfig_sequence
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -74,9 +73,9 @@ def draw(preference, context, layout):
     row = column_pie.row()
     row.label(text='Edit Blue Hole shortcut bindings directly from here.')
 
-    grouped_pie_defs = _group_pie_defs_by_keymap()
+    grouped_pie_actions = _group_pie_actions_by_keymap()
 
-    for keymap_name, pie_defs in grouped_pie_defs.items():
+    for keymap_name, pie_actions in grouped_pie_actions.items():
 
         box_section = column_pie.box()
         column_section = box_section.column()
@@ -84,10 +83,10 @@ def draw(preference, context, layout):
         row = column_section.row()
         row.label(text=keymap_name.upper())
 
-        for pie_def in pie_defs:
+        for action in pie_actions:
             _draw_pie_menu_keymap(
                 column_section,
-                menu_idname=pie_def.menu_idname,
+                action=action,
                 keymap_name=keymap_name
             )
 
@@ -109,25 +108,94 @@ def _get_menu_label(menu_idname: str) -> str:
     return fallback.title()
 
 
-def _group_pie_defs_by_keymap() -> dict[str, list[PieKeymapDef]]:
+def _get_pie_menu_idname(action: OperatorAction) -> str:
     """
-    Group pie menu definitions by keymap_name while preserving declaration order.
+    Return the pie menu idname for a pie-menu OperatorAction.
     """
-    grouped: dict[str, list[PieKeymapDef]] = {}
+    return action.get_props(None).get('name', '')
 
-    for pie_def in get_all_pie_menu_defs():
-        keymap_name = pie_def.keymap_name
-        grouped.setdefault(keymap_name, []).append(pie_def)
+
+def _group_pie_actions_by_keymap() -> dict[str, list[OperatorAction]]:
+    """
+    Group pie menu actions by keymap_name while preserving declaration order.
+    """
+    grouped: dict[str, list[OperatorAction]] = {}
+
+    for action in PIE_ACTIONS:
+        for binding in action.keymap_bindings:
+            grouped.setdefault(binding.keymap_name, []).append(action)
 
     return grouped
 
 
-def _draw_pie_menu_keymap(column, menu_idname: str, keymap_name: str):
+def _find_action_keymap(
+        action: OperatorAction,
+        keymap_name: str | None = None,
+        check_user: bool = True,
+        check_addon: bool = True,
+        check_default: bool = False
+):
     """
-    Draw one real Blender keymap entry for the given pie menu.
+    Find the real Blender keymap item for an OperatorAction.
     """
-    kc, km, kmi = find_pie_menu_keymap(menu_idname, keymap_name=keymap_name)
-    label = _get_menu_label(menu_idname)
+    keyconfigs_to_check = get_keyconfig_sequence(
+        check_user=check_user,
+        check_addon=check_addon,
+        check_default=check_default,
+    )
+
+    preferred_keymap_names = []
+
+    if keymap_name is not None:
+        preferred_keymap_names.append(keymap_name)
+    else:
+        preferred_keymap_names.extend(binding.keymap_name for binding in action.keymap_bindings)
+
+    action_idname = action.get_idname()
+    action_props = action.get_props(None)
+
+    for kc in keyconfigs_to_check:
+        for km_name in preferred_keymap_names:
+            km = kc.keymaps.get(km_name)
+            if km is None:
+                continue
+
+            for kmi in km.keymap_items:
+                if kmi.idname != action_idname:
+                    continue
+
+                matches = True
+                for prop_name, prop_value in action_props.items():
+                    if getattr(kmi.properties, prop_name, None) != prop_value:
+                        matches = False
+                        break
+
+                if matches:
+                    return kc, km, kmi
+
+        for km in kc.keymaps:
+            for kmi in km.keymap_items:
+                if kmi.idname != action_idname:
+                    continue
+
+                matches = True
+                for prop_name, prop_value in action_props.items():
+                    if getattr(kmi.properties, prop_name, None) != prop_value:
+                        matches = False
+                        break
+
+                if matches:
+                    return kc, km, kmi
+
+    return None, None, None
+
+
+def _draw_pie_menu_keymap(column, action: OperatorAction, keymap_name: str):
+    """
+    Draw one real Blender keymap entry for the given pie menu action.
+    """
+    kc, km, kmi = _find_action_keymap(action, keymap_name=keymap_name)
+    label = _get_menu_label(_get_pie_menu_idname(action))
 
     if kc is None or km is None or kmi is None:
         row = column.row()
