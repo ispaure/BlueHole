@@ -27,19 +27,9 @@ show_verbose = True
 # CODE
 
 
-def _update_enable_selection_keymaps(self, context):
-    """
-    Enable or disable Blue Hole selection keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.selection import selection_keymaps_register
-    #
-    # if self.enable_selection_keymaps:
-    #     selection_keymaps_register.register()
-    # else:
-    #     selection_keymaps_register.unregister()
-    pass
+def _update_keymaps(self, context):
+    from ...keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class SelectionKeymapPG(bpy.types.PropertyGroup):
@@ -48,14 +38,14 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
         name='Enable Selection Keymaps',
         description='Enable Blue Hole selection keymaps',
         default=True,
-        update=_update_enable_selection_keymaps
+        update=_update_keymaps
     )
 
     enable_selection_more_less: BoolProperty(
         name='Enable More / Less Selection',
         description='Enable Blue Hole "Select More/Less" shortcuts',
         default=True,
-        # update=_update_enable_selection_more_less
+        update=_update_keymaps
     )
 
 

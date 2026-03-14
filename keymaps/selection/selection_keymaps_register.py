@@ -75,6 +75,9 @@ def get_enabled_selection_actions():
     """
     actions = []
 
+    if not prefs().keymap.enable_keymaps:
+        return actions
+
     if not prefs().keymap.selection.enable_selection_keymaps:
         return actions
 

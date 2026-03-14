@@ -58,6 +58,7 @@ def register():
     menus_register.register()
     keymaps_register.register()
 
+
     # Run initialization only after Blender has finished enabling the add-on.
     bpy.app.timers.register(_post_register_init, first_interval=0.0)
 

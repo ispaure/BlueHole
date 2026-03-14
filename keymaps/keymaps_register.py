@@ -56,3 +56,8 @@ def unregister():
     # Unregister Keymaps
     for module in reversed(keymap_module_lst):
         module.unregister()
+
+
+def refresh():
+    unregister()
+    register()

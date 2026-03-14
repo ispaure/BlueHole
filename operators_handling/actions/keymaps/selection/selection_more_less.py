@@ -67,6 +67,7 @@ def _select_less_bindings(keymap_name: str, space_type: str = 'EMPTY', region_ty
 # ----------------------------------------------------------------------------------------------------------------------
 # FEATURE: SELECT MORE / SELECT LESS
 
+# NOT WORKING
 # Dopesheet
 SELECTION_DOPESHEET_SELECT_MORE = OperatorAction(
     operator='action.select_more',
@@ -185,6 +186,7 @@ SELECTION_MASK_SELECT_LESS = OperatorAction(
     keymap_bindings=_select_less_bindings('Mask Editing')
 )
 
+# NOT WORKING
 # Graph Editor
 SELECTION_GRAPH_SELECT_MORE = OperatorAction(
     operator='graph.select_more',
@@ -196,6 +198,7 @@ SELECTION_GRAPH_SELECT_LESS = OperatorAction(
     keymap_bindings=_select_less_bindings('Graph Editor')
 )
 
+# NOT WORKING
 # Node Editor
 SELECTION_NODE_SELECT_MORE = OperatorAction(
     operator='node.select_linked_to',
@@ -207,6 +210,7 @@ SELECTION_NODE_SELECT_LESS = OperatorAction(
     keymap_bindings=_select_less_bindings('Node Editor')
 )
 
+# NOT WORKING
 # Sequencer
 SELECTION_SEQUENCER_SELECT_MORE = OperatorAction(
     operator='sequencer.select_more',
