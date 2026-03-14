@@ -21,39 +21,6 @@ from ....operators import external_addon_ops
 # HELPER FUNCTIONS
 
 
-def open_pie_menu(
-    pie,
-    menu_cls: Type[bpy.types.Menu],
-    *,
-    text: Optional[str] = None,
-    icon: Optional[str] = None
-):
-    """
-    Adds a pie entry that opens another pie menu.
-
-    Parameters
-    ----------
-    pie : UILayout
-        The pie layout returned from layout.menu_pie().
-    menu_cls : Type[bpy.types.Menu]
-        The menu class to open.
-    text : Optional[str]
-        Label shown in the UI. Defaults to menu_cls.bl_label.
-    icon : Optional[str]
-        Blender icon name.
-    """
-
-    if text is None:
-        text = menu_cls.bl_label
-
-    kwargs = {"text": text}
-    if icon:
-        kwargs["icon"] = icon
-
-    op = pie.operator("wm.call_menu_pie", **kwargs)
-    op.name = menu_cls.bl_idname
-
-
 def op_exists(op_idname: str) -> bool:
     """
     True if operator idname like 'hops.mod_lattice' is registered.

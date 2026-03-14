@@ -16,23 +16,21 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-import rna_keymap_ui
 
 from bpy.props import *
-from ...keymaps.pie import (
-    PieKeymapDef,
-    find_pie_menu_keymap,
-    get_all_pie_menu_defs,
-)
+
+from ...operators_handling.actions.pie_actions import PIE_ACTIONS
+from ...operators_handling.operator_action import OperatorAction
+from .keymap_ui_utils import group_action_bindings_by_keymap, draw_action_binding_keymap
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
 
 show_verbose = True
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
+
 
 def _update_enable_pie_menus(self, context):
     """
@@ -68,15 +66,15 @@ def draw(preference, context, layout):
 
     if not preference.pie.enable_pie_menus:
         row = column_pie.row()
-        row.label(text='Pie menu shortcuts are currently disabled.')
+        row.label(text='Pie Menus are currently disabled.')
         return
 
     row = column_pie.row()
     row.label(text='Edit Blue Hole shortcut bindings directly from here.')
 
-    grouped_pie_defs = _group_pie_defs_by_keymap()
+    grouped_pie_action_bindings = group_action_bindings_by_keymap(PIE_ACTIONS)
 
-    for keymap_name, pie_defs in grouped_pie_defs.items():
+    for keymap_name, pie_action_binding_list in grouped_pie_action_bindings.items():
 
         box_section = column_pie.box()
         column_section = box_section.column()
@@ -84,11 +82,13 @@ def draw(preference, context, layout):
         row = column_section.row()
         row.label(text=keymap_name.upper())
 
-        for pie_def in pie_defs:
-            _draw_pie_menu_keymap(
+        for action, binding_index in pie_action_binding_list:
+            draw_action_binding_keymap(
                 column_section,
-                menu_idname=pie_def.menu_idname,
-                keymap_name=keymap_name
+                action=action,
+                keymap_name=keymap_name,
+                binding_index=binding_index,
+                label=_get_menu_label(_get_pie_menu_idname(action))
             )
 
 
@@ -109,33 +109,8 @@ def _get_menu_label(menu_idname: str) -> str:
     return fallback.title()
 
 
-def _group_pie_defs_by_keymap() -> dict[str, list[PieKeymapDef]]:
+def _get_pie_menu_idname(action: OperatorAction) -> str:
     """
-    Group pie menu definitions by keymap_name while preserving declaration order.
+    Return the pie menu idname for a pie-menu OperatorAction.
     """
-    grouped: dict[str, list[PieKeymapDef]] = {}
-
-    for pie_def in get_all_pie_menu_defs():
-        keymap_name = pie_def.keymap_name
-        grouped.setdefault(keymap_name, []).append(pie_def)
-
-    return grouped
-
-
-def _draw_pie_menu_keymap(column, menu_idname: str, keymap_name: str):
-    """
-    Draw one real Blender keymap entry for the given pie menu.
-    """
-    kc, km, kmi = find_pie_menu_keymap(menu_idname, keymap_name=keymap_name)
-    label = _get_menu_label(menu_idname)
-
-    if kc is None or km is None or kmi is None:
-        row = column.row()
-        row.label(text=f'{label}: shortcut not found.', icon='ERROR')
-        return
-
-    row = column.row()
-    row.label(text=label)
-
-    column.context_pointer_set('keymap', km)
-    rna_keymap_ui.draw_kmi([], kc, km, kmi, column, 0)
+    return action.get_props(None).get('name', '')

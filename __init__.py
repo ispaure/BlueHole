@@ -19,6 +19,8 @@ __status__ = "Production"
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+print('STARTING BLUE HOLE')
+
 import bpy
 
 # Disable PySide UI usage and rely on OS terminal windows instead.
@@ -57,6 +59,7 @@ def register():
     operators_register.register()
     menus_register.register()
     keymaps_register.register()
+
 
     # Run initialization only after Blender has finished enabling the add-on.
     bpy.app.timers.register(_post_register_init, first_interval=0.0)

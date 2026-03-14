@@ -13,9 +13,12 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-from ....Lib.commonUtils.debugUtils import *
 import os
-from .utilities import *
+
+from ....Lib.commonUtils.debugUtils import *
+from ....operators_handling.operator_action import draw_operator_action
+from ....operators_handling.actions import pie_actions
+
 from .entries import blender_entries, addon_entries
 from .entries.third_party import machin3_entries
 
@@ -39,18 +42,19 @@ class BLUEHOLE_MT_pie_add(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.add_cylinder(pie)
         # 6 - RIGHT
         blender_entries.add_cube(pie)
         # 2 - BOTTOM
-        open_pie_menu(pie, BLUEHOLE_MT_pie_add_more, text='More...')
+        draw_operator_action(pie, pie_actions.PIE_ADD_MORE, context, text='More...')
         # 8 - TOP
         blender_entries.add_sphere(pie)
         # 7 - TOP - LEFT
         machin3_entries.add_quadsphere(pie)
         # 9 - TOP - RIGHT
-        open_pie_menu(pie, BLUEHOLE_MT_pie_add_asset_container, text='Asset Containers...')
+        draw_operator_action(pie, pie_actions.PIE_ADD_ASSET_CONTAINER, context, text='Asset Containers...')
         # 1 - BOTTOM - LEFT
         blender_entries.add_plane(pie)
         # blender_entries.add_nurbs_path(pie) TODO: Find new spot for this one
@@ -66,6 +70,7 @@ class BLUEHOLE_MT_pie_add_more(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.add_light_point(pie)
         # 6 - RIGHT
@@ -91,6 +96,7 @@ class BLUEHOLE_MT_pie_add_asset_container(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         pie.separator()
         # 6 - RIGHT
@@ -109,9 +115,11 @@ class BLUEHOLE_MT_pie_add_asset_container(bpy.types.Menu):
         pie.separator()
 
 
-classes = (BLUEHOLE_MT_pie_add,
-           BLUEHOLE_MT_pie_add_more,
-           BLUEHOLE_MT_pie_add_asset_container)
+classes = (
+    BLUEHOLE_MT_pie_add,
+    BLUEHOLE_MT_pie_add_more,
+    BLUEHOLE_MT_pie_add_asset_container,
+)
 
 
 def register():

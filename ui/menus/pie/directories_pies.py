@@ -14,6 +14,7 @@ __status__ = 'Production'
 
 # Blender
 import bpy
+import os
 
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
