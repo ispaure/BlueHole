@@ -19,8 +19,27 @@ import bpy
 from bpy.props import *
 from bpy.types import AddonPreferences
 
-from .addonProperties import general_props, keymap_props, pie_props, help_update_props
-from .environmentProperties import bridge_props, container_props, directory_props, sourcecontrol_props
+# Import Addon Properties
+from .addonProperties import (
+    general_props,
+    keymap_props,
+    keymap_props_mesh,
+    keymap_props_navigation,
+    keymap_props_object,
+    keymap_props_pipeline,
+    keymap_props_sculpt,
+    keymap_props_selection,
+    keymap_props_uv,
+    pie_props,
+    help_update_props)
+
+# Import Environment Properties
+from .environmentProperties import (
+    bridge_props,
+    container_props,
+    directory_props,
+    sourcecontrol_props)
+
 from ..environment import envManager
 
 from .prefs import prefs, addon_module_name
@@ -166,8 +185,21 @@ class BlueHole(AddonPreferences):
 
 
 classes = (
-    general_props.GeneralPG,        # sub PropertyGroups before others
+
+    # General Property Import First
+    general_props.GeneralPG,
+
+    # Keymap Sub-Properties Import Before Keymap
+    keymap_props_selection.SelectionKeymapPG,
+    keymap_props_navigation.NavigationKeymapPG,
+    keymap_props_object.ObjectKeymapPG,
+    keymap_props_mesh.MeshKeymapPG,
+    keymap_props_uv.UVKeymapPG,
+    keymap_props_sculpt.SculptKeymapPG,
+    keymap_props_pipeline.PipelineKeymapPG,
+
     keymap_props.KeymapPG,
+
     pie_props.PiePG,
     help_update_props.HelpUpdatePG,
     directory_props.DirectoryPG,
