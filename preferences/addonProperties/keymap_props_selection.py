@@ -16,7 +16,13 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
+import bpy
+
 from bpy.props import *
+
+from ...operators_handling.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
+from bpy.props import *
+from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -64,8 +70,9 @@ def draw(preference, context, layout):
         row.label(text='Selection keymaps are currently disabled.')
         return
 
-    row = column_selection.row()
-    row.prop(preference.keymap.selection, 'enable_selection_more_less')
-
-    row = column_selection.row()
-    row.label(text='Selection keymap settings will appear here.')
+    draw_action_feature_keymaps(
+        column=column_selection,
+        feature_owner=preference.keymap.selection,
+        feature_prop_name='enable_selection_more_less',
+        actions=get_selection_more_less_actions(),
+    )

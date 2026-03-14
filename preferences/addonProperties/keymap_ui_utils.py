@@ -137,3 +137,59 @@ def draw_action_keymap(column, action: OperatorAction, keymap_name: str, label: 
     column.context_pointer_set('keymap', km)
 
     rna_keymap_ui.draw_kmi([], kc, km, kmi, column, 0)
+
+
+def draw_action_feature_keymaps(
+        column,
+        feature_owner,
+        feature_prop_name: str,
+        actions: list[OperatorAction],
+        label_fn=None,
+):
+    """
+    Draw a keymap feature toggle and its grouped keymap entries.
+
+    feature_owner:
+        The PropertyGroup instance holding the BoolProperty.
+
+    feature_prop_name:
+        The BoolProperty name on feature_owner.
+
+    actions:
+        OperatorAction list to display.
+
+    label_fn:
+        Optional callable: fn(action) -> str
+        If omitted, action.text or action.get_idname() is used.
+    """
+    row = column.row()
+    row.prop(feature_owner, feature_prop_name)
+
+    if not getattr(feature_owner, feature_prop_name):
+        feature_label = feature_owner.bl_rna.properties[feature_prop_name].name
+        row = column.row()
+        row.label(text=f'{feature_label} shortcuts are currently disabled.')
+        return
+
+    row = column.row()
+    row.label(text='Edit shortcut bindings here.')
+
+    grouped_actions = group_actions_by_keymap(actions)
+
+    for keymap_name, action_list in grouped_actions.items():
+
+        box_section = column.box()
+        column_section = box_section.column()
+
+        row = column_section.row()
+        row.label(text=keymap_name.upper())
+
+        for action in action_list:
+            resolved_label = label_fn(action) if label_fn is not None else (action.text or action.get_idname())
+
+            draw_action_keymap(
+                column_section,
+                action=action,
+                keymap_name=keymap_name,
+                label=resolved_label
+            )
