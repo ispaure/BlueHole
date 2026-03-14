@@ -32,6 +32,7 @@ __status__ = 'Production'
 
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable
+from ..Lib.commonUtils.debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DATACLASSES
@@ -355,16 +356,35 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
         return registered
 
     for binding in action.keymap_bindings:
+
         km = create_keymap(kc, binding)
 
         if km is None:
+            log(
+                Severity.WARNING,
+                "Blue Hole Keymap",
+                f"Keymap not found/created: {binding.keymap_name}"
+            )
             continue
 
         kmi = create_keymap_item(km, action, binding, context=context)
 
         if kmi is not None:
-            registered.append((km, kmi))
+            log(
+                Severity.DEBUG,
+                "Blue Hole Keymap Registered",
+                f"{binding.keymap_name} | {action.get_idname()} | "
+                f"{binding.key} "
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt})"
+            )
 
+            registered.append((km, kmi))
+        else:
+            log(
+                Severity.WARNING,
+                "Blue Hole Keymap Failed",
+                f"{binding.keymap_name} | {action.get_idname()}"
+            )
     return registered
 
 

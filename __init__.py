@@ -19,6 +19,8 @@ __status__ = "Production"
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+print('STARTING BLUE HOLE')
+
 import bpy
 
 # Disable PySide UI usage and rely on OS terminal windows instead.
