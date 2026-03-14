@@ -48,8 +48,8 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
     )
 
     enable_selection_more_less: BoolProperty(
-        name='Enable More / Less Selection',
-        description='Enable Blue Hole "Select More/Less" shortcuts',
+        name='Enable Select Less / More',
+        description='Enable Blue Hole "Select Less / More" shortcuts',
         default=True,
         update=_update_keymaps
     )
