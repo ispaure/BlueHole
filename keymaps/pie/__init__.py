@@ -16,5 +16,3 @@ __status__ = 'Production'
 # IMPORTS
 
 from . import pie_keymaps_register
-from .pie_keymaps_defs import PieKeymapDef, get_all_pie_menu_defs
-from .pie_keymaps_lookup import find_pie_menu_def, find_pie_menu_keymap

@@ -14,7 +14,6 @@ __status__ = 'Production'
 
 # System
 import os
-from unittest import case
 
 # Blender
 import bpy
@@ -22,11 +21,9 @@ import bpy
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
 from ....preferences.prefs import *
+from ....operators_handling.operator_action import draw_operator_action
+from ....operators_handling.actions import pie_actions
 from .entries import addon_entries
-from .directories_pies import BLUEHOLE_MT_pie_global_dirs
-from .source_control_pies import BLUEHOLE_MT_pie_global_source_control
-from .utilities import *
-from .add_pies import BLUEHOLE_MT_pie_add_asset_container
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED SETTINGS
@@ -46,27 +43,28 @@ class BLUEHOLE_MT_pie_global_import_export(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         addon_entries.send_all_asset_containers(pie)
         # 6 - RIGHT
         addon_entries.send_selected_asset_containers(pie)
         # 2 - BOTTOM
-        open_pie_menu(pie, BLUEHOLE_MT_pie_global_extra, text='More...')
+        draw_operator_action(pie, pie_actions.PIE_GLOBAL_EXTRA, context, text='More...')
         # 8 - TOP
-        open_pie_menu(pie, BLUEHOLE_MT_pie_global_dirs, text='Open Directories...')
+        draw_operator_action(pie, pie_actions.PIE_GLOBAL_DIRS, context, text='Open Directories...')
         # 7 - TOP - LEFT
         if prefs().sc.source_control_enable:
             match prefs().sc.source_control_solution:
                 case 'perforce':
-                    open_pie_menu(pie, BLUEHOLE_MT_pie_global_source_control, text='Source Control (Perforce)...', icon='CHECKMARK')
+                    draw_operator_action(pie, pie_actions.PIE_GLOBAL_SOURCE_CONTROL, context, text='Source Control (Perforce)...', icon='CHECKMARK')
                 case 'plastic-scm':
-                    open_pie_menu(pie, BLUEHOLE_MT_pie_global_source_control, text='Source Control (Plastic SCM)...', icon='CHECKMARK')
+                    draw_operator_action(pie, pie_actions.PIE_GLOBAL_SOURCE_CONTROL, context, text='Source Control (Plastic SCM)...', icon='CHECKMARK')
                 case 'git':
-                    open_pie_menu(pie, BLUEHOLE_MT_pie_global_source_control, text='Source Control (Git)...', icon='CHECKMARK')
+                    draw_operator_action(pie, pie_actions.PIE_GLOBAL_SOURCE_CONTROL, context, text='Source Control (Git)...', icon='CHECKMARK')
         else:
             addon_entries.sc_disabled(pie)
         # 9 - TOP - RIGHT
-        open_pie_menu(pie, BLUEHOLE_MT_pie_add_asset_container, text='Asset Containers...')
+        draw_operator_action(pie, pie_actions.PIE_ADD_ASSET_CONTAINER, context, text='Asset Containers...')
         # 1 - BOTTOM - LEFT
         addon_entries.batch_export_selection_resource_folder(pie)
         # 3 - BOTTOM - RIGHT
@@ -81,6 +79,7 @@ class BLUEHOLE_MT_pie_global_extra(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         pie.separator()
         # 6 - RIGHT

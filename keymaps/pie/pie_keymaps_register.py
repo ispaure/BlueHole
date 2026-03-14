@@ -16,12 +16,14 @@ __status__ = 'Production'
 # IMPORTS
 
 from ...Lib.commonUtils.debugUtils import *
-from ..keymap_utils import (
-    get_addon_keyconfig,
-    get_or_create_keymap,
-    remove_matching_kmis,
+from ..keymap_utils import get_addon_keyconfig
+from ...operators_handling.operator_action import (
+    register_operator_action_keymaps,
+    remove_matching_action_kmis,
+    unregister_registered_keymaps,
 )
-from .pie_keymaps_defs import PIE_MENU_DEFS, PieKeymapDef
+from ...operators_handling.actions.pie_actions import PIE_ACTIONS
+from ...preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -37,80 +39,53 @@ registered_pie_keymaps = []
 # HELPERS
 
 
-def remove_existing_pie_menu_from_keyconfig(kc, pie_def: PieKeymapDef):
+def remove_existing_action_keymaps_from_keyconfig(kc, action):
     """
-    Remove existing keymap items for the given pie menu from the given keyconfig.
+    Remove existing keymap items for this action from the given keyconfig.
     """
     if kc is None:
         return
 
-    km = kc.keymaps.get(pie_def.keymap_name)
-    if km is None:
-        return
+    for binding in action.keymap_bindings:
+        km = kc.keymaps.get(binding.keymap_name)
+        if km is None:
+            continue
 
-    remove_matching_kmis(
-        km,
-        idname='wm.call_menu_pie',
-        property_name='name',
-        property_value=pie_def.menu_idname,
-    )
+        remove_matching_action_kmis(km, action)
 
 
-def ensure_pie_menu_keymap(pie_def: PieKeymapDef):
+def ensure_action_keymaps(action):
     """
-    Ensure a Blue Hole pie menu keymap exists in Blender's addon keyconfig.
+    Ensure all keymap bindings for this action exist in Blender's addon keyconfig.
     """
+    if not action.keymap_bindings:
+        return []
+
     kc = get_addon_keyconfig()
     if kc is None:
-        return None, None, False
+        return []
 
-    remove_existing_pie_menu_from_keyconfig(kc, pie_def)
+    remove_existing_action_keymaps_from_keyconfig(kc, action)
+    return register_operator_action_keymaps(kc, action)
 
-    km = get_or_create_keymap(
-        kc,
-        keymap_name=pie_def.keymap_name,
-        space_type=pie_def.space_type,
-        region_type=pie_def.region_type,
-    )
-    if km is None:
-        return None, None, False
-
-    kmi = km.keymap_items.new(
-        'wm.call_menu_pie',
-        type=pie_def.key,
-        value=pie_def.value,
-        ctrl=pie_def.ctrl,
-        shift=pie_def.shift,
-        alt=pie_def.alt,
-    )
-    kmi.properties.name = pie_def.menu_idname
-    kmi.active = True
-
-    if hasattr(kmi, 'repeat'):
-        kmi.repeat = pie_def.repeat
-
-    registered_pie_keymaps.append((km, kmi))
-    return km, kmi, True
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
 def register():
-    log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps...')
     unregister()
 
-    for pie_def in PIE_MENU_DEFS:
-        ensure_pie_menu_keymap(pie_def)
+    if not prefs().pie.enable_pie_menus:
+        return
+
+    log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps...')
+
+    for action in PIE_ACTIONS:
+        registered_pie_keymaps.extend(ensure_action_keymaps(action))
 
     log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps completed!')
 
 
 def unregister():
-    for km, kmi in reversed(registered_pie_keymaps):
-        try:
-            km.keymap_items.remove(kmi)
-        except Exception:
-            pass
-
-    registered_pie_keymaps.clear()
+    unregister_registered_keymaps(registered_pie_keymaps)
