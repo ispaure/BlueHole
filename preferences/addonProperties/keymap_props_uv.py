@@ -47,28 +47,28 @@ class UVKeymapPG(bpy.types.PropertyGroup):
     enable_uv_keymaps: BoolProperty(
         name='Enable UV Keymaps',
         description='Enable Blue Hole UV keymaps',
-        default=False,
+        default=True,
         update=_update_enable_uv_keymaps
     )
 
     enable_uv_selection_shortcuts: BoolProperty(
         name='Enable UV Selection Shortcuts',
         description='Enable Blue Hole UV selection shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_uv_selection_shortcuts
     )
 
     enable_uv_tool_shortcuts: BoolProperty(
         name='Enable UV Tool Shortcuts',
         description='Enable Blue Hole UV tool shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_uv_tool_shortcuts
     )
 
     enable_uv_action_shortcuts: BoolProperty(
         name='Enable UV Action Shortcuts',
         description='Enable Blue Hole UV action shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_uv_action_shortcuts
     )
 

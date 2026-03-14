@@ -47,28 +47,28 @@ class SculptKeymapPG(bpy.types.PropertyGroup):
     enable_sculpt_keymaps: BoolProperty(
         name='Enable Sculpt Keymaps',
         description='Enable Blue Hole sculpt keymaps',
-        default=False,
+        default=True,
         update=_update_enable_sculpt_keymaps
     )
 
     enable_sculpt_tool_shortcuts: BoolProperty(
         name='Enable Sculpt Tool Shortcuts',
         description='Enable Blue Hole sculpt tool shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_sculpt_tool_shortcuts
     )
 
     enable_sculpt_action_shortcuts: BoolProperty(
         name='Enable Sculpt Action Shortcuts',
         description='Enable Blue Hole sculpt action shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_sculpt_action_shortcuts
     )
 
     enable_sculpt_simulation_shortcuts: BoolProperty(
         name='Enable Sculpt Simulation Shortcuts',
         description='Enable Blue Hole sculpt simulation shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_sculpt_simulation_shortcuts
     )
 

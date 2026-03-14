@@ -52,6 +52,199 @@ class _GeneralPrefs:
         self._general.active_environment = value
 
 
+class _PieKeymapPrefs:
+    """
+    Wrapper for Blue Hole pie keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, pie):
+        self._pie = pie
+
+    @property
+    def enable_pie_keymaps(self) -> bool:
+        return self._pie.enable_pie_keymaps
+
+    @enable_pie_keymaps.setter
+    def enable_pie_keymaps(self, value: bool):
+        self._pie.enable_pie_keymaps = value
+
+
+class _SelectionKeymapPrefs:
+    """
+    Wrapper for Blue Hole selection keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, selection):
+        self._selection = selection
+
+    @property
+    def enable_selection_keymaps(self) -> bool:
+        return self._selection.enable_selection_keymaps
+
+    @enable_selection_keymaps.setter
+    def enable_selection_keymaps(self, value: bool):
+        self._selection.enable_selection_keymaps = value
+
+    @property
+    def enable_selection_more_less(self) -> bool:
+        return self._selection.enable_selection_more_less
+
+    @enable_selection_more_less.setter
+    def enable_selection_more_less(self, value: bool):
+        self._selection.enable_selection_more_less = value
+
+
+class _MeshKeymapPrefs:
+    """
+    Wrapper for Blue Hole mesh keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, mesh):
+        self._mesh = mesh
+
+    @property
+    def enable_mesh_keymaps(self) -> bool:
+        return self._mesh.enable_mesh_keymaps
+
+    @enable_mesh_keymaps.setter
+    def enable_mesh_keymaps(self, value: bool):
+        self._mesh.enable_mesh_keymaps = value
+
+
+class _NavigationKeymapPrefs:
+    """
+    Wrapper for Blue Hole navigation keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, navigation):
+        self._navigation = navigation
+
+    @property
+    def enable_navigation_keymaps(self) -> bool:
+        return self._navigation.enable_navigation_keymaps
+
+    @enable_navigation_keymaps.setter
+    def enable_navigation_keymaps(self, value: bool):
+        self._navigation.enable_navigation_keymaps = value
+
+
+class _ObjectKeymapPrefs:
+    """
+    Wrapper for Blue Hole object keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, obj):
+        self._object = obj
+
+    @property
+    def enable_object_keymaps(self) -> bool:
+        return self._object.enable_object_keymaps
+
+    @enable_object_keymaps.setter
+    def enable_object_keymaps(self, value: bool):
+        self._object.enable_object_keymaps = value
+
+
+class _PipelineKeymapPrefs:
+    """
+    Wrapper for Blue Hole pipeline keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, pipeline):
+        self._pipeline = pipeline
+
+    @property
+    def enable_pipeline_keymaps(self) -> bool:
+        return self._pipeline.enable_pipeline_keymaps
+
+    @enable_pipeline_keymaps.setter
+    def enable_pipeline_keymaps(self, value: bool):
+        self._pipeline.enable_pipeline_keymaps = value
+
+
+class _SculptKeymapPrefs:
+    """
+    Wrapper for Blue Hole sculpt keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, sculpt):
+        self._sculpt = sculpt
+
+    @property
+    def enable_sculpt_keymaps(self) -> bool:
+        return self._sculpt.enable_sculpt_keymaps
+
+    @enable_sculpt_keymaps.setter
+    def enable_sculpt_keymaps(self, value: bool):
+        self._sculpt.enable_sculpt_keymaps = value
+
+
+class _UVKeymapPrefs:
+    """
+    Wrapper for Blue Hole UV keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, uv):
+        self._uv = uv
+
+    @property
+    def enable_uv_keymaps(self) -> bool:
+        return self._uv.enable_uv_keymaps
+
+    @enable_uv_keymaps.setter
+    def enable_uv_keymaps(self, value: bool):
+        self._uv.enable_uv_keymaps = value
+
+
+class _KeymapPrefs:
+    """
+    Wrapper for Blue Hole keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, keymap):
+        self._keymap = keymap
+
+    @property
+    def enable_keymaps(self) -> bool:
+        return self._keymap.enable_keymaps
+
+    @enable_keymaps.setter
+    def enable_keymaps(self, value: bool):
+        self._keymap.enable_keymaps = value
+
+    @property
+    def pie(self):
+        return _PieKeymapPrefs(self._keymap.pie)
+
+    @property
+    def selection(self):
+        return _SelectionKeymapPrefs(self._keymap.selection)
+
+    @property
+    def mesh(self):
+        return _MeshKeymapPrefs(self._keymap.mesh)
+
+    @property
+    def navigation(self):
+        return _NavigationKeymapPrefs(self._keymap.navigation)
+
+    @property
+    def object(self):
+        return _ObjectKeymapPrefs(self._keymap.object)
+
+    @property
+    def pipeline(self):
+        return _PipelineKeymapPrefs(self._keymap.pipeline)
+
+    @property
+    def sculpt(self):
+        return _SculptKeymapPrefs(self._keymap.sculpt)
+
+    @property
+    def uv(self):
+        return _UVKeymapPrefs(self._keymap.uv)
+
+
 class _PiePrefs:
     """
     Wrapper for Blue Hole pie menu preferences to provide
@@ -652,6 +845,11 @@ class BHPrefs:
     def help_n_update(self):
         p = self.prefs
         return None if p is None else _HelpNUpdatePrefs(p.help_n_update)
+
+    @property
+    def keymap(self):
+        p = self.prefs
+        return None if p is None else _KeymapPrefs(p.keymap)
 
 
 def prefs() -> BHPrefs:

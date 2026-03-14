@@ -47,21 +47,21 @@ class NavigationKeymapPG(bpy.types.PropertyGroup):
     enable_navigation_keymaps: BoolProperty(
         name='Enable Navigation Keymaps',
         description='Enable Blue Hole navigation keymaps',
-        default=False,
+        default=True,
         update=_update_enable_navigation_keymaps
     )
 
     enable_navigation_viewport_shortcuts: BoolProperty(
         name='Enable Viewport Navigation Shortcuts',
         description='Enable Blue Hole viewport navigation shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_navigation_viewport_shortcuts
     )
 
     enable_navigation_selection_wheel: BoolProperty(
         name='Enable Selection Wheel Navigation',
         description='Enable Blue Hole wheel-based selection navigation shortcuts',
-        default=False,
+        default=True,
         # update=_update_enable_navigation_selection_wheel
     )
 

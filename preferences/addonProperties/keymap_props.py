@@ -50,6 +50,21 @@ _KEYMAP_DRAW_MODULES = {
 # CODE
 
 
+def _update_enable_keymaps(self, context):
+    """
+    Enable or disable Blue Hole mesh keymaps.
+    """
+    # TODO: Replace with the real register module once it exists.
+    # Example:
+    # from ...keymaps.mesh import mesh_keymaps_register <- Need to update this for this situation.
+    #
+    # if self.enable_keymaps:
+    #     keymaps_register.register()
+    # else:
+    #     keymaps_register.unregister()
+    pass
+
+
 class KeymapPG(bpy.types.PropertyGroup):
 
     keymap_settings: EnumProperty(
@@ -75,6 +90,13 @@ class KeymapPG(bpy.types.PropertyGroup):
     sculpt: PointerProperty(type=keymap_props_sculpt.SculptKeymapPG)
     pipeline: PointerProperty(type=keymap_props_pipeline.PipelineKeymapPG)
 
+    enable_keymaps: BoolProperty(
+        name='Enable Keymaps',
+        description='Enable Blue Hole keymaps',
+        default=False,
+        update=_update_enable_keymaps
+    )
+
 
 def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
@@ -82,6 +104,14 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     box_keymap = layout.box()
     column_keymap = box_keymap.column()
+
+    row = column_keymap.row()
+    row.prop(preference.keymap, 'enable_keymaps')
+
+    if not preference.keymap.enable_keymaps:
+        row = column_keymap.row()
+        row.label(text='Keymaps are currently disabled.')
+        return
 
     row = column_keymap.row(align=True)
     row.prop(preference.keymap, 'keymap_settings', expand=True)

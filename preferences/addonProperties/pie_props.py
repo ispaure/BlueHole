@@ -67,7 +67,7 @@ def draw(preference, context, layout):
 
     if not preference.pie.enable_pie_menus:
         row = column_pie.row()
-        row.label(text='Pie menu shortcuts are currently disabled.')
+        row.label(text='Pie Menus are currently disabled.')
         return
 
     row = column_pie.row()

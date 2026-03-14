@@ -23,6 +23,7 @@ from ...operators_handling.operator_action import (
     unregister_registered_keymaps,
 )
 from ...operators_handling.actions.pie_actions import PIE_ACTIONS
+from ...preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -73,8 +74,12 @@ def ensure_action_keymaps(action):
 
 
 def register():
-    log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps...')
     unregister()
+
+    if not prefs().pie.enable_pie_menus:
+        return
+
+    log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps...')
 
     for action in PIE_ACTIONS:
         registered_pie_keymaps.extend(ensure_action_keymaps(action))

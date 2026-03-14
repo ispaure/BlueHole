@@ -16,16 +16,43 @@ __status__ = 'Production'
 # IMPORTS
 
 from .pie import pie_keymaps_register
-from ..preferences.prefs import prefs
+from .mesh import mesh_keymaps_register
+from .navigation import navigation_keymaps_register
+from .object import object_keymaps_register
+from .pipeline import pipeline_keymaps_register
+from .sculpt import sculpt_keymaps_register
+from .selection import selection_keymaps_register
+from .uv import uv_keymaps_register
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
+keymap_module_lst = (
+    mesh_keymaps_register,
+    navigation_keymaps_register,
+    object_keymaps_register,
+    pipeline_keymaps_register,
+    sculpt_keymaps_register,
+    selection_keymaps_register,
+    uv_keymaps_register,
+)
+
 
 def register():
-    if prefs().pie.enable_pie_menus:
-        pie_keymaps_register.register()
+
+    # Register Keymaps
+    for module in keymap_module_lst:
+        module.register()
+
+    # Register Pie Menus
+    pie_keymaps_register.register()
 
 
 def unregister():
+
+    # Unregister Pie Menus
     pie_keymaps_register.unregister()
+
+    # Unregister Keymaps
+    for module in reversed(keymap_module_lst):
+        module.unregister()
