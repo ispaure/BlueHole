@@ -292,10 +292,11 @@ def draw(preference, context, layout):
 
         def _tab_button(tab_id: str, label: str):
             btn = tab_row.operator(
-                "wm.bh_set_active_container_settings_tab",
+                "wm.bh_set_active_prefs_tab",
                 text=label,
                 depress=(active_tab == tab_id),
             )
+            btn.prop_path = "container.active_container_settings_tab"
             btn.tab = tab_id
 
         if enabled_hierarchy:

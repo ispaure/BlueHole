@@ -16,12 +16,10 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-import bpy
 
 from bpy.props import *
 
 from ...operators_handling.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
-from bpy.props import *
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -54,6 +52,32 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
         update=_update_keymaps
     )
 
+    active_selection_keymap_tab: EnumProperty(
+        name='Selection Keymap Tab',
+        description='Active selection keymap feature tab',
+        items=[
+            ('MORE_LESS', 'Select Less / More', ''),
+        ],
+        default='MORE_LESS'
+    )
+
+
+def _draw_selection_tab_buttons(column, preference):
+    """
+    Draw the selection feature tab buttons.
+    """
+    row = column.row(align=True)
+
+    current_tab = preference.keymap.selection.active_selection_keymap_tab
+
+    op = row.operator(
+        "wm.bh_set_active_prefs_tab",
+        text="Select Less / More",
+        depress=(current_tab == 'MORE_LESS')
+    )
+    op.prop_path = "keymap.selection.active_selection_keymap_tab"
+    op.tab = "MORE_LESS"
+
 
 def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
@@ -70,9 +94,12 @@ def draw(preference, context, layout):
         row.label(text='Selection keymaps are currently disabled.')
         return
 
-    draw_action_feature_keymaps(
-        column=column_selection,
-        feature_owner=preference.keymap.selection,
-        feature_prop_name='enable_selection_more_less',
-        actions=get_selection_more_less_actions(),
-    )
+    _draw_selection_tab_buttons(column_selection, preference)
+
+    if preference.keymap.selection.active_selection_keymap_tab == 'MORE_LESS':
+        draw_action_feature_keymaps(
+            column=column_selection,
+            feature_owner=preference.keymap.selection,
+            feature_prop_name='enable_selection_more_less',
+            actions=get_selection_more_less_actions(),
+        )
