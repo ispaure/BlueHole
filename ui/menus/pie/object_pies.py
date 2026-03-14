@@ -12,9 +12,12 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+import os
 import bpy
+
 from ....Lib.commonUtils.debugUtils import *
-from .utilities import *
+from ....operators_handling.operator_action import draw_operator_action
+from ....operators_handling.actions import pie_actions
 from .entries import blender_entries
 from .entries.third_party import hardops_entries, machin3_entries, interactivetools_entries
 
@@ -46,7 +49,7 @@ class BLUEHOLE_MT_pie_object_tool(bpy.types.Menu):
         # 2 - BOTTOM
         hardops_entries.modifier_toggle(pie)
         # 8 - TOP
-        open_pie_menu(pie, BLUEHOLE_MT_pie_object_tool_more, text='Modifiers Options...')
+        draw_operator_action(pie, pie_actions.PIE_OBJECT_TOOL_MORE, context, text='Modifiers Options...')
         # 7 - TOP - LEFT
         blender_entries.mod_weighted_nrm(pie)
         # 9 - TOP - RIGHT
@@ -65,6 +68,7 @@ class BLUEHOLE_MT_pie_object_tool_more(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         pie.separator()
         # 6 - RIGHT
@@ -92,6 +96,7 @@ class BLUEHOLE_MT_pie_object_hide(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.object_reveal_all(pie)
         # 6 - RIGHT
@@ -119,14 +124,15 @@ class BLUEHOLE_MT_pie_object_action(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.clear_location(pie)
         # 6 - RIGHT
         blender_entries.object_join(pie)
         # 2 - BOTTOM
-        open_pie_menu(pie, BLUEHOLE_MT_pie_object_action_more, text='More...')
+        draw_operator_action(pie, pie_actions.PIE_OBJECT_ACTION_MORE, context, text='More...')
         # 8 - TOP
-        open_pie_menu(pie, BLUEHOLE_MT_pie_object_action_select, text='Select...')
+        draw_operator_action(pie, pie_actions.PIE_OBJECT_ACTION_SELECT, context, text='Select...')
         # 7 - TOP - LEFT
         blender_entries.apply_transform(pie)
         # 9 - TOP - RIGHT
@@ -145,6 +151,7 @@ class BLUEHOLE_MT_pie_object_action_select(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.select_children_recursive(pie)
         # 6 - RIGHT
@@ -171,6 +178,7 @@ class BLUEHOLE_MT_pie_object_action_more(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         hardops_entries.clean_mesh(pie)
         # 6 - RIGHT
@@ -193,12 +201,14 @@ class BLUEHOLE_MT_pie_object_action_more(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (BLUEHOLE_MT_pie_object_hide,
-           BLUEHOLE_MT_pie_object_tool,
-           BLUEHOLE_MT_pie_object_tool_more,
-           BLUEHOLE_MT_pie_object_action,
-           BLUEHOLE_MT_pie_object_action_select,
-           BLUEHOLE_MT_pie_object_action_more)
+classes = (
+    BLUEHOLE_MT_pie_object_hide,
+    BLUEHOLE_MT_pie_object_tool,
+    BLUEHOLE_MT_pie_object_tool_more,
+    BLUEHOLE_MT_pie_object_action,
+    BLUEHOLE_MT_pie_object_action_select,
+    BLUEHOLE_MT_pie_object_action_more,
+)
 
 
 def register():

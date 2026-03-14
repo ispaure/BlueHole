@@ -14,11 +14,13 @@ __status__ = 'Production'
 
 # Blender
 import bpy
+import os
 
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
+from ....operators_handling.operator_action import draw_operator_action
+from ....operators_handling.actions import pie_actions
 from .entries import addon_entries
-from .utilities import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # USER DEFINED SETTINGS
@@ -38,6 +40,7 @@ class BLUEHOLE_MT_pie_global_help(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         pie.separator()
         # 6 - RIGHT
@@ -51,7 +54,7 @@ class BLUEHOLE_MT_pie_global_help(bpy.types.Menu):
         # 9 - TOP - RIGHT
         addon_entries.open_guide(pie)
         # 1 - BOTTOM - LEFT
-        open_pie_menu(pie, BLUEHOLE_MT_pie_global_theme, text='Themes...', icon='IMAGE_RGB')
+        draw_operator_action(pie, pie_actions.PIE_GLOBAL_THEME, context, text='Themes...', icon='IMAGE_RGB')
         # 3 - BOTTOM - RIGHT
         addon_entries.open_pie_menus_list(pie)
 
@@ -64,6 +67,7 @@ class BLUEHOLE_MT_pie_global_theme(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         addon_entries.apply_theme_zen_light(pie)
         # 6 - RIGHT
@@ -81,6 +85,7 @@ class BLUEHOLE_MT_pie_global_theme(bpy.types.Menu):
         # 3 - BOTTOM - RIGHT
         addon_entries.apply_theme_deep_grey(pie)
 
+
 # Pie Global-Order
 class BLUEHOLE_MT_pie_global_order(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_global_order"
@@ -89,6 +94,7 @@ class BLUEHOLE_MT_pie_global_order(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         pie.separator()
         # 6 - RIGHT

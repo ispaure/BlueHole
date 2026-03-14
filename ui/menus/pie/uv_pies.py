@@ -13,10 +13,13 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
+import os
+
 from ....Lib.commonUtils.debugUtils import *
+from ....operators_handling.operator_action import draw_operator_action
+from ....operators_handling.actions import pie_actions
 from .entries import blender_entries
 from .entries.third_party import dreamuv_entries, uvtoolkit_entries, zenuv_entries
-from .utilities import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -38,6 +41,7 @@ class BLUEHOLE_MT_pie_UV_cursor(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         uvtoolkit_entries.center_cursor_frame_all_req_ver_2(pie)
         # 6 - RIGHT
@@ -101,7 +105,7 @@ class BLUEHOLE_MT_pie_UV_action(bpy.types.Menu):
         # 2 - BOTTOM
         zenuv_entries.merge_verts(pie)
         # 8 - TOP
-        open_pie_menu(pie, BLUEHOLE_MT_pie_UV_action_select, text='Select...', icon='TRIA_UP')
+        draw_operator_action(pie, pie_actions.PIE_UV_ACTION_SELECT, context, text='Select...', icon='TRIA_UP')
         # 7 - TOP - LEFT
         zenuv_entries.get_tx_density(pie)
         # 9 - TOP - RIGHT
@@ -167,44 +171,17 @@ class BLUEHOLE_MT_pie_UV_action_uvspecial(bpy.types.Menu):
         zenuv_entries.relax_along_u(pie)
 
 
-# Context: 3D Viewport Mesh Edit (Vertex/Edge/Vert)
-# Hotkey: Ctrl+Alt+Shift+RMB
-class BLUEHOLE_MT_pie_mesh_action_uvspecial(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_mesh_action_uvspecial"  # named wrong
-    bl_label = "Blue Hole: Mesh > Action (UV Special)"
-
-    def draw(self, context):
-        layout = self.layout
-        pie = layout.menu_pie()
-
-        # 4 - LEFT
-        blender_entries.clear_seam(pie)
-        # 6 - RIGHT
-        blender_entries.mark_seam(pie)
-        # 2 - BOTTOM
-        blender_entries.uv_unwrap_conformal(pie)
-        # 8 - TOP
-        dreamuv_entries.hotspotter(pie)
-        # 7 - TOP - LEFT
-        zenuv_entries.fix_trim_loop(pie)
-        # 9 - TOP - RIGHT
-        zenuv_entries.git_to_trim_2(pie)
-        # 1 - BOTTOM - LEFT
-        zenuv_entries.auto_unwrap(pie)
-        # 3 - BOTTOM - RIGHT
-        zenuv_entries.mark_by_angle(pie)
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (BLUEHOLE_MT_pie_UV_cursor,
-           BLUEHOLE_MT_pie_UV_tool,
-           BLUEHOLE_MT_pie_UV_action,
-           BLUEHOLE_MT_pie_UV_action_select,
-           BLUEHOLE_MT_pie_UV_action_uvspecial,
-           BLUEHOLE_MT_pie_mesh_action_uvspecial)
+classes = (
+    BLUEHOLE_MT_pie_UV_cursor,
+    BLUEHOLE_MT_pie_UV_tool,
+    BLUEHOLE_MT_pie_UV_action,
+    BLUEHOLE_MT_pie_UV_action_select,
+    BLUEHOLE_MT_pie_UV_action_uvspecial,
+)
 
 
 def register():

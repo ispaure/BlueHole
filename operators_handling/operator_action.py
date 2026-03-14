@@ -238,7 +238,13 @@ def apply_properties(target, props: dict[str, Any]) -> None:
 # DRAW HELPERS
 
 
-def draw_operator_action(layout, action: OperatorAction, context=None):
+def draw_operator_action(
+        layout,
+        action: OperatorAction,
+        context=None,
+        text: str | None = None,
+        icon: str | None = None
+):
     """
     Draw an OperatorAction in any Blender layout.
 
@@ -247,24 +253,37 @@ def draw_operator_action(layout, action: OperatorAction, context=None):
     - menu layouts
     - pie layouts
 
-    Returns the created operator UI instance.
+    Optional parameters
+    -------------------
+    text:
+        Optional UI label override. If None, action.text is used.
+
+    icon:
+        Optional UI icon override. If None, action.icon is used.
+
+    Returns
+    -------
+    The created operator UI instance.
     """
     ui_state = action.get_ui_state(context)
     idname = action.get_idname()
     props = action.get_props(context)
 
+    resolved_text = action.text if text is None else text
+    resolved_icon = action.icon if icon is None else icon
+
     if ui_state.enabled:
         op = layout.operator(
             idname,
-            text=action.text,
-            icon=action.icon,
+            text=resolved_text,
+            icon=resolved_icon,
         )
     else:
         col = layout.column()
         col.enabled = False
         op = col.operator(
             idname,
-            text=ui_state.reason or action.text or 'Unavailable',
+            text=ui_state.reason or resolved_text or 'Unavailable',
             icon=ui_state.icon,
         )
 
