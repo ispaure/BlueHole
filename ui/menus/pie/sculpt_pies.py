@@ -12,11 +12,13 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-
 import bpy
+import os
+
 from ....Lib.commonUtils.debugUtils import *
+from ....operators_handling.operator_action import draw_operator_action
+from ....operators_handling.actions import pie_actions
 from .entries.blender_sculpt_entries import *
-from .utilities import *
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -40,19 +42,19 @@ class BLUEHOLE_MT_pie_sculpt_tool(bpy.types.Menu):
         pie = layout.menu_pie()
 
         # 4 - LEFT
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_flattenpinch, text='Flatten/Pinch...', icon='TRIA_LEFT')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_TOOL_FLATTENPINCH, context, text='Flatten/Pinch...', icon='TRIA_LEFT')
         # 6 - RIGHT
         pie.separator()
         # 2 - BOTTOM
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_grab, text='Grab...', icon='TRIA_DOWN')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_TOOL_GRAB, context, text='Grab...', icon='TRIA_DOWN')
         # 8 - TOP
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_clayblob, text='Clay/Blob...', icon='TRIA_UP')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_TOOL_CLAYBLOB, context, text='Clay/Blob...', icon='TRIA_UP')
         # 7 - TOP LEFT
         pie.separator()
         # 9 - TOP RIGHT
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_draw, text='Draw...')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_TOOL_DRAW, context, text='Draw...')
         # 1 - BOTTOM LEFT
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_misc, text='Misc...')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_TOOL_MISC, context, text='Misc...')
         # 3 - BOTTOM RIGHT
         pie.separator()
 
@@ -138,7 +140,6 @@ class BLUEHOLE_MT_pie_sculpt_tool_flattenpinch(bpy.types.Menu):
         brush(pie, BlenderBrush.TRIM)
 
 
-
 # No Hotkey; Submenu
 class BLUEHOLE_MT_pie_sculpt_tool_grab(bpy.types.Menu):
     bl_idname = "BLUEHOLE_MT_pie_sculpt_tool_grab"
@@ -153,7 +154,7 @@ class BLUEHOLE_MT_pie_sculpt_tool_grab(bpy.types.Menu):
         # 6 - RIGHT
         brush(pie, BlenderBrush.ELASTIC_SNAKE_HOOK)
         # 2 - BOTTOM
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_tool_nudgethumb, text='Nudge/Thumb...', icon='TRIA_DOWN')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_TOOL_NUDGETHUMB, context, text='Nudge/Thumb...', icon='TRIA_DOWN')
         # 8 - TOP
         brush(pie, BlenderBrush.GRAB_SILHOUETTE)
         # 7 - TOP LEFT
@@ -229,12 +230,13 @@ class BLUEHOLE_MT_pie_sculpt_action(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         brush(pie, BlenderBrush.PAINT_SOFT)
         # 6 - RIGHT
         brush(pie, BlenderBrush.PAINT_HARD)
         # 2 - BOTTOM
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_action_blend, text='Blend/Blur...', icon='TRIA_DOWN')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_ACTION_BLEND, context, text='Blend/Blur...', icon='TRIA_DOWN')
         # 8 - TOP
         brush(pie, BlenderBrush.PAINT_SQUARE)
         # 7 - TOP - LEFT
@@ -255,6 +257,7 @@ class BLUEHOLE_MT_pie_sculpt_action_blend(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         brush(pie, BlenderBrush.AIRBRUSH)
         # 6 - RIGHT
@@ -282,8 +285,9 @@ class BLUEHOLE_MT_pie_sculpt_simulation(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_simulation_expandcontract, text='Expand/Contract...', icon='TRIA_LEFT')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_SIMULATION_EXPANDCONTRACT, context, text='Expand/Contract...', icon='TRIA_LEFT')
         # 6 - RIGHT
         brush(pie, BlenderBrush.GRAB_CLOTH)
         # 2 - BOTTOM
@@ -295,7 +299,7 @@ class BLUEHOLE_MT_pie_sculpt_simulation(bpy.types.Menu):
         # 9 - TOP - RIGHT
         brush(pie, BlenderBrush.GRAB_RANDOM_CLOTH)
         # 1 - BOTTOM - LEFT
-        open_pie_menu(pie, BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist, text='Bend/Stretch/Twist...')
+        draw_operator_action(pie, pie_actions.PIE_SCULPT_SIMULATION_BENDSTRETCHTWIST, context, text='Bend/Stretch/Twist...')
         # 3 - BOTTOM - RIGHT
         brush(pie, BlenderBrush.PINCH_FOLDS_CLOTH)
 
@@ -308,6 +312,7 @@ class BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         brush(pie, BlenderBrush.BEND_BOUNDARY_CLOTH)
         # 6 - RIGHT
@@ -334,6 +339,7 @@ class BLUEHOLE_MT_pie_sculpt_simulation_expandcontract(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         brush(pie, BlenderBrush.EXPAND_CONTRACT_CLOTH)
         # 6 - RIGHT
@@ -356,18 +362,20 @@ class BLUEHOLE_MT_pie_sculpt_simulation_expandcontract(bpy.types.Menu):
 # REGISTER / UNREGISTER
 
 # Menu classes
-classes = (BLUEHOLE_MT_pie_sculpt_tool,
-           BLUEHOLE_MT_pie_sculpt_tool_draw,
-           BLUEHOLE_MT_pie_sculpt_tool_grab,
-           BLUEHOLE_MT_pie_sculpt_tool_clayblob,
-           BLUEHOLE_MT_pie_sculpt_tool_nudgethumb,
-           BLUEHOLE_MT_pie_sculpt_tool_flattenpinch,
-           BLUEHOLE_MT_pie_sculpt_tool_misc,
-           BLUEHOLE_MT_pie_sculpt_action,
-           BLUEHOLE_MT_pie_sculpt_action_blend,
-           BLUEHOLE_MT_pie_sculpt_simulation,
-           BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist,
-           BLUEHOLE_MT_pie_sculpt_simulation_expandcontract)
+classes = (
+    BLUEHOLE_MT_pie_sculpt_tool,
+    BLUEHOLE_MT_pie_sculpt_tool_draw,
+    BLUEHOLE_MT_pie_sculpt_tool_grab,
+    BLUEHOLE_MT_pie_sculpt_tool_clayblob,
+    BLUEHOLE_MT_pie_sculpt_tool_nudgethumb,
+    BLUEHOLE_MT_pie_sculpt_tool_flattenpinch,
+    BLUEHOLE_MT_pie_sculpt_tool_misc,
+    BLUEHOLE_MT_pie_sculpt_action,
+    BLUEHOLE_MT_pie_sculpt_action_blend,
+    BLUEHOLE_MT_pie_sculpt_simulation,
+    BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist,
+    BLUEHOLE_MT_pie_sculpt_simulation_expandcontract,
+)
 
 
 def register():

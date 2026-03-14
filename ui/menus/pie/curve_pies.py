@@ -13,9 +13,9 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
+import os
 from ....Lib.commonUtils.debugUtils import *
 from .entries import blender_entries
-import os
 
 
 # ----------------------------------------------------------------------------------------------------------------------

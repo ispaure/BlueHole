@@ -3,7 +3,7 @@
 
 __author__ = 'Marc-André Voyer'
 __copyright__ = 'Copyright (C) 2020-2025, Marc-André Voyer'
-__license__ = "MIT License"
+__license__ = 'MIT License'
 __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
@@ -12,12 +12,22 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+import os
 import bpy
+
 from ....Lib.commonUtils.debugUtils import *
 from ....operators.model_ops import WM_OT_MergeLast
+from ....operators_handling.operator_action import draw_operator_action
+from ....operators_handling.actions import pie_actions
 from .entries import blender_entries
-from .entries.third_party import hardops_entries, angle_tool_entries, machin3_entries, interactivetools_entries
-from .utilities import *
+from .entries.third_party import (
+    hardops_entries,
+    angle_tool_entries,
+    machin3_entries,
+    interactivetools_entries,
+    zenuv_entries,
+    dreamuv_entries,
+)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -33,12 +43,13 @@ name = filename = os.path.basename(__file__)
 # Context: 3D Viewport (Mesh)
 # Hotkey: Shift + S + Drag Mouse in any direction
 class BLUEHOLE_MT_pie_mesh_hide(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_mesh_hide"
-    bl_label = "Blue Hole Pie Menu: Mesh > Hide"
+    bl_idname = 'BLUEHOLE_MT_pie_mesh_hide'
+    bl_label = 'Blue Hole Pie Menu: Mesh > Hide'
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.mesh_reveal_all(pie)
         # 6 - RIGHT
@@ -61,12 +72,13 @@ class BLUEHOLE_MT_pie_mesh_hide(bpy.types.Menu):
 # Hotkey: Shift + RMB
 # Changes options displayed if Vertex/Edge/Face Mode
 class BLUEHOLE_MT_pie_mesh_tool(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_mesh_tool"
-    bl_label = "Blue Hole: Mesh > Tools"
+    bl_idname = 'BLUEHOLE_MT_pie_mesh_tool'
+    bl_label = 'Blue Hole: Mesh > Tools'
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         # TODO: Says no parameter vertex_only, will need to fix this.
         blender_entries.mesh_bevel(pie)
@@ -90,8 +102,8 @@ class BLUEHOLE_MT_pie_mesh_tool(bpy.types.Menu):
 # Context: 3D Viewport (Mesh)
 # Hotkey: Ctrl + RMB
 class BLUEHOLE_MT_pie_mesh_action(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_mesh_action"
-    bl_label = "Blue Hole: Mesh > Action"
+    bl_idname = 'BLUEHOLE_MT_pie_mesh_action'
+    bl_label = 'Blue Hole: Mesh > Action'
 
     def draw(self, context):
         layout = self.layout
@@ -105,9 +117,9 @@ class BLUEHOLE_MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.merge_center(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, BLUEHOLE_MT_pie_vertex_action_more, text='More...')
+            draw_operator_action(pie, pie_actions.PIE_VERTEX_ACTION_MORE, context, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, BLUEHOLE_MT_pie_vertex_action_select, text='Select...')
+            draw_operator_action(pie, pie_actions.PIE_VERTEX_ACTION_SELECT, context, text='Select...')
             # 7 - TOP - LEFT
             machin3_entries.straighten(pie)
             # 9 - TOP - RIGHT
@@ -124,9 +136,9 @@ class BLUEHOLE_MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.edge_crease(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, BLUEHOLE_MT_pie_edge_action_more, text='More...')
+            draw_operator_action(pie, pie_actions.PIE_EDGE_ACTION_MORE, context, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, BLUEHOLE_MT_pie_edge_action_select, text='Select...')
+            draw_operator_action(pie, pie_actions.PIE_EDGE_ACTION_SELECT, context, text='Select...')
             # 7 - TOP - LEFT
             blender_entries.fill_grid(pie)
             # 9 - TOP - RIGHT
@@ -143,9 +155,9 @@ class BLUEHOLE_MT_pie_mesh_action(bpy.types.Menu):
             # 6 - RIGHT
             blender_entries.mesh_separate(pie)
             # 2 - BOTTOM
-            open_pie_menu(pie, BLUEHOLE_MT_pie_face_action_more, text='More...')
+            draw_operator_action(pie, pie_actions.PIE_FACE_ACTION_MORE, context, text='More...')
             # 8 - TOP
-            open_pie_menu(pie, BLUEHOLE_MT_pie_face_action_select, text='Select...')
+            draw_operator_action(pie, pie_actions.PIE_FACE_ACTION_SELECT, context, text='Select...')
             # 7 - TOP - LEFT
             interactivetools_entries.quick_lattice(pie)
             # 9 - TOP - RIGHT
@@ -156,14 +168,43 @@ class BLUEHOLE_MT_pie_mesh_action(bpy.types.Menu):
             blender_entries.separate_loose_parts(pie)
 
 
-# No Hotkey; Submenu
-class BLUEHOLE_MT_pie_vertex_action_select(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_vertex_action_select"
-    bl_label = "Blue Hole: Vertex > Action > Select"
+# Context: 3D Viewport Mesh Edit (Vertex/Edge/Vert)
+# Hotkey: Ctrl+Alt+Shift+RMB
+class BLUEHOLE_MT_pie_mesh_action_uvspecial(bpy.types.Menu):
+    bl_idname = 'BLUEHOLE_MT_pie_mesh_action_uvspecial'  # named wrong
+    bl_label = 'Blue Hole: Mesh > Action (UV Special)'
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
+        # 4 - LEFT
+        blender_entries.clear_seam(pie)
+        # 6 - RIGHT
+        blender_entries.mark_seam(pie)
+        # 2 - BOTTOM
+        blender_entries.uv_unwrap_conformal(pie)
+        # 8 - TOP
+        dreamuv_entries.hotspotter(pie)
+        # 7 - TOP - LEFT
+        zenuv_entries.fix_trim_loop(pie)
+        # 9 - TOP - RIGHT
+        zenuv_entries.git_to_trim_2(pie)
+        # 1 - BOTTOM - LEFT
+        zenuv_entries.auto_unwrap(pie)
+        # 3 - BOTTOM - RIGHT
+        zenuv_entries.mark_by_angle(pie)
+
+
+# No Hotkey; Submenu
+class BLUEHOLE_MT_pie_vertex_action_select(bpy.types.Menu):
+    bl_idname = 'BLUEHOLE_MT_pie_vertex_action_select'
+    bl_label = 'Blue Hole: Vertex > Action > Select'
+
+    def draw(self, context):
+        layout = self.layout
+        pie = layout.menu_pie()
+
         # 4 - LEFT
         pie.separator()
         # 6 - RIGHT
@@ -184,12 +225,13 @@ class BLUEHOLE_MT_pie_vertex_action_select(bpy.types.Menu):
 
 # No Hotkey; Submenu
 class BLUEHOLE_MT_pie_vertex_action_more(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_vertex_action_more"
-    bl_label = "Blue Hole: Vertex > Action > More"
+    bl_idname = 'BLUEHOLE_MT_pie_vertex_action_more'
+    bl_label = 'Blue Hole: Vertex > Action > More'
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         pie.separator()
         # 6 - RIGHT
@@ -210,12 +252,13 @@ class BLUEHOLE_MT_pie_vertex_action_more(bpy.types.Menu):
 
 # No Hotkey; Submenu
 class BLUEHOLE_MT_pie_edge_action_select(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_edge_action_select"
-    bl_label = "Blue Hole: Edge > Action > Select"
+    bl_idname = 'BLUEHOLE_MT_pie_edge_action_select'
+    bl_label = 'Blue Hole: Edge > Action > Select'
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         interactivetools_entries.smart_select_ring(pie)
         # 6 - RIGHT
@@ -236,12 +279,13 @@ class BLUEHOLE_MT_pie_edge_action_select(bpy.types.Menu):
 
 # No Hotkey; Submenu
 class BLUEHOLE_MT_pie_edge_action_more(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_edge_action_more"
-    bl_label = "Blue Hole: Edge > Action > More"
+    bl_idname = 'BLUEHOLE_MT_pie_edge_action_more'
+    bl_label = 'Blue Hole: Edge > Action > More'
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.rotate_selected_edge_ccw(pie)
         # 6 - RIGHT
@@ -262,12 +306,13 @@ class BLUEHOLE_MT_pie_edge_action_more(bpy.types.Menu):
 
 # No Hotkey; Submenu
 class BLUEHOLE_MT_pie_face_action_select(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_face_action_select"
-    bl_label = "Blue Hole: Face > Action > Select"
+    bl_idname = 'BLUEHOLE_MT_pie_face_action_select'
+    bl_label = 'Blue Hole: Face > Action > Select'
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.select_random_face(pie)
         # 6 - RIGHT
@@ -288,12 +333,13 @@ class BLUEHOLE_MT_pie_face_action_select(bpy.types.Menu):
 
 # No Hotkey; Submenu
 class BLUEHOLE_MT_pie_face_action_more(bpy.types.Menu):
-    bl_idname = "BLUEHOLE_MT_pie_face_action_more"
-    bl_label = "Blue Hole: Face > Action > More"
+    bl_idname = 'BLUEHOLE_MT_pie_face_action_more'
+    bl_label = 'Blue Hole: Face > Action > More'
 
     def draw(self, context):
         layout = self.layout
         pie = layout.menu_pie()
+
         # 4 - LEFT
         blender_entries.unsubdivide(pie)
         # 6 - RIGHT
@@ -320,6 +366,7 @@ classes = (
     BLUEHOLE_MT_pie_mesh_hide,
     BLUEHOLE_MT_pie_mesh_tool,
     BLUEHOLE_MT_pie_mesh_action,
+    BLUEHOLE_MT_pie_mesh_action_uvspecial,
     BLUEHOLE_MT_pie_vertex_action_more,
     BLUEHOLE_MT_pie_vertex_action_select,
     BLUEHOLE_MT_pie_edge_action_more,

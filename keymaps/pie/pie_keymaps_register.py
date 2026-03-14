@@ -57,6 +57,9 @@ def ensure_action_keymaps(action):
     """
     Ensure all keymap bindings for this action exist in Blender's addon keyconfig.
     """
+    if not action.keymap_bindings:
+        return []
+
     kc = get_addon_keyconfig()
     if kc is None:
         return []
