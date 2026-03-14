@@ -21,7 +21,7 @@ from bpy.props import *
 
 from ...operators_handling.actions.pie_actions import PIE_ACTIONS
 from ...operators_handling.operator_action import OperatorAction
-from .keymap_ui_utils import group_actions_by_keymap, draw_action_keymaps
+from .keymap_ui_utils import group_action_bindings_by_keymap, draw_action_binding_keymap
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -72,9 +72,9 @@ def draw(preference, context, layout):
     row = column_pie.row()
     row.label(text='Edit Blue Hole shortcut bindings directly from here.')
 
-    grouped_pie_actions = group_actions_by_keymap(PIE_ACTIONS)
+    grouped_pie_action_bindings = group_action_bindings_by_keymap(PIE_ACTIONS)
 
-    for keymap_name, pie_actions in grouped_pie_actions.items():
+    for keymap_name, pie_action_binding_list in grouped_pie_action_bindings.items():
 
         box_section = column_pie.box()
         column_section = box_section.column()
@@ -82,11 +82,12 @@ def draw(preference, context, layout):
         row = column_section.row()
         row.label(text=keymap_name.upper())
 
-        for action in pie_actions:
-            draw_action_keymaps(
+        for action, binding_index in pie_action_binding_list:
+            draw_action_binding_keymap(
                 column_section,
                 action=action,
                 keymap_name=keymap_name,
+                binding_index=binding_index,
                 label=_get_menu_label(_get_pie_menu_idname(action))
             )
 

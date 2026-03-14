@@ -25,30 +25,18 @@ from ...keymaps.keymap_utils import get_keyconfig_sequence
 # HELPERS
 
 
-def group_actions_by_keymap(actions: list[OperatorAction]) -> dict[str, list[OperatorAction]]:
+def group_action_bindings_by_keymap(actions: list[OperatorAction]) -> dict[str, list[tuple[OperatorAction, int]]]:
     """
-    Group OperatorActions by keymap_name while preserving declaration order.
+    Group declared OperatorAction bindings by keymap_name while preserving declaration order.
 
-    If an action has multiple bindings inside the same keymap, it is only added once
-    to that keymap group.
+    Returns:
+        dict[keymap_name, list[(action, binding_index)]]
     """
-    grouped: dict[str, list[OperatorAction]] = {}
-    seen_per_keymap: dict[str, set[int]] = {}
+    grouped: dict[str, list[tuple[OperatorAction, int]]] = {}
 
     for action in actions:
-        action_identity = id(action)
-
-        for binding in action.keymap_bindings:
-            keymap_name = binding.keymap_name
-
-            grouped.setdefault(keymap_name, [])
-            seen_per_keymap.setdefault(keymap_name, set())
-
-            if action_identity in seen_per_keymap[keymap_name]:
-                continue
-
-            grouped[keymap_name].append(action)
-            seen_per_keymap[keymap_name].add(action_identity)
+        for binding_index, binding in enumerate(action.keymap_bindings):
+            grouped.setdefault(binding.keymap_name, []).append((action, binding_index))
 
     return grouped
 
@@ -98,6 +86,7 @@ def find_action_keymap_items(
                     continue
 
                 matches = True
+
                 for prop_name, prop_value in action_props.items():
                     if getattr(kmi.properties, prop_name, None) != prop_value:
                         matches = False
@@ -112,26 +101,45 @@ def find_action_keymap_items(
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-def draw_action_keymaps(column, action: OperatorAction, keymap_name: str, label: str | None = None):
+def draw_action_binding_keymap(
+        column,
+        action: OperatorAction,
+        keymap_name: str,
+        binding_index: int,
+        label: str | None = None
+):
     """
-    Draw all real Blender keymap UI entries for an OperatorAction.
+    Draw the real Blender keymap UI for one declared binding slot of an OperatorAction.
+
+    Matching is based on:
+    - action operator idname
+    - action properties
+    - keymap name
+
+    Then the binding_index selects which matching keymap item to draw.
+    This allows edited user bindings to still display correctly without requiring
+    the original declared key / modifier values to remain unchanged.
     """
     matches = find_action_keymap_items(action, keymap_name=keymap_name)
 
     if label is None:
         label = action.text or action.get_idname()
 
-    if not matches:
+    if binding_index >= len(matches):
         row = column.row()
         row.label(text=f'{label}: shortcut not found.', icon='ERROR')
         return
 
-    for kc, km, kmi in matches:
-        row = column.row()
-        row.label(text=label)
+    kc, km, kmi = matches[binding_index]
 
-        column.context_pointer_set('keymap', km)
-        rna_keymap_ui.draw_kmi([], kc, km, kmi, column, 0)
+    row = column.row()
+    row.label(text=label)
+
+    column.context_pointer_set('keymap', km)
+    rna_keymap_ui.draw_kmi([], kc, km, kmi, column, 0)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 def draw_action_feature_keymaps(
@@ -169,9 +177,9 @@ def draw_action_feature_keymaps(
     row = column.row()
     row.label(text='Edit shortcut bindings here.')
 
-    grouped_actions = group_actions_by_keymap(actions)
+    grouped_action_bindings = group_action_bindings_by_keymap(actions)
 
-    for keymap_name, action_list in grouped_actions.items():
+    for keymap_name, action_binding_list in grouped_action_bindings.items():
 
         box_section = column.box()
         column_section = box_section.column()
@@ -179,12 +187,13 @@ def draw_action_feature_keymaps(
         row = column_section.row()
         row.label(text=keymap_name.upper())
 
-        for action in action_list:
+        for action, binding_index in action_binding_list:
             resolved_label = label_fn(action) if label_fn is not None else (action.text or action.get_idname())
 
-            draw_action_keymaps(
+            draw_action_binding_keymap(
                 column_section,
                 action=action,
                 keymap_name=keymap_name,
+                binding_index=binding_index,
                 label=resolved_label
             )
