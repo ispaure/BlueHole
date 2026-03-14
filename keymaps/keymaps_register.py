@@ -23,11 +23,8 @@ from ..preferences.prefs import prefs
 
 
 def register():
-    try:
-        if prefs().pie.enable_pie_menus:
-            pie_keymaps_register.register()
-    except Exception:
-        pass
+    if prefs().pie.enable_pie_menus:
+        pie_keymaps_register.register()
 
 
 def unregister():

@@ -16,6 +16,7 @@ __status__ = 'Production'
 # IMPORTS
 
 from dataclasses import dataclass
+from typing import List
 
 from ...ui.menus.pie import (
     add_pies,
@@ -235,7 +236,7 @@ PIE_MENU_DEFS: list[PieKeymapDef] = [
 ]
 
 
-def get_all_pie_menu_defs() -> list[PieKeymapDef]:
+def get_all_pie_menu_defs() -> List[PieKeymapDef]:
     """
     Return all declared Blue Hole pie keymap definitions.
     """
