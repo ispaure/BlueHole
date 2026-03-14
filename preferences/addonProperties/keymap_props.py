@@ -50,19 +50,9 @@ _KEYMAP_DRAW_MODULES = {
 # CODE
 
 
-def _update_enable_keymaps(self, context):
-    """
-    Enable or disable Blue Hole mesh keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.mesh import mesh_keymaps_register <- Need to update this for this situation.
-    #
-    # if self.enable_keymaps:
-    #     keymaps_register.register()
-    # else:
-    #     keymaps_register.unregister()
-    pass
+def _update_keymaps(self, context):
+    from ...keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class KeymapPG(bpy.types.PropertyGroup):
@@ -94,7 +84,7 @@ class KeymapPG(bpy.types.PropertyGroup):
         name='Enable Keymaps',
         description='Enable Blue Hole keymaps',
         default=False,
-        update=_update_enable_keymaps
+        update=_update_keymaps
     )
 
 
