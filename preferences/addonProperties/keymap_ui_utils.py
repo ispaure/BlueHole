@@ -120,7 +120,7 @@ def draw_action_binding_keymap(
     This allows edited user bindings to still display correctly without requiring
     the original declared key / modifier values to remain unchanged.
     """
-    matches = find_action_keymap_items(action, keymap_name=keymap_name)
+    matches = find_action_keymap_items(action, keymap_name=keymap_name, check_user=False, check_default=False)
 
     if label is None:
         label = action.text or action.get_idname()
