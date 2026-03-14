@@ -52,21 +52,33 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class BH_OT_set_active_container_settings_tab(bpy.types.Operator):
-    bl_idname = "wm.bh_set_active_container_settings_tab"
-    bl_label = "Set Container Settings Tab"
+class BH_OT_set_active_prefs_tab(bpy.types.Operator):
+    bl_idname = "wm.bh_set_active_prefs_tab"
+    bl_label = "Set Preferences Tab"
     bl_options = {'INTERNAL'}
 
+    prop_path: StringProperty(name="Property Path", default="")
     tab: StringProperty(name="Tab", default="")
 
     def execute(self, context):
-        # Use the *actual* addon preferences instance
         addon = context.preferences.addons.get(__package__.split('.')[0])
         if not addon:
             self.report({'ERROR'}, 'Addon preferences not found')
             return {'CANCELLED'}
 
-        addon.preferences.container.active_container_settings_tab = self.tab
+        target = addon.preferences
+
+        try:
+            parts = self.prop_path.split('.')
+            for attr in parts[:-1]:
+                target = getattr(target, attr)
+
+            setattr(target, parts[-1], self.tab)
+
+        except Exception as exc:
+            self.report({'ERROR'}, f'Failed to set tab: {exc}')
+            return {'CANCELLED'}
+
         return {'FINISHED'}
 
 
@@ -74,10 +86,11 @@ class BH_OT_set_active_container_settings_tab(bpy.types.Operator):
 # REGISTER / UNREGISTER
 
 # List of classes to register/unregister
-classes = (WM_OT_URLOpen,
-           WM_OT_Apply_Deluxe_Prefs,
-           BH_OT_set_active_container_settings_tab
-           )
+classes = (
+    WM_OT_URLOpen,
+    WM_OT_Apply_Deluxe_Prefs,
+    BH_OT_set_active_prefs_tab
+)
 
 
 def register():
