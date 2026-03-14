@@ -21,7 +21,7 @@ from bpy.props import *
 
 from ...operators_handling.actions.pie_actions import PIE_ACTIONS
 from ...operators_handling.operator_action import OperatorAction
-from .keymap_ui_utils import group_actions_by_keymap, draw_action_keymap
+from .keymap_ui_utils import group_actions_by_keymap, draw_action_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -83,7 +83,7 @@ def draw(preference, context, layout):
         row.label(text=keymap_name.upper())
 
         for action in pie_actions:
-            draw_action_keymap(
+            draw_action_keymaps(
                 column_section,
                 action=action,
                 keymap_name=keymap_name,

@@ -28,12 +28,27 @@ from ...keymaps.keymap_utils import get_keyconfig_sequence
 def group_actions_by_keymap(actions: list[OperatorAction]) -> dict[str, list[OperatorAction]]:
     """
     Group OperatorActions by keymap_name while preserving declaration order.
+
+    If an action has multiple bindings inside the same keymap, it is only added once
+    to that keymap group.
     """
     grouped: dict[str, list[OperatorAction]] = {}
+    seen_per_keymap: dict[str, set[int]] = {}
 
     for action in actions:
+        action_identity = id(action)
+
         for binding in action.keymap_bindings:
-            grouped.setdefault(binding.keymap_name, []).append(action)
+            keymap_name = binding.keymap_name
+
+            grouped.setdefault(keymap_name, [])
+            seen_per_keymap.setdefault(keymap_name, set())
+
+            if action_identity in seen_per_keymap[keymap_name]:
+                continue
+
+            grouped[keymap_name].append(action)
+            seen_per_keymap[keymap_name].add(action_identity)
 
     return grouped
 
@@ -41,19 +56,20 @@ def group_actions_by_keymap(actions: list[OperatorAction]) -> dict[str, list[Ope
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-def find_action_keymap(
+def find_action_keymap_items(
         action: OperatorAction,
         keymap_name: str | None = None,
         check_user: bool = True,
         check_addon: bool = True,
         check_default: bool = False
-):
+) -> list[tuple]:
     """
-    Find the real Blender keymap item for an OperatorAction.
+    Find all real Blender keymap items for an OperatorAction.
 
     Returns:
-        (kc, km, kmi) or (None, None, None)
+        list[(kc, km, kmi)]
     """
+    results = []
 
     keyconfigs_to_check = get_keyconfig_sequence(
         check_user=check_user,
@@ -72,71 +88,50 @@ def find_action_keymap(
     action_props = action.get_props(None)
 
     for kc in keyconfigs_to_check:
-
         for km_name in preferred_keymap_names:
             km = kc.keymaps.get(km_name)
             if km is None:
                 continue
 
             for kmi in km.keymap_items:
-
                 if kmi.idname != action_idname:
                     continue
 
                 matches = True
-
                 for prop_name, prop_value in action_props.items():
                     if getattr(kmi.properties, prop_name, None) != prop_value:
                         matches = False
                         break
 
                 if matches:
-                    return kc, km, kmi
+                    results.append((kc, km, kmi))
 
-        for km in kc.keymaps:
-
-            for kmi in km.keymap_items:
-
-                if kmi.idname != action_idname:
-                    continue
-
-                matches = True
-
-                for prop_name, prop_value in action_props.items():
-                    if getattr(kmi.properties, prop_name, None) != prop_value:
-                        matches = False
-                        break
-
-                if matches:
-                    return kc, km, kmi
-
-    return None, None, None
+    return results
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-def draw_action_keymap(column, action: OperatorAction, keymap_name: str, label: str | None = None):
+def draw_action_keymaps(column, action: OperatorAction, keymap_name: str, label: str | None = None):
     """
-    Draw the real Blender keymap UI for an OperatorAction.
+    Draw all real Blender keymap UI entries for an OperatorAction.
     """
-
-    kc, km, kmi = find_action_keymap(action, keymap_name=keymap_name)
+    matches = find_action_keymap_items(action, keymap_name=keymap_name)
 
     if label is None:
         label = action.text or action.get_idname()
 
-    if kc is None or km is None or kmi is None:
+    if not matches:
         row = column.row()
         row.label(text=f'{label}: shortcut not found.', icon='ERROR')
         return
 
-    row = column.row()
-    row.label(text=label)
+    for kc, km, kmi in matches:
+        row = column.row()
+        row.label(text=label)
 
-    column.context_pointer_set('keymap', km)
-
-    rna_keymap_ui.draw_kmi([], kc, km, kmi, column, 0)
+        column.context_pointer_set('keymap', km)
+        rna_keymap_ui.draw_kmi([], kc, km, kmi, column, 0)
 
 
 def draw_action_feature_keymaps(
@@ -187,7 +182,7 @@ def draw_action_feature_keymaps(
         for action in action_list:
             resolved_label = label_fn(action) if label_fn is not None else (action.text or action.get_idname())
 
-            draw_action_keymap(
+            draw_action_keymaps(
                 column_section,
                 action=action,
                 keymap_name=keymap_name,
