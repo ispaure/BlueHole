@@ -19,7 +19,7 @@ import bpy
 from bpy.props import *
 from bpy.types import AddonPreferences
 
-from .addonProperties import general_props, pie_props, help_update_props
+from .addonProperties import general_props, keymap_props, pie_props, help_update_props
 from .environmentProperties import bridge_props, container_props, directory_props, sourcecontrol_props
 from ..environment import envManager
 
@@ -45,6 +45,7 @@ _ENV_DRAW_MODULES = {
 _GENERAL_DRAW_MODULES = {
     "GENERAL": general_props,
     "PIE": pie_props,
+    "KEYMAP": keymap_props,
     "HELP_N_UPDATE": help_update_props,
 }
 
@@ -80,6 +81,7 @@ class BlueHole(AddonPreferences):
         description='General addon settings to display',
         items=[
             ('GENERAL', 'General Settings', ''),
+            ('KEYMAP', 'Keymaps', ''),
             ('PIE', 'Pie Menus', ''),
             ('HELP_N_UPDATE', 'Help & Updates', ''),
         ],
@@ -87,6 +89,7 @@ class BlueHole(AddonPreferences):
     )
 
     general: PointerProperty(type=general_props.GeneralPG)
+    keymap: PointerProperty(type=keymap_props.KeymapPG)
     pie: PointerProperty(type=pie_props.PiePG)
     help_n_update: PointerProperty(type=help_update_props.HelpUpdatePG)
     directory: PointerProperty(type=directory_props.DirectoryPG)
@@ -164,6 +167,7 @@ class BlueHole(AddonPreferences):
 
 classes = (
     general_props.GeneralPG,        # sub PropertyGroups before others
+    keymap_props.KeymapPG,
     pie_props.PiePG,
     help_update_props.HelpUpdatePG,
     directory_props.DirectoryPG,
