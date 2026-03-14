@@ -71,12 +71,12 @@ def _select_less_bindings(keymap_name: str, space_type: str = 'EMPTY', region_ty
 # Dopesheet
 SELECTION_DOPESHEET_SELECT_MORE = OperatorAction(
     operator='action.select_more',
-    keymap_bindings=_select_more_bindings('Dopesheet')
+    keymap_bindings=_select_more_bindings('Dopesheet', space_type='DOPESHEET_EDITOR')
 )
 
 SELECTION_DOPESHEET_SELECT_LESS = OperatorAction(
     operator='action.select_less',
-    keymap_bindings=_select_less_bindings('Dopesheet')
+    keymap_bindings=_select_less_bindings('Dopesheet', space_type='DOPESHEET_EDITOR')
 )
 
 # Object Mode
@@ -190,36 +190,36 @@ SELECTION_MASK_SELECT_LESS = OperatorAction(
 # Graph Editor
 SELECTION_GRAPH_SELECT_MORE = OperatorAction(
     operator='graph.select_more',
-    keymap_bindings=_select_more_bindings('Graph Editor')
+    keymap_bindings=_select_more_bindings('Graph Editor', space_type='GRAPH_EDITOR')
 )
 
 SELECTION_GRAPH_SELECT_LESS = OperatorAction(
     operator='graph.select_less',
-    keymap_bindings=_select_less_bindings('Graph Editor')
+    keymap_bindings=_select_less_bindings('Graph Editor', space_type='GRAPH_EDITOR')
 )
 
 # NOT WORKING
 # Node Editor
 SELECTION_NODE_SELECT_MORE = OperatorAction(
     operator='node.select_linked_to',
-    keymap_bindings=_select_more_bindings('Node Editor')
+    keymap_bindings=_select_more_bindings('Node Editor', space_type='NODE_EDITOR')
 )
 
 SELECTION_NODE_SELECT_LESS = OperatorAction(
     operator='node.select_linked_from',
-    keymap_bindings=_select_less_bindings('Node Editor')
+    keymap_bindings=_select_less_bindings('Node Editor', space_type='NODE_EDITOR')
 )
 
 # NOT WORKING
 # Sequencer
 SELECTION_SEQUENCER_SELECT_MORE = OperatorAction(
     operator='sequencer.select_more',
-    keymap_bindings=_select_more_bindings('Sequencer')
+    keymap_bindings=_select_more_bindings('Sequencer', space_type='SEQUENCE_EDITOR')
 )
 
 SELECTION_SEQUENCER_SELECT_LESS = OperatorAction(
     operator='sequencer.select_less',
-    keymap_bindings=_select_less_bindings('Sequencer')
+    keymap_bindings=_select_less_bindings('Sequencer', space_type='SEQUENCE_EDITOR')
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
