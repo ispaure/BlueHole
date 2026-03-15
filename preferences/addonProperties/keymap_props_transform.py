@@ -44,8 +44,8 @@ class TransformKeymapPG(bpy.types.PropertyGroup):
     )
 
     enable_transform_tool_shortcuts: BoolProperty(
-        name='Enable Transform Tool Shortcuts',
-        description='Enable Blue Hole transform tool shortcuts',
+        name='Enable Transform Tools (Translate, Rotate, Resize & Gizmo Equivalents)',
+        description='Transform Tools',
         default=True,
         update=_update_keymaps
     )
@@ -141,6 +141,3 @@ def draw(preference, context, layout):
     elif preference.keymap.transform.active_transform_keymap_tab == 'ACTIONS':
         row = column_transform.row()
         row.prop(preference.keymap.transform, 'enable_transform_action_shortcuts')
-
-    row = column_transform.row()
-    row.label(text='Transform keymap settings will appear here.')

@@ -16,13 +16,9 @@ __status__ = 'Production'
 # IMPORTS
 
 from ...Lib.commonUtils.debugUtils import *
-from ..keymap_utils import get_addon_keyconfig
-from ...operators_handling.operator_action import (
-    register_operator_action_keymaps,
-    remove_matching_action_kmis,
-    unregister_registered_keymaps,
-)
-from ...operators_handling.actions.keymaps.navigation_actions import get_navigation_actions
+from ..keymap_action_utils import ensure_action_keymaps
+from ...operators_handling.operator_action import unregister_registered_keymaps
+from ...operators_handling.actions.keymaps.navigation.viewport import get_navigation_viewport_actions
 from ...preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -39,46 +35,21 @@ registered_navigation_keymaps = []
 # HELPERS
 
 
-def remove_existing_action_keymaps_from_keyconfig(kc, action):
-    """
-    Remove existing keymap items for this action from the given keyconfig.
-    """
-    if kc is None:
-        return
-
-    for binding in action.keymap_bindings:
-        km = kc.keymaps.get(binding.keymap_name)
-        if km is None:
-            continue
-
-        remove_matching_action_kmis(km, action)
-
-
-def ensure_action_keymaps(action):
-    """
-    Ensure all keymap bindings for this action exist in Blender's addon keyconfig.
-    """
-    if not action.keymap_bindings:
-        return []
-
-    kc = get_addon_keyconfig()
-    if kc is None:
-        return []
-
-    remove_existing_action_keymaps_from_keyconfig(kc, action)
-    return register_operator_action_keymaps(kc, action)
-
-
 def get_enabled_navigation_actions():
     """
     Return the list of navigation actions that should currently be registered.
     """
     actions = []
 
+    if not prefs().keymap.enable_keymaps:
+        return actions
+
     if not prefs().keymap.navigation.enable_navigation_keymaps:
         return actions
 
-    actions.extend(get_navigation_actions())
+    if prefs().keymap.navigation.enable_navigation_viewport_shortcuts:
+        actions.extend(get_navigation_viewport_actions())
+
     return actions
 
 

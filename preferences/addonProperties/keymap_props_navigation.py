@@ -17,6 +17,8 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
+from ...operators_handling.actions.keymaps.navigation.viewport import get_navigation_viewport_actions
+from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -27,19 +29,9 @@ show_verbose = True
 # CODE
 
 
-def _update_enable_navigation_keymaps(self, context):
-    """
-    Enable or disable Blue Hole navigation keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.navigation import navigation_keymaps_register
-    #
-    # if self.enable_navigation_keymaps:
-    #     navigation_keymaps_register.register()
-    # else:
-    #     navigation_keymaps_register.unregister()
-    pass
+def _update_keymaps(self, context):
+    from ...keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class NavigationKeymapPG(bpy.types.PropertyGroup):
@@ -48,21 +40,21 @@ class NavigationKeymapPG(bpy.types.PropertyGroup):
         name='Enable Navigation Keymaps',
         description='Enable Blue Hole navigation keymaps',
         default=True,
-        update=_update_enable_navigation_keymaps
+        update=_update_keymaps
     )
 
     enable_navigation_viewport_shortcuts: BoolProperty(
         name='Enable Viewport Navigation Shortcuts',
         description='Enable Blue Hole viewport navigation shortcuts',
         default=True,
-        # update=_update_enable_navigation_viewport_shortcuts
+        update=_update_keymaps
     )
 
     enable_navigation_view_framing: BoolProperty(
         name='Enable View Framing Shortcuts',
         description='Enable Blue Hole view framing shortcuts',
         default=True,
-        # update=_update_enable_navigation_view_framing
+        update=_update_keymaps
     )
 
     active_navigation_keymap_tab: EnumProperty(
@@ -119,12 +111,13 @@ def draw(preference, context, layout):
     _draw_navigation_tab_buttons(column_navigation, preference)
 
     if preference.keymap.navigation.active_navigation_keymap_tab == 'VIEWPORT':
-        row = column_navigation.row()
-        row.prop(preference.keymap.navigation, 'enable_navigation_viewport_shortcuts')
+        draw_action_feature_keymaps(
+            column=column_navigation,
+            feature_owner=preference.keymap.navigation,
+            feature_prop_name='enable_navigation_viewport_shortcuts',
+            actions=get_navigation_viewport_actions(),
+        )
 
     elif preference.keymap.navigation.active_navigation_keymap_tab == 'VIEW_FRAMING':
         row = column_navigation.row()
         row.prop(preference.keymap.navigation, 'enable_navigation_view_framing')
-
-    row = column_navigation.row()
-    row.label(text='Navigation keymap settings will appear here.')
