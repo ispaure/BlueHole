@@ -18,8 +18,8 @@ __status__ = 'Production'
 from ...Lib.commonUtils.debugUtils import *
 from ..keymap_utils import get_addon_keyconfig
 from ..keymap_action_utils import ensure_action_keymaps
-from ...operators_handling.operator_action import unregister_registered_keymaps
-from ...operators_handling.actions.pie_actions import PIE_ACTIONS
+from ...actions.operator_action import unregister_registered_keymaps
+from ...actions.actions.pie_actions import PIE_ACTIONS
 from ...preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------

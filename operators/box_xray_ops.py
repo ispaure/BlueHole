@@ -27,7 +27,7 @@ from ..Lib.commonUtils.debugUtils import *
 
 class BH_OT_tool_select_box_xray_object(bpy.types.Operator):
     bl_idname = "wm.bh_tool_select_box_xray_object"
-    bl_label = "Select Box XRay (Object) / Fallback"
+    bl_label = "Blue Hole: Selection Box XRay / Fallback (Object)"
     bl_description = "Set Select Box XRay tool if available, else Blender Select Box"
 
     def execute(self, context):
@@ -47,7 +47,7 @@ class BH_OT_tool_select_box_xray_object(bpy.types.Operator):
 
 class BH_OT_tool_select_box_xray_mesh(bpy.types.Operator):
     bl_idname = "wm.bh_tool_select_box_xray_mesh"
-    bl_label = "Select Box XRay (Mesh) / Fallback"
+    bl_label = "Blue Hole: Selection Box XRay / Fallback (Mesh)"
     bl_description = "Set Select Box XRay tool if available, else Blender Select Box"
 
     def execute(self, context):
@@ -67,7 +67,7 @@ class BH_OT_tool_select_box_xray_mesh(bpy.types.Operator):
 
 class BH_OT_tool_select_box_xray_curve(bpy.types.Operator):
     bl_idname = "wm.bh_tool_select_box_xray_curve"
-    bl_label = "Select Box XRay (Curve) / Fallback"
+    bl_label = "Blue Hole: Selection Box XRay / Fallback (Curve)"
     bl_description = "Set Select Box XRay tool if available, else Blender Select Box"
 
     def execute(self, context):

@@ -19,8 +19,8 @@ import bpy
 
 from bpy.props import *
 
-from ...operators_handling.actions.pie_actions import PIE_ACTIONS
-from ...operators_handling.operator_action import OperatorAction
+from ...actions.actions.pie_actions import PIE_ACTIONS
+from ...actions.operator_action import OperatorAction
 from .keymap_ui_utils import group_action_bindings_by_keymap, draw_action_binding_keymap
 
 # ----------------------------------------------------------------------------------------------------------------------

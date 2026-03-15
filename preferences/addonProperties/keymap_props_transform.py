@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-from ...operators_handling.actions.keymaps.transform.transform_tools import get_transform_tools_actions
+from ...actions.actions.keymaps.transform.transform_tools import get_transform_tools_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------

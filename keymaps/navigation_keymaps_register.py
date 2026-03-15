@@ -1,5 +1,5 @@
 """
-Registration and runtime management for Blue Hole transform keymaps.
+Registration and runtime management for Blue Hole navigation keymaps.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,11 +15,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ...Lib.commonUtils.debugUtils import *
-from ..keymap_action_utils import ensure_action_keymaps
-from ...operators_handling.operator_action import unregister_registered_keymaps
-from ...operators_handling.actions.keymaps.transform.transform_tools import get_transform_tools_actions
-from ...preferences.prefs import prefs
+from ..Lib.commonUtils.debugUtils import *
+from .keymap_action_utils import ensure_action_keymaps
+from ..actions.operator_action import unregister_registered_keymaps
+from ..actions.actions.keymaps.navigation.viewport import get_navigation_viewport_actions
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -29,26 +29,26 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
 
-registered_transform_keymaps = []
+registered_navigation_keymaps = []
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
 
 
-def get_enabled_transform_actions():
+def get_enabled_navigation_actions():
     """
-    Return the list of transform actions that should currently be registered.
+    Return the list of navigation actions that should currently be registered.
     """
     actions = []
 
     if not prefs().keymap.enable_keymaps:
         return actions
 
-    if not prefs().keymap.transform.enable_transform_keymaps:
+    if not prefs().keymap.navigation.enable_navigation_keymaps:
         return actions
 
-    if prefs().keymap.transform.enable_transform_tool_shortcuts:
-        actions.extend(get_transform_tools_actions())
+    if prefs().keymap.navigation.enable_navigation_viewport_shortcuts:
+        actions.extend(get_navigation_viewport_actions())
 
     return actions
 
@@ -60,17 +60,17 @@ def get_enabled_transform_actions():
 def register():
     unregister()
 
-    actions = get_enabled_transform_actions()
+    actions = get_enabled_navigation_actions()
     if not actions:
         return
 
-    log(Severity.INFO, 'Blue Hole transform Keymaps', 'Registering transform keymaps...')
+    log(Severity.INFO, 'Blue Hole Navigation Keymaps', 'Registering navigation keymaps...')
 
     for action in actions:
-        registered_transform_keymaps.extend(ensure_action_keymaps(action))
+        registered_navigation_keymaps.extend(ensure_action_keymaps(action))
 
-    log(Severity.INFO, 'Blue Hole transform Keymaps', 'Registering transform keymaps completed!')
+    log(Severity.INFO, 'Blue Hole Navigation Keymaps', 'Registering navigation keymaps completed!')
 
 
 def unregister():
-    unregister_registered_keymaps(registered_transform_keymaps)
+    unregister_registered_keymaps(registered_navigation_keymaps)

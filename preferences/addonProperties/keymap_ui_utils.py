@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 import rna_keymap_ui
 
-from ...operators_handling.operator_action import OperatorAction
+from ...actions.operator_action import OperatorAction
 from ...keymaps.keymap_utils import get_keyconfig_sequence
 
 # ----------------------------------------------------------------------------------------------------------------------

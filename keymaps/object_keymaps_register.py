@@ -1,5 +1,5 @@
 """
-Registration and runtime management for Blue Hole sculpt keymaps.
+Registration and runtime management for Blue Hole object keymaps.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,11 +15,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ...Lib.commonUtils.debugUtils import *
-from ..keymap_action_utils import ensure_action_keymaps
-from ...operators_handling.operator_action import unregister_registered_keymaps
-from ...operators_handling.actions.keymaps.sculpt_actions import get_sculpt_actions
-from ...preferences.prefs import prefs
+from ..Lib.commonUtils.debugUtils import *
+from .keymap_action_utils import ensure_action_keymaps
+from ..actions.operator_action import unregister_registered_keymaps
+from ..actions.actions.keymaps.object_actions import get_object_actions
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -29,22 +29,22 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
 
-registered_sculpt_keymaps = []
+registered_object_keymaps = []
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
 
 
-def get_enabled_sculpt_actions():
+def get_enabled_object_actions():
     """
-    Return the list of sculpt actions that should currently be registered.
+    Return the list of object actions that should currently be registered.
     """
     actions = []
 
-    if not prefs().keymap.sculpt.enable_sculpt_keymaps:
+    if not prefs().keymap.object.enable_object_keymaps:
         return actions
 
-    actions.extend(get_sculpt_actions())
+    actions.extend(get_object_actions())
     return actions
 
 
@@ -55,17 +55,17 @@ def get_enabled_sculpt_actions():
 def register():
     unregister()
 
-    actions = get_enabled_sculpt_actions()
+    actions = get_enabled_object_actions()
     if not actions:
         return
 
-    log(Severity.INFO, 'Blue Hole Sculpt Keymaps', 'Registering sculpt keymaps...')
+    log(Severity.INFO, 'Blue Hole Object Keymaps', 'Registering object keymaps...')
 
     for action in actions:
-        registered_sculpt_keymaps.extend(ensure_action_keymaps(action))
+        registered_object_keymaps.extend(ensure_action_keymaps(action))
 
-    log(Severity.INFO, 'Blue Hole Sculpt Keymaps', 'Registering sculpt keymaps completed!')
+    log(Severity.INFO, 'Blue Hole Object Keymaps', 'Registering object keymaps completed!')
 
 
 def unregister():
-    unregister_registered_keymaps(registered_sculpt_keymaps)
+    unregister_registered_keymaps(registered_object_keymaps)
