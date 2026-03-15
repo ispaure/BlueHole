@@ -18,6 +18,10 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 
+from ...actions.actions.keymaps.navigation.viewport_movement import get_navigation_viewport_movement_actions
+from ...actions.actions.keymaps.navigation.viewport_axis import get_navigation_viewport_axis_actions
+from .keymap_ui_utils import draw_action_feature_keymaps
+
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
 
@@ -27,19 +31,9 @@ show_verbose = True
 # CODE
 
 
-def _update_enable_navigation_keymaps(self, context):
-    """
-    Enable or disable Blue Hole navigation keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.navigation import navigation_keymaps_register
-    #
-    # if self.enable_navigation_keymaps:
-    #     navigation_keymaps_register.register()
-    # else:
-    #     navigation_keymaps_register.unregister()
-    pass
+def _update_keymaps(self, context):
+    from ...keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class NavigationKeymapPG(bpy.types.PropertyGroup):
@@ -48,21 +42,48 @@ class NavigationKeymapPG(bpy.types.PropertyGroup):
         name='Enable Navigation Keymaps',
         description='Enable Blue Hole navigation keymaps',
         default=True,
-        update=_update_enable_navigation_keymaps
+        update=_update_keymaps
     )
 
-    enable_navigation_viewport_shortcuts: BoolProperty(
-        name='Enable Viewport Navigation Shortcuts',
-        description='Enable Blue Hole viewport navigation shortcuts',
+    enable_navigation_viewport_movement: BoolProperty(
+        name='Enable Viewport Movement',
+        description='"Viewport Movement"',
         default=True,
-        # update=_update_enable_navigation_viewport_shortcuts
+        update=_update_keymaps
     )
 
-    enable_navigation_selection_wheel: BoolProperty(
-        name='Enable Selection Wheel Navigation',
-        description='Enable Blue Hole wheel-based selection navigation shortcuts',
+    enable_navigation_viewport_axis: BoolProperty(
+        name='Enable View Axis',
+        description='"View Axis"',
         default=True,
-        # update=_update_enable_navigation_selection_wheel
+        update=_update_keymaps
+    )
+
+    enable_navigation_view_framing: BoolProperty(
+        name='Enable View Framing',
+        description='"View Framing"',
+        default=True,
+        update=_update_keymaps
+    )
+
+    active_navigation_keymap_tab: EnumProperty(
+        name='Navigation Keymap Tab',
+        description='Active navigation keymap feature tab',
+        items=[
+            ('VIEWPORT', 'Viewport', ''),
+            ('VIEW_FRAMING', 'View Framing', ''),
+        ],
+        default='VIEWPORT'
+    )
+
+    active_navigation_viewport_tab: EnumProperty(
+        name='Viewport Keymap Tab',
+        description='Active viewport navigation feature tab',
+        items=[
+            ('MOVEMENT', 'Movement', ''),
+            ('AXIS', 'Axis', ''),
+        ],
+        default='MOVEMENT'
     )
 
 
@@ -82,10 +103,29 @@ def draw(preference, context, layout):
         return
 
     row = column_navigation.row()
-    row.prop(preference.keymap.navigation, 'enable_navigation_viewport_shortcuts')
+    row.prop(preference.keymap.navigation, 'active_navigation_keymap_tab', expand=True)
 
-    row = column_navigation.row()
-    row.prop(preference.keymap.navigation, 'enable_navigation_selection_wheel')
+    if preference.keymap.navigation.active_navigation_keymap_tab == 'VIEWPORT':
 
-    row = column_navigation.row()
-    row.label(text='Navigation keymap settings will appear here.')
+        row = column_navigation.row()
+        row.prop(preference.keymap.navigation, 'active_navigation_viewport_tab', expand=True)
+
+        if preference.keymap.navigation.active_navigation_viewport_tab == 'MOVEMENT':
+            draw_action_feature_keymaps(
+                column=column_navigation,
+                feature_owner=preference.keymap.navigation,
+                feature_prop_name='enable_navigation_viewport_movement',
+                actions=get_navigation_viewport_movement_actions(),
+            )
+
+        elif preference.keymap.navigation.active_navigation_viewport_tab == 'AXIS':
+            draw_action_feature_keymaps(
+                column=column_navigation,
+                feature_owner=preference.keymap.navigation,
+                feature_prop_name='enable_navigation_viewport_axis',
+                actions=get_navigation_viewport_axis_actions(),
+            )
+
+    elif preference.keymap.navigation.active_navigation_keymap_tab == 'VIEW_FRAMING':
+        row = column_navigation.row()
+        row.prop(preference.keymap.navigation, 'enable_navigation_view_framing')

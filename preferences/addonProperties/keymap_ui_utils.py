@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 import rna_keymap_ui
 
-from ...operators_handling.operator_action import OperatorAction
+from ...actions.operator_action import OperatorAction
 from ...keymaps.keymap_utils import get_keyconfig_sequence
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -169,13 +169,13 @@ def draw_action_feature_keymaps(
     row.prop(feature_owner, feature_prop_name)
 
     if not getattr(feature_owner, feature_prop_name):
-        feature_label = feature_owner.bl_rna.properties[feature_prop_name].name
+        feature_label = feature_owner.bl_rna.properties[feature_prop_name].description
         row = column.row()
-        row.label(text=f'{feature_label} shortcuts are currently disabled.')
+        row.label(text=f'{feature_label} shortcuts are currently disabled.', icon='ERROR')
         return
 
     row = column.row()
-    row.label(text='Edit shortcut bindings here.')
+    row.label(text='View shortcut bindings here. Custom edits are not yet persistent.')
 
     grouped_action_bindings = group_action_bindings_by_keymap(actions)
 
@@ -188,7 +188,7 @@ def draw_action_feature_keymaps(
         row.label(text=keymap_name.upper())
 
         for action, binding_index in action_binding_list:
-            resolved_label = label_fn(action) if label_fn is not None else (action.text or action.get_idname())
+            resolved_label = label_fn(action) if label_fn is not None else action.get_label()
 
             draw_action_binding_keymap(
                 column_section,

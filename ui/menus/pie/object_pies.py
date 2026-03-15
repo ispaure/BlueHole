@@ -16,8 +16,8 @@ import os
 import bpy
 
 from ....Lib.commonUtils.debugUtils import *
-from ....operators_handling.operator_action import draw_operator_action
-from ....operators_handling.actions import pie_actions
+from ....actions.operator_action import draw_operator_action
+from ....actions.actions import pie_actions
 from .entries import blender_entries
 from .entries.third_party import hardops_entries, machin3_entries, interactivetools_entries
 

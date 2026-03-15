@@ -17,7 +17,9 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-from ...operators_handling.actions.keymaps.transform.transform_tools import get_transform_tools_actions
+
+from ...actions.actions.keymaps.transform.transform_tools_modal import get_transform_tools_modal_actions
+from ...actions.actions.keymaps.transform.transform_tools_gizmo import get_transform_tools_gizmo_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -43,23 +45,30 @@ class TransformKeymapPG(bpy.types.PropertyGroup):
         update=_update_keymaps
     )
 
-    enable_transform_tool_shortcuts: BoolProperty(
-        name='Enable Transform Tool Shortcuts',
-        description='Enable Blue Hole transform tool shortcuts',
+    enable_transform_tools_modal: BoolProperty(
+        name='Enable Transform Tools (Modal)',
+        description='Transform Tools (Modal)',
+        default=True,
+        update=_update_keymaps
+    )
+
+    enable_transform_tools_gizmo: BoolProperty(
+        name='Enable Transform Tools (Gizmo)',
+        description='Transform Tools (Gizmo)',
         default=True,
         update=_update_keymaps
     )
 
     enable_transform_orientation_shortcuts: BoolProperty(
-        name='Enable Transform Orientation Shortcuts',
-        description='Enable Blue Hole transform orientation shortcuts',
+        name='Enable Transform Orientation',
+        description='Transform Orientation',
         default=True,
         update=_update_keymaps
     )
 
     enable_transform_action_shortcuts: BoolProperty(
-        name='Enable Transform Action Shortcuts',
-        description='Enable Blue Hole transform action shortcuts',
+        name='Enable Transform Actions',
+        description='Transform Actions',
         default=True,
         update=_update_keymaps
     )
@@ -75,38 +84,15 @@ class TransformKeymapPG(bpy.types.PropertyGroup):
         default='TOOLS'
     )
 
-
-def _draw_transform_tab_buttons(column, preference):
-    """
-    Draw the transform feature tab buttons.
-    """
-    row = column.row(align=True)
-
-    current_tab = preference.keymap.transform.active_transform_keymap_tab
-
-    op = row.operator(
-        "wm.bh_set_active_prefs_tab",
-        text="Tools",
-        depress=(current_tab == 'TOOLS')
+    active_transform_tools_tab: EnumProperty(
+        name='Transform Tools Tab',
+        description='Active transform tools feature tab',
+        items=[
+            ('MODAL', 'Modal', ''),
+            ('GIZMO', 'Gizmo', ''),
+        ],
+        default='MODAL'
     )
-    op.prop_path = "keymap.transform.active_transform_keymap_tab"
-    op.tab = "TOOLS"
-
-    op = row.operator(
-        "wm.bh_set_active_prefs_tab",
-        text="Orientation",
-        depress=(current_tab == 'ORIENTATION')
-    )
-    op.prop_path = "keymap.transform.active_transform_keymap_tab"
-    op.tab = "ORIENTATION"
-
-    op = row.operator(
-        "wm.bh_set_active_prefs_tab",
-        text="Actions",
-        depress=(current_tab == 'ACTIONS')
-    )
-    op.prop_path = "keymap.transform.active_transform_keymap_tab"
-    op.tab = "ACTIONS"
 
 
 def draw(preference, context, layout):
@@ -124,15 +110,29 @@ def draw(preference, context, layout):
         row.label(text='Transform keymaps are currently disabled.')
         return
 
-    _draw_transform_tab_buttons(column_transform, preference)
+    row = column_transform.row()
+    row.prop(preference.keymap.transform, 'active_transform_keymap_tab', expand=True)
 
     if preference.keymap.transform.active_transform_keymap_tab == 'TOOLS':
-        draw_action_feature_keymaps(
-            column=column_transform,
-            feature_owner=preference.keymap.transform,
-            feature_prop_name='enable_transform_tool_shortcuts',
-            actions=get_transform_tools_actions(),
-        )
+
+        row = column_transform.row()
+        row.prop(preference.keymap.transform, 'active_transform_tools_tab', expand=True)
+
+        if preference.keymap.transform.active_transform_tools_tab == 'MODAL':
+            draw_action_feature_keymaps(
+                column=column_transform,
+                feature_owner=preference.keymap.transform,
+                feature_prop_name='enable_transform_tools_modal',
+                actions=get_transform_tools_modal_actions(),
+            )
+
+        elif preference.keymap.transform.active_transform_tools_tab == 'GIZMO':
+            draw_action_feature_keymaps(
+                column=column_transform,
+                feature_owner=preference.keymap.transform,
+                feature_prop_name='enable_transform_tools_gizmo',
+                actions=get_transform_tools_gizmo_actions(),
+            )
 
     elif preference.keymap.transform.active_transform_keymap_tab == 'ORIENTATION':
         row = column_transform.row()
@@ -141,6 +141,3 @@ def draw(preference, context, layout):
     elif preference.keymap.transform.active_transform_keymap_tab == 'ACTIONS':
         row = column_transform.row()
         row.prop(preference.keymap.transform, 'enable_transform_action_shortcuts')
-
-    row = column_transform.row()
-    row.label(text='Transform keymap settings will appear here.')

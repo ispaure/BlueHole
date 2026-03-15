@@ -15,10 +15,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+from .viewport_movement import NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS
+from .viewport_axis import NAVIGATION_VIEWPORT_AXIS_ACTIONS
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ACTION GROUPS
 
 _NAVIGATION_ACTIONS = (
+    *NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS,
+    *NAVIGATION_VIEWPORT_AXIS_ACTIONS,
 )
 
 # ----------------------------------------------------------------------------------------------------------------------

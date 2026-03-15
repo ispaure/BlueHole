@@ -19,7 +19,8 @@ import bpy
 
 from bpy.props import *
 
-from ...operators_handling.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
+from ...actions.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
+from ...actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -46,8 +47,15 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
     )
 
     enable_selection_more_less: BoolProperty(
-        name='Enable Select Less / More [Shift + Mouse Wheel Up/Down]',
-        description='Enable Blue Hole "Select Less / More" shortcuts',
+        name='Enable Select Less / More',
+        description='"Select Less / More"',
+        default=True,
+        update=_update_keymaps
+    )
+
+    enable_selection_tool_switch: BoolProperty(
+        name='Enable Selection Tool Switch',
+        description='"Selection Tool Switch"',
         default=True,
         update=_update_keymaps
     )
@@ -57,26 +65,10 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
         description='Active selection keymap feature tab',
         items=[
             ('MORE_LESS', 'Select Less / More', ''),
+            ('TOOL_SWITCH', 'Tool Switch', ''),
         ],
         default='MORE_LESS'
     )
-
-
-def _draw_selection_tab_buttons(column, preference):
-    """
-    Draw the selection feature tab buttons.
-    """
-    row = column.row(align=True)
-
-    current_tab = preference.keymap.selection.active_selection_keymap_tab
-
-    op = row.operator(
-        "wm.bh_set_active_prefs_tab",
-        text="Select Less / More",
-        depress=(current_tab == 'MORE_LESS')
-    )
-    op.prop_path = "keymap.selection.active_selection_keymap_tab"
-    op.tab = "MORE_LESS"
 
 
 def draw(preference, context, layout):
@@ -94,7 +86,8 @@ def draw(preference, context, layout):
         row.label(text='Selection keymaps are currently disabled.')
         return
 
-    _draw_selection_tab_buttons(column_selection, preference)
+    row = column_selection.row()
+    row.prop(preference.keymap.selection, 'active_selection_keymap_tab', expand=True)
 
     if preference.keymap.selection.active_selection_keymap_tab == 'MORE_LESS':
         draw_action_feature_keymaps(
@@ -102,4 +95,12 @@ def draw(preference, context, layout):
             feature_owner=preference.keymap.selection,
             feature_prop_name='enable_selection_more_less',
             actions=get_selection_more_less_actions(),
+        )
+
+    elif preference.keymap.selection.active_selection_keymap_tab == 'TOOL_SWITCH':
+        draw_action_feature_keymaps(
+            column=column_selection,
+            feature_owner=preference.keymap.selection,
+            feature_prop_name='enable_selection_tool_switch',
+            actions=get_selection_tool_switch_actions(),
         )
