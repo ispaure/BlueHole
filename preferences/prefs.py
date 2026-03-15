@@ -94,6 +94,31 @@ class _SelectionKeymapPrefs:
         self._selection.enable_selection_more_less = value
 
 
+class _TransformKeymapPrefs:
+    """
+    Wrapper for Blue Hole transform keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, transform):
+        self._transform = transform
+
+    @property
+    def enable_transform_keymaps(self) -> bool:
+        return self._transform.enable_transform_keymaps
+
+    @enable_transform_keymaps.setter
+    def enable_transform_keymaps(self, value: bool):
+        self._transform.enable_transform_keymaps = value
+
+    @property
+    def enable_transform_tool_shortcuts(self) -> bool:
+        return self._transform.enable_transform_tool_shortcuts
+
+    @enable_transform_tool_shortcuts.setter
+    def enable_transform_tool_shortcuts(self, value: bool):
+        self._transform.enable_transform_tool_shortcuts = value
+
+
 class _MeshKeymapPrefs:
     """
     Wrapper for Blue Hole mesh keymap preferences to provide
@@ -239,6 +264,10 @@ class _KeymapPrefs:
     @property
     def sculpt(self):
         return _SculptKeymapPrefs(self._keymap.sculpt)
+
+    @property
+    def transform(self):
+        return _TransformKeymapPrefs(self._keymap.transform)
 
     @property
     def uv(self):

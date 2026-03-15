@@ -22,7 +22,7 @@ from ...operators_handling.operator_action import (
     remove_matching_action_kmis,
     unregister_registered_keymaps,
 )
-from ...operators_handling.actions.keymaps.selection_actions import get_selection_actions
+from ...operators_handling.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
 from ...preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ def get_enabled_selection_actions():
         return actions
 
     if prefs().keymap.selection.enable_selection_more_less:
-        actions.extend(get_selection_actions())
+        actions.extend(get_selection_more_less_actions())
 
     return actions
 
