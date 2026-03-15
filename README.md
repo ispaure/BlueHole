@@ -1,82 +1,290 @@
-# Blue Hole - Streamlined Blender Configuration & Addon
+# Blue Hole  
+### Streamlined Blender Environment & Pipeline Toolkit
 
-![Blue Hole Logo/Screenshot Here if you have one!](https://blue-hole.weebly.com/uploads/2/2/1/6/2216891/published/image.png?1653836439)
+![Blue Hole Logo](https://blue-hole.weebly.com/uploads/2/2/1/6/2216891/published/image.png?1653836439)
 
-## Overview
+![Blender](https://img.shields.io/badge/Blender-4.5%2B-orange)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
+![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)
 
-Blue Hole is a **FREE** configuration and addon for Blender designed to significantly speed up your workflow, particularly for game development. It brings powerful tools and a consistent user experience inspired by industry-standard 3D software like 3ds Max, MODO, and Maya.
+Blue Hole is a **free Blender addon and workflow environment** designed to streamline production workflows, particularly for **game development and studio pipelines**.
 
-## Features
+It provides a curated collection of tools, keymaps, pie menus, and pipeline integrations that transform Blender into a **production-ready environment** inspired by professional DCC tools such as **3ds Max, MODO, and Maya**.
 
-Blue Hole provides a curated collection of scripts, pie menus, and keymaps to streamline common tasks.  Here's a breakdown:
+Blue Hole focuses on:
 
-### Blue Hole Scripts
+- faster interaction
+- predictable workflows
+- pipeline integration
+- project environments
+- artist-friendly tools
 
-A new **Blue Hole Header Menu** unlocks easy access to these powerful scripts:
+The goal is to create a **consistent and efficient workspace** where artists can focus on creating content rather than fighting configuration and setup.
 
-*   **Batch Export:**  Quickly export meshes in a structured format for game engines.
-    *   Customizable Project Folder Structure
-*   **Blender to Game Engine Bridges:** Simplify importing assets into popular game engines.
-    *   Blender to Unity Bridge
-    *   Blender to Unreal Engine 4 & 5 Bridge
-*   **Source Control Integration:**  Seamlessly connect to version control systems.
-    *   Perforce Support
-    *   Plastic SCM Support
-*   **Automatic Updates:** Keep your Blue Hole tools up-to-date with ease.
-*   **Miscellaneous Tools:**  Enhance your workflow with helpful utilities:
-    *   Objects Sorter
-    *   Find and Rename
+---
 
-### Deluxe Edition (Optional)
+# Core Features
 
-Blue Hole isn't just about scripts. The Deluxe Edition also includes: 
+## Environment System
 
-*   **Hand-Crafted Pie Menus:** Intuitive and context-sensitive pie menus designed for artists.
-*   **Custom Keymaps:**  Optimized keybindings to accelerate your modeling process.
-*   **Disclaimer!!!:** The use of the Deluxe Edition overwrites your Blender preference file (`userprefs.blend`)
+Blue Hole introduces the concept of **Environments**.
 
-## Inspiration & Philosophy
+An environment represents a **project configuration** controlling pipeline settings such as:
 
-Blue Hole is inspired by the best features of professional 3D software packages.  We believe in:
+- source content paths
+- export directories
+- asset directory structures
+- container configuration
+- game engine bridge settings
+- source control settings
 
-*   **Efficiency:** Reducing clicks and streamlining repetitive tasks.
-*   **Consistency:**  A user experience that feels familiar across applications. We aim to recreate the core functionality of tools like Maya's "Tools" (SHIFT-RMB) and "Actions" (CTRL-RMB) pies.
-*   **Context Sensitivity:** Options that adapt to your current selection and workflow.
+Each environment stores its configuration in:
+`envFiles/<environment_name>/env_variables.ini`
 
-**Stop relearning how to play the piano every time you switch applications!**  Blue Hole's standardized contextual pie menus create a comfortable and productive environment.
+This allows teams to:
 
-## Installation
+- maintain multiple project setups
+- share pipeline configurations
+- version control environment settings
+- switch between projects easily
 
-Follow the instructions from the [Blue Hole Website](https://blue-hole.weebly.com/installation.html)
-Note that Blender 4.5.1 (or newer) is required.
+---
 
-## Support & Feedback
+# Game Engine Bridges
 
-*   **Documentation:** [Blue Hole Website](https://blue-hole.weebly.com)
-*   **Issues & Bug Reports:** [Contact Form and Discord Server](https://blue-hole.weebly.com/contact.html)
+Blue Hole simplifies sending assets from Blender into game engines.
 
-## License
+### Unity Bridge
+
+Send assets directly from Blender to Unity while preserving:
+
+- folder structure
+- export settings
+- transform rules
+
+### Unreal Engine Bridge
+
+Export assets optimized for Unreal Engine pipelines with configurable options.
+
+---
+
+# Asset Containers
+
+Blue Hole provides structured **container systems** to organize assets inside Blender scenes.
+
+Containers help enforce production-ready hierarchies for export pipelines.
+
+Available systems include:
+
+- **Asset Hierarchy Containers**
+- **Asset Mesh Containers**
+- **Asset Collection Containers**
+
+These tools help maintain consistent scene structure across artists and projects.
+
+---
+
+# Batch Export Tools
+
+Export assets from Blender in structured formats suitable for production pipelines.
+
+Features include:
+
+- batch export workflows
+- project-based directory structures
+- engine-ready exports
+- configurable transform options
+
+This reduces repetitive export steps and keeps assets consistent.
+
+---
+
+# Source Control Integration
+
+Blue Hole integrates directly with multiple version control systems:
+
+- **Perforce**
+- **Plastic SCM**
+- **Git**
+
+Source control features include:
+
+- checkout workflows
+- synchronization
+- add/edit operations
+- workspace validation
+- safe file handling
+
+Commands are wrapped internally to provide **safe behavior inside Blender**.
+
+---
+
+# Custom Keymap System
+
+Blue Hole includes a modular **keymap system** designed for speed and consistency.
+
+Keymap features include:
+
+- transform tool shortcuts
+- viewport navigation improvements
+- selection enhancements
+- transform modal tools
+- gizmo shortcuts
+- pie menu triggers
+
+Keymap features can be enabled or disabled directly in the **addon preferences**.
+
+⚠️ **Note:**  
+Some keymaps are still transitioning to a fully programmatic system.  
+During updates, Blue Hole may temporarily overwrite Blender's `userpref.blend`.
+
+---
+
+# Contextual Pie Menus
+
+Blue Hole includes **artist-focused pie menus** designed to reduce menu navigation.
+
+Pie menus provide fast access to:
+
+- tools
+- transforms
+- utilities
+- configuration menus
+- help and documentation
+
+Menus adapt to context where appropriate.
+
+---
+
+# Blue Hole Header Menu
+
+Blue Hole adds a **header menu inside Blender** that exposes many pipeline tools.
+
+From this menu you can access:
+
+- export tools
+- container creation
+- bridge tools
+- environment features
+- source control utilities
+- help and documentation
+
+This keeps important production tools easily accessible.
+
+---
+
+# Pipeline Utilities
+
+Blue Hole includes several utilities to assist production workflows.
+
+Examples include:
+
+- object sorting tools
+- asset hierarchy generation
+- renaming utilities
+- environment validation helpers
+- pipeline configuration tools
+
+These remove common friction points in day-to-day work.
+
+---
+
+# Philosophy
+
+Blue Hole is built around several core ideas.
+
+### Efficiency
+
+Artists should not need to navigate complex menus or repeat tedious tasks.
+
+Blue Hole reduces friction through:
+
+- hotkeys
+- pie menus
+- automation
+- structured workflows
+
+---
+
+### Consistency
+
+Switching between tools should not require relearning workflows.
+
+Blue Hole borrows interaction patterns familiar to artists coming from:
+
+- Maya
+- MODO
+- 3ds Max
+- game engine editors
+
+---
+
+### Context Awareness
+
+Tools adapt to the current situation.
+
+Blue Hole features frequently react to:
+
+- selection state
+- active environment
+- pipeline configuration
+- project structure
+
+---
+
+### Pipeline Friendly
+
+Modern pipelines involve multiple tools and teams.
+
+Blue Hole is designed to integrate with:
+
+- game engines
+- version control systems
+- structured asset pipelines
+- multi-environment projects
+
+---
+
+# Installation
+
+Installation instructions are available on the Blue Hole website:
+
+https://blue-hole.weebly.com/installation.html
+
+Blue Hole requires **Blender 4.5.1 or newer**.
+
+---
+
+# Documentation & Support
+
+**Website**  
+https://blue-hole.weebly.com
+
+**Feedback / Issues**  
+https://blue-hole.weebly.com/contact.html
+
+---
+
+# License
 
 MIT License
 
-Copyright (c) 2025 Marc-Andre Voyer (marcandre.voyer@gmail.com)
+Copyright (c) 2026 Marc-Andre Voyer
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+of this software and associated documentation files to deal in the Software
+without restriction.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+---
 
-NOTE: This also includes some code from [Epic Games - Blender Tools](https://github.com/EpicGamesExt/BlenderTools) with a separate license under Lib/send2ue.
+### Third Party Code
+
+This repository includes code derived from:
+
+Epic Games – Blender Tools  
+https://github.com/EpicGamesExt/BlenderTools  
+
+which is included under its respective license in `Lib/send2ue`.
