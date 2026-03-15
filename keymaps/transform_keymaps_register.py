@@ -18,7 +18,8 @@ __status__ = 'Production'
 from ..Lib.commonUtils.debugUtils import *
 from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
-from ..actions.actions.keymaps.transform.transform_tools import get_transform_tools_actions
+from ..actions.actions.keymaps.transform.transform_tools_gizmo import get_transform_tools_gizmo_actions
+from ..actions.actions.keymaps.transform.transform_tools_modal import get_transform_tools_modal_actions
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -47,8 +48,11 @@ def get_enabled_transform_actions():
     if not prefs().keymap.transform.enable_transform_keymaps:
         return actions
 
-    if prefs().keymap.transform.enable_transform_tool_shortcuts:
-        actions.extend(get_transform_tools_actions())
+    if prefs().keymap.transform.enable_transform_tools_gizmo:
+        actions.extend(get_transform_tools_gizmo_actions())
+
+    if prefs().keymap.transform.enable_transform_tools_modal:
+        actions.extend(get_transform_tools_modal_actions())
 
     return actions
 
