@@ -293,7 +293,7 @@ NAVIGATION_CLIP_EDITOR_ZOOM = OperatorAction(
 # ----------------------------------------------------------------------------------------------------------------------
 # ACTION LIST
 
-NAVIGATION_VIEWPORT_ACTIONS: list[OperatorAction] = [
+NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS: list[OperatorAction] = [
 
     NAVIGATION_VIEW2D_PAN,
     NAVIGATION_VIEW2D_ZOOM,
@@ -323,8 +323,8 @@ NAVIGATION_VIEWPORT_ACTIONS: list[OperatorAction] = [
 ]
 
 
-def get_navigation_viewport_actions() -> list[OperatorAction]:
+def get_navigation_viewport_movement_actions() -> list[OperatorAction]:
     """
     Return all declared Blue Hole navigation viewport operator actions.
     """
-    return NAVIGATION_VIEWPORT_ACTIONS
+    return NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS
