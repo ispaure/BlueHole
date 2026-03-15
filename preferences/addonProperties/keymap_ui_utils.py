@@ -175,7 +175,7 @@ def draw_action_feature_keymaps(
         return
 
     row = column.row()
-    row.label(text='Edit shortcut bindings here.')
+    row.label(text='View shortcut bindings here. Custom edits are not yet persistent.')
 
     grouped_action_bindings = group_action_bindings_by_keymap(actions)
 
