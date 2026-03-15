@@ -144,6 +144,20 @@ class OperatorAction:
 
         return ui_state
 
+    def get_label(self) -> str:
+        if self.text:
+            return self.text
+
+        idname = self.get_idname()
+
+        try:
+            import bpy
+            op_module, op_name = idname.split(".")
+            op = getattr(getattr(bpy.ops, op_module), op_name)
+            return op.get_rna_type().name or idname
+        except Exception:
+            return idname
+
     def copy_with(
             self,
             *,
