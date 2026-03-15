@@ -119,12 +119,20 @@ class _TransformKeymapPrefs:
         self._transform.enable_transform_keymaps = value
 
     @property
-    def enable_transform_tool_shortcuts(self) -> bool:
-        return self._transform.enable_transform_tool_shortcuts
+    def enable_transform_tools_modal(self) -> bool:
+        return self._transform.enable_transform_tools_modal
 
-    @enable_transform_tool_shortcuts.setter
-    def enable_transform_tool_shortcuts(self, value: bool):
-        self._transform.enable_transform_tool_shortcuts = value
+    @enable_transform_tools_modal.setter
+    def enable_transform_tools_modal(self, value: bool):
+        self._transform.enable_transform_tools_modal = value
+
+    @property
+    def enable_transform_tools_gizmo(self) -> bool:
+        return self._transform.enable_transform_tools_gizmo
+
+    @enable_transform_tools_gizmo.setter
+    def enable_transform_tools_gizmo(self, value: bool):
+        self._transform.enable_transform_tools_gizmo = value
 
 
 class _MeshKeymapPrefs:

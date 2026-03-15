@@ -1,5 +1,5 @@
 """
-Transform keymap operator actions for Blue Hole.
+Transform modal keymap operator actions for Blue Hole.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -62,54 +62,8 @@ def _resize_bindings(keymap_name: str, space_type: str = 'EMPTY', region_type: s
         ),
     )
 
-
-def _builtin_move_bindings(keymap_name: str, space_type: str = 'VIEW_3D', region_type: str = 'WINDOW') -> tuple[KeymapBinding, ...]:
-    """
-    Return the default Blue Hole keymap bindings for the built-in Move gizmo tool.
-    """
-    return (
-        KeymapBinding(
-            keymap_name=keymap_name,
-            space_type=space_type,
-            region_type=region_type,
-            key='W',
-            shift=True,
-        ),
-    )
-
-
-def _builtin_rotate_bindings(keymap_name: str, space_type: str = 'VIEW_3D', region_type: str = 'WINDOW') -> tuple[KeymapBinding, ...]:
-    """
-    Return the default Blue Hole keymap bindings for the built-in Rotate gizmo tool.
-    """
-    return (
-        KeymapBinding(
-            keymap_name=keymap_name,
-            space_type=space_type,
-            region_type=region_type,
-            key='E',
-            shift=True,
-        ),
-    )
-
-
-def _builtin_scale_bindings(keymap_name: str, space_type: str = 'VIEW_3D', region_type: str = 'WINDOW') -> tuple[KeymapBinding, ...]:
-    """
-    Return the default Blue Hole keymap bindings for the built-in Scale gizmo tool.
-    """
-    return (
-        KeymapBinding(
-            keymap_name=keymap_name,
-            space_type=space_type,
-            region_type=region_type,
-            key='R',
-            shift=True,
-        ),
-    )
-
-
 # ----------------------------------------------------------------------------------------------------------------------
-# FEATURE: TRANSFORM TOOLS (TRANSLATE)
+# FEATURE: TRANSFORM MODAL (TRANSLATE)
 
 # Paint Curve
 TRANSFORM_TRANSLATE_PAINT_CURVE = OperatorAction(
@@ -229,7 +183,7 @@ TRANSFORM_TRANSLATE_CLIP_GRAPH_EDITOR = OperatorAction(
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
-# FEATURE: TRANSFORM TOOLS (ROTATE)
+# FEATURE: TRANSFORM MODAL (ROTATE)
 
 # Paint Curve
 TRANSFORM_ROTATE_PAINT_CURVE = OperatorAction(
@@ -346,7 +300,7 @@ TRANSFORM_ROTATE_CLIP_GRAPH_EDITOR = OperatorAction(
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
-# FEATURE: TRANSFORM TOOLS (RESIZE)
+# FEATURE: TRANSFORM MODAL (RESIZE)
 
 # Paint Curve
 TRANSFORM_RESIZE_PAINT_CURVE = OperatorAction(
@@ -463,228 +417,9 @@ TRANSFORM_RESIZE_CLIP_GRAPH_EDITOR = OperatorAction(
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
-# FEATURE: GIZMO TRANSFORM TOOLS (BUILTIN)
-
-# MOVE
-# Pose
-TRANSFORM_TOOL_POSE_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Pose', space_type='VIEW_3D')
-)
-
-# Object Mode
-TRANSFORM_TOOL_OBJECT_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Object Mode', space_type='VIEW_3D')
-)
-
-# Curve
-TRANSFORM_TOOL_CURVE_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Curve', space_type='VIEW_3D')
-)
-
-# Curves
-TRANSFORM_TOOL_CURVES_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Curves', space_type='VIEW_3D')
-)
-
-# Mesh
-TRANSFORM_TOOL_MESH_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Mesh', space_type='VIEW_3D')
-)
-
-# Armature
-TRANSFORM_TOOL_ARMATURE_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Armature', space_type='VIEW_3D')
-)
-
-# Metaball
-TRANSFORM_TOOL_METABALL_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Metaball', space_type='VIEW_3D')
-)
-
-# Lattice
-TRANSFORM_TOOL_LATTICE_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Lattice', space_type='VIEW_3D')
-)
-
-# UV Editor
-TRANSFORM_TOOL_UV_EDITOR_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('UV Editor', space_type='IMAGE_EDITOR')
-)
-
-# Grease Pencil Edit mode
-TRANSFORM_TOOL_GREASE_PENCIL_EDIT_MODE_MOVE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.move'},
-    keymap_bindings=_builtin_move_bindings('Grease Pencil Edit Mode', space_type='VIEW_3D')
-)
-
-# ROTATE
-# Pose
-TRANSFORM_TOOL_POSE_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Pose', space_type='VIEW_3D')
-)
-
-# Object Mode
-TRANSFORM_TOOL_OBJECT_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Object Mode', space_type='VIEW_3D')
-)
-
-# Curve
-TRANSFORM_TOOL_CURVE_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Curve', space_type='VIEW_3D')
-)
-
-# Curves
-TRANSFORM_TOOL_CURVES_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Curves', space_type='VIEW_3D')
-)
-
-# Mesh
-TRANSFORM_TOOL_MESH_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Mesh', space_type='VIEW_3D')
-)
-
-# Armature
-TRANSFORM_TOOL_ARMATURE_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Armature', space_type='VIEW_3D')
-)
-
-# Metaball
-TRANSFORM_TOOL_METABALL_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Metaball', space_type='VIEW_3D')
-)
-
-
-# Lattice
-TRANSFORM_TOOL_LATTICE_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Lattice', space_type='VIEW_3D')
-)
-
-# UV Editor
-TRANSFORM_TOOL_UV_EDITOR_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('UV Editor', space_type='IMAGE_EDITOR')
-)
-
-# Grease Pencil Edit mode
-TRANSFORM_TOOL_GREASE_PENCIL_EDIT_MODE_ROTATE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.rotate'},
-    keymap_bindings=_builtin_rotate_bindings('Grease Pencil Edit Mode', space_type='VIEW_3D')
-)
-
-# SCALE
-# Pose
-TRANSFORM_TOOL_POSE_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Pose', space_type='VIEW_3D')
-)
-
-# Object Mode
-TRANSFORM_TOOL_OBJECT_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Object Mode', space_type='VIEW_3D')
-)
-
-# Curve
-TRANSFORM_TOOL_CURVE_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Curve', space_type='VIEW_3D')
-)
-
-# Curves
-TRANSFORM_TOOL_CURVES_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Curves', space_type='VIEW_3D')
-)
-
-# Mesh
-TRANSFORM_TOOL_MESH_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Mesh', space_type='VIEW_3D')
-)
-
-# Armature
-TRANSFORM_TOOL_ARMATURE_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Armature', space_type='VIEW_3D')
-)
-
-# Metaball
-TRANSFORM_TOOL_METABALL_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Metaball', space_type='VIEW_3D')
-)
-
-# Lattice
-TRANSFORM_TOOL_LATTICE_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Lattice', space_type='VIEW_3D')
-)
-
-# UV Editor
-TRANSFORM_TOOL_UV_EDITOR_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('UV Editor', space_type='IMAGE_EDITOR')
-)
-
-
-# Grease Pencil Edit mode
-TRANSFORM_TOOL_GREASE_PENCIL_EDIT_MODE_SCALE = OperatorAction(
-    operator='wm.tool_set_by_id',
-    props={'name': 'builtin.scale'},
-    keymap_bindings=_builtin_scale_bindings('Grease Pencil Edit Mode', space_type='VIEW_3D')
-)
-
-# ----------------------------------------------------------------------------------------------------------------------
 # ACTION LIST
 
-TRANSFORM_TOOLS_ACTIONS: list[OperatorAction] = [
-
+TRANSFORM_TOOLS_MODAL_ACTIONS: list[OperatorAction] = [
     # Translate
     TRANSFORM_TRANSLATE_PAINT_CURVE,
     TRANSFORM_TRANSLATE_POSE,
@@ -727,7 +462,7 @@ TRANSFORM_TOOLS_ACTIONS: list[OperatorAction] = [
     TRANSFORM_ROTATE_CLIP_EDITOR,
     TRANSFORM_ROTATE_CLIP_GRAPH_EDITOR,
 
-    # Scale
+    # Resize
     TRANSFORM_RESIZE_PAINT_CURVE,
     TRANSFORM_RESIZE_POSE,
     TRANSFORM_RESIZE_OBJECT_MODE,
@@ -747,48 +482,11 @@ TRANSFORM_TOOLS_ACTIONS: list[OperatorAction] = [
     TRANSFORM_RESIZE_PREVIEW,
     TRANSFORM_RESIZE_CLIP_EDITOR,
     TRANSFORM_RESIZE_CLIP_GRAPH_EDITOR,
-
-    # BUILT-IN MOVE, ROTATE, SCALE
-    TRANSFORM_TOOL_POSE_MOVE,
-    TRANSFORM_TOOL_OBJECT_MOVE,
-    TRANSFORM_TOOL_CURVE_MOVE,
-    TRANSFORM_TOOL_CURVES_MOVE,
-    TRANSFORM_TOOL_MESH_MOVE,
-    TRANSFORM_TOOL_ARMATURE_MOVE,
-    TRANSFORM_TOOL_METABALL_MOVE,
-    TRANSFORM_TOOL_LATTICE_MOVE,
-    TRANSFORM_TOOL_UV_EDITOR_MOVE,
-    TRANSFORM_TOOL_GREASE_PENCIL_EDIT_MODE_MOVE,
-
-    # ROTATE
-    TRANSFORM_TOOL_POSE_ROTATE,
-    TRANSFORM_TOOL_OBJECT_ROTATE,
-    TRANSFORM_TOOL_CURVE_ROTATE,
-    TRANSFORM_TOOL_CURVES_ROTATE,
-    TRANSFORM_TOOL_MESH_ROTATE,
-    TRANSFORM_TOOL_ARMATURE_ROTATE,
-    TRANSFORM_TOOL_METABALL_ROTATE,
-    TRANSFORM_TOOL_LATTICE_ROTATE,
-    TRANSFORM_TOOL_UV_EDITOR_ROTATE,
-    TRANSFORM_TOOL_GREASE_PENCIL_EDIT_MODE_ROTATE,
-
-    # SCALE
-    TRANSFORM_TOOL_POSE_SCALE,
-    TRANSFORM_TOOL_OBJECT_SCALE,
-    TRANSFORM_TOOL_CURVE_SCALE,
-    TRANSFORM_TOOL_CURVES_SCALE,
-    TRANSFORM_TOOL_MESH_SCALE,
-    TRANSFORM_TOOL_ARMATURE_SCALE,
-    TRANSFORM_TOOL_METABALL_SCALE,
-    TRANSFORM_TOOL_LATTICE_SCALE,
-    TRANSFORM_TOOL_UV_EDITOR_SCALE,
-    TRANSFORM_TOOL_GREASE_PENCIL_EDIT_MODE_SCALE,
-
 ]
 
 
-def get_transform_tools_actions() -> list[OperatorAction]:
+def get_transform_tools_modal_actions() -> list[OperatorAction]:
     """
-    Return all declared Blue Hole transform tool operator actions.
+    Return all declared Blue Hole transform modal operator actions.
     """
-    return TRANSFORM_TOOLS_ACTIONS
+    return TRANSFORM_TOOLS_MODAL_ACTIONS
