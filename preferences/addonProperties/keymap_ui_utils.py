@@ -169,9 +169,9 @@ def draw_action_feature_keymaps(
     row.prop(feature_owner, feature_prop_name)
 
     if not getattr(feature_owner, feature_prop_name):
-        feature_label = feature_owner.bl_rna.properties[feature_prop_name].name
+        feature_label = feature_owner.bl_rna.properties[feature_prop_name].description
         row = column.row()
-        row.label(text=f'{feature_label} shortcuts are currently disabled.')
+        row.label(text=f'{feature_label} shortcuts are currently disabled.', icon='ERROR')
         return
 
     row = column.row()

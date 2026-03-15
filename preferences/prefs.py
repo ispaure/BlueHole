@@ -152,6 +152,14 @@ class _NavigationKeymapPrefs:
     def enable_navigation_keymaps(self, value: bool):
         self._navigation.enable_navigation_keymaps = value
 
+    @property
+    def enable_navigation_viewport_shortcuts(self) -> bool:
+        return self._navigation.enable_navigation_viewport_shortcuts
+
+    @enable_navigation_viewport_shortcuts.setter
+    def enable_navigation_viewport_shortcuts(self, value: bool):
+        self._navigation.enable_navigation_viewport_shortcuts = value
+
 
 class _ObjectKeymapPrefs:
     """

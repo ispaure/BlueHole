@@ -363,28 +363,53 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
             log(
                 Severity.WARNING,
                 "Blue Hole Keymap",
-                f"Keymap not found/created: {binding.keymap_name}"
+                f"Keymap not found/created: "
+                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type}"
             )
             continue
 
         kmi = create_keymap_item(km, action, binding, context=context)
 
-        if kmi is not None:
-            log(
-                Severity.DEBUG,
-                "Blue Hole Keymap Registered",
-                f"{binding.keymap_name} | {action.get_idname()} | "
-                f"{binding.key} "
-                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt})"
-            )
-
-            registered.append((km, kmi))
-        else:
+        if kmi is None:
             log(
                 Severity.WARNING,
                 "Blue Hole Keymap Failed",
-                f"{binding.keymap_name} | {action.get_idname()}"
+                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
+                f"{action.get_idname()} | {binding.key} "
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt})"
             )
+            continue
+
+        valid = (
+            kmi.idname == action.get_idname()
+            and kmi.type == binding.key
+            and kmi.shift == binding.shift
+            and kmi.ctrl == binding.ctrl
+            and kmi.alt == binding.alt
+        )
+
+        if not valid:
+            log(
+                Severity.WARNING,
+                "Blue Hole Keymap Suspicious",
+                f"Created KMI does not match expected binding: "
+                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
+                f"expected={action.get_idname()} {binding.key} "
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt}) | "
+                f"got={kmi.idname} {kmi.type} "
+                f"(shift={kmi.shift} ctrl={kmi.ctrl} alt={kmi.alt})"
+            )
+        else:
+            log(
+                Severity.DEBUG,
+                "Blue Hole Keymap Registered",
+                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
+                f"{action.get_idname()} | {binding.key} "
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt})"
+            )
+
+        registered.append((km, kmi))
+
     return registered
 
 
