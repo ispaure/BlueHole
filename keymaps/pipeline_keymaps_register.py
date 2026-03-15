@@ -15,11 +15,11 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ...Lib.commonUtils.debugUtils import *
-from ..keymap_action_utils import ensure_action_keymaps
-from ...operators_handling.operator_action import unregister_registered_keymaps
-from ...operators_handling.actions.keymaps.pipeline_actions import get_pipeline_actions
-from ...preferences.prefs import prefs
+from ..Lib.commonUtils.debugUtils import *
+from .keymap_action_utils import ensure_action_keymaps
+from ..actions.operator_action import unregister_registered_keymaps
+from ..actions.actions.keymaps.pipeline_actions import get_pipeline_actions
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

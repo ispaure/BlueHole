@@ -93,6 +93,14 @@ class _SelectionKeymapPrefs:
     def enable_selection_more_less(self, value: bool):
         self._selection.enable_selection_more_less = value
 
+    @property
+    def enable_selection_tool_switch(self) -> bool:
+        return self._selection.enable_selection_tool_switch
+
+    @enable_selection_tool_switch.setter
+    def enable_selection_tool_switch(self, value: bool):
+        self._selection.enable_selection_tool_switch = value
+
 
 class _TransformKeymapPrefs:
     """

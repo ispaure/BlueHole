@@ -1,5 +1,5 @@
 """
-Registration and runtime management for Blue Hole UV keymaps.
+Registration and runtime management for Blue Hole selection keymaps.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,11 +15,12 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ...Lib.commonUtils.debugUtils import *
-from ..keymap_action_utils import ensure_action_keymaps
-from ...operators_handling.operator_action import unregister_registered_keymaps
-from ...operators_handling.actions.keymaps.uv_actions import get_uv_actions
-from ...preferences.prefs import prefs
+from ..Lib.commonUtils.debugUtils import *
+from .keymap_action_utils import ensure_action_keymaps
+from ..actions.operator_action import unregister_registered_keymaps
+from ..actions.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
+from ..actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -29,22 +30,30 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
 
-registered_uv_keymaps = []
+registered_selection_keymaps = []
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
 
 
-def get_enabled_uv_actions():
+def get_enabled_selection_actions():
     """
-    Return the list of UV actions that should currently be registered.
+    Return the list of selection actions that should currently be registered.
     """
     actions = []
 
-    if not prefs().keymap.uv.enable_uv_keymaps:
+    if not prefs().keymap.enable_keymaps:
         return actions
 
-    actions.extend(get_uv_actions())
+    if not prefs().keymap.selection.enable_selection_keymaps:
+        return actions
+
+    if prefs().keymap.selection.enable_selection_more_less:
+        actions.extend(get_selection_more_less_actions())
+
+    if prefs().keymap.selection.enable_selection_tool_switch:
+        actions.extend(get_selection_tool_switch_actions())
+
     return actions
 
 
@@ -55,17 +64,17 @@ def get_enabled_uv_actions():
 def register():
     unregister()
 
-    actions = get_enabled_uv_actions()
+    actions = get_enabled_selection_actions()
     if not actions:
         return
 
-    log(Severity.INFO, 'Blue Hole UV Keymaps', 'Registering UV keymaps...')
+    log(Severity.INFO, 'Blue Hole Selection Keymaps', 'Registering selection keymaps...')
 
     for action in actions:
-        registered_uv_keymaps.extend(ensure_action_keymaps(action))
+        registered_selection_keymaps.extend(ensure_action_keymaps(action))
 
-    log(Severity.INFO, 'Blue Hole UV Keymaps', 'Registering UV keymaps completed!')
+    log(Severity.INFO, 'Blue Hole Selection Keymaps', 'Registering selection keymaps completed!')
 
 
 def unregister():
-    unregister_registered_keymaps(registered_uv_keymaps)
+    unregister_registered_keymaps(registered_selection_keymaps)

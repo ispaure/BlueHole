@@ -16,14 +16,14 @@ __status__ = 'Production'
 # IMPORTS
 
 from .pie import pie_keymaps_register
-from .mesh import mesh_keymaps_register
-from .navigation import navigation_keymaps_register
-from .object import object_keymaps_register
-from .pipeline import pipeline_keymaps_register
-from .sculpt import sculpt_keymaps_register
-from .selection import selection_keymaps_register
-from .transform import transform_keymaps_register
-from .uv import uv_keymaps_register
+from . import mesh_keymaps_register
+from . import navigation_keymaps_register
+from . import object_keymaps_register
+from . import pipeline_keymaps_register
+from . import sculpt_keymaps_register
+from . import selection_keymaps_register
+from . import transform_keymaps_register
+from . import uv_keymaps_register
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER

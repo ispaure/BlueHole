@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-from ...operators_handling.actions.keymaps.navigation.viewport import get_navigation_viewport_actions
+from ...actions.actions.keymaps.navigation.viewport import get_navigation_viewport_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
