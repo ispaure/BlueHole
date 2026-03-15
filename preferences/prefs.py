@@ -161,12 +161,20 @@ class _NavigationKeymapPrefs:
         self._navigation.enable_navigation_keymaps = value
 
     @property
-    def enable_navigation_viewport_shortcuts(self) -> bool:
-        return self._navigation.enable_navigation_viewport_shortcuts
+    def enable_navigation_viewport_movement(self) -> bool:
+        return self._navigation.enable_navigation_viewport_movement
 
-    @enable_navigation_viewport_shortcuts.setter
-    def enable_navigation_viewport_shortcuts(self, value: bool):
-        self._navigation.enable_navigation_viewport_shortcuts = value
+    @enable_navigation_viewport_movement.setter
+    def enable_navigation_viewport_movement(self, value: bool):
+        self._navigation.enable_navigation_viewport_movement = value
+
+    @property
+    def enable_navigation_viewport_axis(self) -> bool:
+        return self._navigation.enable_navigation_viewport_axis
+
+    @enable_navigation_viewport_axis.setter
+    def enable_navigation_viewport_axis(self, value: bool):
+        self._navigation.enable_navigation_viewport_axis = value
 
 
 class _ObjectKeymapPrefs:
