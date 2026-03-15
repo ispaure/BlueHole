@@ -137,7 +137,7 @@ Keymap features can be enabled or disabled directly in the **addon preferences**
 
 ⚠️ **Note:**  
 Some keymaps are still transitioning to a fully programmatic system.  
-During updates, Blue Hole may temporarily overwrite Blender's `userpref.blend`.
+By switching to Blue Hole Deluxe mode, Blue Hole will still overwrite Blender's `userpref.blend`, to offer all features. This is preceeded by a very clear warning dialog window.
 
 ---
 
