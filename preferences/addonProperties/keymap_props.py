@@ -25,6 +25,7 @@ from . import (
     keymap_props_pipeline,
     keymap_props_sculpt,
     keymap_props_selection,
+    keymap_props_transform,
     keymap_props_uv,
 )
 
@@ -39,6 +40,7 @@ show_verbose = True
 _KEYMAP_DRAW_MODULES = {
     'SELECTION': keymap_props_selection,
     'NAVIGATION': keymap_props_navigation,
+    'TRANSFORM': keymap_props_transform,
     'OBJECT': keymap_props_object,
     'MESH': keymap_props_mesh,
     'UV': keymap_props_uv,
@@ -63,6 +65,7 @@ class KeymapPG(bpy.types.PropertyGroup):
         items=[
             ('SELECTION', 'Selection', ''),
             ('NAVIGATION', 'Navigation', ''),
+            ('TRANSFORM', 'Transform', ''),
             ('OBJECT', 'Object', ''),
             ('MESH', 'Mesh', ''),
             ('UV', 'UV', ''),
@@ -74,6 +77,7 @@ class KeymapPG(bpy.types.PropertyGroup):
 
     selection: PointerProperty(type=keymap_props_selection.SelectionKeymapPG)
     navigation: PointerProperty(type=keymap_props_navigation.NavigationKeymapPG)
+    transform: PointerProperty(type=keymap_props_transform.TransformKeymapPG)
     object: PointerProperty(type=keymap_props_object.ObjectKeymapPG)
     mesh: PointerProperty(type=keymap_props_mesh.MeshKeymapPG)
     uv: PointerProperty(type=keymap_props_uv.UVKeymapPG)

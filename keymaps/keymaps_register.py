@@ -22,6 +22,7 @@ from .object import object_keymaps_register
 from .pipeline import pipeline_keymaps_register
 from .sculpt import sculpt_keymaps_register
 from .selection import selection_keymaps_register
+from .transform import transform_keymaps_register
 from .uv import uv_keymaps_register
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -34,6 +35,7 @@ keymap_module_lst = (
     pipeline_keymaps_register,
     sculpt_keymaps_register,
     selection_keymaps_register,
+    transform_keymaps_register,
     uv_keymaps_register,
 )
 

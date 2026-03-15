@@ -29,6 +29,7 @@ from .addonProperties import (
     keymap_props_pipeline,
     keymap_props_sculpt,
     keymap_props_selection,
+    keymap_props_transform,
     keymap_props_uv,
     pie_props,
     help_update_props)
@@ -192,6 +193,7 @@ classes = (
     # Keymap Sub-Properties Import Before Keymap
     keymap_props_selection.SelectionKeymapPG,
     keymap_props_navigation.NavigationKeymapPG,
+    keymap_props_transform.TransformKeymapPG,
     keymap_props_object.ObjectKeymapPG,
     keymap_props_mesh.MeshKeymapPG,
     keymap_props_uv.UVKeymapPG,

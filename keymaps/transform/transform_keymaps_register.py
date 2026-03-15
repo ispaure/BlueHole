@@ -1,5 +1,5 @@
 """
-Registration and runtime management for Blue Hole selection keymaps.
+Registration and runtime management for Blue Hole transform keymaps.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ from ...operators_handling.operator_action import (
     remove_matching_action_kmis,
     unregister_registered_keymaps,
 )
-from ...operators_handling.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
+from ...operators_handling.actions.keymaps.transform.transform_tools import get_transform_tools_actions
 from ...preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
 
-registered_selection_keymaps = []
+registered_transform_keymaps = []
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
@@ -69,20 +69,20 @@ def ensure_action_keymaps(action):
     return register_operator_action_keymaps(kc, action)
 
 
-def get_enabled_selection_actions():
+def get_enabled_transform_actions():
     """
-    Return the list of selection actions that should currently be registered.
+    Return the list of transform actions that should currently be registered.
     """
     actions = []
 
     if not prefs().keymap.enable_keymaps:
         return actions
 
-    if not prefs().keymap.selection.enable_selection_keymaps:
+    if not prefs().keymap.transform.enable_transform_keymaps:
         return actions
 
-    if prefs().keymap.selection.enable_selection_more_less:
-        actions.extend(get_selection_more_less_actions())
+    if prefs().keymap.transform.enable_transform_tool_shortcuts:
+        actions.extend(get_transform_tools_actions())
 
     return actions
 
@@ -94,17 +94,17 @@ def get_enabled_selection_actions():
 def register():
     unregister()
 
-    actions = get_enabled_selection_actions()
+    actions = get_enabled_transform_actions()
     if not actions:
         return
 
-    log(Severity.INFO, 'Blue Hole Selection Keymaps', 'Registering selection keymaps...')
+    log(Severity.INFO, 'Blue Hole transform Keymaps', 'Registering transform keymaps...')
 
     for action in actions:
-        registered_selection_keymaps.extend(ensure_action_keymaps(action))
+        registered_transform_keymaps.extend(ensure_action_keymaps(action))
 
-    log(Severity.INFO, 'Blue Hole Selection Keymaps', 'Registering selection keymaps completed!')
+    log(Severity.INFO, 'Blue Hole transform Keymaps', 'Registering transform keymaps completed!')
 
 
 def unregister():
-    unregister_registered_keymaps(registered_selection_keymaps)
+    unregister_registered_keymaps(registered_transform_keymaps)
