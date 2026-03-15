@@ -43,15 +43,9 @@ class UIState:
     """
     UI state for an operator action.
 
-    enabled:
-        Whether the button / menu entry should be enabled.
-
-    reason:
-        Optional label to show when disabled.
-        If empty, the action's normal text is used instead.
-
-    icon:
-        Icon to use when disabled.
+    enabled : Whether the UI element is enabled.
+    reason  : Optional label shown when disabled (fallbacks to action text).
+    icon    : Icon used when the action is disabled.
     """
     enabled: bool = True
     reason: str = ""
@@ -80,28 +74,13 @@ class OperatorAction:
     """
     Shared description of a Blender operator call.
 
-    operator:
-        Either the operator bl_idname string, or the operator class itself.
-
-    text:
-        Default UI label to use when drawing the action in a layout.
-
-    icon:
-        Default UI icon.
-
-    props:
-        Static operator properties applied both to layout buttons and keymaps.
-
-    props_fn:
-        Optional callable returning additional or overriding props.
-        Signature: fn(context) -> dict
-
-    ui_state_fn:
-        Optional callable returning a UIState.
-        Signature: fn(context) -> UIState
-
-    keymap_bindings:
-        Optional tuple of keymap bindings for this action.
+    operator        : Operator bl_idname string or operator class.
+    text            : UI label used when drawing the action.
+    icon            : Default UI icon.
+    props           : Static operator properties applied to buttons and keymaps.
+    props_fn        : Optional callable -> dict of dynamic properties (fn(context)).
+    ui_state_fn     : Optional callable -> UIState (fn(context)).
+    keymap_bindings : Optional tuple of KeymapBinding definitions.
     """
     operator: str | type
     text: str = ""
@@ -115,7 +94,7 @@ class OperatorAction:
         """
         Return the operator bl_idname.
         """
-        return resolve_operator_idname(self.operator)
+        return resolve_bl_idname(self.operator)
 
     def get_props(self, context=None) -> dict[str, Any]:
         """
@@ -158,30 +137,6 @@ class OperatorAction:
         except Exception:
             return idname
 
-    def copy_with(
-            self,
-            *,
-            operator: str | type | None = None,
-            text: str | None = None,
-            icon: str | None = None,
-            props: dict[str, Any] | None = None,
-            props_fn: Callable[[Any], dict[str, Any]] | None = None,
-            ui_state_fn: Callable[[Any], UIState] | None = None,
-            keymap_bindings: Iterable[KeymapBinding] | None = None,
-    ) -> "OperatorAction":
-        """
-        Return a shallow modified copy of this action.
-        """
-        return OperatorAction(
-            operator=self.operator if operator is None else operator,
-            text=self.text if text is None else text,
-            icon=self.icon if icon is None else icon,
-            props=dict(self.props if props is None else props),
-            props_fn=self.props_fn if props_fn is None else props_fn,
-            ui_state_fn=self.ui_state_fn if ui_state_fn is None else ui_state_fn,
-            keymap_bindings=self.keymap_bindings if keymap_bindings is None else tuple(keymap_bindings),
-        )
-
     def with_keymap_bindings(self, *bindings: KeymapBinding) -> "OperatorAction":
         """
         Return a copy of this action with additional keymap bindings appended.
@@ -201,36 +156,19 @@ class OperatorAction:
 # RESOLVE HELPERS
 
 
-def resolve_operator_idname(operator: str | type) -> str:
+def resolve_bl_idname(target: str | type) -> str:
     """
-    Resolve an operator idname from either:
-    - a raw bl_idname string
-    - a Blender operator class
+    Resolve a Blender bl_idname from either:
+    - a raw idname string
+    - a Blender class defining bl_idname
     """
-    if isinstance(operator, str):
-        return operator
+    if isinstance(target, str):
+        return target
 
-    bl_idname = getattr(operator, 'bl_idname', None)
+    bl_idname = getattr(target, 'bl_idname', None)
 
     if not bl_idname:
-        raise ValueError(f'Operator class "{operator}" has no valid bl_idname.')
-
-    return bl_idname
-
-
-def resolve_menu_idname(menu: str | type) -> str:
-    """
-    Resolve a menu idname from either:
-    - a raw menu bl_idname string
-    - a Blender menu class
-    """
-    if isinstance(menu, str):
-        return menu
-
-    bl_idname = getattr(menu, 'bl_idname', None)
-
-    if not bl_idname:
-        raise ValueError(f'Menu class "{menu}" has no valid bl_idname.')
+        raise ValueError(f'Class "{target}" has no valid bl_idname.')
 
     return bl_idname
 
@@ -467,7 +405,7 @@ def pie_menu_action(
         operator='wm.call_menu_pie',
         text=text,
         icon=icon,
-        props={'name': resolve_menu_idname(menu)},
+        props={'name': resolve_bl_idname(menu)},
         ui_state_fn=ui_state_fn,
         keymap_bindings=tuple(keymap_bindings),
     )
@@ -488,7 +426,7 @@ def menu_action(
         operator='wm.call_menu',
         text=text,
         icon=icon,
-        props={'name': resolve_menu_idname(menu)},
+        props={'name': resolve_bl_idname(menu)},
         ui_state_fn=ui_state_fn,
         keymap_bindings=tuple(keymap_bindings),
     )
