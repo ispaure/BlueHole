@@ -21,8 +21,8 @@ import bpy
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
 from ....preferences.prefs import *
-from ....operators_handling.operator_action import draw_operator_action
-from ....operators_handling.actions import pie_actions
+from ....actions.operator_action import draw_operator_action
+from ....actions.actions import pie_actions
 from .entries import addon_entries
 
 # ----------------------------------------------------------------------------------------------------------------------

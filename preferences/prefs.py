@@ -93,6 +93,14 @@ class _SelectionKeymapPrefs:
     def enable_selection_more_less(self, value: bool):
         self._selection.enable_selection_more_less = value
 
+    @property
+    def enable_selection_tool_switch(self) -> bool:
+        return self._selection.enable_selection_tool_switch
+
+    @enable_selection_tool_switch.setter
+    def enable_selection_tool_switch(self, value: bool):
+        self._selection.enable_selection_tool_switch = value
+
 
 class _TransformKeymapPrefs:
     """
@@ -111,12 +119,20 @@ class _TransformKeymapPrefs:
         self._transform.enable_transform_keymaps = value
 
     @property
-    def enable_transform_tool_shortcuts(self) -> bool:
-        return self._transform.enable_transform_tool_shortcuts
+    def enable_transform_tools_modal(self) -> bool:
+        return self._transform.enable_transform_tools_modal
 
-    @enable_transform_tool_shortcuts.setter
-    def enable_transform_tool_shortcuts(self, value: bool):
-        self._transform.enable_transform_tool_shortcuts = value
+    @enable_transform_tools_modal.setter
+    def enable_transform_tools_modal(self, value: bool):
+        self._transform.enable_transform_tools_modal = value
+
+    @property
+    def enable_transform_tools_gizmo(self) -> bool:
+        return self._transform.enable_transform_tools_gizmo
+
+    @enable_transform_tools_gizmo.setter
+    def enable_transform_tools_gizmo(self, value: bool):
+        self._transform.enable_transform_tools_gizmo = value
 
 
 class _MeshKeymapPrefs:
@@ -151,6 +167,22 @@ class _NavigationKeymapPrefs:
     @enable_navigation_keymaps.setter
     def enable_navigation_keymaps(self, value: bool):
         self._navigation.enable_navigation_keymaps = value
+
+    @property
+    def enable_navigation_viewport_movement(self) -> bool:
+        return self._navigation.enable_navigation_viewport_movement
+
+    @enable_navigation_viewport_movement.setter
+    def enable_navigation_viewport_movement(self, value: bool):
+        self._navigation.enable_navigation_viewport_movement = value
+
+    @property
+    def enable_navigation_viewport_axis(self) -> bool:
+        return self._navigation.enable_navigation_viewport_axis
+
+    @enable_navigation_viewport_axis.setter
+    def enable_navigation_viewport_axis(self, value: bool):
+        self._navigation.enable_navigation_viewport_axis = value
 
 
 class _ObjectKeymapPrefs:

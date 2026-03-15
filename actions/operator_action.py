@@ -43,15 +43,9 @@ class UIState:
     """
     UI state for an operator action.
 
-    enabled:
-        Whether the button / menu entry should be enabled.
-
-    reason:
-        Optional label to show when disabled.
-        If empty, the action's normal text is used instead.
-
-    icon:
-        Icon to use when disabled.
+    enabled : Whether the UI element is enabled.
+    reason  : Optional label shown when disabled (fallbacks to action text).
+    icon    : Icon used when the action is disabled.
     """
     enabled: bool = True
     reason: str = ""
@@ -72,6 +66,7 @@ class KeymapBinding:
     alt: bool = False
     repeat: bool = False
     region_type: str = 'WINDOW'
+    direction: str = 'ANY'
 
 
 @dataclass
@@ -79,28 +74,13 @@ class OperatorAction:
     """
     Shared description of a Blender operator call.
 
-    operator:
-        Either the operator bl_idname string, or the operator class itself.
-
-    text:
-        Default UI label to use when drawing the action in a layout.
-
-    icon:
-        Default UI icon.
-
-    props:
-        Static operator properties applied both to layout buttons and keymaps.
-
-    props_fn:
-        Optional callable returning additional or overriding props.
-        Signature: fn(context) -> dict
-
-    ui_state_fn:
-        Optional callable returning a UIState.
-        Signature: fn(context) -> UIState
-
-    keymap_bindings:
-        Optional tuple of keymap bindings for this action.
+    operator        : Operator bl_idname string or operator class.
+    text            : UI label used when drawing the action.
+    icon            : Default UI icon.
+    props           : Static operator properties applied to buttons and keymaps.
+    props_fn        : Optional callable -> dict of dynamic properties (fn(context)).
+    ui_state_fn     : Optional callable -> UIState (fn(context)).
+    keymap_bindings : Optional tuple of KeymapBinding definitions.
     """
     operator: str | type
     text: str = ""
@@ -114,7 +94,7 @@ class OperatorAction:
         """
         Return the operator bl_idname.
         """
-        return resolve_operator_idname(self.operator)
+        return resolve_bl_idname(self.operator)
 
     def get_props(self, context=None) -> dict[str, Any]:
         """
@@ -143,29 +123,19 @@ class OperatorAction:
 
         return ui_state
 
-    def copy_with(
-            self,
-            *,
-            operator: str | type | None = None,
-            text: str | None = None,
-            icon: str | None = None,
-            props: dict[str, Any] | None = None,
-            props_fn: Callable[[Any], dict[str, Any]] | None = None,
-            ui_state_fn: Callable[[Any], UIState] | None = None,
-            keymap_bindings: Iterable[KeymapBinding] | None = None,
-    ) -> "OperatorAction":
-        """
-        Return a shallow modified copy of this action.
-        """
-        return OperatorAction(
-            operator=self.operator if operator is None else operator,
-            text=self.text if text is None else text,
-            icon=self.icon if icon is None else icon,
-            props=dict(self.props if props is None else props),
-            props_fn=self.props_fn if props_fn is None else props_fn,
-            ui_state_fn=self.ui_state_fn if ui_state_fn is None else ui_state_fn,
-            keymap_bindings=self.keymap_bindings if keymap_bindings is None else tuple(keymap_bindings),
-        )
+    def get_label(self) -> str:
+        if self.text:
+            return self.text
+
+        idname = self.get_idname()
+
+        try:
+            import bpy
+            op_module, op_name = idname.split(".")
+            op = getattr(getattr(bpy.ops, op_module), op_name)
+            return op.get_rna_type().name or idname
+        except Exception:
+            return idname
 
     def with_keymap_bindings(self, *bindings: KeymapBinding) -> "OperatorAction":
         """
@@ -186,36 +156,19 @@ class OperatorAction:
 # RESOLVE HELPERS
 
 
-def resolve_operator_idname(operator: str | type) -> str:
+def resolve_bl_idname(target: str | type) -> str:
     """
-    Resolve an operator idname from either:
-    - a raw bl_idname string
-    - a Blender operator class
+    Resolve a Blender bl_idname from either:
+    - a raw idname string
+    - a Blender class defining bl_idname
     """
-    if isinstance(operator, str):
-        return operator
+    if isinstance(target, str):
+        return target
 
-    bl_idname = getattr(operator, 'bl_idname', None)
+    bl_idname = getattr(target, 'bl_idname', None)
 
     if not bl_idname:
-        raise ValueError(f'Operator class "{operator}" has no valid bl_idname.')
-
-    return bl_idname
-
-
-def resolve_menu_idname(menu: str | type) -> str:
-    """
-    Resolve a menu idname from either:
-    - a raw menu bl_idname string
-    - a Blender menu class
-    """
-    if isinstance(menu, str):
-        return menu
-
-    bl_idname = getattr(menu, 'bl_idname', None)
-
-    if not bl_idname:
-        raise ValueError(f'Menu class "{menu}" has no valid bl_idname.')
+        raise ValueError(f'Class "{target}" has no valid bl_idname.')
 
     return bl_idname
 
@@ -313,6 +266,7 @@ def create_keymap_item(km, action: OperatorAction, binding: KeymapBinding, conte
         ctrl=binding.ctrl,
         shift=binding.shift,
         alt=binding.alt,
+        direction=binding.direction,
     )
 
     apply_properties(kmi.properties, action.get_props(context))
@@ -363,28 +317,56 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
             log(
                 Severity.WARNING,
                 "Blue Hole Keymap",
-                f"Keymap not found/created: {binding.keymap_name}"
+                f"Keymap not found/created: "
+                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type}"
             )
             continue
 
         kmi = create_keymap_item(km, action, binding, context=context)
 
-        if kmi is not None:
-            log(
-                Severity.DEBUG,
-                "Blue Hole Keymap Registered",
-                f"{binding.keymap_name} | {action.get_idname()} | "
-                f"{binding.key} "
-                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt})"
-            )
-
-            registered.append((km, kmi))
-        else:
+        if kmi is None:
             log(
                 Severity.WARNING,
                 "Blue Hole Keymap Failed",
-                f"{binding.keymap_name} | {action.get_idname()}"
+                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
+                f"{action.get_idname()} | {binding.key} "
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} direction={binding.direction})"
             )
+            continue
+
+        valid = (
+            kmi.idname == action.get_idname()
+            and kmi.type == binding.key
+            and kmi.value == binding.value
+            and kmi.shift == binding.shift
+            and kmi.ctrl == binding.ctrl
+            and kmi.alt == binding.alt
+            and getattr(kmi, 'direction', 'ANY') == binding.direction
+        )
+
+        if not valid:
+            log(
+                Severity.WARNING,
+                "Blue Hole Keymap Suspicious",
+                f"Created KMI does not match expected binding: "
+                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
+                f"expected={action.get_idname()} {binding.key} value={binding.value} "
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} direction={binding.direction}) | "
+                f"got={kmi.idname} {kmi.type} value={kmi.value} "
+                f"(shift={kmi.shift} ctrl={kmi.ctrl} alt={kmi.alt} "
+                f"direction={getattr(kmi, 'direction', 'ANY')})"
+            )
+        else:
+            log(
+                Severity.DEBUG,
+                "Blue Hole Keymap Registered",
+                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
+                f"{action.get_idname()} | {binding.key} value={binding.value} "
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} direction={binding.direction})"
+            )
+
+        registered.append((km, kmi))
+
     return registered
 
 
@@ -423,7 +405,7 @@ def pie_menu_action(
         operator='wm.call_menu_pie',
         text=text,
         icon=icon,
-        props={'name': resolve_menu_idname(menu)},
+        props={'name': resolve_bl_idname(menu)},
         ui_state_fn=ui_state_fn,
         keymap_bindings=tuple(keymap_bindings),
     )
@@ -444,7 +426,7 @@ def menu_action(
         operator='wm.call_menu',
         text=text,
         icon=icon,
-        props={'name': resolve_menu_idname(menu)},
+        props={'name': resolve_bl_idname(menu)},
         ui_state_fn=ui_state_fn,
         keymap_bindings=tuple(keymap_bindings),
     )

@@ -15,15 +15,12 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ...Lib.commonUtils.debugUtils import *
-from ..keymap_utils import get_addon_keyconfig
-from ...operators_handling.operator_action import (
-    register_operator_action_keymaps,
-    remove_matching_action_kmis,
-    unregister_registered_keymaps,
-)
-from ...operators_handling.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
-from ...preferences.prefs import prefs
+from ..Lib.commonUtils.debugUtils import *
+from .keymap_action_utils import ensure_action_keymaps
+from ..actions.operator_action import unregister_registered_keymaps
+from ..actions.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
+from ..actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -37,36 +34,6 @@ registered_selection_keymaps = []
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
-
-
-def remove_existing_action_keymaps_from_keyconfig(kc, action):
-    """
-    Remove existing keymap items for this action from the given keyconfig.
-    """
-    if kc is None:
-        return
-
-    for binding in action.keymap_bindings:
-        km = kc.keymaps.get(binding.keymap_name)
-        if km is None:
-            continue
-
-        remove_matching_action_kmis(km, action)
-
-
-def ensure_action_keymaps(action):
-    """
-    Ensure all keymap bindings for this action exist in Blender's addon keyconfig.
-    """
-    if not action.keymap_bindings:
-        return []
-
-    kc = get_addon_keyconfig()
-    if kc is None:
-        return []
-
-    remove_existing_action_keymaps_from_keyconfig(kc, action)
-    return register_operator_action_keymaps(kc, action)
 
 
 def get_enabled_selection_actions():
@@ -83,6 +50,9 @@ def get_enabled_selection_actions():
 
     if prefs().keymap.selection.enable_selection_more_less:
         actions.extend(get_selection_more_less_actions())
+
+    if prefs().keymap.selection.enable_selection_tool_switch:
+        actions.extend(get_selection_tool_switch_actions())
 
     return actions
 
