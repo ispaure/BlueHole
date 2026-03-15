@@ -141,6 +141,7 @@ def _shift_alt_front_view_bindings(
 
 NAVIGATION_3D_VIEW_AXIS_TOP = OperatorAction(
     operator='view3d.view_axis',
+    text='View Axis (Top View)',
     props={
         'type': 'TOP',
         'relative': True,
@@ -150,6 +151,7 @@ NAVIGATION_3D_VIEW_AXIS_TOP = OperatorAction(
 
 NAVIGATION_3D_VIEW_AXIS_BOTTOM = OperatorAction(
     operator='view3d.view_axis',
+    text='View Axis (Bottom View)',
     props={
         'type': 'BOTTOM',
         'relative': True,
@@ -159,6 +161,7 @@ NAVIGATION_3D_VIEW_AXIS_BOTTOM = OperatorAction(
 
 NAVIGATION_3D_VIEW_AXIS_LEFT = OperatorAction(
     operator='view3d.view_axis',
+    text='View Axis (Left View)',
     props={
         'type': 'LEFT',
         'relative': True,
@@ -168,6 +171,7 @@ NAVIGATION_3D_VIEW_AXIS_LEFT = OperatorAction(
 
 NAVIGATION_3D_VIEW_AXIS_RIGHT = OperatorAction(
     operator='view3d.view_axis',
+    text='View Axis (Right View)',
     props={
         'type': 'RIGHT',
         'relative': True,
@@ -177,6 +181,7 @@ NAVIGATION_3D_VIEW_AXIS_RIGHT = OperatorAction(
 
 NAVIGATION_3D_VIEW_AXIS_FRONT = OperatorAction(
     operator='view3d.view_axis',
+    text='View Axis (Front View)',
     props={
         'type': 'FRONT',
         'relative': True,

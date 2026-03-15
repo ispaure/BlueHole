@@ -188,7 +188,7 @@ def draw_action_feature_keymaps(
         row.label(text=keymap_name.upper())
 
         for action, binding_index in action_binding_list:
-            resolved_label = label_fn(action) if label_fn is not None else (action.text or action.get_idname())
+            resolved_label = label_fn(action) if label_fn is not None else action.get_label()
 
             draw_action_binding_keymap(
                 column_section,
