@@ -16,6 +16,11 @@ __status__ = 'Production'
 # IMPORTS
 
 from ....operator_action import OperatorAction, KeymapBinding
+from .....operators.transform_ops import (
+    WM_OT_BH_TranslateAutoConstraint,
+    WM_OT_BH_RotateAutoConstraint,
+    WM_OT_BH_ResizeAutoConstraint,
+)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
@@ -65,6 +70,7 @@ def _resize_bindings(keymap_name: str, space_type: str = 'EMPTY', region_type: s
 # ----------------------------------------------------------------------------------------------------------------------
 # FEATURE: TRANSFORM MODAL (TRANSLATE)
 
+
 TRANSFORM_TRANSLATE_PAINT_CURVE = OperatorAction(
     operator='transform.translate',
     text='Move Tool (Modal)',
@@ -72,61 +78,61 @@ TRANSFORM_TRANSLATE_PAINT_CURVE = OperatorAction(
 )
 
 TRANSFORM_TRANSLATE_POSE = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Pose')
 )
 
 TRANSFORM_TRANSLATE_OBJECT_MODE = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Object Mode')
 )
 
 TRANSFORM_TRANSLATE_CURVE = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Curve')
 )
 
 TRANSFORM_TRANSLATE_CURVES = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Curves')
 )
 
 TRANSFORM_TRANSLATE_MESH = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Mesh')
 )
 
 TRANSFORM_TRANSLATE_ARMATURE = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Armature')
 )
 
 TRANSFORM_TRANSLATE_METABALL = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Metaball')
 )
 
 TRANSFORM_TRANSLATE_LATTICE = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Lattice')
 )
 
 TRANSFORM_TRANSLATE_PARTICLE = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Particle')
 )
 
 TRANSFORM_TRANSLATE_POINT_CLOUD = OperatorAction(
-    operator='transform.translate',
+    operator=WM_OT_BH_TranslateAutoConstraint,
     text='Move Tool (Modal)',
     keymap_bindings=_translate_bindings('Point Cloud')
 )
@@ -190,61 +196,61 @@ TRANSFORM_ROTATE_PAINT_CURVE = OperatorAction(
 )
 
 TRANSFORM_ROTATE_POSE = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Pose')
 )
 
 TRANSFORM_ROTATE_OBJECT_MODE = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Object Mode')
 )
 
 TRANSFORM_ROTATE_CURVE = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Curve')
 )
 
 TRANSFORM_ROTATE_CURVES = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Curves')
 )
 
 TRANSFORM_ROTATE_MESH = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Mesh')
 )
 
 TRANSFORM_ROTATE_ARMATURE = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Armature')
 )
 
 TRANSFORM_ROTATE_METABALL = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Metaball')
 )
 
 TRANSFORM_ROTATE_LATTICE = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Lattice')
 )
 
 TRANSFORM_ROTATE_PARTICLE = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Particle')
 )
 
 TRANSFORM_ROTATE_POINT_CLOUD = OperatorAction(
-    operator='transform.rotate',
+    operator=WM_OT_BH_RotateAutoConstraint,
     text='Rotate Tool (Modal)',
     keymap_bindings=_rotate_bindings('Point Cloud')
 )
@@ -307,61 +313,61 @@ TRANSFORM_RESIZE_PAINT_CURVE = OperatorAction(
 )
 
 TRANSFORM_RESIZE_POSE = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Pose')
 )
 
 TRANSFORM_RESIZE_OBJECT_MODE = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Object Mode')
 )
 
 TRANSFORM_RESIZE_CURVE = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Curve')
 )
 
 TRANSFORM_RESIZE_CURVES = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Curves')
 )
 
 TRANSFORM_RESIZE_MESH = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Mesh')
 )
 
 TRANSFORM_RESIZE_ARMATURE = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Armature')
 )
 
 TRANSFORM_RESIZE_METABALL = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Metaball')
 )
 
 TRANSFORM_RESIZE_LATTICE = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Lattice')
 )
 
 TRANSFORM_RESIZE_PARTICLE = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Particle')
 )
 
 TRANSFORM_RESIZE_POINT_CLOUD = OperatorAction(
-    operator='transform.resize',
+    operator=WM_OT_BH_ResizeAutoConstraint,
     text='Scale Tool (Modal)',
     keymap_bindings=_resize_bindings('Point Cloud')
 )

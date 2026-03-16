@@ -21,6 +21,7 @@ from bpy.props import *
 from ...actions.actions.keymaps.transform.transform_tools_modal import get_transform_tools_modal_actions
 from ...actions.actions.keymaps.transform.transform_tools_gizmo import get_transform_tools_gizmo_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
+from ...blenderUtils.operatorUtils import op_exists
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -50,6 +51,12 @@ class TransformKeymapPG(bpy.types.PropertyGroup):
         description='Transform Tools (Modal)',
         default=True,
         update=_update_keymaps
+    )
+
+    enable_transform_tools_modal_autoconstraint: BoolProperty(
+        name='Enable autoConstraints whilst using Transform Modals in 3D View (Requires "autoConstraints" add-on)',
+        description='Turns on AutoConstraint whilst using Transform Modals in 3D View (Requires "autoConstraints" add-on)',
+        default=True
     )
 
     enable_transform_tools_gizmo: BoolProperty(
@@ -125,6 +132,10 @@ def draw(preference, context, layout):
                 feature_prop_name='enable_transform_tools_modal',
                 actions=get_transform_tools_modal_actions(),
             )
+            if preference.keymap.transform.enable_transform_tools_modal:
+                row = column_transform.row()
+                row.prop(preference.keymap.transform, 'enable_transform_tools_modal_autoconstraint', expand=True)
+                row.enabled = op_exists('transform.translate_auto_constraint')
 
         elif preference.keymap.transform.active_transform_tools_tab == 'GIZMO':
             draw_action_feature_keymaps(

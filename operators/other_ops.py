@@ -52,36 +52,6 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class BH_OT_set_active_prefs_tab(bpy.types.Operator):
-    bl_idname = "wm.bh_set_active_prefs_tab"
-    bl_label = "Set Preferences Tab"
-    bl_options = {'INTERNAL'}
-
-    prop_path: StringProperty(name="Property Path", default="")
-    tab: StringProperty(name="Tab", default="")
-
-    def execute(self, context):
-        addon = context.preferences.addons.get(__package__.split('.')[0])
-        if not addon:
-            self.report({'ERROR'}, 'Addon preferences not found')
-            return {'CANCELLED'}
-
-        target = addon.preferences
-
-        try:
-            parts = self.prop_path.split('.')
-            for attr in parts[:-1]:
-                target = getattr(target, attr)
-
-            setattr(target, parts[-1], self.tab)
-
-        except Exception as exc:
-            self.report({'ERROR'}, f'Failed to set tab: {exc}')
-            return {'CANCELLED'}
-
-        return {'FINISHED'}
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -89,7 +59,6 @@ class BH_OT_set_active_prefs_tab(bpy.types.Operator):
 classes = (
     WM_OT_URLOpen,
     WM_OT_Apply_Deluxe_Prefs,
-    BH_OT_set_active_prefs_tab
 )
 
 

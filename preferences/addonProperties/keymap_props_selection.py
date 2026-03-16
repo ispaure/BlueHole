@@ -19,6 +19,7 @@ import bpy
 
 from bpy.props import *
 
+from ...blenderUtils.operatorUtils import op_exists
 from ...actions.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
 from ...actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
@@ -58,6 +59,12 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
         description='"Selection Tool Switch"',
         default=True,
         update=_update_keymaps
+    )
+
+    enable_selection_tool_switch_box_x_ray: BoolProperty(
+        name='Enable X-Ray upon Selection Tool Switch (Requires "X-Ray Selection Tools" add-on)',
+        description='Enable X-Ray upon Selection Tool Switch (Requires "X-Ray Selection Tools" add-on)',
+        default=True
     )
 
     active_selection_keymap_tab: EnumProperty(
@@ -104,3 +111,7 @@ def draw(preference, context, layout):
             feature_prop_name='enable_selection_tool_switch',
             actions=get_selection_tool_switch_actions(),
         )
+        if preference.keymap.selection.enable_selection_tool_switch:
+            row = column_selection.row()
+            row.prop(preference.keymap.selection, 'enable_selection_tool_switch_box_x_ray', expand=True)
+            row.enabled = op_exists('mesh.select_box_xray')

@@ -20,6 +20,7 @@ import rna_keymap_ui
 
 from ...actions.operator_action import OperatorAction
 from ...keymaps.keymap_utils import get_keyconfig_sequence
+from ...operators.ui_ops import WM_OT_BH_ToggleUISection, draw_action_feature_keymaps_dropdown_state
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
@@ -169,19 +170,41 @@ def draw_action_feature_keymaps(
     row.prop(feature_owner, feature_prop_name)
 
     if not getattr(feature_owner, feature_prop_name):
-        feature_label = feature_owner.bl_rna.properties[feature_prop_name].description
-        row = column.row()
-        row.label(text=f'{feature_label} shortcuts are currently disabled.', icon='ERROR')
+        # Display warning if deactivated, I don't want that.
+        # feature_label = feature_owner.bl_rna.properties[feature_prop_name].description
+        # row = column.row()
+        # row.label(text=f'{feature_label} shortcuts are currently disabled.', icon='ERROR')
         return
 
-    row = column.row()
+    dropdown_key = f'{type(feature_owner).__name__}.{feature_prop_name}'
+    is_expanded = draw_action_feature_keymaps_dropdown_state.get(dropdown_key, False)
+
+    box_toggle = column.box()
+    column_toggle = box_toggle.column()
+
+    row = column_toggle.row()
+    icon = 'TRIA_DOWN' if is_expanded else 'TRIA_RIGHT'
+
+    op = row.operator(
+        WM_OT_BH_ToggleUISection.bl_idname,
+        text='See Bindings',
+        icon=icon,
+        emboss=False
+    )
+
+    op.section_key = dropdown_key
+
+    if not is_expanded:
+        return
+
+    row = column_toggle.row()
     row.label(text='View shortcut bindings here. Custom edits are not yet persistent.')
 
     grouped_action_bindings = group_action_bindings_by_keymap(actions)
 
     for keymap_name, action_binding_list in grouped_action_bindings.items():
 
-        box_section = column.box()
+        box_section = column_toggle.box()
         column_section = box_section.column()
 
         row = column_section.row()
