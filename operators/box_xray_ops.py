@@ -20,67 +20,23 @@ import bpy
 from bpy.props import *
 from ..blenderUtils.toolUtils import tool_set
 from ..Lib.commonUtils.debugUtils import *
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
 
 
-class BH_OT_tool_select_box_xray_object(bpy.types.Operator):
-    bl_idname = "wm.bh_tool_select_box_xray_object"
-    bl_label = "Blue Hole: Selection Box XRay / Fallback (Object)"
+class WM_OT_BH_tool_select_box_xray(bpy.types.Operator):
+    bl_idname = "wm.bh_tool_select_box_xray"
+    bl_label = "Blue Hole: Selection Box"
     bl_description = "Set Select Box XRay tool if available, else Blender Select Box"
 
     def execute(self, context):
-        log(Severity.DEBUG, self.bl_label, "Attempting to activate object_tool.select_box_xray")
 
         # Prefer addon tool
-        if tool_set("object_tool.select_box_xray"):
-            log(Severity.DEBUG, self.bl_label, "Using Select Box XRay tool (object mode)")
+        if prefs().keymap.selection.enable_selection_tool_switch_box_x_ray and tool_set("object_tool.select_box_xray"):
             return {'FINISHED'}
 
-        log(Severity.DEBUG, self.bl_label, "Select Box XRay not available, falling back to builtin.select_box")
-
-        # Fallback to Blender default
-        tool_set("builtin.select_box")
-        return {'FINISHED'}
-
-
-class BH_OT_tool_select_box_xray_mesh(bpy.types.Operator):
-    bl_idname = "wm.bh_tool_select_box_xray_mesh"
-    bl_label = "Blue Hole: Selection Box XRay / Fallback (Mesh)"
-    bl_description = "Set Select Box XRay tool if available, else Blender Select Box"
-
-    def execute(self, context):
-        log(Severity.DEBUG, self.bl_label, "Attempting to activate mesh_tool.select_box_xray")
-
-        # Prefer addon tool
-        if tool_set("mesh_tool.select_box_xray"):
-            log(Severity.DEBUG, self.bl_label, "Using Select Box XRay tool (mesh mode)")
-            return {'FINISHED'}
-
-        log(Severity.DEBUG, self.bl_label, "Select Box XRay not available, falling back to builtin.select_box")
-
-        # Fallback to Blender default
-        tool_set("builtin.select_box")
-        return {'FINISHED'}
-
-
-class BH_OT_tool_select_box_xray_curve(bpy.types.Operator):
-    bl_idname = "wm.bh_tool_select_box_xray_curve"
-    bl_label = "Blue Hole: Selection Box XRay / Fallback (Curve)"
-    bl_description = "Set Select Box XRay tool if available, else Blender Select Box"
-
-    def execute(self, context):
-        log(Severity.DEBUG, self.bl_label, "Attempting to activate curve_tool.select_box_xray")
-
-        # Prefer addon tool (Edit Curve)
-        if tool_set("curve_tool.select_box_xray"):
-            log(Severity.DEBUG, self.bl_label, "Using Select Box XRay tool (curve mode)")
-            return {'FINISHED'}
-
-        log(Severity.DEBUG, self.bl_label, "Select Box XRay not available, falling back to builtin.select_box")
-
-        # Fallback to Blender default
         tool_set("builtin.select_box")
         return {'FINISHED'}
 
@@ -90,9 +46,7 @@ class BH_OT_tool_select_box_xray_curve(bpy.types.Operator):
 
 # List of classes to register/unregister
 classes = (
-    BH_OT_tool_select_box_xray_object,
-    BH_OT_tool_select_box_xray_mesh,
-    BH_OT_tool_select_box_xray_curve,
+    WM_OT_BH_tool_select_box_xray,
 )
 
 

@@ -16,22 +16,10 @@ import bpy
 from typing import *
 from ....Lib.commonUtils.osUtils import *
 from ....operators import external_addon_ops
+from ....blenderUtils.operatorUtils import op_exists
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPER FUNCTIONS
-
-
-def op_exists(op_idname: str) -> bool:
-    """
-    True if operator idname like 'hops.mod_lattice' is registered.
-    """
-    try:
-        cat, name = op_idname.split(".", 1)
-        op = getattr(getattr(bpy.ops, cat), name)
-        op.get_rna_type()   # raises if not registered
-        return True
-    except Exception:
-        return False
 
 
 def pie_op_or_disabled(
