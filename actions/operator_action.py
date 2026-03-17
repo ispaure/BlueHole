@@ -64,6 +64,7 @@ class KeymapBinding:
     ctrl: bool = False
     shift: bool = False
     alt: bool = False
+    oskey: bool = False
     repeat: bool = False
     region_type: str = 'WINDOW'
     direction: str = 'ANY'
@@ -266,6 +267,7 @@ def create_keymap_item(km, action: OperatorAction, binding: KeymapBinding, conte
         ctrl=binding.ctrl,
         shift=binding.shift,
         alt=binding.alt,
+        oskey=binding.oskey,
         direction=binding.direction,
     )
 
@@ -330,7 +332,8 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
                 "Blue Hole Keymap Failed",
                 f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
                 f"{action.get_idname()} | {binding.key} "
-                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} direction={binding.direction})"
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
+                f"oskey={binding.oskey} direction={binding.direction})"
             )
             continue
 
@@ -341,6 +344,7 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
             and kmi.shift == binding.shift
             and kmi.ctrl == binding.ctrl
             and kmi.alt == binding.alt
+            and getattr(kmi, 'oskey', False) == binding.oskey
             and getattr(kmi, 'direction', 'ANY') == binding.direction
         )
 
@@ -351,9 +355,11 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
                 f"Created KMI does not match expected binding: "
                 f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
                 f"expected={action.get_idname()} {binding.key} value={binding.value} "
-                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} direction={binding.direction}) | "
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
+                f"oskey={binding.oskey} direction={binding.direction}) | "
                 f"got={kmi.idname} {kmi.type} value={kmi.value} "
                 f"(shift={kmi.shift} ctrl={kmi.ctrl} alt={kmi.alt} "
+                f"oskey={getattr(kmi, 'oskey', False)} "
                 f"direction={getattr(kmi, 'direction', 'ANY')})"
             )
         else:
@@ -362,7 +368,8 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
                 "Blue Hole Keymap Registered",
                 f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
                 f"{action.get_idname()} | {binding.key} value={binding.value} "
-                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} direction={binding.direction})"
+                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
+                f"oskey={binding.oskey} direction={binding.direction})"
             )
 
         registered.append((km, kmi))
@@ -475,55 +482,3 @@ def remove_matching_action_kmis(km, action: OperatorAction, context=None) -> Non
             km.keymap_items.remove(kmi)
         except Exception:
             pass
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# EXAMPLE USAGE
-#
-# NORMAL OPERATOR
-#
-# ADD_ASSET_HIERARCHY = OperatorAction(
-#     operator=add_ops.SceneAddAssetHierarchy,
-#     text='Add Asset Hierarchy',
-#     ui_state_fn=lambda context: (
-#         UIState(enabled=False, reason='Hierarchy Containers disabled in Preferences')
-#         if not prefs().container.enable_asset_hierarchy_container
-#         else UIState()
-#     ),
-# )
-#
-# PIE MENU
-#
-# OBJECT_ACTION_PIE = pie_menu_action(
-#     object_pies.BLUEHOLE_MT_pie_object_action,
-#     keymap_bindings=(
-#         KeymapBinding(
-#             keymap_name='Object Mode',
-#             space_type='EMPTY',
-#             key='RIGHTMOUSE',
-#             ctrl=True,
-#         ),
-#     )
-# )
-#
-# MODE SWITCH
-#
-# SCULPT_CURVES_MODE = OperatorAction(
-#     operator='object.mode_set',
-#     text='Sculpt Curves',
-#     props={'mode': 'SCULPT_CURVES'},
-# )
-#
-# DRAW
-#
-# draw_operator_action(layout, ADD_ASSET_HIERARCHY, context)
-# draw_operator_action(pie, OBJECT_ACTION_PIE, context)
-#
-# REGISTER KEYMAPS
-#
-# registered_keymaps = []
-# registered_keymaps.extend(register_operator_action_keymaps(kc, OBJECT_ACTION_PIE))
-#
-# UNREGISTER KEYMAPS
-#
-# unregister_registered_keymaps(registered_keymaps)

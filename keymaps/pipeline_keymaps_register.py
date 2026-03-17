@@ -20,6 +20,7 @@ from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
 from ..actions.actions.keymaps.pipeline_actions import get_pipeline_actions
 from ..preferences.prefs import prefs
+from ..actions.actions.keymaps.pipeline.obligatory import get_obligatory_pipeline_actions
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -40,6 +41,12 @@ def get_enabled_pipeline_actions():
     Return the list of pipeline actions that should currently be registered.
     """
     actions = []
+
+    # Regardless of what is enabled, need to enable the custom Save As... operator from Blue Hole. Always
+    actions.extend(get_obligatory_pipeline_actions())
+
+    if not prefs().keymap.enable_keymaps:
+        return actions
 
     if not prefs().keymap.pipeline.enable_pipeline_keymaps:
         return actions
