@@ -32,79 +32,79 @@ show_verbose = True
 class SourceControlPG(bpy.types.PropertyGroup):
 
     # Enable Source Control
-    source_control_enable: BoolProperty(name = 'Enable Source Control',
-                                       description = 'Enables Source Control through Blue Hole scripts',
-                                       default = False)
+    source_control_enable: BoolProperty(name='Enable Source Control',
+                                        description='Enables Source Control through Blue Hole scripts',
+                                        default=False)
 
     # Set Source Control Solution
     solution_lst = [('perforce', 'Perforce', ''), ('plastic-scm', 'Plastic SCM', ''), ('git', 'Git', '')]
     source_control_solution: EnumProperty(name="Solution",
-                                     description="Defines the source control solution.",
-                                     items=solution_lst,
-                                     default='perforce'
-                                     )
+                                          description="Defines the source control solution.",
+                                          items=solution_lst,
+                                          default='perforce'
+                                          )
 
     # Abort Exports on Error
-    source_control_error_aborts_exp: BoolProperty(name = 'Abort Exports on Error',
-                                                      description = 'If there is a source control error during export'
-                                                                    ', will abort said export',
-                                                      default = True)
+    source_control_error_aborts_exp: BoolProperty(name='Abort Exports on Error',
+                                                  description='If there is a source control error during export'
+                                                              ', will abort said export',
+                                                  default=True)
 
     # ------------------------------------------------------------------------------------------------------------------
 
     # Override Environment Settings Setting
     # Enable
-    win32_env_override: BoolProperty(name = 'Override Environment Settings',
-                                       description = 'When enabled, overrides Environment Settings set in P4V',
-                                       default = False)
+    win32_env_override: BoolProperty(name='Override Environment Settings',
+                                     description='When enabled, overrides Environment Settings set in P4V',
+                                     default=False)
 
     # ------------------------------------------------------------------------------------------------------------------
     # OVERRIDE ENVIRONMENT SETTINGS - SINGLE USER
     # Override Environment Settings - Single User/Workspace (Windows)
 
-    win32_env_setting_p4port: StringProperty(name = 'Server (P4PORT)',
-                                             description = 'Set up environment setting override',
-                                             default = '')
+    win32_env_setting_p4port: StringProperty(name='Server (P4PORT)',
+                                             description='Set up environment setting override',
+                                             default='')
 
-    win32_env_setting_p4user: StringProperty(name = 'User (P4USER)',
-                                             description = 'Set up environment setting override',
-                                             default = '')
+    win32_env_setting_p4user: StringProperty(name='User (P4USER)',
+                                             description='Set up environment setting override',
+                                             default='')
 
-    win32_env_setting_p4client: StringProperty(name = 'Workspace (P4CLIENT)',
-                                             description = 'Set up environment setting override',
-                                             default = '')
-
-    # Override Environment Settings - Single User/Workspace (MacOS)
-    macos_env_setting_p4port: StringProperty(name = 'Server (P4PORT)',
-                                             description = 'Set up environment setting for MacOS here, since feature'
-                                                           ' is missing from MacOS P4V app',
-                                             default = '')
-
-    macos_env_setting_p4user: StringProperty(name = 'User (P4USER)',
-                                             description = 'Set up environment setting for MacOS here, since feature'
-                                                           ' is missing from MacOS P4V app',
-                                             default = '')
-
-    macos_env_setting_p4client: StringProperty(name = 'Workspace (P4CLIENT)',
-                                             description = 'Set up environment setting for MacOS here, since feature'
-                                                           ' is missing from MacOS P4V app',
-                                             default = '')
+    win32_env_setting_p4client: StringProperty(name='Workspace (P4CLIENT)',
+                                               description='Set up environment setting override',
+                                               default='')
 
     # Override Environment Settings - Single User/Workspace (MacOS)
-    linux_env_setting_p4port: StringProperty(name = 'Server (P4PORT)',
-                                             description = 'Set up environment setting for Linux here, since feature'
-                                                           ' is missing from Linux P4V app',
-                                             default = '')
+    macos_env_setting_p4port: StringProperty(name='Server (P4PORT)',
+                                             description='Set up environment setting for MacOS here, since feature'
+                                                         ' is missing from MacOS P4V app',
+                                             default='')
 
-    linux_env_setting_p4user: StringProperty(name = 'User (P4USER)',
-                                             description = 'Set up environment setting for Linux here, since feature'
-                                                           ' is missing from Linux P4V app',
-                                             default = '')
+    macos_env_setting_p4user: StringProperty(name='User (P4USER)',
+                                             description='Set up environment setting for MacOS here, since feature'
+                                                         ' is missing from MacOS P4V app',
+                                             default='')
 
-    linux_env_setting_p4client: StringProperty(name = 'Workspace (P4CLIENT)',
-                                             description = 'Set up environment setting for Linux here, since feature'
+    macos_env_setting_p4client: StringProperty(name='Workspace (P4CLIENT)',
+                                               description='Set up environment setting for MacOS here, since feature'
+                                                           ' is missing from MacOS P4V app',
+                                               default='')
+
+    # Override Environment Settings - Single User/Workspace (MacOS)
+    linux_env_setting_p4port: StringProperty(name='Server (P4PORT)',
+                                             description='Set up environment setting for Linux here, since feature'
+                                                         ' is missing from Linux P4V app',
+                                             default='')
+
+    linux_env_setting_p4user: StringProperty(name='User (P4USER)',
+                                             description='Set up environment setting for Linux here, since feature'
+                                                         ' is missing from Linux P4V app',
+                                             default='')
+
+    linux_env_setting_p4client: StringProperty(name='Workspace (P4CLIENT)',
+                                               description='Set up environment setting for Linux here, since feature'
                                                            ' is missing from Linux P4V app',
-                                             default = '')
+                                               default='')
 
     # ------------------------------------------------------------------------------------------------------------------
     # P4 PARALLEL PATH (FOR MAC AND LINUX)
@@ -129,19 +129,18 @@ def draw(preference, context, layout):
     # Enable edits
     enable_rows = prefs().general.active_environment != 'default'
 
-    box = layout.box()
-    column = box.column()
-    row = column.row()
+    row = layout.row()
     row.enabled = enable_rows
     row.label(text="Source Control")
 
-    # # Enable Source Control
+    # Enable Source Control
     row.alignment = 'LEFT'
     row.prop(preference.sourcecontrol, 'source_control_enable', text='Enable')
 
     if prefs().sc.source_control_enable:
         row.prop(preference.sourcecontrol, 'source_control_error_aborts_exp', text='Abort Exports on Error')
-        row = column.row()
+
+        row = layout.row()
         row.enabled = enable_rows
         row.prop(preference.sourcecontrol, 'source_control_solution', text='Solution')
 
@@ -184,12 +183,15 @@ def draw(preference, context, layout):
             if prefs().sc.win32_env_override or get_os() in [OS.MAC, OS.LINUX]:
                 row = column.row()
                 row.label(text=f"Environment Settings [{get_os().value}]:")
+
                 row = column.row()
                 row.enabled = enable_rows
                 row.prop(preference.sourcecontrol, p4_port_var_str, text='Server (P4PORT)')
+
                 row = column.row()
                 row.enabled = enable_rows
                 row.prop(preference.sourcecontrol, p4_user_var_str, text='User (P4USER)')
+
                 row = column.row()
                 row.enabled = enable_rows
                 row.prop(preference.sourcecontrol, p4_client_var_str, text='Workspace (P4CLIENT)')

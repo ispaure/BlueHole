@@ -130,13 +130,10 @@ class BlueHole(AddonPreferences):
         # ENVIRONMENT SETTINGS
         if self.main_settings == 'ENVIRONMENT':
 
-            # One single box for all environment UI
-            box = layout.box()
-            column = box.column()
+            column = layout.column(align=True)
 
-            msg = "Active Environment: " + prefs().general.active_environment
             row = column.row()
-            row.label(text=msg.upper())
+            row.label(text=("Active Environment: " + prefs().general.active_environment).upper())
 
             row = column.row()
             row.operator('wm.set_active_environment', text='Set Active Env.', icon='PRESET')
@@ -150,17 +147,18 @@ class BlueHole(AddonPreferences):
                 row = column.row()
                 row.label(text='Create or set a different active environment to edit settings.')
 
-            # Environment sub-tabs inside the same box
+            # Environment sub-tabs
             row = column.row(align=True)
             row.prop(self, 'environment_settings', expand=True)
 
-            # Draw selected environment panel inside the same box
+            # Draw selected environment panel
+            box = column.box()
             module = _ENV_DRAW_MODULES.get(self.environment_settings)
             if module is None:
-                column.label(text=f'Unknown environment settings panel: {self.environment_settings}')
+                box.label(text=f'Unknown environment settings panel: {self.environment_settings}')
                 return
 
-            module.draw(self, context, column)
+            module.draw(self, context, box)
 
         # ------------------------------------------------------------------------------------------------------------------
         # GENERAL ADDON SETTINGS

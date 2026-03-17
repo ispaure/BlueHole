@@ -21,7 +21,7 @@ from bpy.props import *
 
 from ...actions.actions.pie_actions import PIE_ACTIONS
 from ...actions.operator_action import OperatorAction
-from .keymap_ui_utils import group_action_bindings_by_keymap, draw_action_binding_keymap
+from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -58,38 +58,15 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # PIE MENUS
     # -------------------------------------------------------------------------------------------------
-    box_pie = layout.box()
-    column_pie = box_pie.column()
+    column_pie = layout.column()
 
-    row = column_pie.row()
-    row.prop(preference.pie, 'enable_pie_menus')
-
-    if not preference.pie.enable_pie_menus:
-        row = column_pie.row()
-        row.label(text='Pie Menus are currently disabled.')
-        return
-
-    row = column_pie.row()
-    row.label(text='Edit Blue Hole shortcut bindings directly from here.')
-
-    grouped_pie_action_bindings = group_action_bindings_by_keymap(PIE_ACTIONS)
-
-    for keymap_name, pie_action_binding_list in grouped_pie_action_bindings.items():
-
-        box_section = column_pie.box()
-        column_section = box_section.column()
-
-        row = column_section.row()
-        row.label(text=keymap_name.upper())
-
-        for action, binding_index in pie_action_binding_list:
-            draw_action_binding_keymap(
-                column_section,
-                action=action,
-                keymap_name=keymap_name,
-                binding_index=binding_index,
-                label=_get_menu_label(_get_pie_menu_idname(action))
-            )
+    draw_action_feature_keymaps(
+        column=column_pie,
+        feature_owner=preference.pie,
+        feature_prop_name='enable_pie_menus',
+        actions=PIE_ACTIONS,
+        label_fn=lambda action: _get_menu_label(_get_pie_menu_idname(action)),
+    )
 
 
 def _get_menu_label(menu_idname: str) -> str:

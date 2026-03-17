@@ -200,10 +200,7 @@ def draw(preference, context, layout):
     # CONTAINER GROUP TABS (Asset Containers / Loose Mesh)
     # Note: This file keeps settings shared across all Asset Container types (Hierarchy/Mesh/Collection).
     # -------------------------------------------------------------------------------------------------
-    box = layout.box()
-    column = box.column()
-
-    row = column.row()
+    row = layout.row()
     row.enabled = enable_rows
     row.prop(preference.bridge, 'active_container_group_tab', expand=True)
 
@@ -217,10 +214,7 @@ def draw(preference, context, layout):
         # ---------------------------------------------------------------------------------------------
         # ENGINE (Asset Containers)
         # ---------------------------------------------------------------------------------------------
-        box = layout.box()
-        column = box.column()
-
-        row = column.row()
+        row = layout.row()
         row.enabled = enable_rows
         row.prop(preference.bridge, 'active_game_engine', text='Selected Game Engine')
 

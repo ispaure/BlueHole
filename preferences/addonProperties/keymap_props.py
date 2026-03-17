@@ -96,8 +96,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_keymap = layout.box()
-    column_keymap = box_keymap.column()
+    column_keymap = layout.column()
 
     row = column_keymap.row()
     row.prop(preference.keymap, 'enable_keymaps')

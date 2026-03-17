@@ -91,8 +91,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # NAVIGATION KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_navigation = layout.box()
-    column_navigation = box_navigation.column()
+    column_navigation = layout.column()
 
     row = column_navigation.row()
     row.prop(preference.keymap.navigation, 'enable_navigation_keymaps')
