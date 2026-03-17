@@ -36,17 +36,19 @@ class HelpUpdatePG(bpy.types.PropertyGroup):
     # UPDATES -----------------------------------------------------------------------------------------
 
     # Auto Updates
-    auto_update_addon: BoolProperty(name = 'When enabled, addon will update automatically on startup if needed.',
-                                    default = False)
+    auto_update_addon: BoolProperty(
+        name='When enabled, addon will update automatically on startup if needed.',
+        default=False
+    )
 
     update_version_lst = [('Addon-Only', 'Addon-Only', ''), ('Deluxe', 'Deluxe', '')]
 
-    # Forward Axis
-    update_version: EnumProperty(name="Update Version",
-                                 description="Defines the version to use when auto-updating.",
-                                 items=update_version_lst,
-                                 default='Addon-Only'
-                                 )
+    update_version: EnumProperty(
+        name="Update Version",
+        description="Defines the version to use when auto-updating.",
+        items=update_version_lst,
+        default='Addon-Only'
+    )
 
 
 def label_row(path, prop, row, label=''):
@@ -56,23 +58,31 @@ def label_row(path, prop, row, label=''):
 
 def draw(preference, context, layout):
 
+    column = layout.column()
+
     # Support
-    box = layout.box()
-    box.label(text="Support Links:")
-    column = box.column()
     row = column.row()
-    row.operator("wm.bh_open_url", text='Guide').url = configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'home')
-    row.operator("wm.bh_open_url", text='Keymaps').url = configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'keymaps')
-    row.operator("wm.bh_open_url", text='Pie Menus').url = configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'pie_menus')
+    row.label(text="Support Links:")
+
+    row = column.row()
+    row.operator("wm.bh_open_url", text='Guide').url = configUtils.config_section_map(
+        blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'home'
+    )
+    row.operator("wm.bh_open_url", text='Keymaps').url = configUtils.config_section_map(
+        blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'keymaps'
+    )
+    row.operator("wm.bh_open_url", text='Pie Menus').url = configUtils.config_section_map(
+        blenderFile.get_url_cfg_path(), 'BlueHoleWebsite', 'pie_menus'
+    )
+
     row = column.row()
     row.operator("wm.bh_help_submit_feedback", text='Submit Feedback', icon='WINDOW')
     row.operator("wm.bh_join_bh_discord", text='Join the Blue Hole Discord', icon='FUND')
 
     # Updates
-    box = layout.box()
-    box.label(text="Updates (Coming soon):")
-    column = box.column()
-    # General options
+    row = column.row()
+    row.label(text="Updates (Coming soon):")
+
     row = column.row()
     row.prop(preference.help_n_update, 'auto_update_addon', text='Automatic Updates')
     row.enabled = False

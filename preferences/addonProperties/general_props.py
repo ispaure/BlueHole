@@ -46,8 +46,7 @@ def draw(preference, context, layout):
     """
     Draw general addon settings.
     """
-    box = layout.box()
-    column = box.column()
+    column = layout.column()
 
     row = column.row()
     row.label(text='General Blue Hole addon settings.')

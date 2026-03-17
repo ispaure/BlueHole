@@ -70,8 +70,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # MESH KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_mesh = layout.box()
-    column_mesh = box_mesh.column()
+    column_mesh = layout.column()
 
     row = column_mesh.row()
     row.prop(preference.keymap.mesh, 'enable_mesh_keymaps')
