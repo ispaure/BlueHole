@@ -56,3 +56,15 @@ def draw(preference, context, layout):
 
     row = column.row()
     row.label(text='No option provided for now.')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+def register():
+    bpy.utils.register_class(GeneralPG)
+
+
+def unregister():
+    bpy.utils.unregister_class(GeneralPG)
+

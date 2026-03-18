@@ -16,43 +16,90 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-
 from bpy.props import *
-from ...environment import envManager
+
+from .thirdparty import (
+    auto_constraints_props,
+    x_ray_selection_tools_props,
+)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
 
 show_verbose = True
 
+# ----------------------------------------------------------------------------------------------------------------------
+# DRAW MODULE LOOKUP
+
+_ADDON_DRAW_MODULES = {
+    'AUTO_CONSTRAINTS': auto_constraints_props,
+    'XRAY_SELECTION_TOOLS': x_ray_selection_tools_props,
+}
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-class ThirdPartyPG(bpy.types.PropertyGroup):
-    # Get list of environments
-    env_enum_prop_lst = envManager.get_env_lst_enum_property()
 
-    # Active Environment
-    active_environment: EnumProperty(
-        name="Active Environment",
-        description="Defines the project directory structure.",
-        items=env_enum_prop_lst,
-        default='default'
+class ThirdPartyPG(bpy.types.PropertyGroup):
+
+    addon_settings: EnumProperty(
+        name='Add-on Settings',
+        description='Third-party add-on settings to display',
+        items=[
+            ('AUTO_CONSTRAINTS', 'Auto Constraints', ''),
+            ('XRAY_SELECTION_TOOLS', 'X-Ray Selection Tools', ''),
+        ],
+        default='AUTO_CONSTRAINTS'
     )
+
+    auto_constraints: PointerProperty(type=auto_constraints_props.AutoConstraintsPG)
+    x_ray_selection_tools: PointerProperty(type=x_ray_selection_tools_props.XRaySelectionToolsPG)
 
 
 def draw(preference, context, layout):
     """
-    Draw general addon settings.
+    Draw third-party add-on settings.
     """
     column = layout.column()
 
     row = column.row()
-    row.label(text='Third-party addon settings.')
+    row.label(text='Third-party add-on settings.')
 
     row = column.row()
-    row.label(text='These settings apply to the addon itself rather than a specific environment.')
+    row.label(text='These settings apply to supported third-party add-ons.')
 
-    row = column.row()
-    row.label(text='No option provided for now.')
+    row = column.row(align=True)
+    row.prop(preference.thirdparty, 'addon_settings', expand=True)
+
+    module = _ADDON_DRAW_MODULES.get(preference.thirdparty.addon_settings)
+
+    if module is None:
+        row = column.row()
+        row.label(text=f'Unknown add-on settings panel: {preference.thirdparty.addon_settings}')
+        return
+
+    module.draw(preference, context, column)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+classes = (
+    # Third-Party Add-on Modules
+    auto_constraints_props,
+    x_ray_selection_tools_props,
+)
+
+
+def register():
+    for cls in classes:
+        cls.register()
+
+    bpy.utils.register_class(ThirdPartyPG)
+
+
+def unregister():
+    bpy.utils.unregister_class(ThirdPartyPG)
+
+    for cls in reversed(classes):
+        cls.unregister()

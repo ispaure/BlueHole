@@ -33,7 +33,7 @@ class WM_OT_BH_TranslateAutoConstraint(bpy.types.Operator):
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
-        if prefs().keymap.transform.enable_transform_tools_modal_autoconstraint and op_exists('transform.translate_auto_constraint'):
+        if prefs().thirdparty.auto_constraint.enable_transform_tools_modal_autoconstraint and op_exists('transform.translate_auto_constraint'):
             bpy.ops.transform.translate_auto_constraint('INVOKE_DEFAULT')
         else:
             bpy.ops.transform.translate('INVOKE_DEFAULT')
@@ -49,7 +49,7 @@ class WM_OT_BH_RotateAutoConstraint(bpy.types.Operator):
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
-        if prefs().keymap.transform.enable_transform_tools_modal_autoconstraint and op_exists('transform.rotate_auto_constraint'):
+        if prefs().thirdparty.auto_constraint.enable_transform_tools_modal_autoconstraint and op_exists('transform.rotate_auto_constraint'):
             bpy.ops.transform.rotate_auto_constraint('INVOKE_DEFAULT')
         else:
             bpy.ops.transform.rotate('INVOKE_DEFAULT')
@@ -65,7 +65,7 @@ class WM_OT_BH_ResizeAutoConstraint(bpy.types.Operator):
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
-        if prefs().keymap.transform.enable_transform_tools_modal_autoconstraint and op_exists('transform.resize_auto_constraint'):
+        if prefs().thirdparty.auto_constraint.enable_transform_tools_modal_autoconstraint and op_exists('transform.resize_auto_constraint'):
             bpy.ops.transform.resize_auto_constraint('INVOKE_DEFAULT')
         else:
             bpy.ops.transform.resize('INVOKE_DEFAULT')

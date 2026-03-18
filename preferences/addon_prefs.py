@@ -28,23 +28,13 @@ from .addon import (
     thirdparty_props,
 )
 
-from .addon.keymaps import (
-    keymap_props_mesh,
-    keymap_props_navigation,
-    keymap_props_object,
-    keymap_props_pipeline,
-    keymap_props_sculpt,
-    keymap_props_selection,
-    keymap_props_transform,
-    keymap_props_uv,
-)
-
 # Import Environment Properties
 from .environment import (
     bridge_props,
     container_props,
     directory_props,
-    sourcecontrol_props)
+    sourcecontrol_props
+)
 
 from ..environment import envManager
 
@@ -107,7 +97,7 @@ class BlueHole(AddonPreferences):
         description='General addon settings to display',
         items=[
             ('GENERAL', 'General Settings', ''),
-            ('THIRDPARTY', 'Third party Addons', ''),
+            ('THIRDPARTY', 'Third-Party Add-ons', ''),
             ('KEYMAP', 'Keymaps', ''),
             ('PIE', 'Pie Menus', ''),
             ('HELP_N_UPDATE', 'Help & Updates', ''),
@@ -192,38 +182,36 @@ class BlueHole(AddonPreferences):
 
 
 classes = (
+    # Addon Property Modules
+    general_props,
+    keymap_props,
+    pie_props,
+    help_update_props,
+    thirdparty_props,
 
-    # General Property Import First
-    general_props.GeneralPG,
+    # Environment Property Modules
+    directory_props,
+    container_props,
+    bridge_props,
+    sourcecontrol_props,
 
-    # Keymap Sub-Properties Import Before Keymap
-    keymap_props_selection.SelectionKeymapPG,
-    keymap_props_navigation.NavigationKeymapPG,
-    keymap_props_transform.TransformKeymapPG,
-    keymap_props_object.ObjectKeymapPG,
-    keymap_props_mesh.MeshKeymapPG,
-    keymap_props_uv.UVKeymapPG,
-    keymap_props_sculpt.SculptKeymapPG,
-    keymap_props_pipeline.PipelineKeymapPG,
-
-    keymap_props.KeymapPG,
-
-    pie_props.PiePG,
-    help_update_props.HelpUpdatePG,
-    directory_props.DirectoryPG,
-    container_props.ContainerPG,
-    bridge_props.BridgePG,
-    sourcecontrol_props.SourceControlPG,
-    BlueHole
+    # Import Blue Hole last
+    BlueHole,
 )
 
 
 # Registration
 def register():
     for cls in classes:
-        bpy.utils.register_class(cls)
+        if cls == BlueHole:
+            bpy.utils.register_class(cls)
+        else:
+            cls.register()
 
 
 def unregister():
     for cls in reversed(classes):
-        bpy.utils.unregister_class(cls)
+        if cls == BlueHole:
+            bpy.utils.unregister_class(cls)
+        else:
+            cls.unregister()

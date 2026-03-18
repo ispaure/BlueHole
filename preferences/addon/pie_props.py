@@ -21,7 +21,7 @@ from bpy.props import *
 
 from ...actions.actions.pie_actions import PIE_ACTIONS
 from ...actions.operator_action import OperatorAction
-from .keymap_ui_utils import draw_action_feature_keymaps
+from .keymaps.keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -91,3 +91,14 @@ def _get_pie_menu_idname(action: OperatorAction) -> str:
     Return the pie menu idname for a pie-menu OperatorAction.
     """
     return action.get_props(None).get('name', '')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+def register():
+    bpy.utils.register_class(PiePG)
+
+
+def unregister():
+    bpy.utils.unregister_class(PiePG)

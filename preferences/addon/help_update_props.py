@@ -86,3 +86,15 @@ def draw(preference, context, layout):
     row = column.row()
     row.prop(preference.help_n_update, 'auto_update_addon', text='Automatic Updates')
     row.enabled = False
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+def register():
+    bpy.utils.register_class(HelpUpdatePG)
+
+
+def unregister():
+    bpy.utils.unregister_class(HelpUpdatePG)
+

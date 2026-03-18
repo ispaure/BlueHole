@@ -32,7 +32,7 @@ show_verbose = True
 
 
 def _update_keymaps(self, context):
-    from ...keymaps import keymaps_register
+    from ....keymaps import keymaps_register
     keymaps_register.refresh()
 
 

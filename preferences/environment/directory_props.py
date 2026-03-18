@@ -158,3 +158,14 @@ def draw(preference, context, layout):
     row = column.row()
     row.enabled = enable_rows
     row.prop(preference.directory, 'sc_dir_struct_final', text='Final')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+def register():
+    bpy.utils.register_class(DirectoryPG)
+
+
+def unregister():
+    bpy.utils.unregister_class(DirectoryPG)
