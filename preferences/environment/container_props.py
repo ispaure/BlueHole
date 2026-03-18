@@ -387,3 +387,14 @@ def draw(preference, context, layout):
         row = column2.row()
         row.enabled = enable_rows
         row.label(text='No settings for Loose Mesh.')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+def register():
+    bpy.utils.register_class(ContainerPG)
+
+
+def unregister():
+    bpy.utils.unregister_class(ContainerPG)

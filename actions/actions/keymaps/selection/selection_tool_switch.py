@@ -19,7 +19,7 @@ __status__ = 'Production'
 # IMPORTS
 
 from ....operator_action import OperatorAction, KeymapBinding
-from .....operators.box_xray_ops import WM_OT_BH_tool_select_box_xray
+from .....operators.box_xray_ops import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
@@ -49,25 +49,25 @@ def _selection_tool_switch_bindings(
 
 # Object Mode
 SELECTION_TOOL_SWITCH_OBJECT = OperatorAction(
-    operator=WM_OT_BH_tool_select_box_xray,
+    operator=WM_OT_BH_tool_select_box_xray_object,
     keymap_bindings=_selection_tool_switch_bindings('Object Mode')
 )
 
 # Curve
 SELECTION_TOOL_SWITCH_CURVE = OperatorAction(
-    operator=WM_OT_BH_tool_select_box_xray,
+    operator=WM_OT_BH_tool_select_box_xray_curve,
     keymap_bindings=_selection_tool_switch_bindings('Curve')
 )
 
 # Curves
 SELECTION_TOOL_SWITCH_CURVES = OperatorAction(
-    operator=WM_OT_BH_tool_select_box_xray,
+    operator=WM_OT_BH_tool_select_box_xray_curves,
     keymap_bindings=_selection_tool_switch_bindings('Curves')
 )
 
 # Mesh
 SELECTION_TOOL_SWITCH_MESH = OperatorAction(
-    operator=WM_OT_BH_tool_select_box_xray,
+    operator=WM_OT_BH_tool_select_box_xray_mesh,
     keymap_bindings=_selection_tool_switch_bindings('Mesh')
 
 )

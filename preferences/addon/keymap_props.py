@@ -117,3 +117,32 @@ def draw(preference, context, layout):
         return
 
     module.draw(preference, context, column_keymap)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+
+classes = (
+    # Keymap Sub-Properties Import Before KeymapPG
+    keymap_props_selection.SelectionKeymapPG,
+    keymap_props_navigation.NavigationKeymapPG,
+    keymap_props_transform.TransformKeymapPG,
+    keymap_props_object.ObjectKeymapPG,
+    keymap_props_mesh.MeshKeymapPG,
+    keymap_props_uv.UVKeymapPG,
+    keymap_props_sculpt.SculptKeymapPG,
+    keymap_props_pipeline.PipelineKeymapPG,
+
+    # Import KeymapPG last
+    KeymapPG,
+)
+
+
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
+
+def unregister():
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)

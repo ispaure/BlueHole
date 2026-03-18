@@ -324,6 +324,40 @@ class _KeymapPrefs:
         return _UVKeymapPrefs(self._keymap.uv)
 
 
+class _AutoConstraintsPrefs:
+    """
+    Wrapper for Blue Hole transform keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, auto_constraints):
+        self._auto_constraints = auto_constraints
+
+    @property
+    def enable_transform_tools_modal_autoconstraint(self) -> bool:
+        return self._auto_constraints.enable_transform_tools_modal_autoconstraint
+
+    @enable_transform_tools_modal_autoconstraint.setter
+    def enable_transform_tools_modal_autoconstraint(self, value: bool):
+        self._auto_constraints.enable_transform_tools_modal_autoconstraint = value
+
+
+class _XRaySelectionToolsPrefs:
+    """
+    Wrapper for Blue Hole transform keymap preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, x_ray_selection_tools):
+        self._x_ray_selection_tools = x_ray_selection_tools
+
+    @property
+    def enable_selection_tool_switch_box_x_ray(self) -> bool:
+        return self._x_ray_selection_tools.enable_selection_tool_switch_box_x_ray
+
+    @enable_selection_tool_switch_box_x_ray.setter
+    def enable_selection_tool_switch_box_x_ray(self, value: bool):
+        self._x_ray_selection_tools.enable_selection_tool_switch_box_x_ray = value
+
+
 class _ThirdPartyPrefs:
     """
     Wrapper for Blue Hole third-party addon preferences to provide
@@ -331,6 +365,14 @@ class _ThirdPartyPrefs:
     """
     def __init__(self, thirdparty):
         self._thirdparty = thirdparty
+
+    @property
+    def auto_constraint(self):
+        return _AutoConstraintsPrefs(self._thirdparty.auto_constraints)
+
+    @property
+    def x_ray_selection_tools(self):
+        return _XRaySelectionToolsPrefs(self._thirdparty.x_ray_selection_tools)
 
 
 class _PiePrefs:

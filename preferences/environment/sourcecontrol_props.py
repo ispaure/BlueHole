@@ -201,3 +201,14 @@ def draw(preference, context, layout):
                 row = column.row()
                 row.enabled = enable_rows
                 row.prop(preference.sourcecontrol, p4_parallel_str, text=p4_parallel_name)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+def register():
+    bpy.utils.register_class(SourceControlPG)
+
+
+def unregister():
+    bpy.utils.unregister_class(SourceControlPG)

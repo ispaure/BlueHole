@@ -345,3 +345,14 @@ def draw(preference, context, layout):
         row = column.row()
         row.enabled = enable_rows
         row.prop(preference.bridge, 'exp_select_zero_root_transform', text='Zero Root Transform on Export')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# REGISTER / UNREGISTER
+
+def register():
+    bpy.utils.register_class(BridgePG)
+
+
+def unregister():
+    bpy.utils.unregister_class(BridgePG)
