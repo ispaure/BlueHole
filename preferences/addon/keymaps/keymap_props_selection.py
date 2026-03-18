@@ -19,9 +19,9 @@ import bpy
 
 from bpy.props import *
 
-from ...blenderUtils.operatorUtils import op_exists
-from ...actions.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
-from ...actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
+from ....blenderUtils.operatorUtils import op_exists
+from ....actions.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
+from ....actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 
-from . import (
+from .keymaps import (
     keymap_props_mesh,
     keymap_props_navigation,
     keymap_props_object,

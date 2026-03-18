@@ -18,9 +18,9 @@ __status__ = 'Production'
 import bpy
 import rna_keymap_ui
 
-from ...actions.operator_action import OperatorAction
-from ...keymaps.keymap_utils import get_keyconfig_sequence
-from ...operators.ui_ops import WM_OT_BH_ToggleUISection, draw_action_feature_keymaps_dropdown_state
+from ....actions.operator_action import OperatorAction
+from ....keymaps.keymap_utils import get_keyconfig_sequence
+from ....operators.ui_ops import WM_OT_BH_ToggleUISection, draw_action_feature_keymaps_dropdown_state
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
