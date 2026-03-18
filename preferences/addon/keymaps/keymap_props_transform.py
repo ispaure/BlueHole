@@ -18,10 +18,10 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 
-from ...actions.actions.keymaps.transform.transform_tools_modal import get_transform_tools_modal_actions
-from ...actions.actions.keymaps.transform.transform_tools_gizmo import get_transform_tools_gizmo_actions
+from ....actions.actions.keymaps.transform.transform_tools_modal import get_transform_tools_modal_actions
+from ....actions.actions.keymaps.transform.transform_tools_gizmo import get_transform_tools_gizmo_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
-from ...blenderUtils.operatorUtils import op_exists
+from ....blenderUtils.operatorUtils import op_exists
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG

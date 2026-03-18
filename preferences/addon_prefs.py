@@ -20,9 +20,15 @@ from bpy.props import *
 from bpy.types import AddonPreferences
 
 # Import Addon Properties
-from .addonProperties import (
+from .addon import (
     general_props,
     keymap_props,
+    pie_props,
+    help_update_props,
+    thirdparty_props,
+)
+
+from .addon.keymaps import (
     keymap_props_mesh,
     keymap_props_navigation,
     keymap_props_object,
@@ -31,11 +37,10 @@ from .addonProperties import (
     keymap_props_selection,
     keymap_props_transform,
     keymap_props_uv,
-    pie_props,
-    help_update_props)
+)
 
 # Import Environment Properties
-from .environmentProperties import (
+from .environment import (
     bridge_props,
     container_props,
     directory_props,
@@ -64,6 +69,7 @@ _ENV_DRAW_MODULES = {
 
 _GENERAL_DRAW_MODULES = {
     "GENERAL": general_props,
+    "THIRDPARTY": thirdparty_props,
     "PIE": pie_props,
     "KEYMAP": keymap_props,
     "HELP_N_UPDATE": help_update_props,
@@ -101,6 +107,7 @@ class BlueHole(AddonPreferences):
         description='General addon settings to display',
         items=[
             ('GENERAL', 'General Settings', ''),
+            ('THIRDPARTY', 'Third party Addons', ''),
             ('KEYMAP', 'Keymaps', ''),
             ('PIE', 'Pie Menus', ''),
             ('HELP_N_UPDATE', 'Help & Updates', ''),
@@ -110,6 +117,7 @@ class BlueHole(AddonPreferences):
 
     general: PointerProperty(type=general_props.GeneralPG)
     keymap: PointerProperty(type=keymap_props.KeymapPG)
+    thirdparty: PointerProperty(type=thirdparty_props.ThirdPartyPG)
     pie: PointerProperty(type=pie_props.PiePG)
     help_n_update: PointerProperty(type=help_update_props.HelpUpdatePG)
     directory: PointerProperty(type=directory_props.DirectoryPG)

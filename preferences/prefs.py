@@ -324,6 +324,15 @@ class _KeymapPrefs:
         return _UVKeymapPrefs(self._keymap.uv)
 
 
+class _ThirdPartyPrefs:
+    """
+    Wrapper for Blue Hole third-party addon preferences to provide
+    live access to Blender properties with attribute-style syntax.
+    """
+    def __init__(self, thirdparty):
+        self._thirdparty = thirdparty
+
+
 class _PiePrefs:
     """
     Wrapper for Blue Hole pie menu preferences to provide
@@ -929,6 +938,11 @@ class BHPrefs:
     def keymap(self):
         p = self.prefs
         return None if p is None else _KeymapPrefs(p.keymap)
+
+    @property
+    def thirdparty(self):
+        p = self.prefs
+        return None if p is None else _ThirdPartyPrefs(p.thirdparty)
 
 
 def prefs() -> BHPrefs:
