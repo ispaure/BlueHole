@@ -15,6 +15,11 @@ __status__ = 'Production'
 
 import bpy
 
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .addon_prefs import BlueHole
+
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
@@ -58,7 +63,7 @@ class _PrefsProxy:
     def __init__(self, target):
         object.__setattr__(self, '_target', target)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         target = object.__getattribute__(self, '_target')
         value = getattr(target, name)
 
@@ -68,11 +73,11 @@ class _PrefsProxy:
 
         return value
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any):
         target = object.__getattribute__(self, '_target')
         setattr(target, name, value)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return object.__getattribute__(self, '_target') is not None
 
     @property
@@ -106,7 +111,7 @@ class BHPrefs:
     def is_ready(self) -> bool:
         return self.prefs is not None
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         p = self.prefs
 
         if p is None:
@@ -121,9 +126,15 @@ class BHPrefs:
 
         return value
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self.prefs is not None
 
 
-def prefs() -> BHPrefs:
-    return BHPrefs()
+def prefs() -> 'BlueHole':
+    """
+    Return the live Blue Hole preferences accessor.
+
+    Typed as BlueHole for IDE autocomplete, while still returning a dynamic proxy
+    at runtime to avoid manual preference wrapper duplication.
+    """
+    return BHPrefs()  # type: ignore[return-value]
