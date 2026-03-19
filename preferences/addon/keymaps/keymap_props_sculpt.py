@@ -32,13 +32,6 @@ def _update_enable_sculpt_keymaps(self, context):
     Enable or disable Blue Hole sculpt keymaps.
     """
     # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.sculpt import sculpt_keymaps_register
-    #
-    # if self.enable_sculpt_keymaps:
-    #     sculpt_keymaps_register.register()
-    # else:
-    #     sculpt_keymaps_register.unregister()
     pass
 
 
@@ -55,21 +48,18 @@ class SculptKeymapPG(bpy.types.PropertyGroup):
         name='Enable Sculpt Tool Shortcuts',
         description='Enable Blue Hole sculpt tool shortcuts',
         default=True,
-        # update=_update_enable_sculpt_tool_shortcuts
     )
 
     enable_sculpt_action_shortcuts: BoolProperty(
         name='Enable Sculpt Action Shortcuts',
         description='Enable Blue Hole sculpt action shortcuts',
         default=True,
-        # update=_update_enable_sculpt_action_shortcuts
     )
 
     enable_sculpt_simulation_shortcuts: BoolProperty(
         name='Enable Sculpt Simulation Shortcuts',
         description='Enable Blue Hole sculpt simulation shortcuts',
         default=True,
-        # update=_update_enable_sculpt_simulation_shortcuts
     )
 
 
@@ -77,8 +67,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # SCULPT KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_sculpt = layout.box()
-    column_sculpt = box_sculpt.column()
+    column_sculpt = layout.column()
 
     row = column_sculpt.row()
     row.prop(preference.keymap.sculpt, 'enable_sculpt_keymaps')

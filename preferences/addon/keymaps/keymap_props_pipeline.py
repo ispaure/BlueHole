@@ -32,13 +32,6 @@ def _update_enable_pipeline_keymaps(self, context):
     Enable or disable Blue Hole pipeline keymaps.
     """
     # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.pipeline import pipeline_keymaps_register
-    #
-    # if self.enable_pipeline_keymaps:
-    #     pipeline_keymaps_register.register()
-    # else:
-    #     pipeline_keymaps_register.unregister()
     pass
 
 
@@ -55,21 +48,18 @@ class PipelineKeymapPG(bpy.types.PropertyGroup):
         name='Enable Export Shortcuts',
         description='Enable Blue Hole export shortcuts',
         default=True,
-        # update=_update_enable_pipeline_export_shortcuts
     )
 
     enable_pipeline_send_shortcuts: BoolProperty(
         name='Enable Send Shortcuts',
         description='Enable Blue Hole send shortcuts',
         default=True,
-        # update=_update_enable_pipeline_send_shortcuts
     )
 
     enable_pipeline_container_shortcuts: BoolProperty(
         name='Enable Container Shortcuts',
         description='Enable Blue Hole asset container shortcuts',
         default=True,
-        # update=_update_enable_pipeline_container_shortcuts
     )
 
 
@@ -77,8 +67,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # PIPELINE KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_pipeline = layout.box()
-    column_pipeline = box_pipeline.column()
+    column_pipeline = layout.column()
 
     row = column_pipeline.row()
     row.prop(preference.keymap.pipeline, 'enable_pipeline_keymaps')

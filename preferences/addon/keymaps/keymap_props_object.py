@@ -32,13 +32,6 @@ def _update_enable_object_keymaps(self, context):
     Enable or disable Blue Hole object keymaps.
     """
     # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.object import object_keymaps_register
-    #
-    # if self.enable_object_keymaps:
-    #     object_keymaps_register.register()
-    # else:
-    #     object_keymaps_register.unregister()
     pass
 
 
@@ -55,21 +48,18 @@ class ObjectKeymapPG(bpy.types.PropertyGroup):
         name='Enable Object Selection Shortcuts',
         description='Enable Blue Hole object selection shortcuts',
         default=True,
-        # update=_update_enable_object_selection_shortcuts
     )
 
     enable_object_action_shortcuts: BoolProperty(
         name='Enable Object Action Shortcuts',
         description='Enable Blue Hole object action shortcuts',
         default=True,
-        # update=_update_enable_object_action_shortcuts
     )
 
     enable_object_tool_shortcuts: BoolProperty(
         name='Enable Object Tool Shortcuts',
         description='Enable Blue Hole object tool shortcuts',
         default=True,
-        # update=_update_enable_object_tool_shortcuts
     )
 
 
@@ -77,8 +67,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # OBJECT KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_object = layout.box()
-    column_object = box_object.column()
+    column_object = layout.column()
 
     row = column_object.row()
     row.prop(preference.keymap.object, 'enable_object_keymaps')

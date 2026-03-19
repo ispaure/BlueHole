@@ -31,7 +31,7 @@ show_verbose = True
 
 class XRaySelectionToolsPG(bpy.types.PropertyGroup):
     enable_selection_tool_switch_box_x_ray: BoolProperty(
-        name='Enable X-Ray upon Selection Tool Switch',
+        name='Enable X-Ray (Keymaps → Selection → Tool Switch)',
         description='Enable X-Ray upon Selection Tool Switch (Requires "X-Ray Selection Tools" add-on)',
         default=True
     )

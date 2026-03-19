@@ -63,10 +63,7 @@ def draw(preference, context, layout):
     column = layout.column()
 
     row = column.row()
-    row.label(text='Third-party add-on settings.')
-
-    row = column.row()
-    row.label(text='These settings apply to supported third-party add-ons.')
+    row.label(text='Blue Hole-managed integration of supported third-party add-ons.')
 
     row = column.row(align=True)
     row.prop(preference.thirdparty, 'addon_settings', expand=True)

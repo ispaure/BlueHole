@@ -46,7 +46,7 @@ class NavigationKeymapPG(bpy.types.PropertyGroup):
     )
 
     enable_navigation_viewport_movement: BoolProperty(
-        name='Enable Viewport Movement',
+        name='Enable Maya Viewport Navigation',
         description='"Viewport Movement"',
         default=True,
         update=_update_keymaps

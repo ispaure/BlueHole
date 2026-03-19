@@ -101,14 +101,6 @@ class _SelectionKeymapPrefs:
     def enable_selection_tool_switch(self, value: bool):
         self._selection.enable_selection_tool_switch = value
 
-    @property
-    def enable_selection_tool_switch_box_x_ray(self) -> bool:
-        return self._selection.enable_selection_tool_switch_box_x_ray
-
-    @enable_selection_tool_switch_box_x_ray.setter
-    def enable_selection_tool_switch_box_x_ray(self, value: bool):
-        self._selection.enable_selection_tool_switch_box_x_ray = value
-
 
 class _TransformKeymapPrefs:
     """
@@ -141,8 +133,6 @@ class _TransformKeymapPrefs:
     @enable_transform_tools_modal_autoconstraint.setter
     def enable_transform_tools_modal_autoconstraint(self, value: bool):
         self._transform.enable_transform_tools_modal_autoconstraint = value
-
-
 
     @property
     def enable_transform_tools_gizmo(self) -> bool:

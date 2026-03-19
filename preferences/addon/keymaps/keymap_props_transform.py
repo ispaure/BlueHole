@@ -99,8 +99,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # TRANSFORM KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_transform = layout.box()
-    column_transform = box_transform.column()
+    column_transform = layout.column()
 
     row = column_transform.row()
     row.prop(preference.keymap.transform, 'enable_transform_keymaps')
