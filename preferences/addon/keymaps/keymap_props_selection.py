@@ -76,8 +76,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # SELECTION KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_selection = layout.box()
-    column_selection = box_selection.column()
+    column_selection = layout.column()
 
     row = column_selection.row()
     row.prop(preference.keymap.selection, 'enable_selection_keymaps')

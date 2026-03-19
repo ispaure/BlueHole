@@ -32,13 +32,6 @@ def _update_enable_uv_keymaps(self, context):
     Enable or disable Blue Hole UV keymaps.
     """
     # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.uv import uv_keymaps_register
-    #
-    # if self.enable_uv_keymaps:
-    #     uv_keymaps_register.register()
-    # else:
-    #     uv_keymaps_register.unregister()
     pass
 
 
@@ -55,21 +48,18 @@ class UVKeymapPG(bpy.types.PropertyGroup):
         name='Enable UV Selection Shortcuts',
         description='Enable Blue Hole UV selection shortcuts',
         default=True,
-        # update=_update_enable_uv_selection_shortcuts
     )
 
     enable_uv_tool_shortcuts: BoolProperty(
         name='Enable UV Tool Shortcuts',
         description='Enable Blue Hole UV tool shortcuts',
         default=True,
-        # update=_update_enable_uv_tool_shortcuts
     )
 
     enable_uv_action_shortcuts: BoolProperty(
         name='Enable UV Action Shortcuts',
         description='Enable Blue Hole UV action shortcuts',
         default=True,
-        # update=_update_enable_uv_action_shortcuts
     )
 
 
@@ -77,8 +67,7 @@ def draw(preference, context, layout):
     # -------------------------------------------------------------------------------------------------
     # UV KEYMAPS
     # -------------------------------------------------------------------------------------------------
-    box_uv = layout.box()
-    column_uv = box_uv.column()
+    column_uv = layout.column()
 
     row = column_uv.row()
     row.prop(preference.keymap.uv, 'enable_uv_keymaps')

@@ -31,7 +31,7 @@ show_verbose = True
 
 class AutoConstraintsPG(bpy.types.PropertyGroup):
     enable_transform_tools_modal_autoconstraint: BoolProperty(
-        name='Enable Auto Constraints whilst using Transform Modals in 3D View',
+        name='Enable Auto Constraints in 3D View (Keymaps → Transform → Modal)',
         description='Turns on AutoConstraint whilst using Transform Modals in 3D View (Requires "autoConstraints" add-on)',
         default=True
     )
