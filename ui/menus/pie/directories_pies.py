@@ -39,7 +39,7 @@ class BLUEHOLE_MT_pie_global_dirs(bpy.types.Menu):
         layout = self.layout
         pie = layout.menu_pie()
         # 4 - LEFT
-        if prefs().sc.source_control_enable and prefs().sc.source_control_solution == 'perforce':
+        if prefs().sourcecontrol.source_control_enable and prefs().sourcecontrol.source_control_solution == 'perforce':
             addon_entries.open_workspace_root(pie)
         else:
             pie.separator()

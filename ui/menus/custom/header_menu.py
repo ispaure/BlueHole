@@ -80,7 +80,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
 
         layout.menu(import_menu.BLUE_HOLE_MT_import.bl_idname, icon='IMPORT')
         # layout.menu("BLUE_HOLE_MT_import_export")
-        if prefs().sc.source_control_enable:
+        if prefs().sourcecontrol.source_control_enable:
             layout.menu(source_control_menu.BLUE_HOLE_MT_source_control.bl_idname, icon='CHECKMARK')
         layout.menu(misc_menu.BLUE_HOLE_MT_misc.bl_idname)
 

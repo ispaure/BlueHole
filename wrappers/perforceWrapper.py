@@ -948,35 +948,35 @@ def set_p4_env_settings():
     print('Initialize set P4 environment settings')
 
     # If Source Control is enabled in the Preferences
-    if filterUtils.filter_source_control() and prefs().sc.source_control_solution == 'perforce':
+    if filterUtils.filter_source_control() and prefs().sourcecontrol.source_control_solution == 'perforce':
         print('Attempting to set P4 environment settings')
         # If platform is Windows
         match get_os():
             case OS.WIN:
                 # If preference set to "Override Environment Settings"
-                if prefs().sc.win32_env_override:
+                if prefs().sourcecontrol.win32_env_override:
                     print('Override environment settings is ON')
-                    cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
+                    cmd_str = 'p4 set P4USER=' + prefs().sourcecontrol.macos_env_setting_p4user
                     exec_p4_command(cmd_str)
-                    cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
+                    cmd_str = 'p4 set P4PORT=' + prefs().sourcecontrol.macos_env_setting_p4port
                     exec_p4_command(cmd_str)
-                    cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
+                    cmd_str = 'p4 set P4CLIENT=' + prefs().sourcecontrol.macos_env_setting_p4client
                     exec_p4_command(cmd_str)
             case OS.MAC:
                 # If Platform is MacOS, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
-                cmd_str = 'p4 set P4USER=' + prefs().sc.macos_env_setting_p4user
+                cmd_str = 'p4 set P4USER=' + prefs().sourcecontrol.macos_env_setting_p4user
                 exec_p4_command(cmd_str)
-                cmd_str = 'p4 set P4PORT=' + prefs().sc.macos_env_setting_p4port
+                cmd_str = 'p4 set P4PORT=' + prefs().sourcecontrol.macos_env_setting_p4port
                 exec_p4_command(cmd_str)
-                cmd_str = 'p4 set P4CLIENT=' + prefs().sc.macos_env_setting_p4client
+                cmd_str = 'p4 set P4CLIENT=' + prefs().sourcecontrol.macos_env_setting_p4client
                 exec_p4_command(cmd_str)
             case OS.LINUX:
                 # If Platform is Linux, Set automatically as the MacOS P4V Client doesn't have Environment Settings.
-                cmd_str = 'p4 set P4USER=' + prefs().sc.linux_env_setting_p4user
+                cmd_str = 'p4 set P4USER=' + prefs().sourcecontrol.linux_env_setting_p4user
                 exec_p4_command(cmd_str)
-                cmd_str = 'p4 set P4PORT=' + prefs().sc.linux_env_setting_p4port
+                cmd_str = 'p4 set P4PORT=' + prefs().sourcecontrol.linux_env_setting_p4port
                 exec_p4_command(cmd_str)
-                cmd_str = 'p4 set P4CLIENT=' + prefs().sc.linux_env_setting_p4client
+                cmd_str = 'p4 set P4CLIENT=' + prefs().sourcecontrol.linux_env_setting_p4client
                 exec_p4_command(cmd_str)
 
 class P4UserWorkspace:
@@ -1296,11 +1296,11 @@ def create_empty_binary_file(file_path):
 
 
 def get_p4_macos_path() -> str:
-    return f'{prefs().sc.p4v_app_path_mac}/Contents/Resources/p4_parallel'  # Complete to get p4_parallel path
+    return f'{prefs().sourcecontrol.p4v_app_path_mac}/Contents/Resources/p4_parallel'  # Complete to get p4_parallel path
 
 
 def get_p4_linux_path() -> str:
-    return prefs().sc.p4_parallel_path_linux
+    return prefs().sourcecontrol.p4_parallel_path_linux
 
 
 def exec_p4_command(command: str):

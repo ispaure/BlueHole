@@ -66,7 +66,7 @@ class ContainerGroup(ABC):
         if not bypass_sc:
             sc_result = self.__export_source_control_proc()
             if not sc_result:
-                if prefs().sc.source_control_error_aborts_exp:
+                if prefs().sourcecontrol.source_control_error_aborts_exp:
                     msg = 'There were errors checking out files, aborting export!'
                     log(Severity.CRITICAL, self.CONTAINERS_NAME, msg)
                 else:
@@ -138,10 +138,10 @@ class ContainerGroup(ABC):
         """
         Handle source control steps required before export.
         """
-        if not prefs().sc.source_control_enable:
+        if not prefs().sourcecontrol.source_control_enable:
             return True
 
-        match prefs().sc.source_control_solution:
+        match prefs().sourcecontrol.source_control_solution:
             case 'perforce':
                 p4_file_grp_cls = p4Wrapper.P4FileGroup()
                 for container in self.container_lst:

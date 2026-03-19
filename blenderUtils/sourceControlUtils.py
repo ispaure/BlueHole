@@ -32,13 +32,13 @@ def sc_check_blend(blend_file_path: str, allow_sync, silent_mode=False):
             p4Wrapper.source_control_disabled_dialog()
         return True
 
-    if prefs().sc.source_control_solution == 'perforce':
+    if prefs().sourcecontrol.source_control_solution == 'perforce':
         # New method keeping old behavior.
         blend_p4_file = p4Wrapper.BlendP4File(client_file=blend_file_path)
         blend_p4_file.open_blend_for_edit(allow_sync, silent_mode)
-    elif prefs().sc.source_control_solution == 'plastic-scm':
+    elif prefs().sourcecontrol.source_control_solution == 'plastic-scm':
         return True  # By default, there is nothing to do for Plastic SCM to do its job
-    elif prefs().sc.source_control_solution == 'git':
+    elif prefs().sourcecontrol.source_control_solution == 'git':
         return True  # By default, there is nothing to do for Git to do its job
 
 
@@ -50,9 +50,9 @@ def sc_dialog_box_info():
         p4Wrapper.source_control_disabled_dialog()
         return
 
-    if prefs().sc.source_control_solution == 'perforce':
+    if prefs().sourcecontrol.source_control_solution == 'perforce':
         p4Wrapper.dialog_box_p4_info()
-    elif prefs().sc.source_control_solution == 'plastic-scm':
+    elif prefs().sourcecontrol.source_control_solution == 'plastic-scm':
         return False  # TODO: Plastic SCM should show server info!
-    elif prefs().sc.source_control_solution == 'git':
+    elif prefs().sourcecontrol.source_control_solution == 'git':
         return False  # TODO: Source Control - Git integration

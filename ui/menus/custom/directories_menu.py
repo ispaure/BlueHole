@@ -64,8 +64,8 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
                     layout.operator(directory_ops.OpenUnityAssetsPath.bl_idname, icon='FILE_FOLDER')
 
         # SOURCE CONTROL
-        if prefs().sc.source_control_enable:
-            if prefs().sc.source_control_solution == 'perforce':
+        if prefs().sourcecontrol.source_control_enable:
+            if prefs().sourcecontrol.source_control_solution == 'perforce':
                 layout.separator()
                 show_label('SOURCE CONTROL', layout)
                 layout.operator(directory_ops.OpenP4WorkspaceRootFolder.bl_idname, icon='FILE_FOLDER')

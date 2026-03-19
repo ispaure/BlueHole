@@ -31,7 +31,7 @@ from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 
 def filter_source_control():
-    return prefs().sc.source_control_enable
+    return prefs().sourcecontrol.source_control_enable
 
 
 def check_blend_location_in_dir_structure():
@@ -125,7 +125,7 @@ def check_tests(script_name, *,
         if not silent_mode:
             match get_os():
                 case OS.WIN:
-                    if prefs().sc.win32_env_override:
+                    if prefs().sourcecontrol.win32_env_override:
                         msg = (
                             f'{script_name} connection failed.\n\n'
                             f'What went wrong:\n'

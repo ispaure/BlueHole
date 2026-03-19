@@ -33,7 +33,7 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        if prefs().sc.source_control_solution == 'perforce':
+        if prefs().sourcecontrol.source_control_solution == 'perforce':
             layout.operator(help_ops.PerforceDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
 
             if blenderFile.has_blend_filepath():
