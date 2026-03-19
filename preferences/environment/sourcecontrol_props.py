@@ -137,7 +137,7 @@ def draw(preference, context, layout):
     row.alignment = 'LEFT'
     row.prop(preference.sourcecontrol, 'source_control_enable', text='Enable')
 
-    if prefs().sc.source_control_enable:
+    if prefs().sourcecontrol.source_control_enable:
         row.prop(preference.sourcecontrol, 'source_control_error_aborts_exp', text='Abort Exports on Error')
 
         row = layout.row()
@@ -145,7 +145,7 @@ def draw(preference, context, layout):
         row.prop(preference.sourcecontrol, 'source_control_solution', text='Solution')
 
         # CREATE PERFORCE BOX WITH SETTINGS
-        if prefs().sc.source_control_solution == 'perforce':
+        if prefs().sourcecontrol.source_control_solution == 'perforce':
             box = layout.box()
             column = box.column()
             row = column.row()
@@ -180,7 +180,7 @@ def draw(preference, context, layout):
                 row.prop(preference.sourcecontrol, 'win32_env_override', text='Override P4V Environment Settings')
 
             # If Windows set to override or other platform, show fields
-            if prefs().sc.win32_env_override or get_os() in [OS.MAC, OS.LINUX]:
+            if prefs().sourcecontrol.win32_env_override or get_os() in [OS.MAC, OS.LINUX]:
                 row = column.row()
                 row.label(text=f"Environment Settings [{get_os().value}]:")
 

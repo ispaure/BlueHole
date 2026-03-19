@@ -53,8 +53,8 @@ class BLUEHOLE_MT_pie_global_import_export(bpy.types.Menu):
         # 8 - TOP
         draw_operator_action(pie, pie_actions.PIE_GLOBAL_DIRS, context, text='Open Directories...')
         # 7 - TOP - LEFT
-        if prefs().sc.source_control_enable:
-            match prefs().sc.source_control_solution:
+        if prefs().sourcecontrol.source_control_enable:
+            match prefs().sourcecontrol.source_control_solution:
                 case 'perforce':
                     draw_operator_action(pie, pie_actions.PIE_GLOBAL_SOURCE_CONTROL, context, text='Source Control (Perforce)...', icon='CHECKMARK')
                 case 'plastic-scm':

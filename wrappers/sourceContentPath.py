@@ -108,7 +108,7 @@ def get_valid_source_content_path() -> Optional[Path]:
     log(Severity.WARNING, tool_name, msg)
 
     # Attempt to resolve through Perforce Workspace Root and Perforce folder structure
-    if prefs().sc.source_control_enable and prefs().sc.source_control_solution == 'perforce':
+    if prefs().sourcecontrol.source_control_enable and prefs().sourcecontrol.source_control_solution == 'perforce':
 
         client_root = Path(p4Wrapper.P4Info().client_root)
 
