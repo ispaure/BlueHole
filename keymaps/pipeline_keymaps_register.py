@@ -73,5 +73,7 @@ def register() -> int:
     return registered_count
 
 
-def unregister():
+def unregister() -> int:
+    unregistered_count = len(registered_pipeline_keymaps)
     unregister_registered_keymaps(registered_pipeline_keymaps)
+    return unregistered_count

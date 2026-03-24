@@ -50,5 +50,7 @@ def register() -> int:
     return registered_count
 
 
-def unregister():
+def unregister() -> int:
+    unregistered_count = len(registered_pie_keymaps)
     unregister_registered_keymaps(registered_pie_keymaps)
+    return unregistered_count

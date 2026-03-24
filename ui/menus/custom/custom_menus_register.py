@@ -1,5 +1,8 @@
 """
-Register and unregister all menu modules.
+Registration and runtime management for Blue Hole custom menus.
+
+This module orchestrates registration and unregistration of all custom menu modules,
+including the Blue Hole header menu.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -14,6 +17,8 @@ __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
+
+from ....Lib.commonUtils.debugUtils import *
 
 from . import (
     containers_menu,
@@ -31,6 +36,10 @@ from . import (
     header_menu,
 )
 
+# ----------------------------------------------------------------------------------------------------------------------
+# CONSTANTS
+
+TOOL_NAME = 'Custom Menus'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MODULES
@@ -51,21 +60,37 @@ CUSTOM_MENU_MODULES = (
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
+# HELPERS
+
+
+def _get_module_label(module) -> str:
+    return module.__name__.split('.')[-1]
+
+# ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
 def register():
-    # Register Custom Menus
+    log(Severity.DEBUG, TOOL_NAME, 'Registering...')
+
     for menu in CUSTOM_MENU_MODULES:
         menu.register()
-    # Register Header Menu
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_label(menu)}')
+
     header_menu.register()
+    log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_label(header_menu)}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
 
 
-# Unregister
 def unregister():
-    # Unregister Custom Menus
-    for menu in CUSTOM_MENU_MODULES:
-        menu.unregister()
-    # Unregister Header Menu
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
+
     header_menu.unregister()
+    log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_label(header_menu)}')
+
+    for menu in reversed(CUSTOM_MENU_MODULES):
+        menu.unregister()
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_label(menu)}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')

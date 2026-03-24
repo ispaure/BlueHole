@@ -1,5 +1,15 @@
 """
-Register and unregister all operator modules.
+Top-level registration and refresh management for Blue Hole operators.
+
+This module orchestrates registration and unregistration of all operator modules.
+
+Child operator modules are responsible for:
+- registering their own Blender operator classes
+- unregistering their own Blender operator classes
+
+This module is responsible for:
+- registration order
+- centralized high-level logging
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -14,6 +24,8 @@ __status__ = 'Production'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
+
+from ..Lib.commonUtils.debugUtils import *
 
 from . import (
     add_ops,
@@ -35,6 +47,11 @@ from . import (
     transform_ops,
     ui_ops
 )
+
+# ----------------------------------------------------------------------------------------------------------------------
+# CONSTANTS
+
+TOOL_NAME = 'Operators'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MODULES
@@ -61,14 +78,31 @@ OPERATOR_MODULES = (
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
+# HELPERS
+
+
+def _get_module_label(module) -> str:
+    return module.__name__.split('.')[-1]
+
+# ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
 def register():
+    log(Severity.INFO, TOOL_NAME, f'=== Registering {TOOL_NAME} ===')
+
     for module in OPERATOR_MODULES:
         module.register()
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_label(module)}')
+
+    log(Severity.INFO, TOOL_NAME, 'Registration complete')
 
 
 def unregister():
+    log(Severity.INFO, TOOL_NAME, f'=== Unregistering {TOOL_NAME} ===')
+
     for module in reversed(OPERATOR_MODULES):
         module.unregister()
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_label(module)}')
+
+    log(Severity.INFO, TOOL_NAME, 'Unregistration complete')

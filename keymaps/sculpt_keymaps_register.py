@@ -66,5 +66,7 @@ def register() -> int:
     return registered_count
 
 
-def unregister():
+def unregister() -> int:
+    unregistered_count = len(registered_sculpt_keymaps)
     unregister_registered_keymaps(registered_sculpt_keymaps)
+    return unregistered_count

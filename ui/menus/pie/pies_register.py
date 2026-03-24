@@ -1,3 +1,7 @@
+"""
+Registration and runtime management for Blue Hole pie menus.
+"""
+
 # ----------------------------------------------------------------------------------------------------------------------
 # AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
 
@@ -11,6 +15,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+from ....Lib.commonUtils.debugUtils import *
 
 # Addon
 from . import (
@@ -26,6 +31,10 @@ from . import (
     uv_pies,
 )
 
+# ----------------------------------------------------------------------------------------------------------------------
+# CONSTANTS
+
+TOOL_NAME = 'Pie Menus'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MODULES
@@ -43,20 +52,32 @@ PIE_MODULES = (
     uv_pies,
 )
 
+# ----------------------------------------------------------------------------------------------------------------------
+# HELPERS
+
+
+def _get_module_label(module) -> str:
+    return module.__name__.split('.')[-1]
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
-# Register
 def register():
-    # Register Pies
+    log(Severity.DEBUG, TOOL_NAME, 'Registering...')
+
     for pie in PIE_MODULES:
         pie.register()
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_label(pie)}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
 
 
-# Unregister
 def unregister():
-    # Unregister Pies
-    for pie in PIE_MODULES:
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
+
+    for pie in reversed(PIE_MODULES):
         pie.unregister()
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_label(pie)}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')
