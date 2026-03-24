@@ -109,7 +109,7 @@ def _resolve_source_content_from_preferences() -> Optional[Path]:
 
         if path.is_dir():
             resolved_path = path.resolve()
-            log(Severity.DEBUG, SC_PATH_SEARCH_TOOL_NAME, f'Using Source Content path (from preference): "{resolved_path}"')
+            log(Severity.INFO, SC_PATH_SEARCH_TOOL_NAME, f'Using Source Content path (from preference): "{resolved_path}"')
             return resolved_path
 
     log(Severity.DEBUG, SC_PATH_SEARCH_TOOL_NAME, 'No valid Source Content directory found in configured preference paths.')
@@ -216,7 +216,7 @@ def _resolve_source_content_from_perforce() -> Optional[Path]:
         return None
 
     resolved_path = source_content_candidates[0]
-    log(Severity.DEBUG, SC_PATH_SEARCH_TOOL_NAME, f'Using Source Content path (from Perforce fallback): "{resolved_path}"')
+    log(Severity.INFO, SC_PATH_SEARCH_TOOL_NAME, f'Using Source Content path (from Perforce fallback): "{resolved_path}"')
     return resolved_path
 
 
@@ -258,9 +258,7 @@ def get_valid_source_content_path() -> Optional[Path]:
         return _valid_sc_path
 
     # No valid path found
-    msg = (
-        'No valid Source Content path found in preferences or source control. '
-        'Set a valid Source Content path in Blue Hole preferences.'
-    )
+    msg = ('No valid Source Content path found in preferences or source control. '
+           'Set a valid Source Content path in Blue Hole preferences.')
     log(Severity.ERROR, SC_PATH_SEARCH_TOOL_NAME, msg)
     return None
