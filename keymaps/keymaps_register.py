@@ -91,16 +91,22 @@ def register():
 
 
 def unregister():
-    log(Severity.INFO, TOOL_NAME, 'Unregistering keymaps...')
+    total_unregistered_keymaps = 0
+
+    log(Severity.INFO, TOOL_NAME, '=== Unregistering Keymaps ===')
 
     # Unregister pie keymaps first
-    pie_keymaps_register.unregister()
+    pie_unregistered_count = pie_keymaps_register.unregister()
+    total_unregistered_keymaps += pie_unregistered_count
+    log(Severity.INFO, pie_keymaps_register.KEYMAP_CATEGORY, f'Unregistered {pie_unregistered_count} keymaps.')
 
     # Unregister standard keymaps in reverse order
     for module in reversed(keymap_module_lst):
-        module.unregister()
+        unregistered_count = module.unregister()
+        total_unregistered_keymaps += unregistered_count
+        log(Severity.INFO, module.KEYMAP_CATEGORY, f'Unregistered {unregistered_count} keymaps.')
 
-    log(Severity.INFO, TOOL_NAME, 'Unregistering keymaps completed!')
+    log(Severity.INFO, TOOL_NAME, f'Unregistration complete (Total: {total_unregistered_keymaps})')
 
 
 def refresh():

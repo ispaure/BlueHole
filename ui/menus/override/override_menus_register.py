@@ -1,5 +1,5 @@
 """
-Register and unregister all menu modules.
+Registration and runtime management for Blue Hole override menus.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,9 +15,16 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+from ....Lib.commonUtils.debugUtils import *
+
 from . import (
     file_menu_override
 )
+
+# ----------------------------------------------------------------------------------------------------------------------
+# CONSTANTS
+
+TOOL_NAME = 'Override Menus'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MODULES
@@ -27,17 +34,31 @@ OVERRIDE_MENU_MODULES = (
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
+# HELPERS
+
+
+def _get_module_label(module) -> str:
+    return module.__name__.split('.')[-1]
+
+# ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
 def register():
-    # Register Override Menus
+    log(Severity.DEBUG, TOOL_NAME, 'Registering...')
+
     for menu in OVERRIDE_MENU_MODULES:
         menu.register()
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_label(menu)}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
 
 
-# Unregister
 def unregister():
-    # Unregister Override Menus
-    for menu in OVERRIDE_MENU_MODULES:
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
+
+    for menu in reversed(OVERRIDE_MENU_MODULES):
         menu.unregister()
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_label(menu)}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')

@@ -1,5 +1,5 @@
 """
-Register and unregister all menu modules.
+Registration and runtime management for Blue Hole append menus.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,9 +15,16 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+from ....Lib.commonUtils.debugUtils import *
+
 from . import (
     VIEW3D_MT_add
 )
+
+# ----------------------------------------------------------------------------------------------------------------------
+# CONSTANTS
+
+TOOL_NAME = 'Append Menus'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MODULES
@@ -27,18 +34,31 @@ APPEND_MENU_MODULES = (
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
+# HELPERS
+
+
+def _get_module_label(module) -> str:
+    return module.__name__.split('.')[-1]
+
+# ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
 def register():
+    log(Severity.DEBUG, TOOL_NAME, 'Registering...')
 
-    # Register Append Menus
     for menu in APPEND_MENU_MODULES:
         menu.register()
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_label(menu)}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
 
 
-# Unregister
 def unregister():
-    # Unregister Append Menus
-    for menu in APPEND_MENU_MODULES:
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
+
+    for menu in reversed(APPEND_MENU_MODULES):
         menu.unregister()
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_label(menu)}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')

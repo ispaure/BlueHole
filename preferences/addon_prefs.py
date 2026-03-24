@@ -19,6 +19,8 @@ import bpy
 from bpy.props import *
 from bpy.types import AddonPreferences
 
+from ..Lib.commonUtils.debugUtils import *
+
 # Import Addon Properties
 from .addon import (
     general_props,
@@ -41,9 +43,9 @@ from ..environment import envManager
 from .prefs import prefs, addon_module_name
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# CONSTANTS
 
-show_verbose = True
+TOOL_NAME = 'Preferences'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -200,18 +202,36 @@ classes = (
 )
 
 
+def _get_class_label(cls) -> str:
+    if cls == BlueHole:
+        return 'BlueHole'
+    return cls.__name__.split('.')[-1]
+
+
 # Registration
 def register():
+    log(Severity.INFO, TOOL_NAME, f'=== Registering {TOOL_NAME} ===')
+
     for cls in classes:
         if cls == BlueHole:
             bpy.utils.register_class(cls)
         else:
             cls.register()
 
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_class_label(cls)}')
+
+    log(Severity.INFO, TOOL_NAME, 'Registration complete')
+
 
 def unregister():
+    log(Severity.INFO, TOOL_NAME, f'=== Unregistering {TOOL_NAME} ===')
+
     for cls in reversed(classes):
         if cls == BlueHole:
             bpy.utils.unregister_class(cls)
         else:
             cls.unregister()
+
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_class_label(cls)}')
+
+    log(Severity.INFO, TOOL_NAME, 'Unregistration complete')
