@@ -22,7 +22,6 @@ from bpy.props import *
 
 # Blue Hole
 from ..blenderUtils import sourceControlUtils, blenderFile
-from ..wrappers import perforceWrapper as p4Wrapper
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

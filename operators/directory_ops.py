@@ -20,12 +20,12 @@ import bpy
 
 # Blue Hole
 from ..blenderUtils import blenderFile, projectUtils, filterUtils
-from ..wrappers import perforceWrapper as p4Wrapper
 from ..environment import envPathResolver
 from ..preferences.prefs import *
 from ..Lib.commonUtils import fileUtils
 from ..Lib.commonUtils.osUtils import get_os, OS
 from ..wrappers.sourceContentPath import get_valid_source_content_path
+from ..wrappers.perforce.p4_info import P4Info
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -90,7 +90,7 @@ class OpenP4WorkspaceRootFolder(bpy.types.Operator):
             return {'FINISHED'}
 
         # Open folder
-        fileUtils.open_dir_path(p4Wrapper.P4Info().client_root)
+        fileUtils.open_dir_path(P4Info().client_root)
         return {'FINISHED'}
 
 

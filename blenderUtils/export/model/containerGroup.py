@@ -26,7 +26,7 @@ from ... import filterUtils, sendUnreal
 from ..exportSettings import *
 from ....Lib.commonUtils.debugUtils import *
 from ....preferences.prefs import *
-from ....wrappers import perforceWrapper as p4Wrapper
+from ....wrappers.perforce.p4_file_group import P4FileGroup
 from .container import Container
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ class ContainerGroup(ABC):
 
         match prefs().sourcecontrol.source_control_solution:
             case 'perforce':
-                p4_file_grp_cls = p4Wrapper.P4FileGroup()
+                p4_file_grp_cls = P4FileGroup()
                 for container in self.container_lst:
                     p4_file_grp_cls.append_p4_file_to_group_from_client_file(str(container.path))
                 return p4_file_grp_cls.open_for_edit()
