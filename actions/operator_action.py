@@ -33,6 +33,7 @@ __status__ = 'Production'
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable
 from ..Lib.commonUtils.debugUtils import *
+from ..debug.debug_flags import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DATACLASSES
@@ -363,14 +364,15 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
                 f"direction={getattr(kmi, 'direction', 'ANY')})"
             )
         else:
-            log(
-                Severity.DEBUG,
-                "Blue Hole Keymap Registered",
-                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
-                f"{action.get_idname()} | {binding.key} value={binding.value} "
-                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
-                f"oskey={binding.oskey} direction={binding.direction})"
-            )
+            if is_verbose(VERBOSE_KEYMAPS):
+                log(
+                    Severity.DEBUG,
+                    "Blue Hole Keymap Registered",
+                    f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
+                    f"{action.get_idname()} | {binding.key} value={binding.value} "
+                    f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
+                    f"oskey={binding.oskey} direction={binding.direction})"
+                )
 
         registered.append((km, kmi))
 
