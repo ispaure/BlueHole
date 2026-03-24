@@ -300,7 +300,7 @@ def create_keymap(kc, binding: KeymapBinding):
     )
 
 
-def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -> list[tuple[Any, Any]]:
+def register_operator_action_keymaps(category: str, kc, action: OperatorAction, context=None) -> list[tuple[Any, Any]]:
     """
     Register all keymap bindings attached to this action in the given keyconfig.
 
@@ -312,6 +312,8 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
     if kc is None:
         return registered
 
+    log_title = f'{category} Keymaps'
+
     for binding in action.keymap_bindings:
 
         km = create_keymap(kc, binding)
@@ -319,7 +321,7 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
         if km is None:
             log(
                 Severity.WARNING,
-                "Blue Hole Keymap",
+                log_title,
                 f"Keymap not found/created: "
                 f"{binding.keymap_name} | {binding.space_type} | {binding.region_type}"
             )
@@ -330,7 +332,8 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
         if kmi is None:
             log(
                 Severity.WARNING,
-                "Blue Hole Keymap Failed",
+                log_title,
+                f"Keymap registration failed: "
                 f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
                 f"{action.get_idname()} | {binding.key} "
                 f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
@@ -352,7 +355,7 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
         if not valid:
             log(
                 Severity.WARNING,
-                "Blue Hole Keymap Suspicious",
+                log_title,
                 f"Created KMI does not match expected binding: "
                 f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
                 f"expected={action.get_idname()} {binding.key} value={binding.value} "
@@ -367,7 +370,7 @@ def register_operator_action_keymaps(kc, action: OperatorAction, context=None) -
             if is_verbose(VERBOSE_KEYMAPS):
                 log(
                     Severity.DEBUG,
-                    "Blue Hole Keymap Registered",
+                    log_title,
                     f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
                     f"{action.get_idname()} | {binding.key} value={binding.value} "
                     f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "

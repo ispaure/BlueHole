@@ -25,8 +25,11 @@ import bpy
 
 # Disable PySide UI usage and rely on OS terminal windows instead.
 from .Lib.commonUtils import uiUtils
-
 uiUtils.use_pyside = False
+
+# Set Debug Project Prefix for logging
+from .Lib.commonUtils import debugUtils
+debugUtils.project_prefix = "Blue Hole"
 
 from .blenderUtils import callbacks
 from .preferences import addon_prefs

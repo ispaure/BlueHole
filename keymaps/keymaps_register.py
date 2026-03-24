@@ -76,7 +76,7 @@ def register():
         registered_count = module.register()
         total_registered_keymaps += registered_count
 
-        log(Severity.INFO, module.KEYMAP_CATEGORY, f'Registered {registered_count} keymaps.')
+        log(Severity.INFO, f'{module.KEYMAP_CATEGORY} Keymaps', f'Registered {registered_count} keymaps.')
 
     # Register pie keymaps
     if is_verbose(VERBOSE_KEYMAPS):

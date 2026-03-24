@@ -43,7 +43,7 @@ def register() -> int:
     registered_count = 0
 
     for action in PIE_ACTIONS:
-        new_keymaps = ensure_action_keymaps(action)
+        new_keymaps = ensure_action_keymaps(KEYMAP_CATEGORY, action)
         registered_pie_keymaps.extend(new_keymaps)
         registered_count += len(new_keymaps)
 
