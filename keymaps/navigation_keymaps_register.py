@@ -68,7 +68,7 @@ def register() -> int:
     registered_count = 0
 
     for action in actions:
-        new_keymaps = ensure_action_keymaps(action)
+        new_keymaps = ensure_action_keymaps(KEYMAP_CATEGORY, action)
         registered_navigation_keymaps.extend(new_keymaps)
         registered_count += len(new_keymaps)
 

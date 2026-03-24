@@ -32,7 +32,7 @@ registered_navigation_keymaps = []
 # HELPERS
 
 
-def remove_existing_action_keymaps_from_keyconfig(kc, action):
+def remove_existing_action_keymaps_from_keyconfig(category: str, kc, action):
     """
     Remove existing keymap items for this action from the given keyconfig.
     """
@@ -47,7 +47,7 @@ def remove_existing_action_keymaps_from_keyconfig(kc, action):
         remove_matching_action_kmis(km, action)
 
 
-def ensure_action_keymaps(action):
+def ensure_action_keymaps(category: str, action):
     """
     Ensure all keymap bindings for this action exist in Blender's addon keyconfig.
     """
@@ -58,5 +58,5 @@ def ensure_action_keymaps(action):
     if kc is None:
         return []
 
-    remove_existing_action_keymaps_from_keyconfig(kc, action)
-    return register_operator_action_keymaps(kc, action)
+    remove_existing_action_keymaps_from_keyconfig(category, kc, action)
+    return register_operator_action_keymaps(category, kc, action)

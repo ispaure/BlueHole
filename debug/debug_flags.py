@@ -39,7 +39,7 @@ VERBOSE_ENV_FILES = False
 VERBOSE_ENVIRONMENT = False
 
 # Keymaps (registration, conflicts, bindings)
-VERBOSE_KEYMAPS = True
+VERBOSE_KEYMAPS = False
 
 # Core library utilities (commonUtils, cmd wrappers, etc.)
 VERBOSE_LIB = False
