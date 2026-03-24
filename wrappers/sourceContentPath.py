@@ -17,8 +17,7 @@ from pathlib import Path
 from ..Lib.commonUtils.osUtils import get_os, OS
 from ..Lib.commonUtils.debugUtils import *
 from ..preferences.prefs import prefs
-from . import perforceWrapper as p4Wrapper
-
+from .perforce.p4_info import P4Info
 
 # ----------------------------------------------------------------------------------------------------------------------
 # GLOBAL CACHE
@@ -110,42 +109,47 @@ def get_valid_source_content_path() -> Optional[Path]:
     # Attempt to resolve through Perforce Workspace Root and Perforce folder structure
     if prefs().sourcecontrol.source_control_enable and prefs().sourcecontrol.source_control_solution == 'perforce':
 
-        client_root = Path(p4Wrapper.P4Info().client_root)
+        p4_info_cls = P4Info()
 
-        log(Severity.DEBUG, tool_name, f'Perforce client root detected: "{client_root}"')
+        if not p4_info_cls.status:
+            log(Severity.DEBUG, tool_name, 'Perforce connection is invalid. Cannot search for Source Content')
+        else:
+            client_root = Path(P4Info().client_root)
 
-        if client_root.is_dir():
+            log(Severity.DEBUG, tool_name, f'Perforce client root detected: "{client_root}"')
 
-            # Level 0 (root)
-            sc = client_root / "SourceContent"
-            if sc.is_dir():
-                log(Severity.DEBUG, tool_name, f'Found SourceContent (Perforce) at level 0: "{sc}"')
-                _valid_sc_path = sc.resolve()
-                return _valid_sc_path
+            if client_root.is_dir():
 
-            # Level 1
-            for lvl1 in _safe_iterdir(client_root, tool_name=tool_name):
-                if not lvl1.is_dir():
-                    continue
-
-                sc = lvl1 / "SourceContent"
+                # Level 0 (root)
+                sc = client_root / "SourceContent"
                 if sc.is_dir():
-                    log(Severity.DEBUG, tool_name, f'Found SourceContent (Perforce) at level 1: "{sc}"')
+                    log(Severity.DEBUG, tool_name, f'Found SourceContent (Perforce) at level 0: "{sc}"')
                     _valid_sc_path = sc.resolve()
                     return _valid_sc_path
 
-                # Level 2
-                for lvl2 in _safe_iterdir(lvl1, tool_name=tool_name):
-                    if not lvl2.is_dir():
+                # Level 1
+                for lvl1 in _safe_iterdir(client_root, tool_name=tool_name):
+                    if not lvl1.is_dir():
                         continue
 
-                    sc = lvl2 / "SourceContent"
+                    sc = lvl1 / "SourceContent"
                     if sc.is_dir():
-                        log(Severity.DEBUG, tool_name, f'Found SourceContent (Perforce) at level 2: "{sc}"')
+                        log(Severity.DEBUG, tool_name, f'Found SourceContent (Perforce) at level 1: "{sc}"')
                         _valid_sc_path = sc.resolve()
                         return _valid_sc_path
 
-        log(Severity.DEBUG, tool_name, 'Perforce fallback search did not find a SourceContent folder.')
+                    # Level 2
+                    for lvl2 in _safe_iterdir(lvl1, tool_name=tool_name):
+                        if not lvl2.is_dir():
+                            continue
+
+                        sc = lvl2 / "SourceContent"
+                        if sc.is_dir():
+                            log(Severity.DEBUG, tool_name, f'Found SourceContent (Perforce) at level 2: "{sc}"')
+                            _valid_sc_path = sc.resolve()
+                            return _valid_sc_path
+
+            log(Severity.DEBUG, tool_name, 'Perforce fallback search did not find a SourceContent folder.')
 
     # No valid path found
     log(Severity.ERROR, tool_name, 'No valid Source Content path found in preferences or source control.')

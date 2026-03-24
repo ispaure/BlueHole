@@ -23,7 +23,7 @@ from ..Lib.commonUtils.debugUtils import *
 from ..Lib.commonUtils.osUtils import *
 from ..environment import envPathResolver
 from ..preferences.prefs import *
-from ..wrappers import perforceWrapper
+from ..wrappers.perforce.p4_info import P4Info
 from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -246,7 +246,7 @@ def check_tests(script_name, *,
 
     # Check if source control is enabled
     if check_source_control_enable:
-        if not filter_source_control():
+        if not prefs().sourcecontrol.source_control_enable:
             log(Severity.ERROR, script_name, 'Check Source Control Enabled: Failed')
             dialog_source_control_enable()
             return False
@@ -254,7 +254,7 @@ def check_tests(script_name, *,
 
     # Check source control connection
     if check_source_control_connection:
-        p4_info_cls = perforceWrapper.P4Info()
+        p4_info_cls = P4Info()
         if p4_info_cls.status is False:
             log(Severity.ERROR, script_name, 'Check Source Control Connection: Failed')
             dialog_source_control_connection()
