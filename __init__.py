@@ -27,9 +27,10 @@ import bpy
 from .Lib.commonUtils import uiUtils
 uiUtils.use_pyside = False
 
-# Set Debug Project Prefix for logging
+# Set Debug Project Prefix for logging, remove time delta unless profiling.
 from .Lib.commonUtils import debugUtils
 debugUtils.project_prefix = "Blue Hole"
+debugUtils.use_time_delta = False
 
 from .blenderUtils import callbacks
 from .preferences import addon_prefs
@@ -46,7 +47,7 @@ bl_info = {
     "author": "Marc-André Voyer",
     "description": "",
     "blender": (4, 5, 1),
-    "version": (6, 3, 19),
+    "version": (6, 3, 24),
     "location": "",
     "warning": "",
     "category": "Generic",
