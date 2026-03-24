@@ -15,16 +15,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ..Lib.commonUtils.debugUtils import *
 from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
 from ..actions.actions.keymaps.object_actions import get_object_actions
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# CONSTANTS
 
-show_verbose = True
+KEYMAP_CATEGORY = 'Object'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
@@ -52,19 +51,19 @@ def get_enabled_object_actions():
 # REGISTER / UNREGISTER
 
 
-def register():
+def register() -> int:
     unregister()
 
     actions = get_enabled_object_actions()
-    if not actions:
-        return
 
-    log(Severity.INFO, 'Blue Hole Object Keymaps', 'Registering object keymaps...')
+    registered_count = 0
 
     for action in actions:
-        registered_object_keymaps.extend(ensure_action_keymaps(action))
+        new_keymaps = ensure_action_keymaps(action)
+        registered_object_keymaps.extend(new_keymaps)
+        registered_count += len(new_keymaps)
 
-    log(Severity.INFO, 'Blue Hole Object Keymaps', 'Registering object keymaps completed!')
+    return registered_count
 
 
 def unregister():

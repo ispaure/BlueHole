@@ -15,7 +15,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ..Lib.commonUtils.debugUtils import *
 from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
 from ..actions.actions.keymaps.transform.transform_tools_gizmo import get_transform_tools_gizmo_actions
@@ -23,9 +22,9 @@ from ..actions.actions.keymaps.transform.transform_tools_modal import get_transf
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# CONSTANTS
 
-show_verbose = True
+KEYMAP_CATEGORY = 'Transform'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
@@ -61,19 +60,19 @@ def get_enabled_transform_actions():
 # REGISTER / UNREGISTER
 
 
-def register():
+def register() -> int:
     unregister()
 
     actions = get_enabled_transform_actions()
-    if not actions:
-        return
 
-    log(Severity.INFO, 'Blue Hole transform Keymaps', 'Registering transform keymaps...')
+    registered_count = 0
 
     for action in actions:
-        registered_transform_keymaps.extend(ensure_action_keymaps(action))
+        new_keymaps = ensure_action_keymaps(action)
+        registered_transform_keymaps.extend(new_keymaps)
+        registered_count += len(new_keymaps)
 
-    log(Severity.INFO, 'Blue Hole transform Keymaps', 'Registering transform keymaps completed!')
+    return registered_count
 
 
 def unregister():

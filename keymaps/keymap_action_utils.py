@@ -15,7 +15,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ..Lib.commonUtils.debugUtils import *
 from .keymap_utils import get_addon_keyconfig
 from ..actions.operator_action import register_operator_action_keymaps, remove_matching_action_kmis
 

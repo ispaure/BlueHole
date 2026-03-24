@@ -15,16 +15,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ..Lib.commonUtils.debugUtils import *
 from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
 from ..actions.actions.keymaps.mesh_actions import get_mesh_actions
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# CONSTANTS
 
-show_verbose = True
+KEYMAP_CATEGORY = 'Mesh'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
@@ -52,19 +51,19 @@ def get_enabled_mesh_actions():
 # REGISTER / UNREGISTER
 
 
-def register():
+def register() -> int:
     unregister()
 
     actions = get_enabled_mesh_actions()
-    if not actions:
-        return
 
-    log(Severity.INFO, 'Blue Hole Mesh Keymaps', 'Registering mesh keymaps...')
+    registered_count = 0
 
     for action in actions:
-        registered_mesh_keymaps.extend(ensure_action_keymaps(action))
+        new_keymaps = ensure_action_keymaps(action)
+        registered_mesh_keymaps.extend(new_keymaps)
+        registered_count += len(new_keymaps)
 
-    log(Severity.INFO, 'Blue Hole Mesh Keymaps', 'Registering mesh keymaps completed!')
+    return registered_count
 
 
 def unregister():

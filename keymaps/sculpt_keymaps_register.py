@@ -15,16 +15,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ..Lib.commonUtils.debugUtils import *
 from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
 from ..actions.actions.keymaps.sculpt_actions import get_sculpt_actions
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# CONSTANTS
 
-show_verbose = True
+KEYMAP_CATEGORY = 'Sculpt'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
@@ -52,19 +51,19 @@ def get_enabled_sculpt_actions():
 # REGISTER / UNREGISTER
 
 
-def register():
+def register() -> int:
     unregister()
 
     actions = get_enabled_sculpt_actions()
-    if not actions:
-        return
 
-    log(Severity.INFO, 'Blue Hole Sculpt Keymaps', 'Registering sculpt keymaps...')
+    registered_count = 0
 
     for action in actions:
-        registered_sculpt_keymaps.extend(ensure_action_keymaps(action))
+        new_keymaps = ensure_action_keymaps(action)
+        registered_sculpt_keymaps.extend(new_keymaps)
+        registered_count += len(new_keymaps)
 
-    log(Severity.INFO, 'Blue Hole Sculpt Keymaps', 'Registering sculpt keymaps completed!')
+    return registered_count
 
 
 def unregister():
