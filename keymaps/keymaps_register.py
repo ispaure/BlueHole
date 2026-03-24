@@ -44,7 +44,7 @@ from . import uv_keymaps_register
 # ----------------------------------------------------------------------------------------------------------------------
 # CONSTANTS
 
-TOOL_NAME = 'Blue Hole Keymaps'
+TOOL_NAME = 'Keymaps'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
@@ -64,7 +64,7 @@ keymap_module_lst = (
 def register():
     total_registered_keymaps = 0
 
-    log(Severity.INFO, TOOL_NAME, 'Registering keymaps...')
+    log(Severity.INFO, TOOL_NAME, f'=== Registering {TOOL_NAME} ===')
 
     # Register standard keymaps
     for module in keymap_module_lst:
@@ -85,9 +85,9 @@ def register():
     pie_registered_count = pie_keymaps_register.register()
     total_registered_keymaps += pie_registered_count
 
-    log(Severity.INFO, pie_keymaps_register.KEYMAP_CATEGORY, f'Registered {pie_registered_count} keymaps.')
+    log(Severity.INFO, f'{pie_keymaps_register.KEYMAP_CATEGORY} Keymaps', f'Registered {pie_registered_count} keymaps.')
 
-    log(Severity.INFO, TOOL_NAME, f'Registering keymaps completed! Total registered: {total_registered_keymaps}')
+    log(Severity.INFO, TOOL_NAME, f'Registration complete (Total: {total_registered_keymaps})')
 
 
 def unregister():
