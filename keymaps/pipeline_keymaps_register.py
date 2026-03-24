@@ -15,17 +15,16 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ..Lib.commonUtils.debugUtils import *
 from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
 from ..actions.actions.keymaps.pipeline_actions import get_pipeline_actions
-from ..preferences.prefs import prefs
 from ..actions.actions.keymaps.pipeline.obligatory import get_obligatory_pipeline_actions
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# CONSTANTS
 
-show_verbose = True
+KEYMAP_CATEGORY = 'Pipeline'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
@@ -42,7 +41,7 @@ def get_enabled_pipeline_actions():
     """
     actions = []
 
-    # Regardless of what is enabled, need to enable the custom Save As... operator from Blue Hole. Always
+    # Always include obligatory pipeline actions (e.g. custom Save As...)
     actions.extend(get_obligatory_pipeline_actions())
 
     if not prefs().keymap.enable_keymaps:
@@ -59,19 +58,19 @@ def get_enabled_pipeline_actions():
 # REGISTER / UNREGISTER
 
 
-def register():
+def register() -> int:
     unregister()
 
     actions = get_enabled_pipeline_actions()
-    if not actions:
-        return
 
-    log(Severity.INFO, 'Blue Hole Pipeline Keymaps', 'Registering pipeline keymaps...')
+    registered_count = 0
 
     for action in actions:
-        registered_pipeline_keymaps.extend(ensure_action_keymaps(action))
+        new_keymaps = ensure_action_keymaps(action)
+        registered_pipeline_keymaps.extend(new_keymaps)
+        registered_count += len(new_keymaps)
 
-    log(Severity.INFO, 'Blue Hole Pipeline Keymaps', 'Registering pipeline keymaps completed!')
+    return registered_count
 
 
 def unregister():

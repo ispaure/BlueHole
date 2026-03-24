@@ -1,5 +1,19 @@
 """
-This manages the keymaps.
+Top-level registration and refresh management for Blue Hole keymaps.
+
+This module orchestrates registration, unregistration, and refresh of all
+standard keymap categories and pie keymaps.
+
+Child keymap register modules are responsible for:
+- determining which actions are enabled
+- registering their own keymaps
+- storing runtime keymap references
+- returning the number of successfully registered keymaps
+
+This module is responsible for:
+- registration order
+- centralized high-level logging
+- total keymap registration summaries
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,6 +29,8 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+from ..Lib.commonUtils.debugUtils import *
+from ..debug.debug_flags import *
 from .pie import pie_keymaps_register
 from . import mesh_keymaps_register
 from . import navigation_keymaps_register
@@ -24,6 +40,11 @@ from . import sculpt_keymaps_register
 from . import selection_keymaps_register
 from . import transform_keymaps_register
 from . import uv_keymaps_register
+
+# ----------------------------------------------------------------------------------------------------------------------
+# CONSTANTS
+
+TOOL_NAME = 'Blue Hole Keymaps'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
@@ -41,25 +62,49 @@ keymap_module_lst = (
 
 
 def register():
+    total_registered_keymaps = 0
 
-    # Register Keymaps
+    log(Severity.INFO, TOOL_NAME, 'Registering keymaps...')
+
+    # Register standard keymaps
     for module in keymap_module_lst:
-        module.register()
 
-    # Register Pie Menus
-    pie_keymaps_register.register()
+        # Verbose header per category
+        if is_verbose(VERBOSE_KEYMAPS):
+            log(Severity.DEBUG, f'{module.KEYMAP_CATEGORY} Keymaps', 'Registering keymap bindings...')
+
+        registered_count = module.register()
+        total_registered_keymaps += registered_count
+
+        log(Severity.INFO, module.KEYMAP_CATEGORY, f'Registered {registered_count} keymaps.')
+
+    # Register pie keymaps
+    if is_verbose(VERBOSE_KEYMAPS):
+        log(Severity.DEBUG, f'{pie_keymaps_register.KEYMAP_CATEGORY} Keymaps', 'Registering keymap bindings...')
+
+    pie_registered_count = pie_keymaps_register.register()
+    total_registered_keymaps += pie_registered_count
+
+    log(Severity.INFO, pie_keymaps_register.KEYMAP_CATEGORY, f'Registered {pie_registered_count} keymaps.')
+
+    log(Severity.INFO, TOOL_NAME, f'Registering keymaps completed! Total registered: {total_registered_keymaps}')
 
 
 def unregister():
+    log(Severity.INFO, TOOL_NAME, 'Unregistering keymaps...')
 
-    # Unregister Pie Menus
+    # Unregister pie keymaps first
     pie_keymaps_register.unregister()
 
-    # Unregister Keymaps
+    # Unregister standard keymaps in reverse order
     for module in reversed(keymap_module_lst):
         module.unregister()
 
+    log(Severity.INFO, TOOL_NAME, 'Unregistering keymaps completed!')
+
 
 def refresh():
+    log(Severity.INFO, TOOL_NAME, 'Refreshing keymaps...')
     unregister()
     register()
+    log(Severity.INFO, TOOL_NAME, 'Refreshing keymaps completed!')

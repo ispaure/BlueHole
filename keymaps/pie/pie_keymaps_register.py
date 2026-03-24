@@ -15,17 +15,15 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ...Lib.commonUtils.debugUtils import *
-from ..keymap_utils import get_addon_keyconfig
 from ..keymap_action_utils import ensure_action_keymaps
 from ...actions.operator_action import unregister_registered_keymaps
 from ...actions.actions.pie_actions import PIE_ACTIONS
 from ...preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
+# CONSTANTS
 
-show_verbose = True
+KEYMAP_CATEGORY = 'Pie'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUNTIME STORAGE
@@ -33,24 +31,23 @@ show_verbose = True
 registered_pie_keymaps = []
 
 # ----------------------------------------------------------------------------------------------------------------------
-# HELPERS
-
-# ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
-def register():
+def register() -> int:
     unregister()
 
     if not prefs().pie.enable_pie_menus:
-        return
+        return 0
 
-    log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps...')
+    registered_count = 0
 
     for action in PIE_ACTIONS:
-        registered_pie_keymaps.extend(ensure_action_keymaps(action))
+        new_keymaps = ensure_action_keymaps(action)
+        registered_pie_keymaps.extend(new_keymaps)
+        registered_count += len(new_keymaps)
 
-    log(Severity.INFO, 'Blue Hole Pie Keymaps', 'Registering pie keymaps completed!')
+    return registered_count
 
 
 def unregister():
