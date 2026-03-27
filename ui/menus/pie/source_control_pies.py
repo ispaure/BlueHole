@@ -14,17 +14,15 @@ __status__ = 'Production'
 
 # Blender
 import bpy
-import os
 
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
 from .entries import addon_entries
 
 # ----------------------------------------------------------------------------------------------------------------------
-# USER DEFINED SETTINGS
+# CONSTANTS
 
-name = filename = os.path.basename(__file__)
-
+TOOL_NAME = 'source_control_pies'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENUS
@@ -59,19 +57,26 @@ class BLUEHOLE_MT_pie_global_source_control(bpy.types.Menu):
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
-# Menu classes
 classes = (
     BLUEHOLE_MT_pie_global_source_control,
 )
 
 
 def register():
-    log(Severity.DEBUG, name, 'Registering')
+    log(Severity.DEBUG, TOOL_NAME, 'Registering...')
+
     for cls in classes:
         bpy.utils.register_class(cls)
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {cls.__name__}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
 
 
 def unregister():
-    log(Severity.DEBUG, name, 'Unregistering')
-    for cls in classes:
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
+
+    for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {cls.__name__}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')

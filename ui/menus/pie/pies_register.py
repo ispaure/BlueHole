@@ -16,8 +16,8 @@ __status__ = 'Production'
 # IMPORTS
 
 from ....Lib.commonUtils.debugUtils import *
+from ....debug.debug_flags import *
 
-# Addon
 from . import (
     add_pies,
     curve_pies,
@@ -56,8 +56,8 @@ PIE_MODULES = (
 # HELPERS
 
 
-def _get_module_label(module) -> str:
-    return module.__name__.split('.')[-1]
+def _get_module_name(module) -> str:
+    return getattr(module, 'TOOL_NAME', module.__name__.split('.')[-1])
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
@@ -67,8 +67,11 @@ def register():
     log(Severity.DEBUG, TOOL_NAME, 'Registering...')
 
     for pie in PIE_MODULES:
-        pie.register()
-        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_label(pie)}')
+        if is_verbose(VERBOSE_UI):
+            pie.register()
+            log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_name(pie)}')
+        else:
+            pie.register()
 
     log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
 
@@ -77,7 +80,10 @@ def unregister():
     log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
 
     for pie in reversed(PIE_MODULES):
-        pie.unregister()
-        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_label(pie)}')
+        if is_verbose(VERBOSE_UI):
+            pie.unregister()
+            log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_name(pie)}')
+        else:
+            pie.unregister()
 
     log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')
