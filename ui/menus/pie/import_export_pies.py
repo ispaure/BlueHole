@@ -17,6 +17,7 @@ import bpy
 
 # Blue Hole
 from ....Lib.commonUtils.debugUtils import *
+from ....debug.debug_flags import *
 from ....preferences.prefs import *
 from ....actions.operator_action import draw_operator_action
 from ....actions.actions import pie_actions
@@ -108,7 +109,8 @@ def register():
 
     for cls in classes:
         bpy.utils.register_class(cls)
-        log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Registered: {cls.__name__}')
+        if is_verbose(VERBOSE_UI):
+            log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Registered: {cls.__name__}')
 
     log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', 'Registration complete')
 
@@ -118,6 +120,7 @@ def unregister():
 
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-        log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Unregistered: {cls.__name__}')
+        if is_verbose(VERBOSE_UI):
+            log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Unregistered: {cls.__name__}')
 
     log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', 'Unregistration complete')

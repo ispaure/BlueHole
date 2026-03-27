@@ -15,6 +15,7 @@ __status__ = 'Production'
 import bpy
 
 from ....Lib.commonUtils.debugUtils import *
+from ....debug.debug_flags import *
 from .entries import blender_entries
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -122,7 +123,8 @@ def register():
 
     for cls in classes:
         bpy.utils.register_class(cls)
-        log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Registered: {cls.__name__}')
+        if is_verbose(VERBOSE_UI):
+            log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Registered: {cls.__name__}')
 
     log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', 'Registration complete')
 
@@ -132,6 +134,7 @@ def unregister():
 
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-        log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Unregistered: {cls.__name__}')
+        if is_verbose(VERBOSE_UI):
+            log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Unregistered: {cls.__name__}')
 
     log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', 'Unregistration complete')
