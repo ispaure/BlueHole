@@ -67,11 +67,8 @@ def register():
     log(Severity.DEBUG, TOOL_NAME, 'Registering Pie Menus...')
 
     for pie in PIE_MODULES:
-        if is_verbose(VERBOSE_UI):
-            pie.register()
-            log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_name(pie)} Pie Menus')
-        else:
-            pie.register()
+        pie.register()
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_name(pie)} Pie Menus')
 
     log(Severity.DEBUG, TOOL_NAME, 'Registration of Pie Menus completed!')
 
@@ -80,10 +77,7 @@ def unregister():
     log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
 
     for pie in reversed(PIE_MODULES):
-        if is_verbose(VERBOSE_UI):
-            pie.unregister()
-            log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_name(pie)} Pie Menus')
-        else:
-            pie.unregister()
+        pie.unregister()
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_name(pie)} Pie Menus')
 
     log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')
