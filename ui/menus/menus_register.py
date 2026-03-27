@@ -63,7 +63,7 @@ def register():
 
     for module in MENU_MODULES:
         module.register()
-        log(Severity.DEBUG, TOOL_NAME, f'Registered: {_get_module_name(module)}')
+        log(Severity.INFO, TOOL_NAME, f'Registered: {_get_module_name(module)}')
 
     log(Severity.INFO, TOOL_NAME, 'Registration complete')
 
@@ -73,6 +73,6 @@ def unregister():
 
     for module in reversed(MENU_MODULES):
         module.unregister()
-        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {_get_module_name(module)}')
+        log(Severity.INFO, TOOL_NAME, f'Unregistered: {_get_module_name(module)}')
 
     log(Severity.INFO, TOOL_NAME, 'Unregistration complete')

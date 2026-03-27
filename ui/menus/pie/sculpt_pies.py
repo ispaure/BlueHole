@@ -22,7 +22,7 @@ from .entries.blender_sculpt_entries import *
 # ----------------------------------------------------------------------------------------------------------------------
 # CONSTANTS
 
-TOOL_NAME = 'sculpt_pies'
+TOOL_NAME = 'Sculpt'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENUS
@@ -375,20 +375,20 @@ classes = (
 
 
 def register():
-    log(Severity.DEBUG, TOOL_NAME, 'Registering...')
+    log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', 'Registering...')
 
     for cls in classes:
         bpy.utils.register_class(cls)
-        log(Severity.DEBUG, TOOL_NAME, f'Registered: {cls.__name__}')
+        log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Registered: {cls.__name__}')
 
-    log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
+    log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', 'Registration complete')
 
 
 def unregister():
-    log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
+    log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', 'Unregistering...')
 
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {cls.__name__}')
+        log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', f'Unregistered: {cls.__name__}')
 
-    log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')
+    log(Severity.DEBUG, f'{TOOL_NAME} Pie Menus', 'Unregistration complete')
