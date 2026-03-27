@@ -105,8 +105,6 @@ def draw_topbar_mt_file_blue_hole(self, context):
 def register():
     global ORIGINAL_TOPBAR_MT_FILE_DRAW
 
-    print("Registering File menu override...")
-
     if ORIGINAL_TOPBAR_MT_FILE_DRAW is None:
         ORIGINAL_TOPBAR_MT_FILE_DRAW = bpy.types.TOPBAR_MT_file.draw
 
@@ -116,8 +114,6 @@ def register():
 
 def unregister():
     global ORIGINAL_TOPBAR_MT_FILE_DRAW
-
-    print("Unregistering File menu override...")
 
     if ORIGINAL_TOPBAR_MT_FILE_DRAW is not None:
         bpy.types.TOPBAR_MT_file.draw = ORIGINAL_TOPBAR_MT_FILE_DRAW

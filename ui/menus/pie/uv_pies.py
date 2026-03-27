@@ -13,20 +13,17 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-import os
 
 from ....Lib.commonUtils.debugUtils import *
 from ....actions.operator_action import draw_operator_action
 from ....actions.actions import pie_actions
 from .entries import blender_entries
-from .entries.third_party import dreamuv_entries, uvtoolkit_entries, zenuv_entries
-
+from .entries.third_party import uvtoolkit_entries, zenuv_entries
 
 # ----------------------------------------------------------------------------------------------------------------------
-# USER DEFINED SETTINGS
+# CONSTANTS
 
-name = filename = os.path.basename(__file__)
-
+TOOL_NAME = 'uv_pies'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENUS
@@ -174,7 +171,6 @@ class BLUEHOLE_MT_pie_UV_action_uvspecial(bpy.types.Menu):
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
-# Menu classes
 classes = (
     BLUEHOLE_MT_pie_UV_cursor,
     BLUEHOLE_MT_pie_UV_tool,
@@ -185,12 +181,20 @@ classes = (
 
 
 def register():
-    log(Severity.DEBUG, name, 'Registering')
+    log(Severity.DEBUG, TOOL_NAME, 'Registering...')
+
     for cls in classes:
         bpy.utils.register_class(cls)
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {cls.__name__}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
 
 
 def unregister():
-    log(Severity.DEBUG, name, 'Unregistering')
-    for cls in classes:
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
+
+    for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {cls.__name__}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')

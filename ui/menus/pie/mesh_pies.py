@@ -12,7 +12,6 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-import os
 import bpy
 
 from ....Lib.commonUtils.debugUtils import *
@@ -29,12 +28,10 @@ from .entries.third_party import (
     dreamuv_entries,
 )
 
-
 # ----------------------------------------------------------------------------------------------------------------------
-# USER DEFINED SETTINGS
+# CONSTANTS
 
-name = filename = os.path.basename(__file__)
-
+TOOL_NAME = 'mesh_pies'
 
 # ----------------------------------------------------------------------------------------------------------------------
 # PIE MENUS
@@ -361,7 +358,6 @@ class BLUEHOLE_MT_pie_face_action_more(bpy.types.Menu):
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
-# Menu classes
 classes = (
     BLUEHOLE_MT_pie_mesh_hide,
     BLUEHOLE_MT_pie_mesh_tool,
@@ -377,12 +373,20 @@ classes = (
 
 
 def register():
-    log(Severity.DEBUG, name, 'Registering')
+    log(Severity.DEBUG, TOOL_NAME, 'Registering...')
+
     for cls in classes:
         bpy.utils.register_class(cls)
+        log(Severity.DEBUG, TOOL_NAME, f'Registered: {cls.__name__}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Registration complete')
 
 
 def unregister():
-    log(Severity.DEBUG, name, 'Unregistering')
-    for cls in classes:
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistering...')
+
+    for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
+        log(Severity.DEBUG, TOOL_NAME, f'Unregistered: {cls.__name__}')
+
+    log(Severity.DEBUG, TOOL_NAME, 'Unregistration complete')
