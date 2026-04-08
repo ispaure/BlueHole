@@ -41,8 +41,14 @@ class BridgePG(bpy.types.PropertyGroup):
         default='ASSET',
     )
 
+    axis_exp_lst = [('X', 'X', ''), ('Y', 'Y', ''), ('Z', 'Z', ''),
+                    ('-X', '-X', ''), ('-Y', '-Y', ''), ('-Z', '-Z', '')]
+
     # Set Game Engine
-    engine_lst = [('unreal', 'Unreal', ''), ('unity', 'Unity', ''), ('disabled', 'Disabled', '')]
+    engine_lst = [('unreal', 'Unreal', ''),
+                  ('unity', 'Unity', ''),
+                  ('godot', 'Godot', ''),
+                  ('disabled', 'Disabled', '')]
     active_game_engine: EnumProperty(name="Solution",
                                      description="Defines the game engine used for send/export",
                                      items=engine_lst,
@@ -134,8 +140,6 @@ class BridgePG(bpy.types.PropertyGroup):
         default=""
     )
 
-    # ------------------------------------------------------------------------------------------------------------------
-
     # EXPORTS: ASSET HIERARCHIES (UNITY) -------------------------------------------------------------------------------
 
     # Unity Assets Path
@@ -166,9 +170,6 @@ class BridgePG(bpy.types.PropertyGroup):
     unity_bridge_include_animation: BoolProperty(name='When enabled, includes animation in export.',
                                                  default=False)
 
-    axis_exp_lst = [('X', 'X', ''), ('Y', 'Y', ''), ('Z', 'Z', ''),
-                    ('-X', '-X', ''), ('-Y', '-Y', ''), ('-Z', '-Z', '')]
-
     # Forward Axis
     unity_forward_axis: EnumProperty(name="Forward Axis",
                                      description="Defines the forward axis upon FBX Export (Unity).",
@@ -179,6 +180,47 @@ class BridgePG(bpy.types.PropertyGroup):
     # Up Axis
     unity_up_axis: EnumProperty(name="Up Axis",
                                 description="Defines the up axis upon FBX Export (Unity).",
+                                items=axis_exp_lst,
+                                default='Y'
+                                )
+
+    # EXPORTS: ASSET HIERARCHIES (GODOT) -------------------------------------------------------------------------------
+
+    # Godot Root Path
+    godot_project_root_path: StringProperty(name='Godot Project\'s Root Path',
+                                            subtype='DIR_PATH',
+                                            description='The Godot Project\'s Root Path. Needs to be set for send to Godot',
+                                            default='DEFAULT_STR')
+
+    godot_project_root_path_mac: StringProperty(name='Godot Project\'s Root Path',
+                                                subtype='DIR_PATH',
+                                                description='The Godot Project\'s Root Path. Needs to be set for send to Godot',
+                                                default='DEFAULT_STR')
+
+    godot_project_root_path_linux: StringProperty(name='Godot Project\'s Root Path',
+                                                  subtype='DIR_PATH',
+                                                  description='The Godot Project\'s Root Path. Needs to be set for send to Godot',
+                                                  default='DEFAULT_STR')
+
+    # Hierarchy Root to 0,0,0
+    godot_bridge_zero_root_transform: BoolProperty(
+        name='When enabled, sets the hierarchy root transforms to 0 upon export.',
+        default=True)
+
+    # Include animation
+    godot_bridge_include_animation: BoolProperty(name='When enabled, includes animation in export.',
+                                                 default=False)
+
+    # Forward Axis
+    godot_forward_axis: EnumProperty(name="Forward Axis",
+                                     description="Defines the forward axis upon GLTF Export (Godot).",
+                                     items=axis_exp_lst,
+                                     default='-Z'
+                                     )
+
+    # Up Axis
+    godot_up_axis: EnumProperty(name="Up Axis",
+                                description="Defines the up axis upon GLTF Export (Godot).",
                                 items=axis_exp_lst,
                                 default='Y'
                                 )
@@ -326,6 +368,56 @@ def draw(preference, context, layout):
                 row.enabled = enable_rows
                 row.prop(preference.bridge, 'unity_forward_axis', text='Forward Axis')
                 row.prop(preference.bridge, 'unity_up_axis', text='Up Axis')
+
+            # -----------------------------------------------------------------------------------------
+            # GODOT
+            # -----------------------------------------------------------------------------------------
+            case 'godot':
+                box = layout.box()
+                column = box.column()
+
+                # Source Content paths (per-OS)
+                match get_os():
+                    case OS.WIN:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_alternate', text='Source Content (Alternate)')
+
+                    case OS.MAC:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_mac', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_mac_alternate', text='Source Content (Alternate)')
+
+                    case OS.LINUX:
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_linux', text='Source Content')
+                        row = column.row(); row.enabled = enable_rows
+                        row.prop(preference.bridge, 'sc_path_linux_alternate', text='Source Content (Alternate)')
+
+                # Godot Project Root Path (per-OS)
+                row = column.row()
+                row.enabled = enable_rows
+                match get_os():
+                    case OS.WIN:
+                        row.prop(preference.bridge, 'godot_project_root_path', text='Godot Project Root')
+                    case OS.MAC:
+                        row.prop(preference.bridge, 'godot_project_root_path_mac', text='Godot Project Root')
+                    case OS.LINUX:
+                        row.prop(preference.bridge, 'godot_project_root_path_linux', text='Godot Project Root')
+
+                # Export behavior
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'godot_bridge_zero_root_transform', text='Zero Root Transform on Export')
+                row.prop(preference.bridge, 'godot_bridge_include_animation', text='Include Animation')
+
+                # Axis conversion
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'godot_forward_axis', text='Forward Axis')
+                row.prop(preference.bridge, 'godot_up_axis', text='Up Axis')
 
             case _:
                 pass
