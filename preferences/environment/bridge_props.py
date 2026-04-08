@@ -58,7 +58,7 @@ class BridgePG(bpy.types.PropertyGroup):
     sc_path: StringProperty(name='Source Content Root Path',
                             subtype='DIR_PATH',
                             description='Root Directory in which all Source Content Asset Directory Structures '
-                                        'reside. \nNeeds to be set for Send to Unreal & Send to Unity',
+                                        'reside. \nNeeds to be set for Send to Unreal, Unity or Godot',
                             default='<Define Path Here>')
 
     sc_path_alternate: StringProperty(name='Source Content Root Path (Alternate)',
@@ -70,7 +70,7 @@ class BridgePG(bpy.types.PropertyGroup):
     sc_path_mac: StringProperty(name='Source Content Root Path',
                                 subtype='DIR_PATH',
                                 description='Root Directory in which all Source Content Asset Directory Structures '
-                                            'reside. \nNeeds to be set for Send to Unreal & Send to Unity',
+                                            'reside. \nNeeds to be set for Send to Unreal, Unity or Godot',
                                 default='<Define Path Here>')
 
     sc_path_mac_alternate: StringProperty(name='Source Content Root Path (Alternate)',
@@ -82,7 +82,7 @@ class BridgePG(bpy.types.PropertyGroup):
     sc_path_linux: StringProperty(name='Source Content Root Path',
                                   subtype='DIR_PATH',
                                   description='Root Directory in which all Source Content Asset Directory Structures '
-                                              'reside. \nNeeds to be set for Send to Unreal & Send to Unity',
+                                              'reside. \nNeeds to be set for Send to Unreal, Unity or Godot',
                                   default='<Define Path Here>')
 
     sc_path_linux_alternate: StringProperty(name='Source Content Root Path (Alternate)',
