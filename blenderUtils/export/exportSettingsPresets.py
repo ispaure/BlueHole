@@ -32,6 +32,7 @@ from .exportSettings import *
 class ExportSettingsPreset(Enum):
     UNREAL = "Unreal"
     UNITY = "Unity"
+    GODOT = "Godot"
 
 
 def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
@@ -96,6 +97,33 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
 
                 # ENGINE
                 engine=Engine.UNREAL,
+            )
+
+        case ExportSettingsPreset.GODOT:
+            export_settings = ExportSettings(
+                # NAME
+                name="Godot",
+
+                # EXPORT OPTIONS
+                exp_format=prefs().bridge.godot_export_format.upper(),
+                exp_dir=projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_final),
+                zero_root_transform=prefs().bridge.godot_bridge_zero_root_transform,
+
+                # INCLUDED ELEMENTS
+                include_render=prefs().container.create_element_render,
+                include_collision=prefs().container.create_element_collision,
+                include_socket=prefs().container.create_element_sockets,
+
+                # FBX SPECIFIC OPTIONS
+                axis_up=prefs().bridge.godot_up_axis,
+                axis_fwd=prefs().bridge.godot_forward_axis,
+                mesh_smooth_type="OFF",
+                bake_anim=prefs().bridge.godot_bridge_include_animation,
+                apply_scale_options="FBX_SCALE_UNITS",
+                rename_collisions_for_ue=False,
+
+                # ENGINE
+                engine=Engine.GODOT,
             )
 
         case _:

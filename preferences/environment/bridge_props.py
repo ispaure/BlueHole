@@ -202,6 +202,12 @@ class BridgePG(bpy.types.PropertyGroup):
                                                   description='The Godot Project\'s Root Path. Needs to be set for send to Godot',
                                                   default='DEFAULT_STR')
 
+    # Set Export Format
+    godot_export_format: EnumProperty(name="Export Format",
+                                      description="Defines the export format used for send/export",
+                                      items=[('fbx', 'FBX', ''), ('gltf', 'GLTF', '')],
+                                      default='gltf')
+
     # Hierarchy Root to 0,0,0
     godot_bridge_zero_root_transform: BoolProperty(
         name='When enabled, sets the hierarchy root transforms to 0 upon export.',
@@ -407,19 +413,31 @@ def draw(preference, context, layout):
                     case OS.LINUX:
                         row.prop(preference.bridge, 'godot_project_root_path_linux', text='Godot Project Root')
 
-                # Export behavior
+                # Format
                 row = column.row()
                 row.enabled = enable_rows
-                row.prop(preference.bridge, 'godot_bridge_zero_root_transform', text='Zero Root Transform on Export')
-                row.prop(preference.bridge, 'godot_bridge_include_animation', text='Include Animation')
+                row.prop(preference.bridge, 'godot_export_format', text='Godot Export Format')
 
-                # Axis conversion
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.bridge, 'godot_forward_axis', text='Forward Axis')
-                row.prop(preference.bridge, 'godot_up_axis', text='Up Axis')
+                # Export Settings (Related to Format)
+                match prefs().bridge.godot_export_format:
+                    case 'fbx':
+                        # Export behavior
+                        row = column.row()
+                        row.enabled = enable_rows
+                        row.prop(preference.bridge, 'godot_bridge_zero_root_transform', text='Zero Root Transform on Export')
+                        row.prop(preference.bridge, 'godot_bridge_include_animation', text='Include Animation')
+
+                        # Axis conversion
+                        row = column.row()
+                        row.enabled = enable_rows
+                        row.prop(preference.bridge, 'godot_forward_axis', text='Forward Axis')
+                        row.prop(preference.bridge, 'godot_up_axis', text='Up Axis')
+
+                    case 'gltf':
+                        row.prop(preference.bridge, 'godot_bridge_include_animation', text='Include Animation')
 
             case _:
+                # No valid engine selected.
                 pass
 
     # -------------------------------------------------------------------------------------------------
