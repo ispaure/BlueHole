@@ -55,17 +55,13 @@ This allows teams to:
 
 Blue Hole simplifies sending assets from Blender into game engines.
 
-### Unity Bridge
+### Game Engine Bridges (Unreal, Unity & Godot)
 
-Send assets directly from Blender to Unity while preserving:
+Send assets directly from Blender to Game Engines while preserving:
 
-- folder structure
-- export settings
-- transform rules
-
-### Unreal Engine Bridge
-
-Export assets optimized for Unreal Engine pipelines with configurable options.
+- Folder Structure
+- Export Settings
+- Transform Rules
 
 ---
 

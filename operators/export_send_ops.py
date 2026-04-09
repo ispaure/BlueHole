@@ -151,6 +151,7 @@ class BH_OT_export_containers(bpy.types.Operator):
         items=[
             ('UNREAL', "Unreal", "Use Unreal export preset"),
             ('UNITY', "Unity", "Use Unity export preset"),
+            ('GODOT', "Godot", "Use Godot export preset")
         ],
         default='UNREAL',
     )
@@ -229,6 +230,8 @@ class BH_OT_export_containers(bpy.types.Operator):
                 preset = ExportSettingsPreset.UNREAL
             case 'UNITY':
                 preset = ExportSettingsPreset.UNITY
+            case 'GODOT':
+                preset = ExportSettingsPreset.GODOT
             case _:
                 log(Severity.CRITICAL, self.bl_idname, 'Invalid Value on "Export Preset" Parameter')
                 return {'CANCELLED'}

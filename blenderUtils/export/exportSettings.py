@@ -28,6 +28,7 @@ from pathlib import Path
 class Engine(Enum):
     UNREAL = "Unreal"
     UNITY = "Unity"
+    GODOT = "Godot"
     UNDEFINED = "Undefined"
 
 

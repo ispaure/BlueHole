@@ -146,6 +146,22 @@ class OpenUnityAssetsPath(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class OpenGodotProjectRootPath(bpy.types.Operator):
+
+    bl_idname = "wm.bh_dir_open_godot_project_root_dir"
+    bl_label = 'Open GODOT PROJECT ROOT Folder'
+    bl_description = 'Opens Godot\'s Project Root Folder, as specified in the active environment\'s settings.'
+
+    def execute(self, context):
+        godot_project_root_path = {
+            OS.WIN: prefs().bridge.godot_project_root_path,
+            OS.MAC: prefs().bridge.godot_project_root_path_mac,
+            OS.LINUX: prefs().bridge.godot_project_root_path_linux
+        }
+        fileUtils.open_dir_path(godot_project_root_path[get_os()])
+        return {'FINISHED'}
+
+
 class OpenUnityAssetsCurrentExportPath(bpy.types.Operator):
 
     bl_idname = "wm.bh_dir_open_unity_assets_current_exp_dir"
@@ -168,6 +184,29 @@ class OpenUnityAssetsCurrentExportPath(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class OpenGodotCurrentExportPath(bpy.types.Operator):
+
+    bl_idname = "wm.bh_dir_open_godot_current_exp_dir"
+    bl_label = 'Open GODOT CURRENT EXPORT Folder'
+    bl_description = 'Opens Godot Project\'s Path to the folder used for export.'
+
+    def execute(self, context):
+        result = filterUtils.check_tests('Open Directory',
+                                         check_blend_exist=True,
+                                         check_blend_loc_in_dir_structure=True,
+                                         check_source_content_root_path_exist=True,
+                                         check_blend_in_source_content=True,
+                                         check_godot_project_root_path_exist=True)
+        if not result:
+            return False
+        else:
+            godot_exp_dir_path = envPathResolver.get_godot_exp_dir_path()
+            if godot_exp_dir_path:
+                fileUtils.open_dir_path(str(godot_exp_dir_path))
+        return {'FINISHED'}
+
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -181,7 +220,9 @@ classes = (OpenFinalFolder,
            OpenUserResourcePath,
            OpenSourceContentPath,
            OpenUnityAssetsPath,
-           OpenUnityAssetsCurrentExportPath
+           OpenGodotProjectRootPath,
+           OpenUnityAssetsCurrentExportPath,
+           OpenGodotCurrentExportPath
            )
 
 

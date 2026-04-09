@@ -92,6 +92,32 @@ def get_valid_unity_asset_dir_path(quiet: bool = False) -> Optional[Path]:
     return None
 
 
+def get_valid_godot_project_dir_path(quiet: bool = False) -> Optional[Path]:
+    """
+    Attempt to get a valid Godot Project Root Path from the current Blue Hole settings, regardless of OS.
+    """
+    path_def = 'Godot Project Root'
+
+    match get_os():
+        case OS.WIN:
+            godot_project_root_path = prefs().bridge.godot_project_root_path
+        case OS.MAC:
+            godot_project_root_path = prefs().bridge.godot_project_root_path_mac
+        case OS.LINUX:
+            godot_project_root_path = prefs().bridge.godot_project_root_path_linux
+
+    result = get_dir_path_if_valid(path_def, godot_project_root_path, quiet)
+    if result:
+        return result
+
+    error_msg = (
+        f'Unable to find a valid {path_def} Path in Blue Hole settings, which is required for the '
+        'bridge to Godot. See log for more details.'
+    )
+    log(Severity.CRITICAL, env_tool_name, error_msg, popup=not quiet)
+    return None
+
+
 def get_unity_exp_dir_path(quiet: bool = False) -> Optional[Path]:
     """
     Get the Unity export path within the Assets folder so it mirrors the Source Content path.
@@ -117,5 +143,32 @@ def get_unity_exp_dir_path(quiet: bool = False) -> Optional[Path]:
     blend_dir_path = blend_dir_path.replace('\\', '/')
 
     exp_dir = blend_dir_path.replace(sc_path_str, unity_asset_path_str)
+
+    return Path(exp_dir)
+
+
+def get_godot_exp_dir_path(quiet: bool = False) -> Optional[Path]:
+    """
+    Get the Godot export path within the Assets folder so it mirrors the Source Content path.
+    """
+    blend_dir_path = blenderFile.get_blend_directory_path()
+
+    sc_path = get_valid_source_content_path()
+    if not sc_path:
+        return None
+    else:
+        sc_path_str = str(sc_path)
+
+    godot_root_path = get_valid_godot_project_dir_path(quiet)
+    if not godot_root_path:
+        return None
+    else:
+        godot_root_path_str = str(godot_root_path)
+
+    sc_path_str = sc_path_str.replace('\\', '/')
+    godot_root_path_str = godot_root_path_str.replace('\\', '/')
+    blend_dir_path = blend_dir_path.replace('\\', '/')
+
+    exp_dir = blend_dir_path.replace(sc_path_str, godot_root_path_str)
 
     return Path(exp_dir)

@@ -22,6 +22,8 @@ from .model import Setting
 
 
 bridge_setting_lst = (
+
+    # Source Content
     Setting(pref_path='bridge.sc_path', ini_section='SourceContent', ini_value='sc_root_path', var_type=str),
     Setting(pref_path='bridge.sc_path_alternate', ini_section='SourceContent', ini_value='sc_root_path_alternate', var_type=str),
     Setting(pref_path='bridge.sc_path_mac', ini_section='SourceContent', ini_value='sc_root_path_mac', var_type=str),
@@ -29,14 +31,29 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.sc_path_linux', ini_section='SourceContent', ini_value='sc_root_path_linux', var_type=str),
     Setting(pref_path='bridge.sc_path_linux_alternate', ini_section='SourceContent', ini_value='sc_root_path_linux_alternate', var_type=str),
 
+    # Game Engine: Unity
     Setting(pref_path='bridge.unity_assets_path', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path', var_type=str),
     Setting(pref_path='bridge.unity_assets_path_mac', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path_mac', var_type=str),
     Setting(pref_path='bridge.unity_assets_path_linux', ini_section='SendAssetHierarchiesToUnity', ini_value='unity_assets_path_linux', var_type=str),
     Setting(pref_path='bridge.unity_forward_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='forward_axis', var_type=str),
     Setting(pref_path='bridge.unity_up_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='up_axis', var_type=str),
+    Setting(pref_path='bridge.unity_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnity', ini_value='zero_root_transform', var_type=bool),
+    Setting(pref_path='bridge.unity_bridge_include_animation', ini_section='SendAssetHierarchiesToUnity', ini_value='include_animation', var_type=bool),
 
+    # Game Engine: Godot
+    Setting(pref_path='bridge.godot_project_root_path', ini_section='SendAssetHierarchiesToGodot', ini_value='godot_project_root_path', var_type=str),
+    Setting(pref_path='bridge.godot_project_root_path_mac', ini_section='SendAssetHierarchiesToGodot', ini_value='godot_project_root_path_mac', var_type=str),
+    Setting(pref_path='bridge.godot_project_root_path_linux', ini_section='SendAssetHierarchiesToGodot', ini_value='godot_project_root_path_linux', var_type=str),
+    Setting(pref_path='bridge.godot_export_format', ini_section='SendAssetHierarchiesToGodot', ini_value='export_format', var_type=str),
+    Setting(pref_path='bridge.godot_forward_axis', ini_section='SendAssetHierarchiesToGodot', ini_value='forward_axis', var_type=str),
+    Setting(pref_path='bridge.godot_up_axis', ini_section='SendAssetHierarchiesToGodot', ini_value='up_axis', var_type=str),
+    Setting(pref_path='bridge.godot_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToGodot', ini_value='zero_root_transform', var_type=bool),
+    Setting(pref_path='bridge.godot_bridge_include_animation', ini_section='SendAssetHierarchiesToGodot', ini_value='include_animation', var_type=bool),
+
+    # FBX Exports (Loose)
     Setting(pref_path='bridge.exp_select_zero_root_transform', ini_section='ExportBatchSelectionToFBX', ini_value='zero_root_transform', var_type=bool),
 
+    # Game Engine: Unreal
     Setting(pref_path='bridge.ue_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnreal', ini_value='zero_root_transform', var_type=bool),
     Setting(pref_path='bridge.ue_bridge_include_animation', ini_section='SendAssetHierarchiesToUnreal', ini_value='include_animation', var_type=bool),
     Setting(pref_path='bridge.ue_automated', ini_section='SendAssetHierarchiesToUnreal', ini_value='is_automated', var_type=bool),
@@ -45,9 +62,7 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.ue_enable_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_send_override', var_type=bool),
     Setting(pref_path='bridge.ue_op_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_send_override', var_type=str),
 
-    Setting(pref_path='bridge.unity_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnity', ini_value='zero_root_transform', var_type=bool),
-    Setting(pref_path='bridge.unity_bridge_include_animation', ini_section='SendAssetHierarchiesToUnity', ini_value='include_animation', var_type=bool),
-
+    # Selected Game Engine
     Setting(pref_path='bridge.active_game_engine', ini_section='Engine', ini_value='active_game_engine', var_type=str),
 )
 
