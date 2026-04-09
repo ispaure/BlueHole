@@ -106,7 +106,7 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
 
                 # EXPORT OPTIONS
                 exp_format=prefs().bridge.godot_export_format.upper(),
-                exp_dir=projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_final),
+                exp_dir=envPathResolver.get_godot_exp_dir_path(),
                 zero_root_transform=prefs().bridge.godot_bridge_zero_root_transform,
 
                 # INCLUDED ELEMENTS

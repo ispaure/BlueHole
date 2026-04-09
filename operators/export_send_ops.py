@@ -151,6 +151,7 @@ class BH_OT_export_containers(bpy.types.Operator):
         items=[
             ('UNREAL', "Unreal", "Use Unreal export preset"),
             ('UNITY', "Unity", "Use Unity export preset"),
+            ('GODOT', "Godot", "Use Godot export preset")
         ],
         default='UNREAL',
     )
