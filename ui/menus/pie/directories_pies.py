@@ -48,6 +48,8 @@ class BLUEHOLE_MT_pie_global_dirs(bpy.types.Menu):
                 addon_entries.open_source_content(pie)
             case 'unity':
                 addon_entries.open_unity_assets(pie)
+            case 'godot':
+                addon_entries.open_godot_export_path(pie)
             case 'disabled':
                 pie.separator()
         # 2 - BOTTOM

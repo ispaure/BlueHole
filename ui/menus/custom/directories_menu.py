@@ -54,7 +54,7 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
             )
 
         # ENGINE
-        if prefs().bridge.active_game_engine in ['unreal', 'unity']:
+        if prefs().bridge.active_game_engine in ['unreal', 'unity', 'godot']:
             if os.path.exists(prefs().bridge.sc_path) or os.path.exists(prefs().bridge.sc_path_alternate) or os.path.exists(prefs().bridge.sc_path_mac) or os.path.exists(prefs().bridge.sc_path_mac_alternate) or os.path.exists(prefs().bridge.sc_path_linux) or os.path.exists(prefs().bridge.sc_path_linux_alternate):
                 layout.separator()
                 show_label('ENGINE', layout)
@@ -62,6 +62,9 @@ class BLUE_HOLE_MT_directories(bpy.types.Menu):
             if prefs().bridge.active_game_engine == 'unity':
                 if os.path.exists(prefs().bridge.unity_assets_path) or os.path.exists(prefs().bridge.unity_assets_path_mac) or os.path.exists(prefs().bridge.unity_assets_path_linux):
                     layout.operator(directory_ops.OpenUnityAssetsPath.bl_idname, icon='FILE_FOLDER')
+            if prefs().bridge.active_game_engine == 'godot':
+                if os.path.exists(prefs().bridge.godot_project_root_path) or os.path.exists(prefs().bridge.godot_project_root_path_mac) or os.path.exists(prefs().bridge.godot_project_root_path_linux):
+                    layout.operator(directory_ops.OpenGodotProjectRootPath.bl_idname, icon='FILE_FOLDER')
 
         # SOURCE CONTROL
         if prefs().sourcecontrol.source_control_enable:

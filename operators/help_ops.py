@@ -105,6 +105,17 @@ class SendToUnrealDoc(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class SendToGodotDoc(bpy.types.Operator):
+
+    bl_idname = "wm.bh_send_godot_doc"
+    bl_label = '【 Engine: GODOT 】'
+    bl_description = 'Opens the documentation for the Blender to Godot Bridge'
+
+    def execute(self, context):
+        open_url(configUtils.config_section_map(blenderFile.get_url_cfg_path(), 'Tutorial', 'godot_bridge'))
+        return {'FINISHED'}
+
+
 class PerforceDoc(bpy.types.Operator):
 
     bl_idname = "wm.bh_perforce_doc"
@@ -127,6 +138,7 @@ classes = (OpenGuide,
            JoinBHDiscord,
            SendToUnityDoc,
            SendToUnrealDoc,
+           SendToGodotDoc,
            PerforceDoc)
 
 

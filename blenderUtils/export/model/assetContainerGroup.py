@@ -86,6 +86,8 @@ class AssetContainerGroup(ContainerGroup):
 
         check_unity_assets_path_exist = self.export_settings.engine == Engine.UNITY and send
 
+        check_godot_root_path_exist = self.export_settings.engine == Engine.GODOT and send
+
         chk_result = filterUtils.check_tests(
             self.CONTAINERS_NAME,
             check_blend_exist=True,
@@ -93,6 +95,7 @@ class AssetContainerGroup(ContainerGroup):
             check_source_content_root_path_exist=check_source_content_root_path_exist,
             check_blend_in_source_content=check_blend_in_source_content,
             check_unity_assets_path_exist=check_unity_assets_path_exist,
+            check_godot_project_root_path_exist=check_godot_root_path_exist,
         )
         return chk_result
 
