@@ -149,6 +149,10 @@ def open_unity_assets(pie):
     pie.operator(directory_ops.OpenUnityAssetsCurrentExportPath.bl_idname, text="Open UNITY ASSETS CURRENT EXPORT Folder", icon='FILEBROWSER')
 
 
+def open_godot_export_path(pie):
+    pie.operator(directory_ops.OpenGodotCurrentExportPath.bl_idname, text="Open GODOT CURRENT EXPORT Folder", icon='FILEBROWSER')
+
+
 def open_source_content(pie):
     pie.operator(directory_ops.OpenSourceContentPath.bl_idname, text="Open SOURCECONTENT ROOT Folder", icon='FILEBROWSER')
 
@@ -261,6 +265,8 @@ def send_all_asset_containers(pie):
             export_preset = 'UNITY'
         case 'unreal':
             export_preset = 'UNREAL'
+        case 'godot':
+            export_preset = 'GODOT'
         case _:
             col = pie.column()
             col.enabled = False
@@ -322,12 +328,14 @@ def send_selected_asset_containers(pie):
             export_preset = 'UNITY'
         case 'unreal':
             export_preset = 'UNREAL'
+        case 'godot':
+            export_preset = 'GODOT'
         case _:
             col = pie.column()
             col.enabled = False
             col.operator(
                 export_send_ops.BH_OT_export_containers.bl_idname,
-                text="Under Environment -> Send & Bridge, Set Engine to Unity or Unreal",
+                text="Under Environment -> Send & Bridge, Set Engine to Unity, Godot or Unreal",
                 icon='ERROR'
             )
             return

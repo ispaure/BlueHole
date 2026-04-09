@@ -44,6 +44,7 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.godot_project_root_path', ini_section='SendAssetHierarchiesToGodot', ini_value='godot_project_root_path', var_type=str),
     Setting(pref_path='bridge.godot_project_root_path_mac', ini_section='SendAssetHierarchiesToGodot', ini_value='godot_project_root_path_mac', var_type=str),
     Setting(pref_path='bridge.godot_project_root_path_linux', ini_section='SendAssetHierarchiesToGodot', ini_value='godot_project_root_path_linux', var_type=str),
+    Setting(pref_path='bridge.godot_export_format', ini_section='SendAssetHierarchiesToGodot', ini_value='export_format', var_type=str),
     Setting(pref_path='bridge.godot_forward_axis', ini_section='SendAssetHierarchiesToGodot', ini_value='forward_axis', var_type=str),
     Setting(pref_path='bridge.godot_up_axis', ini_section='SendAssetHierarchiesToGodot', ini_value='up_axis', var_type=str),
     Setting(pref_path='bridge.godot_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToGodot', ini_value='zero_root_transform', var_type=bool),

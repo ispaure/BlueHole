@@ -63,6 +63,7 @@ def check_tests(script_name, *,
                 check_source_content_root_path_exist=False,
                 check_blend_in_source_content=False,
                 check_unity_assets_path_exist=False,
+                check_godot_project_root_path_exist=False,
                 silent_mode=False
                 ):
     """
@@ -81,6 +82,7 @@ def check_tests(script_name, *,
     :param check_source_content_root_path_exist: Check whether the Source Content Root Path exists.
     :param check_blend_in_source_content: Check whether the Blender file is within Source Content.
     :param check_unity_assets_path_exist: Check whether the Unity project's Assets path exists.
+    :param check_unity_assets_path_exist: Check whether the Godot project's root path exists.
     :param silent_mode: If True, do not show dialog boxes on errors.
     """
 
@@ -203,6 +205,20 @@ def check_tests(script_name, *,
         )
         log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
+    def display_path_error_godot_root(path):
+        msg = (
+            f'{script_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The configured Godot Root Path could not be accessed. The directory may not exist or is not reachable.\n\n'
+            f'What to do:\n'
+            f'Create the directory, or update the Environment Settings to point to your Godot Project\'s Root Path.\n\n'
+            f'Configured Godot Project Path:\n'
+            f'"{path}"\n\n'
+            f'Example Godot Project Path:\n'
+            f'"C:\\YourGodotProject\\"'
+        )
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
     def display_path_error_blend(sc_path_seek, blend_path_found):
         msg = (
             f'{script_name} validation failed.\n\n'
@@ -297,6 +313,14 @@ def check_tests(script_name, *,
 
         if not unity_asset_path:
             display_path_error_unity_assets(unity_asset_path)
+            return False
+
+    # Check that Godot Project Root path exists
+    if check_godot_project_root_path_exist:
+        godot_root_path = envPathResolver.get_valid_godot_project_dir_path()
+
+        if not godot_root_path:
+            display_path_error_godot_root(godot_root_path)
             return False
 
     return True

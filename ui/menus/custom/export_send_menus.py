@@ -59,6 +59,12 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
                     layout.operator(help_ops.SendToUnrealDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
                 else:
                     show_label('Directory: FINAL', layout)
+            case 'godot':
+                export_preset = 'GODOT'
+                if self.SEND:
+                    layout.operator(help_ops.SendToGodotDoc.bl_idname, icon='KEYTYPE_EXTREME_VEC')
+                else:
+                    show_label('Directory: FINAL', layout)
             case _:
                 log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
                 return
@@ -170,6 +176,8 @@ class _BLUE_HOLE_MT_specific_base(bpy.types.Menu):
                 export_preset = 'UNITY'
             case 'unreal':
                 export_preset = 'UNREAL'
+            case 'godot':
+                export_preset = 'GODOT'
             case _:
                 log(Severity.CRITICAL, self.bl_label, 'Unsupported Active Game Engine')
                 return
