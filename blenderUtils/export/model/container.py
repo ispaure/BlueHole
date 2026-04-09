@@ -147,6 +147,8 @@ class Container(ABC):
         file_cls.make_writable()
 
         if self.export_settings.exp_format == 'FBX':
+            msg = f'Exporting ".{self.export_settings.exp_format}" file to "{self.path}"...'
+            log(Severity.INFO, 'Blue Hole Export', msg)
             bpy.ops.export_scene.fbx(
                 filepath=str(self.path),
                 use_selection=True,
@@ -157,11 +159,14 @@ class Container(ABC):
                 apply_scale_options=self.export_settings.apply_scale_options,
                 bake_anim=self.export_settings.bake_anim,
             )
-        elif self.export_settings.exp_format == 'GLTF':
+        elif self.export_settings.exp_format in ['GLTF', 'GLB']:
+            msg = f'Exporting ".{self.export_settings.exp_format}" file to "{self.path}"...'
+            log(Severity.INFO, 'Blue Hole Export', msg)
             bpy.ops.export_scene.gltf(
                 filepath=str(self.path),
                 use_selection=True,
                 export_animations=self.export_settings.bake_anim,
+                export_format='GLTF_SEPARATE' if self.export_settings.exp_format == 'GLTF' else 'GLB'  # Embed all in one file
             )
         else:
             msg = f'Export Format of "{self.export_settings.exp_format}" is not implemented in Blue Hole!'

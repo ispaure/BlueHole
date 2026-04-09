@@ -205,7 +205,7 @@ class BridgePG(bpy.types.PropertyGroup):
     # Set Export Format
     godot_export_format: EnumProperty(name="Export Format",
                                       description="Defines the export format used for send/export",
-                                      items=[('fbx', 'FBX', ''), ('gltf', 'GLTF', '')],
+                                      items=[('fbx', 'FBX', ''), ('gltf', 'GLTF', ''), ('glb', 'GLB', '')],
                                       default='gltf')
 
     # Hierarchy Root to 0,0,0
@@ -433,7 +433,10 @@ def draw(preference, context, layout):
                         row.prop(preference.bridge, 'godot_forward_axis', text='Forward Axis')
                         row.prop(preference.bridge, 'godot_up_axis', text='Up Axis')
 
-                    case 'gltf':
+                    case 'gltf' | 'glb':
+                        row = column.row()
+                        row.enabled = enable_rows
+                        row.prop(preference.bridge, 'godot_bridge_zero_root_transform', text='Zero Root Transform on Export')
                         row.prop(preference.bridge, 'godot_bridge_include_animation', text='Include Animation')
 
             case _:
