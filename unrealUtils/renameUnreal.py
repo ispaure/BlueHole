@@ -41,8 +41,11 @@ def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool:
         display_path_error_source_content(sc_path)
         return False
 
-    old_game_path = str(old_uasset_path).replace(str(sc_path), '/Game')
-    new_game_path = str(new_uasset_path).replace(str(sc_path), '/Game')
+    # Convert Source Content path to Unreal Content path.
+    content_path = sc_path.parent / 'Content'
+
+    old_game_path = str(old_uasset_path).replace(str(content_path), '/Game')
+    new_game_path = str(new_uasset_path).replace(str(content_path), '/Game')
 
     old_game_path = old_game_path.replace('\\', '/').replace('.uasset', '')
     new_game_path = new_game_path.replace('\\', '/').replace('.uasset', '')
