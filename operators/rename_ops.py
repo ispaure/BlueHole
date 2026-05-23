@@ -18,9 +18,13 @@ __status__ = 'Production'
 # Blender
 import bpy
 from typing import List
+from pathlib import Path
 from bpy.props import StringProperty
 from ..Lib.commonUtils.debugUtils import *
+from ..blenderUtils.export import exportSettingsPresets
+from ..blenderUtils.export.model.container import ContainerDummy
 from ..preferences.prefs import prefs
+from ..unrealUtils import renameUnreal
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -111,13 +115,42 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
             log(Severity.ERROR, self.bl_label, msg, popup=True)
             return {'CANCELLED'}
 
-        # Renaming in outliner
+        # ------------------------------------------------------------------------------------------------------------------
+        # Resolve .uasset path (Before)
+
+        export_settings = exportSettingsPresets.get_export_settings(
+            exportSettingsPresets.ExportSettingsPreset.UNREAL
+        )
+
+        container = ContainerDummy(root_obj, export_settings)
+
+        before_uasset_path: Path = container.get_path_uasset()
+
+        # ------------------------------------------------------------------------------------------------------------------
+        # RENAME IN BLENDER
+
+        # Renaming in Outliner
         old_name = root_obj.name
         root_obj.name = self.new_name
 
-        # Renaming in Unreal
-        # TODO:
-        # Send rename command to Unreal here
+        # ------------------------------------------------------------------------------------------------------------------
+        # Resolve .uasset path (After)
+
+        export_settings = exportSettingsPresets.get_export_settings(
+            exportSettingsPresets.ExportSettingsPreset.UNREAL
+        )
+
+        container = ContainerDummy(root_obj, export_settings)
+
+        after_uasset_path: Path = container.get_path_uasset()
+
+        # ------------------------------------------------------------------------------------------------------------------
+        # RENAME IN UE
+
+        renameUnreal.trigger_unreal_rename(before_uasset_path, after_uasset_path)
+
+        # ------------------------------------------------------------------------------------------------------------------
+        # FINAL MESSAGE
 
         msg = (
             f'Renamed "{old_name}" -> "{self.new_name}" in Blender\'s Outliner and in Unreal.\n\n'
