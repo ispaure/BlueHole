@@ -274,30 +274,68 @@ def validate_obj_lst_in_view_layer(obj_lst):
     :param obj_lst: List of objects to validate
     """
     view_layer = bpy.context.view_layer
+    invalid_obj_data = []
 
     for obj in obj_lst:
         if obj.name not in view_layer.objects:
             collections = [col.name for col in obj.users_collection]
 
-            msg = (
-                f'Object validation failed.\n\n'
-                f'What went wrong:\n'
-                f'The object "{obj.name}" is part of the export list, but it is not in the active View Layer '
-                f'"{view_layer.name}".\n\n'
-                f'Object information:\n'
-                f'- Object: "{obj.name}"\n'
-                f'- Type: "{obj.type}"\n'
-                f'- Scene: "{bpy.context.scene.name}"\n'
-                f'- Active View Layer: "{view_layer.name}"\n'
-                f'- Collections: "{collections}"\n\n'
-                f'Why this can happen:\n'
-                f'The object may be inside a collection excluded from the active View Layer, '
-                f'or it may belong to another scene/view layer setup.\n\n'
-                f'Export aborted before modifying scene state.'
-            )
+            invalid_obj_data.append({
+                'name': obj.name,
+                'type': obj.type,
+                'collections': collections,
+                'is_stale': not collections,
+            })
 
-            log(Severity.ERROR, 'Object Validation', msg, popup=True)
-            raise RuntimeError(msg)
+    if not invalid_obj_data:
+        return
+
+    invalid_obj_lines = []
+
+    for obj_data in invalid_obj_data:
+        collections = obj_data['collections']
+        collections_str = ', '.join(collections) if collections else 'None / stale object not linked to any collection'
+
+        invalid_obj_lines.append(
+            f'- Object: "{obj_data["name"]}"\n'
+            f'  Type: "{obj_data["type"]}"\n'
+            f'  Collections: "{collections_str}"'
+        )
+
+    stale_count = sum(1 for obj_data in invalid_obj_data if obj_data['is_stale'])
+
+    msg = (
+        f'Object validation failed.\n\n'
+        f'What went wrong:\n'
+        f'{len(invalid_obj_data)} object(s) are part of the export list, but are not in the active View Layer '
+        f'"{view_layer.name}".\n\n'
+        f'Object information:\n'
+        f'- Scene: "{bpy.context.scene.name}"\n'
+        f'- Active View Layer: "{view_layer.name}"\n\n'
+        f'Invalid object(s):\n'
+        f'{chr(10).join(invalid_obj_lines)}\n\n'
+        f'Why this can happen:\n'
+    )
+
+    if stale_count:
+        msg += (
+            f'{stale_count} object(s) appear to be stale because they are not linked to any collection. '
+            f'This can happen when an object was removed from the scene hierarchy, but a Python/export reference '
+            f'to it still exists.\n\n'
+            f'How to fix stale objects:\n'
+            f'In the Outliner, change the display mode to "Blender File", find the stale object under Objects, '
+            f'and delete it from the file.\n\n'
+        )
+
+    msg += (
+        f'Other possible causes:\n'
+        f'An object may be inside a collection excluded from the active View Layer, '
+        f'or it may belong to another scene/view layer setup.\n\n'
+        f'Export aborted before modifying scene state.'
+    )
+
+    log(Severity.ERROR, 'Object Validation', msg, popup=True)
+    raise RuntimeError(msg)
 
 
 def select_obj_lst(obj_lst):

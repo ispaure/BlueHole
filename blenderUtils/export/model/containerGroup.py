@@ -79,7 +79,9 @@ class ContainerGroup(ABC):
 
         # Export containers
         for container in self.container_lst:
-            container.export_proc()
+            success: bool = container.export_proc()
+            if not success:
+                continue
 
             if send and self.export_settings.engine == Engine.UNREAL:
 
