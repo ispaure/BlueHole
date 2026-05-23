@@ -19,7 +19,7 @@ from pathlib import Path
 
 from ..Lib.commonUtils.debugUtils import *
 from ..Lib.send2ue.dependencies import remote_execution
-from ..wrappers.sourceContentPath import get_valid_source_content_path
+from ..wrappers.sourceContentPath import get_valid_source_content_path, display_path_error_source_content
 from . import communicateUnreal
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -38,13 +38,11 @@ def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool:
     sc_path = get_valid_source_content_path()
 
     if not sc_path:
-        communicateUnreal.display_cannot_connect_unreal_error()
+        display_path_error_source_content(sc_path)
         return False
 
-    content_path = sc_path.parent / 'Content'
-
-    old_game_path = str(old_uasset_path).replace(str(content_path), '/Game')
-    new_game_path = str(new_uasset_path).replace(str(content_path), '/Game')
+    old_game_path = str(old_uasset_path).replace(str(sc_path), '/Game')
+    new_game_path = str(new_uasset_path).replace(str(sc_path), '/Game')
 
     old_game_path = old_game_path.replace('\\', '/').replace('.uasset', '')
     new_game_path = new_game_path.replace('\\', '/').replace('.uasset', '')

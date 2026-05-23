@@ -262,3 +262,15 @@ def get_valid_source_content_path() -> Optional[Path]:
            'Set a valid Source Content path in Blue Hole preferences.')
     log(Severity.ERROR, SC_PATH_SEARCH_TOOL_NAME, msg)
     return None
+
+
+def display_path_error_source_content(path):
+    """ Display an error messaging prompting the user to set a proper source content path. """
+    err_msg = (
+        f'What went wrong:\n'
+        f'The Source Content directory path set in the environment settings does not exist.\n\n'
+        f'What to do:\n'
+        f'Update the environment setting to point to your project\'s Source Content folder.\n\n'
+        f'Configured Source Content Path: "{path}"'
+    )
+    log(Severity.CRITICAL, 'Source Content', err_msg, popup=True)
