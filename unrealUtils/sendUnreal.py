@@ -16,18 +16,17 @@ __status__ = 'Production'
 # IMPORTS
 
 from pathlib import Path
-import time
 
 from ..Lib.commonUtils.debugUtils import *
 from ..Lib.send2ue.dependencies import remote_execution
 from ..preferences.prefs import *
 from ..wrappers.sourceContentPath import get_valid_source_content_path
-from . import blenderFile, filterUtils
+from ..blenderUtils import blenderFile, filterUtils
+from . import communicateUnreal
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
 
-unreal_response = ''
 send_ue_name = 'Blue Hole Bridge to Unreal'
 
 
@@ -96,19 +95,6 @@ def trigger_unreal_import(file_path_source):
     return True
 
 
-def display_cannot_connect_unreal_error():
-    msg = (
-        f'{send_ue_name} connection failed.\n\n'
-        f'What went wrong:\n'
-        f'Blender could not establish communication with Unreal Editor.\n\n'
-        f'What to do:\n'
-        f'Ensure Unreal Editor is open with a project loaded, and verify that the Blue Hole Unreal Bridge '
-        f'is properly installed and configured. See Blue Hole website for details.\n\n'
-        f'Perforce operation aborted.'
-    )
-    log(Severity.CRITICAL, send_ue_name, msg, popup=True)
-
-
 def import_asset(file_path_source, file_path_dest):
     """
     Import an asset into Unreal.
@@ -132,7 +118,7 @@ def import_asset(file_path_source, file_path_dest):
     file_path_dest = file_path_dest.replace('\\', '/')
     file_path_dest = file_path_dest[0:-len(file_path_dest.split('/')[-1])]
 
-    run_unreal_python_commands(
+    communicateUnreal.run_unreal_python_commands(
         remote_exec,
         '\n'.join([
             f'import_task = unreal.AssetImportTask()',
@@ -185,39 +171,9 @@ def import_asset(file_path_source, file_path_dest):
         ])
     )
 
-    if unreal_response:
-        if unreal_response['result'] != 'None':
-            display_cannot_connect_unreal_error()
+    if communicateUnreal.unreal_response:
+        if communicateUnreal.unreal_response['result'] != 'None':
+            communicateUnreal.display_cannot_connect_unreal_error()
             return False
-
-    return True
-
-
-def run_unreal_python_commands(remote_exec, commands, failed_connection_attempts=0):
-    """
-    Find the open Unreal Editor with remote connection enabled and send it Python commands.
-
-    :param remote_exec: A RemoteExecution instance
-    :param commands: A formatted string of Python commands to run in the engine
-    :param failed_connection_attempts: Counter tracking how many connection attempts were made
-    """
-    time.sleep(0.1)
-
-    try:
-        for node in remote_exec.remote_nodes:
-            remote_exec.open_command_connection(node.get("node_id"))
-
-        if remote_exec.has_command_connection():
-            global unreal_response
-            unreal_response = remote_exec.run_command(commands, unattended=False)
-        else:
-            if failed_connection_attempts < 10:
-                run_unreal_python_commands(remote_exec, commands, failed_connection_attempts + 1)
-            else:
-                remote_exec.stop()
-                display_cannot_connect_unreal_error()
-                return False
-    finally:
-        remote_exec.stop()
 
     return True

@@ -15,6 +15,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+from typing import Optional
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from ..exportSettings import Engine, ExportSettings
 from ... import objectUtils, sceneUtils
 from ....Lib.commonUtils import fileUtils
 from ....Lib.commonUtils.debugUtils import *
+from ....wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -46,6 +48,26 @@ class Container(ABC):
         exp_dir = self.export_settings.exp_dir
         exp_name_incl_ext = f'{self.name}.{self.export_settings.exp_format.lower()}'
         return Path(exp_dir, exp_name_incl_ext)
+
+    def get_path_uasset(self) -> Optional[Path]:
+
+        if self.export_settings.engine != Engine.UNREAL:
+            return None
+
+        source_content_path: Optional[Path] = get_valid_source_content_path()
+
+        if source_content_path is None:
+            return None
+
+        content_path = source_content_path.parent / 'Content'
+
+        if not content_path.is_dir():
+            return None
+
+        relative_path = self.path.relative_to(source_content_path)
+
+        return (content_path / relative_path).with_suffix('.uasset')
+
 
     def __get_name(self) -> str:
         name = objectUtils.get_obj_name(self.root)
@@ -210,3 +232,15 @@ class Container(ABC):
         )
 
         log(Severity.CRITICAL, f'{self.CONTAINER_NAME}: {name}', msg, popup=True)
+
+
+class ContainerDummy(Container):
+    """ Simple container that doesn't throw on initialization. Not meant for export, just simple queries """
+    def __init__(self, root, export_settings):
+        super().__init__(root, export_settings)
+
+    def _get_obj_lst(self):
+        return None  # Don't need anything specific
+
+    def _rename_before_export(self):
+        return None  # Don't need anything specific
