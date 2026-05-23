@@ -310,8 +310,7 @@ def validate_obj_lst_in_view_layer(obj_lst):
         f'{len(invalid_obj_data)} object(s) are part of the export list, but are not in the active View Layer '
         f'"{view_layer.name}".\n\n'
         f'Object information:\n'
-        f'- Scene: "{bpy.context.scene.name}"\n'
-        f'- Active View Layer: "{view_layer.name}"\n\n'
+        f'- Scene: "{bpy.context.scene.name}"\n\n'
         f'Invalid object(s):\n'
         f'{chr(10).join(invalid_obj_lines)}\n\n'
         f'Why this can happen:\n'
@@ -320,11 +319,11 @@ def validate_obj_lst_in_view_layer(obj_lst):
     if stale_count:
         msg += (
             f'{stale_count} object(s) appear to be stale because they are not linked to any collection. '
-            f'This can happen when an object was removed from the scene hierarchy, but a Python/export reference '
+            f'This can happen when an object was removed from the scene hierarchy, but a reference '
             f'to it still exists.\n\n'
             f'How to fix stale objects:\n'
-            f'In the Outliner, change the display mode to "Blender File", find the stale object under Objects, '
-            f'and delete it from the file.\n\n'
+            f'In the Outliner, change the display mode to "Blender File", find the stale object '
+            f'(can search by name), and delete it from the file.\n\n'
         )
 
     msg += (
