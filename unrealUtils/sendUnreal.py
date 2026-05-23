@@ -20,7 +20,7 @@ from pathlib import Path
 from ..Lib.commonUtils.debugUtils import *
 from ..Lib.send2ue.dependencies import remote_execution
 from ..preferences.prefs import *
-from ..wrappers.sourceContentPath import get_valid_source_content_path
+from ..wrappers.sourceContentPath import get_valid_source_content_path, display_path_error_source_content
 from ..blenderUtils import blenderFile, filterUtils
 from . import communicateUnreal
 
@@ -36,17 +36,6 @@ def trigger_unreal_import(file_path_source):
 
     :param file_path_source: Source file to import
     """
-
-    def display_path_error_source_content(path):
-        err_msg = (
-            f'{send_ue_name} validation failed.\n\n'
-            f'What went wrong:\n'
-            f'The Source Content directory path set in the environment settings does not exist.\n\n'
-            f'What to do:\n'
-            f'Update the environment setting to point to your project\'s Source Content folder.\n\n'
-            f'Configured Source Content Path: "{path}"'
-        )
-        log(Severity.CRITICAL, send_ue_name, err_msg, popup=True)
 
     def display_path_error_blend(sc_path, blend_path):
         err_msg = (
