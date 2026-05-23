@@ -18,7 +18,8 @@ __status__ = 'Production'
 from ....Lib.commonUtils.debugUtils import *
 
 from . import (
-    VIEW3D_MT_add
+    VIEW3D_MT_add,
+    OUTLINER_MT_object
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -31,6 +32,7 @@ TOOL_NAME = 'Append Menus'
 
 APPEND_MENU_MODULES = (
     VIEW3D_MT_add,
+    OUTLINER_MT_object
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
