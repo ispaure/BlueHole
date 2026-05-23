@@ -22,7 +22,8 @@ from typing import *
 
 import bpy
 
-from ... import filterUtils, sendUnreal
+from ... import filterUtils
+from ....unrealUtils import sendUnreal
 from ..exportSettings import *
 from ....Lib.commonUtils.debugUtils import *
 from ....preferences.prefs import *

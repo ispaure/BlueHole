@@ -19,6 +19,7 @@ __status__ = 'Production'
 import bpy
 from typing import List
 from bpy.props import StringProperty
+from ..Lib.commonUtils.debugUtils import *
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -27,7 +28,8 @@ from ..preferences.prefs import prefs
 
 class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
     bl_idname = "bh.rename_in_outliner_and_unreal"
-    bl_label = "Rename in Outliner and in Unreal"
+    bl_label = "Rename (in Outliner and Unreal) [Experimental]"
+    bl_description = "Rename Container in Outliner and in Unreal (and resolve changes in source-control if applicable)"
 
     new_name: bpy.props.StringProperty(name="New Name")
 
@@ -58,17 +60,6 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
 
         return False
 
-    @classmethod
-    def poll(cls, context):
-        obj = context.active_object
-
-        if obj is None:
-            return False
-
-        root_obj = cls.get_hierarchy_root(obj)
-
-        return cls.is_valid_asset_hierarchy_root(root_obj)
-
     def invoke(self, context, event):
         obj = context.active_object
 
@@ -93,24 +84,53 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
 
         root_obj = self.get_hierarchy_root(obj)
 
+        ah_prefix_lst: List[str] = [
+            prefs().container.asset_hierarchy_struct_prefix_static_mesh,
+            prefs().container.asset_hierarchy_struct_prefix_static_mesh_kit,
+            prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh,
+        ]
+
+        valid_prefix_str = ', '.join(ah_prefix_lst)
+
         if not self.is_valid_asset_hierarchy_root(root_obj):
-            self.report({'ERROR'}, f'"{root_obj.name}" is not a valid Asset Hierarchy root.')
+
+            msg = (f'Cannot rename "{root_obj.name}" because it is not a valid Asset Container root. It must have '
+                   f'one of these as prefix: {valid_prefix_str}.')
+            log(Severity.ERROR, self.bl_label, msg, popup=True)
             return {'CANCELLED'}
 
-        if not self.new_name:
-            self.report({'ERROR'}, 'New name cannot be empty.')
+        has_prefix = False
+        for ah_prefix in ah_prefix_lst:
+            if self.new_name.startswith(ah_prefix):
+                has_prefix = True
+                break
+
+        if not has_prefix:
+            msg = (f'Cannot rename "{root_obj.name}" to "{self.new_name}" because the new name does not have '
+                   f'one of these as prefix: {valid_prefix_str}.')
+            log(Severity.ERROR, self.bl_label, msg, popup=True)
             return {'CANCELLED'}
 
+        # Renaming in outliner
         old_name = root_obj.name
         root_obj.name = self.new_name
 
+        # Renaming in Unreal
         # TODO:
         # Send rename command to Unreal here
 
-        self.report(
-            {'INFO'},
-            f'Renamed "{old_name}" -> "{self.new_name}"'
+        msg = (
+            f'Renamed "{old_name}" -> "{self.new_name}" in Blender\'s Outliner and in Unreal.\n\n'
+            f'The associated Unreal asset was successfully renamed. However, the exported source file '
+            f'used by the Asset Container export pipeline (such as the .FBX file) still uses the previous name.\n\n'
+            f'It is recommended to re-export the Asset Container to Unreal so the exported source files are recreated '
+            f'using the updated asset name.\n\n'
+            f'Note:\n'
+            f'Automatic renaming of the exported source file (.FBX) and related Source Control operations '
+            f'(such as Perforce checkout/move support) are planned for a future update of this tool.'
         )
+
+        log(Severity.INFO, self.bl_label, msg, popup=True)
 
         return {'FINISHED'}
 
