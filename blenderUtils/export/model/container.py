@@ -77,6 +77,9 @@ class Container(ABC):
             # Get list of objects to export (can be customized per instance).
             obj_lst = self._get_obj_lst()
 
+            # Validate before any visibility/transform/export mutation.
+            objectUtils.validate_obj_lst_in_view_layer(obj_lst)
+
             # Make invisible objects visible.
             made_visible = []
             for obj in obj_lst:
@@ -105,8 +108,7 @@ class Container(ABC):
         except RuntimeError:
             msg = (
                 f'{self.CONTAINER_NAME} export cancelled.\n\n'
-                f'Container: {self.name}\n'
-                f'Root: {self.root.name}\n\n'
+                f'Container: {self.name}\n\n'
                 f'The export was aborted because one or more objects could not be selected.\n'
                 f'See previous error message for detailed diagnostics.'
             )
