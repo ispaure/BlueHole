@@ -64,49 +64,67 @@ class Container(ABC):
         """
         Run the export procedure for this container.
         """
-        sceneUtils.set_object_mode()
-        sceneUtils.deselect_all()
-
-        # Rename elements before export (can be customized per instance).
-        self._rename_before_export()
-
-        # Get list of objects to export (can be customized per instance).
-        obj_lst = self._get_obj_lst()
-
-        # Make invisible objects visible.
         made_visible: list[object] = []
-        for obj in obj_lst:
-            if not obj.visible_get():
-                obj.hide_set(False)
-                made_visible.append(obj)
+        root_translation = None
+        success = False
+        try:
+            sceneUtils.set_object_mode()
+            sceneUtils.deselect_all()
 
-        # If zero root transform is enabled, store root position and move to origin.
-        if self.export_settings.zero_root_transform:
-            root_translation = objectUtils.get_obj_world_translation(self.root)
-            objectUtils.set_zero_obj_world_translation(self.root)
-        else:
-            root_translation = None
+            # Rename elements before export (can be customized per instance).
+            self._rename_before_export()
 
-        # If exporting to Unity, apply a custom rotation to the root.
-        if self.export_settings.engine == Engine.UNITY:
-            self.__permanently_apply_unity_rotation_to_root()
+            # Get list of objects to export (can be customized per instance).
+            obj_lst = self._get_obj_lst()
 
-        objectUtils.select_obj_lst(obj_lst)
+            # Make invisible objects visible.
+            made_visible = []
+            for obj in obj_lst:
+                if not obj.visible_get():
+                    obj.hide_set(False)
+                    made_visible.append(obj)
 
-        view_layer = bpy.context.view_layer
-        view_layer.objects.active = self.root
+            # If zero root transform is enabled, store root position and move to origin.
+            if self.export_settings.zero_root_transform:
+                root_translation = objectUtils.get_obj_world_translation(self.root)
+                objectUtils.set_zero_obj_world_translation(self.root)
 
-        self.__export()
+            # If exporting to Unity, apply a custom rotation to the root.
+            if self.export_settings.engine == Engine.UNITY:
+                self.__permanently_apply_unity_rotation_to_root()
 
-        # Restore visibility.
-        for obj in made_visible:
-            obj.hide_set(True)
+            objectUtils.select_obj_lst(obj_lst)
 
-        # Restore previous root position.
-        if self.export_settings.zero_root_transform:
-            objectUtils.set_obj_world_translation(self.root, root_translation)
+            view_layer = bpy.context.view_layer
+            view_layer.objects.active = self.root
 
-        sceneUtils.deselect_all()
+            self.__export()
+
+            success = True
+
+        except RuntimeError:
+            msg = (
+                f'{self.CONTAINER_NAME} export cancelled.\n\n'
+                f'Container: {self.name}\n'
+                f'Root: {self.root.name}\n\n'
+                f'The export was aborted because one or more objects could not be selected.\n'
+                f'See previous error message for detailed diagnostics.'
+            )
+
+            log(Severity.ERROR, self._get_log_name(), msg, popup=True)
+
+        finally:
+            # Restore visibility.
+            for obj in made_visible:
+                obj.hide_set(True)
+
+            # Restore previous root position.
+            if root_translation is not None:
+                objectUtils.set_obj_world_translation(self.root, root_translation)
+
+            sceneUtils.deselect_all()
+
+        return success
 
     @abstractmethod
     def _rename_before_export(self) -> None:
