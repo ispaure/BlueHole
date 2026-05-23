@@ -270,10 +270,36 @@ def set_obj_name(obj, name):
 def select_obj_lst(obj_lst):
     """
     Select all objects in a list.
-
     :param obj_lst: List of objects to select
     """
+    view_layer = bpy.context.view_layer
     for obj in obj_lst:
+        if obj.name not in view_layer.objects:
+            collections = [col.name for col in obj.users_collection]
+            msg = (
+                f'Object selection failed.\n\n'
+                f'What went wrong:\n'
+                f'The object "{obj.name}" cannot be selected because it is not in the active View Layer '
+                f'"{view_layer.name}".\n\n'
+                f'Object information:\n'
+                f'- Object: {obj.name}\n'
+                f'- Type: {obj.type}\n'
+                f'- Scene: {bpy.context.scene.name}\n'
+                f'- Active View Layer: {view_layer.name}\n'
+                f'- Collections: {collections}\n'
+                f'- hide_viewport: {obj.hide_viewport}\n'
+                f'- hide_select: {obj.hide_select}\n\n'
+                f'Why this can happen:\n'
+                f'The object may be inside a collection that is excluded from the active View Layer, '
+                f'or it may belong to another scene/view layer setup.\n\n'
+                f'What to do:\n'
+                f'Make sure the object and its collection are included in the active View Layer before exporting.\n\n'
+                f'Selection skipped for this object.'
+            )
+
+            log(Severity.ERROR, 'Object Selection', msg, popup=True)
+            raise RuntimeError(msg)
+
         obj.select_set(True)
 
 
