@@ -27,26 +27,11 @@ from ..blenderUtils.export.assetCollection.containerGroup import AssetCollection
 from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGroup
 from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export.looseMesh.containerGroup import batch_export_loose_mesh
+from ..blenderUtils.export.model import containerUtils
 from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INTERNAL HELPERS
-
-
-def _selected_container_groups(
-    *,
-    include_hierarchy: bool,
-    include_collection: bool,
-    include_mesh: bool,
-) -> list[Type]:
-    groups: list[Type] = []
-    if include_hierarchy:
-        groups.append(AssetHierarchyContainerGroup)
-    if include_collection:
-        groups.append(AssetCollectionContainerGroup)
-    if include_mesh:
-        groups.append(AssetMeshContainerGroup)
-    return groups
 
 
 def _build_confirm_send_all_dialog(
@@ -237,14 +222,14 @@ class BH_OT_export_containers(bpy.types.Operator):
                 return {'CANCELLED'}
 
         # Which container group classes are included
-        groups = _selected_container_groups(
-            include_hierarchy=self.include_hierarchy and prefs().container.enable_asset_hierarchy_container,
-            include_collection=self.include_collection and prefs().container.enable_asset_collection_container,
-            include_mesh=self.include_mesh and prefs().container.enable_asset_mesh_container,
+        groups = containerUtils.get_container_groups(
+            include_hierarchy=self.include_hierarchy,
+            include_collection=self.include_collection,
+            include_mesh=self.include_mesh
         )
 
         if not groups:
-            self.report({'WARNING'}, "No container types selected.")
+            log(Severity.ERROR, self.bl_label, "No container types selected.", popup=True)
             return {'CANCELLED'}
 
         # Confirm once (only when operating on ALL containers from the scene)
