@@ -23,8 +23,11 @@ from bpy.props import StringProperty
 from ..Lib.commonUtils.debugUtils import *
 from ..blenderUtils.export import exportSettingsPresets
 from ..blenderUtils.export.model.container import ContainerDummy
+from ..blenderUtils.export.model.containerGroup import ContainerGroup
+from ..blenderUtils import objectUtils
 from ..preferences.prefs import prefs
 from ..unrealUtils import renameUnreal
+from ..blenderUtils.export.model import containerUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -86,8 +89,7 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
         if obj is None:
             return {'CANCELLED'}
 
-        root_obj = self.get_hierarchy_root(obj)
-
+        # Get valid prefixes
         ah_prefix_lst: List[str] = [
             prefs().container.asset_hierarchy_struct_prefix_static_mesh,
             prefs().container.asset_hierarchy_struct_prefix_static_mesh_kit,
@@ -96,61 +98,78 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
 
         valid_prefix_str = ', '.join(ah_prefix_lst)
 
-        if not self.is_valid_asset_hierarchy_root(root_obj):
+        # This is for unreal, get unreal settings
+        export_settings = exportSettingsPresets.get_export_settings(exportSettingsPresets.ExportSettingsPreset.UNREAL)
 
-            msg = (f'Cannot rename "{root_obj.name}" because it is not a valid Asset Container root. It must have '
-                   f'one of these as prefix: {valid_prefix_str}.')
-            log(Severity.ERROR, self.bl_label, msg, popup=True)
-            return {'CANCELLED'}
+        # Get all the valid container groups
+        container_groups: List[ContainerGroup] = containerUtils.get_container_groups_all()
 
-        has_prefix = False
-        for ah_prefix in ah_prefix_lst:
-            if self.new_name.startswith(ah_prefix):
-                has_prefix = True
+        # Set the groups to have all the containers in the scene
+        container_grp_cls_lst = []
+        for container_grp in container_groups:
+            container_grp_cls = container_grp(export_settings)
+            container_grp_cls.set_containers_from_scene(silent_if_empty=True)
+            container_grp_cls_lst.append(container_grp_cls)
+
+        # Get the upmost root of the current object (all hierarchies have a root object)
+        root_obj = objectUtils.get_obj_upmost_parent(obj)
+
+        # Make sure that this lines up with an existing asset container
+        is_found_container: bool = False
+        for container_grp_cls in container_grp_cls_lst:
+            for container in container_grp_cls.container_lst:
+                if container.root == root_obj:
+                    is_found_container = True
+                    break
+            if is_found_container:
                 break
 
-        if not has_prefix:
-            msg = (f'Cannot rename "{root_obj.name}" to "{self.new_name}" because the new name does not have '
-                   f'one of these as prefix: {valid_prefix_str}.')
+        if not is_found_container:
+            msg = (f'Cannot rename "{root_obj.name}" because it is not a valid Asset Container in this environment. '
+                   f'Most likely it is missing one of these as prefix: {valid_prefix_str}. If you are unsure what '
+                   f'is the issue, feel free to recreate this Asset Container from the Blue Hole header menu.')
             log(Severity.ERROR, self.bl_label, msg, popup=True)
             return {'CANCELLED'}
 
-        # ------------------------------------------------------------------------------------------------------------------
-        # Resolve .uasset path (Before)
+        # Make sure that the new name isn't already chosen for a container group
+        for container_grp_cls in container_grp_cls_lst:
+            for container in container_grp_cls.container_lst:
+                if self.new_name == container.name:
+                    msg = (f'Cannot rename "{root_obj.name}" to "{self.new_name}" because that name is already in use '
+                           f'for an existing {container.CONTAINER_NAME}. Please pick a different name')
+                    log(Severity.ERROR, self.bl_label, msg, popup=True)
+                    return {'CANCELLED'}
 
-        export_settings = exportSettingsPresets.get_export_settings(
-            exportSettingsPresets.ExportSettingsPreset.UNREAL
-        )
-
-        container = ContainerDummy(root_obj, export_settings)
-
-        before_uasset_path: Path = container.get_path_uasset()
-
-        # ------------------------------------------------------------------------------------------------------------------
-        # RENAME IN BLENDER
+        # Resolve pre-change .uasset path
+        pre_container_grp = ContainerDummy(root_obj, export_settings)
+        before_uasset_path: Path = pre_container_grp.get_path_uasset()
+        if not os.path.isfile(str(before_uasset_path)):
+            msg = f'Could not rename asset in Unreal at path "{before_uasset_path}", as it doesn\'t currently exist.'
+            log(Severity.ERROR, self.bl_label, msg, popup=True)
+            return {'CANCELLED'}
 
         # Renaming in Outliner
         old_name = root_obj.name
         root_obj.name = self.new_name
 
-        # ------------------------------------------------------------------------------------------------------------------
-        # Resolve .uasset path (After)
+        # Resolve post-change .uasset path
+        post_container_grp = ContainerDummy(root_obj, export_settings)
+        after_uasset_path: Path = post_container_grp.get_path_uasset()
+        if os.path.isfile(str(after_uasset_path)):
+            msg = f'Could not rename asset in Unreal to path "{after_uasset_path}" as it already exists.'
+            log(Severity.ERROR, self.bl_label, msg, popup=True)
+            return {'CANCELLED'}
 
-        export_settings = exportSettingsPresets.get_export_settings(
-            exportSettingsPresets.ExportSettingsPreset.UNREAL
-        )
+        # Rename in UE
+        result = renameUnreal.trigger_unreal_rename(before_uasset_path, after_uasset_path)
 
-        container = ContainerDummy(root_obj, export_settings)
+        if not result:
+            # If not result / unsuccessful, revert the name on the asset
+            msg = f'Since could not rename successfully in Unreal, reverting name back on asset to "{old_name}".'
+            log(Severity.WARNING, self.bl_label, )
+            root_obj.name = old_name
 
-        after_uasset_path: Path = container.get_path_uasset()
-
-        # ------------------------------------------------------------------------------------------------------------------
-        # RENAME IN UE
-
-        renameUnreal.trigger_unreal_rename(before_uasset_path, after_uasset_path)
-
-        # ------------------------------------------------------------------------------------------------------------------
-        # FINAL MESSAGE
+        # Final message (it worked!)
 
         msg = (
             f'Renamed "{old_name}" -> "{self.new_name}" in Blender\'s Outliner and in Unreal.\n\n'
