@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 # Blender
 import bpy
-from typing import List
+from typing import List, Type
 from pathlib import Path
 from bpy.props import StringProperty
 from ..Lib.commonUtils.debugUtils import *
@@ -102,7 +102,7 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
         export_settings = exportSettingsPresets.get_export_settings(exportSettingsPresets.ExportSettingsPreset.UNREAL)
 
         # Get all the valid container groups
-        container_groups: List[ContainerGroup] = containerUtils.get_container_groups_all()
+        container_groups: List[Type] = containerUtils.get_container_groups_all()
 
         # Set the groups to have all the containers in the scene
         container_grp_cls_lst = []
