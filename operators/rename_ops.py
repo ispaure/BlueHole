@@ -17,17 +17,18 @@ __status__ = 'Production'
 
 # Blender
 import bpy
-from typing import List, Type
+from typing import List, Type, Optional
 from pathlib import Path
 from bpy.props import StringProperty
 from ..Lib.commonUtils.debugUtils import *
 from ..blenderUtils.export import exportSettingsPresets
-from ..blenderUtils.export.model.container import ContainerDummy
+from ..blenderUtils.export.model.container import ContainerDummy, Container
 from ..blenderUtils.export.model.containerGroup import ContainerGroup
 from ..blenderUtils import objectUtils
 from ..preferences.prefs import prefs
 from ..unrealUtils import renameUnreal
 from ..blenderUtils.export.model import containerUtils
+from ..wrappers.perforce import p4_file
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -98,6 +99,19 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
 
         valid_prefix_str = ', '.join(ah_prefix_lst)
 
+        # Validate the selected name starts with one of the prefix
+        start_with_prefix: bool = False
+        for ah_prefix in ah_prefix_lst:
+            if self.new_name.startswith(ah_prefix):
+                start_with_prefix = True
+                break
+
+        if not start_with_prefix:
+            msg = (f'Cannot use new name "{self.new_name}" as it doesn\'t start with one of '
+                   f'these prefixes: {valid_prefix_str}')
+            log(Severity.ERROR, self.bl_label, msg, popup=True)
+            return {'CANCELLED'}
+
         # This is for unreal, get unreal settings
         export_settings = exportSettingsPresets.get_export_settings(exportSettingsPresets.ExportSettingsPreset.UNREAL)
 
@@ -115,16 +129,14 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
         root_obj = objectUtils.get_obj_upmost_parent(obj)
 
         # Make sure that this lines up with an existing asset container
-        is_found_container: bool = False
+        found_container: Optional[Container] = None
         for container_grp_cls in container_grp_cls_lst:
             for container in container_grp_cls.container_lst:
                 if container.root == root_obj:
-                    is_found_container = True
+                    found_container = container
                     break
-            if is_found_container:
-                break
 
-        if not is_found_container:
+        if found_container is None:
             msg = (f'Cannot rename "{root_obj.name}" because it is not a valid Asset Container in this environment. '
                    f'Most likely it is missing one of these as prefix: {valid_prefix_str}. If you are unsure what '
                    f'is the issue, feel free to recreate this Asset Container from the Blue Hole header menu.')
@@ -168,9 +180,47 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
             msg = f'Since could not rename successfully in Unreal, reverting name back on asset to "{old_name}".'
             log(Severity.WARNING, self.bl_label, )
             root_obj.name = old_name
+            return {'CANCELLED'}
+
+        # Checkout current .FBX (if exists -- it should)
+        # Need to get the new container of proper type to determine the path
+
+        # Did this before but need a refresh
+        # Set the groups to have all the containers in the scene
+        container_grp_cls_lst = []
+        for container_grp in container_groups:
+            container_grp_cls = container_grp(export_settings)
+            container_grp_cls.set_containers_from_scene(silent_if_empty=True)
+            container_grp_cls_lst.append(container_grp_cls)
+
+        container_accounting_for_rename: Optional[Container] = None
+        for container_grp_cls in container_grp_cls_lst:
+            for container in container_grp_cls.container_lst:
+                if container.name == self.new_name:
+                    container_accounting_for_rename = container
+
+        if container_accounting_for_rename is None:
+            msg = f'Fatal error, could not locate container "{self.new_name}" after rename!'
+            log(Severity.CRITICAL, self.bl_label, msg)
+            return {'CANCELLED'}
+
+        # 1. Checkout .FBX (if present on disk and not already checked out)
+        if prefs().sourcecontrol.source_control_enable:
+            if prefs().sourcecontrol.source_control_solution == 'perforce':
+                old_path = found_container.path
+                if not os.path.isfile(str(old_path)):
+                    msg = (f'Previous named "{old_path}" Path did not exist, so could not move to new location. '
+                           f'Recommend re-exporting this hierarchy from Blender.')
+                    log(Severity.ERROR, self.bl_label, msg, popup=True)
+                    return {'CANCELLED'}
+                new_path = container_accounting_for_rename.path
+                old_p4_file = p4_file.P4File(str(old_path))
+                old_p4_file.open_for_edit(silent=True, allow_sync=True)
+                # 2. Do P4 Move
+                old_p4_file.run_p4_move(str(new_path))
+
 
         # Final message (it worked!)
-
         msg = (
             f'Renamed "{old_name}" -> "{self.new_name}" in Blender\'s Outliner and in Unreal.\n\n'
             f'The associated Unreal asset was successfully renamed. However, the exported source file '
