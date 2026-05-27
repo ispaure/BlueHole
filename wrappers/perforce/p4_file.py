@@ -237,7 +237,8 @@ class P4File:
 
     def __run_p4_cmd(self, command: str,
                      incl_status_lst: Union[List[P4FileStatus], None] = None,
-                     excl_status_lst: Union[List[P4FileStatus], None] = None):
+                     excl_status_lst: Union[List[P4FileStatus], None] = None,
+                     move_to: Optional[str] = None):
 
         # See if command can be run, return if cannot
         if incl_status_lst is not None:
@@ -253,7 +254,10 @@ class P4File:
 
         # Run command for p4_file
         display_name = self.get_display_name()
-        exec_p4_command(f'{command} {display_name}')
+        if move_to is None:
+            exec_p4_command(f'{command} {display_name}')
+        else:
+            exec_p4_command(f'{command} {display_name} {move_to}')
 
     def _run_p4_add(self):
         self._callback_pre_add()
@@ -375,6 +379,9 @@ class P4File:
             return False
 
         return True
+
+    def run_p4_move(self, move_to_path_str):
+        self.__run_p4_cmd(command='p4 move', move_to=move_to_path_str)
 
 
 class BlendP4File(P4File):
