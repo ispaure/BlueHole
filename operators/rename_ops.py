@@ -29,6 +29,7 @@ from ..preferences.prefs import prefs
 from ..unrealUtils import renameUnreal
 from ..blenderUtils.export.model import containerUtils
 from ..wrappers.perforce import p4_file
+from ..Lib.commonUtils import fileUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -219,6 +220,12 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
                 # 2. Do P4 Move
                 old_p4_file.run_p4_move(str(new_path))
 
+        if os.path.isfile(str(found_container.path)):
+            # Move file
+            fileUtils.copy_file(found_container.path, container_accounting_for_rename.path)
+            # Delete file
+            if os.path.isfile(str(found_container.path)):
+                fileUtils.delete_file(found_container.path)
 
         # Final message (it worked!)
         msg = (
