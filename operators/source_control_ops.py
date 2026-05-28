@@ -22,6 +22,7 @@ from bpy.props import *
 
 # Blue Hole
 from ..blenderUtils import sourceControlUtils, blenderFile
+from ..wrappers.perforce import p4_file
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -47,6 +48,23 @@ class P4DisplayServerInfo(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class P4DisplayFileFstat(bpy.types.Operator):
+
+    bl_idname = "wm.bh_p4_display_file_fstat"
+    bl_label = "Display File Fstat"
+
+    file_path_str: StringProperty(
+        name="File Path to Display Fstat For",
+        default="",
+    )
+
+    def execute(self, context):
+        p4_file_cls = p4_file.P4File(client_file=self.file_path_str)
+        p4_file_cls.update_fields()
+        p4_file_cls.log_info()
+        return {'FINISHED'}
+
+
 class WM_OT_disabled_source_control(bpy.types.Operator):
     bl_idname = "wm.disabled_source_control"
     bl_label = "Source Control is Disabled!"
@@ -67,6 +85,7 @@ class WM_OT_disabled_source_control(bpy.types.Operator):
 # List of classes to register/unregister
 classes = (
     P4CheckOutCurrentScene,
+    P4DisplayFileFstat,
     P4DisplayServerInfo,
     WM_OT_disabled_source_control,
 )

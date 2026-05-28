@@ -20,8 +20,11 @@ import os
 
 # Blender
 import bpy
+from pathlib import Path
 
 # Blue Hole
+from ....blenderUtils import blenderFile
+from ....Lib.commonUtils import fileUtils
 from ....blenderUtils.uiUtils import show_label
 from ....operators import import_ops
 
@@ -36,12 +39,25 @@ class BLUE_HOLE_MT_import(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         show_label('SCALE GUIDES', layout)
-        # layout.menu("BLUE_HOLE_MT_import_scale_guides")
-        layout.operator(import_ops.ImportGuide_5_6_ScaleMan.bl_idname, icon='IMPORT')
-        layout.operator(import_ops.ImportGuide_5_10_ScaleMan.bl_idname, icon='IMPORT')
-        layout.operator(import_ops.ImportGuide_5_10_ScaleManCasual.bl_idname, icon='IMPORT')
-        layout.operator(import_ops.ImportGuide_5_10_ScaleManSitting.bl_idname, icon='IMPORT')
-        layout.operator(import_ops.ImportGuide_6_1_ScaleMan.bl_idname, icon='IMPORT')
+
+        # Get list of meshes in the current environment meshes folder
+        guide_mesh_dir_path: Path = blenderFile.get_default_env_msh_guides_path()
+        if os.path.isdir(str(guide_mesh_dir_path)):
+            layout.separator()
+            # Get list of .FBX in dir
+            file_lst = fileUtils.get_file_path_list(guide_mesh_dir_path, recursive=False, filter_extension='fbx')
+            for file in file_lst:
+                file_path_name = Path(file).name
+                op = layout.operator(import_ops.ImportMeshFBXOBJ.bl_idname, text=file_path_name, icon='IMPORT')
+                op.import_path_str = file
+        else:
+            # layout.menu("BLUE_HOLE_MT_import_scale_guides")
+            layout.separator()
+            layout.operator(import_ops.ImportGuide_5_6_ScaleMan.bl_idname, icon='IMPORT')
+            layout.operator(import_ops.ImportGuide_5_10_ScaleMan.bl_idname, icon='IMPORT')
+            layout.operator(import_ops.ImportGuide_5_10_ScaleManCasual.bl_idname, icon='IMPORT')
+            layout.operator(import_ops.ImportGuide_5_10_ScaleManSitting.bl_idname, icon='IMPORT')
+            layout.operator(import_ops.ImportGuide_6_1_ScaleMan.bl_idname, icon='IMPORT')
 
 
 # ----------------------------------------------------------------------------------------------------------------------

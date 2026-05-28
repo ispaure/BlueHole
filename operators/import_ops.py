@@ -78,6 +78,17 @@ class ImportGuide_6_1_ScaleMan(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class ImportMeshFBXOBJ(bpy.types.Operator):
+    bl_idname = 'wm.bh_imp_scale_guide'
+    bl_label = 'Import Scale Guide'
+
+    import_path_str: bpy.props.StringProperty(name="")
+
+    def execute(self, context):
+        importUtils.import_fbx_obj(self.import_path_str)
+        return {'FINISHED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -88,6 +99,7 @@ classes = (ImportGuide_5_6_ScaleMan,
            ImportGuide_5_10_ScaleManCasual,
            ImportGuide_5_10_ScaleManSitting,
            ImportGuide_6_1_ScaleMan,
+           ImportMeshFBXOBJ,
            )
 
 

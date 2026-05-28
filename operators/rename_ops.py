@@ -26,7 +26,7 @@ from ..blenderUtils.export.model.container import ContainerDummy, Container
 from ..blenderUtils.export.model.containerGroup import ContainerGroup
 from ..blenderUtils import objectUtils
 from ..preferences.prefs import prefs
-from ..unrealUtils import renameUnreal
+from ..unrealUtils import renameUnreal, communicateUnreal
 from ..blenderUtils.export.model import containerUtils
 from ..wrappers.perforce import p4_file
 from ..Lib.commonUtils import fileUtils
@@ -73,6 +73,10 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
         obj = context.active_object
 
         if obj is None:
+            return {'CANCELLED'}
+
+        # Test Unreal connection before asking for a new name
+        if not communicateUnreal.test_unreal_connection():
             return {'CANCELLED'}
 
         root_obj = self.get_hierarchy_root(obj)
@@ -179,7 +183,7 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
         if not result:
             # If not result / unsuccessful, revert the name on the asset
             msg = f'Since could not rename successfully in Unreal, reverting name back on asset to "{old_name}".'
-            log(Severity.WARNING, self.bl_label, )
+            log(Severity.WARNING, self.bl_label, msg, popup=True)
             root_obj.name = old_name
             return {'CANCELLED'}
 
@@ -230,13 +234,11 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
         # Final message (it worked!)
         msg = (
             f'Renamed "{old_name}" -> "{self.new_name}" in Blender\'s Outliner and in Unreal.\n\n'
-            f'The associated Unreal asset was successfully renamed. However, the exported source file '
-            f'used by the Asset Container export pipeline (such as the .FBX file) still uses the previous name.\n\n'
-            f'It is recommended to re-export the Asset Container to Unreal so the exported source files are recreated '
-            f'using the updated asset name.\n\n'
-            f'Note:\n'
-            f'Automatic renaming of the exported source file (.FBX) and related Source Control operations '
-            f'(such as Perforce checkout/move support) are planned for a future update of this tool.'
+            f'The associated Unreal asset was successfully renamed. Exported source files used by the '
+            f'Asset Container export pipeline (such as the .FBX file) were also renamed to match the updated asset name.\n\n'
+            f'Relevant Source Control operations required for the rename/move were automatically performed '
+            f'(such as Perforce checkout and move support where applicable).\n\n'
+            f'The Asset Container and its associated exported source files are now fully synchronized with the updated name.'
         )
 
         log(Severity.INFO, self.bl_label, msg, popup=True)

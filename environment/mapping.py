@@ -61,6 +61,11 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.ue_import_textures', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_textures', var_type=bool),
     Setting(pref_path='bridge.ue_enable_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_send_override', var_type=bool),
     Setting(pref_path='bridge.ue_op_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_send_override', var_type=str),
+    Setting(pref_path='bridge.ue_remote_exec_multicast_group_endpoint_address', ini_section='SendAssetHierarchiesToUnreal', ini_value='remote_exec_multicast_group_endpoint_address', var_type=str),
+    Setting(pref_path='bridge.ue_remote_exec_multicast_group_endpoint_port', ini_section='SendAssetHierarchiesToUnreal', ini_value='remote_exec_multicast_group_endpoint_port', var_type=int),
+    Setting(pref_path='bridge.ue_remote_exec_multicast_bind_address', ini_section='SendAssetHierarchiesToUnreal', ini_value='remote_exec_multicast_bind_address', var_type=str),
+    Setting(pref_path='bridge.ue_remote_exec_command_endpoint_address', ini_section='SendAssetHierarchiesToUnreal', ini_value='remote_exec_command_endpoint_address', var_type=str),
+    Setting(pref_path='bridge.ue_remote_exec_command_endpoint_port', ini_section='SendAssetHierarchiesToUnreal', ini_value='remote_exec_command_endpoint_port', var_type=int),
 
     # Selected Game Engine
     Setting(pref_path='bridge.active_game_engine', ini_section='Engine', ini_value='active_game_engine', var_type=str),
