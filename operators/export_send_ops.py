@@ -29,6 +29,7 @@ from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export.looseMesh.containerGroup import batch_export_loose_mesh
 from ..blenderUtils.export.model import containerUtils
 from ..preferences.prefs import *
+from ..unrealUtils import communicateUnreal
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INTERNAL HELPERS
@@ -261,6 +262,16 @@ class BH_OT_export_containers(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class BH_OT_debug_unreal_exec_nodes(bpy.types.Operator):
+    bl_idname = "wm.bh_debug_unreal_exec_nodes"
+    bl_label = "Debug - Unreal Remote Execution Nodes"
+    bl_description = "Searches for Unreal Remote Execution Nodes using multicast discovery."
+
+    def execute(self, context):
+        communicateUnreal.debug_remote_nodes()
+        return {'FINISHED'}
+
+
 class BatchExportSelectedToFinal(bpy.types.Operator):
     bl_idname = "wm.bh_batch_export_select_to_final"
     bl_label = 'Batch Export (Selection) to FINAL Folder'
@@ -330,7 +341,8 @@ classes = (
     BatchExportSelectedToSpeedtreeHR_FBX,
     BatchExportSelectedToFinal,
     BatchExportSelectedToBakeFBX,
-    BatchExportSelectedToResources
+    BatchExportSelectedToResources,
+    BH_OT_debug_unreal_exec_nodes,
 )
 
 

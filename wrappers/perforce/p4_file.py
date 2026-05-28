@@ -163,7 +163,7 @@ class P4File:
         else:
             return P4FileStatus.INVALID
 
-    def print_info(self):
+    def log_info(self):
         """
         Print some information about the file, for debug purposes
         """
@@ -189,7 +189,7 @@ class P4File:
                 f'Type: {self.type}\n'
                 f'Action Owner: {self.actionOwner}\n'
                 f'Work Revision: {self.workRev}\n')
-        print(info)
+        log(Severity.INFO, tool_name, info, popup=True)
 
     def is_client_file_under_workspace_root(self, p4_info_cls: P4Info, silent: bool = False):
         if self.clientFile is not None:

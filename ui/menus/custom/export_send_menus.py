@@ -121,6 +121,11 @@ class _BLUE_HOLE_MT_export_base(bpy.types.Menu):
                 else:
                     layout.menu(BLUE_HOLE_MT_export_specific.bl_idname)
 
+            # Unreal nodes debug (if Unreal engine is set)
+            if prefs().bridge.active_game_engine == 'unreal':
+                layout.separator()
+                layout.operator(export_send_ops.BH_OT_debug_unreal_exec_nodes.bl_idname, icon='HELP')
+
         else:
             row = layout.row()
             row.enabled = False

@@ -140,6 +140,45 @@ class BridgePG(bpy.types.PropertyGroup):
         default=""
     )
 
+    ue_remote_exec_multicast_group_endpoint_address: StringProperty(
+        name="Multicast Group Endpoint [Address]",
+        description=('The multicast group endpoint tuple that the UDP multicast socket should join '
+                     '(must match the "Multicast Group Endpoint" setting in the Python plugin'),
+        default="239.0.0.1"
+    )
+
+    ue_remote_exec_multicast_group_endpoint_port: IntProperty(
+        name="Multicast Group Endpoint [Port]",
+        description=('The multicast group endpoint port that the UDP multicast socket should join '
+                     '(must match the "Multicast Group Endpoint" setting in the Python plugin'),
+        default=6766,
+        min=0,
+        max=65535,
+    )
+
+    ue_remote_exec_multicast_bind_address: StringProperty(
+        name="Multicast Bind [Address]",
+        description=('The endpoint tuple for the TCP command connection hosted by this client '
+                     '(that the remote client will connect to)'),
+        default="0.0.0.0"
+    )
+
+    ue_remote_exec_command_endpoint_address: StringProperty(
+        name="Command Endpoint [Address]",
+        description=('The endpoint tuple for the TCP command connection hosted by this client '
+                     '(that the remote client will connect to)'),
+        default="127.0.0.1"
+    )
+
+    ue_remote_exec_command_endpoint_port: IntProperty(
+        name="Command Endpoint [Port]",
+        description=('The endpoint port for the TCP command connection hosted by this client '
+                     '(that the remote client will connect to)'),
+        default=6766,
+        min=0,
+        max=65535,
+    )
+
     # EXPORTS: ASSET HIERARCHIES (UNITY) -------------------------------------------------------------------------------
 
     # Unity Assets Path
@@ -307,6 +346,28 @@ def draw(preference, context, layout):
                 row.prop(preference.bridge, 'ue_automated', text='Automated Import')
                 row.prop(preference.bridge, 'ue_import_textures', text='Import Textures')
                 row.prop(preference.bridge, 'ue_import_materials', text='Import Materials')
+
+                # -----------------------------------------------------------------------------------------
+                # REMOTE EXECUTION SETTINGS
+                # -----------------------------------------------------------------------------------------
+                box_remote_exec = box.box()
+                column = box_remote_exec.column()
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.label(text='REMOTE EXECUTION ADDRESSES')
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_remote_exec_multicast_group_endpoint_address')
+                row.prop(preference.bridge, 'ue_remote_exec_multicast_group_endpoint_port')
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_remote_exec_multicast_bind_address')
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_remote_exec_command_endpoint_address')
+                row.prop(preference.bridge, 'ue_remote_exec_command_endpoint_port')
+
 
                 # -----------------------------------------------------------------------------------------
                 # OVERRIDE SEND OPERATOR

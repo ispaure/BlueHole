@@ -17,11 +17,15 @@ __status__ = 'Production'
 
 # Blender
 import bpy
+import os
+from pathlib import Path
 
 # Blue Hole
 from ....operators import help_ops, source_control_ops, external_addon_ops
 from ....preferences.prefs import *
-from ....blenderUtils import blenderFile
+from ....blenderUtils import blenderFile, projectUtils
+from ....Lib.commonUtils import fileUtils
+from ....operators import directory_ops
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -48,6 +52,49 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
                 )
 
             layout.operator(source_control_ops.P4DisplayServerInfo.bl_idname, icon='INFO')
+            layout.separator()
+            layout.menu(BLUE_HOLE_MT_perforce_debug_fstat.bl_idname, icon='HELP')
+
+
+class BLUE_HOLE_MT_perforce_debug_fstat(bpy.types.Menu):
+    bl_label = "Debug - Fstat"
+    bl_idname = "BLUE_HOLE_MT_perforce_debug_fstat"
+
+    def draw(self, context):
+        layout = self.layout
+
+        if not blenderFile.has_blend_filepath():
+            col = layout.column()
+            col.enabled = False
+            col.operator(external_addon_ops.BH_OT_disabled_notice.bl_idname,
+                         text='Save .blend file to enable fstat debug',
+                         icon='ERROR')
+        else:
+            # Fstat for the current blender file
+            op = layout.operator(source_control_ops.P4DisplayFileFstat.bl_idname, text='Blender Scene')
+            op.file_path_str = blenderFile.get_blend_file_path()
+
+            layout.separator()
+
+            # Final dir
+            final_dir = projectUtils.get_project_sub_dir(prefs().directory.sc_dir_struct_final)
+            if not os.path.isdir(final_dir):
+                col = layout.column()
+                col.enabled = False
+                col.operator(
+                    external_addon_ops.BH_OT_disabled_notice.bl_idname,
+                    text='Make final dir to enable fstat debug.',
+                    icon='ERROR'
+                )
+            else:
+                # Fstat for files in final folder
+                layout.operator(directory_ops.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
+                # List files
+                file_path_lst = fileUtils.get_file_path_list(final_dir, recursive=False)
+                for file_path in file_path_lst:
+                    f_path: Path = Path(file_path)
+                    op = layout.operator(source_control_ops.P4DisplayFileFstat.bl_idname, text=f_path.name)
+                    op.file_path_str = file_path
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -56,6 +103,7 @@ class BLUE_HOLE_MT_source_control(bpy.types.Menu):
 # Menu classes
 classes = (
     BLUE_HOLE_MT_source_control,
+    BLUE_HOLE_MT_perforce_debug_fstat,
 )
 
 

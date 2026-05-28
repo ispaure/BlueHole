@@ -27,11 +27,6 @@ _NODE_PING_SECONDS = 1  # Number of seconds to wait before sending another "ping
 _NODE_TIMEOUT_SECONDS = 5  # Number of seconds to wait before timing out a remote node that was discovered via UDP and has stopped sending "pong" responses
 
 DEFAULT_MULTICAST_TTL = 0  # Multicast TTL (0 is limited to the local host, 1 is limited to the local subnet)
-DEFAULT_MULTICAST_GROUP_ENDPOINT = ('239.0.0.1',
-                                    6766)  # The multicast group endpoint tuple that the UDP multicast socket should join (must match the "Multicast Group Endpoint" setting in the Python plugin)
-DEFAULT_MULTICAST_BIND_ADDRESS = '0.0.0.0'  # The adapter address that the UDP multicast socket should bind to, or 0.0.0.0 to bind to all adapters (must match the "Multicast Bind Address" setting in the Python plugin)
-DEFAULT_COMMAND_ENDPOINT = ('127.0.0.1',
-                            6776)  # The endpoint tuple for the TCP command connection hosted by this client (that the remote client will connect to)
 
 # Execution modes (these must match the names given to LexToString for EPythonCommandExecutionMode in IPythonScriptPlugin.h)
 MODE_EXEC_FILE = 'ExecuteFile'  # Execute the Python command as a file. This allows you to execute either a literal Python script containing multiple statements, or a file with optional arguments
@@ -46,9 +41,10 @@ class RemoteExecutionConfig(object):
 
     def __init__(self):
         self.multicast_ttl = DEFAULT_MULTICAST_TTL
-        self.multicast_group_endpoint = DEFAULT_MULTICAST_GROUP_ENDPOINT
-        self.multicast_bind_address = DEFAULT_MULTICAST_BIND_ADDRESS
-        self.command_endpoint = DEFAULT_COMMAND_ENDPOINT
+        from ....preferences.prefs import prefs
+        self.multicast_group_endpoint = (prefs().bridge.ue_remote_exec_multicast_group_endpoint_address, prefs().bridge.ue_remote_exec_multicast_group_endpoint_port)  # The multicast group endpoint tuple that the UDP multicast socket should join (must match the "Multicast Group Endpoint" setting in the Python plugin)
+        self.multicast_bind_address = prefs().bridge.ue_remote_exec_multicast_bind_address  # The adapter address that the UDP multicast socket should bind to, or 0.0.0.0 to bind to all adapters (must match the "Multicast Bind Address" setting in the Python plugin)
+        self.command_endpoint = (prefs().bridge.ue_remote_exec_command_endpoint_address, prefs().bridge.ue_remote_exec_command_endpoint_port)  # The endpoint tuple for the TCP command connection hosted by this client (that the remote client will connect to)
 
 
 class RemoteExecution(object):
@@ -59,8 +55,11 @@ class RemoteExecution(object):
         config (RemoteExecutionConfig): Configuration controlling the connection settings for this session.
     '''
 
-    def __init__(self, config=RemoteExecutionConfig()):
+    def __init__(self, config=None):
+        if config is None:
+            config = RemoteExecutionConfig()
         self._config = config
+
         self._broadcast_connection = None
         self._command_connection = None
         self._node_id = str(_uuid.uuid4())
