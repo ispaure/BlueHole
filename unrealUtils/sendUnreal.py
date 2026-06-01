@@ -93,10 +93,8 @@ def trigger_unreal_import_default(file_path_source: str) -> bool:
     result = import_asset(str(Path(file_path_source)), str(Path(file_path_dest)))
 
     if not result:
-        log(Severity.CRITICAL, send_ue_name, 'Command did not succeed!')
         return False
 
-    log(Severity.DEBUG, send_ue_name, 'Command succeeded!')
     return True
 
 
