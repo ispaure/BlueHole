@@ -441,7 +441,7 @@ def draw(preference, context, layout):
                     row.prop(preference.bridge, 'ue_op_exec_code_override', text='Operator IDName')
 
                 # -----------------------------------------------------------------------------------------
-                # REMOTE EXECUTION SETTINGS (WHEN OVERRIDE IS NOT SET) 
+                # REMOTE EXECUTION SETTINGS (WHEN OVERRIDE IS NOT SET)
                 # -----------------------------------------------------------------------------------------
                 box_remote_exec = box.box()
                 column = box_remote_exec.column()

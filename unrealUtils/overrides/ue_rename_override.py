@@ -17,10 +17,8 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-import bpy
-
-from ...Lib.commonUtils.debugUtils import *
 from ...preferences.prefs import prefs
+from .ue_override_utils import run_unreal_override_operator
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -28,30 +26,12 @@ from ...preferences.prefs import prefs
 rename_ue_name = 'Blue Hole Bridge to Unreal (Rename Operator Override)'
 
 
-def trigger_unreal_rename_override(unreal_source_path: str, unreal_destination_path: str) -> bool | set[str]:
-
-    op_idname = prefs().bridge.ue_op_rename_override.strip()
-
-    if "." not in op_idname:
-        log(Severity.CRITICAL, rename_ue_name, f'Invalid operator idname: "{op_idname}"')
-        raise ValueError(f'Invalid operator idname: "{op_idname}"')
-
-    cat, op = op_idname.split(".", 1)
-
-    try:
-        res = getattr(getattr(bpy.ops, cat), op)(
-            unreal_source_path=str(unreal_source_path),
-            unreal_destination_path=str(unreal_destination_path),
-        )
-    except Exception as e:
-        log(
-            Severity.CRITICAL,
-            rename_ue_name,
-            f'Failed to run override operator "{op_idname}": {e}',
-        )
-        raise
-
-    if res == {'CANCELLED'}:
-        return {'CANCELLED'}
-
-    return True
+def trigger_unreal_rename_override(unreal_source_path: str, unreal_destination_path: str) -> bool:
+    return run_unreal_override_operator(
+        op_idname=prefs().bridge.ue_op_rename_override,
+        log_name=rename_ue_name,
+        operator_kwargs={
+            "unreal_source_path": str(unreal_source_path),
+            "unreal_destination_path": str(unreal_destination_path),
+        },
+    )

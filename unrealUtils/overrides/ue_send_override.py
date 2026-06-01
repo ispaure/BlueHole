@@ -17,9 +17,8 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-import bpy
-from ...Lib.commonUtils.debugUtils import *
 from ...preferences.prefs import prefs
+from .ue_override_utils import run_unreal_override_operator
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -28,27 +27,11 @@ from ...preferences.prefs import prefs
 send_ue_name = 'Blue Hole Bridge to Unreal (Send Operator Override)'
 
 
-def trigger_unreal_import_override(file_path_source: str) -> bool | set[str]:
-
-    op_idname = prefs().bridge.ue_op_send_override.strip()
-
-    if "." not in op_idname:
-        log(Severity.CRITICAL, send_ue_name, f'Invalid operator idname: "{op_idname}"')
-        raise ValueError(f'Invalid operator idname: "{op_idname}"')
-
-    cat, op = op_idname.split(".", 1)
-
-    try:
-        res = getattr(getattr(bpy.ops, cat), op)(path=str(file_path_source))
-    except Exception as e:
-        log(
-            Severity.CRITICAL,
-            send_ue_name,
-            f'Failed to run override operator "{op_idname}": {e}',
-        )
-        raise
-
-    if res == {'CANCELLED'}:
-        return {'CANCELLED'}
-
-    return True
+def trigger_unreal_import_override(file_path_source: str) -> bool:
+    return run_unreal_override_operator(
+        op_idname=prefs().bridge.ue_op_send_override,
+        log_name=send_ue_name,
+        operator_kwargs={
+            "path": str(file_path_source),
+        },
+    )

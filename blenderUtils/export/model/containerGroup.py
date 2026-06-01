@@ -69,7 +69,8 @@ class ContainerGroup(ABC):
             if not sc_result:
                 if prefs().sourcecontrol.source_control_error_aborts_exp:
                     msg = 'There were errors checking out file(s), aborting export!'
-                    log(Severity.CRITICAL, self.CONTAINERS_NAME, msg)
+                    log(Severity.ERROR, self.CONTAINERS_NAME, msg)
+                    return False
                 else:
                     msg = 'There were errors checking out file(s), proceeding with export regardless!'
                     log(Severity.WARNING, self.CONTAINERS_NAME, msg)
@@ -88,13 +89,14 @@ class ContainerGroup(ABC):
 
                 result = sendUnreal.trigger_unreal_import(str(container.path))
 
-                if result == {'CANCELLED'}:
-                    return result
+                if not result:
+                    return False
 
         # Restore previous selection state
         view_layer.objects.active = obj_active
 
         log(Severity.INFO, self.CONTAINERS_NAME, 'Finished Export of Containers!')
+        return True
 
     def _export_checks(self, send: bool):
         """

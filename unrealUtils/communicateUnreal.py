@@ -42,7 +42,7 @@ def display_cannot_connect_unreal_error(silent: bool = False):
     log(Severity.ERROR, communicate_ue_name, msg, popup=not silent)
 
 
-def run_unreal_python_commands(commands: str, silent: bool = False) -> bool | set[str]:
+def run_unreal_python_commands(commands: str, silent: bool = False) -> bool:
     """
     Send Python commands to Unreal.
     Uses a custom override operator when enabled, otherwise uses Blue Hole's default Unreal remote execution.
@@ -69,17 +69,29 @@ def run_unreal_python_commands_default(commands: str, failed_connect_attempts: i
     unreal_response = ''
 
     remote_exec = remote_execution.RemoteExecution()
-    remote_exec.start()
 
     try:
+        remote_exec.start()
+
         return _execute_remote_commands(
             remote_exec,
             commands,
             failed_connect_attempts=failed_connect_attempts,
             silent=silent,
         )
+
+    except Exception as e:
+        msg = f'Failed to run Unreal remote execution command: {e}'
+        log(Severity.CRITICAL, communicate_ue_name, msg)
+        display_cannot_connect_unreal_error(silent=silent)
+        return False
+
     finally:
-        remote_exec.stop()
+        try:
+            remote_exec.stop()
+        except Exception as e:
+            msg = f'Failed to stop Unreal remote execution cleanly: {e}'
+            log(Severity.WARNING, communicate_ue_name, msg)
 
 
 def _execute_remote_commands(remote_exec, commands: str, failed_connect_attempts: int = 0, silent: bool = False) -> bool:
@@ -118,12 +130,7 @@ def test_unreal_connection(silent: bool = True) -> bool:
     """
     Minimal Unreal remote execution connectivity test.
     """
-    result = run_unreal_python_commands('print("UNREAL_REMOTE_OK")', silent=silent)
-
-    if result == {'CANCELLED'}:
-        return False
-
-    return bool(result)
+    return run_unreal_python_commands('print("UNREAL_REMOTE_OK")', silent=silent)
 
 
 def debug_remote_nodes():
