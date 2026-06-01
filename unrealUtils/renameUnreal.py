@@ -37,6 +37,8 @@ def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool:
     unreal_source_path, unreal_destination_path = get_unreal_rename_paths(old_uasset_path, new_uasset_path)
 
     if not unreal_source_path or not unreal_destination_path:
+        msg = f'Source or Destination paths could not be computed'
+        log(Severity.ERROR, rename_ue_name, msg, popup=True)
         return False
 
     if prefs().bridge.ue_enable_rename_override and prefs().bridge.ue_op_rename_override:
