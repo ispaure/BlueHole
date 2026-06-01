@@ -173,6 +173,7 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
         post_container_grp = ContainerDummy(root_obj, export_settings)
         after_uasset_path: Path = post_container_grp.get_path_uasset()
         if os.path.isfile(str(after_uasset_path)):
+            root_obj.name = old_name  # Revert to the last name
             msg = f'Could not rename asset in Unreal to path "{after_uasset_path}" as it already exists.'
             log(Severity.ERROR, self.bl_label, msg, popup=True)
             return {'CANCELLED'}

@@ -50,7 +50,7 @@ def _build_confirm_send_all_dialog(
     send=True  -> "Send"
     send=False -> "Export"
     """
-    engine = preset.name  # e.g. "UNREAL", "UNITY"
+    engine = preset.name
     verb = "Send" if send else "Export"
 
     # If caller provided both, trust them as-is.
@@ -90,7 +90,7 @@ def _export_asset_container_no_confirm(
     send: bool,
     silent_if_empty: bool,
     bypass_sc: bool = False,
-) -> set[str]:
+) -> bool:
     """
     Shared implementation for exporting/sending Asset Containers without confirmation.
     Confirmation is handled once at the operator level.
@@ -106,8 +106,7 @@ def _export_asset_container_no_confirm(
     else:
         container_group.set_containers_from_selection(silent_if_empty=silent_if_empty)
 
-    container_group.export_proc(send=send, bypass_sc=bypass_sc)
-    return {'FINISHED'}
+    return container_group.export_proc(send=send, bypass_sc=bypass_sc)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -248,7 +247,7 @@ class BH_OT_export_containers(bpy.types.Operator):
         # Run all selected container types
         silent_if_empty = len(groups) > 1
         for group_cls in groups:
-            res = _export_asset_container_no_confirm(
+            result = _export_asset_container_no_confirm(
                 preset=preset,
                 container_group_cls=group_cls,
                 send_all=self.send_all,
@@ -256,8 +255,9 @@ class BH_OT_export_containers(bpy.types.Operator):
                 silent_if_empty=silent_if_empty,
                 bypass_sc=False,
             )
-            if res == {'CANCELLED'}:
-                return res
+
+            if not result:
+                return {'CANCELLED'}
 
         return {'FINISHED'}
 

@@ -30,7 +30,7 @@ from . import communicateUnreal
 send_ue_name = 'Blue Hole Bridge to Unreal'
 
 
-def trigger_unreal_import(file_path_source: str) -> bool | set[str]:
+def trigger_unreal_import(file_path_source: str) -> bool:
     """
     Send an import command to Unreal from the given source file path.
     Uses a custom override operator when enabled, otherwise uses Blue Hole's default Unreal import.
@@ -92,9 +92,6 @@ def trigger_unreal_import_default(file_path_source: str) -> bool:
 
     result = import_asset(str(Path(file_path_source)), str(Path(file_path_dest)))
 
-    if result == {'CANCELLED'}:
-        return result
-
     if not result:
         log(Severity.CRITICAL, send_ue_name, 'Command did not succeed!')
         return False
@@ -103,7 +100,7 @@ def trigger_unreal_import_default(file_path_source: str) -> bool:
     return True
 
 
-def import_asset(file_path_source: str, file_path_dest: str) -> bool | set[str]:
+def import_asset(file_path_source: str, file_path_dest: str) -> bool:
     """
     Import an asset into Unreal.
     """
@@ -174,9 +171,6 @@ def import_asset(file_path_source: str, file_path_dest: str) -> bool | set[str]:
             f'\t\traise RuntimeError("Multiple roots are found in the bone hierarchy. Unreal will only support a single root bone.")',
         ])
     )
-
-    if result == {'CANCELLED'}:
-        return result
 
     if not result:
         return False

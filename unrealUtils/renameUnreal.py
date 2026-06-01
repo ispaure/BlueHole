@@ -29,7 +29,7 @@ from . import communicateUnreal
 rename_ue_name = 'Blue Hole Rename in Unreal'
 
 
-def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool | set[str]:
+def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool:
     """
     Rename/move an Unreal asset using its .uasset path on disk.
     Uses a custom override operator when enabled, otherwise uses Blue Hole's default Unreal rename.
@@ -42,7 +42,10 @@ def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool 
     if prefs().bridge.ue_enable_rename_override and prefs().bridge.ue_op_rename_override:
         msg = f'Using Unreal Rename Override: "{prefs().bridge.ue_op_rename_override}"'
         log(Severity.WARNING, rename_ue_name, msg)
-        return trigger_unreal_rename_override(unreal_source_path=unreal_source_path, unreal_destination_path=unreal_destination_path)
+        return trigger_unreal_rename_override(
+            unreal_source_path=unreal_source_path,
+            unreal_destination_path=unreal_destination_path,
+        )
     else:
         msg = 'Using Blue Hole default Unreal rename.'
         log(Severity.INFO, rename_ue_name, msg)
@@ -68,14 +71,14 @@ def get_unreal_rename_paths(old_uasset_path: Path, new_uasset_path: Path) -> tup
     return old_game_path, new_game_path
 
 
-def trigger_unreal_rename_default(unreal_source_path: str, unreal_destination_path: str) -> bool | set[str]:
+def trigger_unreal_rename_default(unreal_source_path: str, unreal_destination_path: str) -> bool:
     msg = f'Renaming Unreal asset: "{unreal_source_path}" -> "{unreal_destination_path}".'
     log(Severity.DEBUG, rename_ue_name, msg)
 
     return _rename_asset(unreal_source_path, unreal_destination_path)
 
 
-def _rename_asset(old_game_path: str, new_game_path: str) -> bool | set[str]:
+def _rename_asset(old_game_path: str, new_game_path: str) -> bool:
     new_asset_name = new_game_path.split('/')[-1]
     new_package_path = '/'.join(new_game_path.split('/')[:-1])
 
@@ -95,9 +98,6 @@ def _rename_asset(old_game_path: str, new_game_path: str) -> bool | set[str]:
             f'unreal.EditorAssetLibrary.save_directory(new_package_path)',
         ])
     )
-
-    if result == {'CANCELLED'}:
-        return result
 
     if not result:
         return False
