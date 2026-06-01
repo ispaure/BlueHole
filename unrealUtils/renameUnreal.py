@@ -1,5 +1,5 @@
 """
-Trigger import command to Unreal.
+Trigger rename command to Unreal.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -17,8 +17,9 @@ __status__ = 'Production'
 
 from pathlib import Path
 
+from ..preferences.prefs import *
+from .overrides.ue_rename_override import trigger_unreal_rename_override
 from ..Lib.commonUtils.debugUtils import *
-from ..Lib.send2ue.dependencies import remote_execution
 from ..wrappers.sourceContentPath import get_valid_source_content_path, display_path_error_source_content
 from . import communicateUnreal
 
@@ -28,18 +29,32 @@ from . import communicateUnreal
 rename_ue_name = 'Blue Hole Rename in Unreal'
 
 
-def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool:
+def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool | set[str]:
     """
     Rename/move an Unreal asset using its .uasset path on disk.
-
-    :param old_uasset_path: Existing .uasset file path
-    :param new_uasset_path: Target .uasset file path
+    Uses a custom override operator when enabled, otherwise uses Blue Hole's default Unreal rename.
     """
+    unreal_source_path, unreal_destination_path = get_unreal_rename_paths(old_uasset_path, new_uasset_path)
+
+    if not unreal_source_path or not unreal_destination_path:
+        return False
+
+    if prefs().bridge.ue_enable_rename_override and prefs().bridge.ue_op_rename_override:
+        msg = f'Using Unreal Rename Override: "{prefs().bridge.ue_op_rename_override}"'
+        log(Severity.WARNING, rename_ue_name, msg)
+        return trigger_unreal_rename_override(unreal_source_path=unreal_source_path, unreal_destination_path=unreal_destination_path)
+    else:
+        msg = 'Using Blue Hole default Unreal rename.'
+        log(Severity.INFO, rename_ue_name, msg)
+        return trigger_unreal_rename_default(unreal_source_path, unreal_destination_path)
+
+
+def get_unreal_rename_paths(old_uasset_path: Path, new_uasset_path: Path) -> tuple[str | None, str | None]:
     sc_path = get_valid_source_content_path()
 
     if not sc_path:
         display_path_error_source_content(sc_path)
-        return False
+        return None, None
 
     # Convert Source Content path to Unreal Content path.
     content_path = sc_path.parent / 'Content'
@@ -50,24 +65,21 @@ def trigger_unreal_rename(old_uasset_path: Path, new_uasset_path: Path) -> bool:
     old_game_path = old_game_path.replace('\\', '/').replace('.uasset', '')
     new_game_path = new_game_path.replace('\\', '/').replace('.uasset', '')
 
-    msg = f'Renaming Unreal asset: "{old_game_path}" -> "{new_game_path}".'
+    return old_game_path, new_game_path
+
+
+def trigger_unreal_rename_default(unreal_source_path: str, unreal_destination_path: str) -> bool | set[str]:
+    msg = f'Renaming Unreal asset: "{unreal_source_path}" -> "{unreal_destination_path}".'
     log(Severity.DEBUG, rename_ue_name, msg)
 
-    return rename_asset(old_game_path, new_game_path)
+    return _rename_asset(unreal_source_path, unreal_destination_path)
 
 
-def rename_asset(old_game_path: str, new_game_path: str) -> bool:
-    """
-    Rename/move an Unreal asset.
-    """
-    remote_exec = remote_execution.RemoteExecution()
-    remote_exec.start()
-    old_game_path = old_game_path.replace('\\', '/')
-    new_game_path = new_game_path.replace('\\', '/')
+def _rename_asset(old_game_path: str, new_game_path: str) -> bool | set[str]:
     new_asset_name = new_game_path.split('/')[-1]
     new_package_path = '/'.join(new_game_path.split('/')[:-1])
-    communicateUnreal.run_unreal_python_commands(
-        remote_exec,
+
+    result = communicateUnreal.run_unreal_python_commands(
         '\n'.join([
             f'old_asset_path = r"{old_game_path}"',
             f'new_package_path = r"{new_package_path}"',
@@ -83,6 +95,12 @@ def rename_asset(old_game_path: str, new_game_path: str) -> bool:
             f'unreal.EditorAssetLibrary.save_directory(new_package_path)',
         ])
     )
+
+    if result == {'CANCELLED'}:
+        return result
+
+    if not result:
+        return False
 
     if communicateUnreal.unreal_response:
         if communicateUnreal.unreal_response['result'] != 'None':

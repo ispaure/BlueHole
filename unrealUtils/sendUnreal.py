@@ -18,10 +18,10 @@ __status__ = 'Production'
 from pathlib import Path
 
 from ..Lib.commonUtils.debugUtils import *
-from ..Lib.send2ue.dependencies import remote_execution
 from ..preferences.prefs import *
 from ..wrappers.sourceContentPath import get_valid_source_content_path, display_path_error_source_content
 from ..blenderUtils import blenderFile, filterUtils
+from .overrides.ue_send_override import trigger_unreal_import_override
 from . import communicateUnreal
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,22 @@ from . import communicateUnreal
 send_ue_name = 'Blue Hole Bridge to Unreal'
 
 
-def trigger_unreal_import(file_path_source):
+def trigger_unreal_import(file_path_source: str) -> bool | set[str]:
+    """
+    Send an import command to Unreal from the given source file path.
+    Uses a custom override operator when enabled, otherwise uses Blue Hole's default Unreal import.
+    """
+    if prefs().bridge.ue_enable_send_override and prefs().bridge.ue_op_send_override:
+        msg = f'Using Unreal Import Override: "{prefs().bridge.ue_op_send_override}"'
+        log(Severity.WARNING, send_ue_name, msg)
+        return trigger_unreal_import_override(file_path_source)
+    else:
+        msg = 'Using Blue Hole default Unreal import.'
+        log(Severity.INFO, send_ue_name, msg)
+        return trigger_unreal_import_default(file_path_source)
+
+
+def trigger_unreal_import_default(file_path_source: str) -> bool:
     """
     Send an import command to Unreal from the given source file path.
 
@@ -76,6 +91,10 @@ def trigger_unreal_import(file_path_source):
     log(Severity.DEBUG, send_ue_name, msg)
 
     result = import_asset(str(Path(file_path_source)), str(Path(file_path_dest)))
+
+    if result == {'CANCELLED'}:
+        return result
+
     if not result:
         log(Severity.CRITICAL, send_ue_name, 'Command did not succeed!')
         return False
@@ -84,13 +103,10 @@ def trigger_unreal_import(file_path_source):
     return True
 
 
-def import_asset(file_path_source, file_path_dest):
+def import_asset(file_path_source: str, file_path_dest: str) -> bool | set[str]:
     """
     Import an asset into Unreal.
     """
-    remote_exec = remote_execution.RemoteExecution()
-    remote_exec.start()
-
     log(Severity.DEBUG, send_ue_name, 'Fetching Properties...')
 
     sk_prefix = prefs().container.asset_hierarchy_struct_prefix_skeletal_mesh
@@ -107,8 +123,7 @@ def import_asset(file_path_source, file_path_dest):
     file_path_dest = file_path_dest.replace('\\', '/')
     file_path_dest = file_path_dest[0:-len(file_path_dest.split('/')[-1])]
 
-    communicateUnreal.run_unreal_python_commands(
-        remote_exec,
+    result = communicateUnreal.run_unreal_python_commands(
         '\n'.join([
             f'import_task = unreal.AssetImportTask()',
             f'import_task.filename = r"{file_path_source}"',
@@ -159,6 +174,12 @@ def import_asset(file_path_source, file_path_dest):
             f'\t\traise RuntimeError("Multiple roots are found in the bone hierarchy. Unreal will only support a single root bone.")',
         ])
     )
+
+    if result == {'CANCELLED'}:
+        return result
+
+    if not result:
+        return False
 
     if communicateUnreal.unreal_response:
         if communicateUnreal.unreal_response['result'] != 'None':

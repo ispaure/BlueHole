@@ -140,6 +140,48 @@ class BridgePG(bpy.types.PropertyGroup):
         default=""
     )
 
+    # Override Rename operator
+    ue_enable_rename_override: BoolProperty(
+        name="Override Rename to Unreal",
+        description="Use a custom operator instead of Blue Hole's default Unreal rename",
+        default=False
+    )
+
+    ue_op_rename_override: StringProperty(
+        name="Rename in Unreal Override Operator",
+        description=(
+            "Operator IDName to run instead of Blue Hole's default Unreal rename "
+            "(example: wm.my_rename_unreal). "
+            "This operator will be executed once for every Asset Container being renamed. "
+            "It will receive two StringProperty named 'unreal_source_path' and 'unreal_destination_path' which are the "
+            "before/after Unreal path (excluding the .uasset segment)"
+            "The override operator is responsible for communicating with Unreal and "
+            "triggering the asset rename only. The additional execution code (such as renaming .FBX and source control)"
+            " is still handled by Blue Hole."
+        ),
+        default=""
+    )
+
+    # Override Execute Code operator
+    ue_enable_exec_code_override: BoolProperty(
+        name="Override Execute Code in Unreal",
+        description="Use a custom operator instead of Blue Hole's default Unreal way of executing arbitrary code",
+        default=False
+    )
+
+    ue_op_exec_code_override: StringProperty(
+        name="Execute Code in Unreal Override Operator",
+        description=(
+            "Operator IDName to run instead of Blue Hole's default way to execute Unreal code in-general use cases."
+            "(example: wm.my_exec_code_unreal). "
+            "This operator will be executed to send code in unreal"
+            "It will receive a StringProperty named 'code' containing the code to be sent. "
+            "The override operator is responsible for communicating with Unreal and "
+            "triggering the code from the arg."
+        ),
+        default=""
+    )
+
     ue_remote_exec_multicast_group_endpoint_address: StringProperty(
         name="Multicast Group Endpoint [Address]",
         description=('The multicast group endpoint tuple that the UDP multicast socket should join '
@@ -348,28 +390,6 @@ def draw(preference, context, layout):
                 row.prop(preference.bridge, 'ue_import_materials', text='Import Materials')
 
                 # -----------------------------------------------------------------------------------------
-                # REMOTE EXECUTION SETTINGS
-                # -----------------------------------------------------------------------------------------
-                box_remote_exec = box.box()
-                column = box_remote_exec.column()
-
-                row = column.row()
-                row.enabled = enable_rows
-                row.label(text='REMOTE EXECUTION ADDRESSES')
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.bridge, 'ue_remote_exec_multicast_group_endpoint_address')
-                row.prop(preference.bridge, 'ue_remote_exec_multicast_group_endpoint_port')
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.bridge, 'ue_remote_exec_multicast_bind_address')
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.bridge, 'ue_remote_exec_command_endpoint_address')
-                row.prop(preference.bridge, 'ue_remote_exec_command_endpoint_port')
-
-
-                # -----------------------------------------------------------------------------------------
                 # OVERRIDE SEND OPERATOR
                 # -----------------------------------------------------------------------------------------
                 box_2 = box.box()
@@ -385,6 +405,66 @@ def draw(preference, context, layout):
 
                 if prefs().bridge.ue_enable_send_override:
                     row.prop(preference.bridge, 'ue_op_send_override', text='Operator IDName')
+
+                # -----------------------------------------------------------------------------------------
+                # OVERRIDE RENAME OPERATOR
+                # -----------------------------------------------------------------------------------------
+                box_3 = box.box()
+                column = box_3.column()
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.label(text='OVERRIDE RENAME OPERATOR')
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_enable_rename_override', text='Override Rename in Unreal')
+
+                if prefs().bridge.ue_enable_rename_override:
+                    row.prop(preference.bridge, 'ue_op_rename_override', text='Operator IDName')
+
+                # -----------------------------------------------------------------------------------------
+                # OVERRIDE CODE EXECUTION OPERATOR
+                # -----------------------------------------------------------------------------------------
+                box_4 = box.box()
+                column = box_4.column()
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.label(text='OVERRIDE CODE EXECUTION OPERATOR')
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_enable_exec_code_override', text='Override Code Execution in Unreal')
+
+                if prefs().bridge.ue_enable_exec_code_override:
+                    row.prop(preference.bridge, 'ue_op_exec_code_override', text='Operator IDName')
+
+                # -----------------------------------------------------------------------------------------
+                # REMOTE EXECUTION SETTINGS (WHEN OVERRIDE IS NOT SET) 
+                # -----------------------------------------------------------------------------------------
+                box_remote_exec = box.box()
+                column = box_remote_exec.column()
+
+                row = column.row()
+                row.enabled = enable_rows
+                row.label(text='UNREAL PYTHON REMOTE EXECUTION SETTINGS')
+                if not prefs().bridge.ue_enable_exec_code_override:
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.bridge, 'ue_remote_exec_multicast_group_endpoint_address')
+                    row.prop(preference.bridge, 'ue_remote_exec_multicast_group_endpoint_port')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.bridge, 'ue_remote_exec_multicast_bind_address')
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.bridge, 'ue_remote_exec_command_endpoint_address')
+                    row.prop(preference.bridge, 'ue_remote_exec_command_endpoint_port')
+                else:
+                    row = column.row()
+                    row.enabled = enable_rows
+                    row.label(text='Unavailable when an override for unreal code execution is set.', icon='ERROR')
 
             # -----------------------------------------------------------------------------------------
             # UNITY
