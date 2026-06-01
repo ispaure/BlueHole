@@ -1,5 +1,5 @@
 """
-Trigger import command to Unreal.
+Trigger commands to Unreal.
 """
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -15,10 +15,12 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from pathlib import Path
 import time
+
 from ..Lib.send2ue.dependencies import remote_execution
 from ..Lib.commonUtils.debugUtils import *
+from ..preferences.prefs import prefs
+from .overrides.ue_exec_code_override import run_unreal_python_commands_override
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -40,60 +42,97 @@ def display_cannot_connect_unreal_error(silent: bool = False):
     log(Severity.ERROR, communicate_ue_name, msg, popup=not silent)
 
 
-def run_unreal_python_commands(remote_exec, commands, failed_connection_attempts=0, silent: bool = False):
+def run_unreal_python_commands(commands: str, silent: bool = False) -> bool | set[str]:
+    """
+    Send Python commands to Unreal.
+    Uses a custom override operator when enabled, otherwise uses Blue Hole's default Unreal remote execution.
+    """
+    if prefs().bridge.ue_enable_exec_code_override and prefs().bridge.ue_op_exec_code_override:
+        msg = f'Using Unreal Execute Code Override: "{prefs().bridge.ue_op_exec_code_override}"'
+        log(Severity.WARNING, communicate_ue_name, msg)
+        return run_unreal_python_commands_override(commands)
+    else:
+        msg = 'Using Blue Hole default Unreal remote execution.'
+        log(Severity.INFO, communicate_ue_name, msg)
+        return run_unreal_python_commands_default(commands, silent=silent)
+
+
+def run_unreal_python_commands_default(commands: str, failed_connect_attempts: int = 0, silent: bool = False) -> bool:
     """
     Find the open Unreal Editor with remote connection enabled and send it Python commands.
 
-    :param remote_exec: A RemoteExecution instance
     :param commands: A formatted string of Python commands to run in the engine
-    :param failed_connection_attempts: Counter tracking how many connection attempts were made
+    :param failed_connect_attempts: Counter tracking how many connection attempts were made
+    :param silent: If True, suppress popup errors
     """
-    time.sleep(0.1)
+    global unreal_response
+    unreal_response = ''
+
+    remote_exec = remote_execution.RemoteExecution()
+    remote_exec.start()
 
     try:
-        for node in remote_exec.remote_nodes:
-            remote_exec.open_command_connection(node.get("node_id"))
-
-        if remote_exec.has_command_connection():
-            global unreal_response
-            unreal_response = remote_exec.run_command(commands, unattended=False)
-        else:
-            if failed_connection_attempts < 10:
-                run_unreal_python_commands(remote_exec, commands, failed_connection_attempts + 1)
-            else:
-                remote_exec.stop()
-                display_cannot_connect_unreal_error(silent=silent)
-                return False
+        return _execute_remote_commands(
+            remote_exec,
+            commands,
+            failed_connect_attempts=failed_connect_attempts,
+            silent=silent,
+        )
     finally:
         remote_exec.stop()
 
-    return True
+
+def _execute_remote_commands(remote_exec, commands: str, failed_connect_attempts: int = 0, silent: bool = False) -> bool:
+    """
+    Execute Python commands through Unreal remote execution.
+
+    :param remote_exec: A RemoteExecution instance
+    :param commands: A formatted string of Python commands to run in the engine
+    :param failed_connect_attempts: Counter tracking how many connection attempts were made
+    :param silent: If True, suppress popup errors
+    """
+
+    time.sleep(0.1)
+
+    for node in remote_exec.remote_nodes:
+        remote_exec.open_command_connection(node.get("node_id"))
+
+    if remote_exec.has_command_connection():
+        global unreal_response
+        unreal_response = remote_exec.run_command(commands, unattended=False)
+        return True
+
+    if failed_connect_attempts < 10:
+        return _execute_remote_commands(
+            remote_exec,
+            commands,
+            failed_connect_attempts=failed_connect_attempts + 1,
+            silent=silent,
+        )
+
+    display_cannot_connect_unreal_error(silent=silent)
+    return False
 
 
 def test_unreal_connection(silent: bool = True) -> bool:
     """
     Minimal Unreal remote execution connectivity test.
     """
-    remote_exec = remote_execution.RemoteExecution()
-    remote_exec.start()
+    result = run_unreal_python_commands('print("UNREAL_REMOTE_OK")', silent=silent)
 
-    run_unreal_python_commands(
-        remote_exec,
-        'print("UNREAL_REMOTE_OK")',
-        silent=silent
-    )
-
-    if unreal_response:
-        return True
-    else:
+    if result == {'CANCELLED'}:
         return False
+
+    return bool(result)
 
 
 def debug_remote_nodes():
+    """
+    Tries to discover unreal instances that can be connected to and displays to the user in a popup window.
+    """
     remote_exec = remote_execution.RemoteExecution()
     remote_exec.start()
 
-    import time
     time.sleep(2.0)
 
     remote_nodes = remote_exec.remote_nodes

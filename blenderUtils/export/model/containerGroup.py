@@ -68,10 +68,10 @@ class ContainerGroup(ABC):
             sc_result = self.__export_source_control_proc()
             if not sc_result:
                 if prefs().sourcecontrol.source_control_error_aborts_exp:
-                    msg = 'There were errors checking out files, aborting export!'
+                    msg = 'There were errors checking out file(s), aborting export!'
                     log(Severity.CRITICAL, self.CONTAINERS_NAME, msg)
                 else:
-                    msg = 'There were errors checking out files, proceeding with export regardless!'
+                    msg = 'There were errors checking out file(s), proceeding with export regardless!'
                     log(Severity.WARNING, self.CONTAINERS_NAME, msg)
 
         # Store current selection state
@@ -86,40 +86,10 @@ class ContainerGroup(ABC):
 
             if send and self.export_settings.engine == Engine.UNREAL:
 
-                # Override Send operator (per-container)
-                if prefs().bridge.ue_enable_send_override and prefs().bridge.ue_op_send_override:
-                    log(
-                        Severity.WARNING,
-                        self.CONTAINERS_NAME,
-                        f'Send to Unreal override from operator: "{prefs().bridge.ue_op_send_override}"',
-                    )
-                    op_idname = prefs().bridge.ue_op_send_override.strip()
+                result = sendUnreal.trigger_unreal_import(str(container.path))
 
-                    # Expect "category.op_name" (example: "wm.my_send_unreal")
-                    if "." not in op_idname:
-                        log(Severity.CRITICAL, self.__class__.__name__, f'Invalid operator idname: "{op_idname}"')
-                        raise ValueError(f'Invalid operator idname: "{op_idname}"')
-
-                    cat, op = op_idname.split(".", 1)
-
-                    # Call operator and pass FBX file path
-                    try:
-                        res = getattr(getattr(bpy.ops, cat), op)(path=str(container.path))
-                    except Exception as e:
-                        log(
-                            Severity.CRITICAL,
-                            self.__class__.__name__,
-                            f'Failed to run override operator "{op_idname}": {e}',
-                        )
-                        raise
-
-                    # Optional: treat operator cancellation as a hard stop
-                    if res == {'CANCELLED'}:
-                        return {'CANCELLED'}
-
-                else:
-                    # Default behavior
-                    sendUnreal.trigger_unreal_import(str(container.path))
+                if result == {'CANCELLED'}:
+                    return result
 
         # Restore previous selection state
         view_layer.objects.active = obj_active

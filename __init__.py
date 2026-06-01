@@ -47,7 +47,7 @@ bl_info = {
     "author": "Marc-André Voyer",
     "description": "",
     "blender": (4, 5, 1),
-    "version": (6, 5, 23),
+    "version": (6, 6, 2),
     "location": "",
     "warning": "",
     "category": "Generic",
