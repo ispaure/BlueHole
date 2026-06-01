@@ -126,7 +126,7 @@ def _execute_remote_commands(remote_exec, commands: str, failed_connect_attempts
     return False
 
 
-def test_unreal_connection(silent: bool = True) -> bool:
+def test_unreal_connection(silent) -> bool:
     """
     Minimal Unreal remote execution connectivity test.
     """

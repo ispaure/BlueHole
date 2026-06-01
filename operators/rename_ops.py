@@ -76,7 +76,7 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
             return {'CANCELLED'}
 
         # Test Unreal connection before asking for a new name
-        if not communicateUnreal.test_unreal_connection():
+        if not communicateUnreal.test_unreal_connection(silent=False):
             return {'CANCELLED'}
 
         root_obj = self.get_hierarchy_root(obj)
