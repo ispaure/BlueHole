@@ -27,6 +27,7 @@ from ....blenderUtils import blenderFile
 from ....Lib.commonUtils import fileUtils
 from ....blenderUtils.uiUtils import show_label
 from ....operators import import_ops
+from ....Lib.commonUtils.debugUtils import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -51,6 +52,9 @@ class BLUE_HOLE_MT_import(bpy.types.Menu):
                 op = layout.operator(import_ops.ImportMeshFBXOBJ.bl_idname, text=file_path_name, icon='IMPORT')
                 op.import_path_str = file
         else:
+            msg = (f'Folder path "{guide_mesh_dir_path}" is inaccessible, defaulting to default environment\'s '
+                   f'scale meshes.')
+            log(Severity.WARNING, 'Import Menu', msg)
             # layout.menu("BLUE_HOLE_MT_import_scale_guides")
             layout.separator()
             layout.operator(import_ops.ImportGuide_5_6_ScaleMan.bl_idname, icon='IMPORT')
