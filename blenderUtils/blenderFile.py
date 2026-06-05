@@ -157,7 +157,7 @@ def get_default_env_msh_guides_path() -> Path:
     """
     Get the msh_scale_guides directory path for the default environment.
     """
-    return Path(envManager.get_default_env().path, 'msh_scale_guides')
+    return Path(envManager.get_env_from_prefs_active_env().path, 'msh_scale_guides')
 
 
 def copy_dir(source_dir: Union[str, Path], destination_dir: Union[str, Path]) -> None:
