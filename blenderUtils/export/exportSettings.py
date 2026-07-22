@@ -55,5 +55,8 @@ class ExportSettings:
     apply_scale_options: str
     rename_collisions_for_ue: bool
 
+    # Mesh modifiers
+    use_mesh_modifiers: bool
+
     # Target Engine
     engine: Engine

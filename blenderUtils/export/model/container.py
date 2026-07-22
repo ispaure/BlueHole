@@ -197,7 +197,7 @@ class Container(ABC):
                 axis_forward=self.export_settings.axis_fwd,
                 axis_up=self.export_settings.axis_up,
                 mesh_smooth_type=self.export_settings.mesh_smooth_type,
-                use_mesh_modifiers=True,
+                use_mesh_modifiers=self.export_settings.use_mesh_modifiers,
                 apply_scale_options=self.export_settings.apply_scale_options,
                 bake_anim=self.export_settings.bake_anim,
             )
@@ -208,6 +208,7 @@ class Container(ABC):
                 filepath=str(self.path),
                 use_selection=True,
                 export_animations=self.export_settings.bake_anim,
+                use_mesh_modifiers=self.export_settings.use_mesh_modifiers,
                 export_format='GLTF_SEPARATE' if self.export_settings.exp_format == 'GLTF' else 'GLB'  # Embed all in one file
             )
         else:

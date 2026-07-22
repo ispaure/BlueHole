@@ -67,6 +67,7 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
                 bake_anim=prefs().bridge.unity_bridge_include_animation,
                 apply_scale_options="FBX_SCALE_UNITS",
                 rename_collisions_for_ue=False,
+                use_mesh_modifiers=prefs().bridge.unity_use_mesh_modifiers,
 
                 # ENGINE
                 engine=Engine.UNITY,
@@ -94,6 +95,7 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
                 bake_anim=prefs().bridge.ue_bridge_include_animation,
                 apply_scale_options="FBX_SCALE_NONE",
                 rename_collisions_for_ue=True,
+                use_mesh_modifiers=prefs().bridge.ue_use_mesh_modifiers,
 
                 # ENGINE
                 engine=Engine.UNREAL,
@@ -121,6 +123,7 @@ def get_export_settings(preset: ExportSettingsPreset) -> ExportSettings:
                 bake_anim=prefs().bridge.godot_bridge_include_animation,
                 apply_scale_options="FBX_SCALE_UNITS",
                 rename_collisions_for_ue=False,
+                use_mesh_modifiers=prefs().bridge.godot_use_mesh_modifiers,
 
                 # ENGINE
                 engine=Engine.GODOT,

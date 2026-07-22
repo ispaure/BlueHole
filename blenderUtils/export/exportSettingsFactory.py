@@ -62,6 +62,7 @@ class ExportSettingsFactory:
             bake_anim=preset.get("Bake Animation", prefs().bridge.ue_bridge_include_animation),
             apply_scale_options=preset.get("Apply Scale Option", "FBX_SCALE_NONE"),
             rename_collisions_for_ue=preset.get("Rename Collisions for UE", False),
+            use_mesh_modifiers=preset.get("Use Mesh Modifiers", True),
 
             engine=engine,
         )

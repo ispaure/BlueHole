@@ -119,6 +119,9 @@ class BridgePG(bpy.types.PropertyGroup):
     # Import Textures
     ue_import_textures: BoolProperty(name='Enable import of textures in Unreal.', default=False)
 
+    # Apply Mesh Modifiers on Export
+    ue_use_mesh_modifiers: BoolProperty(name='Apply Mesh Modifiers upon Export', default=True)
+
     # Override Send operator
     ue_enable_send_override: BoolProperty(
         name="Override Send to Unreal",
@@ -265,6 +268,10 @@ class BridgePG(bpy.types.PropertyGroup):
                                 default='Y'
                                 )
 
+    # Apply Mesh Modifiers on Export
+    unity_use_mesh_modifiers: BoolProperty(name='Apply Mesh Modifiers upon Export', default=True)
+
+
     # EXPORTS: ASSET HIERARCHIES (GODOT) -------------------------------------------------------------------------------
 
     # Godot Root Path
@@ -311,6 +318,9 @@ class BridgePG(bpy.types.PropertyGroup):
                                 items=axis_exp_lst,
                                 default='Y'
                                 )
+
+    # Apply Mesh Modifiers on Export
+    godot_use_mesh_modifiers: BoolProperty(name='Apply Mesh Modifiers upon Export', default=True)
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -388,6 +398,11 @@ def draw(preference, context, layout):
                 row.prop(preference.bridge, 'ue_automated', text='Automated Import')
                 row.prop(preference.bridge, 'ue_import_textures', text='Import Textures')
                 row.prop(preference.bridge, 'ue_import_materials', text='Import Materials')
+
+                # Use Mesh Modifiers
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_use_mesh_modifiers', text='Use Mesh Modifiers')
 
                 # -----------------------------------------------------------------------------------------
                 # OVERRIDE SEND OPERATOR
@@ -516,6 +531,11 @@ def draw(preference, context, layout):
                 row.prop(preference.bridge, 'unity_forward_axis', text='Forward Axis')
                 row.prop(preference.bridge, 'unity_up_axis', text='Up Axis')
 
+                # Use Mesh Modifiers
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'unity_use_mesh_modifiers', text='Use Mesh Modifiers')
+
             # -----------------------------------------------------------------------------------------
             # GODOT
             # -----------------------------------------------------------------------------------------
@@ -553,6 +573,11 @@ def draw(preference, context, layout):
                         row.prop(preference.bridge, 'godot_project_root_path_mac', text='Godot Project Root')
                     case OS.LINUX:
                         row.prop(preference.bridge, 'godot_project_root_path_linux', text='Godot Project Root')
+
+                # Use Mesh Modifiers
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'godot_use_mesh_modifiers', text='Use Mesh Modifiers')
 
                 # Format
                 row = column.row()
