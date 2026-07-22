@@ -39,6 +39,7 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.unity_up_axis', ini_section='SendAssetHierarchiesToUnity', ini_value='up_axis', var_type=str),
     Setting(pref_path='bridge.unity_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToUnity', ini_value='zero_root_transform', var_type=bool),
     Setting(pref_path='bridge.unity_bridge_include_animation', ini_section='SendAssetHierarchiesToUnity', ini_value='include_animation', var_type=bool),
+    Setting(pref_path='bridge.unity_use_mesh_modifiers', ini_section='SendAssetHierarchiesToUnity', ini_value='use_mesh_modifiers', var_type=bool),
 
     # Game Engine: Godot
     Setting(pref_path='bridge.godot_project_root_path', ini_section='SendAssetHierarchiesToGodot', ini_value='godot_project_root_path', var_type=str),
@@ -49,6 +50,7 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.godot_up_axis', ini_section='SendAssetHierarchiesToGodot', ini_value='up_axis', var_type=str),
     Setting(pref_path='bridge.godot_bridge_zero_root_transform', ini_section='SendAssetHierarchiesToGodot', ini_value='zero_root_transform', var_type=bool),
     Setting(pref_path='bridge.godot_bridge_include_animation', ini_section='SendAssetHierarchiesToGodot', ini_value='include_animation', var_type=bool),
+    Setting(pref_path='bridge.godot_use_mesh_modifiers', ini_section='SendAssetHierarchiesToGodot', ini_value='use_mesh_modifiers', var_type=bool),
 
     # FBX Exports (Loose)
     Setting(pref_path='bridge.exp_select_zero_root_transform', ini_section='ExportBatchSelectionToFBX', ini_value='zero_root_transform', var_type=bool),
@@ -59,6 +61,7 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.ue_automated', ini_section='SendAssetHierarchiesToUnreal', ini_value='is_automated', var_type=bool),
     Setting(pref_path='bridge.ue_import_materials', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_materials', var_type=bool),
     Setting(pref_path='bridge.ue_import_textures', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_textures', var_type=bool),
+    Setting(pref_path='bridge.ue_use_mesh_modifiers', ini_section='SendAssetHierarchiesToUnreal', ini_value='use_mesh_modifiers', var_type=bool),
     # Overrides
     Setting(pref_path='bridge.ue_enable_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_send_override', var_type=bool),
     Setting(pref_path='bridge.ue_op_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_send_override', var_type=str),

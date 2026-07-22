@@ -102,6 +102,7 @@ def batch_export_loose_mesh(path_append):
         bake_anim=False,
         apply_scale_options='FBX_SCALE_NONE',
         rename_collisions_for_ue=False,
+        use_mesh_modifiers=True,
 
         # ENGINE
         engine=Engine.UNDEFINED,
