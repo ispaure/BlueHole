@@ -28,6 +28,7 @@ from ....Lib.commonUtils import fileUtils
 from ....blenderUtils.uiUtils import show_label
 from ....operators import import_ops
 from ....Lib.commonUtils.debugUtils import *
+from typing import List
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -45,16 +46,22 @@ class BLUE_HOLE_MT_import(bpy.types.Menu):
         guide_mesh_dir_path: Path = blenderFile.get_default_env_msh_guides_path()
         if os.path.isdir(str(guide_mesh_dir_path)):
             layout.separator()
-            # Get list of .FBX in dir
-            file_lst = fileUtils.get_file_path_list(guide_mesh_dir_path, recursive=False, filter_extension='fbx')
+
+            # Get list of .FBX files in dir
+            file_lst: List[fileUtils.File] = fileUtils.get_file_list_from_path(guide_mesh_dir_path,
+                                                                               recursive=False,
+                                                                               filter_extension='fbx')
+
             for file in file_lst:
-                file_path_name = Path(file).name
-                op = layout.operator(import_ops.ImportMeshFBXOBJ.bl_idname, text=file_path_name, icon='IMPORT')
-                op.import_path_str = file
+                op = layout.operator(import_ops.ImportMeshFBXOBJ.bl_idname,
+                                     text=file.file_name,
+                                     icon='IMPORT')
+                op.import_path_str = str(file.path)
         else:
             msg = (f'Folder path "{guide_mesh_dir_path}" is inaccessible, defaulting to default environment\'s '
                    f'scale meshes.')
             log(Severity.WARNING, 'Import Menu', msg)
+
             # layout.menu("BLUE_HOLE_MT_import_scale_guides")
             layout.separator()
             layout.operator(import_ops.ImportGuide_5_6_ScaleMan.bl_idname, icon='IMPORT')

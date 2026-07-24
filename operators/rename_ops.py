@@ -230,7 +230,8 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
             fileUtils.copy_file(found_container.path, container_accounting_for_rename.path)
             # Delete file
             if os.path.isfile(str(found_container.path)):
-                fileUtils.delete_file(found_container.path)
+                file_to_delete = fileUtils.File(found_container.path)
+                file_to_delete.delete_file()
 
         # Final message (it worked!)
         msg = (
