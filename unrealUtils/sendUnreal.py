@@ -52,22 +52,6 @@ def trigger_unreal_import_default(file_path_source: str) -> bool:
     :param file_path_source: Source file to import
     """
 
-    def display_path_error_blend(sc_path, blend_path):
-        err_msg = (
-            f'{send_ue_name} validation failed.\n\n'
-            f'What went wrong:\n'
-            f'The currently opened Blender file is not located within the configured Source Content directory. '
-            f'Blender files must reside inside the Source Content folder to be exported.\n\n'
-            f'What to do:\n'
-            f'Move the Blender file into the Source Content folder, or update the Source Content path '
-            f'in the Environment Settings (Structure tab).\n\n'
-            f'Configured Source Content path:\n'
-            f'"{sc_path}"\n\n'
-            f'Current Blender file path:\n'
-            f'"{blend_path}"'
-        )
-        log(Severity.CRITICAL, send_ue_name, err_msg, popup=True)
-
     # Validate Source Content path from env_variables.ini and ensure the current .blend file is within it.
     sc_path = get_valid_source_content_path()
 
@@ -77,12 +61,7 @@ def trigger_unreal_import_default(file_path_source: str) -> bool:
 
     sc_path_str = str(sc_path)
 
-    if not filterUtils.check_tests('Export Asset Hierarchy', check_blend_exist=True):
-        return False
-
-    blend_path = str(Path(blenderFile.get_blend_directory_path()))
-    if sc_path_str not in blend_path:
-        display_path_error_blend(sc_path_str, blend_path)
+    if not filterUtils.check_tests('Export Asset Hierarchy', check_blend_exist=True, check_blend_in_source_content=True):
         return False
 
     file_path_dest = file_path_source.replace(sc_path_str, '/Game')

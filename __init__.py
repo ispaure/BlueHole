@@ -53,6 +53,9 @@ bl_info = {
     "category": "Generic",
 }
 
+# Set project prefix to include version for logging purposes
+debugUtils.project_prefix = f'{bl_info["name"]} {".".join(map(str, bl_info["version"]))}'
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -63,7 +66,6 @@ def register():
     operators_register.register()
     menus_register.register()
     keymaps_register.register()
-
 
     # Run initialization only after Blender has finished enabling the add-on.
     bpy.app.timers.register(_post_register_init, first_interval=0.0)
