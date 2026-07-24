@@ -82,7 +82,7 @@ def check_tests(script_name, *,
     :param check_source_content_root_path_exist: Check whether the Source Content Root Path exists.
     :param check_blend_in_source_content: Check whether the Blender file is within Source Content.
     :param check_unity_assets_path_exist: Check whether the Unity project's Assets path exists.
-    :param check_unity_assets_path_exist: Check whether the Godot project's root path exists.
+    :param :param check_godot_project_root_path_exist: Check whether the Godot project's root path exists.
     :param silent_mode: If True, do not show dialog boxes on errors.
     """
 
@@ -220,14 +220,14 @@ def check_tests(script_name, *,
         log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
 
     def display_path_error_blend(sc_path_seek, blend_path_found):
-        msg = (
+        err_msg = (
             f'{script_name} validation failed.\n\n'
             f'What went wrong:\n'
-            f'The opened Blender file is not located within the configured Source Content directory. '
-            f'This is required to mirror the folder structure into the Unity project during export.\n\n'
+            f'The currently opened Blender file is not located within the configured Source Content directory. '
+            f'Blender files must reside inside the Source Content folder to be exported.\n\n'
             f'What to do:\n'
-            f'Move the Blender file into the Source Content directory, or update the Environment Settings '
-            f'to point to the correct Source Content folder.\n\n'
+            f'Move the Blender file into the Source Content folder, or update the Source Content path '
+            f'in the Environment Settings (Structure tab).\n\n'
             f'Configured Source Content path:\n'
             f'"{sc_path_seek}"\n\n'
             f'Current Blender file path:\n'
@@ -297,14 +297,16 @@ def check_tests(script_name, *,
 
         match get_os():
             case OS.WIN:
-                sc_path_str = str(sc_path).lower()
-                blend_path = str(Path(blenderFile.get_blend_directory_path())).lower()
+                sc_path_compare = Path(str(sc_path).lower())
+                blend_path_compare = Path(str(Path(blenderFile.get_blend_directory_path())).lower())
             case OS.MAC | OS.LINUX:
-                sc_path_str = str(sc_path)
-                blend_path = str(Path(blenderFile.get_blend_directory_path()))
+                sc_path_compare = Path(sc_path)
+                blend_path_compare = Path(blenderFile.get_blend_directory_path())
 
-        if not blend_path.startswith(sc_path_str):
-            display_path_error_blend(sc_path, blend_path)
+        try:
+            blend_path_compare.relative_to(sc_path_compare)
+        except ValueError:
+            display_path_error_blend(sc_path, Path(blenderFile.get_blend_directory_path()))
             return False
 
     # Check that Unity Assets path exists
