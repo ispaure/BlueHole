@@ -61,9 +61,19 @@ class P4Info:
 
     def update_fields(self):
 
-        # Check P4 status
-        status_array = exec_p4_command('p4 status')
-        if 'password' in status_array[0] and 'invalid or unset' in status_array[0]:
+        # !!! KEPT THIS UNTIL NEW METHOD IS TESTED TO WORK FINE. BUT IT'S COMPUTATIONALLY EXPENSIVE !!!
+        # # Check P4 status
+        # status_array = exec_p4_command('p4 status')
+        # if 'password' in status_array[0] and 'invalid or unset' in status_array[0]:
+        #     self.status = False
+        #     P4ErrorMessage().login_token_expired()
+        #     return
+
+        # NEW METHOD (CHEAP TO RUN)
+        # Check login token
+        login_array = exec_p4_command('p4 login -s')
+
+        if 'password' in login_array[0].lower() and 'invalid or unset' in login_array[0].lower():
             self.status = False
             P4ErrorMessage().login_token_expired()
             return
