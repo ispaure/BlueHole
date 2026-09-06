@@ -17,12 +17,13 @@ __status__ = 'Production'
 
 # Blender
 import bpy
+from pathlib import Path
 
 # Blue Hole
 from ..blenderUtils import blenderFile, projectUtils, filterUtils
 from ..environment import envPathResolver
 from ..preferences.prefs import *
-from ..Lib.commonUtils import fileUtils
+from ..Lib.commonUtils import dirUtils
 from ..Lib.commonUtils.osUtils import get_os, OS
 from ..wrappers.sourceContentPath import get_valid_source_content_path
 from ..wrappers.perforce.p4_info import P4Info
@@ -90,7 +91,7 @@ class OpenP4WorkspaceRootFolder(bpy.types.Operator):
             return {'FINISHED'}
 
         # Open folder
-        fileUtils.open_dir_path(P4Info().client_root)
+        dirUtils.Directory(P4Info().client_root).open()
         return {'FINISHED'}
 
 
@@ -113,7 +114,7 @@ class OpenUserResourcePath(bpy.types.Operator):
 
     def execute(self, context):
         appdata_path = blenderFile.get_resource_path_user()
-        fileUtils.open_dir_path(appdata_path)
+        dirUtils.Directory(appdata_path).open()
         return {'FINISHED'}
 
 
@@ -126,7 +127,7 @@ class OpenSourceContentPath(bpy.types.Operator):
     def execute(self, context):
         valid_sc_path = get_valid_source_content_path()
         if valid_sc_path:
-            fileUtils.open_dir_path(valid_sc_path)
+            dirUtils.Directory(valid_sc_path).open()
         return {'FINISHED'}
 
 
@@ -142,7 +143,7 @@ class OpenUnityAssetsPath(bpy.types.Operator):
             OS.MAC: prefs().bridge.unity_assets_path_mac,
             OS.LINUX: prefs().bridge.unity_assets_path_linux
         }
-        fileUtils.open_dir_path(unity_assets_path_os_dict[get_os()])
+        dirUtils.Directory(Path(unity_assets_path_os_dict[get_os()])).open()
         return {'FINISHED'}
 
 
@@ -158,7 +159,7 @@ class OpenGodotProjectRootPath(bpy.types.Operator):
             OS.MAC: prefs().bridge.godot_project_root_path_mac,
             OS.LINUX: prefs().bridge.godot_project_root_path_linux
         }
-        fileUtils.open_dir_path(godot_project_root_path[get_os()])
+        dirUtils.Directory(Path(godot_project_root_path[get_os()])).open()
         return {'FINISHED'}
 
 
@@ -180,7 +181,7 @@ class OpenUnityAssetsCurrentExportPath(bpy.types.Operator):
         else:
             unity_exp_dir_path = envPathResolver.get_unity_exp_dir_path()
             if unity_exp_dir_path:
-                fileUtils.open_dir_path(str(unity_exp_dir_path))
+                dirUtils.Directory(unity_exp_dir_path).open()
         return {'FINISHED'}
 
 
@@ -202,9 +203,8 @@ class OpenGodotCurrentExportPath(bpy.types.Operator):
         else:
             godot_exp_dir_path = envPathResolver.get_godot_exp_dir_path()
             if godot_exp_dir_path:
-                fileUtils.open_dir_path(str(godot_exp_dir_path))
+                dirUtils.Directory(godot_exp_dir_path).open()
         return {'FINISHED'}
-
 
 
 # ----------------------------------------------------------------------------------------------------------------------

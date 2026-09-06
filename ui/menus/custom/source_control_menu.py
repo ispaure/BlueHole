@@ -24,7 +24,7 @@ from typing import List
 from ....operators import help_ops, source_control_ops, external_addon_ops
 from ....preferences.prefs import *
 from ....blenderUtils import blenderFile, projectUtils
-from ....Lib.commonUtils import fileUtils
+from ....Lib.commonUtils import fileUtils, dirUtils
 from ....operators import directory_ops
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -89,8 +89,7 @@ class BLUE_HOLE_MT_perforce_debug_fstat(bpy.types.Menu):
                 layout.operator(directory_ops.OpenFinalFolder.bl_idname, icon='FILE_FOLDER')
 
                 # List files
-                file_lst: List[fileUtils.File] = fileUtils.get_file_list_from_path(final_dir,
-                                                                                   recursive=False)
+                file_lst: List[fileUtils.File] = dirUtils.Directory(final_dir).list_files(recursive=False)
 
                 for file in file_lst:
                     op = layout.operator(source_control_ops.P4DisplayFileFstat.bl_idname, text=file.file_name)

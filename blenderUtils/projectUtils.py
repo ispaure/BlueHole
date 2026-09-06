@@ -18,7 +18,7 @@ __status__ = 'Production'
 from pathlib import Path
 
 from . import blenderFile, filterUtils
-from ..Lib.commonUtils import fileUtils
+from ..Lib.commonUtils import dirUtils
 from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -61,4 +61,4 @@ def open_project_sub_dir(path_append):
         return False
 
     dir_to_open = get_project_sub_dir(path_append)
-    fileUtils.open_dir_path(dir_to_open)
+    dirUtils.Directory(dir_to_open).open()
