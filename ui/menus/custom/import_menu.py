@@ -24,7 +24,7 @@ from pathlib import Path
 
 # Blue Hole
 from ....blenderUtils import blenderFile
-from ....Lib.commonUtils import fileUtils
+from ....Lib.commonUtils import fileUtils, dirUtils
 from ....blenderUtils.uiUtils import show_label
 from ....operators import import_ops
 from ....Lib.commonUtils.debugUtils import *
@@ -48,9 +48,7 @@ class BLUE_HOLE_MT_import(bpy.types.Menu):
             layout.separator()
 
             # Get list of .FBX files in dir
-            file_lst: List[fileUtils.File] = fileUtils.get_file_list_from_path(guide_mesh_dir_path,
-                                                                               recursive=False,
-                                                                               filter_extension='fbx')
+            file_lst: List[fileUtils.File] = dirUtils.Directory(guide_mesh_dir_path).list_files(recursive=False, filter_extension='fbx')
 
             for file in file_lst:
                 op = layout.operator(import_ops.ImportMeshFBXOBJ.bl_idname,

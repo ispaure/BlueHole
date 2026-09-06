@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import *
 
 from ..Lib.commonUtils import configUtils
-from ..Lib.commonUtils import fileUtils
+from ..Lib.commonUtils import fileUtils, dirUtils
 from ..Lib.commonUtils.debugUtils import *
 from ..blenderUtils import blenderFile
 from ..preferences.prefs import *
@@ -176,7 +176,7 @@ class Environment:
         """
         Delete this environment directory from disk.
         """
-        fileUtils.delete_dir(self.path)
+        dirUtils.Directory(self.path).delete()
 
     def delete_env(self):
         """
