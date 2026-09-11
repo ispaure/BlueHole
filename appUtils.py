@@ -19,8 +19,8 @@ import stat
 import shlex
 
 # Common utilities
-from .pySideUtils import *
 from .osUtils import *
+from .debugUtils import log, Severity
 from . import fileUtils, dirUtils
 
 # Wrappers
@@ -33,21 +33,26 @@ class App:
 
 
 class DiskApp(App):
-    def __init__(self, name, exec_path: Union[str, Path, None], install_path: Union[Path, None] = None):
+    def __init__(self, name, exec_path: Optional[Union[str, Path]], install_path: Optional[Path] = None):
         super().__init__(name)
         self.exec_path = exec_path
         self.install_path = install_path
 
-    def launch(self):
+    def launch(self, fully_detached: bool = False, open_console: bool = False):
+        """
+        Launch application.
+        :param fully_detached: Launch application independently from the current process.
+        :param open_console: Launch regular applications with a visible console / terminal window.
+        """
         match get_os():
             case OS.WIN:
-                self.__launch_windows()
+                self.__launch_windows(fully_detached, open_console)
             case OS.MAC:
-                self.__launch_macos()
+                self.__launch_macos(fully_detached, open_console)
             case OS.LINUX:
-                self.__launch_linux()
+                self.__launch_linux(fully_detached, open_console)
 
-    def __launch_windows(self):
+    def __launch_windows(self, fully_detached: bool = False, open_console: bool = False):
         path_win = Path(self.exec_path)
         path_win_str = str(path_win)
 
@@ -62,11 +67,45 @@ class DiskApp(App):
         elif path_win_str.lower().endswith(('.cmd', '.bat')):  # If CMD, run in new window
             cmdShellWrapper.exec_cmd(path_win_str, wait_for_output=False, in_new_window=True, cwd=cwd)
 
+        elif fully_detached:
+            creation_flags = subprocess.CREATE_NEW_PROCESS_GROUP
+
+            if open_console:
+                creation_flags |= subprocess.CREATE_NEW_CONSOLE
+
+                subprocess.Popen(
+                    [path_win_str],
+                    cwd=str(cwd),
+                    creationflags=creation_flags,
+                    close_fds=True
+                )
+
+            else:
+                creation_flags |= subprocess.DETACHED_PROCESS
+
+                subprocess.Popen(
+                    [path_win_str],
+                    cwd=str(cwd),
+                    creationflags=creation_flags,
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    close_fds=True
+                )
+
+        elif open_console:
+            subprocess.Popen(
+                [path_win_str],
+                cwd=str(cwd),
+                creationflags=subprocess.CREATE_NEW_CONSOLE,
+                close_fds=True
+            )
+
         else:
             print('App Launcher: Executing Regular Launch')
             cmdShellWrapper.exec_cmd(path_win_str, wait_for_output=False, cwd=cwd)
 
-    def __launch_macos(self):
+    def __launch_macos(self, fully_detached: bool = False, open_console: bool = False):
         path_macos = Path(self.exec_path)
         path_macos_str = str(path_macos)
 
@@ -78,10 +117,26 @@ class DiskApp(App):
 
         if path_macos_str.lower().endswith(('.command', '.sh')):
             cmdShellWrapper.exec_cmd(quoted_path, wait_for_output=False, in_new_window=True, cwd=cwd)
+
+        elif open_console:
+            cmdShellWrapper.exec_cmd(quoted_path, wait_for_output=False, in_new_window=True, cwd=cwd)
+
+        elif fully_detached:
+            subprocess.Popen(
+                [path_macos_str],
+                cwd=str(cwd),
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                close_fds=True,
+                start_new_session=True,
+                env=os.environ.copy()
+            )
+
         else:
             cmdShellWrapper.exec_cmd(quoted_path, wait_for_output=False, cwd=cwd)
 
-    def __launch_linux(self):
+    def __launch_linux(self, fully_detached: bool = False, open_console: bool = False):
         path_linux = Path(self.exec_path)
         path_linux_str = str(path_linux)
 
@@ -93,6 +148,22 @@ class DiskApp(App):
 
         if path_linux_str.lower().endswith('.sh'):
             cmdShellWrapper.exec_cmd(quoted_path, wait_for_output=False, in_new_window=True, cwd=cwd)
+
+        elif open_console:
+            cmdShellWrapper.exec_cmd(quoted_path, wait_for_output=False, in_new_window=True, cwd=cwd)
+
+        elif fully_detached:
+            subprocess.Popen(
+                [path_linux_str],
+                cwd=str(cwd),
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                close_fds=True,
+                start_new_session=True,
+                env=os.environ.copy()
+            )
+
         else:
             cmdShellWrapper.exec_cmd(quoted_path, wait_for_output=False, cwd=cwd)
 
@@ -121,7 +192,7 @@ class StoreApp(App):
                 return aumid
 
         error_msg = f'Could not recover Application User Model ID for: {self.name}. Install first and try again!'
-        display_msg_box_ok('App Launcher', error_msg)
+        log(Severity.ERROR, 'App Launcher', error_msg, popup=True)
         return None
 
     def launch(self):
@@ -132,13 +203,13 @@ class StoreApp(App):
                     os.system(f'explorer shell:appsFolder\\{aumid}')
 
             case OS.MAC:
-                display_msg_box_ok('Store App Launcher', 'Windows Apps not supported on macOS')
+                log(Severity.ERROR, 'Store App Launcher', 'Windows Apps not supported on macOS', popup=True)
 
             case OS.LINUX:
-                display_msg_box_ok('Store App Launcher', 'Windows Apps not supported on Linux')
+                log(Severity.ERROR, 'Store App Launcher', 'Windows Apps not supported on Linux', popup=True)
 
             case _:
-                display_msg_box_ok('Store App Launcher', 'Windows Apps not supported on (Undefined)')
+                log(Severity.ERROR, 'Store App Launcher', 'Windows Apps not supported on (Undefined)', popup=True)
 
 
 class Flatpak(App):
@@ -192,13 +263,13 @@ class AppImage(App):
 def validate_exec(name, exec_path):
     if exec_path is None or exec_path == 'None':
         msg = f'{name} path is not specified (None) for current Operating System! Update code and try again!'
-        display_msg_box_ok('App Launcher', msg)
+        log(Severity.ERROR, 'App Launcher', msg, popup=True)
         return False
 
     elif not os.path.isfile(exec_path):
         msg = (f'{name} is not currently installed (Expected location: {exec_path}). '
-               f'Install first and try again!')
-        display_msg_box_ok('App Launcher', msg)
+            f'Install first and try again!')
+        log(Severity.ERROR, 'App Launcher', msg, popup=True)
         return False
 
     return True
