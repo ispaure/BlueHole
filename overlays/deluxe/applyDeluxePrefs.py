@@ -17,12 +17,10 @@ __status__ = 'Production'
 
 
 import sys
-from typing import *
 from pathlib import Path
 from ...blenderUtils import blenderFile
-from ...Lib.commonUtils.debugUtils import *
-from ...Lib.commonUtils.uiUtils import *
-from ...Lib.commonUtils import fileUtils
+from ...Lib.commonUtils.debugUtils import log, Severity
+from ...Lib.commonUtils import fileUtils, ui
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -67,7 +65,7 @@ def warning_bh_deluxe() -> bool:
            'After installation, you will be prompted to close Blender. Ensure all work is saved now before proceeding.'
            '\n\n'
            'Do you want to continue?')
-    return display_msg_box_ok_cancel('WARNING: APPLY BLUE HOLE DELUXE PREFERENCES', msg)
+    return ui.display_msg_box_ok_cancel('WARNING: APPLY BLUE HOLE DELUXE PREFERENCES', msg)
 
 
 def notice_blender_closure():

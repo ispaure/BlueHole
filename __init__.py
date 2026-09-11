@@ -23,9 +23,9 @@ print('STARTING BLUE HOLE')
 
 import bpy
 
-# Disable PySide UI usage and rely on OS terminal windows instead.
-from .Lib.commonUtils import uiUtils
-uiUtils.use_pyside = False
+# Disable PySide UI usage and rely on the native OS UI backend instead.
+from .Lib.commonUtils import ui
+ui.use_pyside = False
 
 # Set Debug Project Prefix for logging, remove time delta unless profiling.
 from .Lib.commonUtils import debugUtils
