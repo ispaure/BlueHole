@@ -12,8 +12,7 @@ __status__ = 'Production'
 # IMPORTS
 
 # System
-import enum
-from typing import *
+from typing import List, Optional, Union
 from pathlib import Path
 
 # Blender
@@ -21,9 +20,9 @@ import bpy
 
 # Blue Hole
 from ...blenderUtils import filterUtils
-from ...Lib.commonUtils.debugUtils import *
-from ...Lib.commonUtils import uiUtils, fileUtils
-from ...Lib.commonUtils.osUtils import *
+from ...Lib.commonUtils.debugUtils import log, Severity
+from ...Lib.commonUtils import ui, fileUtils
+from ...Lib.commonUtils.osUtils import OS, get_os
 from .p4_messages import P4LogMessage, P4ErrorMessage, P4CriticalMessage
 from .p4_file_status import P4FileStatus
 from .p4_info import P4Info
@@ -266,7 +265,7 @@ class P4File:
 
     def _run_p4_sync(self):
         self._callback_pre_sync()
-        # progress_bar = uiUtils.display_progress_bar(f'{tool_name}: Getting Latest...')
+        # progress_bar = ui.pyside.display_progress_bar(f'{tool_name}: Getting Latest...')
         # progress_bar.update_progress(10)
         self.__run_p4_cmd(command='p4 sync -f', incl_status_lst=[P4FileStatus.NOT_LATEST_REVISION])
         # progress_bar.update_progress(100)
@@ -300,8 +299,9 @@ class P4File:
     def open_for_edit(self, silent: bool = False, allow_sync: bool = True):
 
         msg = (
-            'P4File.open_for_edit: Running single-file open_for_edit, which is costly to run in a loop. Please only use for explicit checkout'
-            'requiring user interaction. For batch checkout, use P4FileGroup.open_for_edit instead as it is more optimized!')
+            'P4File.open_for_edit: Running single-file open_for_edit, which is costly to run in a loop. Please only use '
+            'for explicit checkout requiring user interaction. For batch checkout, use P4FileGroup.open_for_edit instead '
+            'as it is more optimized!')
         log(Severity.WARNING, tool_name, msg)
 
         # Perforce Server accessible Check
@@ -334,7 +334,7 @@ class P4File:
                 self._run_p4_add()
             else:
                 msg = f'File "{self.file_name}" is not marked for add. Do you want to mark for add?'
-                msg_box_result = uiUtils.display_msg_box_ok_cancel(tool_name, msg)
+                msg_box_result = ui.display_msg_box_ok_cancel(tool_name, msg)
                 if msg_box_result:
                     self._run_p4_add()
                 else:
@@ -349,7 +349,7 @@ class P4File:
                 self._run_p4_sync()
             else:
                 msg = f'File "{self.file_name}" is not synced to the latest revision. Sync to the latest revision?'
-                msg_box_result = uiUtils.display_msg_box_ok_cancel(tool_name, msg)
+                msg_box_result = ui.display_msg_box_ok_cancel(tool_name, msg)
                 if msg_box_result:
                     self._run_p4_sync()
                 else:
@@ -361,7 +361,7 @@ class P4File:
                 self._run_p4_edit()
             else:
                 msg = f'File "{self.file_name}" is not checked out. Check out?'
-                msg_box_result = uiUtils.display_msg_box_ok_cancel(tool_name, msg)
+                msg_box_result = ui.display_msg_box_ok_cancel(tool_name, msg)
                 if msg_box_result:
                     self._run_p4_edit()
                 else:
