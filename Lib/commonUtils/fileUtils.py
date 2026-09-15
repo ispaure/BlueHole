@@ -16,6 +16,7 @@ import stat
 import subprocess
 from pathlib import Path
 from shutil import rmtree, copyfile, move
+import csv
 
 # Common utilities
 from .osUtils import *
@@ -24,8 +25,6 @@ from .wrappers import cmdShellWrapper
 
 
 match get_os():
-    case OS.WIN:
-        from . import junctionUtils
     case OS.LINUX:
         import pwd
 
@@ -63,10 +62,16 @@ class File:
         except FileNotFoundError:
             return None
 
-    def delete_file(self) -> bool:
+    def delete_file(self, make_writable: bool = False) -> bool:
         """
         Deletes the file on disk.
-        Returns True if successfully deleted, False otherwise.
+
+        By default, file permissions are not modified before deletion.
+        If make_writable is True and deletion fails due to permissions,
+        the file is made writable and deletion is attempted again.
+
+        Returns True if successfully deleted.
+        Raises a CRITICAL error if deletion fails.
 
         macOS AppleDouble files starting with "._" are treated as successfully deleted
         if they disappear before the delete operation completes.
@@ -76,16 +81,30 @@ class File:
 
         try:
             os.remove(self.path)
-            return not self.path.exists()
+
         except FileNotFoundError as e:
             if self.path.name.startswith('._'):
                 return True
 
-            log(Severity.ERROR, 'Delete File', f'Could not delete "{self.path}"\n{type(e).__name__}: {e}')
-            return False
+            log(Severity.CRITICAL, 'Delete File', f'Could not delete "{self.path}"\n{type(e).__name__}: {e}')
+
+        except PermissionError as e:
+            if not make_writable:
+                log(Severity.CRITICAL, 'Delete File', f'Could not delete "{self.path}" due to permissions\n{type(e).__name__}: {e}')
+
+            try:
+                self.make_writable()
+                os.remove(self.path)
+            except Exception as retry_error:
+                log(Severity.CRITICAL, 'Delete File', f'Could not delete "{self.path}" after making it writable\n{type(retry_error).__name__}: {retry_error}')
+
         except Exception as e:
-            log(Severity.ERROR, 'Delete File', f'Could not delete "{self.path}"\n{type(e).__name__}: {e}')
-            return False
+            log(Severity.CRITICAL, 'Delete File', f'Could not delete "{self.path}"\n{type(e).__name__}: {e}')
+
+        if self.path.exists():
+            log(Severity.CRITICAL, 'Delete File', f'File still exists after deletion attempt: "{self.path}"')
+
+        return True
 
     def make_writable(self) -> bool:
         """
@@ -126,8 +145,10 @@ class File:
         log(Severity.DEBUG, tool_name, f'Getting CHMOD+X Permission for "{self.path}"')
         cmdShellWrapper.exec_cmd(f'chmod +x "{self.path}"')
 
-
 class TXTFile(File):
+    """
+    Deprecated; point to fileTypes.txtType instead.
+    """
     def __init__(self, path: Path):
         super().__init__(path)
         self.line_lst = []
@@ -217,188 +238,8 @@ def move_file(src: Path, dest: Path) -> bool:
         return False
 
 
-def create_n_wipe_dir(path: Path):
-    """
-    Creates directory at path if it does not exist, also wipes contents and double-check it's fully empty.
-    """
-    if not os.path.isdir(path):
-        make_dir(path)
-    if not is_dir_empty(path):
-        from .dirUtils import Directory
-        Directory(path).delete_contents()
-        # Double-Check that it is empty now
-        if not is_dir_empty(path):
-            log(Severity.CRITICAL, 'fileUtils.create_n_wipe_dir', f'Could not delete dir contents in {path}')
-
-
 def has_subdirectories(path: Path) -> bool:
     return any(item.is_dir() for item in path.iterdir())
-
-
-def delete_symbolic_link(dir_path):
-    try:
-        os.unlink(dir_path)
-    except:
-        try:
-            os.remove(dir_path)
-        except:
-            pass
-
-
-def create_symbolic_link(source_dir, destination_dir):
-    """
-    Creates a symbolic link from the source dir to the destination dir
-    """
-    tool_name = 'Create Symbolic Link'
-
-    # Resolve source dir (avoiding potential issues when creating a link)
-    if isinstance(source_dir, Path):
-        source_dir_resolved = source_dir.resolve()
-    elif isinstance(source_dir, str):
-        source_dir_path = Path(source_dir)
-        source_dir_resolved = source_dir_path.resolve()
-    else:
-        log(Severity.ERROR, tool_name, 'Source Dir Input is not a Path or string!')
-        return
-
-    # If there is no directory within where the symbolic link is supposed to be created, there will be an error.
-    # Create directory if required
-    if isinstance(destination_dir, Path):
-        destination_dir_parent = destination_dir.parent
-    elif isinstance(destination_dir, str):
-        destination_dir_path = Path(destination_dir)
-        destination_dir_parent = destination_dir_path.parent
-    else:
-        log(Severity.ERROR, tool_name, 'Destination Dir Input is not a Path or string!')
-        return
-    if not os.path.isdir(destination_dir_parent):
-        make_dir(destination_dir_parent)
-
-    os.symlink(source_dir_resolved, destination_dir)
-
-
-def update_symbolic_link(source: Path, destination: Path, allow_destination_deletion=False):
-    """
-    Creates a symbolic link (allowing directory deletion if a directory exists at source when specified only)
-    If a link already exists, see if it points to the right folder, else updates it.
-    """
-
-    # Tool Name
-    tool_name = f'Symbolic Link (Update)'
-    # Log Message
-    msg = f'Source: "{source}"\nDestination: "{destination}"'
-
-    # If source for symbolic link does not exist, abort right now!
-    if not os.path.exists(source):
-        msg += f'\nSource does not exist; Aborting!'
-        log(Severity.ERROR, tool_name, msg)
-        return
-
-    # If there is something there other than a symbolic link, wipe it (if authorized)
-    if os.path.exists(destination) and not is_symbolic_link(destination):
-        if not allow_destination_deletion:
-            msg += '\nDestination already exists (And "allow_destination_deletion" is not enabled); Aborting!'
-            log(Severity.ERROR, tool_name, msg)
-            return
-        else:
-            if is_junction(destination):
-                msg += '\nDestination is junction; unsure how to delete as of yet; Aborting!'
-                log(Severity.ERROR, tool_name, msg)
-                return
-            # elif is_hard_link(destination):
-            #     print(f'{tool_name}: Destination is hard link, unsure how to delete as of yet!')
-            elif os.path.isfile(destination):
-                msg += '\nDestination is a file, not expected for Symbolic Link creation. Aborting!'
-                log(Severity.ERROR, tool_name, msg)
-                return
-            elif is_mount_point(destination):
-                msg += '\nDestination is a mount point, unsure how to delete as of yet!'
-                # delete_symbolic_link(destination)
-                log(Severity.ERROR, tool_name, msg)
-                return
-            elif is_dir(destination):
-                msg += '\nDestination is a directory! Deleting...'
-                from .dirUtils import Directory
-                Directory(destination).delete()
-            else:
-                msg += '\nDestination is unknown type, unsure how to delete as of yet!'
-                log(Severity.ERROR, tool_name, msg)
-                return
-
-    # If it's a symbolic link, see if path matches expected
-    if is_symbolic_link(destination):
-        destination_link_path = os.path.realpath(destination)
-        if str(Path(destination_link_path)) != str(source):
-            msg += '\nSymbolic Link exists at destination, but doesn\'t match expected destination. Updating...'
-            # Delete existing link
-            delete_symbolic_link(destination)
-            # Make a link to the folder
-            create_symbolic_link(source, destination)
-            log(Severity.DEBUG, tool_name, msg)
-        else:
-            msg += '\nSymbolic Link Already Up to Date!'
-            log(Severity.DEBUG, tool_name, msg)
-    else:
-        # Create new symbolic link
-        msg += '\nSymbolic Link doesn\'t exist at location. Creating...'
-        # Make a link to the folder
-        create_symbolic_link(source, destination)
-        log(Severity.DEBUG, tool_name, msg)
-
-
-def is_junction(path: Union[str, Path]):
-    if get_os() == OS.WIN:
-        return junctionUtils.is_junction(path)
-    else:
-        return False
-
-
-def is_symbolic_link(path: Union[str, Path]):
-    if os.path.islink(path):
-        return True
-    else:
-        return False
-
-
-def is_mount_point(path: Union[str, Path]):
-    if get_os() != OS.WIN:
-        return False
-
-    # Convert type
-    if isinstance(path, str):
-        path_str = path
-    elif isinstance(path, Path):
-        path_str = str(path)
-    else:
-        print('Wrong type!')
-        return None
-
-    # FSUTIL QUERY
-    output_lines = cmdShellWrapper.exec_cmd(f'fsutil reparsepoint query "{path_str}"')
-    for line in output_lines:
-        if line == 'Tag value: Mount Point':
-            return True
-    return False
-
-
-def is_dir(path: Union[str, Path]):
-    """
-    Returns whether a path is a directory.
-    More accurate than os.path.isdir as it will return False if the target is a junction, symbolic link or hard link
-    """
-
-    if not os.path.isdir(path):
-        return False
-    # elif is_hard_link(path):
-    #     return False
-    elif is_junction(path):
-        return False
-    elif is_mount_point(path):
-        return False
-    elif is_symbolic_link(path):
-        return False
-    else:
-        return True
 
 
 def get_split_character():
@@ -472,14 +313,12 @@ def copy_file(source: Union[str, Path], destination: Union[str, Path]) -> bool:
 def make_dir(directory):
     """
     Creates directory at location (if it doesn't exist)
+    DEPRECATED: Fix any usage by swapping to Directory.make_dir() instead.
     """
+    log(Severity.WARNING, 'fileUtils.make_dir', 'This function is deprecated! Use dirUtils.Directory.make_dir instead.')
     if not os.path.exists(directory):
         log(Severity.DEBUG, 'fileUtils.make_dir', f'Creating Directory at "{directory}"')
         Path(directory).mkdir(parents=True, exist_ok=True)
-
-
-def is_dir_empty(path: Path) -> bool:
-    return not any(path.iterdir())
 
 
 def get_current_working_dir() -> Path:
