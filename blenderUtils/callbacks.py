@@ -28,6 +28,7 @@ EVENT_LOG_TITLE = 'Callback Event'
 # GLOBALS
 
 SKIP_NEXT_SAVE_PRE_SC_CHECK: bool = False
+CHECK_SC_AFTER_SAVE: bool = False
 
 # ----------------------------------------------------------------------------------------------------------------------
 # HELPERS
@@ -79,7 +80,19 @@ def save_pre_handler(dummy):
 
 @bpy.app.handlers.persistent
 def save_post_handler(dummy):
+    global CHECK_SC_AFTER_SAVE
+
     _log_callback_event('save_post')
+
+    if CHECK_SC_AFTER_SAVE:
+        CHECK_SC_AFTER_SAVE = False
+
+        if blenderFile.has_blend_filepath():
+            sourceControlUtils.sc_check_blend(
+                blenderFile.get_blend_file_path(),
+                allow_sync=False,
+                silent_mode=False,
+            )
 
 
 def register():
