@@ -15,6 +15,9 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
+# Python
+import os
+
 # Blender
 import bpy
 from bpy.props import *
@@ -63,7 +66,17 @@ class BHSaveAsMainfile(bpy.types.Operator, ExportHelper):
 
         blend_path = self.filepath
 
-        sourceControlUtils.sc_check_blend(blend_path, allow_sync=False, silent_mode=False)
+        if os.path.exists(blend_path):
+            # Existing destination: check source control before overwriting it.
+            sourceControlUtils.sc_check_blend(
+                blend_path,
+                allow_sync=False,
+                silent_mode=False,
+            )
+        else:
+            # New destination: Blender has to create the file before it can
+            # be processed by source control.
+            callbacks.CHECK_SC_AFTER_SAVE = True
 
         callbacks.SKIP_NEXT_SAVE_PRE_SC_CHECK = True
 
