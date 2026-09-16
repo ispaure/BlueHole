@@ -28,6 +28,7 @@ from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGro
 from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export.looseMesh.containerGroup import batch_export_loose_mesh
 from ..blenderUtils.export.model import containerUtils
+from ..Lib.commonUtils import ui
 from ..preferences.prefs import *
 from ..unrealUtils import communicateUnreal
 
@@ -241,7 +242,7 @@ class BH_OT_export_containers(bpy.types.Operator):
                 confirm_title=self.confirm_title or None,
                 confirm_msg=self.confirm_msg or None,
             )
-            if not uiUtils.display_msg_box_ok_cancel(title, msg):
+            if not ui.display_msg_box_ok_cancel(title, msg):
                 return {'CANCELLED'}
 
         # Run all selected container types

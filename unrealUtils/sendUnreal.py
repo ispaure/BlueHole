@@ -125,6 +125,10 @@ def import_asset(file_path_source: str, file_path_dest: str) -> bool:
             f'\toptions.mesh_type_to_import = unreal.FBXImportType.FBXIT_STATIC_MESH',
             f'\toptions.static_mesh_import_data.import_mesh_lo_ds = {False}',
             f'\toptions.static_mesh_import_data.set_editor_property("combine_meshes", True)',
+            f'\toptions.static_mesh_import_data.set_editor_property("normal_import_method", unreal.FBXNormalImportMethod.FBXNIM_COMPUTE_NORMALS)',
+            f'\toptions.static_mesh_import_data.set_editor_property("compute_weighted_normals", {prefs().bridge.ue_compute_weighted_normals})',
+            f'\tif hasattr(options.static_mesh_import_data, "build_nanite"):',
+            f'\t\toptions.static_mesh_import_data.set_editor_property("build_nanite", {prefs().bridge.ue_enable_nanite})',
 
             # Animation import
             f'if {include_animation}:',

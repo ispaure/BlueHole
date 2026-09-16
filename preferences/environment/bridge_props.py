@@ -119,6 +119,12 @@ class BridgePG(bpy.types.PropertyGroup):
     # Import Textures
     ue_import_textures: BoolProperty(name='Enable import of textures in Unreal.', default=False)
 
+    # Compute weighted normals
+    ue_compute_weighted_normals: BoolProperty(name='Compute weighted normals in Unreal.', default=True)
+
+    # Enable as Nanite Mesh
+    ue_enable_nanite: BoolProperty(name='Enable nanite in Unreal.', default=False)
+
     # Apply Mesh Modifiers on Export
     ue_use_mesh_modifiers: BoolProperty(name='Apply Mesh Modifiers upon Export', default=True)
 
@@ -398,6 +404,10 @@ def draw(preference, context, layout):
                 row.prop(preference.bridge, 'ue_automated', text='Automated Import')
                 row.prop(preference.bridge, 'ue_import_textures', text='Import Textures')
                 row.prop(preference.bridge, 'ue_import_materials', text='Import Materials')
+                row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_compute_weighted_normals', text='Compute Weighted Normals')
+                row.prop(preference.bridge, 'ue_enable_nanite', text='Enable Nanite')
 
                 # Use Mesh Modifiers
                 row = column.row()
