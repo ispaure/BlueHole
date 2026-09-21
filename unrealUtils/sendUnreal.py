@@ -33,16 +33,28 @@ send_ue_name = 'Blue Hole Bridge to Unreal'
 def trigger_unreal_import(file_path_source: str) -> bool:
     """
     Send an import command to Unreal from the given source file path.
-    Uses a custom override operator when enabled, otherwise uses Blue Hole's default Unreal import.
+
+    When the custom send override is enabled, an operator IDName must be configured.
+    Otherwise Blue Hole uses its default Unreal import implementation.
     """
-    if prefs().bridge.ue_enable_send_override and prefs().bridge.ue_op_send_override:
-        msg = f'Using Unreal Import Override: "{prefs().bridge.ue_op_send_override}"'
+    if prefs().bridge.ue_enable_send_override:
+        operator_idname = prefs().bridge.ue_op_send_override.strip()
+
+        if not operator_idname:
+            msg = (
+                'Unreal Import Override is enabled, but no operator IDName is configured.\n\n'
+                'Expected an operator exposing a StringProperty named "path".'
+            )
+            log(Severity.CRITICAL, send_ue_name, msg, popup=True)
+            return False
+
+        msg = f'Using Unreal Import Override: "{operator_idname}"'
         log(Severity.WARNING, send_ue_name, msg)
         return trigger_unreal_import_override(file_path_source)
-    else:
-        msg = 'Using Blue Hole default Unreal import.'
-        log(Severity.INFO, send_ue_name, msg)
-        return trigger_unreal_import_default(file_path_source)
+
+    msg = 'Using Blue Hole default Unreal import.'
+    log(Severity.INFO, send_ue_name, msg)
+    return trigger_unreal_import_default(file_path_source)
 
 
 def trigger_unreal_import_default(file_path_source: str) -> bool:
