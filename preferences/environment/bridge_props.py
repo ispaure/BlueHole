@@ -44,6 +44,58 @@ class BridgePG(bpy.types.PropertyGroup):
     axis_exp_lst = [('X', 'X', ''), ('Y', 'Y', ''), ('Z', 'Z', ''),
                     ('-X', '-X', ''), ('-Y', '-Y', ''), ('-Z', '-Z', '')]
 
+    # EXPORT PIPELINE OVERRIDES ----------------------------------------------------------------------------------------
+
+    # Pre-Export Validation operator
+    enable_pre_export_override: BoolProperty(
+        name="Enable Pre-Export Validation",
+        description=(
+            "Run a custom operator before exporting each Asset Container. "
+            "The operator can perform one or more validation checks and should only allow the export to continue "
+            "when validation succeeds."
+        ),
+        default=False
+    )
+
+    op_pre_export_override: StringProperty(
+        name="Pre-Export Validation Operator",
+        description=(
+            "Operator IDName to execute before exporting each Asset Container "
+            "(example: wm.my_pre_export_validation). "
+            "The operator will receive two StringProperty arguments: 'root_name', containing the Blender object name "
+            "of the container root, and 'path', containing the expected full export path. "
+            "This hook is intended for asset validation or preparation before the export begins. "
+            "The operator may internally run one or more validation functions; its result will determine whether "
+            "Blue Hole continues with the export."
+        ),
+        default=""
+    )
+
+    # Post-Export Validation operator
+    enable_post_export_override: BoolProperty(
+        name="Enable Post-Export Validation",
+        description=(
+            "Run a custom operator after exporting each Asset Container. "
+            "The operator can perform validation or processing that requires the exported file to already exist "
+            "and should only allow downstream processing to continue when validation succeeds."
+        ),
+        default=False
+    )
+
+    op_post_export_override: StringProperty(
+        name="Post-Export Validation Operator",
+        description=(
+            "Operator IDName to execute after an Asset Container has been exported "
+            "(example: wm.my_post_export_validation). "
+            "The operator will receive two StringProperty arguments: 'root_name', containing the Blender object name "
+            "of the container root, and 'path', containing the full export path. "
+            "This hook is intended for validation or processing that requires the exported file to already exist. "
+            "The operator may internally run one or more validation functions; its result will determine whether "
+            "Blue Hole continues with downstream processing."
+        ),
+        default=""
+    )
+
     # Set Game Engine
     engine_lst = [('unreal', 'Unreal', ''),
                   ('unity', 'Unity', ''),
@@ -145,56 +197,6 @@ class BridgePG(bpy.types.PropertyGroup):
             "to the exported FBX file for that container. "
             "The override operator is responsible for communicating with Unreal and "
             "triggering the asset import using this exported file."
-        ),
-        default=""
-    )
-
-    # Pre-Export Validation operator
-    ue_enable_pre_export_override: BoolProperty(
-        name="Enable Pre-Export Validation",
-        description=(
-            "Run a custom operator before exporting each Asset Container. "
-            "The operator can perform one or more validation checks and should only allow the export to continue "
-            "when validation succeeds."
-        ),
-        default=False
-    )
-
-    ue_op_pre_export_override: StringProperty(
-        name="Pre-Export Validation Operator",
-        description=(
-            "Operator IDName to execute before exporting each Asset Container "
-            "(example: wm.my_pre_export_validation). "
-            "The operator will receive two StringProperty arguments: 'root_name', containing the Blender object name "
-            "of the container root, and 'path', containing the expected full export path. "
-            "This hook is intended for asset validation or preparation before the export begins. "
-            "The operator may internally run one or more validation functions; its result will determine whether "
-            "Blue Hole continues with the export."
-        ),
-        default=""
-    )
-
-    # Post-Export / Pre-Send Validation operator
-    ue_enable_post_export_override: BoolProperty(
-        name="Enable Post-Export Validation",
-        description=(
-            "Run a custom operator after exporting each Asset Container but before sending it to Unreal. "
-            "The operator can perform one or more validation checks and should only allow the send to continue "
-            "when validation succeeds."
-        ),
-        default=False
-    )
-
-    ue_op_post_export_override: StringProperty(
-        name="Post-Export Validation Operator",
-        description=(
-            "Operator IDName to execute after an Asset Container has been exported but before it is sent to Unreal "
-            "(example: wm.my_post_export_validation). "
-            "The operator will receive two StringProperty arguments: 'root_name', containing the Blender object name "
-            "of the container root, and 'path', containing the full export path. "
-            "This hook is intended for validation or processing that requires the exported file to already exist. "
-            "The operator may internally run one or more validation functions; its result will determine whether "
-            "Blue Hole continues with the Unreal send step."
         ),
         default=""
     )
@@ -407,6 +409,32 @@ def draw(preference, context, layout):
     if active_group == 'ASSET':
 
         # ---------------------------------------------------------------------------------------------
+        # EXPORT PIPELINE OVERRIDES
+        # ---------------------------------------------------------------------------------------------
+        box_pipeline = layout.box()
+        column = box_pipeline.column()
+
+        row = column.row()
+        row.enabled = enable_rows
+        row.label(text='EXPORT PIPELINE OVERRIDES')
+
+        # Pre-Export Validation
+        row = column.row()
+        row.enabled = enable_rows
+        row.prop(preference.bridge, 'enable_pre_export_override', text='Enable Pre-Export Validation')
+
+        if prefs().bridge.enable_pre_export_override:
+            row.prop(preference.bridge, 'op_pre_export_override', text='Operator IDName')
+
+        # Post-Export Validation
+        row = column.row()
+        row.enabled = enable_rows
+        row.prop(preference.bridge, 'enable_post_export_override', text='Enable Post-Export Validation')
+
+        if prefs().bridge.enable_post_export_override:
+            row.prop(preference.bridge, 'op_post_export_override', text='Operator IDName')
+
+        # ---------------------------------------------------------------------------------------------
         # ENGINE (Asset Containers)
         # ---------------------------------------------------------------------------------------------
         row = layout.row()
@@ -473,22 +501,6 @@ def draw(preference, context, layout):
                 row = column.row()
                 row.enabled = enable_rows
                 row.label(text='EXPORT PIPELINE OVERRIDES')
-
-                # Pre-Export Validation
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.bridge, 'ue_enable_pre_export_override', text='Enable Pre-Export Validation')
-
-                if prefs().bridge.ue_enable_pre_export_override:
-                    row.prop(preference.bridge, 'ue_op_pre_export_override', text='Operator IDName')
-
-                # Post-Export / Pre-Send Validation
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.bridge, 'ue_enable_post_export_override', text='Enable Post-Export Validation')
-
-                if prefs().bridge.ue_enable_post_export_override:
-                    row.prop(preference.bridge, 'ue_op_post_export_override', text='Operator IDName')
 
                 # Send to Unreal
                 row = column.row()

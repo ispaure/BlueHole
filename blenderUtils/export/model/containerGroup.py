@@ -66,9 +66,8 @@ class ContainerGroup(ABC):
         # Pre-validate all containers before any source-control operation.
         validated_container_lst: List[Container] = []
         for container in self.container_lst:
-            if self.export_settings.engine == Engine.UNREAL:
-                if not self.__run_unreal_pre_export_override(container):
-                    continue
+            if not self.__run_pre_export_override(container):
+                continue
 
             validated_container_lst.append(container)
 
@@ -95,10 +94,9 @@ class ContainerGroup(ABC):
                 if not success:
                     continue
 
-                # Unreal post-export / pre-send validation hook.
-                if self.export_settings.engine == Engine.UNREAL:
-                    if not self.__run_unreal_post_export_override(container):
-                        continue
+                # Post-export validation hook.
+                if not self.__run_post_export_override(container):
+                    continue
 
                 if send and self.export_settings.engine == Engine.UNREAL:
                     result = sendUnreal.trigger_unreal_import(str(container.path))
@@ -124,18 +122,18 @@ class ContainerGroup(ABC):
         )
         return chk_result
 
-    def __run_unreal_pre_export_override(self, container: Container) -> bool:
+    def __run_pre_export_override(self, container: Container) -> bool:
         """
-        Run the configured Unreal pre-export operator for a container.
+        Run the configured pre-export operator for a container.
 
         The operator must expose the following Blender StringProperty arguments:
             root_name: Blender object name of the container root.
             path: Expected export path as a string.
         """
-        if not prefs().bridge.ue_enable_pre_export_override:
+        if not prefs().bridge.enable_pre_export_override:
             return True
 
-        operator_idname = prefs().bridge.ue_op_pre_export_override.strip()
+        operator_idname = prefs().bridge.op_pre_export_override.strip()
         if not operator_idname:
             log(
                 Severity.CRITICAL,
@@ -144,24 +142,24 @@ class ContainerGroup(ABC):
             )
             return False
 
-        return self.__run_unreal_validation_override(
+        return self.__run_export_validation_override(
             operator_idname=operator_idname,
             container=container,
             hook_name='Pre-Export Validation',
         )
 
-    def __run_unreal_post_export_override(self, container: Container) -> bool:
+    def __run_post_export_override(self, container: Container) -> bool:
         """
-        Run the configured Unreal post-export / pre-send operator for a container.
+        Run the configured post-export operator for a container.
 
         The operator must expose the following Blender StringProperty arguments:
             root_name: Blender object name of the container root.
             path: Export path as a string.
         """
-        if not prefs().bridge.ue_enable_post_export_override:
+        if not prefs().bridge.enable_post_export_override:
             return True
 
-        operator_idname = prefs().bridge.ue_op_post_export_override.strip()
+        operator_idname = prefs().bridge.op_post_export_override.strip()
         if not operator_idname:
             log(
                 Severity.CRITICAL,
@@ -170,13 +168,13 @@ class ContainerGroup(ABC):
             )
             return False
 
-        return self.__run_unreal_validation_override(
+        return self.__run_export_validation_override(
             operator_idname=operator_idname,
             container=container,
             hook_name='Post-Export Validation',
         )
 
-    def __run_unreal_validation_override(
+    def __run_export_validation_override(
             self,
             *,
             operator_idname: str,
@@ -184,7 +182,7 @@ class ContainerGroup(ABC):
             hook_name: str,
     ) -> bool:
         """
-        Execute a configured Blender operator used as an Unreal export validation hook.
+        Execute a configured Blender operator used as an export validation hook.
 
         Configuration/interface errors are treated as critical Blue Hole integration errors.
         An operator that executes correctly but returns anything other than FINISHED is treated
