@@ -84,7 +84,7 @@ class ContainerGroup(ABC):
                     msg = 'There were errors checking out file(s), proceeding with export regardless!'
                     log(Severity.WARNING, self.CONTAINERS_NAME, msg)
 
-        # Store current selection state
+        # Store current active object.
         view_layer = bpy.context.view_layer
         obj_active = view_layer.objects.active
 
@@ -107,7 +107,7 @@ class ContainerGroup(ABC):
                         return False
 
         finally:
-            # Always restore previous selection state, even if export/send fails or returns early.
+            # Always restore previous active object, even if export/send fails or returns early.
             view_layer.objects.active = obj_active
 
         log(Severity.INFO, self.CONTAINERS_NAME, 'Finished Export of Containers!')
@@ -128,7 +128,7 @@ class ContainerGroup(ABC):
         """
         Run the configured Unreal pre-export operator for a container.
 
-        The operator receives:
+        The operator must expose the following Blender StringProperty arguments:
             root_name: Blender object name of the container root.
             path: Expected export path as a string.
         """
@@ -138,7 +138,7 @@ class ContainerGroup(ABC):
         operator_idname = prefs().bridge.ue_op_pre_export_override.strip()
         if not operator_idname:
             log(
-                Severity.ERROR,
+                Severity.CRITICAL,
                 self.CONTAINERS_NAME,
                 'Pre-export validation override is enabled, but no operator IDName is configured.'
             )
@@ -154,7 +154,7 @@ class ContainerGroup(ABC):
         """
         Run the configured Unreal post-export / pre-send operator for a container.
 
-        The operator receives:
+        The operator must expose the following Blender StringProperty arguments:
             root_name: Blender object name of the container root.
             path: Export path as a string.
         """
@@ -164,7 +164,7 @@ class ContainerGroup(ABC):
         operator_idname = prefs().bridge.ue_op_post_export_override.strip()
         if not operator_idname:
             log(
-                Severity.ERROR,
+                Severity.CRITICAL,
                 self.CONTAINERS_NAME,
                 'Post-export validation override is enabled, but no operator IDName is configured.'
             )
@@ -185,25 +185,39 @@ class ContainerGroup(ABC):
     ) -> bool:
         """
         Execute a configured Blender operator used as an Unreal export validation hook.
+
+        Configuration/interface errors are treated as critical Blue Hole integration errors.
+        An operator that executes correctly but returns anything other than FINISHED is treated
+        as a normal validation failure/cancellation for that container.
         """
         try:
             operator_category, operator_name = operator_idname.split('.', 1)
             operator = getattr(getattr(bpy.ops, operator_category), operator_name)
+
+            self.__validate_operator_string_properties(
+                operator=operator,
+                operator_idname=operator_idname,
+                hook_name=hook_name,
+                required_properties=('root_name', 'path'),
+            )
 
             result = operator(
                 root_name=container.root.name,
                 path=str(container.path),
             )
 
-        except (AttributeError, ValueError) as exc:
+        except (AttributeError, ValueError, TypeError, RuntimeError) as exc:
             msg = (
-                f'{hook_name} operator "{operator_idname}" could not be executed.\n\n'
+                f'{hook_name} operator "{operator_idname}" is invalid or could not be executed.\n\n'
                 f'Container: {container.name}\n'
                 f'Root Object: {container.root.name}\n'
                 f'Export Path: {container.path}\n\n'
+                f'Expected operator interface:\n'
+                f'  root_name: StringProperty\n'
+                f'  path: StringProperty\n\n'
                 f'Error: {exc}'
             )
-            log(Severity.ERROR, self.CONTAINERS_NAME, msg, popup=True)
+            log(Severity.CRITICAL, self.CONTAINERS_NAME, msg, popup=True)
             return False
 
         if 'FINISHED' not in result:
@@ -217,6 +231,42 @@ class ContainerGroup(ABC):
             return False
 
         return True
+
+    @staticmethod
+    def __validate_operator_string_properties(
+            *,
+            operator,
+            operator_idname: str,
+            hook_name: str,
+            required_properties: tuple[str, ...],
+    ) -> None:
+        """
+        Validate that a Blender operator exposes the required StringProperty arguments.
+
+        Raises:
+            RuntimeError:
+                If an expected property is missing or is not a Blender STRING property.
+        """
+        rna_type = operator.get_rna_type()
+        operator_properties = {
+            prop.identifier: prop
+            for prop in rna_type.properties
+        }
+
+        for property_name in required_properties:
+            prop = operator_properties.get(property_name)
+
+            if prop is None:
+                raise RuntimeError(
+                    f'{hook_name} operator "{operator_idname}" is missing required '
+                    f'StringProperty "{property_name}".'
+                )
+
+            if prop.type != 'STRING':
+                raise RuntimeError(
+                    f'{hook_name} operator "{operator_idname}" property "{property_name}" '
+                    f'must be a StringProperty, but its Blender RNA type is "{prop.type}".'
+                )
 
     def __export_source_control_proc(self, container_lst: List[Container]):
         """
