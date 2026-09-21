@@ -67,6 +67,10 @@ bridge_setting_lst = (
     # Overrides
     Setting(pref_path='bridge.ue_enable_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_send_override', var_type=bool),
     Setting(pref_path='bridge.ue_op_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_send_override', var_type=str),
+    Setting(pref_path='bridge.ue_enable_pre_export_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_pre_export_override', var_type=bool),
+    Setting(pref_path='bridge.ue_op_pre_export_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_pre_export_override', var_type=str),
+    Setting(pref_path='bridge.ue_enable_post_export_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_post_export_override', var_type=bool),
+    Setting(pref_path='bridge.ue_op_post_export_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_post_export_override', var_type=str),
     Setting(pref_path='bridge.ue_enable_rename_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_rename_override', var_type=bool),
     Setting(pref_path='bridge.ue_op_rename_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_rename_override', var_type=str),
     Setting(pref_path='bridge.ue_enable_exec_code_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_exec_code_override', var_type=bool),
