@@ -63,9 +63,18 @@ class ContainerGroup(ABC):
         if not self._export_checks(send):
             return False
 
+        # Pre-validate all containers before any source-control operation.
+        validated_container_lst: List[Container] = []
+        for container in self.container_lst:
+            if self.export_settings.engine == Engine.UNREAL:
+                if not self.__run_unreal_pre_export_override(container):
+                    continue
+
+            validated_container_lst.append(container)
+
         # Source Control
-        if not bypass_sc:
-            sc_result = self.__export_source_control_proc()
+        if validated_container_lst and not bypass_sc:
+            sc_result = self.__export_source_control_proc(validated_container_lst)
             if not sc_result:
                 if prefs().sourcecontrol.source_control_error_aborts_exp:
                     msg = 'There were errors checking out file(s), aborting export!'
@@ -79,14 +88,8 @@ class ContainerGroup(ABC):
         view_layer = bpy.context.view_layer
         obj_active = view_layer.objects.active
 
-        # Export containers
-        for container in self.container_lst:
-
-            # Unreal pre-export validation hook.
-            if self.export_settings.engine == Engine.UNREAL:
-                if not self.__run_unreal_pre_export_override(container):
-                    continue
-
+        # Export containers that passed pre-validation
+        for container in validated_container_lst:
             success: bool = container.export_proc()
             if not success:
                 continue
@@ -214,9 +217,9 @@ class ContainerGroup(ABC):
 
         return True
 
-    def __export_source_control_proc(self):
+    def __export_source_control_proc(self, container_lst: List[Container]):
         """
-        Handle source control steps required before export.
+        Handle source control steps required before export for the provided containers.
         """
         if not prefs().sourcecontrol.source_control_enable:
             return True
@@ -224,7 +227,7 @@ class ContainerGroup(ABC):
         match prefs().sourcecontrol.source_control_solution:
             case 'perforce':
                 p4_file_grp_cls = P4FileGroup()
-                for container in self.container_lst:
+                for container in container_lst:
                     p4_file_grp_cls.append_p4_file_to_group_from_client_file(str(container.path))
                 return p4_file_grp_cls.open_for_edit()
 
