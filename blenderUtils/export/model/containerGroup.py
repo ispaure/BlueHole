@@ -88,26 +88,27 @@ class ContainerGroup(ABC):
         view_layer = bpy.context.view_layer
         obj_active = view_layer.objects.active
 
-        # Export containers that passed pre-validation
-        for container in validated_container_lst:
-            success: bool = container.export_proc()
-            if not success:
-                continue
-
-            # Unreal post-export / pre-send validation hook.
-            if self.export_settings.engine == Engine.UNREAL:
-                if not self.__run_unreal_post_export_override(container):
+        try:
+            # Export containers that passed pre-validation
+            for container in validated_container_lst:
+                success: bool = container.export_proc()
+                if not success:
                     continue
 
-            if send and self.export_settings.engine == Engine.UNREAL:
+                # Unreal post-export / pre-send validation hook.
+                if self.export_settings.engine == Engine.UNREAL:
+                    if not self.__run_unreal_post_export_override(container):
+                        continue
 
-                result = sendUnreal.trigger_unreal_import(str(container.path))
+                if send and self.export_settings.engine == Engine.UNREAL:
+                    result = sendUnreal.trigger_unreal_import(str(container.path))
 
-                if not result:
-                    return False
+                    if not result:
+                        return False
 
-        # Restore previous selection state
-        view_layer.objects.active = obj_active
+        finally:
+            # Always restore previous selection state, even if export/send fails or returns early.
+            view_layer.objects.active = obj_active
 
         log(Severity.INFO, self.CONTAINERS_NAME, 'Finished Export of Containers!')
         return True
