@@ -69,7 +69,13 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.ue_import_textures', ini_section='SendAssetHierarchiesToUnreal', ini_value='import_textures', var_type=bool),
     Setting(pref_path='bridge.ue_use_mesh_modifiers', ini_section='SendAssetHierarchiesToUnreal', ini_value='use_mesh_modifiers', var_type=bool),
     Setting(pref_path='bridge.ue_compute_weighted_normals', ini_section='SendAssetHierarchiesToUnreal', ini_value='compute_weighted_normals', var_type=bool),
+    Setting(pref_path='bridge.ue_recompute_normals', ini_section='SendAssetHierarchiesToUnreal', ini_value='recompute_normals', var_type=bool),
+    Setting(pref_path='bridge.ue_recompute_tangents', ini_section='SendAssetHierarchiesToUnreal', ini_value='recompute_tangents', var_type=bool),
     Setting(pref_path='bridge.ue_enable_nanite', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_nanite', var_type=bool),
+    Setting(pref_path='bridge.ue_nanite_keep_triangle_percent', ini_section='SendAssetHierarchiesToUnreal', ini_value='nanite_keep_triangle_percent', var_type=float),
+    Setting(pref_path='bridge.ue_nanite_trim_relative_error', ini_section='SendAssetHierarchiesToUnreal', ini_value='nanite_trim_relative_error', var_type=float),
+    Setting(pref_path='bridge.ue_nanite_fallback_target', ini_section='SendAssetHierarchiesToUnreal', ini_value='nanite_fallback_target', var_type=str),
+
     # Overrides
     Setting(pref_path='bridge.ue_enable_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_send_override', var_type=bool),
     Setting(pref_path='bridge.ue_op_send_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_send_override', var_type=str),
@@ -77,6 +83,7 @@ bridge_setting_lst = (
     Setting(pref_path='bridge.ue_op_rename_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_rename_override', var_type=str),
     Setting(pref_path='bridge.ue_enable_exec_code_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='enable_exec_code_override', var_type=bool),
     Setting(pref_path='bridge.ue_op_exec_code_override', ini_section='SendAssetHierarchiesToUnreal', ini_value='op_exec_code_override', var_type=str),
+
     # Remote Execution Addresses
     Setting(pref_path='bridge.ue_remote_exec_multicast_group_endpoint_address', ini_section='SendAssetHierarchiesToUnreal', ini_value='remote_exec_multicast_group_endpoint_address', var_type=str),
     Setting(pref_path='bridge.ue_remote_exec_multicast_group_endpoint_port', ini_section='SendAssetHierarchiesToUnreal', ini_value='remote_exec_multicast_group_endpoint_port', var_type=int),

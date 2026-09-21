@@ -174,8 +174,42 @@ class BridgePG(bpy.types.PropertyGroup):
     # Compute weighted normals
     ue_compute_weighted_normals: BoolProperty(name='Compute weighted normals in Unreal.', default=True)
 
+    # Recompute normals
+    ue_recompute_normals: BoolProperty(name='Recompute normals in Unreal.', default=False)
+
+    # Recompute tangents
+    ue_recompute_tangents: BoolProperty(name='Recompute tangents in Unreal.', default=False)
+
     # Enable as Nanite Mesh
     ue_enable_nanite: BoolProperty(name='Enable nanite in Unreal.', default=False)
+
+    # Nanite: Keep Triangle Percent
+    ue_nanite_keep_triangle_percent: FloatProperty(
+        name='Keep Triangle Percent',
+        description='Percentage of source triangles Nanite should keep.',
+        default=100.0,
+        min=0.0,
+        max=100.0
+    )
+
+    # Nanite: Trim Relative Error
+    ue_nanite_trim_relative_error: FloatProperty(
+        name='Trim Relative Error',
+        description='Relative error used when trimming Nanite geometry.',
+        default=0.0,
+        min=0.0
+    )
+
+    # Nanite: Fallback Target
+    ue_nanite_fallback_target: EnumProperty(
+        name='Fallback Target',
+        description='Target method used to generate the Nanite fallback mesh.',
+        items=[
+            ('relative_error', 'Relative Error', ''),
+            ('percent_triangles', 'Percent Triangles', ''),
+        ],
+        default='relative_error'
+    )
 
     # Apply Mesh Modifiers on Export
     ue_use_mesh_modifiers: BoolProperty(name='Apply Mesh Modifiers upon Export', default=True)
@@ -470,27 +504,54 @@ def draw(preference, context, layout):
                         row = column.row(); row.enabled = enable_rows
                         row.prop(preference.bridge, 'sc_path_linux_alternate', text='Source Content (Alternate)')
 
-                # Export behavior
+                # Blender export behavior
                 row = column.row()
                 row.enabled = enable_rows
                 row.prop(preference.bridge, 'ue_bridge_zero_root_transform', text='Zero Root Transform on Export')
                 row.prop(preference.bridge, 'ue_bridge_include_animation', text='Include Animation')
 
-                # Import behavior
                 row = column.row()
+                row.enabled = enable_rows
+                row.prop(preference.bridge, 'ue_use_mesh_modifiers', text='Use Mesh Modifiers')
+
+                # -----------------------------------------------------------------------------------------
+                # UNREAL IMPORT / BUILD SETTINGS
+                # -----------------------------------------------------------------------------------------
+                box_unreal_settings = box.box()
+                unreal_column = box_unreal_settings.column()
+
+                row = unreal_column.row()
+                row.enabled = enable_rows
+                row.label(text='UNREAL IMPORT / BUILD SETTINGS')
+
+                # Import behavior
+                row = unreal_column.row()
                 row.enabled = enable_rows
                 row.prop(preference.bridge, 'ue_automated', text='Automated Import')
                 row.prop(preference.bridge, 'ue_import_textures', text='Import Textures')
                 row.prop(preference.bridge, 'ue_import_materials', text='Import Materials')
-                row = column.row()
+
+                # Mesh build settings
+                row = unreal_column.row()
                 row.enabled = enable_rows
                 row.prop(preference.bridge, 'ue_compute_weighted_normals', text='Compute Weighted Normals')
+                row.prop(preference.bridge, 'ue_recompute_normals', text='Recompute Normals')
+                row.prop(preference.bridge, 'ue_recompute_tangents', text='Recompute Tangents')
+
+                # Nanite
+                row = unreal_column.row()
+                row.enabled = enable_rows
                 row.prop(preference.bridge, 'ue_enable_nanite', text='Enable Nanite')
 
-                # Use Mesh Modifiers
-                row = column.row()
-                row.enabled = enable_rows
-                row.prop(preference.bridge, 'ue_use_mesh_modifiers', text='Use Mesh Modifiers')
+                if prefs().bridge.ue_enable_nanite:
+                    row = unreal_column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.bridge, 'ue_nanite_keep_triangle_percent', text='Keep Triangle Percent')
+                    row.prop(preference.bridge, 'ue_nanite_trim_relative_error', text='Trim Relative Error')
+
+                    row = unreal_column.row()
+                    row.enabled = enable_rows
+                    row.prop(preference.bridge, 'ue_nanite_fallback_target', text='Fallback Target')
 
                 # -----------------------------------------------------------------------------------------
                 # EXPORT PIPELINE OVERRIDES
