@@ -81,9 +81,20 @@ class ContainerGroup(ABC):
 
         # Export containers
         for container in self.container_lst:
+
+            # Unreal pre-export validation hook.
+            if self.export_settings.engine == Engine.UNREAL:
+                if not self.__run_unreal_pre_export_override(container):
+                    continue
+
             success: bool = container.export_proc()
             if not success:
                 continue
+
+            # Unreal post-export / pre-send validation hook.
+            if self.export_settings.engine == Engine.UNREAL:
+                if not self.__run_unreal_post_export_override(container):
+                    continue
 
             if send and self.export_settings.engine == Engine.UNREAL:
 
@@ -108,6 +119,100 @@ class ContainerGroup(ABC):
             check_blend_loc_in_dir_structure=True,
         )
         return chk_result
+
+    def __run_unreal_pre_export_override(self, container: Container) -> bool:
+        """
+        Run the configured Unreal pre-export operator for a container.
+
+        The operator receives:
+            root_name: Blender object name of the container root.
+            path: Expected export path as a string.
+        """
+        if not prefs().bridge.ue_enable_pre_export_override:
+            return True
+
+        operator_idname = prefs().bridge.ue_op_pre_export_override.strip()
+        if not operator_idname:
+            log(
+                Severity.ERROR,
+                self.CONTAINERS_NAME,
+                'Pre-export validation override is enabled, but no operator IDName is configured.'
+            )
+            return False
+
+        return self.__run_unreal_validation_override(
+            operator_idname=operator_idname,
+            container=container,
+            hook_name='Pre-Export Validation',
+        )
+
+    def __run_unreal_post_export_override(self, container: Container) -> bool:
+        """
+        Run the configured Unreal post-export / pre-send operator for a container.
+
+        The operator receives:
+            root_name: Blender object name of the container root.
+            path: Export path as a string.
+        """
+        if not prefs().bridge.ue_enable_post_export_override:
+            return True
+
+        operator_idname = prefs().bridge.ue_op_post_export_override.strip()
+        if not operator_idname:
+            log(
+                Severity.ERROR,
+                self.CONTAINERS_NAME,
+                'Post-export validation override is enabled, but no operator IDName is configured.'
+            )
+            return False
+
+        return self.__run_unreal_validation_override(
+            operator_idname=operator_idname,
+            container=container,
+            hook_name='Post-Export Validation',
+        )
+
+    def __run_unreal_validation_override(
+            self,
+            *,
+            operator_idname: str,
+            container: Container,
+            hook_name: str,
+    ) -> bool:
+        """
+        Execute a configured Blender operator used as an Unreal export validation hook.
+        """
+        try:
+            operator_category, operator_name = operator_idname.split('.', 1)
+            operator = getattr(getattr(bpy.ops, operator_category), operator_name)
+
+            result = operator(
+                root_name=container.root.name,
+                path=str(container.path),
+            )
+
+        except (AttributeError, ValueError) as exc:
+            msg = (
+                f'{hook_name} operator "{operator_idname}" could not be executed.\n\n'
+                f'Container: {container.name}\n'
+                f'Root Object: {container.root.name}\n'
+                f'Export Path: {container.path}\n\n'
+                f'Error: {exc}'
+            )
+            log(Severity.ERROR, self.CONTAINERS_NAME, msg, popup=True)
+            return False
+
+        if 'FINISHED' not in result:
+            msg = (
+                f'{hook_name} failed or was cancelled.\n\n'
+                f'Container: {container.name}\n'
+                f'Root Object: {container.root.name}\n'
+                f'Export Path: {container.path}'
+            )
+            log(Severity.WARNING, self.CONTAINERS_NAME, msg)
+            return False
+
+        return True
 
     def __export_source_control_proc(self):
         """

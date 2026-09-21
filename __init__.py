@@ -32,7 +32,7 @@ from .Lib.commonUtils import debugUtils
 debugUtils.project_prefix = "Blue Hole"
 debugUtils.use_time_delta = False
 
-from .blenderUtils import callbacks
+from .blenderUtils import callbacks, addon_callbacks
 from .preferences import addon_prefs
 from .operators import operators_register
 from .environment import envManager
@@ -47,7 +47,7 @@ bl_info = {
     "author": "Marc-André Voyer",
     "description": "",
     "blender": (4, 5, 1),
-    "version": (6, 7, 22),
+    "version": (6, 9, 21),
     "location": "",
     "warning": "",
     "category": "Generic",
@@ -62,6 +62,7 @@ debugUtils.project_prefix = f'{bl_info["name"]} {".".join(map(str, bl_info["vers
 
 def register():
     callbacks.register()
+    addon_callbacks.register()
     addon_prefs.register()
     operators_register.register()
     menus_register.register()
@@ -96,6 +97,7 @@ def unregister():
     menus_register.unregister()
     operators_register.unregister()
     addon_prefs.unregister()
+    addon_callbacks.unregister()
     callbacks.unregister()
 
     if hasattr(bpy.app.timers, "_bluehole_timer_registered"):

@@ -28,6 +28,7 @@ from ..blenderUtils.export.assetMesh.containerGroup import AssetMeshContainerGro
 from ..blenderUtils.export.exportSettingsPresets import *
 from ..blenderUtils.export.looseMesh.containerGroup import batch_export_loose_mesh
 from ..blenderUtils.export.model import containerUtils
+from ..blenderUtils import addon_callbacks
 from ..Lib.commonUtils import ui
 from ..preferences.prefs import *
 from ..unrealUtils import communicateUnreal
@@ -247,20 +248,29 @@ class BH_OT_export_containers(bpy.types.Operator):
 
         # Run all selected container types
         silent_if_empty = len(groups) > 1
-        for group_cls in groups:
-            result = _export_asset_container_no_confirm(
-                preset=preset,
-                container_group_cls=group_cls,
-                send_all=self.send_all,
-                send=self.send,
-                silent_if_empty=silent_if_empty,
-                bypass_sc=False,
-            )
+        success = False
 
-            if not result:
-                return {'CANCELLED'}
+        addon_callbacks.emit_export_begin()
 
-        return {'FINISHED'}
+        try:
+            for group_cls in groups:
+                result = _export_asset_container_no_confirm(
+                    preset=preset,
+                    container_group_cls=group_cls,
+                    send_all=self.send_all,
+                    send=self.send,
+                    silent_if_empty=silent_if_empty,
+                    bypass_sc=False,
+                )
+
+                if not result:
+                    return {'CANCELLED'}
+
+            success = True
+            return {'FINISHED'}
+
+        finally:
+            addon_callbacks.emit_export_end(success)
 
 
 class BH_OT_debug_unreal_exec_nodes(bpy.types.Operator):
