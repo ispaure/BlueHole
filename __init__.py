@@ -79,23 +79,24 @@ def register():
 
 
 def _post_register_init():
-    """
-    Complete initialization once the Blue Hole preferences instance is available.
-    """
-
     global _keymaps_registered
 
     from .preferences.prefs import prefs
 
+    print("Blue Hole: _post_register_init called")
+
     p = prefs()
 
-    # Blender may not have created the AddonPreferences instance yet.
-    # Retry shortly until preferences and their container are ready.
-    if not p.is_ready() or p.container is None:
-        return 0.05
+    print("Blue Hole: prefs object:", p)
+    print("Blue Hole: prefs ready:", p.is_ready())
+    print("Blue Hole: prefs container:", p.container)
 
-    # Keymap registration reads Blue Hole preference values, so it must happen
-    # only after the preferences instance is fully available.
+    if not p.is_ready() or p.container is None:
+        print("Blue Hole: preferences not ready, retrying...")
+        return 0.5
+
+    print("Blue Hole: preferences ready")
+
     if not _keymaps_registered:
         keymaps_register.register()
         _keymaps_registered = True
@@ -105,7 +106,6 @@ def _post_register_init():
     env_cls = envManager.get_env_from_prefs_active_env()
     env_cls.set_pref_from_ini()
 
-    # Start the recurring environment update timer only once.
     if not bpy.app.timers.is_registered(update_env_timer):
         bpy.app.timers.register(update_env_timer, persistent=True)
 
