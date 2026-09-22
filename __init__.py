@@ -86,12 +86,11 @@ def _post_register_init():
     print("Blue Hole: _post_register_init called")
 
     p = prefs()
+    ready = p.is_ready()
 
-    print("Blue Hole: prefs object:", p)
-    print("Blue Hole: prefs ready:", p.is_ready())
-    print("Blue Hole: prefs container:", p.container)
+    print("Blue Hole: prefs ready:", ready)
 
-    if not p.is_ready() or p.container is None:
+    if not ready:
         print("Blue Hole: preferences not ready, retrying...")
         return 0.5
 
