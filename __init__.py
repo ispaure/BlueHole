@@ -22,6 +22,7 @@ __status__ = "Production"
 print('STARTING BLUE HOLE')
 
 import bpy
+import addon_utils
 
 # Disable PySide UI usage and rely on the native OS UI backend instead.
 from .Lib.commonUtils import ui
@@ -60,12 +61,17 @@ debugUtils.project_prefix = f'{bl_info["name"]} {".".join(map(str, bl_info["vers
 # STATE
 
 _keymaps_registered = False
+_diagnostics_printed = False
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
 def register():
+    print("Blue Hole: register()")
+    print("Blue Hole: root __name__:", repr(__name__))
+    print("Blue Hole: root __package__:", repr(__package__))
+
     callbacks.register()
     addon_callbacks.register()
     addon_prefs.register()
@@ -78,12 +84,95 @@ def register():
         bpy.app.timers.register(_post_register_init, first_interval=0.0)
 
 
+def _print_addon_diagnostics():
+    """
+    Print Blender's current view of the Blue Hole add-on state.
+    """
+
+    global _diagnostics_printed
+
+    if _diagnostics_printed:
+        return
+
+    _diagnostics_printed = True
+
+    print("")
+    print("------------------------------------------------------------")
+    print("BLUE HOLE ADD-ON DIAGNOSTICS")
+    print("------------------------------------------------------------")
+
+    print("Root __name__:", repr(__name__))
+    print("Root __package__:", repr(__package__))
+
+    try:
+        state = addon_utils.check("BlueHole")
+        print('addon_utils.check("BlueHole"):', state)
+    except Exception as exc:
+        print('addon_utils.check("BlueHole") failed:', repr(exc))
+
+    try:
+        addon = bpy.context.preferences.addons.get("BlueHole")
+        print('preferences.addons.get("BlueHole"):', addon)
+    except Exception as exc:
+        print('preferences.addons.get("BlueHole") failed:', repr(exc))
+
+    print("")
+    print("Preference add-on entries containing 'blue':")
+
+    found_pref_entry = False
+
+    try:
+        for addon in bpy.context.preferences.addons:
+            module_name = addon.module
+
+            if "blue" in module_name.lower():
+                found_pref_entry = True
+                print(
+                    "    module:",
+                    repr(module_name),
+                    "preferences:",
+                    addon.preferences,
+                )
+    except Exception as exc:
+        print("    Failed to enumerate preference add-ons:", repr(exc))
+
+    if not found_pref_entry:
+        print("    <none>")
+
+    print("")
+    print("addon_utils modules containing 'blue':")
+
+    found_module = False
+
+    try:
+        for module in addon_utils.modules():
+            module_name = getattr(module, "__name__", "")
+
+            if "blue" in module_name.lower():
+                found_module = True
+                print(
+                    "    module:",
+                    repr(module_name),
+                    "package:",
+                    repr(getattr(module, "__package__", None)),
+                )
+    except Exception as exc:
+        print("    Failed to enumerate addon_utils modules:", repr(exc))
+
+    if not found_module:
+        print("    <none>")
+
+    print("------------------------------------------------------------")
+    print("")
+
+
 def _post_register_init():
     global _keymaps_registered
 
-    from .preferences.prefs import prefs
+    from .preferences.prefs import prefs, addon_module_name
 
     print("Blue Hole: _post_register_init called")
+    print("Blue Hole: prefs addon module name:", repr(addon_module_name()))
 
     p = prefs()
     ready = p.is_ready()
@@ -91,6 +180,8 @@ def _post_register_init():
     print("Blue Hole: prefs ready:", ready)
 
     if not ready:
+        _print_addon_diagnostics()
+
         print("Blue Hole: preferences not ready, retrying...")
         return 0.5
 
@@ -113,6 +204,7 @@ def _post_register_init():
 
 def unregister():
     global _keymaps_registered
+    global _diagnostics_printed
 
     # The post-register timer may still be waiting for preferences to become ready.
     if bpy.app.timers.is_registered(_post_register_init):
@@ -124,6 +216,8 @@ def unregister():
     if _keymaps_registered:
         keymaps_register.unregister()
         _keymaps_registered = False
+
+    _diagnostics_printed = False
 
     menus_register.unregister()
     operators_register.unregister()
