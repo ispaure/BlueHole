@@ -53,8 +53,13 @@ bl_info = {
     "category": "Generic",
 }
 
-# Set project prefix to include version for logging purposes
+# Set project prefix to include version for logging purposes.
 debugUtils.project_prefix = f'{bl_info["name"]} {".".join(map(str, bl_info["version"]))}'
+
+# ----------------------------------------------------------------------------------------------------------------------
+# STATE
+
+_keymaps_registered = False
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
@@ -66,43 +71,66 @@ def register():
     addon_prefs.register()
     operators_register.register()
     menus_register.register()
-    keymaps_register.register()
 
-    # Run initialization only after Blender has finished enabling the add-on.
-    bpy.app.timers.register(_post_register_init, first_interval=0.0)
+    # Preference-dependent initialization must wait until Blender has fully
+    # enabled the add-on and created its AddonPreferences instance.
+    if not bpy.app.timers.is_registered(_post_register_init):
+        bpy.app.timers.register(_post_register_init, first_interval=0.0)
 
 
 def _post_register_init():
+    """
+    Complete initialization once the Blue Hole preferences instance is available.
+    """
+
+    global _keymaps_registered
+
     from .preferences.prefs import prefs
 
     p = prefs()
+
+    # Blender may not have created the AddonPreferences instance yet.
+    # Retry shortly until preferences and their container are ready.
     if not p.is_ready() or p.container is None:
         return 0.05
+
+    # Keymap registration reads Blue Hole preference values, so it must happen
+    # only after the preferences instance is fully available.
+    if not _keymaps_registered:
+        keymaps_register.register()
+        _keymaps_registered = True
 
     envManager.if_current_env_missing_set_default()
 
     env_cls = envManager.get_env_from_prefs_active_env()
     env_cls.set_pref_from_ini()
 
-    # Start the recurring timer only once, after initialization is safe.
-    if not hasattr(bpy.app.timers, "_bluehole_timer_registered"):
+    # Start the recurring environment update timer only once.
+    if not bpy.app.timers.is_registered(update_env_timer):
         bpy.app.timers.register(update_env_timer, persistent=True)
-        bpy.app.timers._bluehole_timer_registered = True
 
     return None
 
 
 def unregister():
-    keymaps_register.unregister()
+    global _keymaps_registered
+
+    # The post-register timer may still be waiting for preferences to become ready.
+    if bpy.app.timers.is_registered(_post_register_init):
+        bpy.app.timers.unregister(_post_register_init)
+
+    if bpy.app.timers.is_registered(update_env_timer):
+        bpy.app.timers.unregister(update_env_timer)
+
+    if _keymaps_registered:
+        keymaps_register.unregister()
+        _keymaps_registered = False
+
     menus_register.unregister()
     operators_register.unregister()
     addon_prefs.unregister()
     addon_callbacks.unregister()
     callbacks.unregister()
-
-    if hasattr(bpy.app.timers, "_bluehole_timer_registered"):
-        bpy.app.timers.unregister(update_env_timer)
-        del bpy.app.timers._bluehole_timer_registered
 
 
 def update_env_timer():
@@ -113,6 +141,7 @@ def update_env_timer():
     """
 
     interval = 0.25
+
     prefs = bpy.context.preferences
     addon = prefs.addons.get(__package__)
 
@@ -120,6 +149,7 @@ def update_env_timer():
         return interval
 
     addon_preferences = addon.preferences
+
     if addon_preferences is None:
         return interval
 
