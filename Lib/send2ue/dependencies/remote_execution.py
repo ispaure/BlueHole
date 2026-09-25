@@ -463,7 +463,11 @@ class _RemoteExecutionCommandConnection(object):
 
     def _receive_message(self, expected_type):
         '''
-        Receive a message over the TCP socket from the remote party.
+        Receive a complete message over the TCP socket from the remote party.
+
+        TCP is a byte stream, so a single recv call is not guaranteed to return
+        an entire remote execution response. Accumulate data until a complete
+        JSON message can be decoded and validated.
 
         Args:
             expected_type (string): The type of message we expect to receive.
@@ -471,13 +475,44 @@ class _RemoteExecutionCommandConnection(object):
         Returns:
             The message that was received.
         '''
-        data = self._command_channel_socket.recv(4096)
-        if data:
+        data = bytearray()
+
+        while True:
+            try:
+                chunk = self._command_channel_socket.recv(4096)
+            except _socket.timeout:
+                raise RuntimeError('Timed out waiting for Unreal remote execution response!')
+
+            if not chunk:
+                break
+
+            data.extend(chunk)
+
+            try:
+                json_str = data.decode('utf-8')
+                _json.loads(json_str)
+            except (UnicodeDecodeError, _json.JSONDecodeError):
+                # The response may be split across multiple TCP packets.
+                continue
+
             message = _RemoteExecutionMessage(None, None)
-            if message.from_json_bytes(data) and message.passes_receive_filter(
-                    self._node_id) and message.type_ == expected_type:
-                return message
-        raise RuntimeError('Remote party failed to send a valid response!')
+            if not message.from_json(json_str):
+                raise RuntimeError('Remote party failed to send a valid response!')
+
+            if not message.passes_receive_filter(self._node_id):
+                raise RuntimeError('Remote party sent a response that failed the receive filter!')
+
+            if message.type_ != expected_type:
+                raise RuntimeError(
+                    'Remote party sent an unexpected response type "{0}" (expected "{1}")!'.format(
+                        message.type_,
+                        expected_type,
+                    )
+                )
+
+            return message
+
+        raise RuntimeError('Remote party closed the command connection before sending a complete response!')
 
     def _init_command_listen_socket(self):
         '''
@@ -504,7 +539,7 @@ class _RemoteExecutionCommandConnection(object):
             broadcast_connection.broadcast_open_connection(self._remote_node_id)
             try:
                 self._command_channel_socket = self._command_listen_socket.accept()[0]
-                self._command_channel_socket.setblocking(True)
+                self._command_channel_socket.settimeout(30.0)
                 return
             except _socket.timeout:
                 continue
