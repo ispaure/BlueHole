@@ -48,8 +48,7 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
     bl_options = {'INTERNAL'}
 
     def execute(self, _context):
-        applyDeluxePrefs.apply_deluxe_prefs()
-        return {'FINISHED'}
+        return {'FINISHED'} if applyDeluxePrefs.apply_deluxe_prefs() else {'CANCELLED'}
 
 
 # ----------------------------------------------------------------------------------------------------------------------
