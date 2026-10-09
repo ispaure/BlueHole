@@ -12,10 +12,12 @@ __status__ = 'Production'
 # IMPORTS
 
 from typing import *
+import errno
 import stat
+from tempfile import TemporaryDirectory
 import subprocess
 from pathlib import Path
-from shutil import rmtree, copyfile, move
+from shutil import rmtree, copyfile, copy2
 import csv
 
 # Common utilities
@@ -32,7 +34,10 @@ match get_os():
 delete_debug_prompt: bool = False
 
 
-class File:
+from .filesystem import FilesystemObject
+
+
+class File(FilesystemObject):
     def __init__(self, path: Path):
         self.path = path
         self.file_name = self.__get_file_name()
@@ -148,33 +153,45 @@ class File:
 
 def move_file(src: Path, dest: Path) -> bool:
     """
-    Moves a file from src to dest, overwriting if it already exists.
+    Move a file, preserving an existing destination if replacement fails.
+
+    Same-filesystem replacement is atomic. Cross-filesystem moves copy to a
+    temporary location beside the destination before replacing it, then remove
+    the source. Moving a file onto itself is a successful no-op.
     Returns True if successful, False otherwise.
     """
     src = Path(src)
     dest = Path(dest)
 
     try:
-        # Ensure destination folder exists
-        dest.parent.mkdir(parents=True, exist_ok=True)
+        if not src.is_file():
+            raise FileNotFoundError(f'Source is not an existing file: "{src}"')
 
-        # If destination exists, delete it first
-        if dest.exists():
-            dest.unlink()
-
-        # Move the file
-        log(Severity.DEBUG, 'fileUtils.move_file', f'Moving file from \"{src}\" to \"{dest}\"')
-        move(str(src), str(dest))
-
-        # Verify move succeeded
-        if dest.exists() and not src.exists():
+        if dest.exists() and src.samefile(dest):
             return True
-        else:
-            log(Severity.CRITICAL, 'fileUtils.move_file', f'Move may have failed: src exists={src.exists()}, dest exists={dest.exists()}')
-            return False
 
-    except Exception as e:
-        log(Severity.CRITICAL, 'fileUtils.move_file', f'Error moving file from \"{src}\" to \"{dest}\": {e}')
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        log(Severity.DEBUG, 'fileUtils.move_file', f'Moving file from "{src}" to "{dest}"')
+
+        try:
+            os.replace(src, dest)
+        except OSError as error:
+            if error.errno != errno.EXDEV:
+                raise
+
+            # Copy completely on the destination filesystem before replacing
+            # its previous contents. Failed copies leave both files intact.
+            with TemporaryDirectory(dir=dest.parent, prefix='.move_') as staging_dir:
+                staged_file = Path(staging_dir) / 'file'
+                copy2(src, staged_file, follow_symlinks=False)
+                os.replace(staged_file, dest)
+            src.unlink()
+
+        return True
+
+    except Exception as error:
+        log(Severity.ERROR, 'fileUtils.move_file',
+            f'Error moving file from "{src}" to "{dest}": {error}')
         return False
 
 
@@ -193,31 +210,19 @@ def get_split_character():
 def rename_file(original_name: Path, new_name: Path, force: bool = False) -> bool:
     """
     Renames a file on disk.
-    If `force` is True, and the destination exists, it will be deleted first.
+    Existing destinations are preserved unless `force` is True.
+    Forced replacement does not delete the destination before the rename.
     Returns True if successful, False otherwise.
     """
     original_name = Path(original_name)
     new_name = Path(new_name)
 
     try:
-        # If forced overwrite and destination exists on Windows
-        if force and sys.platform == 'win32' and new_name.exists():
-            File(new_name).delete_file()
-
-        # Ensure parent directory for new file exists
+        from .renameUtils import rename_path
         new_name.parent.mkdir(parents=True, exist_ok=True)
-
-        # Perform rename
         log(Severity.DEBUG, 'fileUtils.rename_file', f'Renaming file from "{original_name}" to "{new_name}"')
-        os.rename(original_name, new_name)
-
-        # Verify success
-        if new_name.exists() and not original_name.exists():
-            return True
-        else:
-            log(Severity.WARNING, 'fileUtils.rename_file',
-                f'Rename may have failed: original exists={original_name.exists()}, new exists={new_name.exists()}')
-            return False
+        rename_path(original_name, new_name, overwrite=force)
+        return True
 
     except Exception as e:
         log(Severity.ERROR, 'fileUtils.rename_file',
