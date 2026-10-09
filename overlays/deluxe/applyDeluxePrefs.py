@@ -17,6 +17,7 @@ __status__ = 'Production'
 
 
 import sys
+from shutil import copyfile
 from pathlib import Path
 from ...blenderUtils import blenderFile
 from ...Lib.commonUtils.debugUtils import log, Severity
@@ -27,27 +28,71 @@ from ...Lib.commonUtils import fileUtils, ui
 # CODE
 
 
-def apply_deluxe_prefs():
+TOOL_NAME = 'Applying Blue Hole Deluxe Preferences'
+
+
+def _copy_and_verify(source: Path, destination: Path):
+    """Allow replacement of read-only preferences and verify the installed bytes."""
+    destination.parent.mkdir(parents=True, exist_ok=True)
+
+    if destination.exists():
+        before_mode = destination.stat().st_mode
+        fileUtils.File(destination).make_writable()
+        log(Severity.INFO, TOOL_NAME,
+            f'Made destination writable: "{destination}" '
+            f'(mode {oct(before_mode)} -> {oct(destination.stat().st_mode)})')
+
+    log(Severity.INFO, TOOL_NAME, f'Copying "{source}" to "{destination}"')
+    # Let filesystem exceptions reach the caller so the popup includes the real error.
+    copyfile(source, destination)
+
+    if destination.read_bytes() != source.read_bytes():
+        raise OSError(f'Content verification failed for "{destination}"; '
+                      'the installed file does not match the Deluxe payload.')
+
+    log(Severity.INFO, TOOL_NAME,
+        f'Verified "{destination}" ({destination.stat().st_size} bytes)')
+
+
+def apply_deluxe_prefs() -> bool:
     """ Applies the Deluxe Blue Hole Preferences, by overwriting the userpref.blend and keymaps file. """
 
     # Leave an out for the user.
     if not warning_bh_deluxe():
+        log(Severity.INFO, TOOL_NAME, 'Cancelled by the user; no files copied.')
         return False
 
-    # Debugging Info listing paths
-    userpref_source: Path = get_payload_dir() / 'userpref.blend'
-    userpref_dest: Path = blenderFile.get_userpref_path()
-    key_cfg_source: Path = get_payload_dir() / 'keyconfig' / 'BH_Keymaps.py'
-    key_cfg_dest: Path = Path(blenderFile.get_keyconfig_path(), 'BH_Keymaps.py')
-    msg = (f'UserPref Source: "{userpref_source}"\n'
-           f'UserPref Destination: "{userpref_dest}"\n'
-           f'Keymap Source: "{key_cfg_source}"\n'
-           f'Keymap Destination: "{key_cfg_dest}"\n')
-    log(Severity.INFO, 'Applying Blue Hole Deluxe Preferences', msg)
+    verified = []
+    stage = 'Resolving installation paths'
+    try:
+        copies = (
+            (get_payload_dir() / 'userpref.blend', Path(blenderFile.get_userpref_path())),
+            (get_payload_dir() / 'keyconfig' / 'BH_Keymaps.py',
+             Path(blenderFile.get_keyconfig_path(), 'BH_Keymaps.py')),
+        )
+        # Check both payloads before overwriting either destination.
+        for source, destination in copies:
+            stage = f'Checking payload "{source}"'
+            log(Severity.INFO, TOOL_NAME, f'Source: "{source}"\nDestination: "{destination}"')
+            if not source.is_file() or source.stat().st_size == 0:
+                raise OSError(f'Deluxe payload is missing or empty: "{source}"')
 
-    # Overwrite the files
-    fileUtils.copy_file(userpref_source, userpref_dest)
-    fileUtils.copy_file(key_cfg_source, key_cfg_dest)
+        for source, destination in copies:
+            stage = f'Installing "{source}" to "{destination}"'
+            _copy_and_verify(source, destination)
+            verified.append(str(destination))
+
+    except Exception as error:
+        completed = '\n'.join(verified) if verified else 'None'
+        msg = (f'Applying Deluxe preferences did not complete.\n\n'
+               f'Step: {stage}\n'
+               f'Error: {type(error).__name__}: {error}\n\n'
+               f'Files copied and verified:\n{completed}\n\n'
+               'Blender will remain open. Some files may already have been changed. '
+               'Check the paths and folder permissions above. If a file is locked by another '
+               'application, close that application and try again.')
+        log(Severity.ERROR, TOOL_NAME, msg, popup=True)
+        return False
 
     # Say that operation was done and Blender will terminate
     notice_blender_closure()
