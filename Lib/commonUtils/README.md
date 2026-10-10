@@ -52,23 +52,9 @@ setup and more examples. If you're using Logistics, its launcher handles setup.
 
 ## Dependencies
 
-The project using commonUtils installs the packages it needs. Requirements vary
-by module; there is no single install command for every tool.
-
-| What you're using | What you need |
-| --- | --- |
-| Desktop widgets, file browser and Qt workers | `PySide6` |
-| Shared ZIP tools and built-in file-type registration | `pyzipper` |
-| External archive extraction | `patool`, plus a system extractor for the format |
-| EXIF tools | `piexif` |
-| Platform-specific tools | The relevant application or system command, such as PowerShell, `hdiutil` or Flatpak |
-
-INI parsing and typed-setting validation use Python's standard library. Their
-visual editor also needs `PySide6`. Some modules load dependencies when imported;
-for example, built-in file-type registration loads ZIP support. See the
-[dependency and platform notes](DEVELOPMENT.md#optional-dependencies-and-platforms)
-for details. Create a `QApplication` before using Qt widgets; standalone scripts
-can use the native dialog backend instead.
+Consumers install the optional dependencies required by their chosen modules.
+See [development and platform setup](DEVELOPMENT.md#optional-dependencies-and-platforms)
+and each area's README for specific requirements.
 
 ## Guides
 
@@ -79,11 +65,55 @@ can use the native dialog backend instead.
 | Examples of background work, downloads and cancellation | [Recipes](RECIPES.md) |
 | Batch renaming | [Rename tools](RENAME.md) |
 | File formats and custom file types | [File types](fileTypes/README.md) |
-| ZIP archives | [Archive guide](ZIP_ARCHIVES.md) |
+| Archive operations | [Archives](archives/README.md) |
 | XML documents | [XML guide](XML.md) |
 | Desktop widgets and readers | [UI guide](ui/README.md) |
-| Commands and processes | [Command wrapper](wrappers/cmdShellWrapper/README.md) |
+| External tools and processes | [Wrappers](wrappers/README.md) |
+| Directory indexing | [Directory](directory/README.md) |
+| Atomic publication, text and recovery | [Persistence](persistence/README.md) |
+| Project bootstrap scripts | [Launchers](launchers/README.md) |
+| Regression tests | [Tests](tests/README.md) |
 | Module details, behavior and tests | [Developer reference](DEVELOPMENT.md) |
+
+## Package map
+
+See [root layout decisions](ROOT_LAYOUT.md) for the relocation rationale.
+
+- [appUtils](appUtils/README.md)
+- [archives](archives/README.md)
+- [configuration](configuration/README.md)
+- [debugUtils](debugUtils/README.md)
+- [dirUtils](dirUtils/README.md)
+- [directory](directory/README.md)
+- [downloads](downloads/README.md)
+- [features](features/README.md)
+- [fileTypes](fileTypes/README.md)
+- [fileUtils](fileUtils/README.md)
+- [file_operations](file_operations/README.md)
+- [file_removal](file_removal/README.md)
+- [filesystem](filesystem/README.md)
+- [launchers](launchers/README.md)
+- [linkUtils](linkUtils/README.md)
+- [logUtils](logUtils/README.md)
+- [marcUtils](marcUtils/README.md)
+- [markdownUtils](markdownUtils/README.md)
+- [network_filesystems](network_filesystems/README.md)
+- [operations](operations/README.md)
+- [osUtils](osUtils/README.md)
+- [persistence](persistence/README.md)
+- [renameUtils](renameUtils/README.md)
+- [settings](settings/README.md)
+- [spreadsheetUtils](spreadsheetUtils/README.md)
+- [steamUtils](steamUtils/README.md)
+- [storage](storage/README.md)
+- [streams](streams/README.md)
+- [tests](tests/README.md)
+- [traversal](traversal/README.md)
+- [ui](ui/README.md)
+- [webUtils](webUtils/README.md)
+- [wrappers](wrappers/README.md)
+- [zipUtils](zipUtils/README.md)
+- [zip_access](zip_access/README.md)
 
 ## License
 
