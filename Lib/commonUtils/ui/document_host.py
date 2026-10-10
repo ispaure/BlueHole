@@ -1,5 +1,6 @@
 """Optional application document host; standalone consumers need no registration."""
 from enum import Enum
+from contextlib import nullcontext
 import weakref
 from . import pyside as qt
 from shiboken6 import isValid
@@ -16,10 +17,24 @@ def current_document_host():
     return host if host is not None and isValid(host) else None
 
 
-def show_document(window):
+def document_creation_scope(origin):
+    """Keep asynchronously created related documents with their originating host.
+
+    Hosts may provide creation_scope(origin); standalone consumers need no hook.
+    Resolve the origin at completion, so a moved document follows its live owner.
+    """
+    host = current_document_host()
+    scope = getattr(host, 'creation_scope', None)
+    return scope(origin) if scope is not None else nullcontext()
+
+
+def show_document(window, *, detached=False, allow_new_tabs=True):
     host = current_document_host()
     if host is not None and host.window().isVisible() and not host.closing:
-        host.present(window)
+        if detached or not allow_new_tabs:
+            host.present(window, detached=detached, allow_new_tabs=allow_new_tabs)
+        else:
+            host.present(window)
     else:
         window.showNormal() if window.isMinimized() else window.show()
         window.raise_()
