@@ -2,8 +2,9 @@
 from pathlib import Path
 from .. import pyside as qt
 from ..operations import Operation
-from ...directory_index import directory_cache
+from ...directory import directory_cache
 from ...filesystem import format_size
+from .search_columns import configure_search_columns, describe_search_row
 
 
 class IndexSearch(qt.QWidget):
@@ -35,9 +36,7 @@ class IndexSearch(qt.QWidget):
         self.results.setRootIsDecorated(False)
         self.results.setUniformRowHeights(True)
         self.results.setSelectionMode(qt.QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.results.setColumnWidth(0, 200)
-        self.results.setColumnWidth(1, 85)
-        self.results.setColumnWidth(2, 85)
+        configure_search_columns(self.results)
         self.results.header().setSectionsClickable(True)
         self.results.header().sectionClicked.connect(self._sort_changed)
         self.results.itemSelectionChanged.connect(self._selection_changed)
@@ -76,7 +75,8 @@ class IndexSearch(qt.QWidget):
         if path != self.scope:
             self.scope = path
             self.browser.search_bar.setPlaceholderText(f'Search {path.name or path} and its subfolders')
-            self.browser.search_bar.clear()
+            if self.active:
+                self._query_changed(self.browser.search_bar.text())
 
     def _query_changed(self, text):
         self._revision += 1
@@ -100,7 +100,7 @@ class IndexSearch(qt.QWidget):
             self.refresh()
 
     def refresh(self):
-        if not self.active or self.closing or self.browser.stopping:
+        if not self.active or self.closing or self.browser.stopping or self.browser.network_location:
             return
         if self.busy:
             self.pending = True
@@ -137,6 +137,7 @@ class IndexSearch(qt.QWidget):
                                          entry.path.suffix.lstrip('.') or 'File',
                                          '' if entry.directory else format_size(entry.size), str(entry.path)])
                 row.setData(0, qt.Qt.ItemDataRole.UserRole, entry.path)
+                describe_search_row(row, self.results)
                 self.results.addTopLevelItem(row)
                 if entry.path in selected: row.setSelected(True)
         self._loading = False
@@ -182,7 +183,7 @@ class IndexSearch(qt.QWidget):
             self.summary.setText('This cached result is currently unavailable. Refresh when its location is accessible.')
             return False
         directory = path if path.is_dir() else path.parent
-        self.browser.search_bar.clear()
+        self.browser.close_search()
         self.browser.navigate(directory)
         if directory != path: self.browser.views.select_source(self.browser.model.index(str(path)))
         return True
@@ -193,7 +194,7 @@ class IndexSearch(qt.QWidget):
 
     def _activate(self, row, column):
         path = row.data(0, qt.Qt.ItemDataRole.UserRole)
-        if path.is_dir(): self.show_in_browser(path)
+        if path.is_dir(): self.browser.navigate(path)
         elif path.exists(): self.browser._activate(self.browser.model.index(str(path)))
         else: self.summary.setText('This cached result is currently unavailable.')
 

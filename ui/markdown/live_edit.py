@@ -1,10 +1,12 @@
 """Same-pane Markdown syntax, paired selections and cursor-sensitive preview."""
 from .. import pyside as qt
+from ..text_commands import wrap_selection
 from .syntax import _units
 from .links import link_spans
-from .document import LiveMarkdownDocument, materialize_formats, protect_escapes, restore_escapes
+from .document import LiveMarkdownDocument, materialize_formats, protect_escapes, restore_escapes, space_headings, heading_top_margin
 from .preview import LivePreviewHighlighter
 from .syntax import HEADING, fenced_regions
+from .presentation import style_document
 
 
 class SourceMarkdownEdit(qt.QPlainTextEdit):
@@ -15,15 +17,7 @@ class SourceMarkdownEdit(qt.QPlainTextEdit):
                 and not event.modifiers() & (qt.Qt.KeyboardModifier.ControlModifier |
                                             qt.Qt.KeyboardModifier.MetaModifier |
                                             qt.Qt.KeyboardModifier.AltModifier)):
-            marker = event.text()
-            start = cursor.selectionStart()
-            text = cursor.selectedText().replace('\u2029', '\n')
-            cursor.beginEditBlock()
-            cursor.insertText(marker + text + marker)
-            cursor.setPosition(start + 1)
-            cursor.setPosition(start + 1 + _units(text), qt.QTextCursor.MoveMode.KeepAnchor)
-            cursor.endEditBlock()
-            self.setTextCursor(cursor)
+            wrap_selection(self, event.text())
             event.accept()
             return
         super().keyPressEvent(event)
@@ -49,21 +43,14 @@ class FormattedMarkdownEdit(qt.QTextEdit):
             qt.QTextDocument.MarkdownFeature.MarkdownDialectGitHub | qt.QTextDocument.MarkdownFeature.MarkdownNoHTML)
         materialize_formats(self)
         restore_escapes(self.document(), tokens)
+        style_document(self.document(), self.palette())
         self.document().clearUndoRedoStacks()
         self.document().setModified(False)
         self._highlighter.setDocument(self.document())
         self._highlighter.refresh_cursor()
 
     def _wrap_selection(self, marker):
-        cursor = self.textCursor()
-        start = cursor.selectionStart()
-        text = cursor.selectedText().replace('\u2029', '\n')
-        cursor.beginEditBlock()
-        cursor.insertText(marker + text + marker, qt.QTextCharFormat())
-        cursor.setPosition(start + len(marker))
-        cursor.setPosition(start + len(marker) + _units(text), qt.QTextCursor.MoveMode.KeepAnchor)
-        cursor.endEditBlock()
-        self.setTextCursor(cursor)
+        wrap_selection(self, marker, reset_format=True)
 
     def apply_inline_format(self, marker):
         cursor = self.textCursor()
@@ -134,6 +121,7 @@ class FormattedMarkdownEdit(qt.QTextEdit):
         fmt = block.blockFormat()
         if fmt.headingLevel() != level:
             fmt.setHeadingLevel(level)
+            fmt.setTopMargin(heading_top_margin(block, level))
             cursor.setBlockFormat(fmt)
             chars = qt.QTextCharFormat()
             chars.setFontWeight(qt.QFont.Weight.Bold if level else qt.QFont.Weight.Normal)

@@ -14,6 +14,7 @@ class BrowserFileSystemModel(qt.QFileSystemModel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.folder_totals = {}
+        self.network_location = False
         self.size_parents = set()
         self._items = OrderedDict()
 
@@ -43,6 +44,7 @@ class BrowserFileSystemModel(qt.QFileSystemModel):
                 return item.name if isinstance(item, Directory) else item.file_name
             if index.column() == 1:
                 if isinstance(item, Directory):
+                    if self.network_location: return '—'
                     stats = self.folder_totals.get(item.path)
                     if item.path.is_symlink():
                         return '—'
@@ -52,6 +54,7 @@ class BrowserFileSystemModel(qt.QFileSystemModel):
                 return format_datetime(item.modified_time)
         if index.isValid() and index.column() == 1 and role == qt.Qt.ItemDataRole.ToolTipRole:
             if isinstance(self.item(index), Directory):
+                if self.network_location: return 'Folder sizes disabled for network drives'
                 stats = self.folder_totals.get(Path(self.filePath(index)))
                 state = ('Incomplete / calculating' if not stats.complete else 'Cached; checking for changes'
                          if stats.stale else 'Up to date') if stats is not None else 'Calculating'
@@ -81,6 +84,8 @@ class BrowserFileSystemModel(qt.QFileSystemModel):
             return False
 
     def set_folder_totals(self, totals):
+        if self.folder_totals == (totals or {}):
+            return
         self.folder_totals = totals or {}
         # Updating every indexed path would make QFileSystemModel load distant
         # folders on the GUI thread. Only invalidate currently displayed parents.
@@ -102,9 +107,6 @@ class ByteSortModel(qt.QSortFilterProxyModel):
         self.filesystem = filesystem
         self.setSourceModel(filesystem)
         self.setDynamicSortFilter(True)
-        self.collator = qt.QCollator()
-        self.collator.setNumericMode(True)
-        self.collator.setCaseSensitivity(qt.Qt.CaseSensitivity.CaseInsensitive)
 
     def mapFromSource(self, index):
         if index.isValid() and index.model() is self.filesystem:
@@ -124,10 +126,10 @@ class ByteSortModel(qt.QSortFilterProxyModel):
     def lessThan(self, left, right):
         if left.column() == 1:
             a, b = self._bytes(left), self._bytes(right)
-            if (a is None) != (b is None):
-                return (a is not None) if self.sortOrder() == qt.Qt.SortOrder.AscendingOrder else (a is None)
-            if a != b:
-                return a < b
+            from ..entry_views import value_less
+            decision = value_less(a, b, descending=self.sortOrder() == qt.Qt.SortOrder.DescendingOrder)
+            if decision is not None:
+                return decision
         elif left.column() == 3:
             a, b = self.filesystem.lastModified(left), self.filesystem.lastModified(right)
             if a != b:
@@ -136,7 +138,9 @@ class ByteSortModel(qt.QSortFilterProxyModel):
             a, b = self.filesystem.isDir(left), self.filesystem.isDir(right)
             if a != b:
                 return a
-        return self.collator.compare(self.filesystem.fileName(left), self.filesystem.fileName(right)) < 0
+        # QCollator's C-locale backend ignores numeric mode on headless Linux.
+        from ..entry_views import label_less
+        return label_less(self.filesystem.fileName(left), self.filesystem.fileName(right))
 
 
 class _BrowserSelection(qt.QItemSelectionModel):

@@ -4,9 +4,9 @@ from collections.abc import Sequence
 from pathlib import Path
 import os
 from time import time
-from .operations import check_cancelled
-from .traversal import natural_path_key
-from ._directory_search import search_terms, matches_name
+from ..operations import check_cancelled
+from ..traversal import natural_path_key
+from .search import search_terms, matches_name
 
 
 @dataclass(frozen=True)
@@ -33,6 +33,18 @@ class Snapshot:
     complete: bool = True
     metadata_checked: bool = True
 
+    def close(self):
+        """Release an indexed snapshot's read transaction when its owner is done."""
+        close = getattr(self.entries, 'close', None)
+        if close is not None:
+            close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
     def folder_stats(self, paths=None, *, cancelled=lambda: False, children_of=None):
         """Persisted aggregates; requested paths keep browser updates bounded."""
         if hasattr(self.entries, 'folder_stats'):
@@ -41,7 +53,7 @@ class Snapshot:
         if children_of is not None and paths is not None:
             raise ValueError('Choose explicit paths or immediate child folders')
         # Standalone metadata snapshots retain their public API without a database.
-        from .filesystem import FolderStats
+        from ..filesystem import FolderStats
         stats = {self.root: FolderStats(complete=self.complete, scanned_at=self.scanned_at)}
         ordered = sorted(self.entries, key=lambda entry: len(entry.path.parts), reverse=True)
         for entry in ordered:
@@ -70,6 +82,15 @@ class Snapshot:
             if matches_name(entry.path.name, terms):
                 matches.append(entry)
         return tuple(matches)
+
+    def storage_children(self, path, limit, *, cancelled=lambda: False):
+        if hasattr(self.entries, 'storage_children'):
+            return self.entries.storage_children(path, limit, cancelled=cancelled)
+        totals = self.folder_stats(cancelled=cancelled)
+        items = [(entry.path, entry.directory, totals[entry.path].size if entry.directory and entry.path in totals else entry.size)
+                 for entry in self.children(path) if not entry.symlink]
+        check_cancelled(cancelled)
+        return tuple(sorted(items, key=lambda item: (-item[2], item[0].name.casefold()))[:limit])
 
     def search_page(self, name, offset=0, limit=500, *, cancelled=lambda: False, sort='path', descending=False):
         if offset < 0 or limit < 1:
