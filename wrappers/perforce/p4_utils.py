@@ -147,7 +147,7 @@ def create_empty_binary_file(file_path):
     Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
     # Create File
     if not os.path.isfile(file_path):
-        fileUtils.copy_file(blenderFile.get_blue_hole_lib_path() / 'binary_template.bin', file_path)
+        fileUtils.File(blenderFile.get_blue_hole_lib_path() / 'binary_template.bin').copy_file(file_path)
         # with open(file_path, 'w') as fp:
         #     pass
 
