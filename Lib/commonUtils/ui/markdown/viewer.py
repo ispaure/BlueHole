@@ -13,7 +13,7 @@ from .reading import MarkdownReadingMixin
 from .links import render_links
 from .tables import MarkdownTablesMixin
 from .live_edit import SourceMarkdownEdit, FormattedMarkdownEdit
-from ...markdownUtils import split_frontmatter
+from ...formats.markdown import split_frontmatter
 
 
 class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditingMixin, MarkdownTablesMixin, qt.QWidget):
@@ -38,6 +38,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         layout.setContentsMargins(*READER_MARGINS)
         layout.setSpacing(READER_SPACING)
         toolbar = qt.QHBoxLayout()
+        self.workspace_controls = toolbar
         toolbar.setSpacing(READER_SPACING)
         self.back_button = reader_button(self, 'Back', icon='previous')
         self.forward_button = reader_button(self, 'Forward', icon='next')
@@ -49,9 +50,10 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self.location.setTextInteractionFlags(qt.Qt.TextInteractionFlag.TextSelectableByMouse)
         toolbar.addWidget(self.back_button)
         toolbar.addWidget(self.forward_button)
-        self.document_title = ReaderLabel('Markdown')
+        self.document_title = ReaderLabel('Markdown', self)
         self.document_title.setAlignment(qt.Qt.AlignmentFlag.AlignCenter)
-        toolbar.addWidget(self.document_title, 1)
+        self.document_title.hide()
+        toolbar.addStretch(1)
         self.edit_button = reader_button(self, 'Edit Markdown', icon='edit')
         self.edit_button.setCheckable(True)
         self.edit_button.setToolTip('Switch between reading and editing Markdown')
