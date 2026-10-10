@@ -1,6 +1,6 @@
 """Section tabs and key rows backed by an explicit-save source editor."""
 from configparser import Error as ConfigError
-from ..fileTypes.iniType import INIFile
+from ..formats.iniType import INIFile
 from . import pyside as qt
 from .text_editor import TextFileEditor
 from ..configuration.ini_schema import key_type, mode_choices, parse_value, validate_values
@@ -99,7 +99,7 @@ class INISettingsEditor(TextFileEditor):
                     self.fields[section, key] = control
                 scroll.setWidget(body)
                 self.sections.addTab(scroll, section)
-            self.status.setText('Edit settings, then Save. Source remains available for advanced edits.')
+            self.status.setText('')
             self._source_dirty = False
         except (ConfigError, ValueError) as error:
             self.status.setText(f'Cannot display settings: {error}. Correct the INI in Source.')
