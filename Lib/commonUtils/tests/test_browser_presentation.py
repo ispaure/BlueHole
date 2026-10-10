@@ -5,13 +5,75 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import monotonic, sleep
 import unittest
+from commonUtils.tests.qt_test_case import QtTestCase
 from unittest.mock import patch
 from commonUtils.ui import pyside as qt
 from commonUtils.ui.file_browser import FileBrowser
 from commonUtils.ui.file_browser.status import format_duration, indexing_phase, IndexProgress, private_status
 
 
-class BrowserPresentationTests(unittest.TestCase):
+class BrowserPresentationTests(QtTestCase):
+    def test_toolbar_stays_inline_and_split_panes_cannot_shrink_into_overlap(self):
+        from commonUtils.ui.workspace import Workspace
+        host = qt.QWidget()
+        workspace = Workspace(lambda path: FileBrowser(calculate_folder_sizes=False), host)
+        layout = qt.QVBoxLayout(host)
+        layout.addWidget(workspace)
+        host.resize(1600, 600)
+        first = workspace.add_view()
+        second = workspace.add_view()
+        workspace.arrange(workspace.active_dock, 'right')
+        host.show()
+        try:
+            host.resize(300, 300)
+            for _ in range(10): self.app.processEvents()
+            for browser in (first, second):
+                widgets = [browser.navigation, browser.search_button, browser.folder_size_button, browser.view_selector,
+                           browser.preview_toggle, browser.view_selector.storage_controls]
+                rects = [qt.QRect(widget.mapTo(browser, qt.QPoint()), widget.size()) for widget in widgets]
+                for left, right in zip(rects, rects[1:]):
+                    self.assertLess(left.right(), right.left())
+                    self.assertLess(abs(left.center().y() - right.center().y()), 3)
+                self.assertGreaterEqual(browser.width(), browser.minimumSizeHint().width())
+        finally:
+            host.close(); host.deleteLater(); self.app.processEvents()
+
+    def test_narrow_breadcrumbs_keep_current_folder_visible_after_resize(self):
+        from commonUtils.ui.file_browser.navigation import BreadcrumbBar
+        bar = BreadcrumbBar()
+        bar.set_paths([Path('/root with a very long name'), Path('/root/ancestor with a very long name'),
+                       Path('/root/ancestor/current')])
+        bar.resize(500, 40); bar.show()
+        try:
+            for width in (160, 300, 120):
+                bar.resize(width, 40)
+                for _ in range(5): self.app.processEvents()
+                scroll = bar.scroll.horizontalScrollBar()
+                self.assertEqual(scroll.value(), scroll.maximum())
+                current = bar.buttons[-1]
+                rect = qt.QRect(current.mapTo(bar.scroll.viewport(), qt.QPoint()), current.size())
+                self.assertTrue(bar.scroll.viewport().rect().intersects(rect))
+        finally:
+            bar.close(); bar.deleteLater(); self.app.processEvents()
+
+    def test_index_status_uses_saved_aggregates_without_counting_all_entries(self):
+        from types import SimpleNamespace
+        from commonUtils.ui.file_browser.index_worker import _IndexJob
+        app = qt.QApplication.instance() or qt.QApplication([])
+        root = Path('/fixture')
+        snapshot = SimpleNamespace(
+            folder_stats=lambda *args, **kw: {root: SimpleNamespace(files=100000, folders=400)},
+            errors=(), children=lambda *a, **kw: (),
+        )
+        job = _IndexJob(root, lambda *a, **kw: None, app)
+        try:
+            with patch('commonUtils.ui.file_browser.index_worker.directory_cache.peek', return_value=snapshot):
+                job._cached(force=True)
+            self.assertEqual(job.saved_entries, 100400)
+            self.assertIn('Waiting for index writer', job.last_progress)
+        finally:
+            job.deleteLater()
+
     @classmethod
     def setUpClass(cls):
         cls.app = qt.QApplication.instance() or qt.QApplication([])

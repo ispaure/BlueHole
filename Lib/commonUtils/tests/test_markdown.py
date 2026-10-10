@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import time
 import unittest
+from commonUtils.tests.qt_test_case import QtTestCase
 from unittest.mock import patch
 
 from commonUtils.fileTypes.registry import file_from_path
@@ -14,7 +15,7 @@ from commonUtils.ui.markdown import MarkdownViewer, open_markdown, _windows
 from commonUtils.ui.file_browser import FileBrowser
 
 
-class MarkdownTests(unittest.TestCase):
+class MarkdownTests(QtTestCase):
     def setUp(self):
         self.app = qt.QApplication.instance() or qt.QApplication([])
         self.temporary = TemporaryDirectory()
@@ -33,6 +34,23 @@ class MarkdownTests(unittest.TestCase):
         self.viewer.show()
         self.addCleanup(self.viewer.deleteLater)
         self.app.processEvents()
+
+    def test_edit_read_icons_and_speech_action_visibility(self):
+        viewer = MarkdownViewer(allow_edit=True)
+        viewer.set_editing(False)
+        self.addCleanup(viewer.deleteLater)
+        viewer.show()
+        self.assertFalse(viewer.edit_button.icon().isNull())
+        self.assertEqual(viewer.edit_button.toolButtonStyle(), qt.Qt.ToolButtonStyle.ToolButtonIconOnly)
+        self.assertTrue(viewer.speech.action.isVisible())
+        viewer.set_editing(True)
+        self.assertEqual(viewer.edit_button.accessibleName(), 'Read Markdown')
+        self.assertFalse(viewer.speech.action.isVisible())
+        self.assertFalse(viewer.speech.anchor.isVisible())
+        viewer.set_editing(False)
+        self.assertEqual(viewer.edit_button.accessibleName(), 'Edit Markdown')
+        self.assertTrue(viewer.speech.action.isVisible())
+        self.assertTrue(viewer.speech.anchor.isVisible())
 
     def test_long_document_and_html_block_keep_tail_in_reading_and_editing(self):
         text = '# Long\n\n' + 'Paragraph text.\n\n' * 3000 + '<div>\nText\n\nTAIL_SENTINEL'
@@ -193,7 +211,7 @@ class MarkdownTests(unittest.TestCase):
         cursor = self.viewer.editor.textCursor()
         cursor.movePosition(qt.QTextCursor.MoveOperation.End)
         cursor.insertText('Extra')
-        with patch('commonUtils.ui.markdown.io.os.replace', side_effect=OSError('blocked')):
+        with patch('commonUtils.persistence.os.replace', side_effect=OSError('blocked')):
             self.assertFalse(self.viewer.save_document())
         self.assertEqual(self.first.read_bytes(), source)
         self.assertTrue(self.viewer.is_modified)
@@ -217,7 +235,7 @@ class MarkdownTests(unittest.TestCase):
         destination = directory / 'saved.md'
         self.assertTrue(self.viewer.save_document(destination))
         self.assertEqual(self.viewer.current_path, destination)
-        self.assertEqual(self.viewer.browser.document().baseUrl().toLocalFile(), str(directory) + '/')
+        self.assertEqual(Path(self.viewer.browser.document().baseUrl().toLocalFile()), directory)
         self.assertIn('My changes', destination.read_text())
 
     def test_unsaved_navigation_cancel_discard_and_failed_save(self):
@@ -313,7 +331,7 @@ class MarkdownTests(unittest.TestCase):
         self.assertIn('<table', viewer.formatted_editor.document().toHtml())
         self.assertFalse(viewer.is_modified)
         viewer.set_edit_mode('source')
-        self.assertEqual(viewer.editor.toPlainText(), original.decode())
+        self.assertEqual(viewer.editor.toPlainText(), original.decode().replace("\r\n", "\n"))
         viewer.set_edit_mode('formatted')
         self.assertTrue(viewer.save_document())
         self.assertEqual(self.first.read_bytes(), original)
@@ -382,7 +400,7 @@ class MarkdownTests(unittest.TestCase):
         with patch.object(qt.QMessageBox, 'warning', return_value=qt.QMessageBox.StandardButton.Cancel):
             self.assertFalse(self.viewer.open_document(self.second))
         self.assertIn('Unsaved rich text', self.viewer.formatted_editor.toPlainText())
-        with patch('commonUtils.ui.markdown.io.os.replace', side_effect=OSError('blocked')):
+        with patch('commonUtils.persistence.os.replace', side_effect=OSError('blocked')):
             self.assertFalse(self.viewer.save_document())
         self.assertTrue(self.viewer.is_modified)
         self.assertEqual(self.first.read_bytes(), original)

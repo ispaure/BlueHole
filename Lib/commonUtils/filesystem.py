@@ -111,7 +111,7 @@ class FolderStats:
 def scan_folders(root, cancelled=lambda: False, *, report=lambda done, total, message: None, reuse_for=0,
                  visible_only=False):
     """Compatibility API: recursive totals from the shared persistent index."""
-    from .directory_index import directory_cache
+    from .directory import directory_cache
     from .operations import OperationCancelled
     try:
         snapshot = directory_cache.get(root, cancelled=cancelled, report=report, reuse_for=reuse_for)
@@ -120,9 +120,10 @@ def scan_folders(root, cancelled=lambda: False, *, report=lambda done, total, me
         return None
 
 
-def format_size(size):
-    for unit in ('B', 'KB', 'MB', 'GB', 'TB'):
-        if size < 1024 or unit == 'TB':
+def format_size(size, *, binary_units=False):
+    units = ('B', 'KiB', 'MiB', 'GiB', 'TiB') if binary_units else ('B', 'KB', 'MB', 'GB', 'TB')
+    for unit in units:
+        if size < 1024 or unit == units[-1]:
             return f'{size:,} B' if unit == 'B' else f'{size:.1f} {unit}'
         size /= 1024
 

@@ -34,7 +34,7 @@ class InstalledFeature(qt.QObject):
         return ActionContext(self.browser, self.host, self.controller, tuple(selection))
 
     def _actions_for(self, item, context):
-        return tuple(BrowserAction(f'{self.feature.id}.{action.id}', action.label,
+        return tuple(BrowserAction(action.shared_key or f'{self.feature.id}.{action.id}', action.label,
             lambda ctx, action=action, accepts=accepts: self._invoke(action, accepts, ctx), source=self.feature.label,
             category=action.category, order=action.order)
             for action, accepts in self._actions if isinstance(item, accepts)
@@ -52,8 +52,9 @@ class InstalledFeature(qt.QObject):
         if not self.enabled:
             return False
         for activation, accepts in self._activation:
-            if isinstance(item, accepts):
-                activation.handler(self._context((item,)))
+            context = self._context((item,))
+            if isinstance(item, accepts) and (activation.is_available is None or activation.is_available(context)):
+                activation.handler(context)
                 return True
         return False
 

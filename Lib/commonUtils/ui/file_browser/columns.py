@@ -35,10 +35,13 @@ class ColumnDelegate(FilenameEditorMixin, qt.QStyledItemDelegate):
 
 class FolderColumnView(qt.QColumnView):
     column_context_requested = qt.Signal(object, object)
+    selection_input = qt.Signal(object)
     def __init__(self):
         super().__init__()
+        self.setIconSize(qt.QSize(16, 16))
         self.viewport().setBackgroundRole(qt.QPalette.ColorRole.Window)
         self.viewport().setAutoFillBackground(True)
+        self._preview_requested = False
         self.preview_container = qt.QWidget()
         self.preview_layout = qt.QVBoxLayout(self.preview_container)
         self.preview_layout.setContentsMargins(0, 0, 0, 0)
@@ -47,9 +50,21 @@ class FolderColumnView(qt.QColumnView):
         self.preview_host.setHorizontalScrollBarPolicy(qt.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.preview_host.setVerticalScrollBarPolicy(qt.Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.preview_host.viewport().installEventFilter(self)
+        # QColumnView lays out its preview after updating the current index.
+        # SelectionChanged alone runs before that layout and Qt can hide it again.
+        self.updatePreviewWidget.connect(lambda index: qt.QTimer.singleShot(0, self, self._sync_preview_width))
         self.set_file_preview_visible(False)
 
     def eventFilter(self, watched, event):
+        selecting = (event.type() == qt.QEvent.Type.MouseButtonPress and event.button() == qt.Qt.MouseButton.LeftButton
+                     or event.type() == qt.QEvent.Type.KeyPress and event.key() in
+                     (qt.Qt.Key.Key_Up, qt.Qt.Key.Key_Down, qt.Qt.Key.Key_Left, qt.Qt.Key.Key_Right,
+                      qt.Qt.Key.Key_Home, qt.Qt.Key.Key_End, qt.Qt.Key.Key_PageUp, qt.Qt.Key.Key_PageDown,
+                      qt.Qt.Key.Key_Space, qt.Qt.Key.Key_A))
+        if selecting:
+            self.selection_input.emit(event.modifiers())
+        if event.type() == qt.QEvent.Type.MouseButtonRelease:
+            qt.QTimer.singleShot(0, self, self._sync_preview_width)
         if event.type() == qt.QEvent.Type.Resize:
             if watched is self.preview_host.viewport():
                 self.preview_container.setMinimumHeight(max(0, watched.height()))
@@ -57,8 +72,13 @@ class FolderColumnView(qt.QColumnView):
                 qt.QTimer.singleShot(0, self, self._sync_preview_width)
         return super().eventFilter(watched, event)
 
+    def currentChanged(self, current, previous):
+        super().currentChanged(current, previous)
+        if hasattr(self, '_preview_requested'):
+            qt.QTimer.singleShot(0, self, self._sync_preview_width)
+
     def _sync_preview_width(self):
-        if not self.preview_container.isHidden():
+        if self._preview_requested:
             self.set_file_preview_visible(True)
 
     def setColumnWidths(self, widths):
@@ -66,6 +86,7 @@ class FolderColumnView(qt.QColumnView):
         self._sync_preview_width()
 
     def set_file_preview_visible(self, visible):
+        self._preview_requested = visible
         widths = self.columnWidths()
         depth = 0
         parent = self.currentIndex().parent()
@@ -77,9 +98,15 @@ class FolderColumnView(qt.QColumnView):
             self.setPreviewColumnVisible(visible)
         # Qt before 6.11 has no public visibility switch for the preview host.
         self.preview_host.setFixedWidth(width if visible else 0)
+        self.preview_host.setVisible(visible)
         self.preview_container.setFixedWidth(width if visible else 0)
         self.preview_container.setMinimumHeight(self.preview_host.viewport().height() if visible else 0)
         self.preview_container.setVisible(visible)
+
+    def setIconSize(self, size):
+        super().setIconSize(size)
+        for column in self.findChildren(qt.QListView):
+            column.setIconSize(size)
 
     def createColumn(self, index):
         column = super().createColumn(index)
@@ -87,7 +114,7 @@ class FolderColumnView(qt.QColumnView):
         column.setEditTriggers(qt.QAbstractItemView.EditTrigger.SelectedClicked | qt.QAbstractItemView.EditTrigger.EditKeyPressed)
         column.setContextMenuPolicy(qt.Qt.ContextMenuPolicy.CustomContextMenu)
         column.customContextMenuRequested.connect(lambda point, target=column: self.column_context_requested.emit(target, point))
-        column.setIconSize(qt.QSize(16, 16))
+        column.setIconSize(self.iconSize())
         column.installEventFilter(self)
         column.viewport().installEventFilter(self)
         column.setVerticalScrollBarPolicy(qt.Qt.ScrollBarPolicy.ScrollBarAsNeeded)

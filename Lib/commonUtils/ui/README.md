@@ -326,6 +326,15 @@ Constructing or changing a view never reads file contents; registered thumbnail
 and panel hooks do that work in background operations.
 
 
+## Reader controls
+
+`reader_menus.ReaderMenus` supplies File/Edit/View/Navigate menus and filtered
+recent files for an application's format-specific readers. `reader_chrome`
+supplies matching line icons/buttons, elided single-line titles/status, shared
+spacing and a fullscreen controller that tracks native window-state changes and
+restores maximization. These helpers do not load content or determine how pages
+turn. See [feature authoring](../FEATURES.md) for the contracts.
+
 ## Markdown reader
 
 The [Markdown viewer/editor guide](markdown/README.md) covers preview-only defaults,
@@ -439,8 +448,8 @@ The database reuses freed space rather than imposing a fixed entry limit.
 
 Search shows 500 results per page, with all matches available through Previous/Next.
 Column sorting applies to the entire match set before paging.
-Inside a `FileBrowser`, Search and Storage read cached snapshots on workers and
-follow shared background index updates. Storage is the fourth browser view,
+Inside a `FileBrowser`, Search and Size Map read cached snapshots on workers and
+follow shared background index updates. Size Map is the fourth browser view,
 with Treemap selected by default and a Radial option showing up to four levels
 (maximum 3,000 radial chart nodes; gaps represent omitted entries). Both use saved sizes, normal breadcrumbs/history,
 file previews and context actions; they never launch an independent filesystem scan.
@@ -455,6 +464,23 @@ The index path appears in the snapshot status tooltip. Dialogs participate in
 browser cancellation/shutdown, and snapshot
 dates/partial-state labels distinguish indexed results from a live filesystem view.
 Browser modification dates use `filesystem.format_datetime()` consistently.
+
+`network_filesystems` identifies UNC paths, mapped Windows network drives and
+network mount points from local mount metadata. Browsers disable size maps,
+indexing, scans, indexed search and automatic cover/metadata extraction on these
+locations. Shared scan exclusions also omit network mounts nested under a local
+scan root. Normal file browsing and explicit file opening remain available.
+Windows filesystem browsers put the drive/network-location menu in the first
+breadcrumb; scoped folder browsers keep their existing navigation boundary.
+
+`ui.read_aloud.ReadAloud` starts from the visible reading area, or the reader's
+explicit page-start provider. It highlights individual words using native speech
+events where available and estimated timing otherwise. Back/forward controls
+estimate a 15-second jump from speech progress and rate, preserving pause state.
+`ui.icons` renders Python icon painters into native Qt pixmap icons and refreshes
+bound controls when the palette changes, avoiding Python icon-engine ownership
+during native window teardown. The shared docking workspace hides the final
+attached browser tab's close button while allowing documents to close at any time.
 
 Browsers in one application share a worker for the same database and location.
 Each tab can pause its own subscription; the last subscriber cancels the worker.
@@ -593,3 +619,91 @@ immutable metadata across overlapping roots and generations. Existing absolute
 retains `directory-index.pre-v3.sqlite3` for recovery; freed database pages are reused
 without an automatic full-file rewrite. See [file browser maintenance](file_browser/README.md)
 for module responsibilities, compatibility contracts, storage and test guidance.
+
+## INI settings editor
+
+`commonUtils.ui.ini_editor.INISettingsEditor` displays section tabs and one row
+per key, with a Source tab and explicit saves. It inherits the text editor's
+unsaved-change protection. Ordinary INIs use string fields; pass `typed_keys=True`
+for typed validation, boolean checkboxes and dropdowns. Applications supply the
+path and decide how saved changes apply. See the
+[configuration guide](../configuration/README.md) for conventions and a complete
+embedding example.
+
+## Reusable code editing
+
+The optional [code-editor components](code_editor/README.md) provide a native
+QPlainTextEdit gutter, undoable line commands, bounded asynchronous search and
+palette-aware syntax definitions. They contain no application window or feature
+logic. Qt-independent `commonUtils.persistence.text` supplies strict encoding handling,
+text/binary recognition and lossless atomic saves; existing text/INI/Markdown APIs
+are unchanged. Applications own their document tabs, settings and save prompts.
+
+## Reusable docking workspaces
+
+`commonUtils.ui.workspace.Workspace` owns dockable tabs, full-window dragging,
+left/right splits, grouped tab headers, transfer between compatible workspaces,
+and cooperative closing. It imports no Logistics features. Supply a factory
+returning a QWidget, optionally exposing `view_title`, `title_changed`,
+`prepare_close()` and an `idle` signal. A view may set `can_retire` to retain its
+worker owners while its visible tab disappears immediately.
+
+Set `allow_new_tabs=False` for externally created documents and
+`keep_one_tab=True` to protect the final attached browser tab; floating panes can
+still close. `dock_group` restricts transfers to compatible hosts. Override
+`reveal_for_drop(global_point)` if dragging should reveal an application-specific
+hidden destination. Window dragging and drop placement stay generic; feature
+selection, dirty-document prompts and retained original window ownership belong
+to the application. `document_host.py` supplies optional hosting and original
+window lookup for reusable readers that also work standalone.
+
+Hosted reader close buttons and delayed worker callbacks should use
+`document_host.close_document(window)`: embedded documents receive their own
+close event and retain save/cancel decisions; independent windows close normally.
+Views with no document-close veto may opt into `close_in_background = True` to
+remove their workspace tab immediately, before cooperative shutdown begins.
+Their owners stay alive until `prepare_close()` succeeds after an `idle` signal.
+
+
+## Passive archive contents
+
+`commonUtils.ui.archive_view.ArchiveContents` provides folder navigation,
+filtering, numeric sorting, selection details and text/image presentation. It
+accepts entries and decoded previews and emits preview/extraction/removal requests;
+the owner supplies jobs and credential policy. See the [archive guide](../ARCHIVES.md)
+for a runnable integration outline and responsibility boundaries.
+
+## Shared document and navigation contracts
+
+Optional `document_host` routing embeds a reader/editor in its application's host
+or opens it standalone. `request_document_close(window)` returns CloseOutcome:
+ACCEPTED, VETOED or PENDING. Owners may implement request_close and an idle signal;
+they handle unsaved prompts and asynchronous retirement themselves. A host must
+retain pending owners and retry after idle rather than inspect private fields.
+
+`outline.OutlineEntry(id, label, target, depth=0)` carries an opaque navigation
+target. OutlineList and OutlineTree populate navigation widgets with set_entries;
+items_by_id retains stable selection handles. They provide no filesystem actions.
+
+Reader chrome supplies reading_spin and show_reader_popup with caller-selected
+ranges, callbacks and alignment. text_commands.wrap_selection provides one undo
+step and UTF-16 cursor accounting with explicit selection/format policy.
+entry_views provides selection and sorting mechanics without path semantics.
+
+## Shared result presentation
+
+NotificationCenter retains bounded Notice events, deduplicates IDs and tracks
+acknowledgement. Toast renders plain text and an optional details action for a
+bounded interval. Applications choose native delivery, event IDs, destination
+badges and persistence; these widgets never decide whether an operation is safe.
+
+ResultWorker captures callback result/error under noninteractive logging. Owners
+consume them after finished and retain workers until retirement. Cancellation
+boundaries and error formatting can be supplied by the caller. Operation retains
+its compatibility completed signal; use OperationProgress for finish-safe delivery
+with progress and cancellation controls.
+
+Workspace tab bars use horizontal dragging to reorder panes. Drag outside the
+tab bar to detach and move the whole pane, then drop to tabify or split. The
+workspace keeps its dock order synchronized with native tab order so indexed
+close actions and document lists refer to the visible tab.

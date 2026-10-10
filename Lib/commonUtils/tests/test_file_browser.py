@@ -6,6 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import time
 import unittest
+from commonUtils.tests.qt_test_case import QtTestCase
 from unittest.mock import patch
 
 from commonUtils.fileUtils import File
@@ -32,7 +33,7 @@ class CustomFile(File):
         return True
 
 
-class BrowserTests(unittest.TestCase):
+class BrowserTests(QtTestCase):
     def setUp(self):
         self.app = qt.QApplication.instance() or qt.QApplication([])
         self.temp = TemporaryDirectory()
@@ -54,26 +55,86 @@ class BrowserTests(unittest.TestCase):
 
     def wait(self):
         deadline = time.monotonic() + 5
-        while (self.browser.busy or self.browser.folder_busy or self.browser.views.cover_busy) and time.monotonic() < deadline:
+        stable = 0
+        while time.monotonic() < deadline:
             self.app.processEvents()
+            pending = (self.browser.busy or self.browser.folder_busy or self.browser.views.cover_busy
+                       or self.browser.views._column_selection_pending)
+            stable = 0 if pending else stable + 1
+            if stable >= 2:
+                break
             time.sleep(.01)
-        self.app.processEvents()
-        self.assertFalse(self.browser.busy or self.browser.folder_busy)
+        self.assertFalse(self.browser.busy or self.browser.folder_busy or self.browser.views._column_selection_pending)
+
+    def test_parent_destruction_releases_index_priority(self):
+        import gc
+        from commonUtils.directory import directory_cache
+        from shiboken6 import isValid
+        for _ in range(20):
+            parent = qt.QWidget()
+            browser = FileBrowser(parent=parent, calculate_folder_sizes=False)
+            owner = browser._index_priority_owner
+            directory_cache.set_priority_folders(owner, (self.root,))
+            self.assertIn(owner, directory_cache._priority_folders)
+            parent.deleteLater()
+            self.app.sendPostedEvents(None, qt.QEvent.Type.DeferredDelete)
+            self.assertFalse(isValid(browser))
+            self.assertNotIn(owner, directory_cache._priority_folders)
+            del browser, parent
+            gc.collect()
+
+    def test_network_policy_blocks_maps_scans_indexing_and_thumbnails_then_restores_local(self):
+        remote = self.root/'share'; remote.mkdir()
+        from commonUtils.network_filesystems import is_network_location
+        def network(path, **kwargs):
+            path = Path(path)
+            return path == remote or remote in path.parents
+        with patch('commonUtils.network_filesystems.is_network_location', side_effect=network), \
+             patch('commonUtils.directory.directory_cache.reconcile_folder') as scan:
+            self.browser.set_directory(remote)
+            self.wait()
+            self.assertTrue(self.browser.network_location)
+            for mode in (3, 4):
+                self.assertFalse(self.browser.view_selector.buttons[mode].isEnabled())
+                self.assertEqual(self.browser.view_selector.buttons[mode].toolTip(), 'Size map disabled for network drives')
+            self.browser.view_selector.setCurrentIndex(3)
+            self.browser.views.set_mode(3)
+            self.assertNotEqual(self.browser.views.currentIndex(), 3)
+            self.browser.refresh(); self.browser.refresh_folder_totals()
+            self.assertIsNone(self.browser.open_storage())
+            self.assertIsNone(self.browser.open_search())
+            self.assertIsNone(self.browser.show_index_details())
+            self.assertFalse(self.browser.refresh_button.isEnabled())
+            self.assertEqual(self.browser.index_watcher.directories(), [])
+            self.assertIn('disabled for network drives', self.browser.index_status.text())
+            with patch.object(self.browser.views, '_enqueue_cover') as cover:
+                self.browser.views._request_cover(remote/'file.cbz'); self.app.processEvents()
+                cover.assert_not_called()
+            scan.assert_not_called()
+        self.browser.set_directory(self.root)
+        self.wait()
+        self.assertFalse(self.browser.network_location)
+        self.assertTrue(self.browser.refresh_button.isEnabled())
+        self.assertTrue(self.browser.view_selector.buttons[3].isEnabled())
 
     def test_search_results_locate_file_and_keep_worker_safe(self):
-        window = self.browser.open_search()
-        window.query.setText('ITEM')
-        window.run_search()
-        deadline = time.monotonic() + 5
-        while window.busy:
-            self.assertLess(time.monotonic(), deadline)
-            self.app.processEvents()
-            time.sleep(.01)
-        self.assertEqual(window.results.topLevelItemCount(), 1)
-        window.locate(self.path)
-        self.assertEqual(self.browser.selected_objects()[0].path, self.path)
-        window.close()
-        self.wait()
+        from commonUtils.directory import DirectoryCache
+        support = Path(self.enterContext(TemporaryDirectory()))
+        with DirectoryCache(database=support / 'search-fixture.sqlite3') as cache:
+            cache.get(self.root, refresh=True)
+            with patch('commonUtils.ui.file_browser.index_search.directory_cache', cache):
+                search = self.browser.open_search()
+                self.browser.search_bar.setText('ITEM')
+                deadline = time.monotonic() + 5
+                while search.busy or search.debounce.isActive():
+                    self.assertLess(time.monotonic(), deadline)
+                    self.app.processEvents()
+                    time.sleep(.01)
+                self.assertEqual(search.results.topLevelItemCount(), 1)
+                self.assertTrue(search.show_in_browser(self.path))
+                self.assertEqual(self.browser.selected_objects()[0].path, self.path)
+                self.assertTrue(self.browser.search_panel.isHidden())
+                self.wait()
 
     def test_storage_totals_treemap_and_drilldown(self):
         folder = self.root / 'large'
@@ -120,7 +181,7 @@ class BrowserTests(unittest.TestCase):
         self.assertNotIn('\\n', text)
         menu = self.browser.context_menu_for(index)
         self.assertEqual([action.text() for action in menu.actions() if not action.isSeparator()],
-                         ['Open in Default App', 'Cut', 'Copy', 'Rename', menu.actions()[-1].text()])
+                         ['Open in Default App', 'Cut', 'Copy', 'Rename', 'Move to Trash / Recycle Bin…', menu.actions()[-1].text()])
         with patch('commonUtils.ui.desktop_actions.open_default') as opened:
             menu.actions()[0].trigger()
             opened.assert_called_once_with(self.path)
@@ -213,7 +274,7 @@ class BrowserTests(unittest.TestCase):
         self.assertEqual(self.browser.model.data(index.siblingAtColumn(1)), '6 B')
         menu = self.browser.context_menu_for(index)
         self.assertEqual([action.text() for action in menu.actions() if not action.isSeparator()][:-1],
-                         ['Open', 'Cut', 'Copy', 'Paste', 'Rename'])
+                         ['Open', 'Cut', 'Copy', 'Paste', 'Rename', 'Move to Trash / Recycle Bin…'])
         self.assertTrue(menu.actions()[-1].text().startswith('Reveal in '))
         menu.deleteLater()
         self.browser._activate(index)
@@ -262,6 +323,26 @@ class BrowserTests(unittest.TestCase):
         self.assertEqual(navigation.directory, self.root)
         self.assertEqual(navigation.breadcrumbs.paths, [self.root])
 
+    def test_root_breadcrumb_menu_lists_drives_and_opens_network_locations(self):
+        breadcrumbs = self.browser.navigation.breadcrumbs
+        opened = []
+        breadcrumbs.enable_drive_menu(opened.append)
+        self.assertEqual(breadcrumbs.root_button.popupMode(),
+                         qt.QToolButton.ToolButtonPopupMode.InstantPopup)
+        drive = self.root / 'drive'
+        with patch.object(qt.QDir, 'drives', return_value=[qt.QFileInfo(str(drive))]):
+            breadcrumbs.drive_menu.aboutToShow.emit()
+        actions = breadcrumbs.drive_menu.actions()
+        self.assertEqual(Path(actions[0].text()), drive)
+        actions[0].trigger()
+        self.assertEqual(opened, [drive])
+        with patch.object(qt.QFileDialog, 'getExistingDirectory', return_value=r'\\server\share'):
+            actions[-1].trigger()
+        self.assertEqual(opened[-1], Path(r'\\server\share'))
+        with patch.object(qt.QFileDialog, 'getExistingDirectory', return_value=''):
+            actions[-1].trigger()
+        self.assertEqual(len(opened), 2)
+
     def test_structured_fields_are_selectable_plain_text_and_use_model_folder_icon(self):
         folder = self.root / 'custom folder'
         folder.mkdir()
@@ -305,6 +386,101 @@ class BrowserTests(unittest.TestCase):
             columns = max(1, usable // 99)
             self.assertLess(usable - columns * tiles.gridSize().width(), columns)
             self.assertEqual(tiles.iconSize().width(), min(71, max(16, tiles.gridSize().width() - 28)))
+
+    def test_column_single_click_opens_file_information(self):
+        from PySide6.QtTest import QTest
+        self.browser.view_selector.setCurrentIndex(2)
+        self.browser.resize(1000, 650)
+        self.wait()
+        columns = self.browser.views.columns
+        index = self.browser.model.index(str(self.path))
+        child = next(view for view in columns.findChildren(qt.QListView)
+                     if view.isVisible() and view.rootIndex() == index.parent())
+        QTest.mouseClick(child.viewport(), qt.Qt.MouseButton.LeftButton,
+                         pos=child.visualRect(index).center())
+        self.wait()
+        self.assertEqual(self.browser.selected_object.path, self.path)
+        self.assertTrue(self.browser.preview_panel.isVisible())
+        self.assertTrue(columns.preview_host.isVisible())
+        self.assertGreater(columns.preview_host.width(), 0)
+        self.assertGreater(self.browser.tabs.count(), 0)
+
+    def test_tiles_sort_names_naturally_independent_of_list_sort(self):
+        for name in ('zeta.txt', 'Alpha.txt', 'file10.txt', 'file2.txt'):
+            (self.root/name).write_text('text')
+        for name in ('Folder10', 'Folder2'):
+            (self.root/name).mkdir()
+        self.browser.tree.sortByColumn(3, qt.Qt.SortOrder.DescendingOrder)
+        self.browser.view_selector.setCurrentIndex(1)
+        tiles = self.browser.views.tiles
+        deadline = time.monotonic()+5
+        while tiles.model().rowCount(tiles.rootIndex()) != 8:
+            self.assertLess(time.monotonic(), deadline)
+            self.app.processEvents(); time.sleep(.01)
+        names = [tiles.model().data(tiles.model().index(row,0,tiles.rootIndex())) for row in range(8)]
+        self.assertEqual(names, ['Folder2','Folder10','Alpha.txt','file2.txt','file10.txt','item.project','other.bin','zeta.txt'])
+
+    def test_entering_columns_keeps_opened_folder_in_first_column(self):
+        folder = self.root/'Folder'; folder.mkdir()
+        (folder/'inside.txt').write_text('inside')
+        self.browser.navigate(folder); self.wait()
+        self.browser.view_selector.setCurrentIndex(2); self.wait()
+        columns = self.browser.views.columns
+        self.assertEqual(Path(self.browser.model.filePath(columns.rootIndex())), self.root)
+        self.assertEqual(Path(self.browser.model.filePath(columns.currentIndex())), folder)
+        self.assertEqual(self.browser.navigation.directory, folder)
+        deadline = time.monotonic()+3
+        while not any(view.isVisible() and Path(self.browser.model.filePath(view.rootIndex())) == folder
+                      for view in columns.findChildren(qt.QListView)):
+            self.assertLess(time.monotonic(), deadline)
+            self.app.processEvents(); time.sleep(.01)
+
+    def test_column_file_preview_returns_on_single_click_after_folder_selection(self):
+        from PySide6.QtTest import QTest
+        folder = self.root/'Folder'; folder.mkdir()
+        target = folder/'inside.txt'; target.write_text('inside')
+        self.browser.view_selector.setCurrentIndex(2); self.wait()
+        def click(path):
+            index = self.browser.model.index(str(path))
+            deadline = time.monotonic()+3
+            while True:
+                column = next((view for view in self.browser.views.columns.findChildren(qt.QListView)
+                               if view.isVisible() and view.rootIndex() == index.parent()), None)
+                if column is not None and column.visualRect(index).isValid():
+                    break
+                self.assertLess(time.monotonic(), deadline)
+                self.app.processEvents(); time.sleep(.01)
+                index = self.browser.model.index(str(path))
+            QTest.mouseClick(column.viewport(), qt.Qt.MouseButton.LeftButton, pos=column.visualRect(index).center())
+            self.wait()
+        for path in (self.path, folder, target, self.path):
+            click(path)
+            if path != folder:
+                self.assertEqual(self.browser.selected_object.path, path)
+                self.assertTrue(self.browser.views.columns.preview_host.isVisible())
+                self.assertTrue(self.browser.preview_panel.isVisible())
+
+    def test_columns_preserve_explicit_multi_selection(self):
+        from PySide6.QtTest import QTest
+        folder = self.root/'Folder'; folder.mkdir()
+        (folder/'inside.txt').write_text('inside')
+        self.browser.view_selector.setCurrentIndex(2); self.wait()
+        columns = self.browser.views.columns
+        first = self.browser.model.index(str(self.path))
+        second = self.browser.model.index(str(self.root/'other.bin'))
+        view = next(view for view in columns.findChildren(qt.QListView)
+                    if view.isVisible() and view.rootIndex() == first.parent())
+        directory = self.browser.model.index(str(folder))
+        QTest.mouseClick(view.viewport(),qt.Qt.MouseButton.LeftButton,pos=view.visualRect(directory).center())
+        self.wait()
+        first = self.browser.model.index(str(self.path))
+        second = self.browser.model.index(str(self.root/'other.bin'))
+        QTest.mouseClick(view.viewport(),qt.Qt.MouseButton.LeftButton,pos=view.visualRect(first).center())
+        self.wait()
+        QTest.mouseClick(view.viewport(),qt.Qt.MouseButton.LeftButton,qt.Qt.KeyboardModifier.ControlModifier,
+                         pos=view.visualRect(second).center())
+        self.wait()
+        self.assertEqual({item.path for item in self.browser.selected_objects()}, {self.path,self.root/'other.bin'})
 
     def test_column_files_end_the_trail_with_a_matching_preview_column(self):
         from commonUtils.ui.file_browser.views import ColumnDelegate
@@ -360,7 +536,13 @@ class BrowserTests(unittest.TestCase):
         self.assertGreater(tiles.iconSize().width(), small * 1.5)
         self.assertTrue(self.browser.folder_size_button.isVisible())
         self.browser.view_selector.setCurrentIndex(0)
-        self.assertFalse(self.browser.folder_size_button.isVisible())
+        self.assertTrue(self.browser.folder_size_button.isVisible())
+        self.assertEqual(self.browser.tree.iconSize(), qt.QSize(32, 32))
+        self.browser.view_selector.setCurrentIndex(2)
+        self.app.processEvents()
+        self.assertTrue(self.browser.views.columns.findChildren(qt.QListView))
+        self.assertTrue(all(column.iconSize() == qt.QSize(32, 32)
+                            for column in self.browser.views.columns.findChildren(qt.QListView)))
 
     def test_size_control_scales_mixed_files_and_bounds_icons_in_narrow_views(self):
         tiles = self.browser.views.tiles
@@ -420,7 +602,14 @@ class BrowserTests(unittest.TestCase):
                                                        pixmap.height() / (tiles.iconSize().height() * ratio)),
                                                    1.0, delta=.03)
                             if icon is icons[0]:
-                                self.assertAlmostEqual(pixmap.width() / pixmap.height(), .5, delta=.03)
+                                # The icon now includes a centered transparent canvas;
+                                # measure the artwork rather than the canvas ratio.
+                                image = pixmap.toImage()
+                                pixels = [(x,y) for y in range(image.height()) for x in range(image.width())
+                                          if image.pixelColor(x,y).alpha() > 128]
+                                width = max(x for x,y in pixels) - min(x for x,y in pixels) + 1
+                                height = max(y for x,y in pixels) - min(y for x,y in pixels) + 1
+                                self.assertAlmostEqual(width / height, .5, delta=.03)
 
     def test_tile_paint_preserves_square_wide_and_portrait_images(self):
         tiles = self.browser.views.tiles
@@ -463,7 +652,11 @@ class BrowserTests(unittest.TestCase):
             option=qt.QStyleOptionViewItem();option.decorationSize=tiles.iconSize()
             tiles.itemDelegate().initStyleOption(option,index)
             image=option.icon.pixmap(tiles.iconSize())
-            self.assertEqual(image.width(),image.height())
+            image = image.toImage()
+            pixels = [(x,y) for y in range(image.height()) for x in range(image.width())
+                      if image.pixelColor(x,y).alpha() > 128]
+            self.assertEqual(max(x for x,y in pixels)-min(x for x,y in pixels),
+                             max(y for x,y in pixels)-min(y for x,y in pixels))
 
     def test_thumbnail_resolution_accounts_for_device_pixel_ratio(self):
         covers = self.browser.views.covers
@@ -499,7 +692,7 @@ class BrowserTests(unittest.TestCase):
             release.wait(5)
             from unittest.mock import Mock
             return Mock(folder_stats=lambda **kwargs: {root: FolderStats(files=999)})
-        with patch('commonUtils.directory_index.directory_cache.reconcile_folder', side_effect=scan):
+        with patch('commonUtils.directory.directory_cache.reconcile_folder', side_effect=scan):
             try:
                 self.browser.set_folder_sizes_enabled(True)
                 self.assertTrue(entered.wait(2))
