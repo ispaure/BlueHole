@@ -180,7 +180,7 @@ def exec_p4_command(command: str):
         log(Severity.CRITICAL, 'Perforce Command', msg)
 
     # Resolve P4 Path (macOS & Linux need to be pointed to p4_parallel file)
-    p4_path: str = {OS.WIN: 'p4', OS.MAC: get_p4_macos_path(), OS.LINUX: get_p4_linux_path()}[get_os()]
+    p4_path: str = {OS.WIN: lambda: 'p4', OS.MAC: get_p4_macos_path, OS.LINUX: get_p4_linux_path}[get_os()]()
 
     match get_os():
         case OS.MAC | OS.LINUX:
@@ -206,4 +206,12 @@ def exec_p4_command(command: str):
             command = f'"{p4_path}"{command[2:]}'
 
     # Execute the command
-    return cmdShellWrapper.exec_cmd(command, time_out=15)
+    result = cmdShellWrapper.run_command(command, shell=True, idle_timeout=15)
+    if result.timed_out or result.cancelled:
+        # Partial output must not look like a completed Perforce operation.
+        log(Severity.CRITICAL, 'Perforce Command', 'Perforce command timed out or was cancelled.')
+    # fstat callers intentionally parse nonzero diagnostics such as "no such file(s)".
+    # Keep their existing output-list contract while retaining an explicit outcome internally.
+    if not result.success and not result.lines:
+        log(Severity.CRITICAL, 'Perforce Command', f'Perforce exited with status {result.returncode}.')
+    return result.lines

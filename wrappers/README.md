@@ -353,3 +353,15 @@ The Perforce wrapper exists to provide:
 
 By isolating Perforce behavior inside this wrapper, Blue Hole avoids
 duplicating fragile command-line logic throughout the addon.
+## Perforce command outcomes
+
+The alpha branch vendors the shared structured command wrapper, synchronized
+from commonUtils commit `6671ac3a4e62355fd0de61af44575dafc1de30c0`. Perforce commands
+use `run_command` internally and retain output-list compatibility for callers that
+parse diagnostics such as missing depot files. Timeouts and silent nonzero exits
+raise an error instead of presenting partial output as successful completion.
+The wrapper selects only the current platform's executable preferences.
+
+Run `python -m unittest discover -s tests -v` outside Blender to check the vendored
+command contract and Deluxe preference installation. These tests do not validate
+a live Perforce server or Blender desktop integration.
