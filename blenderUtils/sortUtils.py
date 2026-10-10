@@ -19,7 +19,7 @@ import mathutils
 import os
 
 from . import objectUtils
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # GLOBALS

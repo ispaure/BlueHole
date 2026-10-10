@@ -21,8 +21,8 @@ from typing import *
 
 import bpy
 
-from ..Lib.commonUtils.debugUtils import *
-from ..Lib.commonUtils.osUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
+from ..Lib.commonUtils.runtime.platform import *
 from ..environment import envManager
 
 # ----------------------------------------------------------------------------------------------------------------------

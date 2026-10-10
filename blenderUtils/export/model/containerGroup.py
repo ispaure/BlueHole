@@ -25,7 +25,7 @@ import bpy
 from ... import filterUtils
 from ....unrealUtils import sendUnreal
 from ..exportSettings import *
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ....preferences.prefs import *
 from ....wrappers.perforce.p4_file_group import P4FileGroup
 from .container import Container

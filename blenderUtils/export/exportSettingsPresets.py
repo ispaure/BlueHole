@@ -19,7 +19,7 @@ __status__ = 'Production'
 
 from enum import Enum
 
-from ...Lib.commonUtils.debugUtils import *
+from ...Lib.commonUtils.runtime.diagnostics import *
 from ...environment import envPathResolver
 from ...preferences.prefs import *
 from .. import projectUtils

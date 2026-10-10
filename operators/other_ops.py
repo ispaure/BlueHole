@@ -18,7 +18,7 @@ __status__ = 'Production'
 # Blender
 import bpy
 from bpy.props import *
-from ..Lib.commonUtils.webUtils import open_url
+from ..Lib.commonUtils.integrations.web import open_url
 from ..overlays.deluxe import applyDeluxePrefs
 
 # ----------------------------------------------------------------------------------------------------------------------

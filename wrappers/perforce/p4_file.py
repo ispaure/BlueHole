@@ -2,8 +2,8 @@
 from typing import Union
 import bpy
 from ...blenderUtils import filterUtils
-from ...Lib.commonUtils.debugUtils import log, Severity
-from ...Lib.commonUtils.wrappers.perforce.p4_file import P4File
+from ...Lib.commonUtils.runtime.diagnostics import log, Severity
+from ...Lib.commonUtils.integrations.wrappers.perforce.p4_file import P4File
 tool_name = 'Blue Hole [Perforce Wrapper]'
 
 

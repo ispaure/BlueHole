@@ -13,7 +13,7 @@ __status__ = 'Production'
 
 import bpy
 
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ....debug.debug_flags import *
 from ....actions.operator_action import draw_operator_action
 from ....actions.actions import pie_actions

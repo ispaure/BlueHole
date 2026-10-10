@@ -14,7 +14,7 @@ class DirectoryCompatibilityTests(unittest.TestCase):
         package = types.ModuleType(name)
         package.__path__ = [str(Path(__file__).resolve().parents[1])]
         sys.modules[name] = package
-        cls.canonical = importlib.import_module(name + '.Lib.commonUtils.directory')
+        cls.canonical = importlib.import_module(name + '.Lib.commonUtils.filesystem.index')
         cls.legacy = importlib.import_module(name + '.Lib.commonUtils.directory_index')
         cls.addClassCleanup(lambda: [sys.modules.pop(key, None) for key in tuple(sys.modules)
             if key == name or key.startswith(name + '.')])

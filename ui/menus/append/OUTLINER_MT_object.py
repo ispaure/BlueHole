@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 from typing import List, Optional
 from pathlib import Path
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ....blenderUtils import blenderFile
 from ....blenderUtils.export import exportSettingsPresets
 from ....blenderUtils.export.model.container import ContainerDummy

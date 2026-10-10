@@ -18,7 +18,7 @@ __status__ = 'Production'
 # Blue Hole
 import bpy
 from ..exportSettings import *
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ... import objectUtils
 from ....preferences.prefs import *
 from ..model.container import Container

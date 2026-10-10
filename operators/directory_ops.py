@@ -23,8 +23,8 @@ from pathlib import Path
 from ..blenderUtils import blenderFile, projectUtils, filterUtils
 from ..environment import envPathResolver
 from ..preferences.prefs import *
-from ..Lib.commonUtils import dirUtils
-from ..Lib.commonUtils.osUtils import get_os, OS
+from ..Lib.commonUtils.filesystem import directories as dirUtils
+from ..Lib.commonUtils.runtime.platform import get_os, OS
 from ..wrappers.sourceContentPath import get_valid_source_content_path
 from ..wrappers.perforce.p4_info import P4Info
 

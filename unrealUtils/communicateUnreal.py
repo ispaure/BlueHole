@@ -18,7 +18,7 @@ __status__ = 'Production'
 import time
 
 from ..Lib.send2ue.dependencies import remote_execution
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..preferences.prefs import prefs
 from .overrides.ue_exec_code_override import run_unreal_python_commands_override
 

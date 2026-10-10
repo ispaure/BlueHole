@@ -18,7 +18,7 @@ __status__ = 'Production'
 from abc import abstractmethod
 
 from ..exportSettings import *
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ....preferences.prefs import *
 from ... import filterUtils, objectUtils, sceneUtils
 from .containerGroup import ContainerGroup

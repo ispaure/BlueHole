@@ -16,7 +16,7 @@ __status__ = 'Production'
 # IMPORTS
 
 from ..preferences.prefs import *
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..wrappers.perforce.p4_file import BlendP4File
 from ..wrappers.perforce.p4_info import P4Info
 

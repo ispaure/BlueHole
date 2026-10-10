@@ -27,7 +27,7 @@ __status__ = 'Production'
 
 from typing import Callable
 
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONSTANTS

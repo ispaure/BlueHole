@@ -22,7 +22,7 @@ import bpy
 from ....blenderUtils.uiUtils import show_label
 from ....operators import directory_ops, export_send_ops, help_ops, external_addon_ops
 from ....preferences.prefs import *
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS

@@ -20,7 +20,7 @@ import bpy
 
 # Blue Hole
 from ..exportSettings import *
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ... import objectUtils, projectUtils
 from ....preferences.prefs import *
 from .container import LooseMeshContainer

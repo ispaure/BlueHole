@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import *
 
 from ..blenderUtils import blenderFile
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..preferences.prefs import *
 from .model import Environment
 

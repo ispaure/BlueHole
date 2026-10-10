@@ -20,8 +20,9 @@ import sys
 from shutil import copyfile
 from pathlib import Path
 from ...blenderUtils import blenderFile
-from ...Lib.commonUtils.debugUtils import log, Severity
-from ...Lib.commonUtils import fileUtils, ui
+from ...Lib.commonUtils.runtime.diagnostics import log, Severity
+from ...Lib.commonUtils.filesystem import files as fileUtils
+from ...Lib.commonUtils import ui
 
 
 # ----------------------------------------------------------------------------------------------------------------------

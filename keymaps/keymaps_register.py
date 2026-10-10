@@ -29,7 +29,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..debug.debug_flags import *
 from .pie import pie_keymaps_register
 from . import mesh_keymaps_register

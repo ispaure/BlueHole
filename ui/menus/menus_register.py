@@ -25,7 +25,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from ...Lib.commonUtils.debugUtils import *
+from ...Lib.commonUtils.runtime.diagnostics import *
 
 from .custom import custom_menus_register
 from .append import append_menus_register

@@ -16,7 +16,7 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ....debug.debug_flags import *
 from ....preferences.prefs import *
 from ....actions.operator_action import draw_operator_action

@@ -18,8 +18,8 @@ __status__ = 'Production'
 from pathlib import Path
 from typing import *
 
-from ..Lib.commonUtils.debugUtils import *
-from ..Lib.commonUtils.osUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
+from ..Lib.commonUtils.runtime.platform import *
 from ..blenderUtils import blenderFile
 from ..preferences.prefs import *
 from ..wrappers.sourceContentPath import get_valid_source_content_path

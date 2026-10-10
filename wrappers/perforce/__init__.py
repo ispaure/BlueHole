@@ -1,6 +1,6 @@
 """Supply BlueHole preferences lazily to the shared Perforce models."""
-from ...Lib.commonUtils.wrappers.perforce import PerforceRuntime, configure_runtime
-from ...Lib.commonUtils.osUtils import OS, get_os
+from ...Lib.commonUtils.integrations.wrappers.perforce import PerforceRuntime, configure_runtime
+from ...Lib.commonUtils.runtime.platform import OS, get_os
 
 
 def _executable(platform):

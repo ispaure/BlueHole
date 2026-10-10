@@ -19,7 +19,7 @@ import mathutils
 
 import bpy
 
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..preferences.prefs import *
 from . import sceneUtils
 
