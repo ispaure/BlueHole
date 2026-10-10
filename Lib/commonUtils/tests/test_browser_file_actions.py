@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 from threading import Event
 import time
 import unittest
+from commonUtils.tests.qt_test_case import QtTestCase
 from unittest.mock import patch
 from PySide6.QtTest import QTest
 from commonUtils.ui import pyside as qt
@@ -15,7 +16,7 @@ from commonUtils.ui.file_browser.file_actions import clipboard_files, set_clipbo
 from commonUtils.filesystem import BrowserAction
 
 
-class BrowserFileActionTests(unittest.TestCase):
+class BrowserFileActionTests(QtTestCase):
     def setUp(self):
         self.app = qt.QApplication.instance() or qt.QApplication([])
         self.temp = TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
@@ -55,10 +56,18 @@ class BrowserFileActionTests(unittest.TestCase):
         return {action.text(): action for action in menu.actions() if not action.isSeparator()}
 
     def editor(self):
-        QTest.qWait(20)
-        editors = [editor for editor in self.browser.views.findChildren(qt.QLineEdit) if editor.isVisible()]
-        self.assertEqual(len(editors), 1)
-        return editors[0]
+        deadline = time.monotonic() + 5
+        while time.monotonic() < deadline:
+            self.app.processEvents()
+            editors = [editor for editor in self.browser.views.findChildren(qt.QLineEdit) if editor.isVisible()]
+            if len(editors) == 1:
+                editor = editors[0]
+                length = editor.property('filename_basename_length')
+                if (editor.hasFocus() and editor.selectionStart() == 0
+                        and len(editor.selectedText().encode('utf-16-le')) // 2 == length):
+                    return editor
+            time.sleep(.005)
+        self.fail('Filename editor did not finish focusing and selecting its basename')
 
     def test_paste_is_on_folders_and_empty_space_and_rename_requires_single_selection(self):
         self.select(self.file)
@@ -73,6 +82,94 @@ class BrowserFileActionTests(unittest.TestCase):
         self.browser.tree.selectionModel().select(self.index(self.folder), qt.QItemSelectionModel.SelectionFlag.Select |
                                                  qt.QItemSelectionModel.SelectionFlag.Rows)
         self.assertFalse(self.menu(self.file)['Rename'].isEnabled())
+
+    def test_platform_keys_open_parent_and_leave_editors_alone(self):
+        for platform, modifier in (('darwin', qt.Qt.KeyboardModifier.ControlModifier),
+                                   ('win32', qt.Qt.KeyboardModifier.NoModifier),
+                                   ('linux', qt.Qt.KeyboardModifier.NoModifier)):
+            self.browser.keyboard.platform = platform
+            self.browser.navigate(self.root); self.wait()
+            self.select(self.folder)
+            self.browser.tree.setFocus()
+            QTest.keyClick(self.browser.tree, qt.Qt.Key.Key_Down if platform == 'darwin'
+                           else qt.Qt.Key.Key_Return, modifier)
+            self.wait()
+            self.assertEqual(self.browser.navigation.directory, self.folder)
+            key = qt.Qt.Key.Key_Backspace if platform == 'win32' else qt.Qt.Key.Key_Up
+            up_modifier = modifier if platform != 'linux' else qt.Qt.KeyboardModifier.AltModifier
+            QTest.keyClick(self.browser.tree, key, up_modifier); self.wait()
+            self.assertEqual(self.browser.navigation.directory, self.root)
+        self.browser.keyboard.platform = 'darwin'
+        self.select(self.file); self.browser.tree.setFocus()
+        QTest.keyClick(self.browser.tree, qt.Qt.Key.Key_Return)
+        editor = self.editor()
+        editor.setText('Renamed.txt')
+        QTest.keyClick(editor, qt.Qt.Key.Key_Return); self.wait()
+        self.assertTrue((self.root / 'Renamed.txt').exists())
+        self.browser.open_search()
+        self.browser.search_bar.setText('abc')
+        QTest.keyClick(self.browser.search_bar, qt.Qt.Key.Key_Backspace)
+        self.assertEqual(self.browser.search_bar.text(), 'ab')
+
+    def test_trash_action_removes_selected_folder_only_after_confirmation(self):
+        child = self.folder / 'child.txt'; child.write_text('contents')
+        self.select(self.folder)
+        label = 'Move to Trash / Recycle Bin…'
+        with patch.object(self.browser.file_actions, '_confirm_removal', return_value=False), \
+                patch.object(self.browser.file_actions, '_system_trash') as trash:
+            self.menu(self.folder)[label].trigger()
+            trash.assert_not_called()
+        kept = self.root / '.test-trash'
+        def move(path):
+            path.rename(kept)
+            return True
+        with patch.object(self.browser.file_actions, '_confirm_removal', return_value=True), \
+                patch.object(self.browser.file_actions, '_system_trash', side_effect=move):
+            self.menu(self.folder)[label].trigger(); self.wait()
+        self.assertFalse(self.folder.exists())
+        self.assertEqual((kept / 'child.txt').read_text(), 'contents')
+
+    def test_unavailable_trash_keeps_items_without_automatic_permanent_delete(self):
+        self.select(self.file)
+        with patch.object(self.browser.file_actions, '_confirm_removal', return_value=True) as confirm, \
+                patch.object(self.browser.file_actions, '_system_trash', return_value=False), \
+                patch.object(qt.QMessageBox, 'exec', return_value=0):
+            self.menu(self.file)['Move to Trash / Recycle Bin…'].trigger(); self.wait()
+        self.assertEqual(self.file.read_text(), 'original')
+        self.assertEqual(confirm.call_count, 1)
+
+    def test_delete_key_in_search_field_edits_text_instead_of_files(self):
+        self.select(self.file)
+        self.browser.open_search()
+        self.browser.search_bar.setText('abc')
+        self.browser.search_bar.setFocus(); self.app.processEvents()
+        self.browser.search_bar.setCursorPosition(1)
+        with patch.object(self.browser.file_actions, 'delete') as delete:
+            QTest.keyClick(self.browser.search_bar, qt.Qt.Key.Key_Delete)
+            self.assertEqual(self.browser.search_bar.text(), 'ac')
+            delete.assert_not_called()
+
+    def test_removal_dialog_defaults_to_cancel_and_removed_cut_items_are_pruned(self):
+        from commonUtils.file_removal import removal_plan
+        plan = removal_plan([self.file])
+        inspected = []
+        def cancel_dialog():
+            dialog = self.app.activeModalWidget()
+            inspected.append(dialog.informativeText())
+            self.assertEqual(dialog.defaultButton().text().replace('&', ''), 'Cancel')
+            dialog.defaultButton().click()
+        qt.QTimer.singleShot(0, cancel_dialog)
+        self.assertFalse(self.browser.file_actions._confirm_removal(plan))
+        self.assertIn('network drives', inspected[0])
+        self.select(self.file)
+        set_clipboard_files([self.file, self.folder], move=True)
+        def move(path):
+            path.rename(self.root / '.test-trash-file')
+            return True
+        with patch.object(self.browser.file_actions, '_confirm_removal', return_value=True), \
+                patch.object(self.browser.file_actions, '_system_trash', side_effect=move):
+            self.menu(self.file)['Move to Trash / Recycle Bin…'].trigger(); self.wait()
+        self.assertEqual(clipboard_files()[0], (self.folder,))
 
     def test_copy_paste_and_cut_use_whole_selection_and_clear_only_successful_cut(self):
         self.select(self.file)

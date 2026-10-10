@@ -6,7 +6,7 @@ from threading import Event, Thread
 import unittest
 from unittest.mock import patch
 
-from commonUtils.directory_index import DirectoryCache, directory_index_path, storage_totals
+from commonUtils.directory import DirectoryCache, directory_index_path, storage_totals
 from commonUtils.operations import OperationCancelled
 
 
@@ -19,6 +19,7 @@ class PersistentIndexTests(unittest.TestCase):
         self.root.mkdir()
         self.database = self.folder / 'support' / 'directory-index.sqlite3'
         self.cache = DirectoryCache(database=self.database)
+        self.addCleanup(self.cache.close)
         for name in ('aaa', 'bbb'):
             (self.root / name).mkdir()
             (self.root / name / 'file.txt').write_text(name)
@@ -38,13 +39,13 @@ class PersistentIndexTests(unittest.TestCase):
 
     def test_completed_index_survives_new_instance_without_reenumeration(self):
         original = self.cache.get(self.root)
-        restarted = DirectoryCache(database=self.database)
-        with patch('commonUtils.directory_index.os.scandir', side_effect=AssertionError('Unexpected enumeration')):
-            reused = restarted.get(self.root)
-        self.assertTrue(reused.reused)
-        self.assertEqual(reused.scanned_at, original.scanned_at)
-        self.assertEqual(tuple(reused.entries), tuple(original.entries))
-        self.assertEqual(storage_totals(reused)[self.root], 6)
+        with DirectoryCache(database=self.database) as restarted:
+            with patch('commonUtils.directory.os.scandir', side_effect=AssertionError('Unexpected enumeration')):
+                reused = restarted.get(self.root)
+            self.assertTrue(reused.reused)
+            self.assertEqual(reused.scanned_at, original.scanned_at)
+            self.assertEqual(tuple(reused.entries), tuple(original.entries))
+            self.assertEqual(storage_totals(reused)[self.root], 6)
 
     def test_cancelled_scan_resumes_completed_folders_after_restart(self):
         saved = self.pause()
@@ -55,7 +56,7 @@ class PersistentIndexTests(unittest.TestCase):
         def scandir(path):
             seen.append(Path(path))
             return original(path)
-        with patch('commonUtils.directory_index.os.scandir', side_effect=scandir):
+        with patch('commonUtils.directory.os.scandir', side_effect=scandir):
             result = DirectoryCache(database=self.database).get(self.root)
         self.assertTrue(result.resumed)
         self.assertTrue(result.complete)
@@ -112,7 +113,7 @@ class PersistentIndexTests(unittest.TestCase):
             if Path(path) == self.root / 'aaa':
                 raise PermissionError('temporarily locked')
             return original(path)
-        with patch('commonUtils.directory_index.os.scandir', side_effect=unreadable):
+        with patch('commonUtils.directory.os.scandir', side_effect=unreadable):
             result = self.cache.get(self.root)
         self.assertFalse(result.complete)
         self.assertIn('temporarily locked', result.errors[0][1])
@@ -223,7 +224,7 @@ class PersistentIndexTests(unittest.TestCase):
             yield (Child(index) for index in range(count))
         def stat(path, *args, **kwargs):
             return info if path.name.startswith('virtual') else original_stat(path, *args, **kwargs)
-        with patch('commonUtils.directory_index.os.scandir', children), patch.object(Path, 'lstat', stat):
+        with patch('commonUtils.directory.os.scandir', children), patch.object(Path, 'lstat', stat):
             result = self.cache.get(self.root)
             self.assertTrue(result.complete)
             self.assertEqual(len(result.entries), count)

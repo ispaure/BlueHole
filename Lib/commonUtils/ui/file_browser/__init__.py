@@ -10,12 +10,13 @@ from ...filesystem import BrowserDetails, BrowserPanel, format_size, scan_folder
 from .model import BrowserFileSystemModel, ByteSortModel, BrowserTree, _BrowserSelection
 from .details import DetailsPanel
 from .controls import ViewModeSelector, FolderSizeControl, ViewIcon
+from ..icons import set_painted_icon
 from .navigation import NavigationBar
 from ..operations import Operation
 from .views import FileViews
 from .editing import FilenameDelegate
 from .file_actions import FileActions, clipboard_files
-from .index_worker import FolderOperation
+from .indexing import BrowserIndexing, IndexPriorityLease
 
 
 @dataclass(frozen=True)
@@ -34,7 +35,7 @@ class BrowserContext:
         return handler(*args)
 
 
-class FileBrowser(qt.QWidget):
+class FileBrowser(BrowserIndexing, qt.QWidget):
     """Embed with a Directory/Path. No project libraries, formats or GUI actions are assumed.
 
     File hooks return BrowserPanel/BrowserAction descriptors. Panel loaders and
@@ -48,7 +49,7 @@ class FileBrowser(qt.QWidget):
     index_progress = qt.Signal(str)
     index_state_changed = qt.Signal()
 
-    def __init__(self, directory=None, parent=None, *, services=None, action_providers=(), folder_fields=None, calculate_folder_sizes=True):
+    def __init__(self, directory=None, parent=None, *, services=None, action_providers=(), folder_fields=None, calculate_folder_sizes=True, index_settings_path=None):
         super().__init__(parent)
         self.idle.connect(self.close)
         self.services = services or {}
@@ -63,31 +64,41 @@ class FileBrowser(qt.QWidget):
         self.busy = False
         self.folder_busy = False
         self.calculate_folder_sizes = calculate_folder_sizes
+        self.index_settings_path = index_settings_path
         self.folder_pending = False
         self._index_paused = False
         self._changed_paths = set()
+        self._index_priority_owner = object()
+        from ...directory import directory_cache
+        self._index_priority_lease = IndexPriorityLease(self, directory_cache, self._index_priority_owner)
         self._full_index_refresh = False
         self.folder_root = None
         self.refresh_pending = False
         self._pending_detail_item = None
         self.stopping = False
+        self.network_location = False
         self.selected_object = None
         self.last_details = None
         self.cover_pixmap = qt.QPixmap()
         layout = qt.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSizeConstraint(qt.QLayout.SizeConstraint.SetMinimumSize)
         self.search_bar = qt.QLineEdit()
         self.search_bar.setAccessibleName('Search indexed files and folders')
-        self.search_bar.setClearButtonEnabled(True)
         self.search_bar.setPlaceholderText('Search this location and its subfolders')
         self.search_bar.setToolTip('Search names, ignoring case. Words match in any order; '
                                   '"quoted phrases" keep word order. Spaces, underscores and '
                                   'hyphens are equivalent in phrases.')
-        layout.addWidget(self.search_bar)
         layout.addLayout(self._create_navigation_controls())
         from .status import IndexStatusLabel, IndexActivityBar
         self.index_status = IndexStatusLabel()
         self.index_status.setTextFormat(qt.Qt.TextFormat.PlainText)
+        self.index_incomplete = False
+        self._index_details_dialog = None
+        self.index_details_button = qt.QPushButton('Index details…')
+        self.index_details_button.setToolTip('Show saved scan errors and unfinished folders')
+        self.index_details_button.clicked.connect(self.show_index_details)
+        self.index_details_button.hide()
         self.index_activity = IndexActivityBar()
         self.index_activity.setRange(0, 0)
         self.index_activity.setTextVisible(False)
@@ -98,11 +109,16 @@ class FileBrowser(qt.QWidget):
         status_row = qt.QHBoxLayout()
         status_row.addWidget(self.index_status,1)
         self.index_activity.setFixedWidth(140)
-        self.index_activity.setMaximumHeight(10)
+        self.index_activity.setMaximumHeight(14)
         status_row.addWidget(self.index_activity)
+        status_row.addWidget(self.index_details_button)
+        status_row.addWidget(self.refresh_button)
+        self.index_status.setMinimumHeight(self.refresh_button.sizeHint().height())
         layout.addLayout(status_row)
         self._create_preview_panel()
         self.file_actions = FileActions(self)
+        from .keyboard import BrowserKeyboard
+        self.keyboard = BrowserKeyboard(self)
         self._reconcile_pending = False
         self.index_watcher = qt.QFileSystemWatcher(self)
         self.index_watcher.directoryChanged.connect(self._indexed_path_changed)
@@ -116,7 +132,10 @@ class FileBrowser(qt.QWidget):
         # Compatibility timer stays inactive: completed indexes never poll the tree.
         self.clear_search = qt.QShortcut(qt.QKeySequence(qt.Qt.Key.Key_Escape), self)
         self.clear_search.setContext(qt.Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.clear_search.activated.connect(self.search_bar.clear)
+        self.clear_search.activated.connect(self.close_search)
+        self.find_shortcut = qt.QShortcut(qt.QKeySequence(qt.QKeySequence.StandardKey.Find), self)
+        self.find_shortcut.setContext(qt.Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.find_shortcut.activated.connect(self.open_search)
         qt.QApplication.instance().aboutToQuit.connect(self.shutdown)
         if directory is not None:
             self.set_directory(directory)
@@ -124,16 +143,21 @@ class FileBrowser(qt.QWidget):
     def _create_navigation_controls(self):
         self.navigation = NavigationBar(self)
         self.navigation.requested.connect(self.navigate)
-        controls = qt.QHBoxLayout()
-        controls.addWidget(self.navigation, 1)
+        toolbar = qt.QHBoxLayout()
+        toolbar.setSpacing(6)
+        toolbar.addWidget(self.navigation, 1)
+        controls = toolbar
         self.view_selector = ViewModeSelector(self)
         self.view_selector.setAccessibleName('Browser view')
+        self.folder_size_button = FolderSizeControl(self)
+        self.folder_size_slider = self.folder_size_button.slider
+        controls.addWidget(self.folder_size_button)
         controls.addWidget(self.view_selector)
         self.preview_toggle = qt.QToolButton(self)
         self.preview_toggle.setText('Preview')
-        self.preview_toggle.setIcon(qt.QIcon(ViewIcon(4)))
+        set_painted_icon(self.preview_toggle, ViewIcon, 4)
         self.preview_toggle.setIconSize(qt.QSize(20, 20))
-        self.preview_toggle.setToolButtonStyle(qt.Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.preview_toggle.setToolButtonStyle(qt.Qt.ToolButtonStyle.ToolButtonIconOnly)
         self.preview_toggle.setCheckable(True)
         from ...settings import get_setting
         self.preview_toggle.setChecked(get_setting('FileBrowser', 'preview_enabled', True))
@@ -142,38 +166,60 @@ class FileBrowser(qt.QWidget):
         self.preview_toggle.setAccessibleName('Show file and folder preview')
         self.preview_toggle.toggled.connect(self._preview_toggled)
         controls.addWidget(self.preview_toggle)
-        self.folder_size_button = FolderSizeControl(self)
-        self.folder_size_slider = self.folder_size_button.slider
-        self.folder_size_button.setVisible(False)
-        controls.addWidget(self.folder_size_button)
         controls.addWidget(self.view_selector.storage_controls)
-        self.search_button = qt.QPushButton('Search…')
-        self.search_button.clicked.connect(self.open_search)
-        controls.addWidget(self.search_button)
-        self.storage_button = qt.QPushButton('Storage…')
+        self.search_button = qt.QToolButton(self)
+        set_painted_icon(self.search_button, ViewIcon, 6)
+        self.search_button.setIconSize(qt.QSize(22, 22))
+        self.search_button.setCheckable(True)
+        self.search_button.setAutoRaise(True)
+        self.search_button.setAccessibleName('Search files and folders')
+        self.search_button.setToolTip('Show or hide search (Ctrl/Cmd+F)')
+        self.search_button.toggled.connect(self._search_toggled)
+        controls.insertWidget(1, self.search_button)
+        self.storage_button = qt.QPushButton('Size Map…')
         self.storage_button.clicked.connect(self.open_storage)
         self.storage_button.hide() # Legacy dialog API; Storage is now a view.
-        self.refresh_button = qt.QPushButton('Refresh')
+        self.refresh_button = qt.QPushButton('Refresh index')
+        self.refresh_button.setToolTip('Check all files and saved sizes below the current folder')
         self.refresh_button.clicked.connect(self.refresh)
-        controls.addWidget(self.refresh_button)
         self.index_pause_button = qt.QToolButton(self)
         self.index_pause_button.setText('Pause')
         self.index_pause_button.setToolTip('Pause this tab’s scan; saved search and sizes remain available')
         self.index_pause_button.clicked.connect(self._toggle_index_pause)
         self.index_pause_button.hide()
-        controls.addWidget(self.index_pause_button)
-        return controls
+        # Retained as a hidden compatibility object; scanning has no pause UI.
+        return toolbar
 
     def open_search(self):
-        from .discovery import SearchDialog
-        return self._open_scan_window(SearchDialog)
+        if self.network_location:
+            return None
+        if self.stopping:
+            return None
+        self.search_button.setChecked(True)
+        self.search_bar.setFocus()
+        self.search_bar.selectAll()
+        return self.index_search
+
+    def close_search(self):
+        if self.search_button.isChecked():
+            self.search_button.setChecked(False)
+        else:
+            self._search_toggled(False)
+
+    def _search_toggled(self, enabled):
+        self.search_panel.setVisible(enabled)
+        if enabled:
+            self.search_bar.setFocus()
+        else:
+            self.search_bar.clear()
+            self.views.currentWidget().setFocus()
 
     def open_storage(self):
         from .storage import StorageDialog
         return self._open_scan_window(StorageDialog)
 
     def _open_scan_window(self, kind):
-        if self.stopping or self.navigation.directory is None:
+        if self.stopping or self.navigation.directory is None or self.network_location:
             return None
         window = kind(self)
         self._scan_windows.append(window)
@@ -217,10 +263,11 @@ class FileBrowser(qt.QWidget):
         self.views.directory_opened.connect(self._directory_opened)
         self.views.context_requested.connect(self._context_menu)
         self.views.activated.connect(self._activate)
+        self.views.path_activated.connect(self._activate_path)
         self.views.idle.connect(self._maybe_idle)
         self.view_selector.currentIndexChanged.connect(self.views.set_mode)
-        self.view_selector.currentIndexChanged.connect(lambda mode: self.folder_size_button.setVisible(mode == 1))
-        self.folder_size_slider.valueChanged.connect(self.views.tiles.set_folder_scale)
+        self.view_selector.currentIndexChanged.connect(lambda mode: self.folder_size_button.setEnabled(mode < 3))
+        self.folder_size_slider.valueChanged.connect(self.views.set_icon_scale)
         self.splitter = qt.QSplitter()
         self.splitter.setChildrenCollapsible(False)
         self.list_stack = qt.QStackedWidget()
@@ -229,7 +276,25 @@ class FileBrowser(qt.QWidget):
         self.index_search = IndexSearch(self)
         self.index_search.idle.connect(self._maybe_idle)
         self.list_stack.addWidget(self.index_search)
-        self.splitter.addWidget(self.list_stack)
+        self.files_panel = qt.QWidget()
+        files_layout = qt.QVBoxLayout(self.files_panel)
+        files_layout.setContentsMargins(0, 0, 0, 0)
+        self.search_panel = qt.QWidget()
+        search_layout = qt.QHBoxLayout(self.search_panel)
+        search_layout.setContentsMargins(0, 0, 0, 0)
+        search_layout.addWidget(self.search_bar, 1)
+        self.close_search_button = qt.QToolButton()
+        set_painted_icon(self.close_search_button, ViewIcon, 7)
+        self.close_search_button.setIconSize(qt.QSize(20, 20))
+        self.close_search_button.setAutoRaise(True)
+        self.close_search_button.setAccessibleName('Close search')
+        self.close_search_button.setToolTip('Close search and return to browsing (Esc)')
+        self.close_search_button.clicked.connect(self.close_search)
+        search_layout.addWidget(self.close_search_button)
+        files_layout.addWidget(self.search_panel)
+        files_layout.addWidget(self.list_stack, 1)
+        self.search_panel.hide()
+        self.splitter.addWidget(self.files_panel)
 
     def _create_preview_panel(self):
         from .preview import create_preview_panel
@@ -300,46 +365,104 @@ class FileBrowser(qt.QWidget):
             return tuple(self.model.object_for_path(path) for path in self.index_search.selected_paths())
         return tuple(self.model.item(index) for index in self.views.selected_rows())
 
-    def set_directory(self, directory):
+    def set_directory(self, directory, *, navigation_root=None):
         path = directory.path if isinstance(directory, Directory) else Path(directory)
         path = path.absolute()
         if not path.is_dir():
             raise NotADirectoryError(path)
-        self.navigation.set_library(path)
-        self.model.setRootPath(str(path))
+        root = Path(navigation_root).absolute() if navigation_root is not None else path
+        if not root.is_dir() or (path != root and root not in path.parents):
+            raise ValueError('Starting folder must be within the navigation root')
+        self.navigation.set_library(root, directory=path)
+        self.views.navigation_root = root
+        self.model.setRootPath(str(root))
         self.views.set_root(path)
 
     def _directory_changed(self, path):
+        self._set_network_location(path)
+        from ...directory import directory_cache
+        directory_cache.set_priority_folders(self._index_priority_owner, () if self.network_location else (path,))
         self.model.size_parents = {str(path)}
         self.index_search.scope_changed(path)
         if path != self.folder_root:
             self._update_watch_paths(path, (path,))
             self.refresh_folder_totals()
 
+    def _set_network_location(self, path):
+        from ...network_filesystems import is_network_location
+        network = is_network_location(path)
+        changed = self.network_location != network
+        self.network_location = network
+        self.model.network_location = network
+        self.model.setOption(qt.QFileSystemModel.Option.DontWatchForChanges, network)
+        for mode in (3, 4):
+            self.view_selector.buttons[mode].setEnabled(not network)
+            self.view_selector.buttons[mode].setToolTip('Size map disabled for network drives' if network
+                else ('Treemap view' if mode == 3 else 'Radial view'))
+        self.refresh_button.setToolTip('Indexing and scans disabled for network drives' if network
+            else 'Check all files and saved sizes below the current folder')
+        self.search_button.setEnabled(not network)
+        self.search_button.setToolTip('Indexed search disabled for network drives' if network
+            else 'Show or hide search (Ctrl/Cmd+F)')
+        if network:
+            self.reconcile_debounce.stop(); self.reconcile_timer.stop()
+            self._changed_paths.clear(); self._full_index_refresh = False
+            self.folder_pending = False; self._reconcile_pending = False
+            if self.folder_busy: self.folder_operation.requestInterruption()
+            watches = self.index_watcher.directories() + self.index_watcher.files()
+            if watches: self.index_watcher.removePaths(watches)
+            self.close_search()
+            self.model.set_folder_totals({})
+            self.index_incomplete = False
+            self.index_activity.hide(); self.index_details_button.hide()
+            self.index_status.setText('Indexing and scans disabled for network drives')
+            self.index_progress.emit(self.index_status.text())
+            if self.views.currentIndex() == 3: self.view_selector.setCurrentIndex(0)
+        elif changed:
+            self.index_status.setText('Loading saved sizes…')
+        self._update_pause_button()
+        self.index_state_changed.emit()
+
     def _directory_opened(self, path):
         # Reopening the same folder checks new items without checking on every
         # selection event (which also publishes directory_changed).
-        if path == self.folder_root and not self.folder_busy:
+        from .index_policy import index_policy
+        if not self.network_location and path == self.folder_root and not self.folder_busy and index_policy(path=self.index_settings_path).refresh_on_revisit:
+            from ...directory import directory_cache
+            directory_cache.invalidate(path)
+            self._changed_paths.add(path)
             self.refresh_folder_totals()
 
     def _update_watch_paths(self, root, paths):
-        if self.stopping or root != self.navigation.directory:
+        if self.stopping or self.network_location or root != self.navigation.directory:
             return
-        expected = {str(path) for path in paths}
+        from ...directory import directory_cache
+        from ...directory.exclusions import scan_exclusions, is_excluded
+        exclusions = scan_exclusions(root, directory_cache.database)
+        expected = {str(path) for path in paths if not is_excluded(path, exclusions)}
         previous = set(self.index_watcher.directories()) | set(self.index_watcher.files())
         if previous - expected: self.index_watcher.removePaths(list(previous - expected))
         if expected - previous: self.index_watcher.addPaths(list(expected - previous))
 
     def _indexed_path_changed(self, path):
-        if self.stopping or not self.calculate_folder_sizes: return
-        from ...directory_index import directory_cache
+        if self.stopping or self.network_location or not self.calculate_folder_sizes: return
+        from .index_policy import index_policy
+        if not index_policy(path=self.index_settings_path).watch_changes: return
+        root = self.navigation.directory
+        path = Path(path)
+        if root is None or (path != root and root not in path.parents):
+            return
+        from ...directory import directory_cache
+        from ...directory.exclusions import scan_exclusions, is_excluded
+        if is_excluded(Path(path), scan_exclusions(self.navigation.directory, directory_cache.database)):
+            return
         directory_cache.invalidate(Path(path))
         self._changed_paths.add(Path(path))
         self._reconcile_pending = True
         self.reconcile_debounce.start()
 
     def _reconcile_index(self):
-        if self.stopping or not self.calculate_folder_sizes or self._index_paused or self.folder_busy: return
+        if self.stopping or self.network_location or not self.calculate_folder_sizes or self._index_paused or self.folder_busy: return
         self._reconcile_pending = False
         self.refresh_folder_totals()
 
@@ -419,6 +542,8 @@ class FileBrowser(qt.QWidget):
         for entry in sorted((entry for entry in contributions.values() if entry.category == 'rename'),
                             key=lambda entry: (entry.order, entry.title.casefold())):
             contributed(entry)
+        standard('Move to Trash / Recycle Bin…', lambda: self.file_actions.delete(context.selection),
+                 enabled=mutating, key=qt.QKeySequence.StandardKey.Delete)
         groups = {}
         for entry in contributions.values():
             if entry.category != 'rename':
@@ -447,6 +572,13 @@ class FileBrowser(qt.QWidget):
         if not index.isValid():
             return
         item = self.model.item(index)
+        self._activate_item(item)
+
+    def _activate_path(self, path):
+        """Cached chart paths can be hidden or absent from Qt's live model."""
+        self._activate_item(self.model.object_for_path(path))
+
+    def _activate_item(self, item):
         if isinstance(item, Directory):
             self.navigate(item.path)
         else:
@@ -500,7 +632,8 @@ class FileBrowser(qt.QWidget):
         fields = list(item.filesystem_information())
         if isinstance(item, Directory):
             if stats is None:
-                fields.append(('Total size', 'Not calculated' if not self.calculate_folder_sizes else
+                fields.append(('Total size', 'Disabled for network drives' if self.network_location else
+                               'Not calculated' if not self.calculate_folder_sizes else
                                'Calculating…' if self.folder_busy else 'Unavailable'))
             else:
                 fields.extend([('Total size', ('At least ' if not stats.complete else '') + format_size(stats.size)), ('Files', f'{stats.files:,}'),
@@ -513,23 +646,28 @@ class FileBrowser(qt.QWidget):
                     fields.append(('Excluded links / unreadable items', stats.skipped))
         return BrowserDetails(tuple(fields))
 
-    def load(self, item):
+    def load(self, item, *, preserve=False):
         if self.busy:
             # Public callers can request a file while the default folder details
             # are still loading. Retain that explicit request for the next worker.
             self._pending_detail_item = item
+            self._pending_detail_preserve = preserve
             self.selected_object = item
             self.refresh_pending = True
             return
         self._pending_detail_item = None
-        self._clear_details()
+        self._preserving_details = preserve
+        if not preserve:
+            self._clear_details()
         self.selected_object = item
         self._update_preview_visibility(True)
         self.heading.setText(item.name if isinstance(item, Directory) else item.file_name)
-        self.message.setText('Loading information…')
+        if not preserve:
+            self.message.setText('Loading information…')
         stats = self.model.folder_totals.get(item.path)
         panels = [BrowserPanel('filesystem', 'File Information', lambda: self._generic_details(item, stats))]
-        panels.extend(item.browser_panels())
+        if not self.network_location:
+            panels.extend(item.browser_panels())
         self.busy = True
         self.refresh_pending = False
         def read():
@@ -551,6 +689,10 @@ class FileBrowser(qt.QWidget):
     def _loaded(self, result, error):
         if self.refresh_pending or self.stopping:
             return
+        if self._preserving_details:
+            selected = self.selected_object
+            self._clear_details()
+            self.selected_object = selected
         self.message.setText(error)
         self.last_details = result
         for panel, details, issue in result or ():
@@ -607,177 +749,15 @@ class FileBrowser(qt.QWidget):
         elif self.refresh_pending:
             item = self._pending_detail_item
             if item is not None:
-                self.load(item)
+                self.load(item, preserve=getattr(self, '_pending_detail_preserve', False))
             else:
                 self._selection_changed()
-
-    def refresh_item(self, path):
-        self.model.invalidate(path)
-        self.views.covers.invalidate(path)
-        if self.selected_object is not None and self.selected_object.path == Path(path):
-            self._selection_changed()
-        self.refresh_folder_totals()
-
-    def refresh(self):
-        from ...directory_index import directory_cache
-        directory_cache.invalidate(self.navigation.directory)
-        self._full_index_refresh = True
-        self._index_paused = False
-        for path in list(self.views.covers.icons):
-            self.model.invalidate(path)
-            self.views.covers.invalidate(path)
-        self.refresh_folder_totals()
-        self._selection_changed()
-        self.refreshed.emit()
-
-    def set_folder_sizes_enabled(self, enabled):
-        """Pause/resume automatic index totals without blocking on a running scan."""
-        self.calculate_folder_sizes = bool(enabled)
-        if not enabled:
-            self.folder_pending = False
-            self.index_activity.hide()
-            if self.folder_busy:
-                self.folder_operation.requestInterruption()
-            self._index_progressed('Indexing paused; cached results remain available.')
-        else:
-            self.refresh_folder_totals()
-        if isinstance(self.selected_object, Directory):
-            self._selection_changed()
-
-    def refresh_changed(self, paths=()):
-        """Reconcile known file-operation changes without revalidating the tree."""
-        self._changed_paths.update(Path(path) for path in paths)
-        self.refresh_folder_totals()
-        self._selection_changed()
-        self.refreshed.emit()
-
-    def _toggle_index_pause(self):
-        self._index_paused = not self._index_paused
-        if self._index_paused:
-            self.folder_pending = False
-            self.reconcile_debounce.stop()
-            if self.folder_busy:
-                self._changed_paths.update(self._active_index_changes)
-                self._full_index_refresh |= self._active_index_full
-                self.folder_operation.requestInterruption()
-            self.index_status.setText('Indexing paused · Saved search and sizes available')
-            self.index_progress.emit(self.index_status.text())
-        else:
-            self.refresh_folder_totals()
-        self._update_pause_button()
-
-    def _update_pause_button(self):
-        self.index_pause_button.setText('Resume' if self._index_paused else 'Pause')
-        self.index_pause_button.setVisible(self.folder_busy or self._index_paused)
-
-    def refresh_folder_totals(self):
-        if not self.calculate_folder_sizes:
-            return
-        if self.folder_busy:
-            self.folder_pending = True
-            self._changed_paths.update(self._active_index_changes)
-            self._full_index_refresh |= self._active_index_full
-            self.folder_operation.requestInterruption()
-            return
-        root = self.navigation.directory
-        if root is None or self.stopping:
-            return
-        from ...directory_index import directory_cache
-        from ...operations import OperationCancelled
-        full = self._full_index_refresh
-        paused = self._index_paused
-        changes = tuple(sorted(self._changed_paths))
-        if not paused:
-            self._full_index_refresh = False
-            self._changed_paths.clear()
-            self._reconcile_pending = False
-        self._active_index_changes = changes if not paused else ()
-        self._active_index_full = full and not paused
-        self.folder_busy = True
-        self.index_activity.setVisible(not paused and not getattr(self, 'workspace_status', False))
-        self.folder_pending = False
-        self.folder_root = root
-        self._update_pause_button()
-        self.index_status.setText('Loading saved sizes…' if paused else 'Checking saved index…')
-        def scanner(path, cancelled, *, report, reuse_for):
-            try:
-                if paused:
-                    snapshot = directory_cache.peek(path, cancelled=cancelled)
-                else:
-                    snapshot = directory_cache.reconcile_folder(path, changes=changes, full=full,
-                                                               cancelled=cancelled, report=report)
-                return snapshot.folder_stats(children_of=path, cancelled=cancelled) if snapshot else None
-            except OperationCancelled:
-                return None
-        self.folder_operation = FolderOperation(root, scanner, self,
-            request_key=('cached' if paused else 'full' if full else 'reconcile', changes))
-        self.folder_operation.updated.connect(self._folders_progressed)
-        self.folder_operation.progress.connect(lambda message: self._index_progressed(message)
-                                               if root == self.navigation.directory else None)
-        self.folder_operation.watch_paths.connect(self._update_watch_paths)
-        self.folder_operation.completed.connect(lambda result, error: self._folders_loaded(root, result, error))
-        self.folder_operation.finished.connect(self._folders_finished)
-        self.folder_operation.start()
-        self.index_state_changed.emit()
-
-    def _folders_progressed(self, root, result):
-        if self.calculate_folder_sizes and root == self.navigation.directory and result and not self.folder_pending and not self.stopping:
-            self.model.set_folder_totals(result)
-            self.index_search.refresh()
-            self.index_updated.emit(root)
-            if not self.folder_busy:
-                self.index_status.setText('Cached or partial sizes available.')
-            if isinstance(self.selected_object, Directory):
-                self._selection_changed()
-
-    def _folders_loaded(self, root, result, error=''):
-        if error and root == self.navigation.directory and not self.stopping:
-            self.index_status.setText('Index unavailable. Any cached sizes remain available; refresh to retry.')
-            self.index_progress.emit(self.index_status.text())
-        if self.calculate_folder_sizes and root == self.navigation.directory and result is not None and not self.folder_pending and not self.stopping:
-            self.model.set_folder_totals(result)
-            self.index_search.refresh()
-            stats = result.get(root)
-            checked = datetime.fromtimestamp(stats.scanned_at).strftime('%b %d at %H:%M:%S') if stats else 'just now'
-            if self._index_paused:
-                message = f'Indexing paused · Saved sizes · Last checked {checked}'
-            elif stats is not None and not stats.complete:
-                message = 'Index incomplete · Refresh to retry unreadable or changed folders'
-            elif stats is not None and stats.stale:
-                message = f'Folder checked {checked} · Saved subtree sizes · Refresh checks deeper contents'
-            else:
-                message = f'Index and sizes up to date · Checked {checked}'
-            self.index_status.setText(message)
-            self.index_updated.emit(root)
-            self.index_progress.emit(self.index_status.text())
-            if isinstance(self.selected_object, Directory):
-                self._selection_changed()
-
-    def _index_progressed(self, message):
-        from .status import private_status
-        message = private_status(message)
-        if not self.stopping and self.calculate_folder_sizes and not self._index_paused:
-            self.index_status.setText(message)
-            self.index_progress.emit(message)
-        elif message.startswith('Indexing paused'):
-            self.index_status.setText(message)
-            self.index_progress.emit(message)
-
-    def _folders_finished(self):
-        self.folder_busy = False
-        self.index_activity.hide()
-        self.index_state_changed.emit()
-        self._update_pause_button()
-        self.folder_operation.deleteLater()
-        if self.stopping:
-            self._maybe_idle()
-        elif self.folder_pending or (self._reconcile_pending and not self._index_paused):
-            self._reconcile_pending = False
-            self.refresh_folder_totals()
-        else:
-            self.index_search.refresh()
 
     def stop(self):
+        if self._index_details_dialog is not None:
+            self._index_details_dialog.close()
+        from ...directory import directory_cache
+        directory_cache.set_priority_folders(self._index_priority_owner)
         self.stopping = True
         self.reconcile_debounce.stop(); self.reconcile_timer.stop()
         self.index_search.stop()
