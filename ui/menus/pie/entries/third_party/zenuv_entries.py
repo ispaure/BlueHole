@@ -16,7 +16,7 @@ __status__ = 'Production'
 # IMPORTS
 
 from ...utilities import *
-from ......Lib.commonUtils.osUtils import *
+from ......Lib.commonUtils.runtime.platform import *
 from ......operators.external_addon_ops import ZUV_OT_trim_mode
 
 # ----------------------------------------------------------------------------------------------------------------------

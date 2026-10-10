@@ -24,7 +24,7 @@ from typing import List
 from ....operators import help_ops, source_control_ops, external_addon_ops
 from ....preferences.prefs import *
 from ....blenderUtils import blenderFile, projectUtils
-from ....Lib.commonUtils import fileUtils, dirUtils
+from ....Lib.commonUtils.filesystem import files as fileUtils, directories as dirUtils
 from ....operators import directory_ops
 
 # ----------------------------------------------------------------------------------------------------------------------

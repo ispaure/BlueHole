@@ -19,7 +19,7 @@ from pathlib import Path
 
 from ..preferences.prefs import *
 from .overrides.ue_rename_override import trigger_unreal_rename_override
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..wrappers.sourceContentPath import get_valid_source_content_path, display_path_error_source_content
 from . import communicateUnreal
 

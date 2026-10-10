@@ -18,9 +18,9 @@ __status__ = 'Production'
 from pathlib import Path
 from typing import *
 
-from ..Lib.commonUtils import configUtils
-from ..Lib.commonUtils import fileUtils, dirUtils
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.configuration import legacy as configUtils
+from ..Lib.commonUtils.filesystem import files as fileUtils, directories as dirUtils
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..blenderUtils import blenderFile
 from ..preferences.prefs import *
 from . import envManager

@@ -16,7 +16,7 @@ __status__ = 'Production'
 # IMPORTS
 
 # Blue Hole
-from .....Lib.commonUtils.debugUtils import *
+from .....Lib.commonUtils.runtime.diagnostics import *
 from .....preferences.prefs import *
 from .....blenderUtils import blenderFile
 

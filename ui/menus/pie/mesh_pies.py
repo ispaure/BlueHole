@@ -14,7 +14,7 @@ __status__ = 'Production'
 
 import bpy
 
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ....debug.debug_flags import *
 from ....operators.model_ops import WM_OT_MergeLast
 from ....actions.operator_action import draw_operator_action

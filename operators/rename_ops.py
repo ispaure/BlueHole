@@ -20,7 +20,7 @@ import bpy
 from typing import List, Type, Optional
 from pathlib import Path
 from bpy.props import StringProperty
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..blenderUtils.export import exportSettingsPresets
 from ..blenderUtils.export.model.container import ContainerDummy, Container
 from ..blenderUtils.export.model.containerGroup import ContainerGroup
@@ -29,7 +29,7 @@ from ..preferences.prefs import prefs
 from ..unrealUtils import renameUnreal, communicateUnreal
 from ..blenderUtils.export.model import containerUtils
 from ..wrappers.perforce import p4_file
-from ..Lib.commonUtils import fileUtils
+from ..Lib.commonUtils.filesystem import files as fileUtils
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

@@ -26,8 +26,8 @@ from bpy.props import *
 # Blue Hole
 from ..blenderUtils import blenderFile
 from ..environment import envManager, model
-from ..Lib.commonUtils import webUtils
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.integrations import web as webUtils
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..wrappers import sourceContentPath
 
 

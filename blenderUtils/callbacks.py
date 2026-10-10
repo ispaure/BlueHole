@@ -16,7 +16,7 @@ __status__ = 'Production'
 import bpy
 
 from . import blenderFile, sourceControlUtils
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONSTANTS

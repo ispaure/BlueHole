@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 from pathlib import Path
 
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..preferences.prefs import *
 from ..wrappers.sourceContentPath import get_valid_source_content_path, display_path_error_source_content
 from ..blenderUtils import blenderFile, filterUtils

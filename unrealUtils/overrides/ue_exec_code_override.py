@@ -19,7 +19,7 @@ __status__ = 'Production'
 
 import bpy
 
-from ...Lib.commonUtils.debugUtils import *
+from ...Lib.commonUtils.runtime.diagnostics import *
 from ...preferences.prefs import prefs
 from .ue_override_utils import run_unreal_override_operator
 

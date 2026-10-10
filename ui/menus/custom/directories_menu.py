@@ -23,7 +23,7 @@ from ....blenderUtils.uiUtils import show_label
 from ....operators import directory_ops, external_addon_ops
 from ....preferences.prefs import *
 from ....blenderUtils import blenderFile
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS

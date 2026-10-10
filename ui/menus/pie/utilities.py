@@ -14,7 +14,7 @@ __status__ = 'Production'
 
 import bpy
 from typing import *
-from ....Lib.commonUtils.osUtils import *
+from ....Lib.commonUtils.runtime.platform import *
 from ....operators import external_addon_ops
 from ....blenderUtils.operatorUtils import op_exists
 

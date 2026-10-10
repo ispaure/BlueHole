@@ -19,8 +19,8 @@ import addon_utils
 from pathlib import Path
 
 from . import blenderFile, objectUtils, projectUtils
-from ..Lib.commonUtils.debugUtils import *
-from ..Lib.commonUtils.osUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
+from ..Lib.commonUtils.runtime.platform import *
 from ..environment import envPathResolver
 from ..preferences.prefs import *
 from ..wrappers.perforce.p4_info import P4Info

@@ -19,7 +19,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 from ..blenderUtils.toolUtils import tool_set
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------

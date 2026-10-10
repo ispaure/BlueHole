@@ -23,8 +23,8 @@ import bpy
 
 from ..exportSettings import Engine, ExportSettings
 from ... import objectUtils, sceneUtils
-from ....Lib.commonUtils import fileUtils
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.filesystem import files as fileUtils
+from ....Lib.commonUtils.runtime.diagnostics import *
 from ....wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------

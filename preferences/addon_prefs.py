@@ -19,7 +19,7 @@ import bpy
 from bpy.props import *
 from bpy.types import AddonPreferences
 
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 
 # Import Addon Properties
 from .addon import (

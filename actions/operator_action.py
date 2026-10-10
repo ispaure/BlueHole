@@ -32,7 +32,7 @@ __status__ = 'Production'
 
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..debug.debug_flags import *
 
 # ----------------------------------------------------------------------------------------------------------------------

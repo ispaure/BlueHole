@@ -18,7 +18,7 @@ __status__ = 'Production'
 from pathlib import Path
 
 from . import blenderFile, filterUtils
-from ..Lib.commonUtils import dirUtils
+from ..Lib.commonUtils.filesystem import directories as dirUtils
 from ..preferences.prefs import *
 
 # ----------------------------------------------------------------------------------------------------------------------

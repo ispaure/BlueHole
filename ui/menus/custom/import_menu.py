@@ -24,10 +24,10 @@ from pathlib import Path
 
 # Blue Hole
 from ....blenderUtils import blenderFile
-from ....Lib.commonUtils import fileUtils, dirUtils
+from ....Lib.commonUtils.filesystem import files as fileUtils, directories as dirUtils
 from ....blenderUtils.uiUtils import show_label
 from ....operators import import_ops
-from ....Lib.commonUtils.debugUtils import *
+from ....Lib.commonUtils.runtime.diagnostics import *
 from typing import List
 
 # ----------------------------------------------------------------------------------------------------------------------

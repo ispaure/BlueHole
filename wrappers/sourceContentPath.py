@@ -32,8 +32,8 @@ __status__ = 'Production'
 from typing import Iterable, Optional
 from pathlib import Path
 
-from ..Lib.commonUtils.osUtils import get_os, OS
-from ..Lib.commonUtils.debugUtils import *
+from ..Lib.commonUtils.runtime.platform import get_os, OS
+from ..Lib.commonUtils.runtime.diagnostics import *
 from ..preferences.prefs import prefs
 from .perforce.p4_info import P4Info
 

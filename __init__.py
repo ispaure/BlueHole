@@ -28,7 +28,7 @@ from .Lib.commonUtils import ui
 ui.use_pyside = False
 
 # Set Debug Project Prefix for logging, remove time delta unless profiling.
-from .Lib.commonUtils import debugUtils
+from .Lib.commonUtils.runtime import diagnostics as debugUtils
 debugUtils.project_prefix = "Blue Hole"
 debugUtils.use_time_delta = False
 
