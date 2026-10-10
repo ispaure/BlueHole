@@ -54,7 +54,7 @@ class StorageViewTests(unittest.TestCase):
                 browser.shutdown();browser.close();app.processEvents()
 
     def test_treemap_reads_one_folder_and_radial_loads_on_demand(self):
-        from commonUtils._directory_store import SqlEntries
+        from commonUtils.directory.store import SqlEntries
         app=qt.QApplication.instance() or qt.QApplication([])
         with TemporaryDirectory() as temp:
             root=Path(temp);child=root/'child';child.mkdir();(child/'file.txt').write_bytes(b'abc')

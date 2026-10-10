@@ -9,14 +9,14 @@ import sys
 from threading import RLock
 from time import sleep, time, perf_counter
 
-from ._directory_metadata import Entry, Snapshot, fingerprint
+from .metadata import Entry, Snapshot, fingerprint
 # Keep these long-standing imports available to existing consumers/instrumentation.
-from ._directory_reader import SqlEntries, SqlDirectories, _entry
-from .operations import check_cancelled, OperationCancelled
-from ._directory_order import _sort_key, _encode_sort_parts
-from .storage import cache_directory
-from ._directory_totals import store_folder_stats
-from ._directory_schema import initialize_schema, ensure_folder, copy_entries, write_entries, delete_children, delete_entries, retire_generation
+from .reader import SqlEntries, SqlDirectories, _entry
+from ..operations import check_cancelled, OperationCancelled
+from .order import _sort_key, _encode_sort_parts
+from ..storage import cache_directory
+from .totals import store_folder_stats
+from .schema import initialize_schema, ensure_folder, copy_entries, write_entries, delete_children, delete_entries, retire_generation
 
 
 def directory_index_path():
@@ -140,7 +140,7 @@ class DirectoryCache:
 
     @staticmethod
     def _schema(db, cancelled=lambda: False, report=lambda done, total, message: None):
-        """Compatibility entry point; schema ownership lives in _directory_schema."""
+        """Compatibility entry point; schema ownership lives in directory.schema."""
         initialize_schema(db, cancelled, report)
 
     @staticmethod
@@ -569,7 +569,7 @@ class DirectoryCache:
         Existing readers keep their SQLite transaction while changed rows and parent
         aggregates are updated in the same generation, without copying the tree.
         """
-        from ._directory_reconcile import reconcile_existing
+        from .reconcile import reconcile_existing
         snapshot = reconcile_existing(self, Path(root).absolute(), changes, cancelled, report, full=full)
         return snapshot if snapshot is not None else self.get(root, cancelled=cancelled, report=report)
 

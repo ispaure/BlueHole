@@ -9,8 +9,8 @@ import json
 import os
 from pathlib import Path
 from time import time
-from ._directory_metadata import fingerprint
-from .operations import check_cancelled
+from .metadata import fingerprint
+from ..operations import check_cancelled
 
 
 def _changed(cache, db, generation, folder, source_root, cancelled, report):
