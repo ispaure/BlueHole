@@ -227,7 +227,11 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
 
         if os.path.isfile(str(found_container.path)):
             # Move file
-            fileUtils.copy_file(found_container.path, container_accounting_for_rename.path)
+            try:
+                fileUtils.File(found_container.path).copy_file(container_accounting_for_rename.path)
+            except OSError as error:
+                log(Severity.ERROR, self.bl_label, f'Could not copy exported source file: {error}', popup=True)
+                return {'CANCELLED'}
             # Delete file
             if os.path.isfile(str(found_container.path)):
                 file_to_delete = fileUtils.File(found_container.path)
