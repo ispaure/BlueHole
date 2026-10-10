@@ -6,13 +6,13 @@ import unittest
 from unittest.mock import patch
 from commonUtils.directory_index import DirectoryCache
 from commonUtils.operations import OperationCancelled
-from commonUtils._directory_totals import store_folder_stats
+from commonUtils.directory.totals import store_folder_stats
 
 
 class IndexEfficiencyTests(unittest.TestCase):
     def test_shared_parent_sort_chunks_preserve_exact_natural_order_keys(self):
         import os
-        from commonUtils._directory_store import _sort_key, _encode_sort_parts
+        from commonUtils.directory.store import _sort_key, _encode_sort_parts
         from commonUtils.traversal import natural_path_key
         for folder in (Path('/Users/Example12/Comics'),Path('/Volumes/Drive2/Series300')):
             parts=natural_path_key(str(folder)+os.sep)
@@ -160,7 +160,7 @@ class IndexEfficiencyTests(unittest.TestCase):
             self.assertIn('validation_seconds',cache.last_metrics)
 
     def test_progressive_totals_roll_up_only_changed_branches_and_match_full_pass(self):
-        from commonUtils._directory_totals import collect_folder_stats
+        from commonUtils.directory.totals import collect_folder_stats
         with TemporaryDirectory() as folder:
             root=Path(folder)/'files';root.mkdir()
             for i in range(8):
@@ -171,7 +171,7 @@ class IndexEfficiencyTests(unittest.TestCase):
                 result=scan(*args)
                 cache._publish_totals(args[0],args[1],args[2],args[5]);args[0].commit()
                 return result
-            with patch.object(cache,'_scan_folder',side_effect=scanning),patch('commonUtils._directory_totals.collect_folder_stats',wraps=collect_folder_stats) as full:
+            with patch.object(cache,'_scan_folder',side_effect=scanning),patch('commonUtils.directory.totals.collect_folder_stats',wraps=collect_folder_stats) as full:
                 snapshot=cache.get(root)
             self.assertEqual(full.call_count,1)
             self.assertEqual(snapshot.folder_stats()[root].size,24)
@@ -187,7 +187,7 @@ class IndexEfficiencyTests(unittest.TestCase):
 
     def test_fast_extension_counts_preserve_path_suffix_semantics(self):
         from collections import Counter
-        from commonUtils._directory_totals import _extension
+        from commonUtils.directory.totals import _extension
         names=['.hidden','..odd','file..CBZ','file.tar.gz','trailing.','no_extension','résumé.TXT']
         for name in names:
             self.assertEqual(_extension(str(Path('/example')/name)),Path(name).suffix.lower().lstrip('.'))

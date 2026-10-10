@@ -403,7 +403,7 @@ New tabs are grouped only with docked views, leaving detached views independent.
 Call `prepare_close()`
 before destroying an embedded workspace; it waits for all views' workers.
 
-`commonUtils.directory_index` supplies immutable `Entry`/`Snapshot` metadata,
+`commonUtils.directory` supplies immutable `Entry`/`Snapshot` metadata,
 case-insensitive partial name search, and `storage_totals()`. `DirectoryCache`
 persists completed and partial indices in SQLite, without entry/root count limits.
 `directory_index_path()` defaults to:
