@@ -26,7 +26,7 @@ class EventDrivenIndexTests(QtTestCase):
         self.cache = DirectoryCache(database=self.base / 'cache' / 'index.sqlite3')
         self.addCleanup(self.cache.close)
         self.patches = [patch(name, self.cache) for name in (
-            'commonUtils.directory.directory_cache',
+            'commonUtils.filesystem.index.directory_cache',
             'commonUtils.ui.file_browser.index_worker.directory_cache',
             'commonUtils.ui.file_browser.index_search.directory_cache')]
         for item in self.patches: item.start()
@@ -42,9 +42,10 @@ class EventDrivenIndexTests(QtTestCase):
         self.temp.cleanup()
 
     def wait(self, condition):
-        deadline = monotonic() + 8
+        # Initial native browser workers can be slow on Windows CI runners.
+        deadline = monotonic() + 20
         while not condition():
-            self.assertLess(monotonic(), deadline)
+            self.assertLess(monotonic(), deadline, 'Browser index did not settle within 20 seconds')
             self.app.processEvents(); sleep(.005)
         self.app.processEvents()
 
@@ -98,7 +99,7 @@ class EventDrivenIndexTests(QtTestCase):
             if Path(path) == self.deep:
                 raise PermissionError('locked')
             return scan(path)
-        with patch('commonUtils.directory.os.scandir', side_effect=unreadable):
+        with patch('commonUtils.filesystem.index.os.scandir', side_effect=unreadable):
             with patch.object(self.cache, 'get', wraps=self.cache.get) as get:
                 self.browser.refresh()
                 self.wait(lambda: not self.browser.folder_busy)
@@ -133,7 +134,7 @@ class EventDrivenIndexTests(QtTestCase):
                 attempts.append(path)
                 raise PermissionError('locked')
             return scan(path)
-        with patch('commonUtils.directory.os.scandir', side_effect=unreadable):
+        with patch('commonUtils.filesystem.index.os.scandir', side_effect=unreadable):
             self.browser.refresh(); self.wait(lambda: not self.browser.folder_busy)
             self.assertNotIn(str(self.child), self.browser.index_watcher.directories())
             for _ in range(3):
@@ -158,7 +159,7 @@ class EventDrivenIndexTests(QtTestCase):
             self.assertEqual(self.browser.model.folder_totals[self.child].size, 8)
             self.unwatch()
             second = self.child / 'second.txt'; second.write_bytes(b'xx')
-            with patch('commonUtils.directory.reconcile._changed', side_effect=AssertionError('Revisit rechecked metadata')):
+            with patch('commonUtils.filesystem.index.reconcile._changed', side_effect=AssertionError('Revisit rechecked metadata')):
                 self.browser.navigate(self.child)
                 self.wait(lambda: not self.browser.folder_busy)
             self.assertEqual(self.browser.model.folder_totals[self.child].size, 8)

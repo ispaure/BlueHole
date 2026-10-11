@@ -15,6 +15,7 @@ from commonUtils.filesystem import BrowserPanel, BrowserDetails, BrowserAction
 from commonUtils.formats.registry import register_file_type, file_types
 from commonUtils.ui import pyside as qt
 from commonUtils.ui.file_browser import FileBrowser
+from commonUtils.ui.file_browser.tiles import CELL_PADDING, COVER_WIDTH
 
 
 class CustomFile(File):
@@ -54,17 +55,23 @@ class BrowserTests(QtTestCase):
         self.app.processEvents()
 
     def wait(self):
-        deadline = time.monotonic() + 5
+        # Windows CI can take longer to schedule the browser's initial workers.
+        # Keep polling for real completion rather than adding a fixed delay.
+        deadline = time.monotonic() + 20
         stable = 0
         while time.monotonic() < deadline:
             self.app.processEvents()
-            pending = (self.browser.busy or self.browser.folder_busy or self.browser.views.cover_busy
-                       or self.browser.views._column_selection_pending)
-            stable = 0 if pending else stable + 1
+            pending = {
+                'listing': self.browser.busy,
+                'folder totals': self.browser.folder_busy,
+                'covers': self.browser.views.cover_busy,
+                'column selection': self.browser.views._column_selection_pending,
+            }
+            stable = 0 if any(pending.values()) else stable + 1
             if stable >= 2:
                 break
             time.sleep(.01)
-        self.assertFalse(self.browser.busy or self.browser.folder_busy or self.browser.views._column_selection_pending)
+        self.assertFalse(any(pending.values()), f'Browser workers did not settle: {pending}')
 
     def test_parent_destruction_releases_index_priority(self):
         import gc
@@ -89,8 +96,8 @@ class BrowserTests(QtTestCase):
         def network(path, **kwargs):
             path = Path(path)
             return path == remote or remote in path.parents
-        with patch('commonUtils.network_filesystems.is_network_location', side_effect=network), \
-             patch('commonUtils.directory.directory_cache.reconcile_folder') as scan:
+        with patch('commonUtils.filesystem.network.is_network_location', side_effect=network), \
+             patch('commonUtils.filesystem.index.directory_cache.reconcile_folder') as scan:
             self.browser.set_directory(remote)
             self.wait()
             self.assertTrue(self.browser.network_location)
@@ -383,9 +390,10 @@ class BrowserTests(QtTestCase):
             self.app.processEvents()
             tiles.fit_grid()
             usable = tiles.viewport().width() - 2
-            columns = max(1, usable // 99)
+            preferred_width = round(COVER_WIDTH * tiles.folder_scale)
+            columns = max(1, usable // (preferred_width + CELL_PADDING))
             self.assertLess(usable - columns * tiles.gridSize().width(), columns)
-            self.assertEqual(tiles.iconSize().width(), min(71, max(16, tiles.gridSize().width() - 28)))
+            self.assertEqual(tiles.iconSize().width(), min(preferred_width, max(16, tiles.gridSize().width() - CELL_PADDING)))
 
     def test_column_single_click_opens_file_information(self):
         from PySide6.QtTest import QTest
@@ -525,7 +533,7 @@ class BrowserTests(QtTestCase):
             self.app.processEvents()
             root = tiles.rootIndex()
             usable = tiles.viewport().width() - 2
-            columns = max(1, usable // 99)
+            columns = max(1, usable // (round(COVER_WIDTH * tiles.folder_scale) + CELL_PADDING))
             self.assertLess(usable - columns * tiles.gridSize().width(), columns)
             first_row = [tiles.visualRect(tiles.model().index(row, 0, root)) for row in range(columns)]
             self.assertTrue(all(rect.top() == first_row[0].top() for rect in first_row))
@@ -692,7 +700,7 @@ class BrowserTests(QtTestCase):
             release.wait(5)
             from unittest.mock import Mock
             return Mock(folder_stats=lambda **kwargs: {root: FolderStats(files=999)})
-        with patch('commonUtils.directory.directory_cache.reconcile_folder', side_effect=scan):
+        with patch('commonUtils.filesystem.index.directory_cache.reconcile_folder', side_effect=scan):
             try:
                 self.browser.set_folder_sizes_enabled(True)
                 self.assertTrue(entered.wait(2))

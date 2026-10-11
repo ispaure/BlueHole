@@ -2,7 +2,7 @@
 
 ZIP/TAR listing, creation, safe extraction, editing, integrity checks and bounded previews. Domain operations have no UI dependencies. Passwords, progress and cancellation are supplied by callers.
 
-See [ZIP compatibility](zip_access.md) and the contracts below.
+See [ZIP access](zip_access.md) and the contracts below.
 
 ## Files
 
@@ -19,8 +19,7 @@ See [ZIP compatibility](zip_access.md) and the contracts below.
 
 [Parent guide](../README.md)
 
-`zip_access.py` owns the historical `zip_access` implementation; its compatibility
-package preserves existing consumers.
+`archives.zip_access` provides password-aware ZIP access.
 
 ## ZIP and TAR archives
 
@@ -47,20 +46,6 @@ TAR.bz2/TBZ2 for reading. Creation supports `format='zip'`, `'tar'`, `'tar.gz'`
 and `'tar.xz'`. ZIP levels 0, 1, 6 and 9 correspond to Store, Fast, Balanced and
 Maximum; levels 1–9 use DEFLATE. Passwords encrypt ZIP payloads with AES-256;
 entry names remain visible. 7z, RAR and split archives are unsupported.
-
-## Modules and ownership
-
-| Module | Responsibility |
-| --- | --- |
-| `archives/formats.py` | Shared suffix matching, image suffixes and dialog filter |
-| `archives/models.py` | Immutable entry metadata |
-| `archives/reading.py` | Validated readers, header inspection and integrity checks |
-| `archives/extraction.py` | Selected/whole extraction into a new folder |
-| `archives/creation.py` | Verified ZIP/TAR creation |
-| `archives/editing.py` | Verified atomic ZIP rebuilding |
-| `archives/previews.py` | Bounded text and image decoding |
-| `fileTypes/archiveType.py` | Passive `ArchiveFile` information hooks and TAR resolution |
-| `ui/archive_view/` | Passive Qt folder navigation, sorting, selection and previews |
 
 The existing [ZIP API](zip_access.md) remains available. Archive creation and
 editing reuse its verified writes, metadata copying and decrypted manifests, plus

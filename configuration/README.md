@@ -1,5 +1,7 @@
 # INI configuration and settings editors
 
+[Shared editor user guide](../ui/user_docs/README.md) · [Developer API map](../docs/developer/public-apis.md)
+
 Use `INIFile` for ordinary INI documents. Add the typed-key schema when you want
 consistent value validation, and the Qt editor when you want people to edit those
 settings visually. Each layer works independently.
@@ -13,7 +15,7 @@ settings visually. Each layer works independently.
 The document and schema have no GUI dependency. The editor requires PySide6 and
 an existing `QApplication`. These modules contain no application-specific paths,
 feature names or settings. Applications own defaults, domain rules and what
-happens after a setting changes. The existing `configUtils` API stays available.
+happens after a setting changes. The standalone configuration helpers live in `commonUtils.configuration.legacy`.
 
 ## Read and update an ordinary INI
 
@@ -126,15 +128,38 @@ to offer Save, Discard or Cancel. File switching should retain editor instances
 if you want pending edits preserved. Each editor refuses external disk changes.
 For custom save rules, subclass the editor and validate before `super().save()`.
 
-## Migration and compatibility
+## Settings adoption
 
 Adopt typed keys gradually. Changing a key name requires updating its consumers;
-keep fallback reads for the old name where compatibility matters. Neither the
+plan how existing saved values will be read. Neither the
 schema nor editor automatically renames existing keys or rewrites legacy files.
 
-Applications can retain compatibility imports or a small wrapper to preserve
-their previous defaults while migrating. New consumers should import the
-commonUtils modules directly.
+Import shared settings from `commonUtils.configuration.settings`. Applications
+choose their own defaults and supply a custom settings path when needed.
 
-`settings.py` owns the historical `settings` implementation; its compatibility
-package preserves existing consumers.
+## Shared navigation settings
+
+`commonUtils.configuration.settings.settings_path()` locates `ui/settings.ini` beside the browser
+package. Applications choose where to expose this file. Components using shared page-wheel
+navigation read saved changes on the next wheel event.
+`get_setting(section, key, default, minimum=None, maximum=None)` reads bool, int,
+float or string values using the default's type (bounds are keyword arguments).
+`get_wheel_navigation_settings()` returns immutable validated wheel preferences.
+Both accept a keyword `path` override for other hosts/tests. Missing, unreadable,
+malformed or invalid settings use defaults; reads never rewrite the INI. File
+identity timestamps cache parsing and invalidate it after edits.
+
+The `[WheelNavigation]` fallback defaults are `immediate_notches=true`, `sensitivity=20`
+(range 1–100), and `cooldown_ms=250` (range 0–2000). Each vertical angle-only wheel
+event with no scroll phase turns one page regardless of delta magnitude. Smooth
+pixel/phase events accumulate to 60 pixels or 120 angle units divided by sensitivity,
+with a cooldown to avoid bursts. Disable immediate notches to apply the smooth
+threshold and cooldown to all wheels. Loading, modifiers and modal dialogs still
+block navigation. These preferences affect discrete page navigation, not ordinary
+file-browser list scrolling.
+
+
+The checked-in `ui/settings.ini` overrides sensitivity to 100 and cooldown to
+30 ms. These saved values differ from missing/invalid-value fallbacks. Browser
+preview, storage animation and index preferences are explained in the
+[File Browser settings guide](../ui/file_browser/user_docs/README.md#settings-and-their-effects).
