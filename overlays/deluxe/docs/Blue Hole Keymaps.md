@@ -15,10 +15,10 @@ Feel free to use this Table of Contents. You can also search this page for any k
 - [📷 CAMERA NAVIGATION](#-camera-navigation)
 - [🪟 LAYOUT](#-layout)
 - [👉 SELECTION](#-selection)
-- [❄️ TRANFORM](#️-tranform)
+- [Transform](#transform)
 - [🧊 MODELING MODE](#-modeling-mode)
 - [🎨 SCULPTING MODE](#-sculpting-mode)
-- [❓ ADDITIONAL INFORMATION](#-additional-information)
+- [Additional information](#additional-information)
 
 
 
@@ -180,7 +180,7 @@ How to navigate 2D viewports, such as the **UV Editor** and **Shader Editor**. T
 | Collection Selection             | Ctrl + LMB Double-Click                                                                              |              | ==Seems hit or miss==                                                                    |
 
 
-# ❄️ **TRANFORM**
+# Transform
 ---
 ## Basic Tools
 These are your classic tools to transform objects: Move, Rotate and Scale.
@@ -254,7 +254,7 @@ Set a zone of soft influence for the transform.
 | Sculpt Tool Radius   | Shift + Wheel Up/Down | Shift + Space + Drag Mouse |                 |
 | Sculpt Tool Hardness | Ctrl + Space          |                            | ==Not working== |
 
-# ❓**ADDITIONAL INFORMATION**
+# Additional information
 ---
 > [!NOTE] Notes for macOS users
 >  - **Command Key**: For most intents and purposes, keymaps using `Ctrl` as a modifier haven't been remapped to `Cmd`.
