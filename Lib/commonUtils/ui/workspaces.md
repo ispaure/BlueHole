@@ -57,7 +57,7 @@ badges and persistence; these widgets never decide whether an operation is safe.
 ResultWorker captures callback result/error under noninteractive logging. Owners
 consume them after finished and retain workers until retirement. Cancellation
 boundaries and error formatting can be supplied by the caller. Operation retains
-its compatibility completed signal; use OperationProgress for finish-safe delivery
+its completed signal; use OperationProgress for finish-safe delivery
 with progress and cancellation controls.
 
 Workspace tab bars use horizontal dragging to reorder panes. Drag outside the
@@ -70,4 +70,24 @@ Floating `WorkspaceDock` panes use regular native window flags, including
 minimize/maximize controls and no transient parent. The inner tab header still
 supports dragging and double-click reattachment. Their cooperative close handler
 and `WA_QuitOnClose=False` preserve the document/worker lifecycle.
+
+
+## Reader menus and chrome
+
+Desktop readers can reuse `commonUtils.ui.reader_menus.ReaderMenus` for
+File/Edit/View/Navigate menus and platform-standard shortcuts. The caller supplies
+callbacks and adds format-specific navigation actions. `RecentFiles` stores up
+to 40 canonical paths atomically under `commonUtils/Cache/Readers/recent.json`;
+menus show at most 12 existing files matching the reader's suffixes. Pass a
+custom history object/path for an isolated application or tests. The history
+stores paths only, and a read/write failure does not prevent reading a file.
+
+`commonUtils.ui.reader_chrome` provides presentation shared by separate readers:
+`reader_button` builds consistently sized, keyboard-accessible controls;
+`ReaderLabel` elides long titles/status visually while retaining full text and a
+tooltip; `ReaderFullscreen(owner, action)` synchronizes the checked action and
+icon with native window state and restores previous maximization. Call `toggle`
+and `leave` from the reader's own commands. It does not install navigation keys
+or choose content formats. Hosts can use the shared margins/spacing constants
+and retain their existing widget handles.
 

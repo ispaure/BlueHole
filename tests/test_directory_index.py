@@ -7,7 +7,7 @@ import types
 import unittest
 
 
-class DirectoryCompatibilityTests(unittest.TestCase):
+class DirectoryIndexTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         name = '_bluehole_directory_tests'
@@ -15,13 +15,8 @@ class DirectoryCompatibilityTests(unittest.TestCase):
         package.__path__ = [str(Path(__file__).resolve().parents[1])]
         sys.modules[name] = package
         cls.canonical = importlib.import_module(name + '.Lib.commonUtils.filesystem.index')
-        cls.legacy = importlib.import_module(name + '.Lib.commonUtils.directory_index')
         cls.addClassCleanup(lambda: [sys.modules.pop(key, None) for key in tuple(sys.modules)
             if key == name or key.startswith(name + '.')])
-
-    def test_legacy_import_shares_cache_and_classes(self):
-        self.assertIs(self.legacy, self.canonical)
-        self.assertIs(self.legacy.directory_cache, self.canonical.directory_cache)
 
     def test_metadata_scan_uses_moved_dependencies(self):
         with tempfile.TemporaryDirectory() as folder:
