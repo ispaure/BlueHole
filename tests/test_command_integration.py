@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 
-class CommandCompatibilityTests(unittest.TestCase):
+class CommandIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         name = '_bluehole_command_tests'
@@ -20,12 +20,12 @@ class CommandCompatibilityTests(unittest.TestCase):
         sys.modules[name] = package
         sys.modules[blender.__name__] = blender
         sys.modules[prefs.__name__] = prefs
-        cls.commands = importlib.import_module(f'{name}.Lib.commonUtils.wrappers.cmdShellWrapper')
+        cls.commands = importlib.import_module(f'{name}.Lib.commonUtils.integrations.wrappers.cmdShellWrapper')
         cls.module = importlib.import_module(f'{name}.wrappers.perforce.p4_utils')
         cls.addClassCleanup(lambda: [sys.modules.pop(key, None) for key in tuple(sys.modules)
             if key == name or key.startswith(name + '.')])
 
-    def test_vendored_result_captures_real_exit_status_and_legacy_output(self):
+    def test_vendored_result_captures_exit_status_and_shell_output(self):
         result = self.commands.run_command([sys.executable, '-c', 'import sys; print("out"); sys.exit(7)'])
         self.assertEqual(result.returncode, 7)
         self.assertEqual(result.lines, ['out'])
@@ -64,7 +64,7 @@ class CommandCompatibilityTests(unittest.TestCase):
             settings.source_control_enable = False
             self.assertEqual(adapter._environment(), {})
         compat = importlib.import_module(adapter.__name__ + '.p4_file_group')
-        shared = importlib.import_module(adapter.__name__.split('.wrappers.')[0] + '.Lib.commonUtils.wrappers.perforce.p4_file_group')
+        shared = importlib.import_module(adapter.__name__.split('.wrappers.')[0] + '.Lib.commonUtils.integrations.wrappers.perforce.p4_file_group')
         self.assertIs(compat, shared)
 
     def test_blend_file_keeps_filter_and_scene_reload_callbacks(self):
@@ -75,7 +75,7 @@ class CommandCompatibilityTests(unittest.TestCase):
         bpy.ops = types.SimpleNamespace(wm=types.SimpleNamespace(open_mainfile=Mock()))
         with patch.dict(sys.modules, {'bpy': bpy}), patch.object(blender, 'filterUtils', filters, create=True):
             module = importlib.import_module(root + '.wrappers.perforce.p4_file')
-            shared = importlib.import_module(root + '.Lib.commonUtils.wrappers.perforce.p4_file')
+            shared = importlib.import_module(root + '.Lib.commonUtils.integrations.wrappers.perforce.p4_file')
             self.assertIs(module.P4File, shared.P4File)
             file = module.BlendP4File('/work/scene.blend')
             with patch.object(shared.P4File, 'open_for_edit', return_value=True) as edit:
