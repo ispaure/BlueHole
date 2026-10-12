@@ -24,3 +24,17 @@ class DirectoryIndexTests(unittest.TestCase):
             path.write_text('sample')
             snapshot = self.canonical.scan_metadata(Path(folder))
             self.assertEqual([entry.path for entry in snapshot.entries], [path])
+
+    def test_persistent_scan_initializes_vendored_schema(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / 'files'
+            root.mkdir()
+            path = root / 'example.txt'
+            path.write_text('sample')
+            cache = self.canonical.DirectoryCache(database=Path(folder) / 'index.sqlite3')
+            try:
+                snapshot = cache.get(root)
+                self.assertEqual(snapshot.entry(path).size, 6)
+                snapshot.close()
+            finally:
+                cache.close()
