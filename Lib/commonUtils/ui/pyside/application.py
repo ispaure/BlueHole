@@ -4,6 +4,11 @@ from . import _api
 
 
 def set_font(q_thing):
+    app = _api.QApplication.instance()
+    controller = getattr(app, '_commonutils_styling', None)
+    if controller is not None and controller.apply_application:
+        controller.bind(q_thing, 'ui')
+        return
     if _api.rog_ally:
         modifier = 6
     else:
@@ -79,6 +84,8 @@ class Palette:
 def initialize_q_app():
     # Create QApplication, which is the PySide6 UI Application. One per project!
     q_app = _api.QApplication([])
+    from ..menu_policy import install_menu_policy
+    install_menu_policy(q_app)
     q_app.setStyle('Fusion')
 
     # If on Windows, set to dark mode always with a palette (if not, it doesn't handle it properly)

@@ -2,7 +2,7 @@
 
 ## Reusable docking workspaces
 
-`commonUtils.ui.workspace.Workspace` owns dockable tabs, full-window dragging,
+`commonUtils.ui.workspaces.workspace.Workspace` owns dockable tabs, full-window dragging,
 left/right splits, grouped tab headers, transfer between compatible workspaces,
 and cooperative closing. It imports no Logistics features. Supply a factory
 returning a QWidget, optionally exposing `view_title`, `title_changed`,
@@ -74,7 +74,32 @@ and `WA_QuitOnClose=False` preserve the document/worker lifecycle.
 
 ## Reader menus and chrome
 
-Desktop readers can reuse `commonUtils.ui.reader_menus.ReaderMenus` for
+`workspace_menus.sync_native_menus(container, document)` routes an embedded
+QMainWindow's menus to its host on macOS and to detached container headers on
+other desktops. It refreshes after focus/reparenting settles, on window activation,
+on native focus-window return after popups, and when the source menu bar changes.
+A container with multiple destinations can
+provide `workspace_menu_document()` to resolve its current view at refresh time;
+return None to restore its base menus. Menu refresh does not activate a window or
+move keyboard focus. Original actions and document callbacks remain authoritative.
+Hosts may set `workspace_publish_menus=True` to publish attached views in the
+window header on Windows/Linux as well, hiding the embedded source bar. Optional
+`workspace_menu_actions` are prepended without duplicating identical QAction
+instances, so application navigation remains present across document contexts.
+The `workspace_menu_document()` provider is authoritative during immediate and
+deferred publication, preventing inactive workspaces from replacing active menus.
+On macOS, switching action sets recreates the native menu-bar mapping, including
+after documents are created inside a tab's + menu tracking loop. Refreshes of the
+same action set retain that mapping.
+After publishing a changed context, the focused Cocoa host also invalidates
+AppKit's displayed menu bar. Native menu contents can otherwise be correct while
+macOS continues drawing the prior context until the bar is clicked. The redraw
+briefly toggles application menu-bar visibility off/on synchronously; it preserves
+intentionally hidden bars and does not change window focus or auto-hide settings.
+macOS can briefly hide and redisplay the Dock during this visibility refresh.
+Unchanged widget-focus refreshes do not repeat that redraw.
+
+Desktop readers can reuse `commonUtils.ui.readers.reader_menus.ReaderMenus` for
 File/Edit/View/Navigate menus and platform-standard shortcuts. The caller supplies
 callbacks and adds format-specific navigation actions. `RecentFiles` stores up
 to 40 canonical paths atomically under `commonUtils/Cache/Readers/recent.json`;
@@ -82,7 +107,7 @@ menus show at most 12 existing files matching the reader's suffixes. Pass a
 custom history object/path for an isolated application or tests. The history
 stores paths only, and a read/write failure does not prevent reading a file.
 
-`commonUtils.ui.reader_chrome` provides presentation shared by separate readers:
+`commonUtils.ui.readers.reader_chrome` provides presentation shared by separate readers:
 `reader_button` builds consistently sized, keyboard-accessible controls;
 `ReaderLabel` elides long titles/status visually while retaining full text and a
 tooltip; `ReaderFullscreen(owner, action)` synchronizes the checked action and

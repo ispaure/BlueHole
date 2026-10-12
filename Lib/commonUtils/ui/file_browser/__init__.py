@@ -51,6 +51,8 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
 
     def __init__(self, directory=None, parent=None, *, services=None, action_providers=(), folder_fields=None, calculate_folder_sizes=True, index_settings_path=None):
         super().__init__(parent)
+        from ..styling import bind_font
+        bind_font(self, 'browser')
         self.idle.connect(self.close)
         self.services = services or {}
         self.action_providers = tuple(action_providers)
@@ -71,6 +73,8 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         self._index_priority_owner = object()
         from ...filesystem.index import directory_cache
         self._index_priority_lease = IndexPriorityLease(self, directory_cache, self._index_priority_owner)
+        if directory_cache.shared_activity is not None:
+            directory_cache.shared_activity.connect(self._shared_index_changed)
         self._full_index_refresh = False
         self.folder_root = None
         self.refresh_pending = False
@@ -488,11 +492,16 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         item = self.model.item(index) if index.isValid() else None
         if item is not None and not (item.path.exists() or item.path.is_symlink()):
             return None
-        persistent = qt.QPersistentModelIndex(index)
         context = self.context(item) if item is not None else BrowserContext(self, ())
         destination = (item.path if isinstance(item, Directory) else None) if item else (
             Path(directory) if directory is not None else self.views.browsing_directory())
         menu = qt.QMenu(self)
+        def current_index():
+            # Keep paths in action closures, not native indexes whose destruction
+            # can be delayed until after the filesystem model is torn down.
+            if self.stopping or not (item.path.exists() or item.path.is_symlink()):
+                return qt.QModelIndex()
+            return self.model.index(str(item.path))
         mutating = not self.file_actions.busy and not self.stopping
         def standard(title, callback, *, enabled=True, key=None):
             action = menu.addAction(title)
@@ -504,7 +513,7 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         if item is not None:
             single = len(context.selection) == 1
             if isinstance(item, Directory) or self.activation_handlers:
-                standard('Open', lambda: self._activate(qt.QModelIndex(persistent)), enabled=single)
+                standard('Open', lambda: self._activate(current_index()), enabled=single)
             if not isinstance(item, Directory):
                 standard('Open in Default App', lambda: [desktop_actions.open_default(selected.path)
                          for selected in context.selection],
@@ -524,7 +533,7 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
                      enabled=destination is not None)
             return menu
         menu.addSeparator()
-        standard('Rename', lambda: self.file_actions.rename(persistent), enabled=mutating and single,
+        standard('Rename', lambda: self.file_actions.rename(current_index()), enabled=mutating and single,
                  key=qt.Qt.Key.Key_F2)
         # Capture the full selection, deduplicate, and keep ordering independent of
         # filesystem row order or feature discovery order.

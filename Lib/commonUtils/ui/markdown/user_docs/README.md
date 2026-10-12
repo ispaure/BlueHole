@@ -31,9 +31,12 @@ the current rendered document, including unsaved edits, and **Edit** returns to 
 editor. Standalone windows can also enable editing when opened with Alt held.
 
 **Formatted** mode lets you edit rendered headings, emphasis, lists, links and tables.
-Supported Markdown markers become visible near the caret/selection or pointer so
-you can repair syntax. Formatting controls and selection wrapping support common
-inline styles. The Table commands insert a table or add/remove rows and columns;
+Supported Markdown markers become visible when the caret touches or is inside an
+element, or a selection overlaps it. Hovering leaves the markers hidden. Click a
+link label to navigate, including while editing; click its revealed syntax to edit
+the destination, or Shift-click/drag to select text. Ctrl/Command-click also follows
+links from their syntax. The compact **Format** menu beside Back/Forward contains
+undo/redo, inline styles, headings, lists and quotes. **Format → Table** commands insert a table or add/remove rows and columns;
 the first row is the header. Structural table changes are undoable.
 
 **Source** exposes the Markdown text. Use it for exact syntax and unsupported
@@ -92,9 +95,11 @@ if that theme's image has not been generated. Temporary rendering files are clea
 
 ## Read aloud
 
-Open Read aloud, select a voice/language and press Read. A selected passage takes
-priority; otherwise playback starts from the visible reading area. Speed and available
-pause/resume controls depend on the native speech engine. Back/forward estimate a
+Open Read aloud, select a voice/language and press Play. A selected passage takes
+priority; otherwise playback starts from the visible reading area. The same button
+changes to Pause while speaking and Resume while paused. Engines without pause/resume
+support disable it during playback; Stop remains available. Speed depends on the native
+speech engine. Back/forward estimate a
 15-second jump; highlights may use estimated timing where word events are unavailable.
 
 Playback stops when content is replaced, editing begins, the panel closes or the

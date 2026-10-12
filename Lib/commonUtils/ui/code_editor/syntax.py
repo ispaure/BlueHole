@@ -13,6 +13,8 @@ from .. import pyside as qt
 LANGUAGES = (
     ("Plain Text", "text"),
     ("Python", "python"),
+    ("PHP / HTML", "html+php"),
+    ("Laravel Blade", "blade"),
     ("Shell", "bash"),
     ("Windows Batch", "batch"),
     ("PowerShell", "powershell"),
@@ -37,6 +39,8 @@ LANGUAGES = (
 COMMENT_PREFIX = {
     "bash": "#",
     "python": "#",
+    "php": "//",
+    "html+php": "//",
     "powershell": "#",
     "yaml": "#",
     "toml": "#",
@@ -55,11 +59,18 @@ COMMENT_PREFIX = {
 
 
 def detect_language(path, text=""):
+    name = str(path).lower() if path else ""
+    if name.endswith(".blade.php"):
+        return "blade"
+    if name.endswith(".php"):
+        return "html+php"
+    if name.endswith((".py", ".pyi")):
+        return "python"
     try:
         from pygments.lexers import get_lexer_for_filename
 
         if path:
-            name = str(path)
+            name = str(path).lower()
             if name.endswith((".command", ".zsh", ".bash")):
                 return "bash"
             if name.endswith((".env", ".gitignore", ".editorconfig", ".conf", ".cfg")):
@@ -132,6 +143,28 @@ def regex_tokens(lexer, text, stack):
     return result, tuple(states)
 
 
+def php_html_tokens(lexer, text, stack):
+    """Carry both established grammars across blocks, including PHP islands."""
+    from pygments.token import Other
+    php_stack, html_stack = stack
+    source, php_stack = regex_tokens(lexer.language_lexer, text, php_stack)
+    result = []
+    index = 0
+    while index < len(source):
+        offset, kind, value = source[index]
+        index += 1
+        if kind is not Other:
+            result.append((offset, kind, value))
+            continue
+        # PhpLexer emits individual Other fragments; HTML needs whole tag text.
+        while index < len(source) and source[index][1] is Other:
+            value += source[index][2]
+            index += 1
+        tokens, html_stack = regex_tokens(lexer.root_lexer, value, html_stack)
+        result.extend((offset + start, token, value) for start, token, value in tokens)
+    return result, (php_stack, html_stack)
+
+
 class SyntaxHighlighter(qt.QSyntaxHighlighter):
     def __init__(self, editor, language="text"):
         super().__init__(editor.document())
@@ -142,11 +175,27 @@ class SyntaxHighlighter(qt.QSyntaxHighlighter):
         self.formats = {}
         self.states = {("root",): 0}
         self.reverse_states = {0: ("root",)}
-        self.theme_timer = qt.QTimer(editor)
+        self.theme_timer = qt.QTimer(self)
         self.theme_timer.setSingleShot(True)
         self.theme_timer.timeout.connect(self.refresh_theme)
         editor.installEventFilter(self)
         self.configure(language)
+
+    def rebind_editor(self, editor):
+        """Transfer palette observation to another view of the same document.
+
+        Call before destroying or detaching the previous editor. Text ownership
+        remains with the host; lexer state and this highlighter are retained.
+        """
+        if editor.document() is not self.document():
+            raise ValueError('Highlighter rebinding requires the same document')
+        if editor is not self.editor:
+            self.theme_timer.stop()
+            self.editor.removeEventFilter(self)
+            self.editor = editor
+            editor.installEventFilter(self)
+        editor.comment_prefix = COMMENT_PREFIX.get(self.language)
+        self.refresh_theme()
 
     def configure(self, language):
         self.language = language
@@ -157,7 +206,10 @@ class SyntaxHighlighter(qt.QSyntaxHighlighter):
         try:
             from pygments.lexers import get_lexer_by_name
 
-            if language != "text":
+            if language == "blade":
+                from .blade import BladeLexer
+                self.lexer = BladeLexer(stripnl=False, ensurenl=False)
+            elif language != "text":
                 self.lexer = get_lexer_by_name(language, stripnl=False, ensurenl=False)
         except (ImportError, ValueError):
             self.language = "text"
@@ -207,7 +259,17 @@ class SyntaxHighlighter(qt.QSyntaxHighlighter):
         from pygments.lexer import RegexLexer, ExtendedRegexLexer
 
         try:
-            if isinstance(self.lexer, RegexLexer) and not isinstance(
+            if self.language == "html+php":
+                stack = self.reverse_states.get(self.previousBlockState())
+                if not stack or not isinstance(stack[0], tuple):
+                    stack = (("root",), ("root",))
+                tokens, stack = php_html_tokens(self.lexer, text + "\n", stack)
+                if stack not in self.states:
+                    identity = len(self.states)
+                    self.states[stack] = identity
+                    self.reverse_states[identity] = stack
+                self.setCurrentBlockState(self.states[stack])
+            elif isinstance(self.lexer, RegexLexer) and not isinstance(
                 self.lexer, ExtendedRegexLexer
             ):
                 stack = self.reverse_states.get(self.previousBlockState(), ("root",))

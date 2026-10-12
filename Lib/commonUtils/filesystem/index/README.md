@@ -69,6 +69,9 @@ result paths. Network mounts and the index's own storage are excluded from scans
 Whole-filesystem macOS scans omit `/System/Volumes/Data` to avoid duplicating firmlink
 paths, while explicitly indexing it remains supported. Sizes are logical file bytes,
 not allocated disk usage; links, clones and sparse files need that distinction.
+Scan exclusions are reduced to paths with no already-excluded ancestor before
+enumeration. The cache directory covers its database/lock/sidecar files, and an
+excluded mount covers nested mounts, avoiding redundant parent-path checks per entry.
 
 ## Storage and concurrency
 
@@ -88,6 +91,46 @@ Browser windows can share same-location work; each view retains its own subscrip
 and visible-folder priorities. Independent roots retain separate jobs. Releasing
 one subscriber must not cancel another's scan. Index scheduling does not make widget
 access safe from workers.
+
+## Optional process-shared coordinator
+
+`IndexCoordinator` in `filesystem.index.coordinator` supplies a durable browser-job
+queue beside a `DirectoryCache` database (`.jobs.sqlite3`, plus `.jobs.lock`). A host
+runs `coordinator.run(cancelled)` off the GUI thread in every participating process
+and sets `cache.coordinator` while it is available. Logistics supplies this lifecycle.
+Standalone `DirectoryCache` calls keep their synchronous semantics and writer lock.
+
+`reconcile_folder()` submits or follows a job and returns a saved snapshot; `submit`,
+`status`, `active_job` and `follow` also support explicit subscriptions. Cancelling a
+follower only detaches it. Submitted jobs survive subscribers; a process with no
+subscribers can take over, and the next host launch resumes work if all hosts exited.
+An OS-held runner lock prevents competing runners; actual index writes additionally
+retain the existing writer lock. Ownership never expires on a timer. Abrupt death
+releases both OS locks; normal stop checkpoints cooperatively. In-progress receipts
+are retried after takeover; terminal errors/partial attempts require a new request.
+
+Compatible active requests coalesce. Recursive initial discovery/full refresh can
+cover descendant requests; a completed parent's immediate-folder check cannot.
+Refresh and change notifications arriving during a running job queue a later pass.
+The runner rechecks coverage if another operation completed a queued root first.
+Terminal receipts are retained for seven days and pruned on submission. Queue
+transactions are short and independent of long index transactions. Progress is
+polled on workers; saved snapshots remain readable throughout. Priority hints from
+open views expire after 15 seconds, but their expiry never changes writer ownership.
+
+Hosts may supply `notify(job)` and bridge it through a queued Qt signal exposed as
+`cache.shared_activity` before constructing browsers. This lets idle/cache-only
+views follow work started later elsewhere. Exclusions are computed on the worker.
+A followed parent remains the source for that view's search/sizes even when an
+older independent child index exists. Progress messages are sanitized by the UI;
+receipt errors remain local diagnostic data. Hosts must stop/join their runner
+before destroying it. No external daemon, network service or arbitrary operation
+replay is involved.
+
+An optional `set_priority(background)` callback applies the original submitter's
+saved background-priority setting when a runner starts or resumes the job. Joining
+an existing job does not change its priority. Shared queue contention has bounded,
+cancellable retries; it never authorizes a second index writer.
 
 ## Disconnected drives
 

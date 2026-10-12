@@ -71,17 +71,56 @@ class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlai
         self.highlight_cursor()
         self.update_tab_width()
 
+    def _bind_document(self, document):
+        # Use the retained binding during swaps: querying document() on a
+        # departing view can disturb Qt/PySide ownership during deferred deletion.
+        previous = self.folding.document
+        if previous is document:
+            return
+        self.extra_cursors = []
+        self.search_selections = []
+        previous.contentsChange.disconnect(self._external_multicursor_change)
+        self.cursorPositionChanged.disconnect(self.reveal_cursor)
+        self.folding.views[:] = [ref for ref in self.folding.views if ref() is not self]
+        self.setDocument(document)
+        document.contentsChange.connect(self._external_multicursor_change)
+        self.bind_folding()
+        self.update_gutter()
+        self.highlight_cursor()
+
+    def share_document_from(self, source):
+        """Attach to source text and copy view settings; caller retains its owner."""
+        self._bind_document(source.document())
+        self.setFont(source.font())
+        for name in ('indent_width', 'use_tabs', 'auto_indent', 'auto_pairs',
+                     'line_numbers', 'comment_prefix', 'indent_guides'):
+            setattr(self, name, getattr(source, name))
+        self.setLineWrapMode(source.lineWrapMode())
+        self.setReadOnly(source.isReadOnly())
+        self.update_tab_width()
+        self.update_gutter()
+
+    def detach_document(self):
+        """Replace shared text with empty owned text before deleting/reusing a view."""
+        document = qt.QTextDocument(self)
+        document.setDocumentLayout(qt.QPlainTextDocumentLayout(document))
+        self._bind_document(document)
+
     def gutter_width(self):
         return (
             28
-            + self.fontMetrics().horizontalAdvance("9")
-            * len(str(max(1, self.blockCount())))
+            + max(self.fontMetrics().horizontalAdvance(digit * len(str(max(1, self.blockCount()))))
+                  for digit in '0123456789')
             if self.line_numbers
             else 0
         )
 
     def update_gutter(self, *args):
         self.setViewportMargins(self.gutter_width(), 0, 0, 0)
+        area = self.contentsRect()
+        self.gutter.setGeometry(
+            area.left(), area.top(), self.gutter_width(), area.height()
+        )
         self.gutter.setVisible(self.line_numbers)
         self.gutter.update()
 
@@ -102,6 +141,7 @@ class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlai
 
     def paint_gutter(self, event):
         painter = qt.QPainter(self.gutter)
+        painter.setFont(self.font())
         painter.fillRect(
             event.rect(), self.palette().brush(qt.QPalette.ColorRole.AlternateBase)
         )
