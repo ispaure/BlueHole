@@ -10,7 +10,7 @@ settings visually. Each layer works independently.
 | --- | --- | --- |
 | INI document | `commonUtils.formats.iniType.INIFile` | String values, parsing, formatting preservation and safe saves |
 | Optional schema | `commonUtils.configuration.ini_schema` | Typed suffixes, list parsing and dropdown choices |
-| Visual editor | `commonUtils.ui.ini_editor.INISettingsEditor` | Section tabs, key rows, validation and explicit saving |
+| Visual editor | `commonUtils.ui.settings.ini_editor.INISettingsEditor` | Section tabs, key rows, validation and explicit saving |
 
 The document and schema have no GUI dependency. The editor requires PySide6 and
 an existing `QApplication`. These modules contain no application-specific paths,
@@ -101,7 +101,7 @@ using values; an editor save does not prove an application's domain rules hold.
 
 ```python
 from commonUtils.ui import pyside as qt
-from commonUtils.ui.ini_editor import INISettingsEditor
+from commonUtils.ui.settings.ini_editor import INISettingsEditor
 
 app = qt.QApplication.instance() or qt.QApplication([])
 editor = INISettingsEditor("config.ini", typed_keys=True)
@@ -163,3 +163,52 @@ The checked-in `ui/settings.ini` overrides sensitivity to 100 and cooldown to
 30 ms. These saved values differ from missing/invalid-value fallbacks. Browser
 preview, storage animation and index preferences are explained in the
 [File Browser settings guide](../ui/file_browser/user_docs/README.md#settings-and-their-effects).
+
+## Shared menu placement
+
+`[Menus] macos_native_bool=true` in `ui/settings.ini` enables the macOS system
+menu bar. False uses desktop in-window placement; other platforms ignore the
+flag. Missing/invalid values default to true. The shared application initializer,
+reader menus, Markdown windows and workspace menu router install
+`commonUtils.ui.menu_policy.install_menu_policy(app=None)` once per application.
+Hosts creating their own QApplication can call it directly for all their menus.
+It has no import-time effects and polls saved settings every 500 ms, updating
+existing menu bars and routing contexts without recreating actions. New menu
+bars inherit the application policy. Workspace source bars stay non-native to
+avoid publishing duplicate commands.
+
+Workspace menu publication owns its native-bar rebind events. The application
+policy ignores those events so publication settles instead of repeatedly
+rebinding menus during pointer tracking.
+
+## Software defaults and sparse personal overrides
+
+`configuration.layered.register_settings(defaults, personal)` associates a
+repository INI with a host-owned personal INI. Reads never create files.
+`get_setting` reads registered overrides with typed validation and falls back to
+the software value when a personal value is invalid. `effective_settings` provides
+a ConfigParser overlay for legacy non-typed readers. A malformed personal file is
+ignored for reads and preserved; editors refuse to overwrite malformed files.
+
+`LayeredSettings(defaults, personal)` exposes `values(scope)`, `overrides()` and
+`save(changes, scope='personal', expected=None)`. Scope `application` edits the
+software INI; `personal` edits only overrides. Changes map `(section, key)` to
+strings. A `None` removes an explicit personal field and its continuation lines;
+it is forbidden for software-default fields. `expected=(original_bytes,)` adds
+an editor snapshot check. Atomic saves retain unrelated fields, comments, BOM,
+line endings and permissions and reject concurrent edits. Unsafe removal layouts
+raise rather than corrupting the file. Defaults and personal paths must differ.
+
+`shared_settings()` uses registered shared UI paths, or a platform-standard
+persistent commonUtils directory when the host has not supplied its own mapping.
+Hosts own discovery, migrations and path policy; shared code does not discover
+application features. `ui.settings.layered_settings.LayeredSettingsEditor` provides explicit
+Save/Reload, indicators and per-field ↶ reset for a declared schema. It accepts a
+scope, optional section filter, labels and host validator for domain constraints.
+Dirty editors compare both layers before saving. Choice metadata supplies mode
+dropdowns rather than appearing as a user preference. Undeclared personal session
+fields are retained on disk but omitted from the software settings form.
+
+Mobile hosts must register an explicit personal settings path before calling
+`layered.shared_settings()`. Automatic desktop paths are rejected on iOS/Android;
+registration and reads do not create a settings file or grant sandbox access.

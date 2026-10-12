@@ -68,6 +68,12 @@ sorting applies before paging. `folder_stats()` returns path-keyed totals. Inspe
 Close snapshots or use them as context managers. See the
 [index guide](../../filesystem/index/README.md) for refresh/reconciliation differences.
 
+Hosts that need shared background jobs across processes can opt into
+`commonUtils.filesystem.index.coordinator.IndexCoordinator`. The host runs/stops
+its worker and supplies any Qt notification bridge; cancelled subscriptions leave
+durable requests available for takeover. See the coordinator contract in the
+[index guide](../../filesystem/index/README.md#optional-process-shared-coordinator).
+
 ## Operations, processes and integrations
 
 `run_command(arguments, timeout=..., idle_timeout=...)` waits and returns a
@@ -103,7 +109,7 @@ or headless flows where dialogs are inappropriate.
   preview by default, explicit editing, boolean save/navigation outcomes.
 - [CodeEdit and companions](../../ui/code_editor/README.md): editing mechanics,
   search, diff/merge and optional syntax; host owns documents and save policy.
-- `ui.text_editor.TextFileEditor` and `ui.ini_editor.INISettingsEditor`: embedding
+- `ui.text_editor.TextFileEditor` and `ui.settings.ini_editor.INISettingsEditor`: embedding
   editors with `save`, `reload`, `is_modified`, `can_close` and `saved(path)`.
 - [ArchiveContents](../../ui/archive_view/README.md): passive navigation and request
   signals; host performs preview/extraction/removal jobs and password handling.
@@ -111,3 +117,16 @@ or headless flows where dialogs are inappropriate.
   close protocols; application policy remains explicit.
 
 [Developer hub](README.md)
+
+## Layered settings and shared styling
+
+- [Layered INI APIs](../../configuration/README.md#software-defaults-and-sparse-personal-overrides): registration, validated reads, sparse saves and editor.
+- [Styling](../../ui/styling.md): font roles, live bindings, accent/tint, application opt-in and host settings callback.
+
+## Grouped UI modules
+
+- [UI workspaces](../../ui/workspaces/README.md): canonical modules under `ui.workspaces`; former direct UI module imports remain supported.
+- [UI tasks](../../ui/tasks/README.md): canonical modules under `ui.tasks`; former direct UI module imports remain supported.
+- [UI readers](../../ui/readers/README.md): canonical modules under `ui.readers`; former direct UI module imports remain supported.
+- [UI settings](../../ui/settings/README.md): canonical modules under `ui.settings`; former direct UI module imports remain supported.
+- [UI appearance](../../ui/appearance/README.md): canonical modules under `ui.appearance`; former direct UI module imports remain supported.

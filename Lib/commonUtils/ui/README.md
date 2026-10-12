@@ -81,7 +81,7 @@ remains available. Pause methods are programmatic APIs, not visible controls. Se
 ## Opt-in Slate appearance
 
 ```python
-from commonUtils.ui.theme import apply_theme
+from commonUtils.ui.appearance.theme import apply_theme
 
 controller = apply_theme(app)
 controller.set_mode('dark')  # 'light' or 'system' also work.
@@ -107,3 +107,24 @@ under noninteractive logging and return them to their GUI owner. Critical
 [diagnostics](../runtime/diagnostics/README.md) raise `DebugException`.
 
 [Library overview](../README.md)
+
+## Styling and settings layers
+
+See [shared styling](styling.md) for the four font roles, accent and dark tint,
+application opt-in, and central-settings navigation callback. `[Styling] theme_mode`
+is the preferred theme source; `[Theme] mode` remains a fallback for older hosts.
+See [layered configuration](../configuration/README.md#software-defaults-and-sparse-personal-overrides)
+for the resettable software/personal editor and host-owned path registration.
+
+## Module organization
+
+Implementations are grouped by responsibility. Former direct module paths remain
+compatibility aliases to the same modules; use the grouped paths in new code.
+The UI facade and these packages preserve lazy Qt loading. Shared configuration
+continues to live at `ui/settings.ini`.
+
+- [Docking workspaces](workspaces/README.md): Docking, tab gestures, splitting, floating windows and native workspace menus.
+- [Background task presentation](tasks/README.md): Qt workers, cancellable operation progress, streamed processes and download dialogs. Runtime operations and streams remain outside the UI layer.
+- [Shared reader controls](readers/README.md): Reader menus, fullscreen controls, read-aloud presentation and wheel navigation shared by document readers.
+- [Settings editor widgets](settings/README.md): Typed INI editors, layered overrides, settings sections and font previews. Parsing, persistence and host-owned paths remain in configuration.
+- [Shared UI appearance](appearance/README.md): Opt-in themes, live font styling and palette-aware painted icons.
