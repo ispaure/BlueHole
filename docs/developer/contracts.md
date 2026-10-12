@@ -48,3 +48,37 @@ and documentation, and then update the pinned or vendored source. Keep domain
 workflows in the consuming application.
 
 [Developer hub](README.md)
+
+## Layered configuration and typography
+
+Registered defaults/personal INI paths enable sparse, validated overrides without
+changing unregistered consumers. Reads do not create files; malformed overrides
+remain untouched. Reset removes an explicit personal field, never a software
+schema field. Atomic saves reject concurrent edits. Hosts own migration and paths.
+See the configuration guide for the API, and `ui/styling.md` for live font roles,
+weak widget binding, optional application-font opt-in and settings navigation.
+
+## Grouped UI imports
+
+See [UI module organization](../../ui/README.md#module-organization) for canonical
+package paths. Flat forwarding modules for workspace, task, reader, settings and
+appearance implementations have been removed. Update imports, deferred dotted
+references and mock patch targets to their owning package, for example
+`commonUtils.ui.workspaces.workspace_drag` and `commonUtils.ui.appearance.styling`.
+Modules import relatively within the library, so vendored namespaces retain their
+own classes and registries without installing import finders or standalone aliases.
+Importing a group alone does not import Qt. Existing guide URLs and
+`ui/settings.ini` remain available.
+
+Merge widgets and hosts import the data model directly from `persistence.merge`;
+the former `ui.code_editor.merge_model` shim has been removed. Directory-cache
+writers call `filesystem.index.schema.initialize_schema()` directly under their
+existing writer lock; the private `_schema()` forwarding method has been removed.
+Persistent formats, migration and cancellation behavior are unchanged.
+
+Browser hosts select Treemap/Radial through the view selector; embedded storage
+components may use `StorageView.set_chart_mode()`. The former hidden browser
+buttons, storage chart combo box and unused periodic timer have been removed.
+Pause/resume remains an indexing operation, and independent storage dialogs retain
+cooperative shutdown. Watcher notifications and explicit refresh still schedule
+index updates through the reconciliation debounce.

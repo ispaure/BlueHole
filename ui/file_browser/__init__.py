@@ -10,9 +10,9 @@ from ...filesystem import BrowserDetails, BrowserPanel, format_size, scan_folder
 from .model import BrowserFileSystemModel, ByteSortModel, BrowserTree, _BrowserSelection
 from .details import DetailsPanel
 from .controls import ViewModeSelector, FolderSizeControl, ViewIcon
-from ..icons import set_painted_icon
+from ..appearance.icons import set_painted_icon
 from .navigation import NavigationBar
-from ..operations import Operation
+from ..tasks.operations import Operation
 from .views import FileViews
 from .editing import FilenameDelegate
 from .file_actions import FileActions, clipboard_files
@@ -51,6 +51,8 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
 
     def __init__(self, directory=None, parent=None, *, services=None, action_providers=(), folder_fields=None, calculate_folder_sizes=True, index_settings_path=None):
         super().__init__(parent)
+        from ..appearance.styling import bind_font
+        bind_font(self, 'browser')
         self.idle.connect(self.close)
         self.services = services or {}
         self.action_providers = tuple(action_providers)
@@ -71,6 +73,8 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         self._index_priority_owner = object()
         from ...filesystem.index import directory_cache
         self._index_priority_lease = IndexPriorityLease(self, directory_cache, self._index_priority_owner)
+        if directory_cache.shared_activity is not None:
+            directory_cache.shared_activity.connect(self._shared_index_changed)
         self._full_index_refresh = False
         self.folder_root = None
         self.refresh_pending = False
@@ -127,10 +131,6 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         self.reconcile_debounce = qt.QTimer(self)
         self.reconcile_debounce.setSingleShot(True); self.reconcile_debounce.setInterval(400)
         self.reconcile_debounce.timeout.connect(self._reconcile_index)
-        self.reconcile_timer = qt.QTimer(self)
-        self.reconcile_timer.setInterval(60_000)
-        self.reconcile_timer.timeout.connect(self._reconcile_index)
-        # Compatibility timer stays inactive: completed indexes never poll the tree.
         self.clear_search = qt.QShortcut(qt.QKeySequence(qt.Qt.Key.Key_Escape), self)
         self.clear_search.setContext(qt.Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.clear_search.activated.connect(self.close_search)
@@ -179,18 +179,9 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         self.search_button.setToolTip('Show or hide search (Ctrl/Cmd+F)')
         self.search_button.toggled.connect(self._search_toggled)
         controls.insertWidget(1, self.search_button)
-        self.storage_button = qt.QPushButton('Size Map…')
-        self.storage_button.clicked.connect(self.open_storage)
-        self.storage_button.hide() # Legacy dialog API; Storage is now a view.
         self.refresh_button = qt.QPushButton('Refresh index')
         self.refresh_button.setToolTip('Check all files and saved sizes below the current folder')
         self.refresh_button.clicked.connect(self.refresh)
-        self.index_pause_button = qt.QToolButton(self)
-        self.index_pause_button.setText('Pause')
-        self.index_pause_button.setToolTip('Pause this tab’s scan; saved search and sizes remain available')
-        self.index_pause_button.clicked.connect(self._toggle_index_pause)
-        self.index_pause_button.hide()
-        # Retained as a hidden compatibility object; scanning has no pause UI.
         return toolbar
 
     def open_search(self):
@@ -408,7 +399,7 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         self.search_button.setToolTip('Indexed search disabled for network drives' if network
             else 'Show or hide search (Ctrl/Cmd+F)')
         if network:
-            self.reconcile_debounce.stop(); self.reconcile_timer.stop()
+            self.reconcile_debounce.stop()
             self._changed_paths.clear(); self._full_index_refresh = False
             self.folder_pending = False; self._reconcile_pending = False
             if self.folder_busy: self.folder_operation.requestInterruption()
@@ -423,7 +414,7 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
             if self.views.currentIndex() == 3: self.view_selector.setCurrentIndex(0)
         elif changed:
             self.index_status.setText('Loading saved sizes…')
-        self._update_pause_button()
+        self._update_index_controls()
         self.index_state_changed.emit()
 
     def _directory_opened(self, path):
@@ -488,11 +479,16 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         item = self.model.item(index) if index.isValid() else None
         if item is not None and not (item.path.exists() or item.path.is_symlink()):
             return None
-        persistent = qt.QPersistentModelIndex(index)
         context = self.context(item) if item is not None else BrowserContext(self, ())
         destination = (item.path if isinstance(item, Directory) else None) if item else (
             Path(directory) if directory is not None else self.views.browsing_directory())
         menu = qt.QMenu(self)
+        def current_index():
+            # Keep paths in action closures, not native indexes whose destruction
+            # can be delayed until after the filesystem model is torn down.
+            if self.stopping or not (item.path.exists() or item.path.is_symlink()):
+                return qt.QModelIndex()
+            return self.model.index(str(item.path))
         mutating = not self.file_actions.busy and not self.stopping
         def standard(title, callback, *, enabled=True, key=None):
             action = menu.addAction(title)
@@ -504,7 +500,7 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         if item is not None:
             single = len(context.selection) == 1
             if isinstance(item, Directory) or self.activation_handlers:
-                standard('Open', lambda: self._activate(qt.QModelIndex(persistent)), enabled=single)
+                standard('Open', lambda: self._activate(current_index()), enabled=single)
             if not isinstance(item, Directory):
                 standard('Open in Default App', lambda: [desktop_actions.open_default(selected.path)
                          for selected in context.selection],
@@ -524,7 +520,7 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
                      enabled=destination is not None)
             return menu
         menu.addSeparator()
-        standard('Rename', lambda: self.file_actions.rename(persistent), enabled=mutating and single,
+        standard('Rename', lambda: self.file_actions.rename(current_index()), enabled=mutating and single,
                  key=qt.Qt.Key.Key_F2)
         # Capture the full selection, deduplicate, and keep ordering independent of
         # filesystem row order or feature discovery order.
@@ -762,7 +758,7 @@ class FileBrowser(BrowserIndexing, qt.QWidget):
         from ...filesystem.index import directory_cache
         directory_cache.set_priority_folders(self._index_priority_owner)
         self.stopping = True
-        self.reconcile_debounce.stop(); self.reconcile_timer.stop()
+        self.reconcile_debounce.stop()
         self.index_search.stop()
         for window in tuple(self._scan_windows):
             window.close()

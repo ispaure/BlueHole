@@ -5,7 +5,7 @@ from pathlib import Path
 from ...filesystem.directories import Directory
 from .. import pyside as qt
 from ..entry_views import configure_entry_selection
-from ..operations import Operation
+from ..tasks.operations import Operation
 from .tiles import ResponsiveTileView
 from .columns import FolderColumnView, ColumnDelegate
 from .thumbnails import CoverModel
@@ -245,7 +245,7 @@ class FileViews(qt.QStackedWidget):
             self.set_root(directory)
         self.setCurrentIndex(mode)
         if mode == 3:
-            self.storage.chart_selector.setCurrentIndex(chart_mode)
+            self.storage.set_chart_mode(chart_mode)
             self.storage.set_root(directory)
             if selected:
                 self.storage.select_path(Path(self.model.filePath(selected[-1])))

@@ -14,7 +14,7 @@ from commonUtils.ui.file_browser.status import format_duration, indexing_phase, 
 
 class BrowserPresentationTests(QtTestCase):
     def test_toolbar_stays_inline_and_split_panes_cannot_shrink_into_overlap(self):
-        from commonUtils.ui.workspace import Workspace
+        from commonUtils.ui.workspaces.workspace import Workspace
         host = qt.QWidget()
         workspace = Workspace(lambda path: FileBrowser(calculate_folder_sizes=False), host)
         layout = qt.QVBoxLayout(host)
@@ -61,9 +61,10 @@ class BrowserPresentationTests(QtTestCase):
         from commonUtils.ui.file_browser.index_worker import _IndexJob
         app = qt.QApplication.instance() or qt.QApplication([])
         root = Path('/fixture')
+        closed = []
         snapshot = SimpleNamespace(
             folder_stats=lambda *args, **kw: {root: SimpleNamespace(files=100000, folders=400)},
-            errors=(), children=lambda *a, **kw: (),
+            errors=(), children=lambda *a, **kw: (), close=lambda: closed.append(True),
         )
         job = _IndexJob(root, lambda *a, **kw: None, app)
         try:
@@ -71,6 +72,7 @@ class BrowserPresentationTests(QtTestCase):
                 job._cached(force=True)
             self.assertEqual(job.saved_entries, 100400)
             self.assertIn('Waiting for index writer', job.last_progress)
+            self.assertEqual(closed, [True])
         finally:
             job.deleteLater()
 

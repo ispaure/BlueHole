@@ -3,7 +3,7 @@ from .. import pyside as qt
 from .syntax import inline_spans, FENCE_OPEN, fence_close, HEADING, fenced_regions
 from .syntax import _units
 from .links import link_spans, reference_destinations
-from .presentation import monospace_family
+from .presentation import monospace_family, code_point_size
 
 
 class LivePreviewHighlighter(qt.QSyntaxHighlighter):
@@ -31,13 +31,10 @@ class LivePreviewHighlighter(qt.QSyntaxHighlighter):
             self._refreshing = False
 
     def _active(self, start, end):
-        hover = self.editor._hover_position
-        if hover is not None and start <= hover < end:
-            return True
         cursor = self.editor.textCursor()
         if cursor.hasSelection():
             return cursor.selectionStart() < end and cursor.selectionEnd() > start
-        return start <= cursor.position() < end
+        return start <= cursor.position() <= end
 
     def _marker_format(self, active, *, collapse=False):
         fmt = qt.QTextCharFormat()
@@ -81,6 +78,7 @@ class LivePreviewHighlighter(qt.QSyntaxHighlighter):
             code = qt.QTextCharFormat()
             code.setFontFixedPitch(True)
             code.setFontFamilies([monospace_family()])
+            code.setFontPointSize(code_point_size())
             code.setFontWeight(qt.QFont.Weight.Normal)
             code.setFontItalic(False)
             self.setFormat(0, _units(text), code)
@@ -99,7 +97,7 @@ class LivePreviewHighlighter(qt.QSyntaxHighlighter):
         heading = HEADING.match(text)
         if heading:
             self._collapsed_markers(text, 0, heading.end(),
-                self._active(position, position + _units(text) + 1))
+                self._active(position, position + _units(text)))
         links = list(link_spans(text, self._references))
         for span in links:
             start, end = _units(text[:span.start]), _units(text[:span.end])
@@ -122,6 +120,7 @@ class LivePreviewHighlighter(qt.QSyntaxHighlighter):
             if span.marker.startswith('`'):
                 fmt.setFontFixedPitch(True)
                 fmt.setFontFamilies([monospace_family()])
+                fmt.setFontPointSize(code_point_size())
             else:
                 if len(span.marker) >= 2:
                     fmt.setFontWeight(qt.QFont.Weight.Bold)
@@ -140,6 +139,6 @@ class LivePreviewHighlighter(qt.QSyntaxHighlighter):
             if self._active(position + start, position + end):
                 for index in range(start, end):
                     fmt = self.format(index)
-                    fmt.setForeground(qt.QColor('white'))
+                    fmt.setForeground(self.editor.palette().color(qt.QPalette.ColorRole.Text))
                     fmt.clearProperty(qt.QTextFormat.Property.FontPointSize)
                     self.setFormat(index, 1, fmt)

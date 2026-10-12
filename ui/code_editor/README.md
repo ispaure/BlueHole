@@ -96,3 +96,39 @@ limits each input/result to 1,048,576 Python characters and 5,000 lines; Git cal
 also bound raw blob bytes. Hunk rendering supplies character emphasis for short
 regions. `diff_bands` provides the extracted unified-patch renderer and dual
 line-number gutter for consumers with patch presentation models.
+
+Filename detection recognizes `.pyi`, PHP with embedded HTML, and case-insensitive
+`.blade.php` compound names. Blade uses a small directive/interpolation layer over
+Pygments HTML/PHP grammars; multiline Blade constructs use the bounded per-line
+fallback and are not parsed as a complete template. Both light and dark palettes
+use the same shared highlighter. Hosts need no separate language definitions.
+
+PHP/HTML mode carries both Pygments grammar states across blocks, so a PHP opening
+tag on one line still highlights declarations on subsequent lines and resumes
+HTML formatting after the closing tag. Blade retains its documented per-line
+delegating fallback.
+
+## Shared view lifecycle
+
+`CodeEdit.share_document_from(source)` attaches another CodeEdit to the same
+QTextDocument and copies font, indentation, comment, gutter, wrapping and read-only
+settings. It reconnects multicursor/folding hooks without duplicate registrations.
+It does not copy cursor/scroll position or continually synchronize preferences.
+The host must retain the document owner for as long as any view uses the text.
+
+`CodeEdit.detach_document()` disconnects the old editing hooks and gives the view
+an empty, owned plain-text document. Call it before deleting a shared view; the
+view can also be attached again. File identity, unsaved prompts and deciding when
+the last buffer can be deleted remain host responsibilities. EditorViews uses
+these APIs for its own split lifecycle.
+
+`SyntaxHighlighter.rebind_editor(editor)` moves palette observation to another
+view of its existing document. Rebind before detaching/destroying the old view.
+The highlighter and its timer remain owned by the document/highlighter, and the
+lexer instance is retained. A different document raises ValueError. This changes
+neither document ownership nor text, undo history or cursor positions.
+
+The Qt-independent merge model is imported directly from
+`commonUtils.persistence.merge`. The former `ui.code_editor.merge_model` forwarding
+module has been removed; hosts use the persistence owner for `merge_text`,
+`MergeModel`, `MergeRegion` and `MergeSession`.

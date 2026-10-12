@@ -12,6 +12,9 @@ matching delimiters; it is off by default in the bare shared editor. Indentation
 and tabs-versus-spaces are chosen by the host. Line transformations can sort, remove
 duplicate lines, trim trailing spaces or change indentation; they are undoable.
 
+Line-number gutters follow the editor font and resize when the font or line count
+changes, including when the surrounding window keeps its size.
+
 Alt-click adds cursors; Alt+Shift-drag selects a rectangular column region. Typing
 changes multiple selections as one undo operation. Pasting the same number of lines
 as cursors distributes them. There is no virtual-space padding beyond line ends,
@@ -60,3 +63,8 @@ not expose it. JSON/XML formatting is deliberately conservative and bounded; XML
 with mixed content, CDATA or preserved whitespace can be refused rather than altered.
 
 [Developer integration](../README.md) · [All shared guides](../../../README.md#shared-component-user-guides)
+
+PHP files highlight embedded HTML. Laravel `.blade.php` files are detected before
+ordinary PHP and highlight Blade directives and single-line interpolations using
+the shared PHP/HTML grammars. Python stub (`.pyi`) files use Python highlighting.
+Multiline Blade template expressions have limited highlighting.

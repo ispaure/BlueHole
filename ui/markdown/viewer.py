@@ -3,7 +3,7 @@ from pathlib import Path
 from ..outline import OutlineEntry, OutlineList
 
 from .. import pyside as qt
-from ..reader_chrome import READER_MARGINS, READER_SPACING, ReaderLabel, ReaderFullscreen, reader_button, show_reader_popup
+from ..readers.reader_chrome import READER_MARGINS, READER_SPACING, ReaderLabel, ReaderFullscreen, reader_button, show_reader_popup
 from .editing import MarkdownEditingMixin
 from .formatted import MarkdownFormattedMixin
 from .properties import MarkdownProperties
@@ -38,6 +38,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         layout.setContentsMargins(*READER_MARGINS)
         layout.setSpacing(READER_SPACING)
         toolbar = qt.QHBoxLayout()
+        self.navigation_toolbar = toolbar
         self.workspace_controls = toolbar
         toolbar.setSpacing(READER_SPACING)
         self.back_button = reader_button(self, 'Back', icon='previous')
@@ -129,7 +130,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self.diagrams_button.hide()
         toolbar.addWidget(self.diagrams_button)
         self._build_reading_appearance(toolbar)
-        from ..read_aloud import ReadAloud, reader_text
+        from ..readers.read_aloud import ReadAloud, reader_text
         self.speech = ReadAloud(self, lambda: reader_text(self.browser), text_widget=self.browser)
         self.speech.anchor = reader_button(self, 'Read aloud', action=self.speech.action, text='Read aloud')
         toolbar.addWidget(self.speech.anchor)
@@ -239,7 +240,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self._rich_snapshot = None
         if self.edit_button.isChecked() and self.edit_mode.currentData() == "formatted":
             self._load_formatted()
-        self._render_source(text)
+        self._render_source(text, preserve_selection=False)
         self.location.setText(str(path))
         self.status.clear()
         if scroll is not None:
