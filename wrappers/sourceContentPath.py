@@ -35,7 +35,7 @@ from pathlib import Path
 from ..Lib.commonUtils.runtime.platform import get_os, OS
 from ..Lib.commonUtils.runtime.diagnostics import *
 from ..preferences.prefs import prefs
-from .perforce.p4_info import P4Info
+from ..Lib.commonUtils.integrations.wrappers.perforce import P4Info
 
 # ----------------------------------------------------------------------------------------------------------------------
 # GLOBAL CACHE

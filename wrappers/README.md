@@ -365,3 +365,9 @@ The wrapper selects only the current platform's executable preferences.
 Run `python -m unittest discover -s tests -v` outside Blender to check the vendored
 command contract and Deluxe preference installation. These tests do not validate
 a live Perforce server or Blender desktop integration.
+
+Perforce consumers import generic models directly from
+`Lib.commonUtils.integrations.wrappers.perforce`. The local adapter registers lazy
+preference providers through `initialize_runtime()` at add-on startup and retains
+`BlendP4File` for Blender filter checks and scene reloads. Former generic Perforce
+forwarding modules have been removed.

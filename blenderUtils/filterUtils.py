@@ -23,7 +23,7 @@ from ..Lib.commonUtils.runtime.diagnostics import *
 from ..Lib.commonUtils.runtime.platform import *
 from ..environment import envPathResolver
 from ..preferences.prefs import *
-from ..wrappers.perforce.p4_info import P4Info
+from ..Lib.commonUtils.integrations.wrappers.perforce import P4Info
 from ..wrappers.sourceContentPath import get_valid_source_content_path
 
 # ----------------------------------------------------------------------------------------------------------------------
