@@ -21,7 +21,9 @@ class CommandIntegrationTests(unittest.TestCase):
         sys.modules[blender.__name__] = blender
         sys.modules[prefs.__name__] = prefs
         cls.commands = importlib.import_module(f'{name}.Lib.commonUtils.integrations.wrappers.cmdShellWrapper')
-        cls.module = importlib.import_module(f'{name}.wrappers.perforce.p4_utils')
+        cls.adapter = importlib.import_module(f'{name}.wrappers.perforce')
+        cls.adapter.initialize_runtime()
+        cls.module = importlib.import_module(f'{name}.Lib.commonUtils.integrations.wrappers.perforce.p4_utils')
         cls.addClassCleanup(lambda: [sys.modules.pop(key, None) for key in tuple(sys.modules)
             if key == name or key.startswith(name + '.')])
 
@@ -49,7 +51,7 @@ class CommandIntegrationTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'timed out'):
                 self.module.exec_p4_command('p4 edit "file"')
 
-    def test_adapter_uses_lazy_preferences_and_shared_module_identity(self):
+    def test_adapter_uses_lazy_preferences_and_direct_shared_models(self):
         adapter = importlib.import_module(self.module.__name__.split('.Lib.')[0] + '.wrappers.perforce')
         preference_module = importlib.import_module(adapter.__name__.split('.wrappers.')[0] + '.preferences.prefs')
         settings = types.SimpleNamespace(source_control_enable=True, source_control_solution='perforce',
@@ -63,9 +65,21 @@ class CommandIntegrationTests(unittest.TestCase):
             self.assertEqual(adapter._executable(adapter.OS.MAC), '/Applications/P4V.app/Contents/Resources/p4_parallel')
             settings.source_control_enable = False
             self.assertEqual(adapter._environment(), {})
-        compat = importlib.import_module(adapter.__name__ + '.p4_file_group')
-        shared = importlib.import_module(adapter.__name__.split('.wrappers.')[0] + '.Lib.commonUtils.integrations.wrappers.perforce.p4_file_group')
-        self.assertIs(compat, shared)
+        runtime_module = importlib.import_module(adapter.__name__.split('.wrappers.')[0] + '.Lib.commonUtils.integrations.wrappers.perforce.runtime')
+        self.assertIs(runtime_module.runtime().executable, adapter._executable)
+        self.assertIs(runtime_module.runtime().environment, adapter._environment)
+        self.assertIs(runtime_module.runtime().binary_template, adapter._binary_template)
+
+    def test_runtime_initialization_does_not_read_blender_preferences(self):
+        preference_module = importlib.import_module(self.adapter.__name__.split('.wrappers.')[0] + '.preferences.prefs')
+        with patch.object(preference_module, 'prefs', side_effect=AssertionError('preferences are not ready')):
+            self.adapter.initialize_runtime()
+
+    def test_legacy_perforce_forwarders_are_removed(self):
+        adapter = self.adapter.__name__
+        for name in ('p4_file_group', 'p4_info', 'p4_messages', 'p4_file_status', 'p4_utils'):
+            with self.subTest(module=name):
+                self.assertIsNone(importlib.util.find_spec(adapter + '.' + name))
 
     def test_blend_file_keeps_filter_and_scene_reload_callbacks(self):
         root = self.module.__name__.split('.Lib.')[0]

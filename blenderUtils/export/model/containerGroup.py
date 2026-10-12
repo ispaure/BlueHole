@@ -27,7 +27,7 @@ from ....unrealUtils import sendUnreal
 from ..exportSettings import *
 from ....Lib.commonUtils.runtime.diagnostics import *
 from ....preferences.prefs import *
-from ....wrappers.perforce.p4_file_group import P4FileGroup
+from ....Lib.commonUtils.integrations.wrappers.perforce import P4FileGroup
 from .container import Container
 
 # ----------------------------------------------------------------------------------------------------------------------

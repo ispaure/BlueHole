@@ -26,7 +26,7 @@ from ..preferences.prefs import *
 from ..Lib.commonUtils.filesystem import directories as dirUtils
 from ..Lib.commonUtils.runtime.platform import get_os, OS
 from ..wrappers.sourceContentPath import get_valid_source_content_path
-from ..wrappers.perforce.p4_info import P4Info
+from ..Lib.commonUtils.integrations.wrappers.perforce import P4Info
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS

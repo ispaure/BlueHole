@@ -31,4 +31,6 @@ def _binary_template():
     return blenderFile.get_blue_hole_lib_path() / 'binary_template.bin'
 
 
-configure_runtime(PerforceRuntime(_executable, _environment, _binary_template))
+def initialize_runtime():
+    """Register lazy Blender preference providers before using shared models."""
+    configure_runtime(PerforceRuntime(_executable, _environment, _binary_template))

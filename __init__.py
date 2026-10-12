@@ -32,6 +32,9 @@ from .Lib.commonUtils.runtime import diagnostics as debugUtils
 debugUtils.project_prefix = "Blue Hole"
 debugUtils.use_time_delta = False
 
+from .wrappers.perforce import initialize_runtime as initialize_perforce_runtime
+initialize_perforce_runtime()
+
 from .blenderUtils import callbacks, addon_callbacks
 from .preferences import addon_prefs
 from .operators import operators_register
