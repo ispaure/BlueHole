@@ -15,7 +15,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from distutils.dir_util import copy_tree
+from shutil import copytree
 from pathlib import Path
 from typing import *
 
@@ -167,7 +167,7 @@ def copy_dir(source_dir: Union[str, Path], destination_dir: Union[str, Path]) ->
     :param source_dir: Source directory
     :param destination_dir: Destination directory
     """
-    copy_tree(str(source_dir), str(destination_dir))
+    copytree(source_dir, destination_dir, dirs_exist_ok=True)
 
 
 def string_to_bool(string) -> Optional[bool]:
