@@ -20,6 +20,8 @@ PORTABLE_TESTS = (
     'test_streams', 'test_browsing', 'test_traversal', 'test_persistence', 'test_session_store', 'test_batch',
     'test_content_snapshots', 'test_ini_file', 'test_text_files', 'test_text_merge', 'test_file_registry',
     'test_local_access', 'test_bulk_rename', 'test_sse_framing', 'test_json_type', 'test_xml',
+    'test_archives.ArchiveWorkspaceTests.test_late_archive_changes_are_preserved',
+    'test_archives.ArchiveWorkspaceTests.test_removal_selection_is_reused_for_every_member',
     'test_archives.ArchiveWorkspaceTests.test_selected_directory_extracts_descendants_preserving_paths',
     'test_archives.ArchiveWorkspaceTests.test_racing_destination_at_extraction_publication_is_preserved',
     'test_archives.ArchiveWorkspaceTests.test_extract_rejects_managed_destination_before_creating_parent_folders',
