@@ -54,155 +54,6 @@ def check_addon_loaded(addon_name):
     return addon_utils.check(addon_name)[1]
 
 
-def _report_unsaved_scene(script_name, silent_mode):
-    if not silent_mode:
-        msg = (
-            f'{script_name} validation failed.\n\n'
-            f'What went wrong:\n'
-            f'The current Blender scene has not been saved to disk. Unsaved scenes cannot be processed.\n\n'
-            f'What to do:\n'
-            f'Save the Blender file, then run the operation again.\n\n'
-            f'Operation aborted.'
-        )
-        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
-
-def _report_empty_selection(script_name, silent_mode):
-    if not silent_mode:
-        msg = (
-            f'{script_name} validation failed.\n\n'
-            f'What went wrong:\n'
-            f'No objects are currently selected. This operation requires at least one selected object.\n\n'
-            f'What to do:\n'
-            f'Select one or more objects, then run the operation again.\n\n'
-            f'Operation aborted.'
-        )
-        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
-
-def _report_source_control_disabled(script_name, silent_mode):
-    if not silent_mode:
-        msg = (
-            f'{script_name} validation failed.\n\n'
-            f'What went wrong:\n'
-            f'Source Control is currently disabled in the Blue Hole Add-on Settings.\n\n'
-            f'What to do:\n'
-            f'Enable Source Control in the Blue Hole Add-on Settings, then run the operation again.\n\n'
-            f'Operation aborted.'
-        )
-        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
-
-def _report_connection_failure(script_name, silent_mode):
-    if not silent_mode:
-        match get_os():
-            case OS.WIN:
-                if prefs().sourcecontrol.win32_env_override:
-                    msg = (
-                        f'{script_name} connection failed.\n\n'
-                        f'What went wrong:\n'
-                        f'Blue Hole could not connect to the Perforce server using the configured override settings.\n\n'
-                        f'What to do:\n'
-                        f'Verify your network and VPN connection, and ensure the Server, User, and Workspace '
-                        f'fields in the Blue Hole Add-on Settings (Source Control tab) are correct.\n\n'
-                        f'Note: You are currently using Override P4V Environment Settings.'
-                    )
-                else:
-                    msg = (
-                        f'{script_name} connection failed.\n\n'
-                        f'What went wrong:\n'
-                        f'Blue Hole could not connect to the Perforce server.\n\n'
-                        f'What to do:\n'
-                        f'Verify your network and VPN connection, and ensure your Perforce Environment Settings '
-                        f'are correctly configured in P4V or in the Blue Hole Add-on Settings (Source Control tab).\n\n'
-                        f'Note: You may enable "Override P4V Environment Settings" in the Blue Hole Add-on Settings '
-                        f'to manually configure the connection.'
-                    )
-
-            case OS.MAC | OS.LINUX:
-                msg = (
-                    f'{script_name} connection failed.\n\n'
-                    f'What went wrong:\n'
-                    f'Blue Hole could not connect to the Perforce server.\n\n'
-                    f'What to do:\n'
-                    f'Verify your network and VPN connection, and ensure the Server, User, and Workspace fields '
-                    f'are correctly configured in the Blue Hole Add-on Settings (Source Control tab).'
-                )
-
-        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
-
-def _report_unexpected_scene_directory(script_name, silent_mode):
-    if not silent_mode:
-        specified_sub_folder = prefs().directory.sc_dir_struct_scenes
-
-        msg = (
-            f'{script_name} validation failed.\n\n'
-            f'What went wrong:\n'
-            f'The currently opened Blender file is not located in the required Scenes directory defined '
-            f'in the Environment Settings.\n\n'
-            f'What to do:\n'
-            f'Move the Blender file into the correct Scenes directory, or update the Environment Settings '
-            f'to match your project\'s directory structure.\n\n'
-            f'Configured Scenes directory:\n'
-            f'"{specified_sub_folder}"'
-        )
-
-        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
-
-def _report_missing_source_content(script_name, silent_mode, path):
-    msg = (
-        f'{script_name} validation failed.\n\n'
-        f'What went wrong:\n'
-        f'The configured Source Content Root Path could not be accessed. The directory may not exist or is not reachable.\n\n'
-        f'What to do:\n'
-        f'Create the directory, or update the Environment Settings to point to a valid Source Content folder.\n\n'
-        f'Configured Source Content Root Path:\n'
-        f'"{path}"'
-    )
-    log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
-
-def _report_missing_unity_assets(script_name, silent_mode, path):
-    msg = (
-        f'{script_name} validation failed.\n\n'
-        f'What went wrong:\n'
-        f'The configured Unity Assets path could not be accessed. The directory may not exist or is not reachable.\n\n'
-        f'What to do:\n'
-        f'Create the directory, or update the Environment Settings to point to your Unity project\'s Assets folder.\n\n'
-        f'Configured Unity Assets path:\n'
-        f'"{path}"\n\n'
-        f'Example Unity Assets path:\n'
-        f'"C:\\YourUnityProject\\Assets\\"'
-    )
-    log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
-
-def _report_missing_godot_project(script_name, silent_mode, path):
-    msg = (
-        f'{script_name} validation failed.\n\n'
-        f'What went wrong:\n'
-        f'The configured Godot Root Path could not be accessed. The directory may not exist or is not reachable.\n\n'
-        f'What to do:\n'
-        f'Create the directory, or update the Environment Settings to point to your Godot Project\'s Root Path.\n\n'
-        f'Configured Godot Project Path:\n'
-        f'"{path}"\n\n'
-        f'Example Godot Project Path:\n'
-        f'"C:\\YourGodotProject\\"'
-    )
-    log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
-
-def _report_scene_outside_source(script_name, silent_mode, sc_path_seek, blend_path_found):
-    err_msg = (
-        f'{script_name} validation failed.\n\n'
-        f'What went wrong:\n'
-        f'The currently opened Blender file is not located within the configured Source Content directory. '
-        f'Blender files must reside inside the Source Content folder to be exported.\n\n'
-        f'What to do:\n'
-        f'Move the Blender file into the Source Content folder, or update the Source Content path '
-        f'in the Environment Settings (Structure tab).\n\n'
-        f'Configured Source Content path:\n'
-        f'"{sc_path_seek}"\n\n'
-        f'Current Blender file path:\n'
-        f'"{blend_path_found}"'
-    )
-    log(Severity.CRITICAL, script_name, err_msg, popup=not silent_mode)
-
-
 def check_tests(script_name, *,
                 check_blend_exist=False,
                 check_blend_loc_in_dir_structure=False,
@@ -327,3 +178,160 @@ def check_tests(script_name, *,
             return False
 
     return True
+
+
+def _report_unsaved_scene(script_name, silent_mode):
+    if not silent_mode:
+        msg = (
+            f'{script_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The current Blender scene has not been saved to disk. Unsaved scenes cannot be processed.\n\n'
+            f'What to do:\n'
+            f'Save the Blender file, then run the operation again.\n\n'
+            f'Operation aborted.'
+        )
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
+
+def _report_empty_selection(script_name, silent_mode):
+    if not silent_mode:
+        msg = (
+            f'{script_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'No objects are currently selected. This operation requires at least one selected object.\n\n'
+            f'What to do:\n'
+            f'Select one or more objects, then run the operation again.\n\n'
+            f'Operation aborted.'
+        )
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
+
+def _report_source_control_disabled(script_name, silent_mode):
+    if not silent_mode:
+        msg = (
+            f'{script_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'Source Control is currently disabled in the Blue Hole Add-on Settings.\n\n'
+            f'What to do:\n'
+            f'Enable Source Control in the Blue Hole Add-on Settings, then run the operation again.\n\n'
+            f'Operation aborted.'
+        )
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
+
+def _report_connection_failure(script_name, silent_mode):
+    if not silent_mode:
+        match get_os():
+            case OS.WIN:
+                if prefs().sourcecontrol.win32_env_override:
+                    msg = (
+                        f'{script_name} connection failed.\n\n'
+                        f'What went wrong:\n'
+                        f'Blue Hole could not connect to the Perforce server using the configured override settings.\n\n'
+                        f'What to do:\n'
+                        f'Verify your network and VPN connection, and ensure the Server, User, and Workspace '
+                        f'fields in the Blue Hole Add-on Settings (Source Control tab) are correct.\n\n'
+                        f'Note: You are currently using Override P4V Environment Settings.'
+                    )
+                else:
+                    msg = (
+                        f'{script_name} connection failed.\n\n'
+                        f'What went wrong:\n'
+                        f'Blue Hole could not connect to the Perforce server.\n\n'
+                        f'What to do:\n'
+                        f'Verify your network and VPN connection, and ensure your Perforce Environment Settings '
+                        f'are correctly configured in P4V or in the Blue Hole Add-on Settings (Source Control tab).\n\n'
+                        f'Note: You may enable "Override P4V Environment Settings" in the Blue Hole Add-on Settings '
+                        f'to manually configure the connection.'
+                    )
+
+            case OS.MAC | OS.LINUX:
+                msg = (
+                    f'{script_name} connection failed.\n\n'
+                    f'What went wrong:\n'
+                    f'Blue Hole could not connect to the Perforce server.\n\n'
+                    f'What to do:\n'
+                    f'Verify your network and VPN connection, and ensure the Server, User, and Workspace fields '
+                    f'are correctly configured in the Blue Hole Add-on Settings (Source Control tab).'
+                )
+
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
+
+def _report_unexpected_scene_directory(script_name, silent_mode):
+    if not silent_mode:
+        specified_sub_folder = prefs().directory.sc_dir_struct_scenes
+
+        msg = (
+            f'{script_name} validation failed.\n\n'
+            f'What went wrong:\n'
+            f'The currently opened Blender file is not located in the required Scenes directory defined '
+            f'in the Environment Settings.\n\n'
+            f'What to do:\n'
+            f'Move the Blender file into the correct Scenes directory, or update the Environment Settings '
+            f'to match your project\'s directory structure.\n\n'
+            f'Configured Scenes directory:\n'
+            f'"{specified_sub_folder}"'
+        )
+
+        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
+
+def _report_missing_source_content(script_name, silent_mode, path):
+    msg = (
+        f'{script_name} validation failed.\n\n'
+        f'What went wrong:\n'
+        f'The configured Source Content Root Path could not be accessed. The directory may not exist or is not reachable.\n\n'
+        f'What to do:\n'
+        f'Create the directory, or update the Environment Settings to point to a valid Source Content folder.\n\n'
+        f'Configured Source Content Root Path:\n'
+        f'"{path}"'
+    )
+    log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
+
+def _report_missing_unity_assets(script_name, silent_mode, path):
+    msg = (
+        f'{script_name} validation failed.\n\n'
+        f'What went wrong:\n'
+        f'The configured Unity Assets path could not be accessed. The directory may not exist or is not reachable.\n\n'
+        f'What to do:\n'
+        f'Create the directory, or update the Environment Settings to point to your Unity project\'s Assets folder.\n\n'
+        f'Configured Unity Assets path:\n'
+        f'"{path}"\n\n'
+        f'Example Unity Assets path:\n'
+        f'"C:\\YourUnityProject\\Assets\\"'
+    )
+    log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
+
+def _report_missing_godot_project(script_name, silent_mode, path):
+    msg = (
+        f'{script_name} validation failed.\n\n'
+        f'What went wrong:\n'
+        f'The configured Godot Root Path could not be accessed. The directory may not exist or is not reachable.\n\n'
+        f'What to do:\n'
+        f'Create the directory, or update the Environment Settings to point to your Godot Project\'s Root Path.\n\n'
+        f'Configured Godot Project Path:\n'
+        f'"{path}"\n\n'
+        f'Example Godot Project Path:\n'
+        f'"C:\\YourGodotProject\\"'
+    )
+    log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+
+
+def _report_scene_outside_source(script_name, silent_mode, sc_path_seek, blend_path_found):
+    err_msg = (
+        f'{script_name} validation failed.\n\n'
+        f'What went wrong:\n'
+        f'The currently opened Blender file is not located within the configured Source Content directory. '
+        f'Blender files must reside inside the Source Content folder to be exported.\n\n'
+        f'What to do:\n'
+        f'Move the Blender file into the Source Content folder, or update the Source Content path '
+        f'in the Environment Settings (Structure tab).\n\n'
+        f'Configured Source Content path:\n'
+        f'"{sc_path_seek}"\n\n'
+        f'Current Blender file path:\n'
+        f'"{blend_path_found}"'
+    )
+    log(Severity.CRITICAL, script_name, err_msg, popup=not silent_mode)
