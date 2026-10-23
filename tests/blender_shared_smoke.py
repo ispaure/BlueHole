@@ -20,6 +20,8 @@ PORTABLE_TESTS = (
     'test_streams', 'test_browsing', 'test_traversal', 'test_persistence', 'test_session_store', 'test_batch',
     'test_content_snapshots', 'test_ini_file', 'test_text_files', 'test_text_merge', 'test_file_registry',
     'test_archive_rebuilding',
+    'test_wiki_catalog', 'test_directory_index',
+    'test_package_layout.PackageLayoutTests.test_writer_and_scanner_work_together',
     'test_local_access', 'test_bulk_rename', 'test_sse_framing', 'test_json_type', 'test_xml',
     'test_archives.ArchiveWorkspaceTests.test_late_archive_changes_are_preserved',
     'test_archives.ArchiveWorkspaceTests.test_removal_selection_is_reused_for_every_member',
@@ -62,6 +64,14 @@ class EmbeddedSharedTests(unittest.TestCase):
             await work.close()
             self.assertFalse(work.tasks)
         asyncio.run(retirement())
+
+    def test_vendored_production_sources_compile_in_embedded_python(self):
+        sources = [path for path in (ROOT / 'Lib/commonUtils').rglob('*.py')
+                   if 'tests' not in path.relative_to(ROOT / 'Lib/commonUtils').parts]
+        self.assertTrue(sources)
+        for path in sources:
+            with self.subTest(source=str(path.relative_to(ROOT))):
+                compile(path.read_bytes(), str(path), 'exec')
 
     def test_embedded_command_capture(self):
         import bpy
