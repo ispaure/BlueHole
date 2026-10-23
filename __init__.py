@@ -49,7 +49,7 @@ bl_info = {
     "name": "Blue Hole",
     "author": "Marc-André Voyer",
     "description": "",
-    "blender": (4, 5, 1),
+    "blender": (5, 2, 2),
     "version": (6, 9, 21),
     "location": "",
     "warning": "",
