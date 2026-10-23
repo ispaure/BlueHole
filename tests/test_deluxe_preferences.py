@@ -108,13 +108,44 @@ class DeluxePreferencesTests(unittest.TestCase):
     def test_second_copy_failure_reports_partial_installation(self):
         copyfile = self.module.copyfile
         def fail_keymap(source, destination):
-            if destination == self.keymap:
+            if source.name == self.keymap.name:
                 raise PermissionError('Keymap locked')
             return copyfile(source, destination)
         with patch.object(self.module, 'copyfile', side_effect=fail_keymap):
             self.assert_failed('Keymap locked')
         self.assertIn(str(self.prefs), self.log.call_args.args[2])
         self.assertEqual(self.prefs.read_bytes(), b'deluxe preferences')
+
+    def test_partial_copy_failure_preserves_original_preferences(self):
+        self.prefs.parent.mkdir(parents=True)
+        self.prefs.write_bytes(b'original preferences')
+        def interrupted(source, destination):
+            destination.write_bytes(b'partial')
+            raise OSError('interrupted copy')
+        with patch.object(self.module, 'copyfile', side_effect=interrupted):
+            self.assert_failed('interrupted copy')
+        self.assertEqual(self.prefs.read_bytes(), b'original preferences')
+        self.assertFalse(list(self.prefs.parent.glob('.bluehole-preferences-*')))
+
+    def test_corrupted_copy_preserves_original_preferences(self):
+        self.prefs.parent.mkdir(parents=True)
+        self.prefs.write_bytes(b'original preferences')
+        with patch.object(self.module, 'copyfile', side_effect=lambda source, target: target.write_bytes(b'bad')):
+            self.assert_failed('Content verification failed')
+        self.assertEqual(self.prefs.read_bytes(), b'original preferences')
+        self.assertFalse(list(self.prefs.parent.glob('.bluehole-preferences-*')))
+
+    def test_success_retains_original_preferences_and_keymap_as_recovery_copies(self):
+        for target in (self.prefs, self.keymap):
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(b'original settings')
+        with self.assertRaises(SystemExit):
+            self.module.apply_deluxe_prefs()
+        for target in (self.prefs, self.keymap):
+            backups = list(target.parent.glob(target.name + '.previous-*'))
+            self.assertEqual(len(backups), 1)
+            self.assertEqual(backups[0].read_bytes(), b'original settings')
+            self.assertFalse(list(target.parent.glob('.bluehole-preferences-*')))
 
     def test_user_cancellation_does_not_copy_or_show_error(self):
         with patch.object(self.module, 'warning_bh_deluxe', return_value=False):

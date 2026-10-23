@@ -19,10 +19,12 @@ __status__ = 'Production'
 import sys
 from shutil import copyfile
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from ...blenderUtils import blenderFile
 from ...Lib.commonUtils.runtime.diagnostics import log, Severity
 from ...Lib.commonUtils.filesystem import files as fileUtils
 from ...Lib.commonUtils import ui
+from ...Lib.commonUtils.persistence import promote_path
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -33,23 +35,25 @@ TOOL_NAME = 'Applying Blue Hole Deluxe Preferences'
 
 
 def _copy_and_verify(source: Path, destination: Path):
-    """Allow replacement of read-only preferences and verify the installed bytes."""
+    """Verify private staging before publication, retaining previous settings."""
     destination.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix='.bluehole-preferences-', dir=destination.parent) as temporary:
+        staged = Path(temporary) / destination.name
+        log(Severity.INFO, TOOL_NAME, f'Staging "{source}" for "{destination}"')
+        copyfile(source, staged)
+        if staged.read_bytes() != source.read_bytes():
+            raise OSError(f'Content verification failed for "{destination}"; '
+                          'the staged file does not match the Deluxe payload.')
 
-    if destination.exists():
-        before_mode = destination.stat().st_mode
-        fileUtils.File(destination).make_writable()
-        log(Severity.INFO, TOOL_NAME,
-            f'Made destination writable: "{destination}" '
-            f'(mode {oct(before_mode)} -> {oct(destination.stat().st_mode)})')
-
-    log(Severity.INFO, TOOL_NAME, f'Copying "{source}" to "{destination}"')
-    # Let filesystem exceptions reach the caller so the popup includes the real error.
-    copyfile(source, destination)
-
-    if destination.read_bytes() != source.read_bytes():
-        raise OSError(f'Content verification failed for "{destination}"; '
-                      'the installed file does not match the Deluxe payload.')
+        if destination.exists():
+            before_mode = destination.stat().st_mode
+            fileUtils.File(destination).make_writable()
+            log(Severity.INFO, TOOL_NAME,
+                f'Made destination writable: "{destination}" '
+                f'(mode {oct(before_mode)} -> {oct(destination.stat().st_mode)})')
+        backup = promote_path(staged, destination)
+        if backup is not None:
+            log(Severity.INFO, TOOL_NAME, f'Recovery copy retained at "{backup}"')
 
     log(Severity.INFO, TOOL_NAME,
         f'Verified "{destination}" ({destination.stat().st_size} bytes)')
