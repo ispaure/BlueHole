@@ -50,6 +50,9 @@ GitHub runs them on Windows, macOS and Linux. They check shared command contract
 and preference-installation failure handling; they do not exercise a live engine,
 Perforce server or Blender desktop session.
 
+Portable contracts can also run inside Blender's embedded Python with the
+[isolated smoke-test launcher](tests/README.md#embedded-shared-library-smoke-test).
+
 The shared copy checker compares `Lib/commonUtils` against the commit recorded in
 `Lib/commonUtils.revision`, applying Git line-ending rules. It rejects missing or
 obsolete files, changed content and linked files or directories. Unfinished edits
