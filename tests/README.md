@@ -16,7 +16,8 @@ The launcher selects background factory startup, disables blend-file autoexecuti
 and supplies temporary user resource/configuration folders before Blender starts.
 The script reuses selected existing portable shared regression modules for streams,
 range buffers, batch outcomes, publication, recovery envelopes, provider boundaries,
-renaming, SSE and JSON/XML. Selected unencrypted ZIP extraction cases need no
+renaming, content inventories, INI/text preservation, merge models, format
+registration, SSE and JSON/XML. Selected unencrypted ZIP extraction cases need no
 optional cryptography dependency. Blue Hole retains only namespace/lifecycle and
 embedded-command checks; shared assertions stay in their library test owners.
 Both standalone and vendored namespaces load the actual committed vendor copy and
