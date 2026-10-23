@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | Filesystem and formats | Paths, file snapshots, type resolution, traversal, metadata and index data | Domain file subclasses, overwrite/selection policy |
 | Archives | Archive models, reading, validation, extraction and publication | Password prompts, workflow, software selection |
+| Search | Filename queries, provider traversal, document matching and text-file search | Roots, exclusions, buffers, backend choice and result presentation |
 | Runtime and integrations | Cancellation, progress, diagnostics, streams, processes and OS adapters | Scheduling, error presentation, external tool installation |
 | Configuration and persistence | INI/schema parsing, atomic writes, text snapshots and recovery storage | Domain validation, save timing, schemas and writer coordination |
 | UI | Qt presentation, browser bindings, reusable editors and workspace lifecycle | Feature discovery, application navigation and document policy |
@@ -13,9 +14,10 @@
 The intended flow is application policy → reusable UI/operations → data and runtime
 mechanisms. Core registry declarations do not require Qt; filesystem information
 hooks return data and image bytes rather than widgets. UI modules consume this
-data and schedule work. There are legacy exceptions: diagnostics imports the UI
-facade, and some file activation hooks lazily open a UI. Do not mistake the intended
-boundary for a completely GUI-free transitive dependency graph.
+data and schedule work. Diagnostics emits events to explicitly configured sinks
+and presenters without importing UI. Some file activation hooks still lazily open
+a UI. The optional PCRE search backend imports QtCore without widgets; portable
+name/provider/literal queries need no toolkit. See [search owners](../../search/README.md).
 
 commonUtils does not own Logistics' feature registry, Obsidian vault workflows,
 comic/book application features or full text-editor workspace. Its Markdown reader
@@ -50,6 +52,10 @@ retains its own visible folder and cancellation. Writers serialize across proces
 Old read transactions remain consistent while later generations or reconciliations
 are published; release snapshots when their owner is done to avoid retaining WAL
 storage. Network browsing disables automatic indexing and rich metadata work.
+The index retains logical content size and allocated file size separately. Unknown
+allocations stay explicit; folder totals roll up known allocations and unknown counts.
+Files are counted by path, excluding links and filesystem metadata. See the
+[index size contracts](../../filesystem/index/README.md#compact-cache-schema-4).
 Hosts may opt into the durable process-shared coordinator: one OS-elected runner
 handles queued requests, other processes follow progress and take over after exit.
 The host retains/stops its runner independently of browser widgets; see
@@ -93,3 +99,23 @@ and present errors after returning to the GUI thread. Do not silently swallow
 failure or generalize one operation's policy to every helper.
 
 [Developer hub](README.md)
+
+## Consolidated internal owners
+
+Resource contracts and virtual identifiers live under `runtime.resources`;
+optional Qt resource windows live under `ui.resources`. Native dialog dispatch is
+an ordinary lazy `ui.native.dialogs` import. These groups preserve namespace
+isolation without filesystem loaders or legacy aliases.
+
+`runtime.speech.SpeechSession` owns portable playback transitions for both native
+and Qt read-aloud. Qt engine callbacks/scheduling adapt that session through
+`ui.readers.qt_speech`; document text, voices and UI remain caller-owned.
+`ui.native_browser.lifecycle.BrowserLifecycle` owns epochs, task retirement and
+thumbnail caches shared by paginated and recycled presentation.
+
+Layer composition, transfer phases, ZIP member plans, directory-index writer
+phases and workspace drops also have explicit internal owners. Their contracts
+and caller policy boundaries are documented in the [API map](public-apis.md),
+[configuration](../../configuration/README.md), [persistence](../../persistence/README.md),
+[archives](../../archives/README.md), [index](../../filesystem/index/README.md)
+and [workspace](../../ui/workspaces.md) guides.

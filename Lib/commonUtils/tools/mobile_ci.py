@@ -8,15 +8,24 @@ import subprocess
 PREFIX = 'COMMONUTILS_MOBILE_RESULT='
 
 
-def stage(source, destination):
-    """Copy tracked Python sources only; never follow links or ship local settings."""
+def stage(source, destination, *, allow_dirty=False):
+    """Copy Python and optional native UI bridges; reject linked/local settings."""
     source, destination = Path(source).resolve(), Path(destination).resolve()
     if destination == source or source in destination.parents:
         raise ValueError('Stage outside the source checkout')
-    subprocess.run(['git', '-C', str(source), 'diff', '--exit-code', 'HEAD', '--', '*.py'],
-                   check=True, stdout=subprocess.DEVNULL)
+    dirty = bool(subprocess.check_output(['git', '-C', str(source), 'diff', '--name-only', 'HEAD', '--', '*.py', 'ui/native/**/*.java']))
+    if dirty and not allow_dirty:
+        raise ValueError('Commit shared Python sources before staging, or explicitly allow a local development payload.')
     tracked = subprocess.check_output(['git', '-C', str(source), 'ls-files', '-z']).decode().split('\0')
-    paths = [Path(name) for name in tracked if name.endswith('.py')]
+    paths = sorted({Path(name) for name in tracked if name.endswith('.py')})
+    native_root = source / 'ui/native'
+    native_paths = {path.relative_to(source) for path in native_root.rglob('*')
+                    if path.is_file() and path.suffix in {'.py', '.java'}}
+    untracked_native = native_paths - {Path(name) for name in tracked}
+    if untracked_native and not allow_dirty:
+        raise ValueError('Commit native UI sources before release staging.')
+    dirty = dirty or bool(untracked_native)
+    paths = sorted(set(paths) | native_paths)
     required = Path('tests/mobile_smoke.py')
     if required not in paths:
         raise ValueError('Commit the mobile smoke module before staging')
@@ -24,13 +33,15 @@ def stage(source, destination):
     package.mkdir(parents=True, exist_ok=False)
     for relative in paths:
         original = source / relative
+        if allow_dirty and not original.exists() and not original.is_symlink():
+            continue  # A tracked deletion is part of this explicit development snapshot.
         if original.is_symlink() or any(parent.is_symlink() for parent in original.parents if parent != source):
             raise ValueError(f'Refusing linked source: {relative}')
         target = package / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(original, target)
     revision = subprocess.check_output(['git', '-C', str(source), 'rev-parse', 'HEAD'], text=True).strip()
-    (destination / 'source.json').write_text(json.dumps({'commonUtils_commit': revision}, indent=2) + '\n')
+    (destination / 'source.json').write_text(json.dumps({'commonUtils_commit': revision, 'commonUtils_dirty': dirty}, indent=2) + '\n')
 
 
 def verify(log, target, output):

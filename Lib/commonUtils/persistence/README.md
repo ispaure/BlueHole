@@ -8,7 +8,7 @@ Atomic byte/JSON publication, text decoding and session recovery. Atomic staging
 
 | File | Responsibility / public entry points |
 | --- | --- |
-| [__init__.py](__init__.py) | Atomic byte publication; format validation and overwrite policy stay with callers. |
+| [atomic.py](atomic.py) | Atomic byte publication; format validation and overwrite policy stay with callers. |
 | [session.py](session.py) | Versioned, bounded, atomic private JSON checkpoints without Qt dependencies. |
 | [text.py](text.py) | Bounded text recognition and conflict-checked, lossless atomic text writes. |
 
@@ -58,3 +58,42 @@ if previous is not None:
 If promotion fails, the helper restores the old path before raising. It refuses
 symbolic links and junctions. Callers supply installation validation and decide
 when recovery copies can be removed.
+
+## Verified publication and text sessions
+
+[publication.py](publication.py) owns the shared staging/verification/publication
+transaction and platform no-replace rename. Ordinary atomic writes and virtual
+resource saves use the same sequence. See the [provider contract](../ui/resource-providers.md)
+for callback ownership, cancellation and partial-failure results.
+
+`text.TextSession` holds an in-memory baseline plus a resource key/revision. Its
+`encode` and `modified` methods accept the host's draft; `accept` updates the
+baseline after publication while preserving encoding and newline behavior. It has
+no filesystem, account, archive or recovery policy.
+
+## Verified transfer phases
+
+`transfers.py` contains shared mechanics used by filesystem transfers, relocation
+and virtual resource moves. `try_rename` returns false only for an `EXDEV`
+cross-volume failure; other rename errors propagate. `verify_unchanged` compares a
+captured state with a fresh snapshot before destructive cleanup. The caller
+supplies the snapshot and exception policy.
+
+`cleanup_published` wraps source cleanup after a verified destination exists.
+Failure raises `MutationIncomplete` with `destination_published=True` and the
+known source state/removals, or `unknown` if source-state inspection also fails.
+It never describes a published destination as rolled back. Hosts refresh both
+locations and choose recovery rather than replaying the full transfer blindly.
+These helpers do not choose overwrite, link, encryption or directory-merge policy,
+and provide no cross-process lock or crash-recovery journal.
+
+## Exclusive publication with copy fallback
+
+`exclusive_copy.link_or_copy_exclusive(staged_path, destination)` first hard-links
+without replacement. For unsupported/cross-device links it exclusively creates,
+copies, flushes and fsyncs the destination; failure removes only the target it
+created. The staged source is retained on success and failure. Other link errors
+propagate without copying. The copy fallback exposes a partial destination while
+writing and is **not atomic**. Callers needing atomic no-replace publication must
+continue using `publication.rename_exclusive`; the contracts are intentionally
+different. Hosts own verification, replacement decisions and source deletion.

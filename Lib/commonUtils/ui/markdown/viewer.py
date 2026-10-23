@@ -3,8 +3,10 @@ from pathlib import Path
 from ..outline import OutlineEntry, OutlineList
 
 from .. import pyside as qt
+from ..appearance.status_line import StatusLine
 from ..readers.reader_chrome import READER_MARGINS, READER_SPACING, ReaderLabel, ReaderFullscreen, reader_button, show_reader_popup
 from .editing import MarkdownEditingMixin
+from .search import MarkdownSearchMixin
 from .formatted import MarkdownFormattedMixin
 from .properties import MarkdownProperties
 from .headings import _iter_headings
@@ -13,17 +15,19 @@ from .reading import MarkdownReadingMixin
 from .links import render_links
 from .tables import MarkdownTablesMixin
 from .live_edit import SourceMarkdownEdit, FormattedMarkdownEdit
+from .images import AnimatedImages
 from ...formats.markdown import split_frontmatter
 
 
-class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditingMixin, MarkdownTablesMixin, qt.QWidget):
+class MarkdownViewer(MarkdownSearchMixin, MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditingMixin, MarkdownTablesMixin, qt.QWidget):
     """Preview-only by default; allow_edit=True enables optional Markdown editing."""
     path_changed = qt.Signal(object)
     modified_changed = qt.Signal(bool)
 
-    def __init__(self, path=None, parent=None, *, allow_edit=False):
+    def __init__(self, path=None, parent=None, *, allow_edit=False, storage=None, directory=None):
         super().__init__(parent)
         self.allow_edit = bool(allow_edit)
+        self.storage = storage
         self.history = []
         self.history_index = -1
         self._source_bytes = None
@@ -76,6 +80,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         toolbar.addWidget(self.toc_button)
         layout.addLayout(toolbar)
         self.browser = MarkdownBrowser()
+        self.browser.animated_images = AnimatedImages(self.browser)
         self.browser.setOpenLinks(False)
         self.browser.setOpenExternalLinks(False)
         self.browser.setAccessibleName('Markdown document')
@@ -86,11 +91,17 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self.editor.setFont(qt.QFontDatabase.systemFont(qt.QFontDatabase.SystemFont.FixedFont))
         self.editor.document().modificationChanged.connect(self._modified_changed)
         self.formatted_editor = FormattedMarkdownEdit()
+        for editor in (self.editor, self.formatted_editor):
+            editor.image_base = lambda: self._loaded_path.parent if self._loaded_path else None
+            editor.local_image_drops = storage is None
         for widget in (self.browser, self.formatted_editor):
             configure_text(widget)
         configure_text(self.editor, source=True)
         self.formatted_editor.linkActivated.connect(self.follow_link)
         self.formatted_editor.setReadOnly(not self.allow_edit)
+        if storage is not None:
+            self.browser.resource_loader = storage.load_resource
+            self.formatted_editor.document().resource_loader = storage.load_resource
         self.formatted_editor.setAccessibleName('Formatted Markdown editor')
         self.formatted_editor.document().contentsChanged.connect(self._formatted_changed)
         self.formatted_editor.undoAvailable.connect(lambda available: self._update_edit_actions())
@@ -99,7 +110,25 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self.pages.addWidget(self.browser)
         self.pages.addWidget(self.editor)
         self.pages.addWidget(self.formatted_editor)
-        layout.addWidget(self.pages, 1)
+        self.document_panel = qt.QWidget()
+        self.document_layout = qt.QVBoxLayout(self.document_panel)
+        self.document_layout.setContentsMargins(0, 0, 0, 0)
+        self.document_layout.setSpacing(READER_SPACING)
+        self.document_layout.addWidget(self.pages, 1)
+        if directory is not None:
+            from .wiki import WikiPanel
+            self.wiki = WikiPanel(self, directory)
+            self.wiki_splitter = qt.QSplitter()
+            self.wiki_splitter.addWidget(self.wiki)
+            self.wiki_splitter.addWidget(self.document_panel)
+            self.wiki_splitter.setStretchFactor(1, 1)
+            self.wiki_splitter.setSizes([260, 740])
+            layout.addWidget(self.wiki_splitter, 1)
+            if path is None:
+                path = self.wiki.catalog.first_page
+        else:
+            self.wiki = None
+            layout.addWidget(self.document_panel, 1)
         self.properties = MarkdownProperties(self)
         self.properties.changed.connect(self._apply_properties)
         layout.insertWidget(1, self.properties)
@@ -124,7 +153,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self._properties_timer.setInterval(200)
         self._properties_timer.timeout.connect(lambda: self.properties.refresh(self.editor.toPlainText()))
         self.editor.textChanged.connect(lambda: self._properties_timer.start())
-        self._build_editor_actions(layout)
+        self._build_editor_actions(self.document_layout)
         self.diagrams_button = reader_button(self, 'Render Mermaid diagrams', text='Diagrams')
         self.diagrams_button.clicked.connect(self.render_diagrams)
         self.diagrams_button.hide()
@@ -132,7 +161,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self._build_reading_appearance(toolbar)
         from ..readers.read_aloud import ReadAloud, reader_text
         self.speech = ReadAloud(self, lambda: reader_text(self.browser), text_widget=self.browser)
-        self.speech.anchor = reader_button(self, 'Read aloud', action=self.speech.action, text='Read aloud')
+        self.speech.anchor = reader_button(self, 'Read aloud', action=self.speech.action, icon='speaker')
         toolbar.addWidget(self.speech.anchor)
         self.browser.textChanged.connect(self.speech.stop)
         self.edit_button.toggled.connect(self.speech.stop)
@@ -143,7 +172,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self.escape_shortcut = qt.QShortcut(qt.QKeySequence('Escape'), self)
         self.escape_shortcut.setContext(qt.Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.escape_shortcut.activated.connect(self._escape)
-        self.status = ReaderLabel('', muted=True)
+        self.status = StatusLine()
         layout.addWidget(self.status)
         self.back_button.clicked.connect(self.back)
         self.forward_button.clicked.connect(self.forward)
@@ -152,6 +181,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         for shortcut, callback in ((self.back_shortcut, self.back), (self.forward_shortcut, self.forward)):
             shortcut.setContext(qt.Qt.ShortcutContext.WidgetWithChildrenShortcut)
             shortcut.activated.connect(callback)
+        self._init_search_highlights()
         self._update_buttons()
         self._diagram_renderer = None
         self._reading_palette_timer = qt.QTimer(self)
@@ -159,6 +189,13 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         self._reading_palette_timer.setInterval(0)
         self._reading_palette_timer.timeout.connect(lambda: self._render_source(self.editor.toPlainText()))
         self.browser.installEventFilter(self)
+        from .hover import LinkPreview
+        self.link_preview = LinkPreview(self)
+        if storage is not None:
+            for action in (self.new_action, self.open_action, self.save_as_action):
+                action.setEnabled(False)
+            self.open_action.setEnabled(callable(getattr(storage, 'open_dialog', None)))
+            self.save_as_action.setEnabled(self.allow_edit and callable(getattr(storage, 'save_as', None)))
         if path is not None:
             self.open_document(path)
         if self.allow_edit:
@@ -168,6 +205,9 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
                 self.status.setText(error)
 
     def show_contents(self):
+        if self.toc_popup is not None and self.toc_popup.isVisible():
+            self.toc_popup.hide()
+            return
         self._render_source(self.markdown_text())
         if self.toc_popup is not None:
             self.toc_popup.close()
@@ -224,7 +264,10 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         try:
             if path.suffix.lower() not in ('.md', '.markdown'):
                 raise ValueError('This viewer opens Markdown (.md or .markdown) files.')
-            data = path.read_bytes()
+            if self.storage is None:
+                from ...filesystem.local_access import check_local_path
+                check_local_path(path)
+            data = self.storage.read_bytes(path) if self.storage is not None else path.read_bytes()
             text = data.decode('utf-8-sig')
         except (OSError, UnicodeError, ValueError) as error:
             self.status.setText(f'Cannot open {path}: {error}')
@@ -309,6 +352,24 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         if not url.isLocalFile():
             self.status.setText(f'Unsupported link: {url.toString()}')
             return
+        if self.storage is None:
+            try:
+                from ...filesystem.local_access import check_local_path
+                from ...formats.markdown.wiki import resolve_document_path
+                candidate = Path(url.toLocalFile())
+                check_local_path(candidate)
+                candidate = resolve_document_path(candidate)
+                check_local_path(candidate)
+                if candidate.suffix.lower() not in ('.md', '.markdown'):
+                    from ..text_editor import open_text_file
+                    open_text_file(candidate, self.window())
+                    return
+                fragment = url.fragment()
+                url = qt.QUrl.fromLocalFile(str(candidate))
+                url.setFragment(fragment)
+            except (OSError, ValueError) as error:
+                self.status.setText(f'Cannot open link: {error}')
+                return
         if Path(url.toLocalFile()) == self.current_path:
             self._remember_scroll()
             self._render_source(self.markdown_text())
@@ -319,7 +380,10 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
             self._update_buttons()
             self.path_changed.emit(self.current_path)
         else:
-            self.open_document(url.toLocalFile(), fragment=url.fragment())
+            if self.storage is not None:
+                self.storage.open_link(Path(url.toLocalFile()), url.fragment())
+            else:
+                self.open_document(url.toLocalFile(), fragment=url.fragment())
 
     def _navigate_history(self, offset):
         index = self.history_index + offset
@@ -350,7 +414,7 @@ class MarkdownViewer(MarkdownReadingMixin, MarkdownFormattedMixin, MarkdownEditi
         elif self.appearance_popup is not None and self.appearance_popup.isVisible():
             self.appearance_popup.close()
         elif self.find_bar.isVisible():
-            self.find_bar.hide()
+            self.close_find()
             (self.active_editor() if self.edit_button.isChecked() else self.browser).setFocus()
         else:
             self.fullscreen.leave()

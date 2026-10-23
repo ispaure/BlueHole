@@ -5,6 +5,10 @@ and `storage_totals` from `commonUtils.filesystem.index`. This subsystem owns me
 persistent search and sizes; [File Browser user workflows](../../ui/file_browser/user_docs/README.md)
 belong with the UI.
 
+The process-wide `directory_cache` is created on first access. Importing
+`DirectoryCache` alone does not resolve desktop storage defaults; mobile hosts
+must supply an explicit app-private `database` path.
+
 ## Read and own a snapshot
 
 ```python
@@ -67,8 +71,9 @@ policy. Missed unwatched changes remain cached until validation.
 Nested links/junctions are listed without traversal; a linked root retains lexical
 result paths. Network mounts and the index's own storage are excluded from scans.
 Whole-filesystem macOS scans omit `/System/Volumes/Data` to avoid duplicating firmlink
-paths, while explicitly indexing it remains supported. Sizes are logical file bytes,
-not allocated disk usage; links, clones and sparse files need that distinction.
+paths, while explicitly indexing it remains supported. Logical size and allocated
+size are cached separately. Links are excluded, and files are counted by path;
+hard links and clones may therefore count shared storage more than once.
 Scan exclusions are reduced to paths with no already-excluded ancestor before
 enumeration. The cache directory covers its database/lock/sidecar files, and an
 excluded mount covers nested mounts, avoiding redundant parent-path checks per entry.
@@ -141,19 +146,50 @@ Automatic age-based removal is not enabled. Use explicit clearing deliberately.
 
 ## Maintenance map
 
-`metadata` owns public records and nonpersistent snapshots; `reader` streams immutable
-SQL views; `store` and `scan` own scheduling/checkpoints; `reconcile` updates affected
-folders; `schema` migrates records; `totals` derives aggregates; `search`, `order` and
-`exclusions` centralize matching, stable ordering and scope policy. Public callers
-should not depend on database IDs or mutate the schema directly.
+`store.DirectoryCache` remains the public facade and schedules work; `scan`
+traverses folders. Internal phases have explicit owners:
 
-## Compact cache (schema 3)
+| Module | Responsibility |
+| --- | --- |
+| `writer.WriterSession` | Cancellable thread/process writer lease, legacy backup migration, WAL/schema setup and connection retirement |
+| `generations` | Bounded durable checkpoints and completed-generation publication/retirement |
+| `seeding` | Reuse of saved descendant branches with explicit exclusions |
+| `snapshots` | Snapshot assembly and retained read ownership |
+| `reader`, `metadata` | Immutable SQL views and public records |
+| `reconcile`, `schema`, `totals` | Affected-folder updates, migrations and aggregates |
+| `search`, `order`, `exclusions` | Matching, stable ordering and scope policy |
+
+Writer phases run under the same owned lease; snapshot readers retain their own
+consistent views and must close independently. Cancellation can leave resumable
+folder checkpoints; incomplete work is not published as a completed replacement.
+These internal splits do not change cache paths, schema or the public facade.
+Callers must not depend on database IDs or mutate the schema directly.
+
+## Compact cache (schema 4)
 
 `folder_paths` stores a folder's cached absolute address, parent ID, segment name,
 and natural-sort prefix. `entry_nodes` stores a filename, parent folder ID, folded
 name and filename-only sort key. `entry_records` stores immutable metadata versions.
 `generation_entries` stores integer references. Overlapping roots and scan rebuilds
 share unchanged names/metadata; changing a file creates a new metadata version.
+`entry_allocations` stores allocation per immutable record. File fingerprints include
+allocation so allocation-only changes produce a new record, preserving old readers.
+`Entry.disk_size` is allocated bytes or -1 when unavailable. `FolderStats.size`
+remains logical bytes; `disk_size` sums known allocations and `disk_unknown` counts
+files without allocation metadata. Folder totals persist both measures and the
+unknown count; incremental reconciliation propagates them to changed ancestors.
+`Snapshot.storage_children(..., metric='size')` retains logical-size compatibility;
+`metric='disk_size'` sorts and returns known allocated bytes (unknowns have no area).
+POSIX uses `st_blocks * 512`. Windows reads allocation through attribute-only handles,
+or compressed/sparse storage metadata, without reading file contents.
+
+Schema 3 upgrades retain all generations, checkpoints and logical totals. A
+`.pre-v4.sqlite3` backup includes committed WAL data; the schema update is atomic.
+Existing totals initially count their files as allocation unknown. Metadata validation
+fills allocations without discarding saved logical sizes; read-only loading never
+performs that scan. Schema 1/2 still use the existing `.pre-v3.sqlite3` recovery copy
+before upgrading their compact records.
+
 Folder checkpoints, errors and aggregate totals remain generation-specific, with
 their established path-based representation. Returned `Entry.path` values are still
 absolute paths; callers do not need to understand database IDs.
@@ -166,8 +202,8 @@ The next index update removes this branch from existing whole-filesystem
 generations and recalculates ancestor totals without requiring a full rescan.
 Repair runs under the index writer lock and rolls back on cancellation; old
 display snapshots remain readable. Read-only saved-size loading does not perform
-the repair. Sizes represent logical file bytes, so hard links, APFS clones and
-sparse files can still make totals differ from physical disk usage.
+the repair. Both size measures count files by path, so hard links and APFS clones
+can still make totals differ from exclusive physical disk usage.
 
 Scoped reads/copies/deletes use indexed folder IDs. Filesystem identities and
 metadata still need validation; compact storage does not turn filesystem enumeration
@@ -209,3 +245,7 @@ and verify entry counts plus SQLite integrity/foreign-key checks afterward.
 
 
 [Developer architecture](../../docs/developer/architecture.md) · [Filesystem overview](../README.md)
+
+Coordinator receipt reads inspect an existing queue schema without requesting a
+DDL write lock, so readers can follow work while another connection holds the
+queue writer reservation. Initial schema creation retains normal SQL retries.

@@ -44,7 +44,7 @@ def sc_check_blend(blend_file_path: str, allow_sync, silent_mode=False):
     if prefs().sourcecontrol.source_control_solution == 'perforce':
         # New method keeping old behavior.
         blend_p4_file = BlendP4File(client_file=blend_file_path)
-        blend_p4_file.open_blend_for_edit(allow_sync, silent_mode)
+        return blend_p4_file.open_blend_for_edit(allow_sync, silent_mode)
     elif prefs().sourcecontrol.source_control_solution == 'plastic-scm':
         return True  # By default, there is nothing to do for Plastic SCM to do its job
     elif prefs().sourcecontrol.source_control_solution == 'git':

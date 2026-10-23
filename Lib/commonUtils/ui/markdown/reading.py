@@ -1,9 +1,11 @@
 """Reading presentation and optional diagrams, independent of editing/IO."""
 from .. import pyside as qt
+from ..appearance.typography import point_size, setting_size
 from ...formats.markdown import split_frontmatter
 from .extensions import reading_source, mermaid_blocks
 from .headings import _iter_headings
 from .links import render_links
+from .images import prepare_wiki_images, configure_images
 from .presentation import style_document
 from ..readers.reader_chrome import reader_button, reading_spin, show_reader_popup
 
@@ -11,13 +13,13 @@ from ..readers.reader_chrome import reader_button, reading_spin, show_reader_pop
 class MarkdownReadingMixin:
     def _build_reading_appearance(self, toolbar):
         self.appearance_popup = None
-        self.reading_size = self.browser.font().pointSize()
+        self.reading_size = round(setting_size(self.browser.font()))
         self.appearance_button = reader_button(self, 'Reading appearance', icon='appearance')
         self.appearance_button.clicked.connect(self.show_reading_appearance)
         toolbar.addWidget(self.appearance_button)
         key = qt.QKeySequence.StandardKey
-        self.text_larger_action = self._action('Larger text', lambda: self.set_reading_size(self.browser.font().pointSize() + 1), key.ZoomIn)
-        self.text_smaller_action = self._action('Smaller text', lambda: self.set_reading_size(self.browser.font().pointSize() - 1), key.ZoomOut)
+        self.text_larger_action = self._action('Larger text', lambda: self.set_reading_size(round(setting_size(self.browser.font())) + 1), key.ZoomIn)
+        self.text_smaller_action = self._action('Smaller text', lambda: self.set_reading_size(round(setting_size(self.browser.font())) - 1), key.ZoomOut)
         self.text_reset_action = self._action('Reset text size', lambda: self.set_reading_size(self._default_reading_size()))
 
     def _default_reading_size(self):
@@ -29,23 +31,26 @@ class MarkdownReadingMixin:
         if callable(getattr(app, '_commonutils_open_settings', None)):
             from ...configuration.layered import shared_settings
             from ..appearance.styling import styling
-            shared_settings().save({('Styling', 'reading_font_size_int'): str(max(8, min(48, int(size))))})
+            shared_settings().save({('Styling', 'reading_font_size_int'): str(max(7, min(24, int(size))))})
             styling().reload()
-            self.reading_size = self.browser.font().pointSize()
+            self.reading_size = round(setting_size(self.browser.font()))
             return
         self.reading_size = max(10, min(24, int(size)))
         font = self.browser.font()
-        font.setPointSizeF(self.reading_size)
+        font.setPointSizeF(point_size(self.reading_size))
         self.browser.setFont(font)
         self._render_source(self.markdown_text())
 
     def show_reading_appearance(self):
+        if self.appearance_popup is not None and self.appearance_popup.isVisible():
+            self.appearance_popup.hide()
+            return
         app = qt.QApplication.instance()
         open_settings = getattr(app, '_commonutils_open_settings', None)
         if callable(open_settings):
             open_settings(self, 'commonutils')
             return
-        self.reading_size = self.browser.font().pointSize()
+        self.reading_size = round(setting_size(self.browser.font()))
         if self.appearance_popup is not None:
             self.appearance_popup.close()
             self.appearance_popup.deleteLater()
@@ -82,8 +87,10 @@ class MarkdownReadingMixin:
         # Treat embedded HTML as literal Markdown rather than losing authored text.
         body = self._diagram_renderer.substitute(parts.body, self.browser.document()) if self._diagram_renderer else parts.body
         rendered, callouts = reading_source(body, self._folded_callouts)
-        self.browser.document().setMarkdown(render_links(rendered),
+        prepared, images = prepare_wiki_images(render_links(rendered))
+        self.browser.document().setMarkdown(prepared,
             qt.QTextDocument.MarkdownFeature.MarkdownDialectGitHub | qt.QTextDocument.MarkdownFeature.MarkdownNoHTML)
+        configure_images(self.browser.document(), images)
         style_document(self.browser.document(), self.browser.palette(), callouts=callouts)
         self._callouts = callouts
         self.diagrams_button.setVisible(bool(mermaid_blocks(parts.body)) and not self.edit_button.isChecked())
@@ -109,6 +116,9 @@ class MarkdownReadingMixin:
 
 
     def render_diagrams(self):
+        if self.storage is not None and getattr(self.storage, 'private', False):
+            self.status.setText('Diagram rendering requires temporary files and is disabled for private documents.')
+            return False
         from .diagrams import MermaidRenderer
         if self._diagram_renderer is None:
             self._diagram_renderer = MermaidRenderer(self)

@@ -126,3 +126,44 @@ Commands launched without captured output or in a new terminal window return imm
 Platform-specific terminal and process behavior is isolated inside the package so callers can generally use the same `exec_cmd()` interface on Windows, macOS, and Linux.
 
 For Windows-specific PowerShell execution, use the separate `powerShellWrapper.py` module.
+
+`run_command(..., environment=mapping)` supplies a complete child environment without
+mutating the parent or including values in command arguments. `None` inherits the
+parent environment. The caller owns filtering and secret lifetime.
+
+`binary.run_bytes()` accepts bounded binary output and an optional `input_writer`
+callback. The callback receives a write-only, nonseekable binary stream. Archive
+writers therefore use streaming headers on every platform, including Windows
+pipes whose native seek operations can appear to succeed. The wrapper drains
+stderr without retaining it and applies cancellation and elapsed time limits.
+Failed commands raise `binary.BinaryCommandError`, an `OSError` subclass with
+`returncode` and `stderr` attributes. Diagnostics are empty by default; callers
+may set `max_stderr` to retain at most that many bytes in memory while the rest
+is drained. The exception message never includes these bytes. They may contain
+secrets: consumers must translate or redact them before presentation or logging.
+
+## Disk-spooled binary capture
+
+`capture.run_captured(arguments, ...)` is the alternative for commands requiring
+separate binary stdout, stderr progress and a final diagnostic tail. It returns
+`CapturedCommand(stdout, stderr, returncode, truncated)`; nonzero exit status is
+returned for the caller to interpret. Stdout reads use the requested `limit` and
+stderr retains its final 64 KiB. Temporary spool files can grow on disk while the
+command runs; these are memory bounds, not disk quotas. The existing `run_bytes`
+API retains its pipe-based bounded-output behavior.
+
+Supply `environment`, `cwd`, `input_data`, `timeout`, `cancelled` and a raw-byte
+`progress` callback as needed. Timeouts and cooperative cancellation terminate the
+process tree. On platforms without `os.pread`, progress is left to the caller using
+the final stderr tail. `discard_output=True` routes both streams to DEVNULL.
+Input stays in a pipe rather than a disk spool. A supervised writer keeps a
+non-reading child from blocking timeout/cancellation; the writer retires before
+return. Already-cancelled requests do not launch a process. Callers own input-size
+limits, environment filtering, tool options and diagnostics.
+Process creation raises `CommandStartError`, elapsed deadlines raise
+`CommandTimeout`, and cooperative cancellation raises `OperationCancelled`.
+
+`runtime.diagnostics.redaction.redact(text)` filters URL userinfo/query strings and
+common authorization/password/token assignments in complete diagnostic text. It is
+best effort, cannot recognize every secret, and cannot safely redact credentials
+split across arbitrary streaming chunks. Discard output for sensitive commands.

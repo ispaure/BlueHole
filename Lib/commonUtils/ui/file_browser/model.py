@@ -2,21 +2,66 @@
 
 from collections import OrderedDict
 from pathlib import Path
+import stat
+import sys
 from .. import pyside as qt
 from ...filesystem.directories import Directory
 from ...formats.registry import file_types, object_from_path
 from ...filesystem import format_size, format_datetime
 from ...filesystem.transfers import validate_name
+from ...runtime.browsing import BrowseRole
+
+
+def hidden_path(path, *, info=None):
+    """Recognize dot names and native hidden metadata for a local entry."""
+    path = Path(path)
+    if path.name.startswith('.'):
+        return True
+    info = info if info is not None else qt.QFileInfo(str(path))
+    if info.isHidden():
+        return True
+    if sys.platform == 'darwin':
+        try:
+            return bool(path.lstat().st_flags & stat.UF_HIDDEN)
+        except OSError:
+            pass
+    return False
+
+
+def hidden_brush():
+    return qt.QApplication.palette().brush(qt.QPalette.ColorRole.PlaceholderText)
 
 
 class BrowserFileSystemModel(qt.QFileSystemModel):
+    def multiData(self, index, roles):
+        # Qt 6.12 delegates request roles in batches. Native implementations
+        # bypass Python data() overrides, including our names and folder sizes.
+        for position in range(roles.size()):
+            role = roles[position]
+            role.setData(self.data(index, role.role()))
+
     edit_failed = qt.Signal(str)
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.directory_boundary = None
         self.folder_totals = {}
         self.network_location = False
         self.size_parents = set()
         self._items = OrderedDict()
+
+    def _managed_directory(self, index):
+        return bool(index.isValid() and getattr(self, 'directory_boundary', None)
+                    and self.directory_boundary(Path(self.filePath(index))))
+
+    def rowCount(self, parent=qt.QModelIndex()):
+        return 0 if self._managed_directory(parent) else super().rowCount(parent)
+
+    def canFetchMore(self, parent):
+        return False if self._managed_directory(parent) else super().canFetchMore(parent)
+
+    def fetchMore(self, parent):
+        if not self._managed_directory(parent):
+            super().fetchMore(parent)
 
     def item(self, index):
         return self.object_for_path(self.filePath(index))
@@ -37,7 +82,69 @@ class BrowserFileSystemModel(qt.QFileSystemModel):
             self._items.popitem(last=False)
         return cached[1]
 
+    def browse_identity(self, index):
+        return Path(self.filePath(index)) if index.isValid() else None
+
+    def browse_key(self, identity):
+        return Path(identity)
+
+    def browse_index(self, identity):
+        return self.index(str(identity)) if identity is not None else qt.QModelIndex()
+
+    def browse_parent(self, identity):
+        return Path(identity).parent
+
+    def browse_within(self, identity, scope):
+        return identity == scope or scope in Path(identity).parents
+
+    def browse_network(self, identity):
+        from ...filesystem.network import is_network_location
+        return is_network_location(identity)
+
+    def browse_root_index(self, identity):
+        hidden_root = getattr(self, '_browse_hidden_root', None)
+        if hidden_root is not None and not self.browse_within(identity, hidden_root):
+            self.setFilter(self._browse_hidden_filter)
+            self._browse_hidden_root = None
+        index = self.browse_index(identity)
+        if not index.isValid():
+            if getattr(self, '_browse_hidden_root', None) is None:
+                self._browse_hidden_filter = self.filter()
+                self._browse_hidden_root = identity
+            self.setFilter(self._browse_hidden_filter | qt.QDir.Filter.Hidden)
+            index = self.setRootPath(str(identity))
+        return index
+
+    def refresh_index(self, index):
+        return self.index(self.filePath(index), index.column())
+
     def data(self, index, role=qt.Qt.ItemDataRole.DisplayRole):
+        if (index.isValid() and role == qt.Qt.ItemDataRole.ForegroundRole
+                and hidden_path(self.filePath(index), info=self.fileInfo(index))):
+            return hidden_brush()
+        if index.isValid() and role in BrowseRole._value2member_map_:
+            if role == BrowseRole.Identity:
+                return self.browse_identity(index)
+            if role == BrowseRole.Container:
+                return self.isDir(index)
+            item = self.item(index)
+            if role == BrowseRole.Badge:
+                return item.browser_thumbnail_badge
+            if role == BrowseRole.Thumbnail:
+                return (lambda size, cancelled: item.browser_thumbnail(size)) if item.browser_has_thumbnail else None
+            if role == BrowseRole.Suffix:
+                return '' if isinstance(item, Directory) else item.path.suffix
+            if role == BrowseRole.Revision:
+                return None
+            if role == BrowseRole.SortValue:
+                if index.column() == 1:
+                    if self.isDir(index):
+                        stats = self.folder_totals.get(item.path)
+                        return stats.size if stats is not None and not item.path.is_symlink() else None
+                    return self.size(index)
+                if index.column() == 3:
+                    return self.lastModified(index)
+                return self.fileName(index)
         if index.isValid() and role == qt.Qt.ItemDataRole.DisplayRole:
             item = self.item(index)
             if index.column() == 0:
@@ -70,6 +177,9 @@ class BrowserFileSystemModel(qt.QFileSystemModel):
             validate_name(value)
             source = Path(self.filePath(index))
             target = source.with_name(value)
+            from ...filesystem.local_access import check_local_path
+            check_local_path(source, recursive=True)
+            check_local_path(target, recursive=True)
             if source == target:
                 return True
             # Directory entries distinguish a real collision from a case-only rename
@@ -101,6 +211,12 @@ class BrowserFileSystemModel(qt.QFileSystemModel):
 
 
 class ByteSortModel(qt.QSortFilterProxyModel):
+    def multiData(self, index, roles):
+        # Preserve data() overrides in subclasses such as CoverModel as well.
+        for position in range(roles.size()):
+            role = roles[position]
+            role.setData(self.data(index, role.role()))
+
     """The list sorts displayed byte totals without changing other view models."""
     def __init__(self, filesystem, parent=None):
         super().__init__(parent)
@@ -110,37 +226,27 @@ class ByteSortModel(qt.QSortFilterProxyModel):
 
     def mapFromSource(self, index):
         if index.isValid() and index.model() is self.filesystem:
-            # QFileSystemModel indexes can retain a file pointer with an old row
-            # while asynchronous loading reorders siblings. Refresh by path before
-            # passing the row-based index to the sorting proxy.
-            index = self.filesystem.index(self.filesystem.filePath(index), index.column())
+            # Disk watching can reorder rows while indexes retain file pointers.
+            refresh = getattr(self.filesystem, 'refresh_index', None)
+            if refresh:
+                index = refresh(index)
         return super().mapFromSource(index)
 
     def _bytes(self, index):
-        path = Path(self.filesystem.filePath(index))
-        if self.filesystem.isDir(index):
-            stats = self.filesystem.folder_totals.get(path)
-            return stats.size if stats is not None and not path.is_symlink() else None
-        return self.filesystem.size(index)
+        return self.filesystem.data(index, BrowseRole.SortValue)
 
     def lessThan(self, left, right):
-        if left.column() == 1:
-            a, b = self._bytes(left), self._bytes(right)
-            from ..entry_views import value_less
+        from ..entry_views import value_less, label_less
+        if left.column() == 0:
+            a, b = left.data(BrowseRole.Container), right.data(BrowseRole.Container)
+            if a != b:
+                return bool(a)
+        a, b = left.data(BrowseRole.SortValue), right.data(BrowseRole.SortValue)
+        if left.column() != 0:
             decision = value_less(a, b, descending=self.sortOrder() == qt.Qt.SortOrder.DescendingOrder)
             if decision is not None:
                 return decision
-        elif left.column() == 3:
-            a, b = self.filesystem.lastModified(left), self.filesystem.lastModified(right)
-            if a != b:
-                return a < b
-        else:
-            a, b = self.filesystem.isDir(left), self.filesystem.isDir(right)
-            if a != b:
-                return a
-        # QCollator's C-locale backend ignores numeric mode on headless Linux.
-        from ..entry_views import label_less
-        return label_less(self.filesystem.fileName(left), self.filesystem.fileName(right))
+        return label_less(str(left.siblingAtColumn(0).data()), str(right.siblingAtColumn(0).data()))
 
 
 class _BrowserSelection(qt.QItemSelectionModel):

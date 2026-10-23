@@ -35,6 +35,25 @@ class CustomFile(File):
 
 
 class BrowserTests(QtTestCase):
+    def test_host_can_omit_column_view_and_keep_list_tile_navigation(self):
+        self.browser.close()
+        self.wait()
+        self.browser = FileBrowser(self.root, column_navigation=False, calculate_folder_sizes=False)
+        self.browser.show()
+        self.wait()
+        self.assertIsNone(self.browser.views.columns)
+        self.assertFalse(self.browser.view_selector.buttons[2].isEnabled())
+        with self.assertRaisesRegex(ValueError, 'disabled column'):
+            self.browser.views.set_mode(2)
+        child = self.root / 'child'
+        child.mkdir()
+        self.browser.set_directory(child, navigation_root=self.root)
+        self.assertEqual(self.browser.views.root, child)
+        self.browser.views.set_mode(1)
+        self.assertEqual(self.browser.views.currentIndex(), 1)
+        self.browser.set_directory(self.root, navigation_root=self.root)
+        self.assertEqual(self.browser.views.root, self.root)
+
     def setUp(self):
         self.app = qt.QApplication.instance() or qt.QApplication([])
         self.temp = TemporaryDirectory()
@@ -72,6 +91,45 @@ class BrowserTests(QtTestCase):
                 break
             time.sleep(.01)
         self.assertFalse(any(pending.values()), f'Browser workers did not settle: {pending}')
+
+    def test_host_managed_directory_routes_all_navigation_without_listing_children(self):
+        managed = self.root / 'managed'
+        managed.mkdir()
+        (managed / 'opaque.bin').write_bytes(b'opaque')
+        calls = []
+        def route(path):
+            if path == managed or managed in path.parents:
+                calls.append(path)
+                return True
+            return False
+        self.browser.directory_handler = route
+        self.browser.model.directory_boundary = lambda path: path == managed or managed in path.parents
+        self.wait()
+        index = self.browser.model.index(str(managed))
+        self.assertTrue(index.isValid())
+        self.assertEqual(self.browser.model.rowCount(index), 0)
+        self.assertFalse(self.browser.model.canFetchMore(index))
+        for invoke in (lambda: self.browser.navigate(managed),
+                       lambda: self.browser.set_directory(managed),
+                       lambda: self.browser.views.set_root(managed),
+                       lambda: self.browser.navigation.requested.emit(managed),
+                       lambda: self.browser.tree.expand(self.browser.sort_model.mapFromSource(index)),
+                       lambda: self.browser._activate_path(managed / 'opaque.bin')):
+            calls.clear()
+            invoke()
+            self.assertEqual(calls, [managed])
+            self.assertEqual(self.browser.navigation.directory, self.root)
+        self.browser.views.set_mode(2)
+        calls.clear()
+        self.browser.views.select_source(index)
+        self.wait()
+        self.assertIn(managed, calls)
+        self.assertEqual(self.browser.navigation.directory, self.root)
+        ordinary = self.root / 'ordinary'
+        ordinary.mkdir()
+        self.browser.navigate(ordinary)
+        self.wait()
+        self.assertEqual(self.browser.navigation.directory, ordinary)
 
     def test_parent_destruction_releases_index_priority(self):
         import gc
@@ -188,7 +246,7 @@ class BrowserTests(QtTestCase):
         self.assertNotIn('\\n', text)
         menu = self.browser.context_menu_for(index)
         self.assertEqual([action.text() for action in menu.actions() if not action.isSeparator()],
-                         ['Open in Default App', 'Cut', 'Copy', 'Rename', 'Move to Trash / Recycle Bin…', menu.actions()[-1].text()])
+                         ['Open in Default App', 'Cut', 'Copy', 'Pick Link Source', 'Rename', 'Move to Trash / Recycle Bin…', menu.actions()[-1].text()])
         with patch('commonUtils.ui.desktop_actions.open_default') as opened:
             menu.actions()[0].trigger()
             opened.assert_called_once_with(self.path)
@@ -295,7 +353,7 @@ class BrowserTests(QtTestCase):
         self.assertEqual(self.browser.model.data(index.siblingAtColumn(1)), '6 B')
         menu = self.browser.context_menu_for(index)
         self.assertEqual([action.text() for action in menu.actions() if not action.isSeparator()][:-1],
-                         ['Open', 'Cut', 'Copy', 'Paste', 'Rename', 'Move to Trash / Recycle Bin…'])
+                         ['Open', 'Cut', 'Copy', 'Paste', 'Pick Link Source', 'Rename', 'Move to Trash / Recycle Bin…'])
         self.assertTrue(menu.actions()[-1].text().startswith('Reveal in '))
         menu.deleteLater()
         self.browser._activate(index)
@@ -682,14 +740,14 @@ class BrowserTests(QtTestCase):
 
     def test_thumbnail_resolution_accounts_for_device_pixel_ratio(self):
         covers = self.browser.views.covers
-        path = str(self.path)
+        path = self.path
         small = qt.QPixmap(120, 165)
         small.fill(qt.QColor('orange'))
         buffer = qt.QBuffer()
         buffer.open(qt.QIODevice.OpenModeFlag.WriteOnly)
         small.save(buffer, 'PNG')
         covers.requested.add(path)
-        covers.complete(path, bytes(buffer.data()))
+        covers.complete(path.as_posix(), bytes(buffer.data()))
         covers.set_resolution(qt.QSize(180, 248), 2.0)
         self.assertEqual(covers.render_size, (360, 496))
         self.assertNotIn(path, covers.icons)
@@ -702,6 +760,10 @@ class BrowserTests(QtTestCase):
         covers.complete(path, bytes(buffer.data()), 2.0, (360, 496))
         self.assertEqual(covers.resolutions[path], (360, 496))
         self.assertFalse(covers.icons[path].isNull())
+        covers.invalidate(str(path))
+        self.assertNotIn(path, covers.icons)
+        self.assertNotIn(path, covers.resolutions)
+        self.assertEqual(covers.revisions[path], 2)
 
     def test_pausing_indexing_preserves_cached_totals_and_discards_late_results(self):
         from threading import Event

@@ -7,6 +7,15 @@ For workflows and settings, see the [user guide](user_docs/README.md).
 
 ## Construction and navigation
 
+The column view installs its preview before its model. On Qt 6.11+ it applies
+the native preview visibility switch only after attaching a model, avoiding
+Qt 6.12's null-model crash during construction. Earlier Qt versions retain
+the preview host sizing fallback.
+
+Filesystem and sorting models also route Qt's batched `multiData()` role requests
+through their Python `data()` implementations. Native delegates therefore retain
+custom filenames, recursive folder sizes and cached thumbnails on Qt 6.12.
+
 To open a standalone browser at a specific folder, put commonUtils on the Python
 import path, install PySide6, and run this minimal script. Replace the example path
 with an existing directory:
@@ -126,3 +135,68 @@ Treemap and Radial selection flows from the toolbar into
 truth for cached results and stale-worker checks; no hidden combo box mirrors it.
 Former `reconcile_timer`, `storage_button`, `index_pause_button` and
 `chart_selector` attributes have been removed.
+
+Default context menus include Pick Link Source for a single selected item and
+Drop Link As/Cancel Link Creation when an application-local source is present.
+`link_actions` owns the transient selection; `FileActions` runs exclusive link
+creation on its existing worker and refreshes the destination through normal
+reconciliation. Busy/stopping guards and close ownership match other file actions.
+Link creation contracts belong to `filesystem/links/README.md`.
+
+`FilesystemObject.browser_thumbnail_badge()` returns an optional short string for
+an overlay at the top-right of a tile's thumbnail. It runs during painting, so it
+must be cheap, bounded and dialog-free; archive parsing belongs in the thumbnail
+worker, not this hook. The visible tile view repaints once per second for live
+labels without invalidating cached covers. The refresh timer stops with FileViews.
+
+Thumbnail caches and queued request/revision keys use `Path` objects internally.
+Qt model lookups and the existing thumbnail-request signal convert to strings at
+the boundary; completion and invalidation accept either spelling on Windows.
+
+FileDragDrop routes local URL drops into FileActions.transfer, sharing paste's
+worker, cancellation and refresh lifecycle. Its own QDrag avoids Qt deleting
+source rows after an asynchronous move. Internal drags are identified within the
+current process; external drops acknowledge CopyAction and preserve their source.
+Qt columns install the controller through column_created as they are created.
+
+
+### Host-managed directory navigation
+
+`FileBrowser(..., directory_handler=callback, directory_boundary=predicate)`
+lets a host route selected directories to another browser. Both callbacks receive
+an absolute `Path` on the GUI thread and must be inexpensive. The handler returns
+true when it consumes navigation (including refusal or an unlock prompt); the
+regular browser retains its location. Hosts should defer UI replacement until the
+current signal returns and own errors, credentials and replacement-view lifetime.
+The boundary predicate is read-only: the filesystem model does not list or fetch
+children beneath matching directories. It must not open dialogs or navigate.
+
+Hosts may supply `column_navigation=False` to omit QColumnView entirely while
+keeping list, thumbnails, details and storage modes at their established indices.
+The column button is disabled and requesting mode 2 raises ValueError;
+`views.columns` is None. The default remains True. This is an explicit host choice,
+not a claim that every other mode has been verified on mobile. A consuming iOS
+proof uses it to isolate a Qt 6.12/Python 3.15 column-navigation native crash.
+
+Routing covers explicit locations, breadcrumbs, activation, tree expansion,
+column navigation and storage/search navigation. Cached file activation routes
+its parent directory before ordinary file launch. The shared browser knows
+nothing about encryption or application backends. Use the host's trusted logical
+location type when cloning a provider tab; raw filesystem locations cannot stand
+in for decoded provider paths.
+
+## Shared provider presentation
+
+List, tile and column presentation is owned by `BrowserViews`; `FileViews` adds
+local indexed storage charts. The local filesystem model supplies shared item roles
+while retaining its watcher and existing file APIs. Provider browsing and pickers
+use the same views through `ProviderEntryModel`. Arbitrary item identities and
+custom properties are available through the UI-independent browse tree and its
+Qt `EntryModel`. See the [item and provider contract](../resource-providers.md#shared-item-presentation)
+for loading, identity, thumbnail, privacy and lifecycle rules.
+
+
+Mobile consumers use [NativeBrowser](../native_browser/README.md), which presents
+list/tile views over the same portable tree and provider-row conversion through
+Toga, rather than importing Qt widgets. Backend-specific presentation stays separate
+while source identities, metadata rows, revisions and mutation contracts are shared.

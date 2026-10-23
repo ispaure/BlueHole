@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import *
 
 from ..blenderUtils import blenderFile
+import os
 from ..Lib.commonUtils.runtime.diagnostics import *
 from ..preferences.prefs import *
 from .model import Environment

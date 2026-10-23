@@ -4,119 +4,14 @@ from weakref import WeakSet
 from shiboken6 import isValid
 from .workspace_policy import WorkspacePolicy, header_visible
 from .workspace_drag import WorkspaceDragMixin, register_dock
+from .headers import (TAB_BUTTON_SIZE, TAB_HEADER_HEIGHT, TAB_PLUS_RESERVE,
+                      _DockTabStyle, _tab_button, DockTabHeader)
 
-TAB_BUTTON_SIZE = 28
-TAB_HEADER_HEIGHT = 30
-TAB_PLUS_RESERVE = 32
 
 _workspaces = WeakSet()
 _DOCK_AREAS = (qt.Qt.DockWidgetArea.LeftDockWidgetArea |
                qt.Qt.DockWidgetArea.RightDockWidgetArea |
                qt.Qt.DockWidgetArea.TopDockWidgetArea)
-
-
-class _DockTabStyle(qt.QProxyStyle):
-    def styleHint(self, hint, option=None, widget=None, return_data=None):
-        if hint == qt.QStyle.StyleHint.SH_TabBar_Alignment:
-            # macOS centers native dock tabs, including our reserved + space.
-            return qt.Qt.AlignmentFlag.AlignLeft.value
-        return super().styleHint(hint, option, widget, return_data)
-
-
-def _tab_button(text, tooltip, parent, callback=None):
-    button = qt.QToolButton(parent)
-    button.setText(text)
-    button.setToolTip(tooltip)
-    button.setAccessibleName(tooltip)
-    button.setAutoRaise(True)
-    button.setFixedSize(TAB_BUTTON_SIZE, TAB_BUTTON_SIZE)
-    font = button.font(); font.setPointSizeF(font.pointSizeF() * 1.5); button.setFont(font)
-    if callback is not None:
-        button.clicked.connect(callback)
-    return button
-
-
-class DockTabHeader(qt.QWidget):
-    """Single-tab header with the same opaque dragging as grouped tab bars."""
-    def __init__(self, dock):
-        super().__init__(dock)
-        layout = qt.QHBoxLayout(self)
-        layout.setContentsMargins(2, 0, 2, 0)
-        layout.setSpacing(0)
-        self.close_button = _tab_button('×', 'Close tab', self, dock.close)
-        self.title = qt.QLabel(dock.windowTitle(), self)
-        self.title.setAlignment(qt.Qt.AlignmentFlag.AlignCenter)
-        self.title.setMinimumWidth(0)
-        self.title.setSizePolicy(qt.QSizePolicy.Policy.Ignored, qt.QSizePolicy.Policy.Preferred)
-        self.title.setAttribute(qt.Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        self.new_button = _tab_button('+', 'New tab', self, lambda: dock.workspace.request_new_view())
-        self.new_button.setVisible(dock.workspace.allow_new_tabs)
-        layout.addWidget(self.close_button)
-        layout.addWidget(self.title, 1)
-        layout.addWidget(self.new_button)
-        dock.windowTitleChanged.connect(self.title.setText)
-        font = self.title.font(); font.setBold(True); self.title.setFont(font)
-        self.setFixedHeight(TAB_HEADER_HEIGHT)
-        self._press = None
-
-    def sizeHint(self):
-        # QDockWidget reserves its title area from this hint, even when the
-        # title widget itself has been assigned a fixed height of zero.
-        hint = super().sizeHint()
-        hint.setHeight(self.minimumHeight())
-        return hint
-
-    def minimumSizeHint(self):
-        hint = super().minimumSizeHint()
-        hint.setHeight(self.minimumHeight())
-        return hint
-
-    def mousePressEvent(self, event):
-        if event.button() == qt.Qt.MouseButton.LeftButton:
-            self._press = event.globalPosition().toPoint()
-            event.accept()
-        else:
-            event.ignore()
-
-    def mouseMoveEvent(self, event):
-        if (self._press is not None and event.buttons() & qt.Qt.MouseButton.LeftButton
-                and (event.globalPosition().toPoint() - self._press).manhattanLength() >= qt.QApplication.startDragDistance()):
-            origin = self._press
-            self._press = None
-            self.parentWidget().workspace.begin_window_drag(self.parentWidget(), event.globalPosition().toPoint(), origin)
-            event.accept()
-        else:
-            event.ignore()
-
-    def mouseReleaseEvent(self, event):
-        self._press = None
-        if self.parentWidget().isFloating():
-            event.ignore()
-        else:
-            event.accept()
-
-    def mouseDoubleClickEvent(self, event):
-        if event.button() == qt.Qt.MouseButton.LeftButton:
-            dock = self.parentWidget()
-            dock.workspace.toggle_detach(dock)
-            event.accept()
-        else:
-            event.ignore()
-
-    def paintEvent(self, event):
-        option = qt.QStyleOptionTab()
-        option.initFrom(self)
-        reserve = TAB_PLUS_RESERVE if self.parentWidget().workspace.allow_new_tabs else 0
-        option.rect = qt.QRect(0, 0, max(0, self.width() - reserve), self.height())
-        option.shape = qt.QTabBar.Shape.RoundedNorth
-        option.position = qt.QStyleOptionTab.TabPosition.OnlyOneTab
-        option.state |= qt.QStyle.StateFlag.State_Selected
-        painter = qt.QStylePainter(self)
-        painter.drawControl(qt.QStyle.ControlElement.CE_TabBarTabShape, option)
-        # Palette-based selection works with and without the opt-in shared theme.
-        painter.fillRect(option.rect.adjusted(0, 0, 0, -3), self.palette().brush(qt.QPalette.ColorRole.Base))
-        painter.fillRect(0, self.height() - 3, option.rect.width(), 3,
-                         self.palette().brush(qt.QPalette.ColorRole.Highlight))
 
 
 class WorkspaceDock(qt.QDockWidget):
@@ -140,6 +35,11 @@ class WorkspaceDock(qt.QDockWidget):
         super().__init__(title, workspace)
         self.workspace = workspace
         self.setWidget(view)
+        if view.property('workspace_show_icon'):
+            self.setProperty('workspace_show_icon', True)
+            self.setWindowIcon(view.windowIcon())
+            view.windowIconChanged.connect(self.setWindowIcon)
+            self.windowIconChanged.connect(lambda: self.workspace._schedule_tab_headers())
         # A floating tab is a document/tool window, never the application's quit owner.
         self.setAttribute(qt.Qt.WidgetAttribute.WA_QuitOnClose, False)
         self.setFeatures(qt.QDockWidget.DockWidgetFeature.DockWidgetClosable |
@@ -232,7 +132,8 @@ class Workspace(WorkspaceDragMixin, qt.QMainWindow):
         self.active_dock = None
         self._closing = False
         self._window_drag = None
-        self._headers_pending = False
+        from .presentation import WorkspaceHeaderPresentation
+        self.header_presentation = WorkspaceHeaderPresentation(self)
         self._drop_target = qt.QDockWidget('Return a detached tab', self)
         self._drop_target.setObjectName('workspace.emptyDropTarget')
         self._drop_target.setFeatures(qt.QDockWidget.DockWidgetFeature.NoDockWidgetFeatures)
@@ -285,9 +186,9 @@ class Workspace(WorkspaceDragMixin, qt.QMainWindow):
             sync_native_menus(self.window(), view if isinstance(view, qt.QMainWindow) else getattr(view, 'document', None))
 
     def _schedule_tab_headers(self):
-        if not self._headers_pending:
-            self._headers_pending = True
-            qt.QTimer.singleShot(0, self._refresh_tab_headers)
+        if not self.header_presentation.pending:
+            self.header_presentation.pending = True
+            qt.QTimer.singleShot(0, self, self.header_presentation.refresh)
 
     def _tab_dock(self, bar, index):
         # Native dock bars store the dock's C++ identity. Compare identities only;
@@ -296,79 +197,6 @@ class Workspace(WorkspaceDragMixin, qt.QMainWindow):
         identity = bar.tabData(index)
         return next((dock for dock in self.docks if getCppPointer(dock)[0] == identity), None)
 
-    def _refresh_tab_headers(self):
-        self._headers_pending = False
-        if self._closing:
-            return
-        for dock in self.docks:
-            grouped = not dock.isFloating() and bool(self.tabifiedDockWidgets(dock))
-            visible = self.policy is None or header_visible(self.policy, len(self.docks), self.is_detached)
-            visible = visible or (self.allow_new_tabs and getattr(dock.widget(), 'workspace_controls', None) is None)
-            height = TAB_HEADER_HEIGHT if visible and not grouped else 0
-            self._refresh_view_controls(dock, not visible)
-            if dock.tab_header.minimumHeight() != height or dock.tab_header.maximumHeight() != height:
-                dock.tab_header.setFixedHeight(height)
-            dock.tab_header.close_button.setVisible(self.can_close_tab(dock))
-            dock.tab_header.close_button.setEnabled(self.can_close_tab(dock))
-        for bar in self.findChildren(qt.QTabBar):
-            # Limit styling to Qt's dock bars, leaving views' own tab widgets alone.
-            if bar.parent() is not self or not bar.count() or not self._tab_dock(bar, 0):
-                continue
-            visible = self.policy is None or header_visible(self.policy, bar.count(), self.is_detached)
-            bar.setFixedHeight(TAB_HEADER_HEIGHT if visible else 0)
-            bar.setVisible(visible)
-            bar.installEventFilter(self)
-            bar.setExpanding(False)
-            bar.setMovable(True)
-            self._tab_order_changed(bar)
-            bar.setElideMode(qt.Qt.TextElideMode.ElideRight)
-            bar.setUsesScrollButtons(True)
-            if not hasattr(bar, 'workspace_plus'):
-                bar.workspace_style = _DockTabStyle()
-                bar.workspace_style.setParent(bar)
-                bar.setStyle(bar.workspace_style)
-                bar.workspace_plus = _tab_button('+', 'New tab', bar, lambda: self.request_new_view())
-                bar.currentChanged.connect(self._schedule_tab_headers)
-                bar.tabMoved.connect(lambda source, target, owner=bar: self._tab_order_changed(owner))
-                bar.currentChanged.connect(lambda index, owner=bar: self._activate(self._tab_dock(owner, index)))
-            if self.active_dock in [self._tab_dock(bar, index) for index in range(bar.count())]:
-                self._activate(self._tab_dock(bar, bar.currentIndex()))
-            reserve = TAB_PLUS_RESERVE if self.allow_new_tabs else 0
-            width = max(60, (bar.width() - reserve) // bar.count())
-            style = (f'QTabBar::tab {{ width: {width}px; height: {TAB_HEADER_HEIGHT}px; padding: 0px; }} '
-                     'QTabBar::scroller { width: 96px; } '
-                     'QTabBar::tab:selected { background: palette(base); color: palette(text); '
-                     'border-bottom: 3px solid palette(highlight); font-weight: bold; }')
-            if bar.styleSheet() != style:
-                bar.setStyleSheet(style)
-            for index in range(bar.count()):
-                dock = self._tab_dock(bar, index)
-                if dock is None:
-                    continue
-                button = bar.tabButton(index, qt.QTabBar.ButtonPosition.LeftSide)
-                if button is None:
-                    button = _tab_button('×', 'Close tab', bar)
-                    button.clicked.connect(lambda checked=False, owner=button: owner.dock.close())
-                    bar.setTabButton(index, qt.QTabBar.ButtonPosition.LeftSide, button)
-                button.dock = dock
-                button.setVisible(self.can_close_tab(dock))
-                button.setEnabled(self.can_close_tab(dock))
-            arrows = [bar.findChild(qt.QToolButton, name)
-                      for name in ('ScrollLeftButton', 'ScrollRightButton')]
-            overflow = all(arrow is not None and arrow.isVisible() for arrow in arrows)
-            # Keep + available even when native overflow arrows appear. Qt reserves
-            # 96 pixels for these controls; the remaining tabs scroll as usual.
-            for index, arrow in enumerate(arrows):
-                if arrow is not None:
-                    if not hasattr(arrow, 'workspace_connected'):
-                        arrow.clicked.connect(self._schedule_tab_headers)
-                        arrow.workspace_connected = True
-                    if overflow:
-                        arrow.setFixedSize(28, 28)
-                        arrow.move(bar.width() - 62 + index * 32, 1)
-            bar.workspace_plus.move(bar.width() - (94 if overflow else TAB_BUTTON_SIZE + 2), max(0, (bar.height() - TAB_BUTTON_SIZE) // 2))
-            bar.workspace_plus.setVisible(self.allow_new_tabs)
-            bar.workspace_plus.raise_()
 
     def _tab_order_changed(self, bar):
         group = [self._tab_dock(bar, index) for index in range(bar.count())]
@@ -432,12 +260,12 @@ class Workspace(WorkspaceDragMixin, qt.QMainWindow):
             self._drop_target.show()
 
     def _docking_changed(self, floating):
-        qt.QTimer.singleShot(0, self._update_drop_target)
+        qt.QTimer.singleShot(0, self, self._update_drop_target)
 
     def _dock_location_changed(self, dock, area):
         if area == qt.Qt.DockWidgetArea.TopDockWidgetArea:
             # Wait for Qt to finish its native drop before changing the layout.
-            qt.QTimer.singleShot(0, lambda: dock.workspace._finish_top_docking(dock))
+            qt.QTimer.singleShot(0, dock, lambda: dock.workspace._finish_top_docking(dock))
 
     def _finish_top_docking(self, dock):
         if (self._closing or dock not in self.docks or dock.isFloating()
@@ -470,27 +298,6 @@ class Workspace(WorkspaceDragMixin, qt.QMainWindow):
             return None
         return self.new_view(self) if self.new_view is not None else self.add_view()
 
-    def _refresh_view_controls(self, dock, single):
-        layout = getattr(dock.widget(), 'workspace_controls', None)
-        if layout is None:
-            return
-        if not hasattr(dock, 'workspace_buttons'):
-            dock.workspace_buttons = qt.QWidget(dock.widget())
-            row = qt.QHBoxLayout(dock.workspace_buttons)
-            row.setContentsMargins(0, 0, 0, 0)
-            dock.return_button = _tab_button('↩', 'Dock to Main Window', dock.workspace_buttons,
-                                            lambda: dock.workspace.return_to_main(dock))
-            dock.local_new_button = _tab_button('+', 'New tab', dock.workspace_buttons,
-                                                lambda: dock.workspace.request_new_view())
-            row.addWidget(dock.return_button)
-            row.addWidget(dock.local_new_button)
-            layout.addWidget(dock.workspace_buttons)
-        dock.return_button.setVisible(self.is_detached and self.can_move_tab(dock))
-        dock.local_new_button.setVisible(self.allow_new_tabs)
-        dock.workspace_buttons.setVisible(single and (self.allow_new_tabs or self.is_detached))
-        controls_widget = getattr(dock.widget(), 'workspace_controls_widget', None)
-        if controls_widget is not None:
-            controls_widget.setVisible(single and (self.allow_new_tabs or self.is_detached))
 
     def populate_tab_menu(self, menu, dock):
         action = menu.addAction('Close tab', dock.close)
@@ -552,6 +359,8 @@ class Workspace(WorkspaceDragMixin, qt.QMainWindow):
                              and len(self.docks) >= self.policy.max_tabs):
             return None
         view = self.factory(argument)
+        if view is None:
+            return None
         dock = WorkspaceDock(self, view, getattr(view, 'view_title', 'View'))
         previous = self._docked_anchor()
         self._hide_drop_target()
@@ -622,6 +431,10 @@ class Workspace(WorkspaceDragMixin, qt.QMainWindow):
         if other is None:
             self.addDockWidget(qt.Qt.DockWidgetArea.LeftDockWidgetArea, dock)
         elif placement == 'tabs':
+            # Newer Qt preserves an existing native tab group when asked to
+            # tabify one of its members elsewhere. Detach just the moving dock
+            # first so the requested anchor determines its destination.
+            self.removeDockWidget(dock)
             self.tabifyDockWidget(other, dock)
         else:
             from .workspace_layout import split_at

@@ -20,6 +20,7 @@ from typing import *
 
 from ..Lib.commonUtils.configuration import legacy as configUtils
 from ..Lib.commonUtils.filesystem import files as fileUtils, directories as dirUtils
+import os
 from ..Lib.commonUtils.runtime.diagnostics import *
 from ..blenderUtils import blenderFile
 from ..preferences.prefs import *

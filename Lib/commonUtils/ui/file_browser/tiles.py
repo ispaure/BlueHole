@@ -1,7 +1,8 @@
 """Responsive tile layout with bounded, adjustable icons and thumbnails."""
 
-from ...filesystem.directories import Directory
+from ...runtime.browsing import BrowseRole
 from .. import pyside as qt
+from ..appearance.typography import point_size, setting_size
 from .editing import FilenameEditorMixin
 
 COVER_WIDTH = 142
@@ -29,12 +30,31 @@ class TileDelegate(FilenameEditorMixin, qt.QStyledItemDelegate):
             size = pixmap.deviceIndependentSize()
             painter.drawPixmap(qt.QPointF(area.center().x() - size.width()/2,
                                          area.center().y() - size.height()/2), pixmap)
+            source = index.model().mapToSource(index)
+            text = source.data(BrowseRole.Badge) or ''
+            text = text() if callable(text) else text
+            if text:
+                painter.save()
+                font = qt.QFont(option.font)
+                font.setPointSizeF(point_size(max(6, min(7.5, setting_size(font) - .75))))
+                painter.setFont(font)
+                metrics = qt.QFontMetricsF(font)
+                text = metrics.elidedText(text, qt.Qt.TextElideMode.ElideMiddle, max(1, int(size.width() - 12)))
+                width, height = metrics.horizontalAdvance(text) + 8, metrics.height() + 4
+                badge = qt.QRectF(area.center().x() + size.width()/2 - width - 3,
+                                 area.center().y() - size.height()/2 + 3, width, height)
+                painter.setPen(qt.Qt.PenStyle.NoPen)
+                painter.setBrush(qt.QColor(0, 0, 0, 200))
+                painter.drawRoundedRect(badge, 4, 4)
+                painter.setPen(qt.QColor('white'))
+                painter.drawText(badge, qt.Qt.AlignmentFlag.AlignCenter, text)
+                painter.restore()
 
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
         view = self.parent()
         source = index.model().mapToSource(index)
-        size = (view.folder_icon_size if isinstance(source.model().item(source), Directory)
+        size = (view.folder_icon_size if source.data(BrowseRole.Container)
                 else view.iconSize())
         # Native icon engines and cached covers can supply pixmaps larger than requested.
         # Normalize after Qt initializes the option so its intrinsic size cannot override
@@ -123,7 +143,7 @@ class ResponsiveTileView(qt.QListView):
         root = self.rootIndex()
         for row in range(model.rowCount(root)):
             source = model.mapToSource(model.index(row, 0, root))
-            if not isinstance(source_model.item(source), Directory):
+            if not source.data(BrowseRole.Container):
                 return False
         return True
 

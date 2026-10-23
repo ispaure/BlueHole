@@ -23,6 +23,7 @@ from ....blenderUtils.uiUtils import show_label
 from ....operators import directory_ops, external_addon_ops
 from ....preferences.prefs import *
 from ....blenderUtils import blenderFile
+import os
 from ....Lib.commonUtils.runtime.diagnostics import *
 
 # ----------------------------------------------------------------------------------------------------------------------

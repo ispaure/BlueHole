@@ -30,7 +30,7 @@ class BlendP4File(P4File):
         if not check_result:
             return False
 
-        super().open_for_edit(silent=silent, allow_sync=allow_sync)
+        return super().open_for_edit(silent=silent, allow_sync=allow_sync)
 
     def _callback_post_sync(self):
         bpy.ops.wm.open_mainfile(filepath=self.clientFile)

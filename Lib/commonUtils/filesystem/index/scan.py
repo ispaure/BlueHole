@@ -4,6 +4,7 @@ from pathlib import Path
 from time import time
 from ...runtime.operations import check_cancelled
 from .schema import retire_generation, copy_entries
+from .generations import publish_generation
 from .exclusions import scan_exclusions
 from .totals import store_folder_stats
 
@@ -118,7 +119,7 @@ class DirectoryScan:
                 if completed and not refresh:
                     copy_entries(db, building, completed)
                     db.execute('INSERT INTO folders SELECT ?,path,parent,status,identity FROM folders WHERE generation=?', (building, completed))
-                    db.execute('INSERT INTO folder_totals SELECT ?,path,size,files,folders,skipped,extensions,complete,scanned_at FROM folder_totals WHERE generation=?',(building,completed))
+                    db.execute('INSERT INTO folder_totals SELECT ?,path,size,files,folders,skipped,extensions,complete,scanned_at,disk_size,disk_unknown FROM folder_totals WHERE generation=?',(building,completed))
                 else:
                     db.execute("INSERT INTO folders VALUES(?,?,?,'pending',NULL)", (building, str(root), ''))
                 db.execute('UPDATE roots SET building=? WHERE root=? AND recursive=?', (building, str(root), recursive))
@@ -212,11 +213,7 @@ class DirectoryScan:
         checked = [path for path in visible_roots if (path == root or root in path.parents) and
                        db.execute("SELECT 1 FROM folders WHERE generation=? AND path=?",
                                   (building,str(path))).fetchone()]
-        if complete:
-            db.execute('UPDATE roots SET completed=?,building=NULL WHERE root=? AND recursive=?', (building, str(root), recursive))
-            if completed:
-                retire_generation(db, completed)
-        db.commit()
+        publish_generation(db, building, completed, root, recursive, complete=complete)
         with self._state_lock:
             # A finished attempt is terminal even when some folders were
             # unreadable/unstable. Cancellation never reaches this point.

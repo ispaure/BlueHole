@@ -24,3 +24,18 @@ class SharedCopyTests(unittest.TestCase):
             (target / 'owner.py').write_text('modified')
             self.assertEqual(checker.compare_copy(source, target, ['owner.py'], ['owner.py']), [('changed', 'owner.py')])
             self.assertEqual(checker.compare_copy(source, target, ['owner.py'], []), [('missing', 'owner.py')])
+
+    def test_linked_members_and_parent_directories_are_rejected(self):
+        with TemporaryDirectory() as directory:
+            source, target, outside = (Path(directory) / name for name in ('source', 'target', 'outside'))
+            for path in (source, target, outside):
+                path.mkdir()
+            (source / 'owner.py').write_text('owner')
+            (outside / 'owner.py').write_text('owner')
+            (target / 'owner.py').symlink_to(outside / 'owner.py')
+            self.assertEqual(checker.compare_copy(source, target, ['owner.py'], ['owner.py']), [('linked', 'owner.py')])
+            (target / 'owner.py').unlink()
+            (source / 'nested').mkdir()
+            (source / 'nested/owner.py').write_text('owner')
+            (target / 'nested').symlink_to(outside, target_is_directory=True)
+            self.assertEqual(checker.compare_copy(source, target, ['nested/owner.py'], ['nested/owner.py']), [('linked', 'nested/owner.py')])

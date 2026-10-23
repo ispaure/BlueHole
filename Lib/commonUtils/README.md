@@ -3,8 +3,9 @@
 commonUtils is a reusable Python library for file automation and desktop tools.
 It provides filesystem objects and format registration, persistent directory
 indexing, archive and process operations, configuration and atomic persistence,
-and shared Qt browsers, readers and editors. Applications supply their own
-workflows, domain file types, dependency policy and settings.
+shared Qt browsers, readers and editors, and optional native mobile components.
+Portable resource and speech mechanisms remain independent of toolkit presentation.
+Applications supply their own workflows, domain file types, dependency policy and settings.
 
 Logistics and Blue Hole are existing consumers. Application features built on
 these components remain owned by their consuming projects.
@@ -58,6 +59,7 @@ Start at the [developer hub](docs/developer/README.md).
 | [filesystem](filesystem/README.md) | Files, directories, links, traversal, transfers, removal, rename, storage and indexes |
 | [formats](formats/README.md) | File registry; text, CSV, JSON, XML, INI, Markdown and archive types |
 | [archives](archives/README.md) | Create, inspect, extract, edit and verify archives |
+| [search](search/README.md) | Filename/provider queries, document matching and text-file content search |
 | [runtime](runtime/README.md) | Platform detection, diagnostics, cancellation, batches, streams and downloads |
 | [integrations](integrations/README.md) | Applications, web links, Steam and external command adapters |
 | [configuration](configuration/README.md) | Settings reads, optional typed INI schema and editor integration |
@@ -78,6 +80,8 @@ choose which components to expose.
 - [Code editing and diff/merge review](ui/code_editor/user_docs/README.md)
 - [Archive contents and previews](ui/archive_view/user_docs/README.md)
 - [Shared text and INI editors](ui/user_docs/README.md)
+- [Native list/tile browsing](ui/native_browser/user_docs/README.md)
+- [Native component workflows](ui/native/user_docs/README.md)
 
 ## Contributing
 
