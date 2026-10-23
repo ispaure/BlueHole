@@ -82,6 +82,30 @@ class DeluxePreferencesTests(unittest.TestCase):
         self.assertTrue(self.prefs.stat().st_mode & stat.S_IWUSR)
         self.notice.assert_called_once()
 
+    @unittest.skipIf(sys.platform == 'win32', 'POSIX permission bits require a POSIX filesystem')
+    def test_install_preserves_private_existing_preferences_permissions(self):
+        self.prefs.parent.mkdir(parents=True)
+        self.prefs.write_bytes(b'private preferences')
+        self.prefs.chmod(0o400)
+        with self.assertRaises(SystemExit):
+            self.module.apply_deluxe_prefs()
+        self.assertEqual(stat.S_IMODE(self.prefs.stat().st_mode), 0o600)
+        backups = list(self.prefs.parent.glob(self.prefs.name + '.previous-*'))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(stat.S_IMODE(backups[0].stat().st_mode), 0o600)
+
+    def test_linked_preferences_fail_without_changing_link_target(self):
+        self.prefs.parent.mkdir(parents=True)
+        original = self.prefs.parent / 'original.blend'
+        original.write_bytes(b'linked preferences')
+        original.chmod(stat.S_IRUSR)
+        mode = stat.S_IMODE(original.stat().st_mode)
+        self.prefs.symlink_to(original)
+        self.assert_failed('Refusing to replace linked preferences')
+        self.assertTrue(self.prefs.is_symlink())
+        self.assertEqual(original.read_bytes(), b'linked preferences')
+        self.assertEqual(stat.S_IMODE(original.stat().st_mode), mode)
+
     def test_missing_destination_folders_are_created(self):
         with self.assertRaises(SystemExit):
             self.module.apply_deluxe_prefs()
