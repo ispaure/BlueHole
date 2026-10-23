@@ -24,24 +24,14 @@ __status__ = 'Production'
 
 from ..operator_action import OperatorAction, KeymapBinding, pie_menu_action
 
-from ...ui.menus.pie import (
-    add_pies,
-    curve_pies,
-    directories_pies,
-    global_pies,
-    import_export_pies,
-    mesh_pies,
-    object_pies,
-    sculpt_pies,
-    source_control_pies,
-    uv_pies,
-)
+# Use registered menu IDs so declarations do not import the menus that draw them.
+# tests/test_pie_actions.py checks these IDs against the actual menu declarations.
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ADD PIES
 
 PIE_ADD = pie_menu_action(
-    add_pies.BLUEHOLE_MT_pie_add,
+    'BLUEHOLE_MT_pie_add',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='3D View',
@@ -54,14 +44,14 @@ PIE_ADD = pie_menu_action(
 )
 
 # Submenu (no hotkey by default)
-PIE_ADD_MORE = pie_menu_action(add_pies.BLUEHOLE_MT_pie_add_more)
-PIE_ADD_ASSET_CONTAINER = pie_menu_action(add_pies.BLUEHOLE_MT_pie_add_asset_container)
+PIE_ADD_MORE = pie_menu_action('BLUEHOLE_MT_pie_add_more')
+PIE_ADD_ASSET_CONTAINER = pie_menu_action('BLUEHOLE_MT_pie_add_asset_container')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CURVE PIES
 
 PIE_CURVE_ACTION = pie_menu_action(
-    curve_pies.BLUEHOLE_MT_pie_curve_action,
+    'BLUEHOLE_MT_pie_curve_action',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Curve',
@@ -73,7 +63,7 @@ PIE_CURVE_ACTION = pie_menu_action(
 )
 
 PIE_CURVE_TOOL = pie_menu_action(
-    curve_pies.BLUEHOLE_MT_pie_curve_tool,
+    'BLUEHOLE_MT_pie_curve_tool',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Curve',
@@ -85,7 +75,7 @@ PIE_CURVE_TOOL = pie_menu_action(
 )
 
 PIE_CURVE_HIDE = pie_menu_action(
-    curve_pies.BLUEHOLE_MT_pie_curve_hide,
+    'BLUEHOLE_MT_pie_curve_hide',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Curve',
@@ -101,7 +91,7 @@ PIE_CURVE_HIDE = pie_menu_action(
 # DIRECTORIES / GLOBAL (WINDOW)
 
 PIE_GLOBAL_HELP = pie_menu_action(
-    global_pies.BLUEHOLE_MT_pie_global_help,
+    'BLUEHOLE_MT_pie_global_help',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Window',
@@ -112,7 +102,7 @@ PIE_GLOBAL_HELP = pie_menu_action(
 )
 
 PIE_GLOBAL_DIRS = pie_menu_action(
-    directories_pies.BLUEHOLE_MT_pie_global_dirs,
+    'BLUEHOLE_MT_pie_global_dirs',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Window',
@@ -123,14 +113,14 @@ PIE_GLOBAL_DIRS = pie_menu_action(
 )
 
 # Submenus (no hotkey by default)
-PIE_GLOBAL_THEME = pie_menu_action(global_pies.BLUEHOLE_MT_pie_global_theme)
-PIE_GLOBAL_ORDER = pie_menu_action(global_pies.BLUEHOLE_MT_pie_global_order)
+PIE_GLOBAL_THEME = pie_menu_action('BLUEHOLE_MT_pie_global_theme')
+PIE_GLOBAL_ORDER = pie_menu_action('BLUEHOLE_MT_pie_global_order')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORT / EXPORT
 
 PIE_GLOBAL_IMPORT_EXPORT = pie_menu_action(
-    import_export_pies.BLUEHOLE_MT_pie_global_import_export,
+    'BLUEHOLE_MT_pie_global_import_export',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Window',
@@ -152,13 +142,13 @@ PIE_GLOBAL_IMPORT_EXPORT = pie_menu_action(
 )
 
 # Submenu (no hotkey by default)
-PIE_GLOBAL_EXTRA = pie_menu_action(import_export_pies.BLUEHOLE_MT_pie_global_extra)
+PIE_GLOBAL_EXTRA = pie_menu_action('BLUEHOLE_MT_pie_global_extra')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MESH PIES
 
 PIE_MESH_HIDE = pie_menu_action(
-    mesh_pies.BLUEHOLE_MT_pie_mesh_hide,
+    'BLUEHOLE_MT_pie_mesh_hide',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Mesh',
@@ -171,7 +161,7 @@ PIE_MESH_HIDE = pie_menu_action(
 )
 
 PIE_MESH_TOOL = pie_menu_action(
-    mesh_pies.BLUEHOLE_MT_pie_mesh_tool,
+    'BLUEHOLE_MT_pie_mesh_tool',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Mesh',
@@ -183,7 +173,7 @@ PIE_MESH_TOOL = pie_menu_action(
 )
 
 PIE_MESH_ACTION = pie_menu_action(
-    mesh_pies.BLUEHOLE_MT_pie_mesh_action,
+    'BLUEHOLE_MT_pie_mesh_action',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Mesh',
@@ -195,7 +185,7 @@ PIE_MESH_ACTION = pie_menu_action(
 )
 
 PIE_MESH_ACTION_UVSPECIAL = pie_menu_action(
-    mesh_pies.BLUEHOLE_MT_pie_mesh_action_uvspecial,
+    'BLUEHOLE_MT_pie_mesh_action_uvspecial',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Mesh',
@@ -209,20 +199,20 @@ PIE_MESH_ACTION_UVSPECIAL = pie_menu_action(
 )
 
 # Submenus (no hotkey by default)
-PIE_VERTEX_ACTION_SELECT = pie_menu_action(mesh_pies.BLUEHOLE_MT_pie_vertex_action_select)
-PIE_VERTEX_ACTION_MORE = pie_menu_action(mesh_pies.BLUEHOLE_MT_pie_vertex_action_more)
+PIE_VERTEX_ACTION_SELECT = pie_menu_action('BLUEHOLE_MT_pie_vertex_action_select')
+PIE_VERTEX_ACTION_MORE = pie_menu_action('BLUEHOLE_MT_pie_vertex_action_more')
 
-PIE_EDGE_ACTION_SELECT = pie_menu_action(mesh_pies.BLUEHOLE_MT_pie_edge_action_select)
-PIE_EDGE_ACTION_MORE = pie_menu_action(mesh_pies.BLUEHOLE_MT_pie_edge_action_more)
+PIE_EDGE_ACTION_SELECT = pie_menu_action('BLUEHOLE_MT_pie_edge_action_select')
+PIE_EDGE_ACTION_MORE = pie_menu_action('BLUEHOLE_MT_pie_edge_action_more')
 
-PIE_FACE_ACTION_SELECT = pie_menu_action(mesh_pies.BLUEHOLE_MT_pie_face_action_select)
-PIE_FACE_ACTION_MORE = pie_menu_action(mesh_pies.BLUEHOLE_MT_pie_face_action_more)
+PIE_FACE_ACTION_SELECT = pie_menu_action('BLUEHOLE_MT_pie_face_action_select')
+PIE_FACE_ACTION_MORE = pie_menu_action('BLUEHOLE_MT_pie_face_action_more')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OBJECT PIES
 
 PIE_OBJECT_TOOL = pie_menu_action(
-    object_pies.BLUEHOLE_MT_pie_object_tool,
+    'BLUEHOLE_MT_pie_object_tool',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Object Mode',
@@ -234,10 +224,10 @@ PIE_OBJECT_TOOL = pie_menu_action(
 )
 
 # Submenu (no hotkey by default)
-PIE_OBJECT_TOOL_MORE = pie_menu_action(object_pies.BLUEHOLE_MT_pie_object_tool_more)
+PIE_OBJECT_TOOL_MORE = pie_menu_action('BLUEHOLE_MT_pie_object_tool_more')
 
 PIE_OBJECT_HIDE = pie_menu_action(
-    object_pies.BLUEHOLE_MT_pie_object_hide,
+    'BLUEHOLE_MT_pie_object_hide',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Object Mode',
@@ -250,7 +240,7 @@ PIE_OBJECT_HIDE = pie_menu_action(
 )
 
 PIE_OBJECT_ACTION = pie_menu_action(
-    object_pies.BLUEHOLE_MT_pie_object_action,
+    'BLUEHOLE_MT_pie_object_action',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Object Mode',
@@ -262,14 +252,14 @@ PIE_OBJECT_ACTION = pie_menu_action(
 )
 
 # Submenus (no hotkey by default)
-PIE_OBJECT_ACTION_SELECT = pie_menu_action(object_pies.BLUEHOLE_MT_pie_object_action_select)
-PIE_OBJECT_ACTION_MORE = pie_menu_action(object_pies.BLUEHOLE_MT_pie_object_action_more)
+PIE_OBJECT_ACTION_SELECT = pie_menu_action('BLUEHOLE_MT_pie_object_action_select')
+PIE_OBJECT_ACTION_MORE = pie_menu_action('BLUEHOLE_MT_pie_object_action_more')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # SCULPT PIES
 
 PIE_SCULPT_TOOL = pie_menu_action(
-    sculpt_pies.BLUEHOLE_MT_pie_sculpt_tool,
+    'BLUEHOLE_MT_pie_sculpt_tool',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Sculpt',
@@ -281,7 +271,7 @@ PIE_SCULPT_TOOL = pie_menu_action(
 )
 
 PIE_SCULPT_ACTION = pie_menu_action(
-    sculpt_pies.BLUEHOLE_MT_pie_sculpt_action,
+    'BLUEHOLE_MT_pie_sculpt_action',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Sculpt',
@@ -293,7 +283,7 @@ PIE_SCULPT_ACTION = pie_menu_action(
 )
 
 PIE_SCULPT_SIMULATION = pie_menu_action(
-    sculpt_pies.BLUEHOLE_MT_pie_sculpt_simulation,
+    'BLUEHOLE_MT_pie_sculpt_simulation',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='Sculpt',
@@ -307,32 +297,32 @@ PIE_SCULPT_SIMULATION = pie_menu_action(
 )
 
 # Submenus (no hotkey by default)
-PIE_SCULPT_TOOL_CLAYBLOB = pie_menu_action(sculpt_pies.BLUEHOLE_MT_pie_sculpt_tool_clayblob)
-PIE_SCULPT_TOOL_DRAW = pie_menu_action(sculpt_pies.BLUEHOLE_MT_pie_sculpt_tool_draw)
-PIE_SCULPT_TOOL_FLATTENPINCH = pie_menu_action(sculpt_pies.BLUEHOLE_MT_pie_sculpt_tool_flattenpinch)
-PIE_SCULPT_TOOL_GRAB = pie_menu_action(sculpt_pies.BLUEHOLE_MT_pie_sculpt_tool_grab)
-PIE_SCULPT_TOOL_NUDGETHUMB = pie_menu_action(sculpt_pies.BLUEHOLE_MT_pie_sculpt_tool_nudgethumb)
-PIE_SCULPT_TOOL_MISC = pie_menu_action(sculpt_pies.BLUEHOLE_MT_pie_sculpt_tool_misc)
+PIE_SCULPT_TOOL_CLAYBLOB = pie_menu_action('BLUEHOLE_MT_pie_sculpt_tool_clayblob')
+PIE_SCULPT_TOOL_DRAW = pie_menu_action('BLUEHOLE_MT_pie_sculpt_tool_draw')
+PIE_SCULPT_TOOL_FLATTENPINCH = pie_menu_action('BLUEHOLE_MT_pie_sculpt_tool_flattenpinch')
+PIE_SCULPT_TOOL_GRAB = pie_menu_action('BLUEHOLE_MT_pie_sculpt_tool_grab')
+PIE_SCULPT_TOOL_NUDGETHUMB = pie_menu_action('BLUEHOLE_MT_pie_sculpt_tool_nudgethumb')
+PIE_SCULPT_TOOL_MISC = pie_menu_action('BLUEHOLE_MT_pie_sculpt_tool_misc')
 
-PIE_SCULPT_ACTION_BLEND = pie_menu_action(sculpt_pies.BLUEHOLE_MT_pie_sculpt_action_blend)
+PIE_SCULPT_ACTION_BLEND = pie_menu_action('BLUEHOLE_MT_pie_sculpt_action_blend')
 
 PIE_SCULPT_SIMULATION_BENDSTRETCHTWIST = pie_menu_action(
-    sculpt_pies.BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist
+    'BLUEHOLE_MT_pie_sculpt_simulation_bendstretchtwist'
 )
 PIE_SCULPT_SIMULATION_EXPANDCONTRACT = pie_menu_action(
-    sculpt_pies.BLUEHOLE_MT_pie_sculpt_simulation_expandcontract
+    'BLUEHOLE_MT_pie_sculpt_simulation_expandcontract'
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
 # SOURCE CONTROL PIES
 
-PIE_GLOBAL_SOURCE_CONTROL = pie_menu_action(source_control_pies.BLUEHOLE_MT_pie_global_source_control)
+PIE_GLOBAL_SOURCE_CONTROL = pie_menu_action('BLUEHOLE_MT_pie_global_source_control')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # UV PIES
 
 PIE_UV_CURSOR = pie_menu_action(
-    uv_pies.BLUEHOLE_MT_pie_UV_cursor,
+    'BLUEHOLE_MT_pie_UV_cursor',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='UV Editor',
@@ -345,7 +335,7 @@ PIE_UV_CURSOR = pie_menu_action(
 )
 
 PIE_UV_TOOL = pie_menu_action(
-    uv_pies.BLUEHOLE_MT_pie_UV_tool,
+    'BLUEHOLE_MT_pie_UV_tool',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='UV Editor',
@@ -357,7 +347,7 @@ PIE_UV_TOOL = pie_menu_action(
 )
 
 PIE_UV_ACTION = pie_menu_action(
-    uv_pies.BLUEHOLE_MT_pie_UV_action,
+    'BLUEHOLE_MT_pie_UV_action',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='UV Editor',
@@ -369,7 +359,7 @@ PIE_UV_ACTION = pie_menu_action(
 )
 
 PIE_UV_ACTION_UVSPECIAL = pie_menu_action(
-    uv_pies.BLUEHOLE_MT_pie_UV_action_uvspecial,
+    'BLUEHOLE_MT_pie_UV_action_uvspecial',
     keymap_bindings=(
         KeymapBinding(
             keymap_name='UV Editor',
@@ -384,7 +374,7 @@ PIE_UV_ACTION_UVSPECIAL = pie_menu_action(
 
 
 # Submenus (no hotkey by default)
-PIE_UV_ACTION_SELECT = pie_menu_action(uv_pies.BLUEHOLE_MT_pie_UV_action_select)
+PIE_UV_ACTION_SELECT = pie_menu_action('BLUEHOLE_MT_pie_UV_action_select')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ALL PIE ACTIONS
