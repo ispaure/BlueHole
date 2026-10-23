@@ -233,7 +233,7 @@ def check_tests(script_name, *,
             f'Current Blender file path:\n'
             f'"{blend_path_found}"'
         )
-        log(Severity.CRITICAL, script_name, msg, popup=not silent_mode)
+        log(Severity.CRITICAL, script_name, err_msg, popup=not silent_mode)
 
     # Check if blend exists
     if check_blend_exist:
