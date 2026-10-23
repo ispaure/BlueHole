@@ -14,6 +14,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMESPACE = '_bluehole_embedded_smoke'
+OWNED_NAMESPACES = (NAMESPACE, 'commonUtils', 'test_pie_actions')
 # Reuse portable library regressions; GUI/host-Python subprocess tests need their own runtimes.
 PORTABLE_TESTS = (
     'test_streams', 'test_browsing', 'test_persistence', 'test_session_store', 'test_batch',
@@ -68,10 +69,10 @@ class EmbeddedSharedTests(unittest.TestCase):
 
 def main():
     import bpy
-    if NAMESPACE in sys.modules or 'commonUtils' in sys.modules:
+    if any(name in sys.modules for name in OWNED_NAMESPACES):
         raise RuntimeError('Smoke-test library namespaces are already loaded')
     original_path = sys.path[:]
-    sys.path.insert(0, str(ROOT / 'Lib'))
+    sys.path[:0] = [str(ROOT / 'Lib'), str(ROOT / 'tests')]
     package = types.ModuleType(NAMESPACE)
     package.__path__ = [str(ROOT)]
     sys.modules[NAMESPACE] = package
@@ -88,6 +89,7 @@ def main():
                     unittest.defaultTestLoader.loadTestsFromTestCase(EmbeddedSharedTests),
                     unittest.defaultTestLoader.loadTestsFromNames(
                         ['commonUtils.tests.' + name for name in PORTABLE_TESTS]),
+                    unittest.defaultTestLoader.loadTestsFromName('test_pie_actions'),
                 ))
                 standalone_logging = importlib.import_module('commonUtils.runtime.diagnostics').noninteractive_logging
                 with standalone_logging(), shared('runtime.diagnostics').noninteractive_logging():
@@ -100,7 +102,7 @@ def main():
     finally:
         sys.path[:] = original_path
         for name in tuple(sys.modules):
-            if name == NAMESPACE or name.startswith(NAMESPACE + '.') or name == 'commonUtils' or name.startswith('commonUtils.'):
+            if any(name == owner or name.startswith(owner + '.') for owner in OWNED_NAMESPACES):
                 sys.modules.pop(name, None)
 
 

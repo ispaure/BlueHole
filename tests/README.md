@@ -20,7 +20,7 @@ renaming, SSE and JSON/XML. Selected unencrypted ZIP extraction cases need no
 optional cryptography dependency. Blue Hole retains only namespace/lifecycle and
 embedded-command checks; shared assertions stay in their library test owners.
 Both standalone and vendored namespaces load the actual committed vendor copy and
-keep separate registries. Legacy diagnostic dialogs are disabled during the suite.
+keep separate registries. The consumer pie-action tests also run in this suite. Legacy diagnostic dialogs are disabled during the suite.
 It neither registers Blue Hole nor opens or saves user projects/preferences.
 Failures produce a nonzero process status; no additional packages are installed.
 
@@ -29,3 +29,11 @@ counts. Skipped platform cases do not establish coverage.
 Passing on an older Blender establishes only those portable contracts in that
 runtime. It does not establish compatibility of the target branch's registration,
 operators, UI or exports. Use the declared target Blender for those separate checks.
+
+## Pie action dependency contract
+
+Pie action descriptors use the existing string menu-ID form of pie_menu_action.
+Menus depend on the actions they draw; declaration metadata does not import those
+menus back. tests/test_pie_actions.py rejects that dependency and checks all target
+IDs against literal menu declarations, without registering or executing the UI.
+The action catalog, fields, key bindings and registration code remain unchanged.
