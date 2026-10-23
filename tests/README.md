@@ -38,3 +38,7 @@ Menus depend on the actions they draw; declaration metadata does not import thos
 menus back. tests/test_pie_actions.py rejects that dependency and checks all target
 IDs against literal menu declarations, without registering or executing the UI.
 The action catalog, fields, key bindings and registration code remain unchanged.
+
+Selected archive cases also check late source changes at ZIP publication and
+one-pass removal selections. They use plain ZIP fixtures without optional
+encryption packages and do not register the add-on.
