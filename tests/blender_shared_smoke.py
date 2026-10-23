@@ -110,6 +110,12 @@ class EmbeddedSharedTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 record.write_json({'invalid': float('nan')})
             self.assertEqual(record.path.read_bytes(), before)
+            session = shared('persistence.session').SessionStore(root / 'session.json')
+            payload = {'version': 1, 'documents': [{'text': 'recoverable'}]}
+            session.write(payload)
+            with self.assertRaises(ValueError):
+                session.write({'version': 2, 'documents': []})
+            self.assertEqual(session.read(), payload)
 
     def test_embedded_command_capture(self):
         import bpy
