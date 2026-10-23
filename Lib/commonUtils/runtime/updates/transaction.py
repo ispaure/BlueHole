@@ -4,6 +4,7 @@ Hosts own channels, repositories, protected paths, UI, and shutdown approval.
 This file is copied outside the installation before an application exits.
 """
 import argparse
+from contextlib import contextmanager, nullcontext
 import fnmatch
 import hashlib
 import json
@@ -212,6 +213,27 @@ def prepare_archive(root, snapshot, revision, protected):
             'previous': installed, 'files': files, 'protected': list(protected), 'marker_hash': digest(marker)}
 
 
+def _archive_target(root, name, expected):
+    """Recheck the installed bytes immediately before a planned mutation."""
+    target = contained(root, name)
+    if (expected is not None and (not target.is_file() or digest(target) != expected)
+            or expected is None and target.exists()):
+        raise ValueError(f'Local file changed during update: {name}')
+    return target
+
+
+@contextmanager
+def _staged_update(target):
+    """Own a private sibling until verified publication or failed-copy cleanup."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with NamedTemporaryFile(prefix='.' + target.name + '.update-', dir=target.parent, delete=False) as stream:
+        temporary = Path(stream.name)
+    try:
+        yield temporary
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def apply_archive(plan, workspace):
     root, snapshot = Path(plan['root']), Path(plan['snapshot'])
     # Recheck all local files after shutdown, including edits made during preparation.
@@ -222,42 +244,48 @@ def apply_archive(plan, workspace):
     backup = workspace / 'rollback'
     backup.mkdir()
     existed = {}
-    changed = []
+    changed = {}
     try:
-        for name in sorted(names):
-            target = contained(root, name)
+        # The manifest advertises the revision only after every managed file.
+        for name in [*sorted(names - {MARKER}), MARKER]:
+            expected = plan['marker_hash'] if name == MARKER else plan['previous']['files'].get(name)
+            target = _archive_target(root, name, expected)
             saved = backup / relative(name)
             existed[name] = target.is_file()
-            expected = plan['previous']['files'].get(name)
-            if name != MARKER and (expected is not None and (not existed[name] or digest(target) != expected)
-                                   or expected is None and target.exists()):
-                raise ValueError(f'Local file changed during update: {name}')
             if existed[name]:
                 saved.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(target, saved)
-            changed.append(name)
-            (workspace / 'rollback.json').write_text(json.dumps({'root': str(root), 'files': existed}), encoding='utf-8')
-            if name in plan['files']:
-                target.parent.mkdir(parents=True, exist_ok=True)
-                with NamedTemporaryFile(prefix='.' + target.name + '.update-', dir=target.parent, delete=False) as stream:
-                    temporary = Path(stream.name)
-                try:
+                if digest(saved) != expected:
+                    raise ValueError(f'Recovery copy failed verification: {name}')
+            staging = _staged_update(target) if name in plan['files'] or name == MARKER else nullcontext(None)
+            with staging as temporary:
+                if name in plan['files']:
                     shutil.copy2(snapshot / relative(name), temporary)
                     if digest(temporary) != plan['files'][name]:
                         raise ValueError('Staged file changed during update')
+                elif name == MARKER:
+                    temporary.write_text(json.dumps({'format': 1, 'revision': plan['revision'], 'files': plan['files']}, indent=2), encoding='utf-8')
+                    shutil.copymode(target, temporary)
+                published = digest(temporary) if name == MARKER else plan['files'].get(name)
+                target = _archive_target(root, name, expected)
+                (workspace / 'rollback.json').write_text(json.dumps({'root': str(root), 'files': existed}), encoding='utf-8')
+                if temporary is not None:
                     temporary.replace(target)
-                finally:
-                    temporary.unlink(missing_ok=True)
-            elif name == MARKER:
-                target.write_text(json.dumps({'format': 1, 'revision': plan['revision'], 'files': plan['files']}, indent=2), encoding='utf-8')
-            else:
-                target.unlink()
+                else:
+                    target.unlink()
+                changed[name] = published
     except BaseException:
         try:
             for name in reversed(changed):
-                target = contained(root, name)
+                target = _archive_target(root, name, changed[name])
                 if existed[name]:
-                    shutil.copy2(backup / relative(name), target)
+                    expected = plan['marker_hash'] if name == MARKER else plan['previous']['files'][name]
+                    with _staged_update(target) as temporary:
+                        shutil.copy2(backup / relative(name), temporary)
+                        if digest(temporary) != expected:
+                            raise ValueError(f'Restored file failed verification: {name}')
+                        target = _archive_target(root, name, changed[name])
+                        temporary.replace(target)
                 elif target.exists():
                     target.unlink()
         except Exception as recovery:

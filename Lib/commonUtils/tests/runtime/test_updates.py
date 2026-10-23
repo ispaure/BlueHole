@@ -205,6 +205,156 @@ class UpdateTests(unittest.TestCase):
             updates.prepare_archive(installed, snapshot, 'new', self.protected)
         self.assertEqual(outside.read_text(), 'private')
 
+    def test_archive_rejects_corrupt_recovery_copies_before_changing_the_file(self):
+        base = self.root
+        for name in (updates.MARKER, 'app.py', 'obsolete.py'):
+            with self.subTest(name=name):
+                self.root = base / name
+                self.root.mkdir()
+                installed, snapshot, workspace = self.archive()
+                before = {path.name: path.read_bytes() for path in installed.iterdir()}
+                plan = updates.prepare_archive(installed, snapshot, 'new', self.protected)
+                original = shutil.copy2
+
+                def corrupt(source, destination, *args, **kwargs):
+                    result = original(source, destination, *args, **kwargs)
+                    if Path(destination) == workspace / 'rollback' / name:
+                        Path(destination).write_bytes(b'corrupted recovery copy')
+                    return result
+
+                with patch.object(updates.shutil, 'copy2', side_effect=corrupt):
+                    with self.assertRaisesRegex(ValueError, 'Recovery copy'):
+                        updates.apply_archive(plan, workspace)
+                self.assertEqual({path.name: path.read_bytes() for path in installed.iterdir()
+                                  if path.is_file()}, before)
+
+    def test_archive_preserves_edits_made_while_copying_recovery_or_payload(self):
+        base = self.root
+        for phase in ('recovery', 'payload'):
+            with self.subTest(phase=phase):
+                self.root = base / phase
+                self.root.mkdir()
+                installed, snapshot, workspace = self.archive()
+                marker = (installed / updates.MARKER).read_bytes()
+                plan = updates.prepare_archive(installed, snapshot, 'new', self.protected)
+                original = shutil.copy2
+
+                def edit(source, destination, *args, **kwargs):
+                    result = original(source, destination, *args, **kwargs)
+                    if (phase == 'recovery' and Path(destination) == workspace / 'rollback/app.py'
+                            or phase == 'payload' and Path(source).resolve() == snapshot.resolve() / 'app.py'):
+                        (installed / 'app.py').write_text('newer local edits')
+                    return result
+
+                with patch.object(updates.shutil, 'copy2', side_effect=edit):
+                    with self.assertRaisesRegex(ValueError, 'Local file changed'):
+                        updates.apply_archive(plan, workspace)
+                self.assertEqual((installed / 'app.py').read_text(), 'newer local edits')
+                self.assertEqual((installed / 'obsolete.py').read_text(), 'obsolete')
+                self.assertEqual((installed / updates.MARKER).read_bytes(), marker)
+
+    def test_archive_preserves_new_unmanaged_file_created_during_payload_copy(self):
+        installed, snapshot, workspace = self.archive()
+        plan = updates.prepare_archive(installed, snapshot, 'new', self.protected)
+        original = shutil.copy2
+        target = installed / 'nested/new.py'
+
+        def create(source, destination, *args, **kwargs):
+            result = original(source, destination, *args, **kwargs)
+            if Path(source).resolve() == snapshot.resolve() / 'nested/new.py':
+                target.write_text('new unmanaged file')
+            return result
+
+        with patch.object(updates.shutil, 'copy2', side_effect=create):
+            with self.assertRaisesRegex(ValueError, 'Local file changed'):
+                updates.apply_archive(plan, workspace)
+        self.assertEqual(target.read_text(), 'new unmanaged file')
+        self.assertEqual((installed / 'app.py').read_text(), 'old')
+
+    def test_archive_does_not_advertise_new_manifest_before_file_publication(self):
+        installed, snapshot, workspace = self.archive()
+        marker = (installed / updates.MARKER).read_bytes()
+        plan = updates.prepare_archive(installed, snapshot, 'new', self.protected)
+        original = shutil.copy2
+        observed = []
+
+        def copy(source, destination, *args, **kwargs):
+            if Path(source).resolve().is_relative_to(snapshot.resolve()):
+                observed.append((installed / updates.MARKER).read_bytes())
+            return original(source, destination, *args, **kwargs)
+
+        with patch.object(updates.shutil, 'copy2', side_effect=copy):
+            updates.apply_archive(plan, workspace)
+        self.assertEqual(observed, [marker, marker])
+        self.assertEqual(json.loads((installed / updates.MARKER).read_bytes())['revision'], 'new')
+
+    def test_archive_failed_recovery_copy_preserves_installed_bytes_and_reports_rollback_failure(self):
+        base = self.root
+        for failure in ('corrupt', 'partial'):
+            with self.subTest(failure=failure):
+                self.root = base / failure
+                self.root.mkdir()
+                installed, snapshot, workspace = self.archive()
+                plan = updates.prepare_archive(installed, snapshot, 'new', self.protected)
+                original = shutil.copy2
+
+                def fail(source, destination, *args, **kwargs):
+                    if Path(source).resolve() == snapshot.resolve() / 'nested/new.py':
+                        raise OSError('payload failure')
+                    if Path(source) == workspace / 'rollback/app.py':
+                        Path(destination).write_bytes(b'bad recovery output')
+                        if failure == 'partial':
+                            raise OSError('recovery copy interrupted')
+                        return destination
+                    return original(source, destination, *args, **kwargs)
+
+                with patch.object(updates.shutil, 'copy2', side_effect=fail):
+                    with self.assertRaises(updates.RollbackError):
+                        updates.apply_archive(plan, workspace)
+                self.assertEqual((installed / 'app.py').read_text(), 'new')
+                self.assertEqual((workspace / 'rollback/app.py').read_text(), 'old')
+                self.assertEqual((installed / 'obsolete.py').read_text(), 'obsolete')
+                self.assertFalse(list(installed.glob('.*.update-*')))
+
+    def test_archive_rollback_preserves_external_changes_to_already_published_paths(self):
+        base = self.root
+        for name in ('app.py', 'nested/new.py', 'obsolete.py'):
+            with self.subTest(name=name):
+                self.root = base / name.replace('/', '-')
+                self.root.mkdir()
+                installed, snapshot, workspace = self.archive()
+                plan = updates.prepare_archive(installed, snapshot, 'new', self.protected)
+                original = shutil.copy2
+                target = installed / name
+
+                def edit(source, destination, *args, **kwargs):
+                    if Path(destination) == workspace / 'rollback' / updates.MARKER:
+                        target.write_text('external change after publication')
+                        raise OSError('later update failure')
+                    return original(source, destination, *args, **kwargs)
+
+                with patch.object(updates.shutil, 'copy2', side_effect=edit):
+                    with self.assertRaises(updates.RollbackError):
+                        updates.apply_archive(plan, workspace)
+                self.assertEqual(target.read_text(), 'external change after publication')
+                self.assertEqual((workspace / 'rollback/app.py').read_text(), 'old')
+
+    def test_archive_failed_atomic_replace_does_not_restore_an_untouched_path(self):
+        installed, snapshot, workspace = self.archive()
+        plan = updates.prepare_archive(installed, snapshot, 'new', self.protected)
+        original = Path.replace
+
+        def fail(path, target):
+            if Path(target) == installed.resolve() / 'app.py':
+                Path(target).write_text('external edit before failed replace')
+                raise OSError('replace denied')
+            return original(path, target)
+
+        with patch.object(Path, 'replace', new=fail):
+            with self.assertRaisesRegex(OSError, 'replace denied'):
+                updates.apply_archive(plan, workspace)
+        self.assertEqual((installed / 'app.py').read_text(), 'external edit before failed replace')
+
     def test_helper_does_not_restart_after_incomplete_rollback(self):
         workspace = self.root / 'failed-runner'; workspace.mkdir()
         status = workspace / 'status.json'
