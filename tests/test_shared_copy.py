@@ -39,3 +39,35 @@ class SharedCopyTests(unittest.TestCase):
             (source / 'nested/owner.py').write_text('owner')
             (target / 'nested').symlink_to(outside, target_is_directory=True)
             self.assertEqual(checker.compare_copy(source, target, ['nested/owner.py'], ['nested/owner.py']), [('linked', 'nested/owner.py')])
+
+    def test_committed_copy_accepts_checkout_line_endings_and_ignores_dirty_upstream(self):
+        from contextlib import redirect_stdout
+        import io
+        import subprocess
+        with TemporaryDirectory() as directory:
+            root, source = Path(directory) / 'consumer', Path(directory) / 'shared'
+            for repo in (root, source):
+                repo.mkdir()
+                subprocess.run(['git', '-C', str(repo), 'init', '--quiet'], check=True)
+                subprocess.run(['git', '-C', str(repo), 'config', 'core.autocrlf', 'false'], check=True)
+            (source / '.gitattributes').write_text('*.txt text eol=lf\n')
+            (source / 'owner.txt').write_bytes(b'owner\n')
+            subprocess.run(['git', '-C', str(source), 'add', '.'], check=True)
+            hooks = Path(directory) / 'disabled-hooks'
+            hooks.mkdir()
+            subprocess.run(['git', '-C', str(source), '-c', 'user.name=Fixture',
+                '-c', 'user.email=fixture@example.invalid', '-c', 'commit.gpgsign=false',
+                '-c', 'core.hooksPath=' + str(hooks), 'commit', '--quiet', '-m', 'fixture'], check=True)
+            revision = subprocess.check_output(['git', '-C', str(source), 'rev-parse', 'HEAD'], text=True).strip()
+            vendor = root / 'Lib/commonUtils'
+            vendor.mkdir(parents=True)
+            (root / 'Lib/commonUtils.revision').write_text(revision + '\n')
+            (vendor / '.gitattributes').write_bytes((source / '.gitattributes').read_bytes())
+            (vendor / 'owner.txt').write_bytes(b'owner\r\n')
+            with redirect_stdout(io.StringIO()):
+                checker.main(source, root=root)
+                (source / 'owner.txt').write_text('unfinished upstream edit\n')
+                checker.main(source, root=root)
+            (vendor / 'owner.txt').write_bytes(b'changed\r\n')
+            with self.assertRaisesRegex(SystemExit, 'changed: owner.txt'):
+                checker.main(source, root=root)

@@ -1,8 +1,11 @@
 # Blue Hole
 
 Blue Hole adds project settings, asset export tools, keymaps and menus to Blender.
-It requires **Blender 4.5.1 or newer** and supports Windows, macOS and Linux;
+It requires **Blender 5.2.2 or newer** and supports Windows, macOS and Linux;
 external tools and individual integrations may have narrower platform support.
+
+Development targets `blender-5.2.2/alpha`. The `blender-4.5.1/*` branches retain
+the legacy version for existing installations.
 
 ## Install and start
 
@@ -46,6 +49,11 @@ Run `python -m unittest discover -s tests -v` for adapter checks outside Blender
 GitHub runs them on Windows, macOS and Linux. They check shared command contracts
 and preference-installation failure handling; they do not exercise a live engine,
 Perforce server or Blender desktop session.
+
+The shared copy checker compares `Lib/commonUtils` against the commit recorded in
+`Lib/commonUtils.revision`, applying Git line-ending rules. It rejects missing or
+obsolete files, changed content and linked files or directories. Unfinished edits
+in the source checkout do not change the recorded shared revision.
 
 [Website](https://blue-hole.weebly.com) ·
 [Feedback](https://blue-hole.weebly.com/contact.html)
