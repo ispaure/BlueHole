@@ -1,6 +1,7 @@
 """Run portable vendored contracts in Blender's embedded Python, without registration."""
 from array import array
 import argparse
+import asyncio
 import importlib
 from io import BytesIO
 import json
@@ -31,6 +32,20 @@ class EmbeddedSharedTests(unittest.TestCase):
         self.assertFalse(any(name.split('.')[0] in {'toga', 'PySide6', 'commonUtils'}
                              for name in set(sys.modules) - before))
         self.assertTrue(Path(shared('runtime.platform').__file__).is_relative_to(ROOT / 'Lib/commonUtils'))
+        async def retirement():
+            work = browser.BrowserLifecycle()
+            work.stop()
+            coroutine = asyncio.sleep(0)
+            try:
+                self.assertIsNone(work.spawn(coroutine))
+            finally:
+                coroutine.close()
+            # Prepared-tree publication explicitly reopens this existing owner.
+            work.closed = False
+            self.assertIsNotNone(work.spawn(asyncio.sleep(0)))
+            await work.close()
+            self.assertFalse(work.tasks)
+        asyncio.run(retirement())
 
     def test_short_streams_range_buffers_and_batch_success(self):
         streams = shared('runtime.streams')
