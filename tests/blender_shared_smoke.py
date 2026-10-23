@@ -1,9 +1,7 @@
 """Run portable vendored contracts in Blender's embedded Python, without registration."""
-from array import array
 import argparse
 import asyncio
 import importlib
-from io import BytesIO
 import json
 import os
 from pathlib import Path
@@ -13,10 +11,18 @@ from tempfile import TemporaryDirectory
 import types
 import unittest
 from unittest.mock import patch
-import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMESPACE = '_bluehole_embedded_smoke'
+# Reuse portable library regressions; GUI/host-Python subprocess tests need their own runtimes.
+PORTABLE_TESTS = (
+    'test_streams', 'test_browsing', 'test_persistence', 'test_session_store', 'test_batch',
+    'test_local_access', 'test_bulk_rename', 'test_sse_framing', 'test_json_type', 'test_xml',
+    'test_archives.ArchiveWorkspaceTests.test_selected_directory_extracts_descendants_preserving_paths',
+    'test_archives.ArchiveWorkspaceTests.test_racing_destination_at_extraction_publication_is_preserved',
+    'test_archives.ArchiveWorkspaceTests.test_extract_rejects_managed_destination_before_creating_parent_folders',
+    'test_archives.ArchiveWorkspaceTests.test_extract_rechecks_provider_boundary_before_complete_tree_publication',
+)
 
 
 def shared(name):
@@ -32,6 +38,11 @@ class EmbeddedSharedTests(unittest.TestCase):
         self.assertFalse(any(name.split('.')[0] in {'toga', 'PySide6', 'commonUtils'}
                              for name in set(sys.modules) - before))
         self.assertTrue(Path(shared('runtime.platform').__file__).is_relative_to(ROOT / 'Lib/commonUtils'))
+        standalone = importlib.import_module('commonUtils.runtime.platform')
+        self.assertTrue(Path(standalone.__file__).is_relative_to(ROOT / 'Lib/commonUtils'))
+        self.assertIsNot(shared('runtime.platform'), standalone)
+        self.assertIsNot(shared('formats.registry').file_types,
+                         importlib.import_module('commonUtils.formats.registry').file_types)
         async def retirement():
             work = browser.BrowserLifecycle()
             work.stop()
@@ -47,76 +58,6 @@ class EmbeddedSharedTests(unittest.TestCase):
             self.assertFalse(work.tasks)
         asyncio.run(retirement())
 
-    def test_short_streams_range_buffers_and_batch_success(self):
-        streams = shared('runtime.streams')
-        data = b'portable embedded data'
-        class ShortRead(BytesIO):
-            def read(self, count=-1):
-                return super().read(min(count, 3))
-        class ShortWrite(BytesIO):
-            def write(self, data):
-                return super().write(data[:2])
-        self.assertEqual(streams.read_up_to(ShortRead(data), len(data) + 1), data)
-        output = ShortWrite()
-        streams.copy_stream(ShortRead(data), output)
-        self.assertEqual(output.getvalue(), data)
-        RangeReader = shared('runtime.resources.range_reader').RangeReader
-        with RangeReader(8, lambda start, count: b'12345678'[start:start + count]) as stream:
-            target = array('I', [0, 0])
-            self.assertEqual(stream.readinto(target), target.itemsize * len(target))
-            self.assertEqual(target.tobytes(), b'12345678')
-        item = {'path': 'synthetic'}
-        result = shared('runtime.operations').run_batch([item], lambda value: True)
-        self.assertEqual(result.completed, [item])
-        self.assertFalse(result.failed)
-
-    def test_native_publication_and_collision_preservation(self):
-        persistence = shared('persistence')
-        publication = shared('persistence.publication')
-        with TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            target, stage = root / 'target', root / 'stage'
-            target.mkdir(); stage.mkdir()
-            (target / 'old').write_bytes(b'old')
-            (stage / 'new').write_bytes(b'new')
-            backup = persistence.promote_path(stage, target)
-            self.assertEqual((backup / 'old').read_bytes(), b'old')
-            self.assertEqual((target / 'new').read_bytes(), b'new')
-            source, occupied = root / 'source', root / 'occupied'
-            source.mkdir(); occupied.mkdir()
-            with self.assertRaises(FileExistsError):
-                publication.rename_exclusive(source, occupied)
-            self.assertTrue(source.is_dir())
-            self.assertEqual(list(occupied.iterdir()), [])
-            renamed = root / 'renamed'
-            shared('filesystem.rename').rename_path(source, renamed)
-            self.assertTrue(renamed.is_dir())
-
-    def test_archive_and_json_publication(self):
-        with TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            archive = root / 'sample.zip'
-            with zipfile.ZipFile(archive, 'w') as output:
-                output.writestr('nested/sample.txt', 'embedded')
-            destination = root / 'extracted'
-            shared('archives.extraction').extract(archive, destination)
-            self.assertEqual((destination / 'nested/sample.txt').read_text(), 'embedded')
-            with self.assertRaises(FileExistsError):
-                shared('archives.extraction').extract(archive, destination)
-            record = shared('formats.jsonType').JSONFile(root / 'record.json')
-            record.write_json({'name': '😀'})
-            self.assertEqual(record.read_json(), {'name': '😀'})
-            before = record.path.read_bytes()
-            with self.assertRaises(ValueError):
-                record.write_json({'invalid': float('nan')})
-            self.assertEqual(record.path.read_bytes(), before)
-            session = shared('persistence.session').SessionStore(root / 'session.json')
-            payload = {'version': 1, 'documents': [{'text': 'recoverable'}]}
-            session.write(payload)
-            with self.assertRaises(ValueError):
-                session.write({'version': 2, 'documents': []})
-            self.assertEqual(session.read(), payload)
-
     def test_embedded_command_capture(self):
         import bpy
         result = shared('integrations.wrappers.cmdShellWrapper').run_command(
@@ -127,8 +68,10 @@ class EmbeddedSharedTests(unittest.TestCase):
 
 def main():
     import bpy
-    if NAMESPACE in sys.modules:
-        raise RuntimeError('Smoke-test namespace is already loaded')
+    if NAMESPACE in sys.modules or 'commonUtils' in sys.modules:
+        raise RuntimeError('Smoke-test library namespaces are already loaded')
+    original_path = sys.path[:]
+    sys.path.insert(0, str(ROOT / 'Lib'))
     package = types.ModuleType(NAMESPACE)
     package.__path__ = [str(ROOT)]
     sys.modules[NAMESPACE] = package
@@ -141,16 +84,23 @@ def main():
                            'XDG_CONFIG_HOME': str(home / '.config'), 'XDG_CACHE_HOME': str(home / '.cache'),
                            'APPDATA': str(home / 'AppData/Roaming'), 'LOCALAPPDATA': str(home / 'AppData/Local')}
             with patch.dict(os.environ, environment), patch.object(Path, 'home', return_value=home):
-                suite = unittest.defaultTestLoader.loadTestsFromTestCase(EmbeddedSharedTests)
-                result = unittest.TextTestRunner(verbosity=2).run(suite)
+                suite = unittest.TestSuite((
+                    unittest.defaultTestLoader.loadTestsFromTestCase(EmbeddedSharedTests),
+                    unittest.defaultTestLoader.loadTestsFromNames(
+                        ['commonUtils.tests.' + name for name in PORTABLE_TESTS]),
+                ))
+                standalone_logging = importlib.import_module('commonUtils.runtime.diagnostics').noninteractive_logging
+                with standalone_logging(), shared('runtime.diagnostics').noninteractive_logging():
+                    result = unittest.TextTestRunner(verbosity=2).run(suite)
             print(json.dumps({'blender': bpy.app.version_string, 'python': sys.version.split()[0],
                               'shared': (ROOT / 'Lib/commonUtils.revision').read_text().strip(),
-                              'tests': result.testsRun, 'registration_tested': False}))
+                              'tests': result.testsRun, 'skipped': len(result.skipped), 'registration_tested': False}))
             if not result.wasSuccessful():
                 raise RuntimeError('Embedded shared-library smoke tests failed')
     finally:
+        sys.path[:] = original_path
         for name in tuple(sys.modules):
-            if name == NAMESPACE or name.startswith(NAMESPACE + '.'):
+            if name == NAMESPACE or name.startswith(NAMESPACE + '.') or name == 'commonUtils' or name.startswith('commonUtils.'):
                 sys.modules.pop(name, None)
 
 

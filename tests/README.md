@@ -14,14 +14,18 @@ python tests/blender_shared_smoke.py --blender "/path/to/Blender"
 
 The launcher selects background factory startup, disables blend-file autoexecution
 and supplies temporary user resource/configuration folders before Blender starts.
-The script tests the actual vendored namespace with temporary storage and fixtures:
-portable imports and browser retirement/reuse, short streams, typed range buffers,
-batch outcomes, native
-no-replace publication, ZIP/JSON/recovery writes and a bounded Blender version subprocess.
+The script reuses selected existing portable shared regression modules for streams,
+range buffers, batch outcomes, publication, recovery envelopes, provider boundaries,
+renaming, SSE and JSON/XML. Selected unencrypted ZIP extraction cases need no
+optional cryptography dependency. Blue Hole retains only namespace/lifecycle and
+embedded-command checks; shared assertions stay in their library test owners.
+Both standalone and vendored namespaces load the actual committed vendor copy and
+keep separate registries. Legacy diagnostic dialogs are disabled during the suite.
 It neither registers Blue Hole nor opens or saves user projects/preferences.
 Failures produce a nonzero process status; no additional packages are installed.
 
-The printed JSON records Blender, embedded Python and the shared revision.
+The printed JSON records Blender, embedded Python, the shared revision and test/skip
+counts. Skipped platform cases do not establish coverage.
 Passing on an older Blender establishes only those portable contracts in that
 runtime. It does not establish compatibility of the target branch's registration,
 operators, UI or exports. Use the declared target Blender for those separate checks.
