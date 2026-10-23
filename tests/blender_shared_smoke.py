@@ -17,7 +17,7 @@ NAMESPACE = '_bluehole_embedded_smoke'
 OWNED_NAMESPACES = (NAMESPACE, 'commonUtils', 'test_pie_actions')
 # Reuse portable library regressions; GUI/host-Python subprocess tests need their own runtimes.
 PORTABLE_TESTS = (
-    'test_streams', 'test_browsing', 'test_persistence', 'test_session_store', 'test_batch',
+    'test_streams', 'test_browsing', 'test_traversal', 'test_persistence', 'test_session_store', 'test_batch',
     'test_local_access', 'test_bulk_rename', 'test_sse_framing', 'test_json_type', 'test_xml',
     'test_archives.ArchiveWorkspaceTests.test_selected_directory_extracts_descendants_preserving_paths',
     'test_archives.ArchiveWorkspaceTests.test_racing_destination_at_extraction_publication_is_preserved',
