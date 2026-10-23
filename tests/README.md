@@ -42,3 +42,6 @@ The action catalog, fields, key bindings and registration code remain unchanged.
 Selected archive cases also check late source changes at ZIP publication and
 one-pass removal selections. They use plain ZIP fixtures without optional
 encryption packages and do not register the add-on.
+
+The portable member-rebuilding module checks retained-name and stored-name
+iterators, container comments, ordering, attributes, cancellation and size bounds.
