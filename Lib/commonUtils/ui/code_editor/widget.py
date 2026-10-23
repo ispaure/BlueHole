@@ -1,7 +1,9 @@
 """Reusable QPlainTextEdit with a gutter and focused code-editing conveniences."""
 
 from .. import pyside as qt
+from ..appearance.typography import point_size, setting_size
 from ..text_commands import wrap_selection
+from ..column_guide import ColumnGuide
 from .transforms import TransformCommands
 from .multicursor import MultiCursorCommands
 from .folding import FoldingCommands
@@ -43,7 +45,7 @@ class LineNumbers(qt.QWidget):
         self.editor.gutter_click(event.position().toPoint())
 
 
-class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlainTextEdit):
+class CodeEdit(ColumnGuide, FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlainTextEdit):
     focused = qt.Signal()
     read_only_changed = qt.Signal(bool)
     preferences_changed = qt.Signal()
@@ -58,6 +60,8 @@ class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlai
         self.auto_indent = True
         self.auto_pairs = False
         self.line_numbers = True
+        self.line_changes = ()
+        self.column_guide = 0
         self.comment_prefix = "#"
         self.search_selections = []
         self.initialize_multicursor()
@@ -93,7 +97,7 @@ class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlai
         self._bind_document(source.document())
         self.setFont(source.font())
         for name in ('indent_width', 'use_tabs', 'auto_indent', 'auto_pairs',
-                     'line_numbers', 'comment_prefix', 'indent_guides'):
+                     'line_numbers', 'comment_prefix', 'indent_guides', 'column_guide'):
             setattr(self, name, getattr(source, name))
         self.setLineWrapMode(source.lineWrapMode())
         self.setReadOnly(source.isReadOnly())
@@ -106,14 +110,34 @@ class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlai
         document.setDocumentLayout(qt.QPlainTextDocumentLayout(document))
         self._bind_document(document)
 
+    def set_line_changes(self, changes, label=''):
+        self.line_changes = tuple(changes)
+        self.gutter.setToolTip(label)
+        self.gutter.update()
+
+    def paint_line_changes(self, painter, block, top, height):
+        number = block.blockNumber()
+        for change in self.line_changes:
+            if change.start <= number < change.end:
+                painter.fillRect(2, top, 4, height, qt.QColor(
+                    '#009e73' if change.kind == 'add' else '#408bd6'))
+            elif change.kind == 'delete' and number == min(change.start, self.blockCount() - 1):
+                y = top if change.start < self.blockCount() else top + height - 3
+                painter.fillRect(0, y, 8, 3, qt.QColor('#d55e00'))
+
     def gutter_width(self):
         return (
-            28
+            14 + self.fold_marker_width()
             + max(self.fontMetrics().horizontalAdvance(digit * len(str(max(1, self.blockCount()))))
                   for digit in '0123456789')
             if self.line_numbers
             else 0
         )
+
+    def fold_marker_width(self):
+        if not self.folding_enabled or not self.folding.ranges:
+            return 0
+        return max(14, self.fontMetrics().horizontalAdvance('+') + 4)
 
     def update_gutter(self, *args):
         self.setViewportMargins(self.gutter_width(), 0, 0, 0)
@@ -140,35 +164,37 @@ class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlai
         )
 
     def paint_gutter(self, event):
-        painter = qt.QPainter(self.gutter)
-        painter.setFont(self.font())
-        painter.fillRect(
-            event.rect(), self.palette().brush(qt.QPalette.ColorRole.AlternateBase)
-        )
-        block = self.firstVisibleBlock()
-        top = round(
-            self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
-        )
-        while block.isValid() and top <= event.rect().bottom():
-            height = round(self.blockBoundingRect(block).height())
-            if block.isVisible() and top + height >= event.rect().top():
-                role = (
-                    qt.QPalette.ColorRole.Text
-                    if block == self.textCursor().block()
-                    else qt.QPalette.ColorRole.PlaceholderText
-                )
-                painter.setPen(self.palette().color(role))
-                self.draw_fold_marker(painter, block, top)
-                painter.drawText(
-                    0,
-                    top,
-                    self.gutter.width() - 6,
-                    self.fontMetrics().height(),
-                    qt.Qt.AlignmentFlag.AlignRight,
-                    str(block.blockNumber() + 1),
-                )
-            top += height
-            block = block.next()
+        with qt.QPainter(self.gutter) as painter:
+            painter.setFont(self.font())
+            painter.fillRect(
+                event.rect(), self.palette().brush(qt.QPalette.ColorRole.AlternateBase)
+            )
+            block = self.firstVisibleBlock()
+            top = round(
+                self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
+            )
+            while block.isValid() and top <= event.rect().bottom():
+                height = round(self.blockBoundingRect(block).height())
+                if block.isVisible() and top + height >= event.rect().top():
+                    role = (
+                        qt.QPalette.ColorRole.Text
+                        if block == self.textCursor().block()
+                        else qt.QPalette.ColorRole.PlaceholderText
+                    )
+                    painter.setPen(self.palette().color(role))
+                    self.paint_line_changes(painter, block, top, height)
+                    self.draw_fold_marker(painter, block, top)
+                    number_left = 10 + self.fold_marker_width()
+                    painter.drawText(
+                        number_left,
+                        top,
+                        self.gutter.width() - number_left - 4,
+                        self.fontMetrics().height(),
+                        qt.Qt.AlignmentFlag.AlignRight,
+                        str(block.blockNumber() + 1),
+                    )
+                top += height
+                block = block.next()
 
     def highlight_cursor(self):
         selection = qt.QTextEdit.ExtraSelection()
@@ -226,12 +252,12 @@ class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlai
 
     def update_tab_width(self):
         self.setTabStopDistance(
-            self.fontMetrics().horizontalAdvance(" ") * self.indent_width
+            qt.QFontMetricsF(self.font()).horizontalAdvance(" ") * self.indent_width
         )
 
     def set_font_size(self, size):
         font = self.font()
-        font.setPointSizeF(max(7, min(48, size)))
+        font.setPointSizeF(point_size(max(7, min(24, size))))
         self.setFont(font)
         self.update_tab_width()
         self.update_gutter()
@@ -241,7 +267,7 @@ class CodeEdit(FoldingCommands, MultiCursorCommands, TransformCommands, qt.QPlai
         if event.modifiers() & qt.Qt.KeyboardModifier.ControlModifier:
             delta = event.angleDelta().y() or event.pixelDelta().y()
             if delta:
-                self.set_font_size(self.font().pointSizeF() + (1 if delta > 0 else -1))
+                self.set_font_size(setting_size(self.font()) + (1 if delta > 0 else -1))
             event.accept()
             return
         super().wheelEvent(event)

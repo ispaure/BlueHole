@@ -155,7 +155,7 @@ multiple files at once.
 
 ## `exec_p4_command()`
 
-All Perforce shell execution is funneled through `exec_p4_command()`.
+Model operations use `exec_p4_arguments()` with separate arguments and structured command outcomes. `exec_p4_command()` remains the legacy string/shell entry point.
 
 This helper ensures that:
 
@@ -355,11 +355,7 @@ By isolating Perforce behavior inside this wrapper, Blue Hole avoids
 duplicating fragile command-line logic throughout the addon.
 ## Perforce command outcomes
 
-The alpha branch vendors the shared structured command wrapper, synchronized
-from commonUtils commit `6671ac3a4e62355fd0de61af44575dafc1de30c0`. Perforce commands
-use `run_command` internally and retain output-list compatibility for callers that
-parse diagnostics such as missing depot files. Timeouts and silent nonzero exits
-raise an error instead of presenting partial output as successful completion.
+The shared source revision is recorded in `Lib/commonUtils.revision`. Model operations use shell-free argument lists and structured command outcomes, while the legacy string API retains output-list compatibility. Failed commands, timeouts and incomplete status records cannot report checkout success.
 The wrapper selects only the current platform's executable preferences.
 
 Run `python -m unittest discover -s tests -v` outside Blender to check the vendored
@@ -371,3 +367,25 @@ Perforce consumers import generic models directly from
 preference providers through `initialize_runtime()` at add-on startup and retains
 `BlendP4File` for Blender filter checks and scene reloads. Former generic Perforce
 forwarding modules have been removed.
+
+## Checkout failure and save policy
+
+Blue Hole intentionally keeps saving permissive. Scene checkout and its dispatcher
+return boolean outcomes, but the existing save callbacks and Save As operator do
+not veto a save when checkout returns `False`. Loading permits sync and reloads
+the scene after successful sync; pre-save checks keep `allow_sync=False`. New
+Save As destinations are checked after creation, and the next pre-save check is
+skipped to avoid checking the previous scene path twice.
+
+Batch export still honors `source_control_error_aborts_exp`: a checkout failure
+aborts only when that preference is enabled. Otherwise the existing export flow
+continues, including making export targets writable. Binary placeholders, batched
+add/sync/edit ordering and user prompts are preserved.
+
+Rename stops after failed checkout or move and reports the partial result. At that
+point Blender/Unreal may already have been renamed; there is no automatic rollback.
+No local copy/delete fallback follows a failed Perforce step.
+
+`tests/test_perforce_workflows.py` exercises these policies with Blender/Perforce
+fixtures, including both export preferences. It does not validate native Blender
+handlers, a live Perforce server, or an Unreal connection.

@@ -34,6 +34,7 @@ class ColumnDelegate(FilenameEditorMixin, qt.QStyledItemDelegate):
 
 
 class FolderColumnView(qt.QColumnView):
+    column_created = qt.Signal(object)
     column_context_requested = qt.Signal(object, object)
     selection_input = qt.Signal(object)
     def __init__(self):
@@ -85,6 +86,10 @@ class FolderColumnView(qt.QColumnView):
         super().setColumnWidths(widths)
         self._sync_preview_width()
 
+    def setModel(self, model):
+        super().setModel(model)
+        self.set_file_preview_visible(self._preview_requested)
+
     def set_file_preview_visible(self, visible):
         self._preview_requested = visible
         widths = self.columnWidths()
@@ -94,7 +99,9 @@ class FolderColumnView(qt.QColumnView):
             depth += 1
             parent = parent.parent()
         width = widths[min(depth, len(widths)-1)] if widths else 240
-        if hasattr(self, 'setPreviewColumnVisible'):
+        # Qt 6.12 dereferences the model in this method. Construction installs
+        # the preview before a model exists; apply the native switch in setModel.
+        if self.model() is not None and hasattr(self, 'setPreviewColumnVisible'):
             self.setPreviewColumnVisible(visible)
         # Qt before 6.11 has no public visibility switch for the preview host.
         self.preview_host.setFixedWidth(width if visible else 0)
@@ -118,4 +125,5 @@ class FolderColumnView(qt.QColumnView):
         column.installEventFilter(self)
         column.viewport().installEventFilter(self)
         column.setVerticalScrollBarPolicy(qt.Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.column_created.emit(column)
         return column

@@ -24,6 +24,11 @@ Ordinary INI values are text, even when their names resemble types. If the host 
 into typed keys, booleans become checkboxes and choice fields can become dropdowns;
 numbers and lists are validated before saving. Unrecognized suffixes stay text.
 
+The mouse wheel scrolls settings pages without changing values under the pointer,
+even when a field has focus. This includes numeric, date/time and dropdown fields,
+sliders and dials. Use typing, keyboard arrows or clicks to change values. Open a
+dropdown to scroll its available choices.
+
 Invalid typed fields block Save and switching to Source until corrected or discarded.
 Malformed INI files open in Source for repair. Comments and unrelated formatting are
 preserved where a field can be patched unambiguously. Ambiguous formatting is reported
@@ -90,18 +95,36 @@ browse their options without another click. Press Escape to dismiss the menu.
 Hosts can expose software defaults and personal settings using the shared settings
 editor. Personal fields show Inherited or Override; **↶** removes an override, then
 Save applies it. Software mode edits the defaults INI and ↶ reverts an unsaved
-field. Appearance has four font roles: interface/dialogs, browsers, reading, code.
+field. Font sizes range from 7 to 24 pt. Appearance has four font roles: interface/dialogs, browsers, reading, code.
 Ordinary buttons, including Save and Reload, follow the interface font. Buttons
 inside browser panels follow the browser font; sample buttons use the preview font.
 Font dropdowns display each family name in its own typeface so you can preview
-fonts while browsing. Choose Automatic to use the role's fallback font, or type
+fonts while browsing. EPUB and Markdown use Arial at 10 pt by default, a neutral
+sans serif for books and technical documentation; personal
+font choices override that default. Choose Automatic to use the role's fallback font, or type
 a font family name directly. The selected field also uses the chosen typeface.
 Samples underneath show interface controls, browser entries, reading text or code
 using the pending family and size. Selecting a font, changing its size or resetting
 it updates the sample immediately; the application changes only after Save.
 The code list contains only monospace fonts (equal character widths). Automatic
 uses the platform's monospace fallback; typed code font names must be monospace too.
+On Windows, the lists exclude legacy bitmap/vector fonts such as Terminal and
+Fixedsys. Choose a scalable outline font or Automatic. Unsupported typed names
+use a safe preview and show an error on Save; old saved choices use a fallback.
 Markdown uses the reading font for prose and the code font for source/code blocks.
 Accent and dark surface tint update the theme. In a host with central settings,
 Markdown's appearance button opens that host window; standalone hosts retain a
 local reading-size popup.
+
+New Tab (+) appears in the active tab strip or the view toolbar when a single-tab
+header is collapsed. Hidden or retired headers do not display extra + buttons.
+
+The Menus settings include **Launch with sidebar**, enabled by default, for hosts
+that support sidebar navigation on their launch screen. Hosts apply the choice
+when opening a workspace.
+
+## Password visibility
+
+Password and token controls start hidden. Use the eye button to show or hide the
+current value. Clearing the field hides it again. The application decides when
+credentials are submitted, retained or cleared.

@@ -1,6 +1,7 @@
 """Internal source-editing actions and safe file operations for MarkdownViewer."""
 from ..appearance.icons import set_painted_icon
-from ..readers.reader_chrome import ReaderIcon
+from ..readers.reader_chrome import ReaderIcon, reader_button
+from ..appearance.formatting_icons import FormattingIcon
 from pathlib import Path
 
 from .. import pyside as qt
@@ -47,13 +48,18 @@ class MarkdownEditingMixin:
         self.copy_action = self._action('Copy', lambda: (self.active_editor() if self.edit_button.isChecked() else self.browser).copy(), key.Copy)
         self.paste_action = self._action('Paste', lambda: self.active_editor().paste(), key.Paste)
         self.select_all_action = self._action('Select All', lambda: (self.active_editor() if self.edit_button.isChecked() else self.browser).selectAll(), key.SelectAll)
-        self.find_action = self._action('Find / Replace…' if self.allow_edit else 'Find…', self.show_find, key.Find, ('Ctrl+F',))
+        self.find_action = self._action('Find / Replace in this page…' if self.allow_edit else 'Find in this page…', self.show_find, key.Find, ('Ctrl+F',))
         self.bold_action = self._action('Bold', lambda: self.wrap_selection('**', 'text'), key.Bold, ('Ctrl+B',))
         self.italic_action = self._action('Italic', lambda: self.wrap_selection('*', 'text'), key.Italic, ('Ctrl+I',))
         self.code_action = self._action('Inline code', lambda: self.wrap_selection('`', 'code'))
         self.link_action = self._action('Insert link', self.insert_link, extra=('Ctrl+K',))
         self.editor_toolbar = qt.QToolButton(self)
         self.editor_toolbar.setText('Format')
+        set_painted_icon(self.editor_toolbar, FormattingIcon, 'format')
+        self.editor_toolbar.setToolButtonStyle(qt.Qt.ToolButtonStyle.ToolButtonIconOnly)
+        self.editor_toolbar.setToolTip('Markdown formatting')
+        self.editor_toolbar.setIconSize(qt.QSize(20, 20))
+        self.editor_toolbar.setMinimumSize(32, 32)
         self.editor_toolbar.setAccessibleName('Markdown formatting')
         self.editor_toolbar.setPopupMode(qt.QToolButton.ToolButtonPopupMode.InstantPopup)
         self.format_menu = qt.QMenu(self.editor_toolbar)
@@ -61,35 +67,71 @@ class MarkdownEditingMixin:
         for action in (self.undo_action, self.redo_action, self.bold_action, self.italic_action,
                        self.code_action, self.link_action):
             self.format_menu.addAction(action)
+        for action, glyph in ((self.bold_action, 'bold'), (self.italic_action, 'italic'),
+                              (self.undo_action, 'undo'), (self.redo_action, 'redo'),
+                              (self.code_action, 'code'), (self.link_action, 'link')):
+            set_painted_icon(action, FormattingIcon, glyph)
         menu = self.format_menu.addMenu('Heading')
-        menu.addAction('Paragraph', lambda: self.prefix_lines(''))
+        set_painted_icon(menu.menuAction(), FormattingIcon, 'heading')
+        action = menu.addAction('Paragraph', lambda: self.prefix_lines(''))
+        set_painted_icon(action, FormattingIcon, 'paragraph')
         for level in range(1, 7):
-            menu.addAction(f'Heading {level}', lambda level=level: self.prefix_lines('#' * level + ' '))
-        self.format_menu.addAction('Bullet list', lambda: self.prefix_lines('- '))
-        self.format_menu.addAction('Quote', lambda: self.prefix_lines('> '))
+            action = menu.addAction(f'Heading {level}', lambda level=level: self.prefix_lines('#' * level + ' '))
+            set_painted_icon(action, FormattingIcon, 'heading')
+        action = self.format_menu.addAction('Bullet list', lambda: self.prefix_lines('- '))
+        set_painted_icon(action, FormattingIcon, 'bullets')
+        action = self.format_menu.addAction('Quote', lambda: self.prefix_lines('> '))
+        set_painted_icon(action, FormattingIcon, 'quote')
         self._build_table_actions()
+        self.format_buttons = {}
         self.navigation_toolbar.insertWidget(2, self.editor_toolbar)
+        for index, (glyph, action) in enumerate((('bold', self.bold_action), ('italic', self.italic_action),
+                                                ('undo', self.undo_action), ('redo', self.redo_action))):
+            button = reader_button(self, action.text(), action=action)
+            button.setToolButtonStyle(qt.Qt.ToolButtonStyle.ToolButtonIconOnly)
+            self.navigation_toolbar.insertWidget(2 + index, button)
+            self.format_buttons[glyph] = button
+            button.hide()
         self.editor_toolbar.hide()
         self.find_bar = qt.QWidget()
-        row = qt.QHBoxLayout(self.find_bar)
-        row.setContentsMargins(0, 0, 0, 0)
+        find_layout = qt.QVBoxLayout(self.find_bar)
+        find_layout.setContentsMargins(0, 0, 0, 0)
+        row = qt.QHBoxLayout()
+        find_layout.addLayout(row)
         self.find_text = qt.QLineEdit()
-        self.find_text.setPlaceholderText('Find text')
+        self.find_text.setPlaceholderText('Find in this page…')
+        self.find_text.setAccessibleName('Find in this page')
+        self.find_text.setClearButtonEnabled(True)
+        row.addWidget(qt.QLabel('This page'))
+        row.addWidget(self.find_text, 1)
+        for title, glyph, callback in (('Previous match', 'previous', self.find_previous),
+                                       ('Next match', 'next', self.find_next), ('Close search', 'close', self.close_find)):
+            button = reader_button(self, title, icon=glyph)
+            button.clicked.connect(lambda checked=False, callback=callback: callback())
+            row.addWidget(button)
+        self.replace_row = qt.QWidget()
+        replace_layout = qt.QHBoxLayout(self.replace_row)
+        replace_layout.setContentsMargins(0, 0, 0, 0)
         self.replace_text = qt.QLineEdit()
         self.replace_text.setPlaceholderText('Replace with')
-        row.addWidget(self.find_text, 1)
         self.replace_text.setVisible(self.allow_edit)
-        row.addWidget(self.replace_text, 1)
-        for title, callback in (('Next', self.find_next), ('Replace', self.replace_match),
-                                ('Replace all', self.replace_all), ('Close', self.find_bar.hide)):
+        replace_layout.addWidget(self.replace_text, 1)
+        for title, callback in (('Replace', self.replace_match), ('Replace all', self.replace_all)):
             button = qt.QPushButton(title)
             button.clicked.connect(lambda checked=False, callback=callback: callback())
-            if title in ('Replace', 'Replace all'):
-                button.setVisible(self.allow_edit)
-                button.setEnabled(self.allow_edit)
-            row.addWidget(button)
+            replace_layout.addWidget(button)
+        find_layout.addWidget(self.replace_row)
+        self.replace_row.hide()
         self.find_text.returnPressed.connect(self.find_next)
-        layout.addWidget(self.find_bar)
+        self.find_count = qt.QLabel()
+        self.find_count.setMinimumWidth(0)
+        self.find_count.setAccessibleName('Page search matches')
+        row.insertWidget(2, self.find_count)
+        layout.insertWidget(0, self.find_bar)
+        self.find_button = reader_button(self, 'Find in this page', icon='search')
+        self.find_button.setToolTip('Find in this page (Ctrl+F / ⌘F)')
+        self.find_button.clicked.connect(self.show_find)
+        self.navigation_toolbar.addWidget(self.find_button)
         self.find_bar.hide()
         for action in (self.cut_action, self.paste_action, self.bold_action, self.italic_action, self.code_action, self.link_action):
             action.setEnabled(False)
@@ -114,6 +156,8 @@ class MarkdownEditingMixin:
         self.pages.setCurrentWidget(self.active_editor() if enabled else self.browser)
         self.diagrams_button.setVisible(not enabled and bool(mermaid_blocks(self.editor.toPlainText())))
         self.editor_toolbar.setVisible(enabled)
+        for button in self.format_buttons.values():
+            button.setVisible(enabled)
         self.properties_button.setVisible(enabled and self.allow_edit)
         self.appearance_button.setVisible(not enabled)
         self.speech.action.setVisible(not enabled)
@@ -122,6 +166,7 @@ class MarkdownEditingMixin:
             action.setEnabled(not enabled)
         self.edit_mode.setVisible(enabled)
         self.replace_text.setEnabled(enabled)
+        self.replace_row.setVisible(enabled and self.allow_edit)
         self.properties.set_editable(enabled and self.edit_mode.currentData() == "formatted")
         label = 'Read Markdown' if enabled else 'Edit Markdown'
         set_painted_icon(self.edit_button, ReaderIcon, 'read' if enabled else 'edit')
@@ -171,6 +216,11 @@ class MarkdownEditingMixin:
         return self._confirm_leave()
 
     def open_dialog(self):
+        if self.storage is not None and callable(getattr(self.storage, 'open_dialog', None)):
+            return self.storage.open_dialog(self)
+        action = getattr(qt.QApplication.instance(), '_commonutils_markdown_resource_action', None)
+        if action:
+            return action(self, 'open')
         path, _ = qt.QFileDialog.getOpenFileName(self, 'Open Markdown',
                                                str(self.current_path.parent) if self.current_path else '',
                                                'Markdown (*.md *.markdown);;All files (*)')
@@ -181,24 +231,66 @@ class MarkdownEditingMixin:
     def save_as_dialog(self):
         if not self.allow_edit:
             return False
+        if self.storage is not None and hasattr(self.storage, 'save_as'):
+            return self.storage.save_as(self)
+        action = getattr(qt.QApplication.instance(), '_commonutils_markdown_resource_action', None)
+        if action:
+            return action(self, 'save')
         path, _ = qt.QFileDialog.getSaveFileName(self, 'Save Markdown As',
                                                str(self.current_path) if self.current_path else 'document.md',
                                                'Markdown (*.md *.markdown)')
         return self.save_document(path) if path else False
 
+    def capture_save(self):
+        """Return a lossless byte snapshot of the current draft for a storage host."""
+        return _encode_markdown(self.markdown_text(), self._source_bytes, self.is_modified)
+
+    def begin_save(self):
+        """Reserve an asynchronous save; False means a save is already pending."""
+        if not self.allow_edit or getattr(self, '_save_pending', False):
+            return False
+        self._save_pending = True
+        return True
+
+    def complete_save(self, destination, data, error=None):
+        """Accept a published snapshot or retain the draft on failure."""
+        self._save_pending = False
+        if error:
+            self.status.setText(f'Cannot save {destination}: {error}')
+            return False
+        return self._finish_save(Path(destination), data)
+
     def save_document(self, path=None):
-        if not self.allow_edit:
+        if not self.allow_edit or getattr(self, '_save_pending', False):
             return False
         destination = Path(path).expanduser().absolute() if path is not None else self.current_path
         if destination is None:
             return self.save_as_dialog()
         try:
-            data = _encode_markdown(self.markdown_text(), self._source_bytes, self.is_modified)
+            data = self.capture_save()
             expected = self._source_bytes if destination == self._loaded_path else None
-            _write_markdown(destination, data, expected=expected)
+            if self.storage is not None and hasattr(self.storage, 'submit_write'):
+                self._save_pending = True
+                self.status.setText('Saving locally…')
+                def completed(error):
+                    self._save_pending = False
+                    if error:
+                        self.status.setText(f'Cannot save {destination}: {error}')
+                    else:
+                        self._finish_save(destination, data)
+                self.storage.submit_write(destination, data, expected, completed)
+                return False  # A close request waits for the host's completion.
+            if self.storage is not None:
+                self.storage.write_bytes(destination, data, expected=expected)
+            else:
+                _write_markdown(destination, data, expected=expected)
         except (OSError, UnicodeError, ValueError) as error:
+            self._save_pending = False
             self.status.setText(f'Cannot save {destination}: {error}')
             return False
+        return self._finish_save(destination, data)
+
+    def _finish_save(self, destination, data):
         self._source_bytes = data
         self._loaded_path = destination
         self.formatted_editor.document().setBaseUrl(qt.QUrl.fromLocalFile(str(destination.parent) + '/'))
@@ -270,21 +362,33 @@ class MarkdownEditingMixin:
     def show_find(self):
         self.find_bar.show()
         self.replace_text.setEnabled(self.edit_button.isChecked())
+        self.replace_row.setVisible(self.edit_button.isChecked() and self.allow_edit)
         self.find_text.setFocus()
         self.find_text.selectAll()
+        self._refresh_search_highlights()
 
-    def find_next(self):
+    def close_find(self):
+        self.find_bar.hide()
+        self._clear_search_selection('page')
+        self._refresh_search_highlights()
+
+    def find_previous(self):
+        return self.find_next(backward=True)
+
+    def find_next(self, backward=False):
         target = self.active_editor() if self.edit_button.isChecked() else self.browser
         if not self.find_text.text():
             return False
+        flags = qt.QTextDocument.FindFlag.FindBackward if backward else qt.QTextDocument.FindFlag(0)
         original = target.textCursor()
-        if target.find(self.find_text.text()):
+        if target.find(self.find_text.text(), flags):
+            self._select_search_match(target, target.textCursor(), 'page')
             return True
-        target.moveCursor(qt.QTextCursor.MoveOperation.Start)
-        if target.find(self.find_text.text()):
+        target.moveCursor(qt.QTextCursor.MoveOperation.End if backward else qt.QTextCursor.MoveOperation.Start)
+        if target.find(self.find_text.text(), flags):
+            self._select_search_match(target, target.textCursor(), 'page')
             return True
         target.setTextCursor(original)
-        self.status.setText('No matching text.')
         return False
 
     def replace_match(self):

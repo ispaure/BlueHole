@@ -10,85 +10,7 @@ PYGMENTS_LICENSE.txt). Its compiled-rule adapter is tested with pinned 2.19.2.
 
 from .. import pyside as qt
 
-LANGUAGES = (
-    ("Plain Text", "text"),
-    ("Python", "python"),
-    ("PHP / HTML", "html+php"),
-    ("Laravel Blade", "blade"),
-    ("Shell", "bash"),
-    ("Windows Batch", "batch"),
-    ("PowerShell", "powershell"),
-    ("Markdown", "markdown"),
-    ("JSON", "json"),
-    ("XML", "xml"),
-    ("HTML", "html"),
-    ("YAML", "yaml"),
-    ("TOML", "toml"),
-    ("INI / Configuration", "ini"),
-    ("JavaScript", "javascript"),
-    ("TypeScript", "typescript"),
-    ("C", "c"),
-    ("C++", "cpp"),
-    ("CSS", "css"),
-    ("SQL", "sql"),
-    ("C#", "csharp"),
-    ("Java", "java"),
-    ("Rust", "rust"),
-    ("Go", "go"),
-)
-COMMENT_PREFIX = {
-    "bash": "#",
-    "python": "#",
-    "php": "//",
-    "html+php": "//",
-    "powershell": "#",
-    "yaml": "#",
-    "toml": "#",
-    "ini": ";",
-    "batch": "REM",
-    "javascript": "//",
-    "typescript": "//",
-    "c": "//",
-    "cpp": "//",
-    "csharp": "//",
-    "java": "//",
-    "rust": "//",
-    "go": "//",
-    "sql": "--",
-}
-
-
-def detect_language(path, text=""):
-    name = str(path).lower() if path else ""
-    if name.endswith(".blade.php"):
-        return "blade"
-    if name.endswith(".php"):
-        return "html+php"
-    if name.endswith((".py", ".pyi")):
-        return "python"
-    try:
-        from pygments.lexers import get_lexer_for_filename
-
-        if path:
-            name = str(path).lower()
-            if name.endswith((".command", ".zsh", ".bash")):
-                return "bash"
-            if name.endswith((".env", ".gitignore", ".editorconfig", ".conf", ".cfg")):
-                return "ini"
-            if name.endswith(".csv"):
-                return "text"
-            lexer = get_lexer_for_filename(name, stripnl=False, ensurenl=False)
-            if lexer.aliases:
-                return lexer.aliases[0]
-    except (ImportError, ValueError):
-        pass
-    first = text.split("\n", 1)[0]
-    if first.startswith("#!"):
-        if "python" in first:
-            return "python"
-        if any(shell in first for shell in ("sh", "bash", "zsh")):
-            return "bash"
-    return "text"
+from ...formats.code_syntax import LANGUAGES, COMMENT_PREFIX, detect_language, syntax_style
 
 
 def regex_tokens(lexer, text, stack):
@@ -200,6 +122,7 @@ class SyntaxHighlighter(qt.QSyntaxHighlighter):
     def configure(self, language):
         self.language = language
         self.lexer = None
+        self.style = None
         self.formats.clear()
         self.states = {("root",): 0}
         self.reverse_states = {0: ("root",)}
@@ -207,7 +130,7 @@ class SyntaxHighlighter(qt.QSyntaxHighlighter):
             from pygments.lexers import get_lexer_by_name
 
             if language == "blade":
-                from .blade import BladeLexer
+                from ...formats.code_blade import BladeLexer
                 self.lexer = BladeLexer(stripnl=False, ensurenl=False)
             elif language != "text":
                 self.lexer = get_lexer_by_name(language, stripnl=False, ensurenl=False)
@@ -223,13 +146,14 @@ class SyntaxHighlighter(qt.QSyntaxHighlighter):
 
     def refresh_theme(self):
         try:
-            from pygments.styles import get_style_by_name
-
             dark = (
                 self.editor.palette().color(qt.QPalette.ColorRole.Base).lightness()
                 < 128
             )
-            self.style = get_style_by_name("native" if dark else "default")
+            style = syntax_style(dark)
+            if style is self.style:
+                return
+            self.style = style
             self.formats.clear()
             self.rehighlight()
         except ImportError:

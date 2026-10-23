@@ -4,12 +4,36 @@
 `ui_font_*` (interface and dialogs), `browser_font_*`, `reading_font_*` (Markdown
 and consumer book readers), and `code_font_*` (editors, diffs and Markdown code).
 Each pair has `family_str` and `size_int`; blank families use the platform font,
-with one shared monospace fallback for editors, diffs and Markdown code. Defaults are 11 pt for UI/browser/code and 15 pt with the automatic interface
-family for reading. UI/browser sizes allow 7–32 pt, reading 8–48, code 7–48.
+with one shared monospace fallback for editors, diffs and Markdown code. Defaults
+are 10 pt for UI/browser, 9 pt for code and Arial at 10 pt for reading. All four font sizes
+allow 7–24 pt.
+Sizes are reference points at 96 logical DPI: an 11 setting occupies about
+15 logical pixels on every platform. `ui.appearance.typography.point_size(size)`
+converts that setting to Qt points using its font DPI; `setting_size(font)` converts
+back for zoom and persistence. This compensates for macOS's usual 72 font DPI
+without overriding Qt's screen scaling. Families retain their native metrics,
+so identical sizes do not guarantee identical glyph widths. Previews, Markdown
+code, reading controls and editor zoom use the same convention. Saved values and
+their 7–24 range remain unchanged; macOS text becomes larger at the same setting.
+The smaller shipped defaults (10 for UI/browser/reading, 9 for code) retain the
+previous macOS proportions across platforms. Existing personal overrides take
+precedence and are never rewritten to the new defaults.
 Code families must be installed fixed-pitch fonts, or blank for the monospace
 fallback. The layered editor filters its code family list accordingly and validates
 typed names on Save. Existing unavailable or proportional saved code families fall
 back at runtime without rewriting configuration.
+
+On Windows, all four family roles require smoothly scalable outline fonts.
+The dropdown excludes legacy GDI bitmap/vector families (including Terminal,
+Fixedsys and MS Sans Serif) before assigning preview fonts, and filters other
+non-scalable families using QFontDatabase metadata. Typed unsupported names are
+rejected on Save and use a fallback for local previews. Saved unsupported choices
+fall through to software defaults or the role fallback without rewriting the INI.
+Other platforms retain their existing family selection behavior.
+
+Preference reads before GUI startup reject known Windows legacy names but defer
+font-database metadata checks. Qt requires a QGuiApplication for those queries;
+the styling controller performs full family validation after GUI construction.
 
 The layered editor renders font names and its selected editable field in the
 chosen family. Local sample widgets preview pending families/sizes and resets;
@@ -46,3 +70,9 @@ For central settings navigation, a host may set
 button then calls it with `commonutils`, and its zoom uses the shared personal
 reading size. Without this callback Markdown retains a local reading-size popup.
 Shared UI does not import consumer feature registries or windows.
+
+Theme transitions reuse the Fusion style engine, coalesce system-color notifications,
+and skip unchanged palettes/stylesheets. Font roles cache their resolved fonts and
+already-bound controls are not rebound during polish/show events. Syntax highlighting
+skips palette notifications that retain its effective token style. These changes
+avoid repeated font/layout work while preserving document text, undo and saved sizes.

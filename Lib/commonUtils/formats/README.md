@@ -13,7 +13,7 @@ See [public API contracts](../docs/developer/public-apis.md) and
 | `CSVFile` | `csvType.py` | Read and write CSV data |
 | `INIFile` | `iniType.py` | String-valued INI documents, formatting preservation and conflict-checked saves |
 | `JSONFile` | `jsonType.py` | Parse JSON and write it atomically |
-| `MarkdownFile` | `markdownType.py` | Text-file operations and activation in the shared Markdown reader |
+| `MarkdownFile` | `markdown/file.py` | Text-file operations and activation in the shared Markdown reader |
 | `XMLFile` | `xmlType.py` | DOM queries, namespace-aware editing and atomic saving, plus inherited line operations |
 | `ArchiveFile` | `archiveType.py` | TAR inspection, staged extraction and passive archive details |
 | `ZIPFile` | `zipType.py` | ZIP extraction and root-entry inspection, with inherited archive details |
@@ -382,3 +382,44 @@ handled at the application boundary. See [file-type details](README.md).
 For nested XML, repeated elements, namespace-aware attributes and atomic XML
 saving, see [XML document examples](xmlType.md). Existing simple-field editing remains
 compatible with direct-child formats such as ComicInfo.
+
+## Bounded image header inspection
+
+`image_headers.image_header(data, max_bytes=...)` returns an immutable
+`ImageHeader(format, width, height, animated=False)` for PNG, JPEG or WebP bytes.
+The explicit byte bound limits input; malformed or unsupported headers raise
+`ValueError`. WebP extended headers report the animation flag rather than imposing
+a caller's animation policy. Header inspection does not validate the complete
+pixel stream or certify successful decoding. Consumers choose allowed formats,
+dimension/pixel limits and whether to accept animation before their native decoder.
+
+`image_headers.gif_header(data, max_bytes=...)` separately inspects GIF87a/89a
+containers and reports whether they contain multiple image frames. It verifies
+canvas/frame dimensions, palettes and data sub-block boundaries through a trailer;
+truncation raises `ValueError`. It does not decompress or certify LZW pixel data.
+The existing `image_header` PNG/JPEG/WebP contract is unchanged.
+
+`markdown.images.image_size(label)` parses Obsidian image size hints as
+`(caption, width, height)`, accepting `Caption|400`, `Caption|400x200` or a numeric
+label alone. Dimensions are positive integers of up to six digits; malformed
+hints stay literal. Desktop and native Markdown renderers share this parser.
+
+## Optional Pillow encoding
+
+`image_encoding.encode_image(source, allocate_output=..., extension=..., quality=...,
+max_long_edge=None, max_height=None, preserve_alpha=True)` applies EXIF orientation,
+ICC conversion when needed, proportional LANCZOS resizing, and JPEG/WebP encoding.
+It preserves remaining EXIF and updates existing dimension tags. WebP retains alpha
+when requested; JPEG discards alpha. WebP uses method 6; JPEG uses optimization.
+Pillow is required only by this optional module.
+
+`quality` may be an integer or a callback evaluated after source metadata is read.
+`image_is_color` provides chroma-based classification, including uniform tints.
+The caller chooses quality and dimensions, supplies an exclusive staging allocator,
+and owns output verification, failure cleanup, publication and source retention.
+The allocator runs after pixel preparation and before encoding; input is closed
+before return. Unsupported suffixes raise `UnsupportedImageFormat`.
+
+## Portable Markdown and string tables
+
+[Markdown](markdown/README.md) groups properties, image-size syntax, file activation and local wiki catalogs. [String tables](tables.md) documents the lightweight CSV-backed Cell/Row/Spreadsheet API.

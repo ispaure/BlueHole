@@ -14,6 +14,8 @@ Detailed API examples remain beside their owners and are linked from these guide
 For interactive workflows, use the [component user guides](../../README.md#shared-component-user-guides).
 The [audit record](audit.md) explains the restructuring and remaining uncertainties.
 
+[Process, diagnostics and presentation owners](lifecycle-owners.md) describes lifecycle boundaries.
+
 [Library overview](../../README.md)
 
 ## Platform support
@@ -24,3 +26,11 @@ See the [compatibility audit and deployment blockers](mobile-foundation.md).
 
 [Mobile test guide](mobile-testing.md): manually run the embedded Android/iOS
 smoke harness, inspect evidence and distinguish host checks from mobile results.
+
+## Resource integration
+
+Use the [resource runtime map](../../runtime/resources/README.md) for storage
+contracts and virtual paths, and [Qt resource windows](../../ui/resources/README.md)
+for picker/editor operation ownership. Shared native browsing and speech lifetimes
+are covered in the [native browser](../../ui/native_browser/README.md) and
+[reader controls](../../ui/readers/README.md) guides.

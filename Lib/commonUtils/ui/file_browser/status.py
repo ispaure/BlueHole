@@ -3,6 +3,7 @@ import re
 from threading import RLock
 from time import monotonic
 from .. import pyside as qt
+from ..appearance.status_line import StatusLine
 
 
 def format_duration(seconds):
@@ -127,43 +128,10 @@ class IndexActivityBar(qt.QProgressBar):
         painter.end()
 
 
-class IndexStatusLabel(qt.QLabel):
+class IndexStatusLabel(StatusLine):
     def __init__(self, parent=None):
-        super().__init__(parent)
-        self.full_text = ''
-        self.setForegroundRole(qt.QPalette.ColorRole.PlaceholderText)
-        font = self.font()
-        font.setItalic(True)
-        self.setFont(font)
-        self.setTextFormat(qt.Qt.TextFormat.PlainText)
-        self.setWordWrap(False)
-        self.setSizePolicy(qt.QSizePolicy.Policy.Ignored,qt.QSizePolicy.Policy.Fixed)
-        self.setMinimumWidth(0)
-
-    def setText(self, text):
-        if self.full_text == text:
-            return
-        self.full_text = text
-        self.setToolTip(text)
-        self._fit()
-
-    def text(self):
-        return self.full_text
-
-    def _fit(self):
-        metrics = self.fontMetrics()
-        width = max(0,self.contentsRect().width())
-        text = self.full_text
-        super().setText(metrics.elidedText(text,qt.Qt.TextElideMode.ElideMiddle,width))
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event); self._fit()
-
-    def changeEvent(self, event):
-        super().changeEvent(event); self._fit()
-
-    def minimumSizeHint(self):
-        return qt.QSize(0, self.fontMetrics().height()+4)
+        super().__init__(parent=parent)
+        self.setContentsMargins(0, 0, 0, 0)
 
 
 class WorkspaceIndexStatus(qt.QObject):
@@ -213,7 +181,9 @@ class WorkspaceIndexStatus(qt.QObject):
 
     def refresh(self, *args):
         from shiboken6 import isValid
-        current = {getattr(dock.widget(), 'file_browser', None) for dock in self.workspace.docks}
+        current = {browser for dock in self.workspace.docks
+                   if (browser := getattr(dock.widget(), 'file_browser', None)) is not None
+                   and getattr(browser, 'persistent_index', True)}
         for previous in tuple(self.connected - current):
             dock, destroyed = self._connections[previous]
             if isValid(previous):
@@ -227,7 +197,7 @@ class WorkspaceIndexStatus(qt.QObject):
         for dock in self.workspace.docks:
             view = dock.widget()
             browser = getattr(view,'file_browser',None)
-            if browser is None: continue
+            if browser is None or not getattr(browser, 'persistent_index', True): continue
             browsers.append((view,browser))
             floating = dock.isFloating()
             presentation = (floating, browser.index_incomplete, browser.folder_busy,
@@ -249,6 +219,14 @@ class WorkspaceIndexStatus(qt.QObject):
                 browser.destroyed.connect(destroyed)
         active = self.workspace.active_view
         browser = getattr(active,'file_browser',None)
+        if browser is not None and not getattr(browser, 'persistent_index', True):
+            self.label.setText('Session-only folder · Persistent indexing and previews disabled')
+            self.activity.hide()
+            self.details_button.hide()
+            self.refresh_button.setText('Refresh folder')
+            self.refresh_button.setEnabled(not browser.operation.busy)
+            return
+        self.refresh_button.setText('Refresh index')
         running = len({item.folder_operation.root for _,item in browsers if item.folder_busy and not item.network_location
                        and not getattr(item, '_loading_cached_only', False)})
         message = browser.index_status.text() if browser else 'No folder open.'

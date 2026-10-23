@@ -2,8 +2,7 @@
 import os
 os.environ.setdefault('QT_QPA_PLATFORM','offscreen')
 from pathlib import Path
-from tempfile import TemporaryDirectory
-from time import monotonic, sleep
+from time import sleep
 import unittest
 from commonUtils.tests.qt_test_case import QtTestCase
 from unittest.mock import patch
@@ -17,7 +16,7 @@ class IntegratedSearchTests(QtTestCase):
     def setUpClass(cls): cls.app=qt.QApplication.instance() or qt.QApplication([])
 
     def setUp(self):
-        self.temp=TemporaryDirectory();self.base=Path(self.temp.name)
+        self.temp=self.temporary_directory();self.base=Path(self.temp.name)
         self.root=self.base/'Documents';self.root.mkdir();(self.root/'nested').mkdir()
         self.file=self.root/'nested'/'Needle.TXT';self.file.write_text('abc')
         self.cache=DirectoryCache(database=self.base/'cache'/'index.sqlite3')
@@ -38,10 +37,7 @@ class IntegratedSearchTests(QtTestCase):
         self.temp.cleanup()
 
     def wait(self, condition, timeout=8):
-        deadline=monotonic()+timeout
-        while not condition():
-            self.assertLess(monotonic(),deadline)
-            self.app.processEvents();sleep(.01)
+        self.wait_until(condition, timeout=timeout, message='Integrated index search did not settle')
         self.app.processEvents()
 
     def search(self, text, expected):
@@ -177,6 +173,7 @@ class IntegratedSearchTests(QtTestCase):
 
     def test_partial_discovery_updates_search_before_scan_finishes_and_close_cancels(self):
         import os
+        from threading import Event
         real = os.scandir
         # Retire the existing watcher before adding files. Otherwise its queued
         # reconciliation can publish a complete generation before the fixture
@@ -185,6 +182,7 @@ class IntegratedSearchTests(QtTestCase):
         self.browser.close()
         self.wait(lambda: not self.browser.folder_busy and not self.browser.busy)
         browser = None
+        committed, release = Event(), Event()
         for number in range(1100): (self.root / f'progress-{number}.bin').write_bytes(b'x')
         class SlowDirectory:
             def __init__(self, path): self.entries=real(path)
@@ -195,9 +193,10 @@ class IntegratedSearchTests(QtTestCase):
                     # Retain a pending tail after a progressive checkpoint;
                     # unrelated GUI work must not let the scan complete before
                     # this test requests cancellation.
-                    if number == 1050:
-                        while not browser.stopping:
-                            sleep(.002)
+                    if number == 768:
+                        while not release.wait(.002):
+                            if browser is not None and browser.stopping:
+                                break
                     yield entry
         def scandir(path): return SlowDirectory(path) if Path(path)==self.root else real(path)
         # Initial/partial scans publish durable progress. A completed index's
@@ -208,6 +207,8 @@ class IntegratedSearchTests(QtTestCase):
             # Commit real bounded batches without depending on elapsed sleep
             # time (short sleeps have coarse granularity on Windows runners).
             checkpoint(db, cancelled, force=True)
+            if self.cache._discovered_entries >= 512:
+                committed.set()
         class IndexFilesystem:
             # Scope the stalled iterator to the indexer. Patching os.scandir
             # globally also stalls directory previews and GUI filesystem work.
@@ -217,13 +218,24 @@ class IntegratedSearchTests(QtTestCase):
                 self.cache, '_checkpoint', side_effect=publish):
             browser = self.browser = FileBrowser(self.root)
             self.browsers.append(browser)
-            browser.show()
-            self.browser.search_bar.setText('progress-')
-            self.wait(lambda: 0 < self.browser.index_search.total < 1100, timeout=20)
-            self.assertTrue(self.browser.folder_busy)
-            self.assertIn('incomplete', self.browser.index_search.summary.text())
-            self.browser.close()
-            self.wait(lambda: not self.browser.folder_busy and not self.browser.index_search.busy)
+            # Paging/rendering hundreds of rows is covered separately. This
+            # fixture checks delivery of durable partial results and cancellation.
+            browser.index_search.page_size = 10
+            try:
+                browser.show()
+                browser.search_bar.setText('progress-')
+                # Start the query-delivery budget only after the producer has
+                # actually committed its first bounded SQLite batch.
+                self.wait(committed.is_set, timeout=20)
+                self.wait(lambda: 0 < browser.index_search.total < 1100, timeout=20)
+                self.assertTrue(browser.folder_busy)
+                self.assertIn('incomplete', browser.index_search.summary.text())
+                browser.close()
+                self.wait(lambda: not browser.folder_busy and not browser.index_search.busy)
+            finally:
+                # A failed assertion must not strand the fixture's worker. On
+                # success the close above must have cancelled it independently.
+                release.set()
         self.assertIsNotNone(self.cache.status(self.root))
         self.assertGreater(self.cache.status(self.root)['entries'], 0)
 

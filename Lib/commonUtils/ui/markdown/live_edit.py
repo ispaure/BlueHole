@@ -1,15 +1,17 @@
 """Same-pane Markdown syntax, paired selections and cursor-sensitive preview."""
 from .. import pyside as qt
 from ..text_commands import wrap_selection
+from ..column_guide import ColumnGuide
 from .syntax import _units
 from .links import link_spans, reference_destinations
 from .document import LiveMarkdownDocument, materialize_formats, protect_escapes, restore_escapes, space_headings, heading_top_margin
 from .preview import LivePreviewHighlighter
+from .images import ImageDropMixin, AnimatedImages, prepare_wiki_images, configure_images
 from .syntax import HEADING, fenced_regions
 from .presentation import style_document
 
 
-class SourceMarkdownEdit(qt.QPlainTextEdit):
+class SourceMarkdownEdit(ImageDropMixin, ColumnGuide, qt.QPlainTextEdit):
     """Source editor with paired delimiters around the current selection."""
     def keyPressEvent(self, event):
         cursor = self.textCursor()
@@ -23,13 +25,14 @@ class SourceMarkdownEdit(qt.QPlainTextEdit):
         super().keyPressEvent(event)
 
 
-class FormattedMarkdownEdit(qt.QTextEdit):
+class FormattedMarkdownEdit(ImageDropMixin, qt.QTextEdit):
     linkActivated = qt.Signal(object)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._live_document = LiveMarkdownDocument(self)
         self.setDocument(self._live_document)
+        self.animated_images = AnimatedImages(self)
         self._pressed_link = None
         self._highlighter = LivePreviewHighlighter(self)
         self._wrapped_selection = None
@@ -39,11 +42,13 @@ class FormattedMarkdownEdit(qt.QTextEdit):
 
     def setMarkdown(self, markdown):
         self._highlighter.setDocument(None)
-        protected, tokens = protect_escapes(markdown)
+        prepared, images = prepare_wiki_images(markdown)
+        protected, tokens = protect_escapes(prepared)
         self.document().setMarkdown(protected,
             qt.QTextDocument.MarkdownFeature.MarkdownDialectGitHub | qt.QTextDocument.MarkdownFeature.MarkdownNoHTML)
         materialize_formats(self)
         restore_escapes(self.document(), tokens)
+        configure_images(self.document(), images)
         # Qt imports heading text with a relative size adjustment, which takes
         # precedence over the highlighter's collapsed-marker font. Normalize
         # it to the same absolute sizes used for headings typed in this editor.
@@ -71,6 +76,11 @@ class FormattedMarkdownEdit(qt.QTextEdit):
         style_document(self.document(), self.palette())
         self.document().clearUndoRedoStacks()
         self.document().setModified(False)
+        # Direct document imports and syntax materialization move the widget's
+        # cursor to the end. Start newly loaded content like QTextEdit.setText.
+        self.moveCursor(qt.QTextCursor.MoveOperation.Start)
+        self.verticalScrollBar().setValue(0)
+        self.horizontalScrollBar().setValue(0)
         self._highlighter.setDocument(self.document())
         self._highlighter.refresh_cursor()
 
@@ -122,6 +132,8 @@ class FormattedMarkdownEdit(qt.QTextEdit):
     def insertFromMimeData(self, source):
         if self.isReadOnly():
             return
+        if self._image_urls(source):
+            return ImageDropMixin.insertFromMimeData(self, source)
         cursor = self.textCursor()
         cursor.beginEditBlock()
         super().insertFromMimeData(source)

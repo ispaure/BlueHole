@@ -14,6 +14,9 @@ duplicate lines, trim trailing spaces or change indentation; they are undoable.
 
 Line-number gutters follow the editor font and resize when the font or line count
 changes, including when the surrounding window keeps its size.
+Short files keep a compact gutter; space for folding controls appears
+only when the document has foldable blocks. The colored change-marker lane stays
+separate from the numbers.
 
 Alt-click adds cursors; Alt+Shift-drag selects a rectangular column region. Typing
 changes multiple selections as one undo operation. Pasting the same number of lines
@@ -23,6 +26,10 @@ regions without deleting their content. Large/complex inputs have bounded analys
 
 Syntax highlighting is optional. Without a lexer, or for very large documents or
 long lines, text can remain uncolored while still editable. Coloring is not validation.
+Dark mode uses muted orange keywords; light mode uses blue keywords. Strings are
+green, numbers blue, built-ins purple and comments italic gray. Module paths and
+function names retain ordinary text colors. Syntax colors follow the host's
+light/dark appearance without replacing its plain text or background colors.
 
 ## Find and replace
 
@@ -42,6 +49,10 @@ A diff dialog can show side-by-side or unified changes with linked scrolling and
 change bands. Applying a change is available only when the application provides
 that action; it changes the host buffer according to the host's policy, not necessarily
 the file on disk. Stale comparisons may need to be refreshed before applying.
+
+Unified patch previews keep diff colors when a patch line contains embedded
+paragraph breaks. Extra paragraphs leave old/new line numbers blank; the next
+patch line keeps its original numbering.
 
 In a three-way merge, inspect the left/right sources and editable result. Resolve a
 change with **Left**, **Right**, **Both** (left then right), **Keep Base**, or a manual
@@ -68,3 +79,16 @@ PHP files highlight embedded HTML. Laravel `.blade.php` files are detected befor
 ordinary PHP and highlight Blade directives and single-line interpolations using
 the shared PHP/HTML grammars. Python stub (`.pyi`) files use Python highlighting.
 Multiline Blade template expressions have limited highlighting.
+
+Indentation guides follow the current font and zoom, including mixed tabs and
+spaces. They stay inside leading whitespace and do not cross the text on wrapped
+continuation rows.
+
+Applications may supply change markers in the gutter: green for added lines, blue
+for replaced lines and red for deleted-line boundaries. Hover for the application's
+baseline label. The marker lane is separate from folding and line numbers.
+When a replacement block also removes or adds lines, the edited portion stays
+blue while the extra removed/added lines receive red/green markers.
+Additions use a blue-green vertical band and deletions an orange-red horizontal mark
+to provide a cue besides color. Hosts may also enable a dashed column guide;
+this is a visual line-length reference and does not wrap or restrict your text.

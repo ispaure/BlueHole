@@ -18,6 +18,11 @@ selection-detail loading. Column view uses its own final details column; size ma
 use a ranked entry list instead. Optional previews depend on file type and installed
 application features; opening a file may use an application-supplied reader.
 
+Hidden files and folders use muted grey text in these views and cached search
+results. Dot-prefixed names are muted on every desktop platform, along with
+Windows entries marked Hidden and macOS entries carrying the native hidden flag.
+They remain selectable and open normally when displayed.
+
 Keyboard navigation follows the platform: macOS uses Command-Up for the parent,
 Command-Down/Command-O to open, and Return to rename. Windows/Linux use Enter to
 open, F2 to rename and Alt-Up for the parent; Windows also accepts Backspace.
@@ -43,15 +48,23 @@ does not start a separate scan.
 
 ## Understand folder sizes
 
-Treemap and Radial views use saved logical file sizes. Larger areas mean more bytes;
-the companion list ranks entries by size. Double-click a folder to explore it.
+Treemap and Radial default to **Size on disk (allocated space)**. The **Measure**
+dropdown above the chart switches to **Size (file contents)**. Size on disk measures
+the space allocated to files, including block rounding and sparse/compressed storage;
+Size measures their content length. Larger areas mean more of the selected measure,
+and the companion list ranks entries by that same measure. Both values are cached;
+switching measures does not scan files again. Double-click a folder to explore it.
 The radial centre can return to the parent within the browser's navigation boundary.
 
 Radial shows at most four levels and 3,000 entries; treemap immediate-child reads
 are also bounded to 3,000. Gaps can represent omitted entries, zero-byte folders or
 incomplete indexing. Root totals can include entries not individually drawn.
-Percentages refer to the current root. Sizes are logical bytes, so hard links,
-clones and sparse files can make them differ from physical disk consumption.
+Percentages refer to the current root and selected measure. Totals count files by
+path, so hard links and clones may count shared storage more than once. Folder and
+filesystem metadata are excluded. Unavailable allocations are excluded from the
+allocated total and reported above the chart; they are never replaced with file
+content size. Saved indexes created before allocation support retain their content
+sizes, and collect allocations on the next metadata validation or Refresh index.
 
 Indexing stores paths and metadata in a local cache, not file contents. It can use
 substantial disk space for large trees. Results stay usable while updates run.
@@ -144,3 +157,58 @@ editors use their reading/code font settings.
   unless permanent removal is explicitly intended.
 
 [Developer integration](../README.md) · [All shared guides](../../../README.md#shared-component-user-guides)
+
+## Pick and drop links
+
+Right-click one file or folder and choose **Pick Link Source**. In the destination
+folder, right-click empty space (or the destination folder) and choose
+**Drop Link As → Symbolic Link**. This creates a reference to the source without
+copying its contents. The picked source is shared across browser views in the
+same application session, remains available for further drops, and does not change
+your Copy/Cut clipboard. **Cancel Link Creation** clears it.
+
+For files, **Hard Link** is available on the same filesystem/volume: both names
+refer to the same file, so editing through either name changes that file. For
+local Windows folders, **Junction** is also available. Symbolic links support files
+and folders; Windows may require Developer Mode or symbolic-link privileges.
+Network folders should use symbolic links. Failures are reported without automatic
+elevation. A missing source disables drop actions. Existing destination files are
+never replaced: name collisions get ` - Link`, then a numbered suffix. Native
+Windows link creation still requires validation on a Windows host.
+
+Tile thumbnails can show a small status badge at their top-right when the host's
+file type supplies one. Visible badges refresh as their status changes.
+
+## Drag files and folders
+
+Drag selected files or folders onto a folder, or onto a view's empty background,
+to move them within Logistics. Hold Ctrl (Option on macOS) to copy instead. A
+highlight marks the receiving folder or current-directory background. List, tile,
+and folder-column views support drops. Files dragged in from another application
+are copied; their originals remain in place. Local files can also be dragged out
+to applications that accept file URLs.
+
+Drops use the same progress, cancellation and collision handling as paste.
+Existing destinations are not overwritten; collisions receive numbered copy names.
+Moving a folder into itself or a descendant is refused. Drops do not replace or
+clear the Copy/Cut clipboard. Web URLs are not accepted as filesystem items.
+
+
+## Storage-aware Open and Save As
+
+Hosts can use a compact, session-only resource browser as their Open/Save As
+window. Select a storage location, navigate folders, and select or enter a name.
+The host supplies available locations and unlock prompts. This picker shares
+navigation with the resource browser but does not expose destructive context
+menu actions. Save As requires an unused name and a valid existing parent folder.
+Closing during a folder read or selection check cancels safely before releasing
+storage. Neither navigation history nor decoded names are saved by this picker.
+
+
+Applications can redirect managed folders into their own browser when you open,
+expand or navigate into them. The regular browser then keeps its previous location
+and does not display the managed folder's underlying files.
+
+## Provider-backed folder browsing
+
+Applications can also present a provider-backed browser. It uses the same compact navigation buttons and clickable folder breadcrumbs with a filterable Name/Date Modified/Size list (in that order), tile view and column navigation. The Size slider adjusts icons and tiles. Its optional Preview panel shows file information and host-supplied metadata on the right in list/tile view or in the final column. Modified dates use local time in the same readable format as local files, for example **Feb 11, 2026 at 6:45 PM**. Missing or invalid dates show **—**. Provider browsers omit storage maps. Open/Save As dialogs omit Preview and keep an application-supplied storage selector at the top. The dialog title begins with **🕵️ Private -** when its selected provider declares private storage. Session-only text editor titles also use that prefix and retain it after Save As. Provider thumbnails stay in memory; missing or locked covers use generic icons. Two visible thumbnails can load at once, and closing waits for both workers.

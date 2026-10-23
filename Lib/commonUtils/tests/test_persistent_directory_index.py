@@ -35,7 +35,9 @@ class PersistentIndexTests(unittest.TestCase):
         return self.cache.status(self.root)
 
     def test_path_defaults_to_cache_on_macos(self):
-        with patch('commonUtils.filesystem.index.store.sys.platform', 'darwin'), patch.object(Path, 'home', return_value=self.folder):
+        with patch.dict('os.environ', {}, clear=True), \
+                patch('commonUtils.filesystem.index.store.sys.platform', 'darwin'), \
+                patch.object(Path, 'home', return_value=self.folder):
             self.assertEqual(directory_index_path(), self.folder / 'Library' / 'Application Support' / 'commonUtils' / 'Cache' / 'directory-index.sqlite3')
 
     def test_completed_index_survives_new_instance_without_reenumeration(self):
@@ -188,7 +190,7 @@ class PersistentIndexTests(unittest.TestCase):
             sleep(seconds)
         # Observe actual OS-lock contention before cancelling. Schema creation can
         # take more than two seconds on Windows CI; it is not the behavior under test.
-        with patch('commonUtils.filesystem.index.store.sleep', side_effect=lock_wait):
+        with patch('commonUtils.filesystem.index.writer.sleep', side_effect=lock_wait):
             worker.start()
             try:
                 self.assertTrue(entered.wait(30), f'Scan did not start: {errors}')

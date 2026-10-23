@@ -18,6 +18,7 @@ __status__ = 'Production'
 from pathlib import Path
 from typing import *
 
+import os
 from ..Lib.commonUtils.runtime.diagnostics import *
 from ..Lib.commonUtils.runtime.platform import *
 from ..blenderUtils import blenderFile

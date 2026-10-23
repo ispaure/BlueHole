@@ -29,8 +29,8 @@ ui.use_pyside = False
 
 # Set Debug Project Prefix for logging, remove time delta unless profiling.
 from .Lib.commonUtils.runtime import diagnostics as debugUtils
-debugUtils.project_prefix = "Blue Hole"
-debugUtils.use_time_delta = False
+from .Lib.commonUtils.ui.diagnostics import present_diagnostic
+debugUtils.configure(project_prefix="Blue Hole", use_time_delta=False, presenter=present_diagnostic)
 
 from .wrappers.perforce import initialize_runtime as initialize_perforce_runtime
 initialize_perforce_runtime()
@@ -57,7 +57,7 @@ bl_info = {
 }
 
 # Set project prefix to include version for logging purposes.
-debugUtils.project_prefix = f'{bl_info["name"]} {".".join(map(str, bl_info["version"]))}'
+debugUtils.configure(project_prefix=f'{bl_info["name"]} {".".join(map(str, bl_info["version"]))}')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # STATE

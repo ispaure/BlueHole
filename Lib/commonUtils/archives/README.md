@@ -120,3 +120,47 @@ Plain ZIP access through `zip_access` uses the standard library without importin
 pyzipper. Encrypted ZIP access loads pyzipper on demand and raises an explanatory
 RuntimeError if it is absent. This allows unencrypted EPUB/CBZ container I/O in
 portable code; rendering and mobile deployment are separate concerns.
+
+## Open-adapter rebuilding
+
+`rebuilding.content_manifest(archive)` hashes open archive adapters, using an
+explicit native `content_manifest` shortcut when available. `patched_manifest`
+accepts replacement-name/bytes mappings. `rewrite_members(original, output,
+replacements, first=(), stored=(), max_member_bytes=None, cancelled=...)` streams
+unchanged members, preserves comments/portable member attributes and returns
+expected content hashes. Hosts validate inputs, configure encryption, verify the
+finished output and publish it. Entry ordering and compression overrides are explicit
+names; this layer contains no EPUB/comic rules.
+
+## Member plans and streamed writes
+
+`rebuilding.member_plan(original, replacements, include=None, first=(), stored=())`
+yields `MemberOperation` records for retained/replaced members followed by new
+replacements. `include` filters existing members; replacements not retained by
+that filter are still appended. `first` ranks existing members and `stored`
+selects uncompressed output names. It is an operation iterator, not input/path
+validation or a publication transaction.
+
+`write_members` consumes that plan, streams unchanged files, checks cancellation
+between members/chunks and returns an expected name-to-length/SHA-256 manifest
+(with `None` for directories). `max_member_bytes` bounds streamed original members;
+callers must bound replacement bytes separately. `rewrite_members` combines the
+plan/write path and preserves the archive comment by default.
+
+`members.copy_member_info` copies portable timestamps, comments, platform and
+attribute fields into the output adapter's ZipInfo type; crypto flags/headers
+are not copied. `members.name_key` supplies normalized identity for callers'
+collision checks. Editing/access entry points retain their own validation,
+authentication, staging and finished-output verification. EPUB ordering and
+comic metadata rules remain consumer policy. Focused regressions live in
+`tests/test_archive_rebuilding.py` and archive operation tests.
+
+## Callback-backed member views
+
+`callbacks.CallbackArchive(members, read_member=..., manifest=None)` adapts explicit
+`ZipInfo` records and a lazy byte callback to `infolist`, `namelist`, `getinfo`,
+`read` and context-managed `open`. Unknown member names fail before invoking the
+callback. An optional manifest callback returns member signatures; cancellation
+is checked before and after it runs. No file, credential or password is opened by
+the facade. The backend owns authentication, size limits, revision checks, caching
+and retirement. `open` wraps a complete member in RAM; it is not a streaming API.

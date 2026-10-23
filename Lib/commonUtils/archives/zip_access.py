@@ -9,11 +9,11 @@ from contextlib import contextmanager
 import os
 from pathlib import Path, PurePosixPath
 import stat
-import unicodedata
 from tempfile import NamedTemporaryFile
 import zipfile
 import zlib
 
+from .members import copy_member_info, name_key
 from ..runtime.operations import check_cancelled
 from ..runtime.streams import CHUNK_SIZE, copy_stream, iter_chunks, stream_signature
 
@@ -41,13 +41,15 @@ def is_encrypted(path):
 def open_archive(path, mode='r', *, password=None, compression=zipfile.ZIP_DEFLATED, compresslevel=None):
     """Open plain/ZipCrypto/AES ZIPs; never silently write unencrypted output."""
     password = password_bytes(password)
+    label = Path(path).name if isinstance(path, (str, os.PathLike)) else str(getattr(path, 'name', 'archive'))
+    source = str(path) if isinstance(path, os.PathLike) else path
     if mode not in ('r', 'w', 'x'):
         raise ValueError('Only ZIP read, write and exclusive-create modes are supported')
     encrypted = is_encrypted(path) if mode == 'r' else password is not None
     if mode != 'r' and encrypted and not password:
         raise ValueError('An encrypted ZIP requires a nonempty password')
     if mode == 'r' and encrypted and not password:
-        raise ArchivePasswordError(f'Archive password required: {Path(path).name}')
+        raise ArchivePasswordError(f'Archive password required: {label}')
     bad_zip_errors = (zipfile.BadZipFile,)
     if encrypted:
         try:
@@ -55,7 +57,7 @@ def open_archive(path, mode='r', *, password=None, compression=zipfile.ZIP_DEFLA
         except ImportError as error:
             raise RuntimeError('Encrypted ZIP access requires the optional pyzipper dependency') from error
         bad_zip_errors += (pyzipper.BadZipFile,)
-        archive = pyzipper.AESZipFile(str(path), mode, compression=compression, compresslevel=compresslevel)
+        archive = pyzipper.AESZipFile(source, mode, compression=compression, compresslevel=compresslevel)
         archive.setpassword(password)
         if mode != 'r':
             archive.setencryption(pyzipper.WZ_AES, nbits=256)
@@ -66,22 +68,18 @@ def open_archive(path, mode='r', *, password=None, compression=zipfile.ZIP_DEFLA
             yield archive
     except RuntimeError as error:
         if 'password' in str(error).lower():
-            raise ArchivePasswordError(f'Archive password incorrect: {Path(path).name}') from None
+            raise ArchivePasswordError(f'Archive password incorrect: {label}') from None
         raise
     except bad_zip_errors as error:
         if encrypted and ('hmac' in str(error).lower() or 'bad crc' in str(error).lower()):
             raise ArchivePasswordError(
-                f'Archive password incorrect or encrypted data damaged: {Path(path).name}') from None
+                f'Archive password incorrect or encrypted data damaged: {label}') from None
         raise zipfile.BadZipFile(str(error)) from None
     except zlib.error:
         if encrypted:
             raise ArchivePasswordError(
-                f'Archive password incorrect or encrypted data damaged: {Path(path).name}') from None
+                f'Archive password incorrect or encrypted data damaged: {label}') from None
         raise
-
-
-def _name_key(name):
-    return unicodedata.normalize('NFC', PurePosixPath(name).as_posix()).casefold()
 
 
 def validate_members(archive):
@@ -98,7 +96,7 @@ def validate_members(archive):
             raise ValueError(f'Archive contains a symbolic link: {member.filename}')
         if member.is_dir() and member.file_size:
             raise ValueError(f'Archive directory contains file data: {member.filename}')
-        key = _name_key(name)
+        key = name_key(name)
         if key in seen:
             raise ValueError(f'Duplicate archive member: {member.filename}')
         seen.add(key)
@@ -136,40 +134,8 @@ def archive_manifest(path, *, password=None, cancelled=lambda: False, progress=N
     """Authenticate every entry and compare decrypted bytes independently of CRCs."""
     with open_archive(path, password=password) as archive:
         validate_members(archive)
-        result = {}
-        done = 0
-        total = sum(info.file_size for info in archive.infolist())
-        for info in archive.infolist():
-            check_cancelled(cancelled)
-            def advanced(size):
-                nonlocal done
-                done += size
-                if progress:
-                    progress(done, total, f'Verifying {info.filename}')
-            if info.is_dir():
-                with archive.open(info) as stream:
-                    stream_signature(stream, cancelled=cancelled, progress=advanced)
-                result[info.filename] = None
-            else:
-                with archive.open(info) as stream:
-                    result[info.filename] = stream_signature(stream, cancelled=cancelled, progress=advanced)
-        return result
-
-
-def copy_member_info(member, target):
-    """ZipInfo types differ between stdlib and pyzipper; copy portable attributes."""
-    if isinstance(target, zipfile.ZipFile):
-        cls = zipfile.ZipInfo
-    else:
-        import pyzipper
-        cls = pyzipper.zipfile_aes.AESZipInfo if isinstance(target, pyzipper.AESZipFile) else zipfile.ZipInfo
-    result = cls(member.filename, member.date_time)
-    for name in ('comment', 'create_system', 'external_attr', 'internal_attr', 'compress_type'):
-        setattr(result, name, getattr(member, name))
-    # AES reports method 99 in stdlib headers; never copy crypto headers/flags.
-    if result.compress_type == 99:
-        result.compress_type = zipfile.ZIP_DEFLATED
-    return result
+        from .rebuilding import content_manifest
+        return content_manifest(archive, cancelled=cancelled, progress=progress)
 
 
 def extract_archive(path, destination, *, password=None, progress=None):
@@ -246,13 +212,20 @@ def directory_entries(source, *, keep_root=True, cancelled=lambda: False):
 
 
 def write_directory(source, destination, *, password=None, keep_root=True):
-    entries = list(directory_entries(source, keep_root=keep_root))
-    with open_archive(destination, 'w', password=password) as archive:
-        for path, name in entries:
-            archive.write(str(path), name)
+    from tempfile import TemporaryDirectory
+    source, destination = Path(source).absolute(), Path(destination).absolute()
+    if destination == source or source in destination.parents:
+        raise ValueError('The output archive must be outside the source directory')
+    if destination.is_symlink():
+        raise ValueError('Output archive cannot be a symbolic link')
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix='.commonutils-zip-', dir=destination.parent) as temporary:
+        staged = Path(temporary) / 'archive.zip'
+        create_archive([source], staged, password=password, keep_root=keep_root)
+        os.replace(staged, destination)
 
 
-def create_archive(sources, destination, *, password=None,
+def create_archive(sources, destination, *, password=None, keep_root=True,
                    compression=zipfile.ZIP_DEFLATED, compresslevel=None,
                    progress=lambda done, total, message: None, cancelled=lambda: False):
     """Create a verified separate ZIP atomically; never delete or replace sources.
@@ -281,7 +254,7 @@ def create_archive(sources, destination, *, password=None,
     for root in roots:
         check_cancelled(cancelled)
         if root.is_dir():
-            entries.extend(directory_entries(root, cancelled=cancelled))
+            entries.extend(directory_entries(root, keep_root=keep_root, cancelled=cancelled))
         elif root.is_file():
             entries.append((root, root.name))
         else:
@@ -297,7 +270,7 @@ def create_archive(sources, destination, *, password=None,
         progress(done, 3 * total_bytes, message)
     for path, name in entries:
         check_cancelled(cancelled)
-        key = _name_key(name)
+        key = name_key(name)
         if key in names:
             raise ValueError(f'Selected sources have colliding archive names: {name}')
         names.add(key)

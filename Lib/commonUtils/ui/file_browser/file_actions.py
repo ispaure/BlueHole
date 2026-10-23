@@ -62,6 +62,8 @@ class FileActions(TrashActionsMixin, qt.QObject):
         self.task = OperationProgress(browser)
         browser.layout().addWidget(self.task)
         self.task.completed.connect(self._completed)
+        from .drag_drop import FileDragDrop
+        self.drag_drop = FileDragDrop(self)
         self.shortcuts = []
         for key, callback in ((qt.QKeySequence.StandardKey.Copy, lambda: self.copy(browser.selected_objects())),
                               (qt.QKeySequence.StandardKey.Cut, lambda: self.copy(browser.selected_objects(), move=True)),
@@ -126,21 +128,48 @@ class FileActions(TrashActionsMixin, qt.QObject):
         paths, move, marker = clipboard_files()
         if not paths:
             return
-        self.clipboard_request = paths, move, marker
+        self.transfer(paths, directory, move=move, clipboard_request=(paths, move, marker))
+
+    def transfer(self, paths, directory, *, move=False, clipboard_request=None):
+        if self.busy or self.browser.stopping or not paths or directory is None:
+            return
+        paths, directory = tuple(Path(path) for path in paths), Path(directory)
+        self.clipboard_request = clipboard_request
+        self.transfer_request = paths, move
         self._operation_kind = 'transfer'
-        self.destination = Path(directory)
+        self.destination = directory
         self.browser.model.setReadOnly(True)
         self.task.start(lambda report, cancelled: transfer_paths(paths, directory, move=move,
                        report=report, cancelled=cancelled), message='Moving files…' if move else 'Copying files…')
 
+    def drop_link(self, source, directory, kind):
+        if self.busy or self.browser.stopping:
+            return
+        from ...filesystem.links.creation import create_link_in_directory
+        self._operation_kind = 'link'
+        self.destination = Path(directory)
+        self.browser.model.setReadOnly(True)
+        def work(report, cancelled):
+            from ...runtime.operations import check_cancelled
+            check_cancelled(cancelled)
+            return create_link_in_directory(source, directory, kind)
+        self.task.start(work, message='Creating link…')
+
     def _completed(self, result, error):
         self.browser.model.setReadOnly(False)
         self.task.hide()
+        if self._operation_kind == 'link':
+            if not self.browser.stopping:
+                self.browser.refresh_changed((self.destination,))
+                if error:
+                    self._error(error)
+            self.browser._maybe_idle()
+            return
         if self._operation_kind == 'remove':
             self._removal_completed(result, error)
             return
-        paths, move, marker = self.clipboard_request
-        if result is not None and move:
+        paths, move = self.transfer_request
+        if result is not None and move and self.clipboard_request is not None:
             completed = tuple(source for source, target in result.completed)
             prune_cut_clipboard(completed, expected=self.clipboard_request)
         if not self.browser.stopping:

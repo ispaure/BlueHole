@@ -9,7 +9,7 @@ from commonUtils.tests.qt_test_case import QtTestCase
 from unittest.mock import patch
 
 from commonUtils.formats.registry import file_from_path
-from commonUtils.formats.markdownType import MarkdownFile
+from commonUtils.formats.markdown.file import MarkdownFile
 from commonUtils.ui import pyside as qt
 from commonUtils.ui.markdown import MarkdownViewer, open_markdown, _windows
 from commonUtils.ui.file_browser import FileBrowser
@@ -59,6 +59,30 @@ class MarkdownTests(QtTestCase):
         self.assertEqual(viewer.edit_button.accessibleName(), 'Edit Markdown')
         self.assertTrue(viewer.speech.action.isVisible())
         self.assertTrue(viewer.speech.anchor.isVisible())
+
+    def test_speech_reads_rendered_link_labels_and_selected_passages(self):
+        from commonUtils.tests.test_read_aloud import SilentEngine
+        viewer = self.viewer
+        viewer.set_editing(True)
+        viewer.editor.setPlainText('# Heading\n\n[Readable label](https://example.invalid/hidden) '
+                                  'and **bold**.\n\n[Reference][target]\n\n'
+                                  '[target]: https://example.invalid/reference\n\n'
+                                  'Visible https://visible.invalid/path\n\n'
+                                  '`[literal](https://code.invalid)`')
+        viewer.set_editing(False)
+        viewer.speech.engine_factory = SilentEngine
+        viewer.speech.show()
+        viewer.speech.start()
+        spoken = viewer.speech.session.text
+        self.assertIn('Heading\nReadable label and bold.', spoken)
+        self.assertIn('Reference', spoken)
+        self.assertNotIn('https://example.invalid', spoken)
+        self.assertIn('https://visible.invalid/path', spoken)
+        self.assertIn('[literal](https://code.invalid)', spoken)
+        viewer.speech.stop()
+        self.assertTrue(viewer.browser.find('Readable label'))
+        viewer.speech.start()
+        self.assertEqual(viewer.speech.engine.spoken[-1], 'Readable label')
 
     def test_long_document_and_html_block_keep_tail_in_reading_and_editing(self):
         text = '# Long\n\n' + 'Paragraph text.\n\n' * 3000 + '<div>\nText\n\nTAIL_SENTINEL'
@@ -219,7 +243,7 @@ class MarkdownTests(QtTestCase):
         cursor = self.viewer.editor.textCursor()
         cursor.movePosition(qt.QTextCursor.MoveOperation.End)
         cursor.insertText('Extra')
-        with patch('commonUtils.persistence.os.replace', side_effect=OSError('blocked')):
+        with patch('commonUtils.persistence.atomic.os.replace', side_effect=OSError('blocked')):
             self.assertFalse(self.viewer.save_document())
         self.assertEqual(self.first.read_bytes(), source)
         self.assertTrue(self.viewer.is_modified)
@@ -408,7 +432,7 @@ class MarkdownTests(QtTestCase):
         with patch.object(qt.QMessageBox, 'warning', return_value=qt.QMessageBox.StandardButton.Cancel):
             self.assertFalse(self.viewer.open_document(self.second))
         self.assertIn('Unsaved rich text', self.viewer.formatted_editor.toPlainText())
-        with patch('commonUtils.persistence.os.replace', side_effect=OSError('blocked')):
+        with patch('commonUtils.persistence.atomic.os.replace', side_effect=OSError('blocked')):
             self.assertFalse(self.viewer.save_document())
         self.assertTrue(self.viewer.is_modified)
         self.assertEqual(self.first.read_bytes(), original)
@@ -507,7 +531,7 @@ class MarkdownTests(QtTestCase):
         self.assertNotIn('Save', visible_file)
         self.assertNotIn('Save As…', visible_file)
         self.assertNotIn('Edit / Read', [action.text() for action in window._view_menu.actions()])
-        self.assertEqual(viewer.find_action.text(), 'Find…')
+        self.assertEqual(viewer.find_action.text(), 'Find in this page…')
         viewer.show_find()
         self.assertTrue(viewer.replace_text.isHidden())
         for action in (viewer.new_action, viewer.save_action, viewer.save_as_action):
@@ -568,6 +592,21 @@ class MarkdownTests(QtTestCase):
         self.assertTrue(viewer.save_document())
         self.assertIn('Explicitly edited', self.second.read_text())
 
+    def test_links_preserve_read_and_edit_modes_in_editable_viewer(self):
+        viewer = self.viewer
+        for editing, mode in ((False, 'formatted'), (True, 'formatted'),
+                              (True, 'source'), (False, 'source')):
+            with self.subTest(editing=editing, mode=mode):
+                viewer.open_document(self.first)
+                viewer.set_edit_mode(mode)
+                viewer.set_editing(editing)
+                viewer.follow_link(qt.QUrl('second%20page.MD#details'))
+                self.assertEqual(viewer.current_path, self.second.resolve())
+                self.assertEqual(viewer.edit_button.isChecked(), editing)
+                self.assertEqual(viewer.edit_mode.currentData(), mode)
+                self.assertIs(viewer.pages.currentWidget(),
+                              viewer.active_editor() if editing else viewer.browser)
+
     def test_window_lifetime_and_browser_markdown_activation(self):
         self.assertIsInstance(file_from_path(self.second), MarkdownFile)
         self.assertIsInstance(file_from_path('missing.markdown'), MarkdownFile)
@@ -587,4 +626,4 @@ class MarkdownTests(QtTestCase):
         self.assertTrue(index.isValid())
         with patch('commonUtils.ui.markdown.open_markdown') as opened:
             browser._activate(index)
-        opened.assert_called_once_with(self.second, parent=browser.window(), allow_edit=True)
+        opened.assert_called_once_with(self.second, parent=browser.window())

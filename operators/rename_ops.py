@@ -20,6 +20,7 @@ import bpy
 from typing import List, Type, Optional
 from pathlib import Path
 from bpy.props import StringProperty
+import os
 from ..Lib.commonUtils.runtime.diagnostics import *
 from ..blenderUtils.export import exportSettingsPresets
 from ..blenderUtils.export.model.container import ContainerDummy, Container
@@ -221,9 +222,17 @@ class BH_OT_rename_in_outliner_and_unreal(bpy.types.Operator):
                     return {'CANCELLED'}
                 new_path = container_accounting_for_rename.path
                 old_p4_file = p4_file.P4File(str(old_path))
-                old_p4_file.open_for_edit(silent=True, allow_sync=True)
+                if not old_p4_file.open_for_edit(silent=True, allow_sync=True):
+                    log(Severity.ERROR, self.bl_label,
+                        'The asset was renamed in Blender and Unreal, but source-file checkout failed. '
+                        'The exported source file was not moved; resolve its Perforce state before retrying.', popup=True)
+                    return {'CANCELLED'}
                 # 2. Do P4 Move
-                old_p4_file.run_p4_move(str(new_path))
+                if not old_p4_file.run_p4_move(str(new_path)):
+                    log(Severity.ERROR, self.bl_label,
+                        'The asset was renamed in Blender and Unreal, but the Perforce source-file move failed. '
+                        'Check both source paths in Perforce before retrying; no local copy/delete fallback was run.', popup=True)
+                    return {'CANCELLED'}
 
         if os.path.isfile(str(found_container.path)):
             # Move file
