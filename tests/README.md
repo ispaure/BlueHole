@@ -45,3 +45,11 @@ encryption packages and do not register the add-on.
 
 The portable member-rebuilding module checks retained-name and stored-name
 iterators, container comments, ordering, attributes, cancellation and size bounds.
+
+Portable wiki catalog and directory snapshot/cache cases exercise junction-safe
+traversal in the embedded Python version, including versions before pathlib
+added `Path.is_junction`. Viewer tests remain in their Qt host suite.
+
+The embedded driver also compiles vendored production Python sources without
+importing their optional toolkits. Syntax acceptance is separate from import,
+registration and runtime behavior.
