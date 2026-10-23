@@ -41,6 +41,14 @@ ordinary file operations reject raw access to registered roots, including aliase
 and recursive ancestor operations. See the [provider contract](../ui/resource-providers.md)
 for registration, internal record grants and the scope of this safeguard.
 
+The same guard applies before legacy File copy/move/rename/deletion and permission
+changes, and before Directory deletion/content deletion. Ancestor directory
+operations preflight registered descendants before touching ordinary siblings;
+denied renames do not create destination parents. Ordinary unregistered paths
+keep their established behavior, and exact backend-record grants remain scoped.
+This routes host-managed storage through its provider; it is not an OS sandbox
+for arbitrary external filesystem calls.
+
 ## Verified content snapshots
 
 `snapshots.file_revision(path, follow_symlinks=True)` returns
@@ -112,3 +120,11 @@ retains the source and new location and raises `MutationIncomplete` with
 `destination_published=True`. Relative/internal link rebasing and no-overwrite
 migration policy are unchanged; callers must resolve both-location conflicts
 rather than blindly retrying a completed publication.
+
+## Executable permissions
+
+`File.set_executable_permission()` retains native `chmod +x` and its umask
+semantics, passing an absolute filename as a literal argument with `shell=False`.
+Quotes, substitutions and option-like relative filenames are never shell syntax.
+Command failures raise OSError instead of silently continuing; the existing
+15-second idle-output timeout remains. The host provider guard runs first.
