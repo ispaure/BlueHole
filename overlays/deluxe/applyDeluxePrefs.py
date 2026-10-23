@@ -17,12 +17,13 @@ __status__ = 'Production'
 
 
 import sys
-from shutil import copyfile
+from shutil import copyfile, copymode
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from ...blenderUtils import blenderFile
 from ...Lib.commonUtils.runtime.diagnostics import log, Severity
 from ...Lib.commonUtils.filesystem import files as fileUtils
+from ...Lib.commonUtils.filesystem.links import is_junction
 from ...Lib.commonUtils import ui
 from ...Lib.commonUtils.persistence import promote_path
 
@@ -36,6 +37,8 @@ TOOL_NAME = 'Applying Blue Hole Deluxe Preferences'
 
 def _copy_and_verify(source: Path, destination: Path):
     """Verify private staging before publication, retaining previous settings."""
+    if destination.is_symlink() or is_junction(destination):
+        raise ValueError('Refusing to replace linked preferences')
     destination.parent.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix='.bluehole-preferences-', dir=destination.parent) as temporary:
         staged = Path(temporary) / destination.name
@@ -48,6 +51,7 @@ def _copy_and_verify(source: Path, destination: Path):
         if destination.exists():
             before_mode = destination.stat().st_mode
             fileUtils.File(destination).make_writable()
+            copymode(destination, staged)
             log(Severity.INFO, TOOL_NAME,
                 f'Made destination writable: "{destination}" '
                 f'(mode {oct(before_mode)} -> {oct(destination.stat().st_mode)})')

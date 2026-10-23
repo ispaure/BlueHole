@@ -19,7 +19,9 @@ recovery file back to its original name.
 The two files are installed separately. If the second fails, the first may already
 be installed; the error lists verified destinations and Blender stays open.
 Recovery copies are never cleaned automatically. Existing read-only targets are
-made writable only after staging has passed verification. No-replace publication
+made writable only after staging has passed verification; those permissions
+are retained on the installed file. Linked targets are rejected before changing
+their permissions or content. No-replace publication
 rejects a target created by another writer; failed restoration retains and reports
 the old recovery file. Adapter tests use temporary settings outside Blender; a
 live Blender 5.2.2 installation remains a separate validation step.
