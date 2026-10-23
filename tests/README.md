@@ -17,7 +17,7 @@ and supplies temporary user resource/configuration folders before Blender starts
 The script tests the actual vendored namespace with temporary storage and fixtures:
 portable imports and browser retirement/reuse, short streams, typed range buffers,
 batch outcomes, native
-no-replace publication, ZIP/JSON writes and a bounded Blender version subprocess.
+no-replace publication, ZIP/JSON/recovery writes and a bounded Blender version subprocess.
 It neither registers Blue Hole nor opens or saves user projects/preferences.
 Failures produce a nonzero process status; no additional packages are installed.
 
