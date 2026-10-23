@@ -21,7 +21,7 @@ def _environment():
     platform = get_os()
     if platform is OS.WIN and not settings.win32_env_override:
         return {}
-    prefix = 'linux' if platform is OS.LINUX else 'macos'
+    prefix = {OS.WIN: 'win32', OS.MAC: 'macos', OS.LINUX: 'linux'}[platform]
     return {key: getattr(settings, f'{prefix}_env_setting_{key.lower()}')
             for key in ('P4USER', 'P4PORT', 'P4CLIENT')}
 

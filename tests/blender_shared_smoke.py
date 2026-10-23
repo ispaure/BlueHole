@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMESPACE = '_bluehole_embedded_smoke'
-OWNED_NAMESPACES = (NAMESPACE, 'commonUtils', 'test_pie_actions')
+OWNED_NAMESPACES = (NAMESPACE, 'commonUtils', 'test_pie_actions', 'test_shared_contracts')
 # Reuse portable library regressions; GUI/host-Python subprocess tests need their own runtimes.
 PORTABLE_TESTS = (
     'runtime.test_streams',
@@ -118,6 +118,7 @@ def main():
                     unittest.defaultTestLoader.loadTestsFromNames(
                         ['commonUtils.tests.' + name for name in PORTABLE_TESTS]),
                     unittest.defaultTestLoader.loadTestsFromName('test_pie_actions'),
+                    unittest.defaultTestLoader.loadTestsFromName('test_shared_contracts'),
                 ))
                 standalone_logging = importlib.import_module('commonUtils.runtime.diagnostics').noninteractive_logging
                 with standalone_logging(), shared('runtime.diagnostics').noninteractive_logging():
