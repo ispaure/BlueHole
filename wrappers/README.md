@@ -389,3 +389,16 @@ No local copy/delete fallback follows a failed Perforce step.
 `tests/test_perforce_workflows.py` exercises these policies with Blender/Perforce
 fixtures, including both export preferences. It does not validate native Blender
 handlers, a live Perforce server, or an Unreal connection.
+
+## Shared runtime configuration
+
+The canonical Perforce models live in vendored commonUtils. Blue Hole supplies lazy
+executable, environment and binary-template providers through `PerforceRuntime`;
+initialization does not read Blender preferences before they are available.
+
+When Windows environment overrides are enabled, the provider reads the
+`win32_env_setting_*` fields. With overrides disabled it leaves the process
+settings untouched. macOS and Linux read their respective `macos_env_setting_*`
+and `linux_env_setting_*` fields. `P4USER`, `P4PORT` and `P4CLIENT` are selected
+from the active platform; another platform's stored values are not substituted.
+Scene reload callbacks and permissive Blender save behavior remain Blue Hole policy.

@@ -53,3 +53,38 @@ added `Path.is_junction`. Viewer tests remain in their Qt host suite.
 The embedded driver also compiles vendored production Python sources without
 importing their optional toolkits. Syntax acceptance is separate from import,
 registration and runtime behavior.
+
+## Shared-library contract audit
+
+`test_shared_contracts.py` resolves the add-on's shared imports and checks callable
+argument shapes against the actual vendored modules. It also checks function global
+bindings, including names brought in through wildcard exports, without importing
+or registering Blender consumer modules. Blender property factory names are an
+explicit static allowlist; the native check below validates the loaded modules.
+The embedded smoke suite includes these checks and preserves namespace isolation.
+
+## Native add-on fixture check
+
+```sh
+python tests/blender_addon_smoke.py --blender "/path/to/Blender"
+```
+
+This driver copies tracked add-on files into a temporary package and starts Blender
+with factory settings and private user resources. It enables/disables the add-on
+twice, checks preference and shared Perforce providers, inspects live function
+bindings, exercises save callbacks with source control disabled, exports a fixture
+mesh through Blue Hole to FBX and GLB, verifies position restoration, and checks
+operator/timer/handler/keymap cleanup. It neither connects to a Perforce server nor
+sends assets to an engine. Temporary projects, exports and settings are removed
+when the process exits; the printed JSON records the exercised phases.
+
+For an explicitly chosen older-runtime check, add `--test-minimum-version 4.5.1`.
+Only the temporary copy's `bl_info` minimum changes; the checkout keeps its declared
+version. A pass in Blender 4.5.1 validates those fixture workflows there and does
+not establish Blender 5.2.2 compatibility or interactive viewport behavior.
+
+On October 23, 2026, the 5.2.2 alpha source passed both the embedded shared suite
+and native registration/save/FBX/GLB fixture checks in Blender 4.5.1 LTS/Python 3.11.
+The vendor copy is byte-checked against its recorded commonUtils commit. Shared
+workflow documentation uses canonical repository URLs because `.github` files are
+intentionally excluded from vendored packages.

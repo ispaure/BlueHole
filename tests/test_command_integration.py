@@ -70,6 +70,26 @@ class CommandIntegrationTests(unittest.TestCase):
         self.assertIs(runtime_module.runtime().environment, adapter._environment)
         self.assertIs(runtime_module.runtime().binary_template, adapter._binary_template)
 
+    def test_environment_overrides_use_each_platforms_own_fields(self):
+        preference_module = importlib.import_module(self.adapter.__name__.split('.wrappers.')[0] + '.preferences.prefs')
+        settings = types.SimpleNamespace(source_control_enable=True, source_control_solution='perforce',
+                                         win32_env_override=True)
+        for prefix in ('win32', 'macos', 'linux'):
+            for key in ('p4user', 'p4port', 'p4client'):
+                setattr(settings, f'{prefix}_env_setting_{key}', f'{prefix}-{key}')
+        with patch.object(preference_module, 'prefs', return_value=types.SimpleNamespace(sourcecontrol=settings)):
+            for platform, prefix in ((self.adapter.OS.WIN, 'win32'), (self.adapter.OS.MAC, 'macos'),
+                                     (self.adapter.OS.LINUX, 'linux')):
+                with self.subTest(platform=platform), patch.object(self.adapter, 'get_os', return_value=platform):
+                    self.assertEqual(self.adapter._environment(),
+                                     {key: f'{prefix}-{key.lower()}' for key in ('P4USER', 'P4PORT', 'P4CLIENT')})
+            with patch.object(self.adapter, 'get_os', return_value=self.adapter.OS.WIN):
+                settings.win32_env_override = False
+                self.assertEqual(self.adapter._environment(), {})
+                settings.win32_env_override = True
+                settings.source_control_solution = 'git'
+                self.assertEqual(self.adapter._environment(), {})
+
     def test_runtime_initialization_does_not_read_blender_preferences(self):
         preference_module = importlib.import_module(self.adapter.__name__.split('.wrappers.')[0] + '.preferences.prefs')
         with patch.object(preference_module, 'prefs', side_effect=AssertionError('preferences are not ready')):
