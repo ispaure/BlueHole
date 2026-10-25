@@ -10,6 +10,23 @@ sys.path.insert(0,str(ROOT))
 from Scripts.release_adapter import source_identity,package,prepare,ReleaseTransport,artifact_name
 
 
+
+def relocated_candidate(candidate, directory):
+    """Rebind downloaded evidence files, retaining every source/checksum gate."""
+    directory=Path(directory).resolve()
+    candidate=json.loads(json.dumps(candidate))
+    candidate['artifact']=str(directory/artifact_name())
+    for name in ('portable','inspection','native'):
+        evidence=candidate.get('evidence',{}).get(name)
+        if not isinstance(evidence,dict) or not evidence.get('report'):
+            raise ValueError('Required downloaded '+name+' report is missing.')
+        report=directory/Path(evidence['report']).name
+        if report.is_symlink() or not report.is_file() or not report.resolve().is_relative_to(directory):
+            raise ValueError('Required downloaded '+name+' report is missing or unsafe.')
+        evidence['report']=str(report)
+    return candidate
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--create-draft',action='store_true')
@@ -19,10 +36,11 @@ def main():
         raise ValueError('Hosted source differs from the reviewed dispatch.')
     artifact=ROOT/'test-results/release'/artifact_name()
     if args.create_draft:
-        candidate=json.loads((artifact.parent/'candidate.json').read_text())
-        candidate['artifact']=str(artifact) # Relocate downloaded bytes; exact checksum/source still apply.
+        candidate=relocated_candidate(json.loads((artifact.parent/'candidate.json').read_text()),artifact.parent)
         if os.environ.get('REVIEWED_SHA256')!=candidate['sha256'] or os.environ.get('RELEASE_TAG')!=candidate['tag']:
             raise ValueError('Post-build review of this exact checksum, embedded version and destination/tag is required before draft creation.')
+        from Scripts.release_adapter import verify_candidate
+        verify_candidate(candidate) # Reject stale/missing gates before reading credentials.
         from Scripts.github_alpha import GitHubDraftClient
         from build_manager.github import credential_token
         from build_manager.settings import SettingsStore
