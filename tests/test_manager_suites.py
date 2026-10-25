@@ -166,3 +166,26 @@ class ManagerSuiteTests(unittest.TestCase):
                 with self.assertRaises(ConnectionError):reviewed_release.publish(candidate,root/'receipt.json',client=client)
                 with self.assertRaisesRegex(ValueError,'Reconcile'):reviewed_release.publish(candidate,root/'receipt.json',client=client)
             self.assertEqual(effect.call_count,1)
+
+    def test_downloaded_hosted_evidence_relocates_only_files_inside_artifact_directory(self):
+        from Scripts.hosted_alpha import relocated_candidate
+        with TemporaryDirectory() as directory:
+            root=Path(directory)
+            candidate={'artifact':'/previous-macos-runner/addon.zip','evidence':{}}
+            for name in ('portable','inspection','native'):
+                filename=name+'.xml';(root/filename).write_text('<testsuite/>')
+                candidate['evidence'][name]={'report':'/previous-macos-runner/'+filename,'source':{'commit':'fixed'}}
+            actual=relocated_candidate(candidate,root)
+            for name in candidate['evidence']:
+                self.assertEqual(actual['evidence'][name]['report'],str((root/(name+'.xml')).resolve()))
+                self.assertEqual(actual['evidence'][name]['source'],{'commit':'fixed'})
+            self.assertTrue(candidate['evidence']['native']['report'].startswith('/previous-macos-runner/'))
+            (root/'native.xml').unlink()
+            with self.assertRaisesRegex(ValueError,'missing or unsafe'):
+                relocated_candidate(candidate,root)
+            outside=root.parent/('outside-'+root.name+'.xml');outside.write_text('<testsuite/>')
+            try:
+                (root/'native.xml').symlink_to(outside)
+                with self.assertRaisesRegex(ValueError,'missing or unsafe'):
+                    relocated_candidate(candidate,root)
+            finally:outside.unlink()

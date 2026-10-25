@@ -83,3 +83,8 @@ pinned setup can consume them; local pinning performs no push.
 Descriptor changes require renewed trust. Portable controlled-fixture tests are
 not real Blender 5.2.2 or GitHub acceptance, and no live publication/dispatch is
 performed as part of source implementation.
+
+Hosted draft continuation relocates the downloaded JUnit evidence files into its
+own artifact directory before revalidating the complete source, case inventory and
+ZIP checksum. It rejects missing or linked evidence before credential access; paths
+from a previous runner are not treated as accessible local files.
