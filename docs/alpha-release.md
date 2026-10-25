@@ -12,15 +12,16 @@ a supported runtime for isolated native acceptance; no preferences are changed.
 
 `python Scripts/release_adapter.py package --output test-results/release/addon.zip`
 runs portable tests and shared-copy checks, then creates an installable `BlueHole/`
-ZIP from `Scripts/package-files.json`. Unexpected/missing runtime members fail.
+ZIP from `Scripts/package-files.json`. Manager and hosted artifacts use
+`BlueHole-6.9.21-blender5.2.2-alpha.zip`. Unexpected/missing runtime members fail.
 Tests, caches, evidence and credentials are excluded. The receipt records exact
 source, shared revision, add-on version, Blender compatibility and checksum.
 Dirty packages are development-only and cannot be made publishable by relabelling.
 
 Tags use `bluehole-v6.9.21-blender5.2.2-alpha.N`. Preparation requires clean
 committed source and rejects tag collisions. Missing native Blender 5.2.2 or hosted
-platform acceptance keeps the candidate blocked. The dispatch-only candidate
-workflow has read-only permissions; no dispatch is performed by local preparation.
+platform acceptance keeps the candidate blocked. The validation jobs have read-only contents permissions; no dispatch is performed
+by local preparation.
 
 Draft-only capability is implemented behind exact embedded-source/checksum and
 native/hosted evidence checks. It reconciles exact existing drafts before writing
