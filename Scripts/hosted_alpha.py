@@ -3,7 +3,6 @@ import argparse
 import json
 import os
 from pathlib import Path
-import subprocess
 import sys
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -34,15 +33,14 @@ def main():
         receipt=ReleaseTransport(GitHubDraftClient(token)).publish_draft(candidate,confirmed=True)
         (artifact.parent/'draft-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
         print(json.dumps(receipt));return
-    blender=Path(os.environ.get('BLUEHOLE_BLENDER',''))
-    if not blender.is_file():raise ValueError('Configure supported Blender 5.2.2; portable tests do not replace native acceptance.')
-    version=subprocess.check_output([str(blender),'--version'],text=True).splitlines()[0]
-    if not version.startswith('Blender 5.2.2'):raise ValueError('Native acceptance requires Blender 5.2.2.')
-    subprocess.run([sys.executable,'tests/blender_addon_smoke.py','--blender',str(blender)],check=True)
     receipt=package(artifact)
-    native=dict(status='passed',source=source,runtime=version)
+    from Scripts.validation import native_suite, package_suite
+    inspection=package_suite(artifact.with_suffix('.json'),artifact.parent/'inspection.xml')
+    native=native_suite(artifact.parent/'native.xml',artifact.with_suffix('.json'))
+    if inspection['status']!='passed' or native['status']!='passed':
+        raise ValueError('Exact package inspection and supported Blender install/enable acceptance are required.')
     hosted=dict(status='passed',source=source,platforms=dict(macos='passed',linux='passed',windows='passed'),run_id=os.environ['GITHUB_RUN_ID'])
-    candidate=prepare(receipt,os.environ['RELEASE_TAG'],native=native,hosted=hosted)
+    candidate=prepare(receipt,os.environ['RELEASE_TAG'],native=native,hosted=hosted,inspection=inspection)
     (artifact.parent/'candidate.json').write_text(json.dumps(candidate,indent=2)+'\n')
     print(json.dumps(candidate,indent=2))
 

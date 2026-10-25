@@ -40,3 +40,46 @@ newly validated bytes before credential access or upload. First prepare with
 request draft creation with its reviewed SHA256. A rebuild that differs stops for
 new review. The environment gate is additional protection, not a substitute for
 this exact-artifact approval.
+
+## Guided suites and exact-package acceptance
+
+The descriptor declares `portable.contracts`, `blender.integration`,
+`package.inspection` and `release.acceptance`. Portable cases remain under `tests/`;
+Blender integration stays in `tests/blender_addon_smoke.py`, package checks stay
+with the release adapter, and release acceptance stays in `Scripts/validation.py`.
+This maps existing owners into contracts, native, integration and acceptance groups
+without moving package code or introducing another runtime environment.
+
+Check without a suite now runs portable/shared-copy checks plus the supported
+Blender gate. Select Portable contracts for an explicitly portable-only result.
+Package runs the portable gates and inspects exact ZIP membership/checksums; it
+remains a development package operation. Release preparation additionally installs
+that exact ZIP into the smoke test's isolated add-on directories, verifies Blender
+5.2.2, exercises enable/import/export/disable cleanup, and checks complete case
+inventories with no skips. Native evidence records the tested artifact SHA256;
+a successful source-copy smoke test cannot substitute for that ZIP acceptance.
+Focused filename patterns apply only to portable Check and cannot narrow releases.
+
+`BLUEHOLE_HOSTED_EVIDENCE` (or the private `tools.hosted_evidence` file reference)
+provides exact-source successful macOS/Linux/Windows receipts and a hosted run ID.
+Missing hosted or supported native evidence fails the required acceptance phase;
+no workflow is dispatched to manufacture it. Per-case JUnit reports and JSON
+receipts are retained under ignored `test-results/release/` even on test failure.
+Full portable inventory is recomputed at release review, so focused results cannot
+be relabelled as complete coverage.
+
+Reviewed GitHub draft runs all preparation and gates once, then pauses on its
+explicit upload phase. Continuation consumes the exact manager-approved candidate
+and ZIP with their checksums; it never rebuilds for upload. The existing draft
+transport rechecks local/native/hosted evidence, and a durable attempt marker stops
+blind retry after an uncertain provider outcome. Draft creation remains separate
+from publication; beta/stable promotion remains unimplemented.
+
+The project now requires the companion manager's `build_manager.reporting` helper.
+Local editable integration can be tested against that implementation. The tracked
+manager pin selects the locally reviewed implementation containing reporting. Its
+manager and commonUtils commits must be available remotely before hosted/fresh
+pinned setup can consume them; local pinning performs no push.
+Descriptor changes require renewed trust. Portable controlled-fixture tests are
+not real Blender 5.2.2 or GitHub acceptance, and no live publication/dispatch is
+performed as part of source implementation.

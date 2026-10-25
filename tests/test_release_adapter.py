@@ -60,7 +60,24 @@ class ReleaseAdapterTests(unittest.TestCase):
         artifact=root/'addon.zip'
         with zipfile.ZipFile(artifact,'w') as archive:
             archive.writestr('BlueHole/build-identity.json',json.dumps(dict(source=source)))
-        evidence=dict(native=dict(status='passed',source=source,runtime='Blender 5.2.2'),
+        from build_manager.reporting import write_junit
+        from Scripts.validation import portable_case_ids
+        digest=hashlib.sha256(artifact.read_bytes()).hexdigest()
+        def evidence_row(suite, identities):
+            path=root/(suite+'.xml')
+            cases=[]
+            for identity in identities:
+                classname,_,name=identity.rpartition('.')
+                cases.append(dict(classname=classname,name=name,status='passed',seconds=.01))
+            write_junit(path,suite,cases)
+            return dict(status='passed',source=source,report=str(path),expected_tests=identities,
+                        tests_run=len(identities),failures=0,errors=0,skipped=0)
+        portable=evidence_row('portable.contracts',portable_case_ids()+['Scripts.release_adapter.checks.<locals>.SharedCopy.test_pinned_shared_copy'])
+        native=evidence_row('blender.integration',['driver.NativeAcceptance.test_supported_runtime_and_install'])
+        native.update(runtime='Blender 5.2.2',registration_tested=True,artifact_sha256=digest)
+        inspection=evidence_row('package.inspection',['driver.PackageInspection.test_exact_member_inventory_and_checksums'])
+        inspection['artifact_sha256']=digest
+        evidence=dict(native=native,inspection=inspection,portable=portable,
             hosted=dict(status='passed',source=source,platforms=dict(macos='passed',linux='passed',windows='passed'),run_id='7'))
         return dict(source=source,artifact=str(artifact),sha256=hashlib.sha256(artifact.read_bytes()).hexdigest(),
             publishable=True,blocked_gates=[],evidence=evidence,repository='ispaure/BlueHole',tag='bluehole-v6.9.21-blender5.2.2-alpha.1')
