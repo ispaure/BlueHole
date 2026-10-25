@@ -65,3 +65,9 @@ in the source checkout do not change the recorded shared revision.
 
 MIT. Copyright © 2026 Marc-André Voyer.
 Third-party Blender Tools code retains its own license in `Lib/send2ue`.
+
+## Alpha build tooling
+
+The current Blender 5.2.2 alpha line has project-owned checks and installable ZIP
+preparation for the external Build Deployment Manager. See the
+[alpha packaging and release review guide](docs/alpha-release.md).

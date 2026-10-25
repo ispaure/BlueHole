@@ -17,6 +17,16 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.12.2'
+      - id: manager
+        run: python -c "import json,os; d=json.load(open('build-manager-dependency.json'));open(os.environ['GITHUB_OUTPUT'],'a').write('revision='+d['revision']+'\n')"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ispaure/build-deployment-manager
+          ref: ${{ steps.manager.outputs.revision }}
+          submodules: recursive
+          path: .manager-tooling
+          persist-credentials: false
+      - run: python -m pip install --no-deps -e .manager-tooling
       - run: python -m unittest discover -s tests -v
   shared-copy:
     runs-on: ubuntu-latest

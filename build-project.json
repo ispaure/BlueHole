@@ -15,12 +15,40 @@
       "blender"
     ],
     "operations": [
-      "Check"
+      "Check",
+      "Package",
+      "Prepare GitHub release"
     ],
     "backends": {
       "blender": [
         "Local"
       ]
+    },
+    "providers": [
+      "github"
+    ]
+  },
+  "presets": {
+    "Alpha validation": {
+      "operation": "Check",
+      "platform": "blender",
+      "backend": "Local"
+    },
+    "Alpha installable package": {
+      "operation": "Package",
+      "platform": "blender",
+      "backend": "Local"
+    },
+    "Alpha GitHub release preparation": {
+      "operation": "Prepare GitHub release",
+      "platform": "blender",
+      "backend": "Local"
+    }
+  },
+  "account_fields": {
+    "github": {
+      "reference": "auth.github_reference",
+      "kind": "auth.github_kind"
     }
   }
 }
