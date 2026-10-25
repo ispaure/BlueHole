@@ -13,3 +13,8 @@
 !/envFiles/default/**
 
 **/.DS_Store
+.venv/
+__pycache__/
+test-results/
+dist/
+*.egg-info/
