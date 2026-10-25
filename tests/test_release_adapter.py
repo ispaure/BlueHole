@@ -32,6 +32,28 @@ class ReleaseAdapterTests(unittest.TestCase):
         with self.assertRaises(ValueError):transport.publish_draft({'publishable':False},confirmed=True)
         client.assert_not_called();client.reconcile.assert_not_called()
 
+    def test_tag_collision_and_failed_prerequisite_stop_before_packaging(self):
+        source=dict(dirty=False,addon_version='6.9.21')
+        with patch.object(adapter,'source_identity',return_value=source), patch.object(adapter.subprocess,'run',return_value=Mock(returncode=0)):
+            with self.assertRaisesRegex(ValueError,'already exists'):
+                adapter.prepare(dict(source=source),'bluehole-v6.9.21-blender5.2.2-alpha.1')
+        with TemporaryDirectory() as directory, patch.object(adapter,'source_identity',return_value=source):
+            output=Path(directory)/'candidate.zip'
+            with self.assertRaisesRegex(ValueError,'Prerequisite evidence'):
+                adapter.package(output,validation=dict(status='failed',source=source))
+            self.assertFalse(output.exists())
+        with self.assertRaisesRegex(ValueError,'explicit commonUtils'):
+            adapter.check_shared(None)
+
+    def test_hosted_source_and_artifact_guards_reject_without_transport(self):
+        with TemporaryDirectory() as directory:
+            candidate=self.candidate(Path(directory));client=Mock()
+            with patch.object(adapter,'source_identity',return_value=candidate['source']):
+                candidate['evidence']['hosted']['platforms'].pop('windows')
+                with self.assertRaisesRegex(ValueError,'hosted acceptance'):
+                    adapter.ReleaseTransport(client).publish_draft(candidate,confirmed=True)
+            client.reconcile.assert_not_called();client.create_draft.assert_not_called()
+
     def candidate(self,root):
         import zipfile,hashlib
         source=dict(dirty=False,commit='a'*40,addon_version='6.9.21')
