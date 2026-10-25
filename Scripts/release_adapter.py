@@ -13,6 +13,7 @@ import tempfile
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
 FILES={'__init__.py','LICENSE.md','url_database.ini'}
 DIRECTORIES={'actions','blenderUtils','debug','environment','keymaps','operators','overlays',
              'preferences','ui','unrealUtils','wrappers','Lib','envFiles'}
@@ -95,15 +96,23 @@ def storage():
     path=ROOT/'test-results/release';path.mkdir(parents=True,exist_ok=True);return path
 
 
-def checks(upstream=None):
+def checks(upstream=None, *, junit=None, pattern='test*.py'):
     before=source_identity()
     expected=os.environ.get('BLUEHOLE_MANAGER_SOURCE')
     if expected and json.loads(expected)!=before:raise ValueError('Source changed after manager planning; inspect a new plan.')
-    check_shared(upstream or os.environ.get('BLUEHOLE_SHARED_SOURCE'))
-    result=subprocess.run([sys.executable,'-m','unittest','discover','-s','tests','-v'],cwd=ROOT,timeout=300)
-    if result.returncode:raise ValueError('Blue Hole adapter prerequisites failed.')
+    import unittest
+    from uuid import uuid4
+    from build_manager.reporting import run_suite
+    report = Path(junit) if junit else storage() / (uuid4().hex + '-portable.xml')
+    class SharedCopy(unittest.TestCase):
+        def test_pinned_shared_copy(self):
+            check_shared(upstream or os.environ.get('BLUEHOLE_SHARED_SOURCE'))
+    suite = unittest.TestSuite([unittest.defaultTestLoader.loadTestsFromTestCase(SharedCopy),
+                               unittest.defaultTestLoader.discover(str(ROOT / 'tests'), pattern=pattern)])
+    result = run_suite(suite, report, 'portable.contracts', fail_on_skip=True)
+    if result['status'] != 'passed':raise ValueError('Blue Hole adapter prerequisites failed; inspect the JUnit report.')
     if source_identity()!=before:raise ValueError('Source changed during prerequisite checks.')
-    return dict(status='passed',source=before,python=sys.version,interpreter=sys.executable,scope='portable adapter tests and exact shared-copy check')
+    return dict(result,source=before,python=sys.version,interpreter=sys.executable,scope='portable adapter tests and exact shared-copy check')
 
 
 def package(destination,*,upstream=None,validation=None):
@@ -150,7 +159,7 @@ def release_tag(version,sequence):
     return f'bluehole-v{version}-blender5.2.2-alpha.{int(sequence)}'
 
 
-def prepare(receipt,tag,*,native=None,hosted=None):
+def prepare(receipt,tag,*,native=None,hosted=None,inspection=None):
     source=source_identity()
     if source['dirty'] or receipt['source']!=source:raise ValueError('Release preparation requires exact clean committed source; development packages cannot be relabelled.')
     if not re.fullmatch(re.escape('bluehole-v'+source['addon_version']+'-blender5.2.2-alpha.')+r'[1-9]\d*',tag):
@@ -169,10 +178,40 @@ def prepare(receipt,tag,*,native=None,hosted=None):
         gates.append('supported-blender-runtime')
     if hosted and (hosted.get('platforms')!={'macos':'passed','linux':'passed','windows':'passed'} or not hosted.get('run_id')):
         gates.append('required-hosted-platforms')
-    return dict(schema=1,evidence=dict(native=native,hosted=hosted),repository='ispaure/BlueHole',tag=tag,channel='alpha',prerelease=True,draft=True,
+    try:
+        from Scripts.validation import release_acceptance
+        release_acceptance(receipt.get('checks', {}), receipt, inspection or {}, native or {}, hosted,
+                           expected_source=source)
+    except (OSError, ValueError, KeyError, TypeError):
+        gates.append('required-suite-inventory-and-exact-package-native-acceptance')
+    return dict(schema=1,evidence=dict(native=native,hosted=hosted,portable=receipt.get('checks'),inspection=inspection),repository='ispaure/BlueHole',tag=tag,channel='alpha',prerelease=True,draft=True,
                 source=source,artifact=receipt['artifact'],sha256=receipt['sha256'],
                 publishable=not gates,blocked_gates=gates,effect='prepare only; no network or tag mutation',
                 future_channels={'beta':'not implemented','stable':'not implemented'})
+
+
+def verify_candidate(candidate):
+    if not candidate.get("publishable") or candidate.get("blocked_gates"):
+        raise ValueError("Reviewed native/hosted suite gates are required.")
+    if candidate['source']!=source_identity() or candidate['source']['dirty']:
+        raise ValueError('Candidate source identity changed.')
+    if candidate.get('repository')!='ispaure/BlueHole' or not re.fullmatch(re.escape('bluehole-v'+candidate['source']['addon_version']+'-blender5.2.2-alpha.')+r'[1-9]\d*',candidate.get('tag','')):
+        raise ValueError('Candidate destination or alpha tag differs from project policy.')
+    artifact=Path(candidate['artifact'])
+    with zipfile.ZipFile(artifact) as archive:
+        embedded=json.loads(archive.read('BlueHole/build-identity.json'))
+        if embedded['source']!=candidate['source']:raise ValueError('Embedded source differs; development archives cannot be relabelled.')
+    evidence=candidate.get('evidence',{})
+    native=evidence.get('native') or {};hosted=evidence.get('hosted') or {}
+    if (native.get('source')!=candidate['source'] or native.get('status')!='passed'
+            or not str(native.get('runtime','')).startswith('Blender 5.2.2')
+            or hosted.get('source')!=candidate['source'] or hosted.get('status')!='passed'
+            or hosted.get('platforms')!={'macos':'passed','linux':'passed','windows':'passed'} or not hosted.get('run_id')):
+        raise ValueError('Native and hosted acceptance evidence is missing or incompatible.')
+    from Scripts.validation import release_acceptance
+    release_acceptance(evidence.get('portable', {}), candidate, evidence.get('inspection', {}), native, hosted,
+                       expected_source=candidate['source'])
+    if hashlib.sha256(artifact.read_bytes()).hexdigest()!=candidate['sha256']:raise ValueError('Artifact checksum changed.')
 
 
 class ReleaseTransport:
@@ -182,22 +221,7 @@ class ReleaseTransport:
     def publish_draft(self,candidate,*,confirmed=False):
         if not confirmed or not candidate.get('publishable') or candidate.get('blocked_gates'):
             raise ValueError('Reviewed native/hosted gates and explicit operator confirmation are required.')
-        if candidate['source']!=source_identity() or candidate['source']['dirty']:
-            raise ValueError('Candidate source identity changed.')
-        if candidate.get('repository')!='ispaure/BlueHole' or not re.fullmatch(re.escape('bluehole-v'+candidate['source']['addon_version']+'-blender5.2.2-alpha.')+r'[1-9]\d*',candidate.get('tag','')):
-            raise ValueError('Candidate destination or alpha tag differs from project policy.')
-        artifact=Path(candidate['artifact'])
-        with zipfile.ZipFile(artifact) as archive:
-            embedded=json.loads(archive.read('BlueHole/build-identity.json'))
-            if embedded['source']!=candidate['source']:raise ValueError('Embedded source differs; development archives cannot be relabelled.')
-        evidence=candidate.get('evidence',{})
-        native=evidence.get('native') or {};hosted=evidence.get('hosted') or {}
-        if (native.get('source')!=candidate['source'] or native.get('status')!='passed'
-                or not str(native.get('runtime','')).startswith('Blender 5.2.2')
-                or hosted.get('source')!=candidate['source'] or hosted.get('status')!='passed'
-                or hosted.get('platforms')!={'macos':'passed','linux':'passed','windows':'passed'} or not hosted.get('run_id')):
-            raise ValueError('Native and hosted acceptance evidence is missing or incompatible.')
-        if hashlib.sha256(artifact.read_bytes()).hexdigest()!=candidate['sha256']:raise ValueError('Artifact checksum changed.')
+        verify_candidate(candidate)
         # Client reconciles exact tag/SHA/checksum. Existing unrelated state is never overwritten.
         existing=self.client.reconcile(candidate)
         if existing is not None:return existing
@@ -209,6 +233,7 @@ def main():
     parser.add_argument('action',choices=['check','package','prepare'])
     parser.add_argument('--shared-source',type=Path)
     parser.add_argument('--output',type=Path);parser.add_argument('--receipt',type=Path);parser.add_argument('--tag');parser.add_argument('--checks',type=Path)
+    parser.add_argument('--native', type=Path);parser.add_argument('--hosted', type=Path);parser.add_argument('--inspection', type=Path)
     args=parser.parse_args()
     if args.action=='check':result=checks(args.shared_source)
     elif args.action=='package':
@@ -216,7 +241,10 @@ def main():
         result=package(args.output,upstream=args.shared_source,validation=json.loads(args.checks.read_text()) if args.checks else None)
     else:
         if not args.receipt or not args.tag:parser.error('--receipt and --tag are required')
-        result=prepare(json.loads(args.receipt.read_text()),args.tag)
+        result=prepare(json.loads(args.receipt.read_text()),args.tag,
+            native=json.loads(args.native.read_text()) if args.native else None,
+            hosted=json.loads(args.hosted.read_text()) if args.hosted else None,
+            inspection=json.loads(args.inspection.read_text()) if args.inspection else None)
     if args.output and args.action!='package':
         args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result,indent=2));return 0

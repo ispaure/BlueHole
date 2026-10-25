@@ -7,12 +7,14 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import zipfile
+import stat
 from tempfile import TemporaryDirectory
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def launch(binary, minimum=None):
+def launch(binary, minimum=None, package_archive=None):
     with TemporaryDirectory(prefix='bluehole-native-') as temporary:
         root = Path(temporary)
         environment = dict(os.environ)
@@ -24,16 +26,21 @@ def launch(binary, minimum=None):
             environment['BLENDER_USER_' + key] = str(folder)
         package = root / 'scripts/addons/bluehole_health'
         package.mkdir(parents=True)
-        names = subprocess.check_output(['git', '-C', str(ROOT), 'ls-files', '-z']).decode().split('\0')
-        for name in filter(None, names):
-            if name.startswith(('tests/', '.github/')):
-                continue
-            source = ROOT / name
-            if source.is_symlink() or not source.is_file():
-                raise RuntimeError('Expected a regular tracked file: ' + name)
-            destination = package / name
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source, destination)
+        if package_archive:
+            if minimum is not None:
+                raise ValueError('Exact-package acceptance cannot override Blender compatibility.')
+            extract_package(package_archive, package)
+        else:
+            names = subprocess.check_output(['git', '-C', str(ROOT), 'ls-files', '-z']).decode().split('\0')
+            for name in filter(None, names):
+                if name.startswith(('tests/', '.github/')):
+                    continue
+                source = ROOT / name
+                if source.is_symlink() or not source.is_file():
+                    raise RuntimeError('Expected a regular tracked file: ' + name)
+                destination = package / name
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source, destination)
         if minimum is not None:
             initializer = package / '__init__.py'
             text = initializer.read_text()
@@ -50,6 +57,28 @@ def launch(binary, minimum=None):
                                '--python-exit-code', '1', '--python', str(Path(__file__).resolve()),
                                '--', '--fixture-root', str(root)],
                               env=environment, timeout=120).returncode
+
+
+def extract_package(archive_path, destination):
+    from pathlib import PurePosixPath
+    with zipfile.ZipFile(archive_path) as archive:
+        rows = archive.infolist()
+        if len(rows) > 20000 or sum(row.file_size for row in rows) > 256 * 1024 * 1024:
+            raise ValueError('Native package fixture exceeds bounded extraction limits.')
+        if len({row.filename for row in rows}) != len(rows):
+            raise ValueError('Native package contains duplicate members.')
+        for row in rows:
+            name = PurePosixPath(row.filename)
+            kind = stat.S_IFMT(row.external_attr >> 16)
+            if (name.is_absolute() or '..' in name.parts or '\\' in row.filename
+                    or not name.parts or name.parts[0] != 'BlueHole' or kind not in (0, stat.S_IFREG, stat.S_IFDIR)):
+                raise ValueError('Unsafe native package member: ' + row.filename)
+            target = destination.joinpath(*name.parts[1:])
+            if row.is_dir():
+                target.mkdir(parents=True, exist_ok=True)
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(archive.read(row))
 
 
 def main(root):
@@ -181,12 +210,13 @@ if __name__ == '__main__':
     if '--blender' in sys.argv:
         parser = argparse.ArgumentParser(description=__doc__)
         parser.add_argument('--blender', type=Path, required=True)
+        parser.add_argument('--package', type=Path, help='Install these exact packaged bytes into the isolated fixture')
         parser.add_argument('--test-minimum-version', help='Override only the temporary copy, for an explicitly chosen older Blender')
         args = parser.parse_args()
         minimum = tuple(map(int, args.test_minimum_version.split('.'))) if args.test_minimum_version else None
         if minimum is not None and len(minimum) != 3:
             parser.error('Use a three-part minimum version')
-        raise SystemExit(launch(args.blender.resolve(strict=True), minimum))
+        raise SystemExit(launch(args.blender.resolve(strict=True), minimum, args.package))
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--fixture-root', type=Path, required=True)
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])

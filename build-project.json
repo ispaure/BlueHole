@@ -17,7 +17,8 @@
     "operations": [
       "Check",
       "Package",
-      "Prepare GitHub release"
+      "Prepare GitHub release",
+      "Reviewed GitHub draft"
     ],
     "backends": {
       "blender": [
@@ -43,6 +44,24 @@
       "operation": "Prepare GitHub release",
       "platform": "blender",
       "backend": "Local"
+    },
+    "Portable contracts": {
+      "operation": "Check",
+      "platform": "blender",
+      "backend": "Local",
+      "suite": "portable.contracts"
+    },
+    "Supported Blender native acceptance": {
+      "operation": "Check",
+      "platform": "blender",
+      "backend": "Local",
+      "suite": "blender.integration"
+    },
+    "Reviewed GitHub draft": {
+      "operation": "Reviewed GitHub draft",
+      "platform": "blender",
+      "backend": "Local",
+      "suite": "release.acceptance"
     }
   },
   "account_fields": {
@@ -50,5 +69,56 @@
       "reference": "auth.github_reference",
       "kind": "auth.github_kind"
     }
-  }
+  },
+  "test_suites": [
+    {
+      "id": "portable.contracts",
+      "label": "Portable contracts and pinned shared copy",
+      "tier": "contracts",
+      "platforms": [
+        "blender"
+      ],
+      "operations": [
+        "Check"
+      ],
+      "description": "Actual portable unittest cases; no native acceptance is implied."
+    },
+    {
+      "id": "blender.integration",
+      "label": "Blender 5.2.2 isolated enable and import",
+      "tier": "native",
+      "platforms": [
+        "blender"
+      ],
+      "operations": [
+        "Check"
+      ],
+      "description": "Requires an explicit supported binary and isolated user directories."
+    },
+    {
+      "id": "package.inspection",
+      "label": "Prepare and inspect exact installable package",
+      "tier": "integration",
+      "platforms": [
+        "blender"
+      ],
+      "operations": [
+        "Package"
+      ],
+      "description": "Complete portable gates, package allowlist and checksum verification."
+    },
+    {
+      "id": "release.acceptance",
+      "label": "Complete alpha release acceptance",
+      "tier": "acceptance",
+      "platforms": [
+        "blender"
+      ],
+      "operations": [
+        "Prepare GitHub release",
+        "Reviewed GitHub draft"
+      ],
+      "description": "Complete portable, package, exact-package native and hosted gates. Cannot be narrowed."
+    }
+  ]
 }
