@@ -26,7 +26,7 @@ jobs:
           submodules: recursive
           path: .manager-tooling
           persist-credentials: false
-      - run: python -m pip install --no-deps -e .manager-tooling
+      - run: python -m pip install --no-deps -e .manager-tooling/Python
       - run: python -m unittest discover -s tests -v
   shared-copy:
     runs-on: ubuntu-latest

@@ -46,7 +46,7 @@ jobs:
           submodules: recursive
           path: .manager-tooling
           persist-credentials: false
-      - run: python -m pip install --no-deps -e .manager-tooling
+      - run: python -m pip install --no-deps -e .manager-tooling/Python
       - run: python -m unittest discover -s tests -v
   candidate:
     needs: portable
@@ -76,7 +76,7 @@ jobs:
           submodules: recursive
           path: .manager-tooling
           persist-credentials: false
-      - run: python -m pip install --no-deps -e .manager-tooling
+      - run: python -m pip install --no-deps -e .manager-tooling/Python
       - name: Require supported Blender and prepare immutable candidate
         env:
           EXPECTED_COMMIT: ${{ inputs.expected_commit }}
@@ -112,7 +112,7 @@ jobs:
           submodules: recursive
           path: .manager-tooling
           persist-credentials: false
-      - run: python -m pip install --no-deps -e .manager-tooling
+      - run: python -m pip install --no-deps -e .manager-tooling/Python
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: bluehole-reviewed-alpha-candidate
