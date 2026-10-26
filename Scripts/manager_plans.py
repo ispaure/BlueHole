@@ -19,7 +19,8 @@ def make_plan(operation, target, backend, values, source, tools_env, origins, se
         raise ValueError('Blue Hole validates this exact checkout; historical revisions need a separately registered checkout.')
     release = operation in {'Prepare GitHub release', 'Reviewed GitHub draft'}
     if release and not values.get('release_tag'):
-        raise ValueError('Choose an explicit alpha release tag.')
+        from Scripts.release_adapter import suggest_release_tag
+        values = dict(values,release_tag=suggest_release_tag(source))
     if release and pattern:
         raise ValueError('Release acceptance cannot use a focused test pattern.')
     from Scripts.release_adapter import artifact_name
@@ -65,6 +66,6 @@ def make_plan(operation, target, backend, values, source, tools_env, origins, se
                     dependencies=('release-review',), environment=tools_env, timeout=300, kind='distribution',
                     effect='upload', provider='github', artifacts=(str(run / 'draft-receipt.json'),)))
     return Plan('Blue Hole', operation, dict(source, destination='ispaure/BlueHole', channel='alpha',
-                test_suite=suite or 'full declared operation', focused_test_pattern=pattern), tuple(phases), str(ROOT / 'test-results/build-manager/workspace'),
+                test_suite=suite or 'full declared operation', focused_test_pattern=pattern, release_tag=values.get('release_tag','')), tuple(phases), str(ROOT / 'test-results/build-manager/workspace'),
                 effect='test' if operation == 'Check' else 'build', secret_environment=secrets,
                 settings=dict(values=tools_env, origins=dict(origins, BLUEHOLE_MANAGER_SOURCE='captured source identity')))

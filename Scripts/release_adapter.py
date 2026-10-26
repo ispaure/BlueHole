@@ -159,6 +159,13 @@ def release_tag(version,sequence):
     return f'bluehole-v{version}-blender5.2.2-alpha.{int(sequence)}'
 
 
+def suggest_release_tag(source):
+    prefix=release_tag(source['addon_version'],1).rsplit('.',1)[0]+'.'
+    tags=subprocess.check_output(['git','tag','--list',prefix+'*'],cwd=ROOT,text=True,timeout=10).splitlines()
+    numbers=[int(tag[len(prefix):]) for tag in tags if tag[len(prefix):].isdigit()]
+    return prefix+str(max(numbers,default=0)+1)
+
+
 def prepare(receipt,tag,*,native=None,hosted=None,inspection=None):
     source=source_identity()
     if source['dirty'] or receipt['source']!=source:raise ValueError('Release preparation requires exact clean committed source; development packages cannot be relabelled.')

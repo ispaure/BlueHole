@@ -88,3 +88,11 @@ Hosted draft continuation relocates the downloaded JUnit evidence files into its
 own artifact directory before revalidating the complete source, case inventory and
 ZIP checksum. It rejects missing or linked evidence before credential access; paths
 from a previous runner are not treated as accessible local files.
+
+## Automatic manager release identifiers
+
+When the manager receives no custom release identifier, the owning adapter uses
+the captured version and next local alpha tag suffix. Review shows the resulting
+identifier before any external work. This is a read-only suggestion, not a remote
+reservation; publication retains its remote collision checks. Supplying a custom
+identifier remains supported. Plan preparation does not upload or publish.
