@@ -40,6 +40,13 @@ class ManagerSuiteTests(unittest.TestCase):
         self.assertIn('junit', native.phases[0].artifact_types.values())
         self.assertEqual([phase.id for phase in self.plan('Check').phases], ['portable-contracts','blender-integration'])
 
+    def test_release_identifier_is_suggested_without_creating_or_publishing_tags(self):
+        with patch('Scripts.release_adapter.subprocess.check_output',return_value='bluehole-v6.9.21-blender5.2.2-alpha.3\n') as read:
+            plan=self.plan('Prepare GitHub release','release.acceptance')
+        self.assertEqual(plan.source['release_tag'],'bluehole-v6.9.21-blender5.2.2-alpha.4')
+        self.assertEqual(read.call_args.args[0][:3],['git','tag','--list'])
+        self.assertFalse(any(phase.effect in {'publish','upload','dispatch'} for phase in plan.phases))
+
     def test_reviewed_draft_depends_on_all_required_case_and_package_gates(self):
         plan = self.plan('Reviewed GitHub draft', 'release.acceptance', release_tag='bluehole-v6.9.21-blender5.2.2-alpha.1')
         rows = {phase.id: phase for phase in plan.phases}
