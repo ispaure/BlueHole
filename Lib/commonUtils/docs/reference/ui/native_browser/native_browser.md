@@ -62,6 +62,13 @@ cooperative cancellation, retained async tasks and encoded/decoded caches.
 provides native recycled rows and bounded tiles. Rendering policy stays separate
 while both use the same worker and revision lifetime.
 
+Within `RecycledBrowser`, construction keeps callback, event-loop and renderer
+state admission together, then builds navigation controls and the listing.
+`_render_list` invalidates the previous generation and resets thumbnail requests
+before `_publish_list_rows` replaces native records under the `updating` guard.
+That guard is released in `finally`; native selection callbacks must not activate
+rows while the snapshot and its identity/index maps are being replaced.
+
 Thumbnail cache keys are `(entry.identity, entry.revision)`. At most two loaders
 run concurrently. Encoded data is bounded to 64 entries and 8 MiB; recycled
 native decoded images are bounded to 64 entries. Invalidating a snapshot signals
@@ -85,3 +92,15 @@ storage leases merely because rows disappeared. For a memory trim,
 `work.prune(set())` clears both cache tiers without changing selection. Hosts must
 also release their own displayed image references when appropriate. Stop/close
 remain the retirement path.
+
+## Hidden item appearance
+
+Recycled lists and tiles use a provider's `hidden` flag or a dot-prefixed
+basename. A hidden ancestor alone does not dim an ordinary child in search
+results. Provider payloads retain that metadata through browse projections;
+indexed search revalidates hits through the provider before publication.
+Native selection preserves muted hidden names, including Android high-contrast
+selection; iOS binds both normal and highlighted colors on every reused cell.
+The default tile presentation uses system/theme surface roles and resets the
+normal foreground when a non-hidden item is drawn. These rules affect styling,
+not visibility, access, encryption or indexing admission.

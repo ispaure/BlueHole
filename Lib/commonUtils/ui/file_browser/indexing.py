@@ -2,7 +2,7 @@
 from datetime import datetime
 from pathlib import Path
 from ...filesystem.directories import Directory
-from .index_worker import FolderOperation
+from .index_worker import FolderOperation, _FolderScan
 from .. import pyside as qt
 
 
@@ -35,9 +35,7 @@ class BrowserIndexing:
             return
         if job['state'] == 'error':
             return
-        with directory_cache._state_lock:
-            directory_cache._shared_sources[root] = source
-            directory_cache._session_checked.add((directory_cache.database, root))
+        directory_cache.shared_scan_completed(root, source)
         # Read/subscribe without enqueueing another check in response to our own
         # completion notification, even if automatic refresh is enabled.
         self.refresh_folder_totals()
@@ -123,7 +121,6 @@ class BrowserIndexing:
         if root is None or self.stopping:
             return
         from ...filesystem.index import directory_cache
-        from ...runtime.operations import OperationCancelled
         full = self._full_index_refresh
         paused = self._index_paused
         changes = tuple(sorted(self._changed_paths))
@@ -147,35 +144,8 @@ class BrowserIndexing:
         self._update_index_controls()
         if not cached_only or not same_root:
             self.index_status.setText('Loading saved sizes…' if cached_only else 'Checking saved index…')
-        def scanner(path, cancelled, *, report, reuse_for):
-            try:
-                coordinator = directory_cache.coordinator
-                active = coordinator.active_job(path) if coordinator and read_cache and not paused else None
-                if active is not None:
-                    snapshot = coordinator.follow(active, path, cancelled=cancelled, report=report)
-                    if snapshot is None:
-                        return None
-                    with snapshot:
-                        return snapshot.folder_stats(children_of=path, cancelled=cancelled)
-                if read_cache:
-                    if not paused:
-                        directory_cache.repair_cached_exclusions(path, cancelled=cancelled, report=report)
-                    snapshot = directory_cache.peek(path, cancelled=cancelled)
-                else:
-                    snapshot = None
-                if not read_cache or snapshot is None and not paused and policy.scan_on_open:
-                    indexer = directory_cache.coordinator or directory_cache
-                    snapshot = indexer.reconcile_folder(path, changes=changes, full=full, once=True,
-                                                               cancelled=cancelled, report=report,
-                                                               recursive_initial=policy.recursive_on_open,
-                                                               **({'background_priority': policy.background_priority}
-                                                                  if directory_cache.coordinator else {}))
-                if snapshot is None:
-                    return None
-                with snapshot:
-                    return snapshot.folder_stats(children_of=path, cancelled=cancelled)
-            except OperationCancelled:
-                return None
+        scanner = _FolderScan(directory_cache, policy, read_cache=read_cache,
+                              paused=paused, full=full, changes=changes)
         self.folder_operation = FolderOperation(root, scanner, self,
             request_key=('cached' if read_cache else 'full' if full else 'reconcile', changes),
             background_priority=policy.background_priority)
@@ -283,3 +253,92 @@ class BrowserIndexing:
             self.refresh_folder_totals()
         else:
             self.index_search.refresh()
+
+    def _set_network_location(self, path):
+        from ...filesystem.network import is_network_location
+        network = is_network_location(path)
+        changed = self.network_location != network
+        self.network_location = network
+        self.model.network_location = network
+        self.model.setOption(qt.QFileSystemModel.Option.DontWatchForChanges, network)
+        for mode in (3, 4):
+            self.view_selector.buttons[mode].setEnabled(not network)
+            self.view_selector.buttons[mode].setToolTip('Size map disabled for network drives' if network
+                else ('Treemap view' if mode == 3 else 'Radial view'))
+        self.refresh_button.setToolTip('Indexing and scans disabled for network drives' if network
+            else 'Check all files and saved sizes below the current folder')
+        self.search_button.setEnabled(not network)
+        self.search_button.setToolTip('Indexed search disabled for network drives' if network
+            else 'Show or hide search (Ctrl/Cmd+F)')
+        if network:
+            self.reconcile_debounce.stop()
+            self._changed_paths.clear()
+            self._full_index_refresh = False
+            self.folder_pending = False
+            self._reconcile_pending = False
+            if self.folder_busy:
+                self.folder_operation.requestInterruption()
+            watches = self.index_watcher.directories() + self.index_watcher.files()
+            if watches:
+                self.index_watcher.removePaths(watches)
+            self.close_search()
+            self.model.set_folder_totals({})
+            self.index_incomplete = False
+            self.index_activity.hide()
+            self.index_details_button.hide()
+            self.index_status.setText('Indexing and scans disabled for network drives')
+            self.index_progress.emit(self.index_status.text())
+            if self.views.currentIndex() == 3:
+                self.view_selector.setCurrentIndex(0)
+        elif changed:
+            self.index_status.setText('Loading saved sizes…')
+        self._update_index_controls()
+        self.index_state_changed.emit()
+
+    def _directory_opened(self, path):
+        # Reopening the same folder checks new items without checking on every
+        # selection event (which also publishes directory_changed).
+        from .index_policy import index_policy
+        if not self.network_location and path == self.folder_root and not self.folder_busy and index_policy(path=self.index_settings_path).refresh_on_revisit:
+            from ...filesystem.index import directory_cache
+            directory_cache.invalidate(path)
+            self._changed_paths.add(path)
+            self.refresh_folder_totals()
+
+    def _update_watch_paths(self, root, paths):
+        if self.stopping or self.network_location or root != self.navigation.directory:
+            return
+        from ...filesystem.index import directory_cache
+        from ...filesystem.index.exclusions import scan_exclusions, is_excluded
+        exclusions = scan_exclusions(root, directory_cache.database)
+        expected = {str(path) for path in paths if not is_excluded(path, exclusions)}
+        previous = set(self.index_watcher.directories()) | set(self.index_watcher.files())
+        if previous - expected:
+            self.index_watcher.removePaths(list(previous - expected))
+        if expected - previous:
+            self.index_watcher.addPaths(list(expected - previous))
+
+    def _indexed_path_changed(self, path):
+        if self.stopping or self.network_location or not self.calculate_folder_sizes:
+            return
+        from .index_policy import index_policy
+        if not index_policy(path=self.index_settings_path).watch_changes:
+            return
+        root = self.navigation.directory
+        path = Path(path)
+        if root is None or (path != root and root not in path.parents):
+            return
+        from ...filesystem.index import directory_cache
+        from ...filesystem.index.exclusions import scan_exclusions, is_excluded
+        if is_excluded(Path(path), scan_exclusions(self.navigation.directory, directory_cache.database)):
+            return
+        directory_cache.invalidate(Path(path))
+        self._changed_paths.add(Path(path))
+        self._reconcile_pending = True
+        self.reconcile_debounce.start()
+
+    def _reconcile_index(self):
+        if self.stopping or self.network_location or not self.calculate_folder_sizes or self._index_paused or self.folder_busy:
+            return
+        self._reconcile_pending = False
+        self.refresh_folder_totals()

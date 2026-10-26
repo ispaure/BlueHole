@@ -1,12 +1,59 @@
 """Worker snapshots keep database reads and aggregate loading off the GUI thread."""
 from contextlib import ExitStack
+from dataclasses import dataclass
+from pathlib import Path
 from time import monotonic
 import sqlite3
 from threading import Event, RLock
 from ..tasks.operations import Operation
 from .. import pyside as qt
-from ...filesystem.index import directory_cache
+from ...filesystem.index import DirectoryCache, directory_cache
+from ...runtime.operations import OperationCancelled
+from .index_policy import IndexPolicy
 from .status import IndexProgress
+
+
+@dataclass(frozen=True)
+class _FolderScan:
+    """Captured browser scan policy; no widgets or mutable browser state."""
+    cache: DirectoryCache
+    policy: IndexPolicy
+    read_cache: bool
+    paused: bool
+    full: bool
+    changes: tuple[Path, ...]
+
+    def __call__(self, path, cancelled, *, report, reuse_for):
+        try:
+            coordinator = self.cache.coordinator
+            active = (coordinator.active_job(path)
+                      if coordinator and self.read_cache and not self.paused else None)
+            if active is not None:
+                snapshot = coordinator.follow(active, path, cancelled=cancelled, report=report)
+                if snapshot is None:
+                    return None
+                with snapshot:
+                    return snapshot.folder_stats(children_of=path, cancelled=cancelled)
+            if self.read_cache:
+                if not self.paused:
+                    self.cache.repair_cached_exclusions(path, cancelled=cancelled, report=report)
+                snapshot = self.cache.peek(path, cancelled=cancelled)
+            else:
+                snapshot = None
+            if not self.read_cache or (snapshot is None and not self.paused and self.policy.scan_on_open):
+                indexer = self.cache.coordinator or self.cache
+                snapshot = indexer.reconcile_folder(
+                    path, changes=self.changes, full=self.full, once=True,
+                    cancelled=cancelled, report=report,
+                    recursive_initial=self.policy.recursive_on_open,
+                    **({'background_priority': self.policy.background_priority}
+                       if self.cache.coordinator else {}))
+            if snapshot is None:
+                return None
+            with snapshot:
+                return snapshot.folder_stats(children_of=path, cancelled=cancelled)
+        except OperationCancelled:
+            return None
 
 
 class _IndexJob(Operation):
@@ -92,8 +139,7 @@ class _IndexJob(Operation):
             return
         with self._view_lock:
             roots = tuple(dict.fromkeys((self.root,) + tuple(self._view_roots.values())))
-        with directory_cache._state_lock:
-            source_root = directory_cache._shared_sources.get(self.root, self.root)
+        source_root = directory_cache.shared_source(self.root)
         with ExitStack() as snapshots:
             source = directory_cache.peek(source_root, cancelled=self.isInterruptionRequested)
             if source is not None:
@@ -227,8 +273,7 @@ class FolderOperation(qt.QObject):
             return False
         self.visible_root = root
         if directory_cache.coordinator is not None:
-            with directory_cache._state_lock:
-                directory_cache._shared_sources[root] = directory_cache._shared_sources.get(job.root, job.root)
+            directory_cache.follow_shared_source(root, job.root)
         job.set_view_root(self, root)
         if root in job.totals_by_root:
             self.updated.emit(root, job.totals_by_root[root])

@@ -235,7 +235,10 @@ gestures for a visible reader; see the [native component contract](../reference/
 | Literal Find/Replace | `editor_search.EditorSearch(editor, container)`; host notifies text changes |
 | Native source input, line numbers and syntax colours | `code_input.CodeInput(loop=..., filename=...)`; call `dispose()` on retirement |
 
-`formats.code_syntax` shares language choices and detection with desktop;
+`formats.code_language` supplies shared automatic/manual language state and
+catalogues; `runtime.choices` supplies ordered ID/label collections without UI or
+selection policy. See the [language contract](../reference/formats/formats.md#editor-language-selection).
+`formats.code_syntax` shares language detection and syntax styles with desktop;
 ordinary text, Markdown, JSON, YAML, TOML and INI filenames resolve directly,
 without scanning the Pygments filename registry on each editor change.
 `formats.code_spans` provides bounded UTF-16 colour spans and logical line starts
@@ -292,7 +295,7 @@ only when a native constructor is called. Returned native views are consumer-own
 live subscribers. No GUI imports, timers or retained application owners.
 
 Native Markdown hosts can use
-`ui.native.markdown_images.folder_image_source(provider, document)` for bounded,
+`formats.markdown.image_sources.folder_image_source(provider, document)` for bounded,
 revision-checked provider image reads, including animated GIFs. Feed its callback
 to `markdown_preview` or a formatted editor using `embedded_image`. See the
 [native image contract](../reference/ui/native/native.md#host-supplied-markdown-images).

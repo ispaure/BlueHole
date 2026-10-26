@@ -38,9 +38,10 @@ class BrowserPresentation:
         pass
 
     def highlight(self, widget, selected):
-        widget.style.background_color = '#dce9ff' if selected else 'transparent'
-        if isinstance(widget, toga.Button) and getattr(widget, 'browser_hidden', False):
-            widget.style.color = '#808080'
+        from ..native.appearance import SurfaceStyle, SurfacePainter
+        SurfacePainter().paint(widget._impl, SurfaceStyle(radius=8, background='hover' if selected else 'surface',
+            foreground=('muted' if getattr(widget, 'browser_hidden', False) else 'text')
+            if isinstance(widget, toga.Button) else None))
 
     def bind_keyboard(self, browser):
         from ..native.keyboard import SearchDismissal
@@ -83,6 +84,10 @@ class RecycledBrowser(NativeBrowser):
         self.on_open_file = open_file
         self.on_item_actions = item_actions
         super().__init__(**kwargs)
+        self._build_navigation_controls()
+        self._build_listing(contextual_selection=contextual_selection, inline_details=inline_details)
+
+    def _build_navigation_controls(self):
         # Keep the listing unobstructed until search is requested.
         for child in list(self.widget.children):
             self.widget.remove(child)
@@ -106,6 +111,8 @@ class RecycledBrowser(NativeBrowser):
         self.navigation_controls = self.widget.children[-1]
         self.page_label.style.update(flex=0, font_size=12, margin_bottom=6)
         self.page_label.style.font_size = 12
+
+    def _build_listing(self, *, contextual_selection, inline_details):
         self.native_list = self.list_factory(on_select=self._list_selected,
             primary_action='Select' if contextual_selection else None,
             on_primary_action=self._list_context if contextual_selection else None, on_visible=self._row_visible,
@@ -207,6 +214,16 @@ class RecycledBrowser(NativeBrowser):
         self._thumbnail_requested.clear()
         self._thumbnail_pending.clear()
         self.native_list.observe_rows = bool(self.thumbnail)
+        self._publish_list_rows()
+        if self._list_entries:
+            self._mount_listing(self.native_list)
+        else:
+            self.empty_label.text = ('Searching subfolders…' if getattr(self, 'searching', False)
+                                     else 'No matching items.' if self.search.value else 'This folder is empty.')
+            self._mount_listing(self.empty_label)
+        self.presentation.bind_keyboard(self)
+
+    def _publish_list_rows(self):
         self.native_list.updating = True
         try:
             # Each row carries the entry object, not an index into mutable state.
@@ -226,13 +243,6 @@ class RecycledBrowser(NativeBrowser):
             self.highlight_selection()
         finally:
             self.native_list.updating = False
-        if self._list_entries:
-            self._mount_listing(self.native_list)
-        else:
-            self.empty_label.text = ('Searching subfolders…' if getattr(self, 'searching', False)
-                                     else 'No matching items.' if self.search.value else 'This folder is empty.')
-            self._mount_listing(self.empty_label)
-        self.presentation.bind_keyboard(self)
 
     def _list_selected(self, widget, **kwargs):
         if self._rendering or widget.updating:

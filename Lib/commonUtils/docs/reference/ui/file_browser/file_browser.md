@@ -94,11 +94,25 @@ view while submitted work survives. A host-provided `shared_activity` Qt signal
 connects idle browsers to jobs started by another process. Cache-only views can
 follow existing work without requesting a scan; explicitly paused views do not.
 
+The GUI captures each scan's cache, immutable policy, pause/read mode and changed
+paths in a private request owned by `index_worker`. The worker then follows an
+existing coordinator job, reads saved snapshots or reconciles according to those
+captured inputs. It holds no browser/widget reference. Snapshot contexts close on
+success, cancellation and errors; view subscription and progress delivery stay on
+`FolderOperation`. Request keys, scan admission and retargeting remain unchanged.
+
 See [index persistence and migration](../../filesystem/index/index.md). Snapshot
 owners must close readers when done, especially before removing temporary databases
 on Windows. Do not close a shared cache while other views still use it.
 
 ## Shutdown and workspaces
+
+`BrowserIndexing` owns network policy, watch-set replacement and queued
+notification/revisit handling. These remain inherited FileBrowser methods, with
+the same callback signatures and state fields. FileBrowser coordinates all owned
+worker families through one close/idle admission expression. A running details
+worker stays owned until finished; pending refresh or shutdown rejects its late
+publication before controls or `details_loaded` are updated.
 
 `stop()` returns **true while workers are still finishing**. Ignore close while
 true and retry on `idle`. `shutdown()` waits during final application exit. Retain

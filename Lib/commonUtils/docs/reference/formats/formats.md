@@ -341,6 +341,13 @@ since `read()`. Callers should serialize writes to the same file; the conflict
 check is not a cross-process lock. Standard I/O and ConfigParser errors propagate.
 INI parsing is independent of `configuration.legacy` and `TXTFile`.
 
+Internally, `_expected_update` validates requests using the class's parser;
+`_locate_option` returns a named option/insertion-boundary record from the current
+lines, and `_replace_option` preserves delimiters, continuation comments and final
+newlines. `updated_text` retains ordered application of all edits and the final
+independent semantic comparison. These phases do not write files or replace the
+ambiguity guard.
+
 The optional [typed-key schema and visual editor](../configuration/configuration.md)
 are separate layers; INIFile itself never interprets suffixes.
 
@@ -441,3 +448,36 @@ on failure.
 ## Portable Markdown and string tables
 
 [Markdown](markdown/markdown.md) groups properties, image-size syntax, file activation and local wiki catalogs. [String tables](tables.md) documents the lightweight CSV-backed Cell/Row/Spreadsheet API.
+
+
+## Editor language selection
+
+`code_language.LanguageSelection` owns toolkit-independent automatic/manual syntax
+selection. `selected_id=None` means Automatic; `text` means manual Plain Text.
+`update(path, text)` refreshes `detected_id` using the existing `code_syntax`
+detector and returns whether the effective `language_id` changed. Detection uses
+at most 256 source characters and caches unchanged path/prefix input, even while
+a manual override is active. `select(alias)` chooses a manual ID; `select(None)`
+resumes detection. Invalid non-string, empty or over-100-character IDs raise
+`ValueError`; extended aliases remain representable outside the curated catalogue.
+
+`LANGUAGE_CHOICES` is an ordered `runtime.choices.ChoiceSet` of `ChoiceOption`
+records, beginning with Automatic and Plain Text. `language_choices(extended=True)`
+lazily adds Pygments lexer aliases, retaining curated IDs/labels and sorting the
+additional presentation choices. The default catalogue imports neither Pygments
+nor a UI toolkit. `language_label(id)` supplies a curated name or the unchanged
+extended ID. Hosts choose their catalogue, labels/captions, storage representation
+and document lifetimes; the model owns no widgets, worker or persistence policy.
+
+Native CodeInput and desktop consumers share this model. `tests/formats/test_code_language.py`
+covers transitions, bounded detection and catalogue identities;
+`tests/runtime/test_choices.py` covers collection contracts.
+
+## Provider-backed Markdown images
+
+`formats.markdown.image_sources` owns `folder_image_source(provider, document)`
+and `local_image_source(document, root)`. These toolkit-free callbacks resolve
+relative raster images through a rooted provider, enforce byte/dimension budgets
+and recheck revisions and access before returning cached image bytes. Native
+Markdown presentation consumes them; portable note libraries can use them without
+importing the UI package.

@@ -91,6 +91,14 @@ Qt read-aloud also uses `SpeechSession` and `PlaybackTimer`;
 `ui.readers.qt_speech` adapts Qt scheduling and engine callbacks. Each platform
 retains its own widgets, voice selection and installed-engine availability.
 
+`speech_language.passage_language(text, hint='')` detects up to 6,000 characters
+locally with optional `langdetect==1.0.9` profiles. Detection uses a deterministic
+seed, at least 20 letters and a probability threshold of 0.85; uncertain text
+falls back to the supplied language tag. Only profiles are cached, never text.
+`matching_locale(language, locales, preferred='')` selects an offered locale,
+preferring an exact tag or a compatible preferred dialect. No match returns an
+empty string. Consumers own dependency installation and missing-voice UI.
+
 ## Coalesced async signals
 
 `signals.CoalescedSignal` broadcasts without timers or retained owners. Call
@@ -110,3 +118,18 @@ Search mechanisms live in [search](../search/search.md); personal filesystem def
 - [operations](operations/operations.md)
 - [Operating system and architecture](platform/platform.md)
 - [streams](streams/streams.md)
+
+
+## Ordered choices
+
+`choices.ChoiceOption(id, label)` is an immutable option. `ChoiceSet(options)`
+snapshots an ordered collection with unique hashable IDs; duplicate IDs raise
+`ValueError`. `None` is an ordinary ID with no automatic/empty-selection meaning
+assigned by this collection. Selection and unknown-ID policy belong to callers.
+
+The collection supports iteration, indexing/slicing, `labels`, `by_id(id)` and
+`index_of(id)`. Missing identities raise `KeyError`. Labels can repeat, so a native
+control capable of retaining IDs should do so. String-only bindings can use
+`from_label(label)`: unknown labels raise `KeyError`, ambiguous labels raise
+`ValueError`. Renaming or reordering options does not change their identities.
+There are no callbacks, widgets, task runners or persistence in this contract.

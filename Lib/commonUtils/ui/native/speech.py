@@ -5,6 +5,116 @@ import weakref
 _delegate_class = None
 
 
+def _android_listeners(speech):
+    from android.speech.tts import TextToSpeech
+    from java import dynamic_proxy
+
+    owner = weakref.ref(speech)
+
+    class Init(dynamic_proxy(TextToSpeech.OnInitListener)):
+        def onInit(self, status):
+            engine = owner()
+            if engine is not None:
+                engine.loop.call_soon_threadsafe(engine.initialized, status)
+
+    from io.github.ispaure.commonutils import SpeechListener
+
+    class Complete(dynamic_proxy(SpeechListener.Listener)):
+        def started(self, token):
+            engine = owner()
+            if engine is not None:
+                engine.begin(str(token))
+
+        def progress(self, token, start, end):
+            engine = owner()
+            if engine is not None:
+                engine.word_range(str(token), int(start), int(end))
+
+        def completed(self, token):
+            engine = owner()
+            if engine is not None:
+                engine.deliver(str(token))
+
+        def failed(self, token):
+            engine = owner()
+            if engine is not None:
+                engine.failure(str(token))
+
+    return Complete(), Init()
+
+
+def _apple_delegate_class():
+    global _delegate_class
+    import ctypes
+
+    ctypes.CDLL("/System/Library/Frameworks/AVFoundation.framework/AVFoundation")
+    from rubicon.objc import ObjCClass, ObjCProtocol, objc_method, objc_property
+    from rubicon.objc.types import NSRange
+
+    if _delegate_class is None:
+
+        class CommonUtilsSpeechDelegate(
+            ObjCClass("NSObject"),
+            protocols=(ObjCProtocol("AVSpeechSynthesizerDelegate"),),
+        ):
+            owner = objc_property(object, weak=True)
+
+            @objc_method
+            def speechSynthesizer_didStartSpeechUtterance_(
+                self, synth, utterance
+            ) -> None:
+                engine = self.owner
+                if (
+                    engine is not None
+                    and getattr(engine, "utterance", None) is not None
+                ):
+                    if utterance.ptr.value == engine.utterance.ptr.value:
+                        engine.begin(engine.token)
+
+            @objc_method
+            def speechSynthesizer_willSpeakRangeOfSpeechString_utterance_(
+                self, synth, characterRange: NSRange, utterance
+            ) -> None:
+                engine = self.owner
+                if (
+                    engine is not None
+                    and getattr(engine, "utterance", None) is not None
+                ):
+                    if utterance.ptr.value == engine.utterance.ptr.value:
+                        engine.word_range(
+                            engine.token,
+                            int(characterRange.location),
+                            int(characterRange.location + characterRange.length),
+                        )
+
+            @objc_method
+            def speechSynthesizer_didFinishSpeechUtterance_(
+                self, synth, utterance
+            ) -> None:
+                engine = self.owner
+                if (
+                    engine is not None
+                    and getattr(engine, "utterance", None) is not None
+                ):
+                    if utterance.ptr.value == engine.utterance.ptr.value:
+                        engine.deliver(engine.token)
+
+            @objc_method
+            def speechSynthesizer_didCancelSpeechUtterance_(
+                self, synth, utterance
+            ) -> None:
+                engine = self.owner
+                if (
+                    engine is not None
+                    and getattr(engine, "utterance", None) is not None
+                ):
+                    if utterance.ptr.value == engine.utterance.ptr.value:
+                        engine.failure(engine.token)
+
+        _delegate_class = CommonUtilsSpeechDelegate
+    return _delegate_class
+
+
 class NativeSpeech:
     def __init__(self, loop):
         self.loop, self.ready, self.error, self.closed = loop, False, "", False
@@ -54,40 +164,9 @@ class NativeSpeech:
     def android(self):
         from android.speech.tts import TextToSpeech
         from org.beeware.android import MainActivity
-        from java import dynamic_proxy
-
-        owner = weakref.ref(self)
-
-        class Init(dynamic_proxy(TextToSpeech.OnInitListener)):
-            def onInit(self, status):
-                engine = owner()
-                if engine is not None:
-                    engine.loop.call_soon_threadsafe(engine.initialized, status)
-
         from io.github.ispaure.commonutils import SpeechListener
 
-        class Complete(dynamic_proxy(SpeechListener.Listener)):
-            def started(self, token):
-                engine = owner()
-                if engine is not None:
-                    engine.begin(str(token))
-
-            def progress(self, token, start, end):
-                engine = owner()
-                if engine is not None:
-                    engine.word_range(str(token), int(start), int(end))
-
-            def completed(self, token):
-                engine = owner()
-                if engine is not None:
-                    engine.deliver(str(token))
-
-            def failed(self, token):
-                engine = owner()
-                if engine is not None:
-                    engine.failure(str(token))
-
-        self.listener, self.init_listener = Complete(), Init()
+        self.listener, self.init_listener = _android_listeners(self)
         self.progress_listener = SpeechListener(self.listener)
         self.native = TextToSpeech(MainActivity.singletonThis, self.init_listener)
 
@@ -174,85 +253,20 @@ class NativeSpeech:
             )
 
     def apple(self):
-        global _delegate_class
         self.native_word_events = True
-        import ctypes
+        delegate_class = _apple_delegate_class()
+        from rubicon.objc import ObjCClass
 
-        ctypes.CDLL("/System/Library/Frameworks/AVFoundation.framework/AVFoundation")
-        from rubicon.objc import ObjCClass, ObjCProtocol, objc_method, objc_property
-        from rubicon.objc.types import NSRange
-
-        if _delegate_class is None:
-
-            class CommonUtilsSpeechDelegate(
-                ObjCClass("NSObject"),
-                protocols=(ObjCProtocol("AVSpeechSynthesizerDelegate"),),
-            ):
-                owner = objc_property(object, weak=True)
-
-                @objc_method
-                def speechSynthesizer_didStartSpeechUtterance_(
-                    self, synth, utterance
-                ) -> None:
-                    engine = self.owner
-                    if (
-                        engine is not None
-                        and getattr(engine, "utterance", None) is not None
-                    ):
-                        if utterance.ptr.value == engine.utterance.ptr.value:
-                            engine.begin(engine.token)
-
-                @objc_method
-                def speechSynthesizer_willSpeakRangeOfSpeechString_utterance_(
-                    self, synth, characterRange: NSRange, utterance
-                ) -> None:
-                    engine = self.owner
-                    if (
-                        engine is not None
-                        and getattr(engine, "utterance", None) is not None
-                    ):
-                        if utterance.ptr.value == engine.utterance.ptr.value:
-                            engine.word_range(
-                                engine.token,
-                                int(characterRange.location),
-                                int(characterRange.location + characterRange.length),
-                            )
-
-                @objc_method
-                def speechSynthesizer_didFinishSpeechUtterance_(
-                    self, synth, utterance
-                ) -> None:
-                    engine = self.owner
-                    if (
-                        engine is not None
-                        and getattr(engine, "utterance", None) is not None
-                    ):
-                        if utterance.ptr.value == engine.utterance.ptr.value:
-                            engine.deliver(engine.token)
-
-                @objc_method
-                def speechSynthesizer_didCancelSpeechUtterance_(
-                    self, synth, utterance
-                ) -> None:
-                    engine = self.owner
-                    if (
-                        engine is not None
-                        and getattr(engine, "utterance", None) is not None
-                    ):
-                        if utterance.ptr.value == engine.utterance.ptr.value:
-                            engine.failure(engine.token)
-
-            _delegate_class = CommonUtilsSpeechDelegate
         self.native = ObjCClass("AVSpeechSynthesizer").alloc().init()
         self.native.usesApplicationAudioSession = True
-        self.delegate = _delegate_class.alloc().init()
+        self.delegate = delegate_class.alloc().init()
         self.delegate.owner = self
         self.native.delegate = self.delegate
         self.utterance = None
         voices = ObjCClass("AVSpeechSynthesisVoice").speechVoices
         for voice in voices() if callable(voices) else voices:
             self.voices[str(voice.language) + " · " + str(voice.name)] = voice
-        default = ObjCClass("AVSpeechSynthesisVoice").voiceWithLanguage("en-US")
+        default = ObjCClass("AVSpeechSynthesisVoice").voiceWithLanguage(None)
         self.default_voice = next(
             (
                 label
@@ -267,6 +281,17 @@ class NativeSpeech:
             self.error = (
                 "No installed voice. Add a system voice in Spoken Content settings."
             )
+
+    def voice_for_language(self, language, preferred=''):
+        from ...runtime.speech_language import matching_locale
+        fallback = preferred if preferred in self.voices else self.default_voice
+        locales = {label: label.split(' · ', 1)[0] for label in self.voices}
+        tag = matching_locale(language, locales.values(), locales.get(fallback, ''))
+        if not language:
+            return fallback
+        if fallback in locales and locales[fallback] == tag:
+            return fallback
+        return next((label for label in self.voices if locales[label] == tag), '')
 
     def speak(self, text, voice, speed, token):
         if self.closed or not self.ready or voice not in self.voices:
@@ -300,6 +325,10 @@ class NativeSpeech:
     def close(self):
         if not self.closed:
             self.closed = True
+            self.ready = False
+            self.voices = {}
+            # Retire presentation owners even if a native shutdown raises.
+            self.completed = self.failed = self.progress = self.started = lambda *args: None
             self.stop()
             if getattr(self, "native", None) is not None:
                 if self.backend.startswith("toga_android."):
@@ -307,4 +336,3 @@ class NativeSpeech:
                     self.native.shutdown()
                 else:
                     self.native.delegate = None
-            self.voices = {}
