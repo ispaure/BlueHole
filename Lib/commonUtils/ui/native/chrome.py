@@ -21,7 +21,7 @@ class NavigationChrome:
         if adapter is None or not hasattr(adapter, 'navigation'):
             self.restore_page_swipes()
             return
-        navigation = navigation or adapter.navigation[self.host.destinations.index(self.host.state.destination)]
+        navigation = navigation or adapter.navigation_for(self.host.state.destination)
         if not active or navigation != self.page_navigation:
             self.restore_page_swipes()
         if not active:
@@ -51,7 +51,7 @@ class NavigationChrome:
         if adapter is None:
             return
         if hasattr(adapter, 'navigation'):
-            navigation = navigation or adapter.navigation[self.host.destinations.index(self.host.state.destination)]
+            navigation = navigation or adapter.navigation_for(self.host.state.destination)
         context = (self.host.state.destination, navigation)
         changed = self.context != context
         if not hidden or changed:
@@ -65,17 +65,12 @@ class NavigationChrome:
         capture = not self.restore_callbacks
         if hasattr(adapter, 'navigation'):
             from rubicon.objc import SEL
-            controller, tab = adapter.controller, adapter.controller.tabBar
-            if controller.respondsToSelector(SEL('setTabBarHidden:animated:')):
-                previous = bool(controller.isTabBarHidden())
-                if capture:
-                    self.restore_callbacks.append(lambda: controller.setTabBarHidden(previous, animated=False))
-                controller.setTabBarHidden(True, animated=False)
-            else:
-                previous = bool(tab.isHidden())
-                if capture:
-                    self.restore_callbacks.append(lambda: tab.setHidden(previous))
-                tab.setHidden(True)
+            controller = adapter.controller
+            modern = bool(controller.respondsToSelector(SEL('setTabBarHidden:animated:')))
+            previous = adapter.tabs_hidden()
+            if capture:
+                self.restore_callbacks.append(lambda: adapter.set_keyboard_tabs_hidden(modern, previous))
+            adapter.set_keyboard_tabs_hidden(modern, True)
             previous_nav = bool(navigation.isNavigationBarHidden())
             if capture:
                 self.restore_callbacks.append(lambda: navigation.setNavigationBarHidden(previous_nav, animated=False))

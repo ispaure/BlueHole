@@ -13,8 +13,8 @@ from .chrome import NavigationChrome
 class NativeNavigationHost:
     def __init__(self, items, *, state=None, on_select=None, prefer_sidebar=True):
         items = tuple(items)
-        if not 1 <= len(items) <= 5 or any(len(item) != 4 for item in items):
-            raise ValueError('Supply one to five (key, label, Apple symbol, Android icon) destinations.')
+        if not 1 <= len(items) <= 7 or any(len(item) != 4 for item in items):
+            raise ValueError('Supply one to seven (key, label, Apple symbol, Android icon) destinations.')
         self.destinations, self.labels, self.symbols, self.android_icons = map(tuple, zip(*items))
         self.state = state or NavigationState(self.destinations)
         if self.state.destinations != self.destinations:
@@ -22,19 +22,44 @@ class NativeNavigationHost:
         self.on_select = on_select
         self.prefer_sidebar = prefer_sidebar
         self.changing = False
+        self._programmatic_overflow = None
         self.bodies = {key: toga.Box(style=Pack(direction=COLUMN, flex=1)) for key in self.destinations}
-        self.root = toga.OptionContainer(content=[(label, self.bodies[key])
-            for key, label in zip(self.destinations, self.labels)], on_select=self._selected,
-            style=Pack(flex=1))
+        self.root = toga.OptionContainer(style=Pack(flex=1))
+        if len(items) > 5 and type(self.root._impl).__module__.startswith('toga_android.'):
+            self._expand_android_bar()
+        for key, label in zip(self.destinations, self.labels):
+            self.root.content.append(label, self.bodies[key])
+        self.root.on_select = self._selected
         self.adapter = None
         self.window = None
         self.chrome = NavigationChrome(self)
         self.activate(self.state.destination)
 
+    def _expand_android_bar(self):
+        """Prepare the backend before it creates option references for item six."""
+        from java import jclass
+        from android.widget import LinearLayout
+        impl = self.root._impl
+        old = impl.native_navigationview
+        old.setOnItemSelectedListener(None)
+        old.removeOnLayoutChangeListener(impl.onLayoutChangeListener)
+        impl.native.removeView(old)
+        bar = jclass('io.github.ispaure.commonutils.ExpandedBottomNavigationView')(impl._native_activity)
+        bar.setLabelVisibilityMode(2)
+        bar.setOnItemSelectedListener(impl.onItemSelectedListener)
+        bar.addOnLayoutChangeListener(impl.onLayoutChangeListener)
+        impl.native.addView(bar, LinearLayout.LayoutParams(-1, -2))
+        impl.native_navigationview = bar
+        impl.max_items = bar.getMaxItemCount()
+
     def _selected(self, widget, **kwargs):
         if self.changing or widget.current_tab is None:
             return
         destination = self.destinations[widget.current_tab.index]
+        if self._programmatic_overflow == destination:
+            self._programmatic_overflow = None
+            return
+        self._programmatic_overflow = None
         if self.on_select is not None and self.on_select(destination) is False:
             self.activate(self.state.destination)
             return
@@ -43,9 +68,21 @@ class NativeNavigationHost:
     def activate(self, destination):
         if destination not in self.destinations:
             raise ValueError('Unknown mobile destination.')
+        index = self.destinations.index(destination)
+        current = self.root.current_tab
+        if current is not None and current.index == index:
+            self.state.select(destination)
+            return
+        self._programmatic_overflow = None
+        if (len(self.destinations) > 5 and index >= 4
+                and type(self.root._impl).__module__.startswith('toga_iOS.')
+                and getattr(self.root._impl, 'uses_more', False)
+                and self.adapter is not None
+                and len(list(self.adapter.controller.tabBar.items or ())) == 5):
+            self._programmatic_overflow = destination
         self.changing = True
         try:
-            self.root.current_tab = self.destinations.index(destination)
+            self.root.current_tab = index
             self.state.select(destination)
         finally:
             self.changing = False
@@ -55,10 +92,14 @@ class NativeNavigationHost:
             raise RuntimeError('Navigation host is already installed.')
         self.window = window
         backend = type(self.root._impl).__module__
-        if backend.startswith('toga_iOS.'):
-            self.adapter = AppleNavigation(self, window)
-        elif backend.startswith('toga_android.'):
-            self.adapter = AndroidNavigation(self, window)
+        try:
+            if backend.startswith('toga_iOS.'):
+                self.adapter = AppleNavigation(self, window)
+            elif backend.startswith('toga_android.'):
+                self.adapter = AndroidNavigation(self, window)
+        except Exception:
+            self.window = None
+            raise
 
     def uninstall(self):
         self.chrome.restore()
@@ -85,7 +126,7 @@ class NativeNavigationHost:
 
 class AppleNavigation:
     def __init__(self, host, window):
-        from rubicon.objc import ObjCClass, SEL, Block, objc_id
+        from rubicon.objc import ObjCClass, SEL
         self.host, self.window = host, window
         self.impl = host.root._impl
         self.controller = self.impl.native_controller
@@ -93,18 +134,45 @@ class AppleNavigation:
         self.old_layout = window._impl.container.on_native_layout
         self.old_get_size = window._impl.get_size
         self.old_additional_insets = self.parent.additionalSafeAreaInsets
+        self._install_keyboard_observer()
+        self._install_controllers()
+        self.sidebar_available = bool(self.controller.respondsToSelector(SEL('setMode:')))
+        self.sidebar_used = (self.sidebar_available and host.prefer_sidebar
+                             and ObjCClass('UIDevice').currentDevice.userInterfaceIdiom == 1)
+        if self.sidebar_available:
+            self.controller.setMode(2 if self.sidebar_used else 1)  # Sidebar on iPad; bottom tabs on iPhone.
+        window._impl.container.on_native_layout = self.layout_window
+        window._impl.get_size = self.get_size
+        self.layout_window(window._impl.container)
+
+    def _install_keyboard_observer(self):
+        from rubicon.objc import ObjCClass, Block, objc_id
         self.keyboard_inset = 0
         self.keyboard_visible = False
         self.keyboard_tab_visibility = None
         self.keyboard_layout_pending = False
         self.keyboard_live = True
+        self.keyboard_frame = None
         self.keyboard_block = Block(self.refresh_keyboard, None, objc_id)
         self.notification_center = ObjCClass('NSNotificationCenter').defaultCenter
         if callable(self.notification_center):
             self.notification_center = self.notification_center()
         self.keyboard_observer = self.notification_center.addObserverForName(
             'UIKeyboardDidChangeFrameNotification', object=None, queue=None, usingBlock=self.keyboard_block)
-        self.outer_navigation = window._impl.native.rootViewController
+        self.keyboard_focus_block = Block(self.keyboard_focus_changed, None, objc_id)
+        # Child windows acquire their UIWindowScene after adapter construction.
+        # Filter scene notifications at delivery time rather than binding nil.
+        self.keyboard_focus_observers = [self.notification_center.addObserverForName(
+            name, object=owner, queue=None, usingBlock=self.keyboard_focus_block)
+            for name, owner in (
+                ('UIWindowDidBecomeKeyNotification', self.window._impl.native),
+                ('UIWindowDidResignKeyNotification', self.window._impl.native),
+                ('UISceneDidActivateNotification', None),
+                ('UISceneWillDeactivateNotification', None))]
+
+    def _install_controllers(self):
+        from rubicon.objc import ObjCClass
+        self.outer_navigation = self.window._impl.native.rootViewController
         self.old_bar_hidden = bool(self.outer_navigation.isNavigationBarHidden())
         self.outer_navigation.setNavigationBarHidden(True, animated=False)
         self.containers = []
@@ -128,14 +196,6 @@ class AppleNavigation:
             self.containers.append((container, content))
             self.navigation.append(navigation)
         self.impl.refresh_tabs()
-        self.sidebar_available = bool(self.controller.respondsToSelector(SEL('setMode:')))
-        self.sidebar_used = (self.sidebar_available and host.prefer_sidebar
-                             and ObjCClass('UIDevice').currentDevice.userInterfaceIdiom == 1)
-        if self.sidebar_available:
-            self.controller.setMode(2 if self.sidebar_used else 1)  # Sidebar on iPad; bottom tabs on iPhone.
-        window._impl.container.on_native_layout = self.layout_window
-        window._impl.get_size = self.get_size
-        self.layout_window(window._impl.container)
 
     def get_size(self):
         from toga.types import Size
@@ -176,6 +236,8 @@ class AppleNavigation:
             container.content.interface.refresh()
 
     def layout_window(self, container):
+        if not self.keyboard_live:
+            return
         # This root hosts native navigation controllers, which own safe areas.
         # Subtracting their bar insets here too repeatedly shrinks the tab/split
         # controller during show/hide transitions. Leaf containers apply them.
@@ -193,13 +255,33 @@ class AppleNavigation:
         frame = value.CGRectValue
         if callable(frame):
             frame = frame()
+        self.keyboard_frame = frame
+        self.apply_keyboard_frame(frame)
+
+    def keyboard_focus_changed(self, notification):
+        if not self.keyboard_live:
+            return
+        from rubicon.objc import ObjCInstance
+        owner = ObjCInstance(notification).object
+        native = self.window._impl.native
+        if owner is not None and (owner == native or owner == native.windowScene):
+            # WillDeactivate can arrive before activationState changes.
+            self.window.app.loop.call_soon(self.refresh_keyboard_focus)
+
+    def refresh_keyboard_focus(self):
+        if self.keyboard_live and self.keyboard_frame is not None:
+            self.apply_keyboard_frame(self.keyboard_frame)
+
+    def apply_keyboard_frame(self, frame):
         # Convert from the owning window's screen, never UIScreen.main. Floating
         # iPad keyboards do not consume a full-width bottom inset.
         native = self.window._impl.native
+        scene = native.windowScene
         frame = native.convertRect(frame, fromCoordinateSpace=native.screen.coordinateSpace)
         frame = self.parent.view.convertRect(frame, fromView=native)
         bounds = self.parent.view.bounds.size
-        intersects = (bool(native.isKeyWindow()) and frame.size.height > 0
+        intersects = (bool(native.isKeyWindow()) and scene is not None and int(scene.activationState) == 0
+                      and frame.size.height > 0
                       and frame.origin.y < bounds.height and frame.origin.y + frame.size.height > 0
                       and frame.origin.x < bounds.width and frame.origin.x + frame.size.width > 0)
         self.keyboard_visible = intersects
@@ -247,6 +329,22 @@ class AppleNavigation:
             self.set_keyboard_tabs_hidden(modern, True)
 
     def set_keyboard_tabs_hidden(self, modern, hidden):
+        # A hidden tab bar alone leaves iPad's sidebar and its toggle available.
+        # Temporarily use tab-only mode, retaining the user's sidebar state for
+        # route/keyboard/fullscreen restoration through this same entry point.
+        if getattr(self, 'sidebar_used', False):
+            saved = getattr(self, '_sidebar_visibility', None)
+            if hidden:
+                if saved is None:
+                    self._sidebar_visibility = (int(self.controller.mode),
+                                                bool(self.controller.sidebar.isHidden()))
+                self.controller.sidebar.setHidden(True)
+                self.controller.setMode(1)
+            elif saved is not None:
+                self._sidebar_visibility = None
+                mode, sidebar_hidden = saved
+                self.controller.setMode(mode)
+                self.controller.sidebar.setHidden(sidebar_hidden)
         if modern:
             # UIKit also releases the tab bar's safe-area reservation.
             self.controller.setTabBarHidden(hidden, animated=False)
@@ -262,6 +360,35 @@ class AppleNavigation:
             self.keyboard_tab_visibility = None
             self.set_keyboard_tabs_hidden(modern, hidden)
 
+    def navigation_for(self, destination):
+        """UIKit More can move a tab's root into its own navigation stack."""
+        index = self.host.destinations.index(destination)
+        root = self.containers[index][1]
+        return root.navigationController or self.navigation[index]
+
+    def content_controller(self, destination):
+        index = self.host.destinations.index(destination)
+        navigation = self.navigation_for(destination)
+        return navigation.topViewController or self.containers[index][1]
+
+    def is_destination_controller(self, controller):
+        return any(controller == root or controller == navigation
+                   for (_, root), navigation in zip(self.containers, self.navigation))
+
+    def destination_for_navigation(self, navigation):
+        if navigation == self.controller.moreNavigationController:
+            stack = list(navigation.viewControllers)
+            for index, (_, root) in enumerate(self.containers):
+                if root in stack:
+                    return self.host.destinations[index]
+            return None  # The overflow list itself has no document route.
+        return self.host.destinations[self.navigation.index(navigation)]
+
+    def route_depth(self, navigation):
+        # More's own list precedes the selected tab's root.
+        root_count = 2 if navigation == self.controller.moreNavigationController else 1
+        return max(0, len(navigation.viewControllers) - root_count)
+
     def push(self, destination, widget, title):
         from toga_iOS.container import ControlledContainer
         container = ControlledContainer(on_refresh=lambda value: None,
@@ -271,11 +398,11 @@ class AppleNavigation:
         container.content = widget._impl
         container.controller.title = title
         self.panes.append(container)
-        self.navigation[self.host.destinations.index(destination)].pushViewController(container.controller, animated=False)
+        self.navigation_for(destination).pushViewController(container.controller, animated=False)
         return container
 
     def pop(self, destination):
-        return self.navigation[self.host.destinations.index(destination)].popViewControllerAnimated(False)
+        return self.navigation_for(destination).popViewControllerAnimated(False)
 
     def release_pane(self, container):
         from rubicon.objc import ObjCClass
@@ -330,6 +457,10 @@ class AppleNavigation:
         self.keyboard_live = False
         self.keyboard_visible = False
         self.notification_center.removeObserver(self.keyboard_observer)
+        for observer in self.keyboard_focus_observers:
+            self.notification_center.removeObserver(observer)
+        self.keyboard_focus_observers.clear()
+        self.keyboard_frame = None
         self.restore_keyboard_chrome()
         self.parent.additionalSafeAreaInsets = self.old_additional_insets
         if getattr(self, 'split', None):
@@ -356,17 +487,43 @@ class AppleNavigation:
 
 class AndroidNavigation:
     def __init__(self, host, window):
-        from android import R
-        from com.google.android.material.navigation import NavigationBarView
-        from java import dynamic_proxy
-        import weakref
         self.host, self.window = host, window
+        self.active = True
+        # Admit the window before replacing any of Toga's native controls.
+        self.old_window_resize = window.on_resize
         self.impl = host.root._impl
         self.old_min_height = host.root._MIN_HEIGHT
         # OptionContainer's default 100-point floor can exceed the entire
         # keyboard-sized window and push its children behind the IME.
         host.root._MIN_HEIGHT = 0
         self.impl.rehint()
+        self._replace_bottom_bar()
+        self.rail = None
+        self.old_resize = self.impl.resize_tab_content
+        self.old_refreshed = self.impl.refreshed
+        self.native_window = self.impl._native_activity.getWindow()
+        self.old_soft_input = self.native_window.getAttributes().softInputMode
+        from android.view import WindowManager
+        self.native_window.setSoftInputMode((self.old_soft_input & ~WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST)
+                                           | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        self.layout_events = 0
+        self.keyboard_chrome = None
+        self.mode = 'bottom'
+        self.old_listener = self.impl.onItemSelectedListener
+        self._install_selection_listener()
+        self.bottom.setOnItemSelectedListener(self.impl.onItemSelectedListener)
+        self.impl.resize_tab_content = self.resize_content
+        self.impl.refreshed = self.content_refreshed
+        # GONE navigation bars do not receive a layout event themselves.
+        # Watch the content viewport so hiding/restoring chrome still relayouts
+        # the Python widgets after Android has reclaimed the actual space.
+        self.impl.native_content.addOnLayoutChangeListener(self.impl.onLayoutChangeListener)
+        window.on_resize = self.window_resized
+        self._populate_bottom_menu()
+        self.select_current_tab()
+        self.window_resized(window)
+
+    def _replace_bottom_bar(self):
         # The pinned backend constructs Material navigation with an AppCompat
         # context. Its fallback surface can be black while inactive items are
         # also black. Give both native presentations the same Material theme.
@@ -380,30 +537,26 @@ class AndroidNavigation:
         self.impl.native.removeView(self.original_bottom)
         context = ContextThemeWrapper(self.impl._native_activity,
             MaterialR.style.Theme_MaterialComponents_DayNight)
-        self.bottom = BottomNavigationView(context)
+        if len(self.host.destinations) > 5:
+            from java import jclass
+            self.bottom = jclass('io.github.ispaure.commonutils.ExpandedBottomNavigationView')(context)
+        else:
+            self.bottom = BottomNavigationView(context)
         # Material 1.12's default inset listener treats the IME bottom inset as
         # navigation padding. Under adjustResize that grows this WRAP_CONTENT
         # bar to the whole remaining viewport and gives the content zero height.
         # The window/navigation host already reserves system and keyboard space.
         from java import jclass
         jclass('androidx.core.view.ViewCompat').setOnApplyWindowInsetsListener(self.bottom, None)
-        self.bottom.setLabelVisibilityMode(1)
+        self.bottom.setLabelVisibilityMode(2 if len(self.host.destinations) > 5 else 1)
         self.bottom.addOnLayoutChangeListener(self.impl.onLayoutChangeListener)
         self.impl.native.addView(self.bottom, LinearLayout.LayoutParams(-1, -2))
         self.impl.native_navigationview = self.bottom
-        self.rail = None
-        self.old_resize = self.impl.resize_tab_content
-        self.old_refreshed = self.impl.refreshed
-        self.old_window_resize = window.on_resize
-        self.native_window = self.impl._native_activity.getWindow()
-        self.old_soft_input = self.native_window.getAttributes().softInputMode
-        from android.view import WindowManager
-        self.native_window.setSoftInputMode((self.old_soft_input & ~WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST)
-                                           | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        self.layout_events = 0
-        self.keyboard_chrome = None
-        self.mode = 'bottom'
-        self.old_listener = self.impl.onItemSelectedListener
+
+    def _install_selection_listener(self):
+        from com.google.android.material.navigation import NavigationBarView
+        from java import dynamic_proxy
+        import weakref
         class SelectionListener(dynamic_proxy(NavigationBarView.OnItemSelectedListener)):
             def __init__(self, adapter):
                 super().__init__()
@@ -411,7 +564,7 @@ class AndroidNavigation:
 
             def onNavigationItemSelected(self, item):
                 owner = self.adapter()
-                if owner is None:
+                if owner is None or not owner.active:
                     return False
                 index = next((index for index, option in enumerate(owner.impl.options)
                               if option.menu_item == item), None)
@@ -431,21 +584,22 @@ class AndroidNavigation:
                 return True
 
         self.impl.onItemSelectedListener = SelectionListener(self)
-        self.bottom.setOnItemSelectedListener(self.impl.onItemSelectedListener)
-        self.impl.resize_tab_content = self.resize_content
-        self.impl.refreshed = self.content_refreshed
-        # GONE navigation bars do not receive a layout event themselves.
-        # Watch the content viewport so hiding/restoring chrome still relayouts
-        # the Python widgets after Android has reclaimed the actual space.
-        self.impl.native_content.addOnLayoutChangeListener(self.impl.onLayoutChangeListener)
-        window.on_resize = self.window_resized
-        resources = [None if name == 'home' else getattr(R.drawable, name) for name in host.android_icons]
+
+    def _populate_bottom_menu(self):
+        from android import R
+        resources = [None if name == 'home' else getattr(R.drawable, name) for name in self.host.android_icons]
         self.bottom.getMenu().clear()
         for index, (option, resource) in enumerate(zip(self.impl.options, resources)):
             option.menu_item = self.bottom.getMenu().add(0, index + 1, index, option.text)
             option.menu_item.setIcon(resource if resource is not None else self.home_icon())
-        self.impl.set_current_tab_index(self.host.destinations.index(host.state.destination))
-        self.window_resized(window)
+
+    def select_current_tab(self):
+        # Toga publishes on_select even for programmatic native selection.
+        changing, self.host.changing = self.host.changing, True
+        try:
+            self.impl.set_current_tab_index(self.host.destinations.index(self.host.state.destination))
+        finally:
+            self.host.changing = changing
 
     @staticmethod
     def home_icon():
@@ -458,12 +612,15 @@ class AndroidNavigation:
         return drawable
 
     def window_resized(self, window, **kwargs):
+        if not self.active:
+            return
         self.layout_events += 1
         # Consumers must see the current IME state before laying out editors;
         # otherwise one frame still uses full-height controls in a short pane.
         self.update_keyboard_inset()
         if self.old_window_resize:
-            self.old_window_resize(window)
+            # Toga's getter returns a wrapper already bound to this window.
+            self.old_window_resize(**kwargs)
         width = self.impl.scale_out(self.impl.native.getWidth())
         if width > 0:
             self.set_mode('rail' if width >= 600 else 'bottom')
@@ -548,23 +705,21 @@ class AndroidNavigation:
         self.transfer_keyboard_chrome(view)
         for index, option in enumerate(self.impl.options):
             option.menu_item = view.getMenu().getItem(index)
-        # Toga emits on_select even for this programmatic layout update. A
-        # rotation must retain the current route rather than reselect its tab.
-        changing, self.host.changing = self.host.changing, True
-        try:
-            self.impl.set_current_tab_index(self.host.destinations.index(self.host.state.destination))
-        finally:
-            self.host.changing = changing
+        self.select_current_tab()
         view.setOnItemSelectedListener(self.impl.onItemSelectedListener)
         self.impl.native.requestLayout()
 
     def resize_content(self):
+        if not self.active:
+            return
         native = self.impl.native_content
         width, height = native.getWidth(), native.getHeight()
         if width and height:
             self.impl.resize_content(width, height)
 
     def content_refreshed(self):
+        if not self.active:
+            return
         # Container.refreshed replaces MATCH_PARENT/weight dimensions with the
         # previous measured content size. In rail mode this freezes the height
         # before system bars disappear; its weighted width also keeps the old
@@ -590,6 +745,7 @@ class AndroidNavigation:
                     main_thread=Looper.myLooper() == Looper.getMainLooper())
 
     def dispose(self):
+        self.active = False
         self.restore_keyboard_chrome()
         self.set_mode('bottom')
         from android.widget import LinearLayout
@@ -604,10 +760,11 @@ class AndroidNavigation:
         self.original_bottom.addOnLayoutChangeListener(self.impl.onLayoutChangeListener)
         self.impl.onItemSelectedListener = self.old_listener
         self.original_bottom.setOnItemSelectedListener(self.old_listener)
-        self.impl.set_current_tab_index(self.host.destinations.index(self.host.state.destination))
+        self.select_current_tab()
         self.impl.resize_tab_content = self.old_resize
         self.impl.refreshed = self.old_refreshed
-        self.window.on_resize = self.old_window_resize
+        from toga.handlers import NativeHandler
+        self.window.on_resize = NativeHandler(self.old_window_resize)
         self.native_window.setSoftInputMode(self.old_soft_input)
         self.host.root._MIN_HEIGHT = self.old_min_height
         self.impl.rehint()

@@ -169,6 +169,10 @@ def apple_backend(interface):
             self.native.addSubview(self.picture)
             self.native.setTranslatesAutoresizingMaskIntoConstraints(False)
             self.native.setAutoresizesSubviews(False)
+            self._install_gestures()
+            self.add_constraints()
+
+        def _install_gestures(self):
             self.swipes = []
             for direction in ((4, 8) if self.interface.page_axis == 'vertical' else (1, 2)):
                 gesture = ObjCClass('UISwipeGestureRecognizer').alloc().initWithTarget(self.native, action=SEL('pageSwipe:'))
@@ -190,7 +194,6 @@ def apple_backend(interface):
             self.native.addGestureRecognizer(self.hold)
             self.tap.requireGestureRecognizerToFail(self.hold)
             self.native.panGestureRecognizer.requireGestureRecognizerToFail(self.hold)
-            self.add_constraints()
 
         def set_magnifier_enabled(self, enabled):
             self.hold.enabled = enabled
@@ -218,45 +221,20 @@ def apple_backend(interface):
             if parent is None or self.picture.image is None or not self.interface.magnifier_enabled:
                 self.hide_magnifier()
                 return
-            source = gesture.locationInView(self.picture)
             size = self.picture.bounds.size
             if self.lens is None:
+                source = gesture.locationInView(self.picture)
                 # Ignore holds in the letterbox, but allow an active lens to
                 # follow the thumb across page edges without changing gestures.
                 if not (0 <= source.x <= size.width and 0 <= source.y <= size.height):
                     return
-                self.lens = apple_lens_class().alloc().init()
-                self.lens.userInteractionEnabled = True
-                self.lens.clipsToBounds = True
-                self.lens.layer.cornerRadius = 24
-                self.lens.layer.borderWidth = 2
-                self.lens.layer.borderColor = ObjCClass('UIColor').whiteColor.CGColor
-                self.lens.backgroundColor = ObjCClass('UIColor').blackColor
-                self.lens_picture = ObjCClass('UIImageView').alloc().init()
-                self.lens_picture.image = self.picture.image
-                self.lens.addSubview(self.lens_picture)
-                parent.addSubview(self.lens)
-                for field, title, action, label in (
-                    ('lens_less', '−', 'magnifierLess:', 'Decrease magnifier zoom'),
-                    ('lens_more', '+', 'magnifierMore:', 'Increase magnifier zoom')):
-                    button = ObjCClass('UIButton').buttonWithType(0)
-                    button.setTitle(title, forState=0)
-                    button.setTitleColor(ObjCClass('UIColor').whiteColor, forState=0)
-                    button.setTitleColor(ObjCClass('UIColor').grayColor, forState=2)
-                    button.titleLabel.font = ObjCClass('UIFont').systemFontOfSize(18)
-                    button.backgroundColor = ObjCClass('UIColor').blackColor.colorWithAlphaComponent(.85)
-                    button.accessibilityLabel = label
-                    button.addTarget(self.native, action=SEL(action), forControlEvents=64)
-                    setattr(self, field, button)
-                    button.layer.cornerRadius = 16.5
-                    parent.addSubview(button)
+                self._create_magnifier(parent)
             # Convert through the native hierarchy: scroll offsets, fit margins
             # and zoom are all included, and the lens itself never scrolls.
             thumb = gesture.locationInView(parent)
             rect = self.native.convertRect(self.native.bounds, toView=parent)
             x, y, width, height, sample_x, sample_y = magnifier_geometry(
                 rect.size.width, rect.size.height, thumb.x - rect.origin.x, thumb.y - rect.origin.y)
-            self.lens.frame = CGRect((rect.origin.x + x, rect.origin.y + y), (width, height))
             source = self.picture.convertPoint(
                 CGPoint(rect.origin.x + sample_x, rect.origin.y + sample_y), fromView=parent)
             percent = getattr(self.interface, 'magnifier_zoom', 200)
@@ -264,13 +242,54 @@ def apple_backend(interface):
             # clamp to the reader viewport so edge holds keep both reachable.
             left, right, top = magnifier_controls_geometry(
                 rect.size.width, rect.size.height, x, y, width, height)
-            self.lens_less.frame = CGRect((rect.origin.x + left, rect.origin.y + top), (33, 33))
-            self.lens_more.frame = CGRect((rect.origin.x + right, rect.origin.y + top), (33, 33))
-            self.lens_less.setEnabled(percent > 150)
-            self.lens_more.setEnabled(percent < 250)
             scale = percent / 100 * float(self.native.zoomScale)
-            self.lens_picture.frame = CGRect((width / 2 - source.x * scale, height / 2 - source.y * scale),
-                                              (size.width * scale, size.height * scale))
+            layout = (width, height, size.width, size.height, scale, percent)
+            if self.lens_layout != layout:
+                self.lens_layout = layout
+                self.lens.frame = CGRect((rect.origin.x + x, rect.origin.y + y), (width, height))
+                self.lens_less.frame = CGRect((rect.origin.x + left, rect.origin.y + top), (33, 33))
+                self.lens_more.frame = CGRect((rect.origin.x + right, rect.origin.y + top), (33, 33))
+                self.lens_picture.frame = CGRect(
+                    (width / 2 - source.x * scale, height / 2 - source.y * scale),
+                    (size.width * scale, size.height * scale))
+                self.lens_less.setEnabled(percent > 150)
+                self.lens_more.setEnabled(percent < 250)
+            else:
+                # Dragging only translates existing layers. Setting UIImageView
+                # and UIButton frames repeatedly schedules layout/content work.
+                self.lens.center = CGPoint(rect.origin.x + x + width / 2, rect.origin.y + y + height / 2)
+                self.lens_less.center = CGPoint(rect.origin.x + left + 16.5, rect.origin.y + top + 16.5)
+                self.lens_more.center = CGPoint(rect.origin.x + right + 16.5, rect.origin.y + top + 16.5)
+                self.lens_picture.center = CGPoint(width / 2 + (size.width / 2 - source.x) * scale,
+                                                    height / 2 + (size.height / 2 - source.y) * scale)
+
+        def _create_magnifier(self, parent):
+            self.lens_layout = None
+            self.lens = apple_lens_class().alloc().init()
+            self.lens.userInteractionEnabled = True
+            self.lens.clipsToBounds = True
+            self.lens.layer.cornerRadius = 24
+            self.lens.layer.borderWidth = 2
+            self.lens.layer.borderColor = ObjCClass('UIColor').whiteColor.CGColor
+            self.lens.backgroundColor = ObjCClass('UIColor').blackColor
+            self.lens_picture = ObjCClass('UIImageView').alloc().init()
+            self.lens_picture.image = self.picture.image
+            self.lens.addSubview(self.lens_picture)
+            parent.addSubview(self.lens)
+            for field, title, action, label in (
+                ('lens_less', '−', 'magnifierLess:', 'Decrease magnifier zoom'),
+                ('lens_more', '+', 'magnifierMore:', 'Increase magnifier zoom')):
+                button = ObjCClass('UIButton').buttonWithType(0)
+                button.setTitle(title, forState=0)
+                button.setTitleColor(ObjCClass('UIColor').whiteColor, forState=0)
+                button.setTitleColor(ObjCClass('UIColor').grayColor, forState=2)
+                button.titleLabel.font = ObjCClass('UIFont').systemFontOfSize(18)
+                button.backgroundColor = ObjCClass('UIColor').blackColor.colorWithAlphaComponent(.85)
+                button.accessibilityLabel = label
+                button.addTarget(self.native, action=SEL(action), forControlEvents=64)
+                setattr(self, field, button)
+                button.layer.cornerRadius = 16.5
+                parent.addSubview(button)
 
         def set_image(self, image):
             self.hide_magnifier()
@@ -322,6 +341,11 @@ def android_backend(interface):
             self.native = View(self._native_activity)
             self.native.setContentDescription(self.interface.description)
             self.native.setVerticalPaging(self.interface.page_axis == 'vertical')
+            self._install_page_listener()
+            self.native.setMagnifierEnabled(self.interface.magnifier_enabled)
+            self.native.setMagnifierZoom(self.interface.magnifier_zoom)
+
+        def _install_page_listener(self):
             owner = self
             class Listener(dynamic_proxy(View.PageListener)):
                 def page(self, direction):
@@ -332,8 +356,6 @@ def android_backend(interface):
                     owner.interface.request_magnifier_zoom(value)
             self.listener = Listener()
             self.native.setPageListener(self.listener)
-            self.native.setMagnifierEnabled(self.interface.magnifier_enabled)
-            self.native.setMagnifierZoom(self.interface.magnifier_zoom)
 
         def set_magnifier_enabled(self, enabled):
             self.native.setMagnifierEnabled(enabled)

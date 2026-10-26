@@ -42,10 +42,21 @@ are described in the [native browser guide](../native_browser/native_browser.md)
 ## Configurable navigation
 
 `NativeNavigationHost(items, state=None, on_select=None, prefer_sidebar=True)`
-accepts one to five `(identity, label, Apple symbol, Android drawable name)` tuples.
+accepts one to seven `(identity, label, Apple symbol, Android drawable name)` tuples.
 Identities must be unique. Android's `home` icon name selects the vector house;
 other names resolve through `android.R.drawable`. The optional state must have
 the same destinations in the same order. Labels and destinations are caller data.
+
+For six or seven destinations Android uses the bundled
+`ExpandedBottomNavigationView`, with evenly measured compact icon cells; include
+`ui/native/android` in the application Java sources. The shared host installs it
+before creating backend option references and retains it when replacing chrome.
+The rail still uses Material navigation. UIKit retains its native overflow
+presentation on compact devices; applications must use destination identities
+instead of fixed numeric tab positions. `navigation_for(identity)` resolves the
+actual navigation stack when UIKit More reparents a tab root;
+`content_controller(identity)` resolves its visible controller. Route delegates
+forward More selection callbacks and exclude its list from document route depth.
 
 `install(window)` establishes native containment and layout/keyboard listeners;
 `uninstall()` restores them, and `dispose()` retires the host's widgets and
@@ -53,13 +64,81 @@ callbacks. `activate(identity)` selects a destination without rebuilding views.
 `Routes(host, guard, changed, intent=None)` retains a separate stack per destination.
 The guard controls navigation, and the consumer decides document-close behavior.
 Install/uninstall routes with their host to register/remove native Back delegates.
-On iOS, a software keyboard in the owning key window temporarily hides destination
-tabs and restores their previous visibility on dismissal or host uninstallation.
+
+### Lifetime ownership before backend changes
+
+| Owner | Installation and retention | Retirement |
+| --- | --- | --- |
+| `NativeNavigationHost` | One installed window and adapter; adapter retains original containment/layout/listener bindings | `uninstall` restores chrome before disposing the adapter, then clears adapter/window. The host permits reinstall while retaining selected destination; a second simultaneous install is refused. Retired layout/selection callbacks do nothing. Android forwards the already-bound Toga resize handler without adding a window argument and restores that exact wrapper. `dispose` also clears the host selection callback. |
+| `ImageCanvas` | Backend retains gestures/listeners; Apple native delegate ownership is weak | `dispose` clears pixels and page/toggle/magnifier callbacks, disables magnification, then detaches the native delegate/listener. Retire permanently before releasing a page. |
+| `NativeSpeech` | Backend owns engine/delegate or Java progress listener; notifications marshal onto the supplied loop | `close` marks the engine closed/not ready and clears voices and presentation callbacks before stopping it, then detaches native callbacks. Deliveries check closed state both before scheduling and when the loop executes them. `stop` alone permits reuse; `close` does not. |
+
+The host pairs adapter installation with uninstallation; direct backend `dispose`
+methods are not an independent public idempotence contract. A draft owner that
+allocates controls before admission must retire rejected controls itself.
+Android checks the supplied window's resize interface before replacing controls;
+failed admission clears the host's window so it can retry. This is not a general
+rollback guarantee for failures partway through native construction.
+`test_native_owner_lifetimes` covers host reinstall/restoration, fake native canvas
+detachment, retired layout dispatch, bound resize forwarding and queued speech
+suppression/presentation-owner release. Keyboard/gesture fixtures cover existing
+chrome restoration separately. These are dummy/fake contracts, not native proof.
+
+Logistics owns an isolated `native_lifecycle_probe` and external driver. Native
+simulator/emulator runs exercise repeated navigation install/uninstall, chrome
+restoration, canvas zoom and gesture retirement, speech stop/restart and close,
+plus background/resume with each owner live. They record loaded source or packaged
+bytecode fingerprints. Keep the consumer's exact target/build scope with its
+evidence; these runs do not replace the broader acceptance matrix below.
+
+Before moving embedded Apple/Android factories or upgrading their backend
+assumptions, validate rotation and independent windows, IME/chrome restoration,
+pinch/pan/edge paging and magnifier gestures, voice interruption and repeated
+install/dispose with late notifications on supported native hosts. Preserve paired
+allocation/restoration and callback ownership throughout such a change.
+
+### Factory construction
+
+Navigation constructors keep admission, saved bindings and final publication in
+one owner. Apple observer registration and child-controller assembly have named
+private stages; Android bottom-bar replacement, weak selection-listener binding
+and menu population do too. Their call order matches allocation/restoration order;
+callbacks and `dispose` remain on the existing adapters. Platform imports stay
+lazy inside the native construction path.
+
+Canvas construction separates Apple gesture wiring and magnifier/lens-control
+allocation from layout and gesture delivery, and Android page-listener binding
+from view setup. The backend classes remain in their lazy factories; cached
+Objective-C classes, native selectors and ownership links are unchanged.
+
+Speech uses private lazy factories for Android weak listener proxies and the
+cached Apple delegate class. `NativeSpeech.android`/`apple` still own engine
+allocation, listener/delegate retention and voice setup; runtime delivery and
+shutdown remain on `NativeSpeech`. AVFoundation loads before protocol lookup,
+and the module's existing delegate cache still prevents duplicate class registration.
+
+On iOS, a software keyboard in an active scene's owning key window temporarily
+hides destination tabs and restores their previous visibility on dismissal or
+host uninstallation.
+Each scene can retain its own key window while inactive. The adapter therefore
+reconciles scene activation and window key changes as well as keyboard-frame
+notifications. It retains the last raw screen-coordinate frame, converts it again
+for the owning window, and releases added insets/tabs while that scene is inactive
+or unbound. Scene notifications are filtered against the window's current scene,
+including child windows bound after adapter construction. Disposal unregisters
+every observer; queued focus reconciliation checks the retired-owner flag.
 UIKit's tab-bar visibility API releases the tab bar's safe-area reservation on
 iOS 18 and later; older systems use native view visibility. Floating keyboards
 hide the tabs without claiming a full-width keyboard inset. Immersive reader
 chrome keeps independent restoration ownership; leaving a reader while typing
 reapplies temporary keyboard suppression.
+`set_keyboard_tabs_hidden(modern, hidden)` owns both Apple destination surfaces.
+When the adapter uses the iPad sidebar, hiding snapshots its mode and visibility,
+collapses the sidebar and uses tab-only mode to remove the sidebar toggle before
+hiding the bar. Repeated hiding preserves that snapshot; showing restores it.
+Immersive chrome uses this same path so keyboard/document transitions share
+restoration without losing the original sidebar presentation.
+
 `tabs_hidden()` reports the active UIKit tab-container visibility, which can differ
 from `tabBar.isHidden`. Keyboard geometry changes coalesce a consumer resize
 callback even when the window dimensions stay constant, so callers can release
@@ -126,7 +205,11 @@ with another finger to change `magnifier_zoom` through 150, 170, 190, 210, 230 a
 label overlays the image.
 UIKit adds the buttons as siblings of the clipped lens; Android uses a split-touch
 popup at the lens's bottom edge. The original hold stays on the image; button taps do not
-page or toggle controls. Releasing the original hold dismisses the lens and buttons.
+page or toggle controls. UIKit drag updates translate existing image/button centers;
+sizes and enabled states update when the lens layout or zoom changes. Android
+coalesces popup movement to display frames and updates enabled/alpha states only
+when zoom changes. Releasing the original hold dismisses the lens and buttons,
+including pending Android movement callbacks.
 `on_magnifier_zoom(canvas, percent)` receives a requested change before applying it;
 return `False` to reject a failed host save. Assigning `magnifier_zoom` updates a
 visible lens without firing the callback. `change_magnifier_zoom(direction)` steps
@@ -357,7 +440,12 @@ IME extraction; Source mode keeps the application's toolbar and native editor.
 Call `set_filename` on rename, `set_language(alias)` for an override (None restores
 detection), and `dispose()` when retiring a view. Existing `.value`, `.readonly`
 and EditorSearch contracts remain available; `backend_name` identifies the host
-backend for native UTF-16 selection adapters.
+backend for native UTF-16 selection adapters. `language_selection` exposes the
+shared `formats.code_language.LanguageSelection` used internally; `language` is
+the effective ID and `language_override` exposes its selected ID. Filename and
+text changes refresh detection while retaining manual overrides. Hosts may bind
+their chooser to this same model; use `set_language` to apply a selection and
+schedule native highlighting without emitting a text-change callback.
 
 Hosts supply Pygments (Logistics pins 2.19.2). Language choices, filename detection
 and the Blade grammar are shared with desktop under `formats.code_syntax` and
@@ -413,13 +501,13 @@ apply the same image policy without loading an application module. Wiki parsing
 is opt-in; code spans, fenced code and escaped embeds remain literal.
 
 The default `MarkdownWikiView` renderer uses
-`markdown_images.local_image_source(document, root)` for page-relative local
+`commonUtils.formats.markdown.image_sources.local_image_source(document, root)` for page-relative local
 images within the documentation root. A custom `render` callback keeps its old
 arguments unless `image_source_factory(document, root)` is explicitly supplied;
 then the renderer also receives the per-page `image_source` keyword. Logistics'
 Documentation reader opts in through this factory as well.
 
-`markdown_images.folder_image_source(provider, document)` supplies the bounded
+`commonUtils.formats.markdown.image_sources.folder_image_source(provider, document)` supplies the bounded
 shared resolver for folder-backed native readers/editors. It accepts a rooted
 provider with `relative`, `entry` and `open` methods; paths resolve relative to
 the document's provider key. All reads stay behind that provider, with revision
@@ -454,11 +542,18 @@ include the shared native Java root when building. The listener carries opaque
 utterance tokens and ranges, not source text or document names. Disposal detaches
 native callbacks and suppresses queued deliveries. System media controls, audio
 session/privacy policy and document title publication remain consumer-owned.
+`voice_for_language(language, preferred='')` chooses a matching offered voice,
+preserving a compatible preference, or returns an empty string when none is
+installed. An empty language uses the preferred/system default voice. iOS uses
+the system’s default language rather than forcing English. Text detection stays
+with the caller through `runtime.speech_language`.
 
 `private_webview.PrivateWebView(max_html_bytes=..., **toga_options)` creates a
 nonpersistent WKWebView on iOS or a cache-disabled Android WebView. Backend
 selection follows Toga's factory. `private_webview_supported()` reports those
-supported backends. `set_content` checks encoded UTF-8 bytes before entering Toga;
+supported backends. `set_content` checks encoded UTF-8 bytes before entering Toga. The Android
+private backend loads HTML directly with `loadDataWithBaseURL`, including caller
+limits above 2 MiB, rather than using Toga's plaintext large-content cache;
 `clear_private_content()` retires callbacks, clears the live document and disposes
 the native view idempotently. Unsupported backends fail closed. Callers choose
 HTML byte limits and supply navigation, resource and credential-validity policy.

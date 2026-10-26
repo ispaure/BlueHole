@@ -15,6 +15,8 @@ startup and durable checkpoints on slower hosts. Marker waits report child
 exit status and stderr immediately if a runner dies. Browser subscription tests
 retry transient SQLite queue locks within their deadline, matching production
 followers; assertions still verify completion, totals and durable task ownership.
+The no-duplicate-scan assertion counts exact folders across both process journals:
+transient queue contention can hand off ownership after a durable checkpoint.
 
 See [maintenance and documentation ownership](../../developer/maintenance.md).
 
@@ -95,6 +97,15 @@ as an owner's `future` (a `concurrent.futures.Future`) is also awaited after own
 destruction, allowing cancellation callbacks to release process/file handles.
 Cleanup errors remain test failures. The base class also releases unscoped windows
 between tests.
+
+After widget destruction and owned worker/future retirement, cleanup explicitly
+collects eligible Python cycles on the GUI thread. Signal/callback cycles can
+retain wrappers whose C++ widgets are already gone; leaving them for a later
+worker allocation can run their finalizers on that worker. A real widget-cycle
+regression checks collection after native destruction on the application thread.
+Production application GC policy remains application-owned. Native crashes still
+require their captured trace and affected-suite rechecks; a fixture contract does
+not establish every possible crash cause.
 
 Raw SQLite fixture connections need explicit closure (for example,
 `contextlib.closing(sqlite3.connect(...))`). A connection's own context manager

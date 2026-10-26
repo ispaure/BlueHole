@@ -26,6 +26,12 @@ baseline or search/table state. Widget entry points such as `markdown_text()`,
 `set_edit_mode()`, saving and IDE callback hooks remain explicit methods. No
 dynamic attribute forwarding is installed.
 
+Viewer construction keeps navigation, text surfaces, document properties and
+reading controls in four private builders in `viewer.py`. The constructor retains
+wiki composition, signal/lifetime integration, provider action policy and initial
+document admission. Builders populate the existing widget fields in construction
+order; they introduce no additional state owner or embedding interface.
+
 Hosts which previously assigned `_loaded_path` or `_source_bytes` should assign
 `document_state.loaded_path` and `document_state.source_bytes`. A private-document
 host discarding its draft calls `document_state.new()` before clearing editor
@@ -87,6 +93,16 @@ shutdown. MarkdownWindow handles those duties for its own close event. Document
 hosts must preserve close vetoes through [document-host routing](../workspaces.md).
 
 ## Source and save guarantees
+
+Qt presentation first classifies each block's fragments into a named internal
+content record: callout title/separator, inline-code ranges and image presence.
+The existing traversal retains quote-depth scope and format precedence; code and
+image helpers apply native typography without becoming source-editing owners.
+`document.materialize_formats` separately traverses rich blocks, plans authored
+inline delimiters and code fences, then applies replacements in reverse position
+order. Code-fence planning also clears the original rich block flags before those
+replacements. UTF-16 positions, undo handling and source synchronization retain
+their existing contracts.
 
 Reading, callout folding and unchanged saves do not reserialize original bytes.
 Actual formatted edits use Qt's Markdown writer and can normalize or lose unsupported

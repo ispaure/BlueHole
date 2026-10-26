@@ -21,3 +21,27 @@ dist/
 
 .shared-validation/
 .manager-tooling/
+
+# Local secrets, signing material and disposable developer output.
+.env
+.env.*
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.keychain-db
+*.mobileprovision
+secrets.json
+secrets.local.*
+service-account*.json
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.idea/

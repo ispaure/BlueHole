@@ -53,15 +53,7 @@ class LayeredSettingsEditor(qt.QWidget):
     def reload(self, *, initial=False):
         if self.pending and not initial and not self.can_close():
             return False
-        try:
-            self.original = self.store.values(self.scope)
-            self.defaults = self.store.values('application')
-            self.overrides = self.store.overrides()
-            self.snapshot = self._bytes(self.path)
-            self.default_snapshot = self._bytes(self.store.defaults)
-        except (OSError, UnicodeError, Error) as error:
-            self.status.setText(f'Cannot read settings: {error}. The file has been preserved.')
-            self.save_button.setEnabled(False)
+        if not self._read_snapshot():
             return False
         self.pending.clear()
         self.path_label.setText(str(self.path))
@@ -71,6 +63,21 @@ class LayeredSettingsEditor(qt.QWidget):
         self.status.setText('Software defaults: edits change this installation’s repository INI.'
                             if self.scope == 'application' else 'Inherited values follow software defaults. ↶ removes a personal override.')
         self.save_button.setEnabled(False)
+        return True
+
+    def _read_snapshot(self):
+        try:
+            original = self.store.values(self.scope)
+            defaults = self.store.values('application')
+            overrides = self.store.overrides()
+            snapshot = self._bytes(self.path)
+            default_snapshot = self._bytes(self.store.defaults)
+        except (OSError, UnicodeError, Error) as error:
+            self.status.setText(f'Cannot read settings: {error}. The file has been preserved.')
+            self.save_button.setEnabled(False)
+            return False
+        self.original, self.defaults, self.overrides = original, defaults, overrides
+        self.snapshot, self.default_snapshot = snapshot, default_snapshot
         return True
 
     def _build(self):
@@ -99,94 +106,105 @@ class LayeredSettingsEditor(qt.QWidget):
                 scroll.setWidget(body)
                 self.sections.addTab(scroll, section)
             identity = section, key
-            label, kind = key_type(key)
-            values = {k: v for (s, k), v in self.original.items() if s == section}
-            choices = mode_choices(key, values)
-            if section == 'Styling' and key in STYLE_FIELDS:
-                label, fallback, limits = STYLE_FIELDS[key]
-                if key == 'theme_mode':
-                    choices = limits
-                if isinstance(fallback, int):
-                    try:
-                        validate_style(key, value)
-                    except (ValueError, OverflowError):
-                        control = None
-                    else:
-                        control = qt.QSpinBox()
-                        control.setRange(*limits)
-                        control.setValue(int(value))
-                        control.valueChanged.connect(lambda v, i=identity: self._edit(i, str(v)))
-                else:
-                    control = None
-            else:
-                control = None
-            if control is None and (kind == 'bool' or value.lower() in ('true', 'false')):
-                control = qt.QCheckBox()
-                control.setChecked(value.lower() in ('true', 'yes', 'on', '1'))
-                control.toggled.connect(lambda v, i=identity: self._edit(i, 'true' if v else 'false'))
-            elif control is None and choices:
-                control = qt.QComboBox()
-                control.addItems(choices)
-                if value not in choices:
-                    control.addItem(value)
-                control.setCurrentText(value)
-                control.currentTextChanged.connect(lambda v, i=identity: self._edit(i, v))
-            elif control is None and section == 'Styling' and key.endswith('font_family_str'):
-                control = qt.QComboBox()
-                control.setEditable(True)
-                control.setInsertPolicy(qt.QComboBox.InsertPolicy.NoInsert)
-                control.setProperty('monospace_only', key == 'code_font_family_str')
-                control.addItem('Automatic', '')
-                if font_families is None:
-                    font_families = [family for family in qt.QFontDatabase.families()
-                                     if supported_font_family(family)]
-                for family in font_families:
-                    if key == 'code_font_family_str' and not qt.QFontDatabase.isFixedPitch(family):
-                        continue
-                    self._add_font(control, family)
-                self._select_font(control, value)
-                control.currentTextChanged.connect(lambda v, c=control, i=identity:
-                    self._edit(i, '' if c.currentIndex() == 0 and v == 'Automatic' else v))
-            elif control is None:
-                if '\n' in value:
-                    control = qt.QPlainTextEdit(value)
-                    control.setMaximumHeight(120)
-                    control.textChanged.connect(lambda c=control, i=identity: self._edit(i, c.toPlainText()))
-                else:
-                    control = qt.QLineEdit(value)
-                    control.textChanged.connect(lambda v, i=identity: self._edit(i, v))
-            label = self.labels.get(identity, label.replace('_', ' '))
-            control.setAccessibleName(f'{section}: {label}')
-            control.setToolTip(key)
-            row = qt.QWidget()
-            content = qt.QHBoxLayout(row)
-            content.setContentsMargins(0, 0, 0, 0)
-            content.addWidget(control, 1)
-            if key.endswith('_color_str'):
-                if not value:
-                    control.setPlaceholderText('Automatic (theme)')
-                choose = qt.QToolButton()
-                choose.setText('…'); choose.setToolTip('Choose color')
-                choose.clicked.connect(lambda checked=False, c=control: self._color(c))
-                content.addWidget(choose)
-            indicator = qt.QLabel()
-            indicator.setMinimumWidth(65)
-            content.addWidget(indicator)
-            reset = qt.QToolButton()
-            reset.setText('↶')
-            reset.setToolTip('Use software default' if self.scope == 'personal' else 'Revert this unsaved field')
-            reset.setAccessibleName(f'Reset {label} to default')
-            reset.clicked.connect(lambda checked=False, i=identity: self._reset(i))
-            content.addWidget(reset)
-            self.fields[identity], self.resets[identity], self.indicators[identity] = control, reset, indicator
-            forms[section].addRow(label, row)
-            if section == 'Styling' and key.endswith('font_family_str'):
-                role = key.removesuffix('_font_family_str')
-                self.font_previews[role] = FontPreview(role)
-                forms[section].addRow('', self.font_previews[role])
-            self._state(identity)
+            control, label, font_families = self._field_control(identity, value, font_families)
+            self._add_field_row(forms[section], identity, value, label, control)
         self.building = False
         self._update_font_previews()
+
+    def _field_control(self, identity, value, font_families):
+        """Choose and bind one schema control, retaining the rebuild's lazy font cache."""
+        section, key = identity
+        label, kind = key_type(key)
+        values = {k: v for (s, k), v in self.original.items() if s == section}
+        choices = mode_choices(key, values)
+        if section == 'Styling' and key in STYLE_FIELDS:
+            label, fallback, limits = STYLE_FIELDS[key]
+            if key == 'theme_mode':
+                choices = limits
+            if isinstance(fallback, int):
+                try:
+                    validate_style(key, value)
+                except (ValueError, OverflowError):
+                    control = None
+                else:
+                    control = qt.QSpinBox()
+                    control.setRange(*limits)
+                    control.setValue(int(value))
+                    control.valueChanged.connect(lambda v, i=identity: self._edit(i, str(v)))
+            else:
+                control = None
+        else:
+            control = None
+        if control is None and (kind == 'bool' or value.lower() in ('true', 'false')):
+            control = qt.QCheckBox()
+            control.setChecked(value.lower() in ('true', 'yes', 'on', '1'))
+            control.toggled.connect(lambda v, i=identity: self._edit(i, 'true' if v else 'false'))
+        elif control is None and choices:
+            control = qt.QComboBox()
+            control.addItems(choices)
+            if value not in choices:
+                control.addItem(value)
+            control.setCurrentText(value)
+            control.currentTextChanged.connect(lambda v, i=identity: self._edit(i, v))
+        elif control is None and section == 'Styling' and key.endswith('font_family_str'):
+            control = qt.QComboBox()
+            control.setEditable(True)
+            control.setInsertPolicy(qt.QComboBox.InsertPolicy.NoInsert)
+            control.setProperty('monospace_only', key == 'code_font_family_str')
+            control.addItem('Automatic', '')
+            if font_families is None:
+                font_families = [family for family in qt.QFontDatabase.families()
+                                 if supported_font_family(family)]
+            for family in font_families:
+                if key == 'code_font_family_str' and not qt.QFontDatabase.isFixedPitch(family):
+                    continue
+                self._add_font(control, family)
+            self._select_font(control, value)
+            control.currentTextChanged.connect(lambda v, c=control, i=identity:
+                self._edit(i, '' if c.currentIndex() == 0 and v == 'Automatic' else v))
+        elif control is None:
+            if '\n' in value:
+                control = qt.QPlainTextEdit(value)
+                control.setMaximumHeight(120)
+                control.textChanged.connect(lambda c=control, i=identity: self._edit(i, c.toPlainText()))
+            else:
+                control = qt.QLineEdit(value)
+                control.textChanged.connect(lambda v, i=identity: self._edit(i, v))
+        return control, label, font_families
+
+    def _add_field_row(self, form, identity, value, label, control):
+        """Mount the field with its color action, reset state and optional font preview."""
+        section, key = identity
+        label = self.labels.get(identity, label.replace('_', ' '))
+        control.setAccessibleName(f'{section}: {label}')
+        control.setToolTip(key)
+        row = qt.QWidget()
+        content = qt.QHBoxLayout(row)
+        content.setContentsMargins(0, 0, 0, 0)
+        content.addWidget(control, 1)
+        if key.endswith('_color_str'):
+            if not value:
+                control.setPlaceholderText('Automatic (theme)')
+            choose = qt.QToolButton()
+            choose.setText('…'); choose.setToolTip('Choose color')
+            choose.clicked.connect(lambda checked=False, c=control: self._color(c))
+            content.addWidget(choose)
+        indicator = qt.QLabel()
+        indicator.setMinimumWidth(65)
+        content.addWidget(indicator)
+        reset = qt.QToolButton()
+        reset.setText('↶')
+        reset.setToolTip('Use software default' if self.scope == 'personal' else 'Revert this unsaved field')
+        reset.setAccessibleName(f'Reset {label} to default')
+        reset.clicked.connect(lambda checked=False, i=identity: self._reset(i))
+        content.addWidget(reset)
+        self.fields[identity], self.resets[identity], self.indicators[identity] = control, reset, indicator
+        form.addRow(label, row)
+        if section == 'Styling' and key.endswith('font_family_str'):
+            role = key.removesuffix('_font_family_str')
+            self.font_previews[role] = FontPreview(role)
+            form.addRow('', self.font_previews[role])
+        self._state(identity)
 
     def _add_font(self, control, family):
         control.addItem(family, family)
@@ -268,9 +286,7 @@ class LayeredSettingsEditor(qt.QWidget):
         self.status.setText('Unsaved settings.' if self.pending else '')
         self._update_font_previews()
 
-    def _reset(self, identity):
-        value = self.defaults.get(identity, '') if self.scope == 'personal' else self.original[identity]
-        self.building = True
+    def _set_field_value(self, identity, value):
         control = self.fields[identity]
         with qt.QSignalBlocker(control):
             if isinstance(control, qt.QCheckBox):
@@ -289,7 +305,10 @@ class LayeredSettingsEditor(qt.QWidget):
                 control.setPlainText(value)
             else:
                 control.setText(value)
-        self.building = False
+
+    def _reset(self, identity):
+        value = self.defaults.get(identity, '') if self.scope == 'personal' else self.original[identity]
+        self._set_field_value(identity, value)
         if self.scope == 'personal' and identity in self.overrides:
             self.pending[identity] = None
         else:
@@ -323,9 +342,20 @@ class LayeredSettingsEditor(qt.QWidget):
             self.status.setText(f'Could not save settings: {error}')
             return False
         self.pending.clear()
-        self.reload(initial=True)
+        if self._read_snapshot():
+            # The saved values are already displayed. Retain controls, previews,
+            # selection and scroll; only synchronize parser-normalized values.
+            for identity in self.fields:
+                value = self.original.get(identity, '')
+                if value != effective.get(identity, ''):
+                    self._set_field_value(identity, value)
+                self._state(identity)
+            self._update_font_previews()
+            self.save_button.setEnabled(False)
+            self.status.setText('Settings saved.')
+        else:
+            self.status.setText('Settings saved, but could not read them back. Reload before editing further.')
         self.saved.emit(self.path)
-        self.status.setText('Settings saved.')
         return True
 
     def can_close(self):
