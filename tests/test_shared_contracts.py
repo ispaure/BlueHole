@@ -53,6 +53,8 @@ class SharedContractTests(unittest.TestCase):
         package.__path__ = [str(ROOT)]
         cls.modules = set(sys.modules)
         sys.modules[NAMESPACE] = package
+        from shared_source import install_candidate
+        install_candidate(NAMESPACE)
 
     @classmethod
     def tearDownClass(cls):

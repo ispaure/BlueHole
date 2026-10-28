@@ -96,3 +96,27 @@ the captured version and next local alpha tag suffix. Review shows the resulting
 identifier before any external work. This is a read-only suggestion, not a remote
 reservation; publication retains its remote collision checks. Supplying a custom
 identifier remains supported. Plan preparation does not upload or publish.
+
+## Test a candidate commonUtils working tree
+
+This branch remains `blender-5.2.2/alpha`. Production imports use the namespaced
+`Lib/commonUtils` subtree and `Lib/commonUtils.revision`; this test hook changes
+neither the subtree nor that recorded revision. The normal shared-copy check
+continues to require the exact committed membership and bytes.
+
+For an explicitly selected local shared working tree, run:
+
+```sh
+BLUEHOLE_SHARED_TEST_SOURCE=/explicit/commonUtils .venv/bin/python -m unittest discover -s tests -p test_shared_contracts.py -v
+BLUEHOLE_SHARED_TEST_SOURCE=/explicit/commonUtils .venv/bin/python -m unittest discover -s tests -p test_directory_index.py -v
+```
+
+On Windows set `BLUEHOLE_SHARED_TEST_SOURCE` in the shell and use
+`.venv\Scripts\python.exe`. The fixture loads that package under the add-on's test
+namespace, retaining its independent registries; it does not install a global
+`commonUtils` alias or redirect production imports. Without the variable these
+same tests use the recorded subtree. Run both selections before proposing a
+subtree refresh. These portable import/signature/index fixtures complement the
+exact-copy check and do not establish live Blender acceptance. The manager's
+explicit consumer-acceptance plan can capture both selections alongside other
+consumers, with each checkout, interpreter and candidate path recorded.

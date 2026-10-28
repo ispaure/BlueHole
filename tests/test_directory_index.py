@@ -14,6 +14,8 @@ class DirectoryIndexTests(unittest.TestCase):
         package = types.ModuleType(name)
         package.__path__ = [str(Path(__file__).resolve().parents[1])]
         sys.modules[name] = package
+        from shared_source import install_candidate
+        install_candidate(name)
         cls.canonical = importlib.import_module(name + '.Lib.commonUtils.filesystem.index')
         cls.addClassCleanup(lambda: [sys.modules.pop(key, None) for key in tuple(sys.modules)
             if key == name or key.startswith(name + '.')])
