@@ -82,6 +82,12 @@ callbacks. Engines supply `ready`, `error`, `speak(text, voice, speed, token)`,
 `stop()` and `close()`, and receive `started`, `progress`, `completed` and `failed`
 callbacks. An optional engine loop schedules approximate word progress.
 `can_speak` is a caller-supplied gate checked before each utterance.
+`on_finished` is an optional callback after natural exhaustion, including an empty
+passage. It runs after text/highlight cleanup and the stopped notification; Stop,
+failure, disposal and stale engine completions never invoke it. Hosts may use it
+to fetch the next passage lazily, retaining their own cancellation and access
+checks. Qt `ReadAloud(..., on_finished=...)` forwards this event only when the user
+is reading the document rather than a text selection.
 
 `PlaybackTimer(loop, changed=..., expired=..., clock=...)` tracks active listening
 time. Pause preserves the remaining budget; Play after expiry starts a fresh
@@ -90,6 +96,16 @@ selection, saved voice preferences, privacy gating and when to dispose a session
 Qt read-aloud also uses `SpeechSession` and `PlaybackTimer`;
 `ui.readers.qt_speech` adapts Qt scheduling and engine callbacks. Each platform
 retains its own widgets, voice selection and installed-engine availability.
+
+Speech input separates prose em/en dashes and horizontal bars from adjacent words
+with spaces, so `Sumire—Never` is submitted as `Sumire — Never`. Ordinary compound
+hyphens, apostrophes, minus signs and numeric en-dash ranges are preserved. The
+utterance budget includes inserted spaces. Source queue text remains untouched;
+each engine payload owns a UTF-16 boundary map back to the source. Native range
+callbacks map through it and exclude separator-only spans; fallback word cursors
+and skip targets also split at prose dashes. Pause, resume and selection bounds
+stay in source coordinates. Stop/disposal releases payload text and its map. This
+prepares word boundaries, while pronunciation still depends on the installed voice.
 
 `speech_language.passage_language(text, hint='')` detects up to 6,000 characters
 locally with optional `langdetect==1.0.9` profiles. Detection uses a deterministic
