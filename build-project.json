@@ -120,5 +120,10 @@
       ],
       "description": "Complete portable, package, exact-package native and hosted gates. Cannot be narrowed."
     }
+  ],
+  "adapter_actions": [
+    "plan",
+    "settings",
+    "save_settings"
   ]
 }

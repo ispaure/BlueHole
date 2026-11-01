@@ -13,8 +13,9 @@ def main():
     from build_manager.profiles import load_profile,save_profile
     from build_manager.registry import config_directory
     import os
-    profile=config_directory()/'projects/io.github.ispaure.bluehole.json'
-    tools=load_profile(profile)
+    legacy=config_directory()/'projects/io.github.ispaure.bluehole.json'
+    profile=Path(request['settings_profile']) if request.get('settings_profile') else legacy
+    tools=load_profile(profile if profile.exists() else legacy)
     origins={}
     for key,variable in [('tools.shared_source','BLUEHOLE_SHARED_SOURCE'),('tools.blender','BLUEHOLE_BLENDER'),('tools.hosted_evidence','BLUEHOLE_HOSTED_EVIDENCE')]:
         origins[variable]='environment '+variable if variable in os.environ else 'private project tooling profile' if tools.get(key) else 'tracked unconfigured default'
@@ -46,7 +47,8 @@ def main():
                 'auth.github_kind':dict(value=os.environ['BLUEHOLE_GITHUB_KIND'],origin=origins['BLUEHOLE_GITHUB_KIND'],read_only=True)}
     elif action=='save_settings':
         changes=values['changes']
-        save_profile(profile,changes,allowed={'tools.shared_source','tools.blender','tools.hosted_evidence'})
+        allowed={'tools.shared_source','tools.blender','tools.hosted_evidence'}
+        save_profile(profile,{**{k:v for k,v in tools.items() if k in allowed},**changes},allowed=allowed)
         result=None
     else:raise ValueError('Unsupported Blue Hole adapter action.')
     print(json.dumps(dict(schema=1,result=result)))
