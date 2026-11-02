@@ -12,6 +12,22 @@ are likewise bound to the native item view lifetime.
 
 ## Construction and navigation
 
+Hosts can assign `browser.directory_gate(path, resume)` to defer a folder open
+before changing the displayed directory. Return `True` to consume/defer the
+request, then call `resume()` only after approval; return `False` to continue
+immediately. The existing `directory_handler` still runs first for host routing.
+The host must let the approved path pass when its continuation reenters the
+gate, discard superseded continuations, and cancel pending decisions on close.
+`ResourceBrowser` supports the same hook, including its first asynchronous
+listing before model publication. Provider identity and browser lifetime are
+checked again before a retained listing resumes.
+
+`BrowserViews.directory_resumer` is the optional counterpart for hosts that
+retain tree-expansion or column-selection continuations; it accepts
+`(path, resume=callback)`. Without it, existing one-argument directory handlers
+retain their routing behavior. History positions commit with the displayed
+directory, so a deferred or cancelled Back/Forward request keeps the old position.
+
 The column view installs its preview before its model. On Qt 6.11+ it applies
 the native preview visibility switch only after attaching a model, avoiding
 Qt 6.12's null-model crash during construction. Earlier Qt versions retain
@@ -26,6 +42,17 @@ The next event turn permits a fresh nanosecond stat; explicit
 `object_for_path()` calls still check immediately. Registry revisions invalidate
 resolved types immediately, and sort roles use the filesystem model's native
 size/date/name values without constructing a file object for every comparison.
+Sort comparisons also retain bounded per-row values and natural-name keys using
+persistent model indexes. Insertions preserve existing row keys; changed rows,
+removals, resets, layouts and registry revisions invalidate the affected values
+before the proxy sorts. This avoids repeated Python role dispatch for each pair.
+
+Repeated filesystem notifications for the same path share one pending debounce
+batch. The browser reads index policy, filters exclusions and invalidates that
+path once while the batch timer is active. Distinct paths remain queued, and a
+later notification after the batch can request fresh reconciliation. This keeps
+large Windows file-creation bursts from repeatedly doing settings and path work
+on the GUI thread without suppressing later filesystem changes.
 
 To open a standalone browser at a specific folder, put commonUtils on the Python
 import path, install PySide6, and run this minimal script. Replace the example path

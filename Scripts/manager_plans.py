@@ -68,4 +68,5 @@ def make_plan(operation, target, backend, values, source, tools_env, origins, se
     return Plan('Blue Hole', operation, dict(source, destination='ispaure/BlueHole', channel='alpha',
                 test_suite=suite or 'full declared operation', focused_test_pattern=pattern, release_tag=values.get('release_tag','')), tuple(phases), str(ROOT / 'test-results/build-manager/workspace'),
                 effect='test' if operation == 'Check' else 'build', secret_environment=secrets,
+                resource_locks=(str(run / 'operation.lock'),),
                 settings=dict(values=tools_env, origins=dict(origins, BLUEHOLE_MANAGER_SOURCE='captured source identity')))
