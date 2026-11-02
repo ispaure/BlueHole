@@ -147,6 +147,8 @@ def main():
     parser.add_argument('--hosted', type=Path)
     parser.add_argument('--pattern', default='test*.py')
     args = parser.parse_args()
+    from Scripts.build_retention import enroll_preparation
+    enroll_preparation(args.output)
     args.junit.unlink(missing_ok=True)
     args.output.unlink(missing_ok=True)
     try:
