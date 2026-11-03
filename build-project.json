@@ -124,6 +124,9 @@
   "adapter_actions": [
     "plan",
     "settings",
-    "save_settings"
+    "save_settings",
+    "storage_inventory",
+    "delete_storage",
+    "storage_maintenance"
   ]
 }

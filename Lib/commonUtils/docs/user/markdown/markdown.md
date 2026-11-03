@@ -1,5 +1,10 @@
 # Reading and editing Markdown
 
+Opening a page or retracing page history shows loading feedback while the page
+is prepared. Native mobile wikis use a spinner and “Loading page…” caption;
+desktop readers use a busy cursor and a slim progress bar. The previous page
+remains visible until the replacement is ready, and failures clear the indicator.
+
 The shared Markdown reader opens local `.md` and `.markdown` documents with headings,
 links, images, tables and fenced code. It also supports local wiki-style links,
 Obsidian-style callouts and a limited YAML properties editor. It is a document
@@ -148,6 +153,14 @@ Prose dashes separate spoken words even when the document omits spaces, as in
 `Sumire—Never`. The cursor follows the separate source words. Compound hyphens,
 apostrophes and numeric ranges retain their original speech input; pronunciation
 still depends on the selected installed voice.
+
+Spaced `-` and prose `--` are treated as dashes, and invisible line-wrap hyphens
+are removed from speech. Question marks, exclamation marks, periods and ellipses
+remain available to the voice for pauses and intonation. Sentence queues keep
+closing quotes with their sentence and avoid splitting common abbreviations.
+Punctuation alone is not a highlighted word or a separate spoken passage.
+These adjustments affect speech only; the document and its selection positions
+are preserved.
 
 Playback stops when content is replaced, editing begins or the
 reader closes. Speech does not edit the file. If no engine/voice is available, the
