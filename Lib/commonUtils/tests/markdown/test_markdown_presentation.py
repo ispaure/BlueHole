@@ -22,6 +22,59 @@ from commonUtils.ui.appearance.theme import apply_theme, theme_palette, SLATE_DA
 
 
 class MarkdownPresentationTests(QtTestCase):
+    def test_video_controls_support_keyboard_seeks_without_feedback_and_match_accessibility_state(self):
+        from commonUtils.ui.markdown.videos import VideoCard
+        from PySide6.QtMultimedia import QMediaPlayer
+        from PySide6.QtTest import QTest
+        card = VideoCard(None, 'http://127.0.0.1:1/clip.mp4', '<clip>.mp4')
+        self.addCleanup(card.retire)
+        card.show()
+        self.assertFalse(card.seek.isEnabled())
+        self.assertEqual(card.seek.maximum(), 0)
+        self.assertEqual(card.status.textFormat(), qt.Qt.TextFormat.PlainText)
+        with patch.object(card.player, 'setPosition') as seek:
+            card.duration_changed(10000)
+            card.position_changed(5000)
+            seek.assert_not_called()
+            # Exercise the keyboard action even without a decoder fixture.
+            card.seek.setEnabled(True)
+            QTest.keyClick(card.seek, qt.Qt.Key.Key_Right)
+            self.assertGreater(card.seek.value(), 5000)
+            seek.assert_called_once_with(card.seek.value())
+        card.state_changed(QMediaPlayer.PlaybackState.PlayingState)
+        self.assertEqual(card.play.text(), 'Pause')
+        self.assertEqual(card.play.accessibleName(), 'Pause <clip>.mp4')
+        card.state_changed(QMediaPlayer.PlaybackState.PausedState)
+        self.assertEqual(card.play.accessibleName(), 'Play <clip>.mp4')
+
+    def test_video_wiki_filename_with_hash_is_encoded_and_source_is_preserved(self):
+        source = '![[clip #1.mp4]]\n'
+        viewer = self.viewer(source)
+        block = viewer.browser.document().begin()
+        fragment = block.begin().fragment()
+        self.assertTrue(fragment.charFormat().isImageFormat())
+        self.assertEqual(fragment.charFormat().toImageFormat().name(), 'clip%20%231.mp4')
+        self.assertEqual(viewer.markdown_text(), source)
+
+    def test_heading_links_keep_heading_size_and_navigation(self):
+        viewer = self.viewer('# # [[Art]]\n\n# # [[Tech]]\n\nOrdinary text\n')
+        document = viewer.browser.document()
+        block = document.begin()
+        while block.isValid():
+            if block.blockFormat().headingLevel():
+                iterator = block.begin()
+                sizes = []
+                while not iterator.atEnd():
+                    fragment = iterator.fragment()
+                    if fragment.isValid():
+                        font = fragment.charFormat().font().resolve(document.defaultFont())
+                        sizes.append(qt.QFontMetricsF(font).height())
+                    iterator += 1
+                self.assertGreater(min(sizes), qt.QFontMetricsF(document.defaultFont()).height() * 1.5)
+            block = block.next()
+        self.assertIn('Art.md', viewer.browser.toHtml())
+        self.assertEqual(viewer.markdown_text(), '# # [[Art]]\n\n# # [[Tech]]\n\nOrdinary text\n')
+
     @classmethod
     def setUpClass(cls):
         cls.app = qt.QApplication.instance() or qt.QApplication([])

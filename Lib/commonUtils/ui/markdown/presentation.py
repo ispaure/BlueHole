@@ -71,6 +71,24 @@ def style_document(document, palette, *, callouts=None):
             fmt.setBottomMargin(9)
         else:
             fmt.setBottomMargin(12)
+            # Qt's Markdown importer gives link fragments an explicit body
+            # size, overriding the heading's relative size adjustment.
+            size = document.defaultFont().pointSizeF()
+            iterator, fragments = block.begin(), []
+            while not iterator.atEnd():
+                fragment = iterator.fragment()
+                chars = fragment.charFormat()
+                chars.clearProperty(qt.QTextFormat.Property.FontSizeAdjustment)
+                chars.setFontPointSize((size if size > 0 else 12) *
+                                      (1.9, 1.6, 1.35, 1.2, 1.1, 1)[fmt.headingLevel() - 1])
+                chars.setFontWeight(qt.QFont.Weight.Bold)
+                fragments.append((fragment.position(), fragment.length(), chars))
+                iterator += 1
+            for position, length, chars in fragments:
+                heading = qt.QTextCursor(document)
+                heading.setPosition(position)
+                heading.setPosition(position + length, qt.QTextCursor.MoveMode.KeepAnchor)
+                heading.setCharFormat(chars)
         fmt.setLineHeight(145, qt.QTextBlockFormat.LineHeightTypes.ProportionalHeight.value)
         if depth:
             callout = active.get(depth)
@@ -376,6 +394,12 @@ def tables(frame):
 
 class MarkdownBrowser(qt.QTextBrowser):
     """Native selectable text with slim quote/callout accent rules."""
+    def mouseMoveEvent(self, event):
+        super().mouseMoveEvent(event)
+        self.viewport().setCursor(qt.Qt.CursorShape.PointingHandCursor
+                                  if self.anchorAt(event.position().toPoint())
+                                  else qt.Qt.CursorShape.IBeamCursor)
+
     def update_reading_width(self):
         """Center a readable text measure while allowing narrow windows to wrap."""
         document = self.document()
@@ -399,6 +423,10 @@ class MarkdownBrowser(qt.QTextBrowser):
         loader = getattr(self, 'resource_loader', None)
         if loader is not None:
             return loader(kind, url)
+        from .images import local_image_resource
+        image = local_image_resource(kind, url, self.document().baseUrl())
+        if image is not None:
+            return image
         return super().loadResource(kind, url)
 
     def paintEvent(self, event):

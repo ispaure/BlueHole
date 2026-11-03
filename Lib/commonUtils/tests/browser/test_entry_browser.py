@@ -55,6 +55,25 @@ class EntryBrowserTests(QtTestCase):
     def setUp(self):
         self.app = qt.QApplication.instance() or qt.QApplication([])
 
+    def test_folder_picker_confirms_current_directory_without_a_filename(self):
+        from commonUtils.runtime.resources.local import LocalFiles
+        with self.temporary_directory() as temporary:
+            root = Path(temporary)
+            (root / 'folder').mkdir()
+            released = []
+            picker = ResourcePicker([('Local', lambda: (LocalFiles(root), lambda: released.append(True)))],
+                                    mode='folder', directory='folder')
+            picker.show()
+            self.wait_until(lambda: picker.browser is not None and not picker.browser.busy)
+            self.assertFalse(picker.name.isVisible())
+            picker.choose()
+            self.wait_until(lambda: picker.choice is not None)
+            self.assertEqual(picker.choice.path, 'folder')
+            self.assertEqual(released, [])
+            picker.choice.close()
+            self.assertEqual(released, [True])
+            picker.deleteLater()
+
     def test_provider_columns_and_readable_local_modified_dates(self):
         from datetime import datetime
         from commonUtils.filesystem import format_datetime
@@ -96,11 +115,24 @@ class EntryBrowserTests(QtTestCase):
         rows = browser.model.tree.entries
         identity = provider.root / 'folder/nested-note.txt'
         self.assertIn(identity, rows)
+        self.assertEqual([browser.model.headerData(i, qt.Qt.Orientation.Horizontal) for i in range(4)],
+                         ['Name', 'Type', 'Size', 'Path'])
+        index = browser.model.browse_index(identity)
+        self.assertEqual(index.data(), 'nested-note.txt')
+        self.assertEqual(index.siblingAtColumn(1).data(), 'TXT')
+        self.assertEqual(index.siblingAtColumn(3).data(), str(identity))
+        self.assertEqual(index.siblingAtColumn(3).data(qt.Qt.ItemDataRole.ForegroundRole),
+                         browser.palette().brush(qt.QPalette.ColorRole.PlaceholderText))
         opened = []
         browser.activated.connect(opened.append)
-        browser._activate(browser.model.browse_index(identity))
+        from PySide6.QtTest import QTest
+        point = browser.tree.visualRect(browser.model.browse_index(identity)).center()
+        QTest.mouseClick(browser.tree.viewport(), qt.Qt.MouseButton.LeftButton, pos=point)
+        QTest.mouseDClick(browser.tree.viewport(), qt.Qt.MouseButton.LeftButton, pos=point)
+        self.app.processEvents()
         self.assertEqual(opened, [identity])
         browser.close_search()
+        self.assertEqual(browser.model.columnCount(), 3)
         self.assertEqual(browser.tree.topLevelItemCount(), 3)
         browser.stop()
         self.wait_until(lambda: not browser.busy)
