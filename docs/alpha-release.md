@@ -120,3 +120,15 @@ subtree refresh. These portable import/signature/index fixtures complement the
 exact-copy check and do not establish live Blender acceptance. The manager's
 explicit consumer-acceptance plan can capture both selections alongside other
 consumers, with each checkout, interpreter and candidate path recorded.
+
+
+## Local package storage
+
+The manager cleanup dialog lists explicitly marked package preparations under
+`test-results/release/`. `Scripts/build_retention.py` owns this project's policy:
+three newest entries, seven days, a 4 GiB soft budget and a one-hour grace period.
+Active preparation locks, workflow holds and `.keep` pins protect retained work.
+Validation marks newly generated manager preparation folders; unclassified older
+evidence is preserved. The optional storage-maintenance adapter action runs after
+CLI/GUI execution releases its locks. The manager's Retained workflows tab can
+retire superseded runs without rewriting their outcomes or deleting their logs.

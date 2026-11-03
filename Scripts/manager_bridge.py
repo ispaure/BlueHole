@@ -37,6 +37,15 @@ def main():
         secrets=tuple(dict.fromkeys(('GH_TOKEN','GITHUB_TOKEN','FIREBASE_TOKEN',os.environ['BLUEHOLE_GITHUB_REFERENCE']))) if os.environ['BLUEHOLE_GITHUB_KIND'] in {'auto','environment-name'} else ('GH_TOKEN','GITHUB_TOKEN','FIREBASE_TOKEN')
         from Scripts.manager_plans import make_plan
         result=make_plan(operation,values['target'],values['backend'],values,source,tools_env,origins,secrets).data()
+    elif action=='storage_inventory':
+        from Scripts.build_retention import storage_inventory
+        result=storage_inventory(ROOT)
+    elif action=='delete_storage':
+        from Scripts.build_retention import delete_storage
+        result=delete_storage(values['selections'], ROOT)
+    elif action=='storage_maintenance':
+        from Scripts.build_retention import clean
+        result=dict(status='passed',removed=clean(ROOT,apply=True))
     elif action=='settings':
         result={'github.repository':dict(value='ispaure/BlueHole',origin='tracked alpha release policy',read_only=True),
                 'project.identity':dict(value='Blue Hole · Blender 5.2.2 alpha',origin='tracked project descriptor',read_only=True),
