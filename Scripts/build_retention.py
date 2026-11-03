@@ -12,7 +12,7 @@ def group(root=ROOT):
     def eligible(path):
         marker = path / MARKER
         return bool(re.fullmatch('[0-9a-f]{32}', path.name)) and marker.is_file() and not linked(marker)
-    return dict(root=Path(root) / 'test-results/release', eligible=eligible, lock_path=lambda p: p / 'operation.lock')
+    return dict(root=Path(root) / 'test-results/release', eligible=eligible, lock_path=lambda p: p / 'operation.lock', ownership_files=(MARKER,))
 
 
 def clean(root=ROOT, *, apply=False):

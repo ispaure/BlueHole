@@ -33,10 +33,11 @@ class ResourceBreadcrumbBar(BreadcrumbBar):
 class ResourceBrowser(qt.QWidget):
     activated = qt.Signal(object)
     directory_changed = qt.Signal(object)
+    renamed = qt.Signal(str, str)
     idle = qt.Signal()
     persistent_index = False
 
-    def __init__(self, provider: DirectoryProvider, parent=None, *, directory=None, actions=(), thumbnail=None, details=None, preview=True):
+    def __init__(self, provider: DirectoryProvider, parent=None, *, directory=None, actions=(), thumbnail=None, details=None, preview=True, path_label=None):
         super().__init__(parent)
         self.provider = provider
         self.directory_gate = None
@@ -44,6 +45,7 @@ class ResourceBrowser(qt.QWidget):
         self.operations.bind(provider)
         self.actions = tuple(actions)
         self.thumbnail = thumbnail
+        self.path_label = path_label
         self._queued_listings = deque()
         self._restoring = False
         self.navigation = SimpleNamespace(library=provider.root, directory=provider.root)
@@ -126,7 +128,7 @@ class ResourceBrowser(qt.QWidget):
         self.clear_search.activated.connect(self.close_search)
 
     def _build_provider_views(self, layout, provider):
-        self.model = ProviderEntryModel(provider, self, thumbnail=self._thumbnail)
+        self.model = ProviderEntryModel(provider, self, thumbnail=self._thumbnail, path_label=self.path_label)
         self.sort_model = ByteSortModel(self.model, self)
         self.tree = ProviderTree()
         self.tree.setModel(self.sort_model)
@@ -362,13 +364,26 @@ class ResourceBrowser(qt.QWidget):
         try:
             self.model.beginResetModel()
             self.model.tree = tree
+            self.model.search_results = flat
+            self.model.columns = self.model.search_columns(flat)
             self.model.flat_root = self.navigation.directory if flat else None
             self.model.pending.clear()
             self.model.filter_text = ''
             self.model.endResetModel()
+            self._configure_columns()
             self.views.set_root(self.navigation.directory)
         finally:
             self._restoring = False
+
+    def _configure_columns(self):
+        header = self.tree.header()
+        header.setStretchLastSection(False)
+        header.setSectionResizeMode(0, qt.QHeaderView.ResizeMode.Stretch)
+        for column in (1, 2):
+            header.setSectionResizeMode(column, qt.QHeaderView.ResizeMode.ResizeToContents)
+        if self.model.search_results:
+            header.setSectionResizeMode(3, qt.QHeaderView.ResizeMode.Interactive)
+            self.tree.setColumnWidth(3, 260)
 
     def _filter(self, *_):
         self.search_timer.stop()
@@ -496,6 +511,8 @@ class ResourceBrowser(qt.QWidget):
             self.mutate(lambda cancelled: create_resource_folder(self.provider, path, cancelled=cancelled))
 
     def _rename(self, row):
+        if self.busy or self.closing or not capabilities(self.provider).rename:
+            return
         name, accepted = qt.QInputDialog.getText(self, 'Rename', 'New name:', text=row['name'])
         if accepted and name:
             from ...runtime.resources.paths import resource_path
@@ -507,7 +524,12 @@ class ResourceBrowser(qt.QWidget):
                 qt.QMessageBox.warning(self, 'Rename', str(error))
                 return
             target = '/'.join(p for p in (row['path'].rpartition('/')[0], name) if p)
-            self.mutate(lambda cancelled: rename_resource(self.provider, row['path'], target, cancelled=cancelled))
+            source, provider = row['path'], self.provider
+            def rename(cancelled):
+                rename_resource(provider, source, target, cancelled=cancelled)
+                # Notify after commit even if the following listing fails.
+                self.renamed.emit(source, target)
+            self.mutate(rename)
 
     def _delete(self, row):
         if qt.QMessageBox.question(self, 'Delete permanently',

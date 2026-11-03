@@ -14,6 +14,20 @@ from commonUtils.ui.native.markdown_preview import markdown_preview
 
 
 class NativeMarkdownTests(unittest.TestCase):
+    def test_video_embeds_use_only_host_supplied_loopback_transport(self):
+        source = lambda target: ('video/mp4', 'http://127.0.0.1:43210/capability/video.mp4')
+        html = markdown_preview('![[potato.mp4]]\n\n`![[literal.mp4]]`', image_source=source)
+        self.assertEqual(html.count('<video '), 1)
+        self.assertIn('controls playsinline preload="none"', html)
+        self.assertIn('media-src http://127.0.0.1:*', html)
+        self.assertNotIn('<video ', markdown_preview('![[potato.mp4]]',
+            image_source=lambda target: ('video/mp4', 'https://example.com/video.mp4')))
+
+    def test_wiki_links_remain_inside_headings(self):
+        html = markdown_preview('# # [[Art]]\n\n# # [[Tech]]', local_links=True)
+        self.assertIn('<h1 id="art"># <a href="Art">Art</a></h1>', html)
+        self.assertIn('<h1 id="tech"># <a href="Tech">Tech</a></h1>', html)
+
     def test_host_supplied_images_are_opt_in_and_cannot_inject_markup(self):
         calls = []
         def image(target):
@@ -233,6 +247,19 @@ with TemporaryDirectory() as temporary:
     wiki.back()
     wiki.follow_link(wiki.web, '../../outside.md')
     assert wiki.path == folder / 'test.md'
+    literal, decoded = folder / 'Two%20Words.md', folder / 'Two Words.md'
+    literal.write_text('# Literal')
+    wiki.follow_link(wiki.web, 'Two%20Words.md#literal')
+    assert wiki.path == literal
+    wiki.back()
+    decoded.write_text('# Decoded')
+    wiki.follow_link(wiki.web, 'Two%20Words.md#decoded')
+    assert wiki.path == decoded
+    wiki.back()
+    wiki.follow_link(wiki.web, 'Two%2520Words.md')
+    assert wiki.path == literal
+    wiki.back()
+
     wiki.back()
     index = wiki.history_index
     (folder / 'test.md').unlink()

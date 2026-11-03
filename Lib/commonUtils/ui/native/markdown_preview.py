@@ -6,6 +6,7 @@ from urllib.parse import quote, urlsplit
 
 from markdown_it import MarkdownIt
 from ...formats.markdown.images import image_size, wiki_image
+from ...formats.markdown.image_sources import image_failure_reason
 
 _ALIAS = re.compile(r'\[\[([^]\n|]+)(?:\|([^]\n]+))?\]\]|\[([^]\n|]+)\|([^]\n]+)\]')
 
@@ -30,11 +31,24 @@ def _alias(state, silent):
 
 def embedded_image(target, alt, image_source=None):
     """Render host-supplied raster bytes; never fetch a URL or open a path here."""
+    reason = ''
     if image_source is not None:
+        reason = 'Image not found, unsupported, or outside the allowed folder.'
         try:
             image = image_source(target)
             if image is not None:
                 mime, data = image
+                if mime.startswith('video/') and isinstance(data, str):
+                    url = urlsplit(data)
+                    if url.scheme != 'http' or url.hostname != '127.0.0.1' or not url.port or url.username or url.password:
+                        raise ValueError('Invalid embedded video transport.')
+                    caption, width, height = image_size(alt)
+                    dimensions = f' width="{width}"' if width else ''
+                    if height:
+                        dimensions += f' height="{height}"'
+                    return ('<video controls playsinline preload="none" aria-label="' + escape(caption, quote=True)
+                            + '" src="' + escape(data, quote=True) + '"' + dimensions
+                            + ' style="max-width:100%;height:auto">' + escape(caption) + '</video>')
                 if mime not in {'image/png', 'image/jpeg', 'image/webp', 'image/gif'} or not isinstance(data, bytes) or len(data) > 8 * 1024 * 1024:
                     raise ValueError('Invalid embedded image.')
                 caption, width, height = image_size(alt)
@@ -49,9 +63,10 @@ def embedded_image(target, alt, image_source=None):
                 style += ';vertical-align:middle'
                 encoded = base64.b64encode(data).decode('ascii')
                 return f'<img src="data:{mime};base64,{encoded}" alt="{escape(caption, quote=True)}"{dimensions} style="{style}">'
-        except (OSError, ValueError):
-            pass
-    return '<span class="image-alt">' + escape(alt) + '</span>'
+        except (OSError, ValueError) as error:
+            reason = image_failure_reason(error)
+    label = alt + (' — Image unavailable: ' + reason if reason else '')
+    return '<span class="image-alt">' + escape(label) + '</span>'
 
 
 def markdown_body(text, *, local_links=False, image_source=None):
@@ -115,7 +130,7 @@ def markdown_body(text, *, local_links=False, image_source=None):
         rendered = embedded_image(token.attrGet('src') or '', renderer.renderInlineAsText(token.children or [], options, env), image_source)
         image_bytes += len(rendered)
         if image_bytes > 22 * 1024 * 1024:
-            return embedded_image('', token.content)
+            return '<span class="image-alt">' + escape(token.content + ' — Image unavailable: Images exceed the preview output budget.') + '</span>'
         return rendered
 
     def table_open(renderer, items, index, options, env):
@@ -137,7 +152,7 @@ def markdown_preview(text, font_size=16, *, local_links=False, stylesheet="", im
     body = markdown_body(text, local_links=local_links, image_source=image_source)
     policy = "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"
     if image_source is not None:
-        policy += "; img-src data:"
+        policy += "; img-src data:; media-src http://127.0.0.1:*"
     result = ('<!doctype html><html><head><meta charset="utf-8">'
             f'<meta http-equiv="Content-Security-Policy" content="{policy}">'
             '<meta name="viewport" content="width=device-width, initial-scale=1">'
