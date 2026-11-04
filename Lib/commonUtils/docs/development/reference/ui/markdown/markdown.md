@@ -337,3 +337,24 @@ literal fallback; access or provider-path rejection does not. Qt local image
 loaders return an empty image after a denied lookup so the default loader cannot
 bypass that result. Windows absolute images on a different drive retain their
 absolute path.
+
+## Native voice availability
+
+`ui.native.speech.NativeSpeech` enumerates installed offline voices and chooses
+the platform default when a requested voice label is absent. Android rejects
+network-required/uninstalled voice entries. If `setVoice` rejects a previously
+listed voice at playback time, the adapter refreshes its inventory (discarding
+stale entries) and retries the installed system default once. If no offline default
+can be selected, it reports the existing unavailable-voice error. Settings hosts
+should discover voices on entry and close the discovery engine afterward.
+
+Apple speech service creation and voice enumeration run on an executor because
+system TextToSpeech initialization can synchronously wait for async service setup.
+Readiness and delegate attachment are published on the app loop. Closing during
+initialization keeps readiness false and retires a late synthesizer instead of
+reviving the engine; discovery consumers retain their existing bounded readiness
+wait and unavailable-voice feedback.
+
+Apple speech initialization reports an actionable error after twelve seconds if the
+system service does not return. Closed or expired engines discard late native
+results, and discovery never waits on the UI thread.
