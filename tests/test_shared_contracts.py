@@ -20,7 +20,7 @@ BLENDER_PROPERTIES = {'BoolProperty', 'BoolVectorProperty', 'CollectionProperty'
 
 def consumer_sources():
     return sorted(path for path in ROOT.rglob('*.py')
-                  if not set(path.relative_to(ROOT).parts) & {'Lib', 'tests', '.git', '.github', 'test-results'})
+                  if not set(path.relative_to(ROOT).parts) & {'Lib', 'tests', '.git', '.github', 'test-results', '.manager-tooling'})
 
 
 def module_name(path):
@@ -61,6 +61,19 @@ class SharedContractTests(unittest.TestCase):
         for name in tuple(sys.modules):
             if name not in cls.modules and (name == NAMESPACE or name.startswith(NAMESPACE + '.')):
                 sys.modules.pop(name, None)
+
+    def test_consumer_inventory_includes_addon_but_excludes_owned_manager_checkout(self):
+        from tempfile import TemporaryDirectory
+        from unittest.mock import patch
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            addon = root / 'operators/action.py'
+            sdk = root / '.manager-tooling/Python/build_manager/gui.py'
+            for path in (addon, sdk):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('from PySide6 import QtWidgets\n' if path == sdk else 'value = 1\n')
+            with patch.object(sys.modules[__name__], 'ROOT', root):
+                self.assertEqual(consumer_sources(), [addon])
 
     def test_shared_imports_attributes_and_call_signatures(self):
         for path in consumer_sources():
