@@ -358,6 +358,7 @@
     "Lib/commonUtils/ui/native/recycled_list.py",
     "Lib/commonUtils/ui/native/recycled_list_android.py",
     "Lib/commonUtils/ui/native/recycled_list_ios.py",
+    "Lib/commonUtils/ui/native/recycled_tree_ios.py",
     "Lib/commonUtils/ui/native/routes.py",
     "Lib/commonUtils/ui/native/sliders.py",
     "Lib/commonUtils/ui/native/speech.py",
