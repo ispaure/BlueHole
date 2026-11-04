@@ -70,11 +70,11 @@ UIKit cells use a 12-point leading gutter; the image
 point size reserves the icon slot without adding it again to the separator inset.
 Android retains the injected icon size and uses 6 dp between icon and text,
 with 4 dp between text and the contextual action target.
-Both platforms reserve 28 points/dp for the contextual button, with a 4-unit
-gap from the filename label to its bounds. UIKit cells reclaim the default
-accessory gutter after native layout. The button's touch area extends left over
-the end of the filename to retain a 48-by-48-unit target at the default row
-height; contextual actions take priority in that overlap.
+Both platforms reserve a square contextual button as wide as the row height
+(48 points/dp by default), with a 4-unit gap from the filename label. The glyph
+keeps its existing size. UIKit cells reclaim the default accessory gutter after
+native layout. Hit testing stays within the reserved slot, keeping filename
+and neighboring-row actions separate.
 iOS places the button 4 points from the trailing safe edge, increasing that to
 8 points for a scrollable list with a vertical scrollbar. Android uses a 4 dp
 row gutter plus a 2 dp gap outside the rows before its separately reserved scrollbar.
@@ -759,7 +759,9 @@ Collapsed controls stay alive and retain their values.
 label relative to its window (or explicit `reference`), with an explicit color.
 Only action groups in the same row constrain title width. `android_bar` returns
 (root, title, status), mounting controls returned by `native_control` and reserving
-symmetric title clearance. Hosts retain controls and own routes, privacy, status
+title clearance for the actual leading and trailing control counts.
+`android_title_insets` retains a title touch target while bounding a scrollable
+trailing action group on narrow displays. Hosts retain controls and own routes, privacy, status
 messages, fullscreen behavior, release and window/app assignment.
 
 ## Desktop-native message boxes
