@@ -1,6 +1,6 @@
 """Give every Qt test ownership of its windows and background workers."""
 
-from time import monotonic, sleep
+from time import monotonic
 from tempfile import TemporaryDirectory
 from concurrent.futures import Future, ThreadPoolExecutor
 from threading import Lock
@@ -9,9 +9,11 @@ import unittest
 import os
 import sys
 import gc
+import traceback
 from pathlib import Path
 
 from commonUtils.ui import pyside as qt
+from PySide6.QtTest import QTest
 from shiboken6 import isValid
 
 
@@ -73,6 +75,18 @@ class _QtTemporaryDirectory(TemporaryDirectory):
 
 
 class QtTestCase(unittest.TestCase):
+    def _dispatch_qt(self, callback, *args):
+        try:
+            return callback(*args)
+        except Exception:
+            # PySide may propagate a native callback failure directly rather
+            # than send it to sys.excepthook. Keep both paths under the same
+            # case ownership and finish retirement before reporting failures.
+            record = getattr(self, '_record_callback_error', None)
+            if record is None:
+                raise
+            record(*sys.exc_info())
+
     def temporary_directory(self, **kwargs):
         """TemporaryDirectory-compatible scope, also safe for addCleanup fixtures.
 
@@ -91,19 +105,39 @@ class QtTestCase(unittest.TestCase):
         app = qt.QApplication.instance()
         while True:
             if app:
-                app.processEvents()
+                self._dispatch_qt(app.processEvents)
                 if drain_deferred:
-                    app.sendPostedEvents(None, qt.QEvent.Type.DeferredDelete)
+                    self._dispatch_qt(app.sendPostedEvents, None, qt.QEvent.Type.DeferredDelete)
+            check_callbacks = getattr(self, '_check_callback_errors', None)
+            if check_callbacks is not None and not getattr(self, '_releasing_windows', False):
+                check_callbacks()
             if condition():
                 return
             self.assertLess(monotonic(), deadline, message() if callable(message) else message)
-            sleep(.005)
+            # Native browser/decoder callbacks need a real Qt event-loop turn,
+            # not just processEvents followed by a blocked GUI thread.
+            self._dispatch_qt(QTest.qWait, 5)
 
     def run(self, result=None):
+        callback_errors = []
+        def callback_failed(kind, value, trace):
+            callback_errors.append(''.join(traceback.format_exception(kind, value, trace)))
+        def check_callbacks():
+            errors = callback_errors[:]
+            callback_errors.clear()
+            self.assertFalse(errors, 'Unhandled Qt callback exception(s):\n' + '\n'.join(errors))
+        # Register first so this assertion runs after widget/worker cleanup too.
+        self.addCleanup(check_callbacks)
+        self.enterContext(patch.object(self, '_record_callback_error', callback_failed, create=True))
+        self.enterContext(patch.object(self, '_check_callback_errors', check_callbacks, create=True))
+        self.enterContext(patch.object(sys, 'excepthook', callback_failed))
         app = qt.QApplication.instance()
         if app is None:
             app = QtTestCase._test_app = qt.QApplication([])
         _load_windows_test_fonts(app)
+        if sys.platform == 'darwin' and qt.QApplication.platformName() == 'offscreen':
+            # macOS has Helvetica; avoid resolving Qt's missing Sans Serif alias.
+            app.setFont(qt.QFont('Helvetica'))
         existing = set(app.topLevelWidgets()) if app else set()
         if app:
             palette, stylesheet, font = app.palette(), app.styleSheet(), app.font()
@@ -117,6 +151,12 @@ class QtTestCase(unittest.TestCase):
         return super().run(result)
 
     def _release_windows(self, existing):
+        # Report callback errors after retirement; they must not interrupt the
+        # cleanup of other widgets or leave worker-owned files open.
+        with patch.object(self, '_releasing_windows', True, create=True):
+            self._release_window_resources(existing)
+
+    def _release_window_resources(self, existing):
         app = qt.QApplication.instance()
         if app is None:
             return
@@ -171,8 +211,8 @@ class QtTestCase(unittest.TestCase):
             if isValid(window):
                 capture_futures(window)
                 window.deleteLater()
-        app.sendPostedEvents(None, qt.QEvent.Type.DeferredDelete)
-        app.processEvents()
+        self._dispatch_qt(app.sendPostedEvents, None, qt.QEvent.Type.DeferredDelete)
+        self._dispatch_qt(app.processEvents)
         self.wait_until(lambda: all(future.done() for future in futures),
                         message='Executor tasks did not finish after Qt owner destruction')
         # Signal/callback cycles can retain wrappers after their C++ widgets die.
