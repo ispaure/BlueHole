@@ -225,7 +225,7 @@ def assignments(layout, current, preview, query, *, side_by_side, search_keys=Fa
             matches = find(' '.join((ops.command_name(current, row['command']), operator, event,
                                      scope, owner, catalog['sections'][row['section']]['label'])), query)
         if matches:
-            found.append((id_, command, event, scope, owner))
+            found.append((id_, command, event, scope, meta))
     if found:
         listing, detail = detail_columns(layout, side_by_side)
         shown = paginate(listing, current, found)
@@ -235,16 +235,20 @@ def assignments(layout, current, preview, query, *, side_by_side, search_keys=Fa
             heading = listing.split(factor=ASSIGNMENT_SOURCE_SPLIT, align=True)
             heading.label(text='Assignment')
             heading.label(text='Source')
-        for id_, command, event, scope, owner in shown:
+        for id_, command, event, scope, meta in shown:
             item = listing.column(align=True)
             header = item.split(factor=ASSIGNMENT_SOURCE_SPLIT, align=True) if side_by_side else item
             ops.operator_button(header, 'assignment', command, id_, depress=id_ == current.assignment)
             summary = f'{event}  ·  {scope}'
+            owner = meta['owner']
+            waiting = meta['availability'] == 'waiting_for_provider'
             if side_by_side:
-                header.label(text=owner)
+                header.label(text=owner, icon='ERROR' if waiting else 'NONE')
             else:
                 summary = f'{owner}  ·  {summary}'
             item.label(text=summary)
+            if waiting:
+                item.label(text=STATUS_LABELS['waiting_for_provider'], icon='ERROR' if not side_by_side else 'NONE')
         inspector(detail.box().column(align=True), current, preview, current.assignment)
     else:
         current.assignment = ''

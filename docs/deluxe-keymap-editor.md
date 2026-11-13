@@ -14,7 +14,7 @@ category and section menus browse one section at a time when search is empty.
   state. **View Commands** and **View Assignments** switch between views for
   that section. Select **Key-Binding** in Assignments to type a shortcut such
   as `Shift F10` or `Ctrl Shift A`. Use **Name** to search by command name,
-  operator ID, or keymap.
+  operator ID, keymap, or add-on source such as `Zen UV`.
 - Click the key in the detail pane to capture a new key for that assignment.
   Expand **Linked assignments** to see the contexts affected by **Capture for
   All**. Escape cancels capture. The pane places the key, event phase,
@@ -41,7 +41,10 @@ category and section menus browse one section at a time when search is empty.
   Boolean, integer, float, string, enum, enum-flag and fixed numeric array
   controls follow the resolver's RNA metadata. Flag and array controls edit
   one member at a time. Menu/tool routes and provider-managed values are
-  read-only. A missing provider leaves its assignments and settings visible.
+  read-only. Add-on commands stay in their workflow sections. When Blender
+  has no matching operator, the list shows **Waiting for add-on** and Deluxe
+  leaves the shortcut unregistered. The saved choice remains available for
+  when the operator loads.
 - **Disable Existing Shortcut** opens the live binding picker for the selected
   section. Choose the source and search by command, key or keymap. Review the
   selected row's event and properties before staging it. The existing proved
