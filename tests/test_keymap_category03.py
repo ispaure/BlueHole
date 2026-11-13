@@ -851,6 +851,43 @@ class Category03NativeReceiptTests(unittest.TestCase):
                 self.assertTrue(new['is_user_modified'])
         self.assertEqual(changes, 1)
 
+    def test_matched_editor_guard_preserves_exact_endpoints_and_unknowns(self):
+        run = self.runs['editor_probe-1794550412457976000']
+        self.assertEqual(run['native_status'], 'complete')
+        endpoints = run['editor_matched_endpoints']['endpoints']
+        self.assertEqual([value['label'] for value in endpoints],
+                         ['before_owned_probe', 'after_first_release', 'after_second_release'])
+        baseline = endpoints[0]
+        for value in endpoints:
+            self.assertEqual(value['context'], baseline['context'])
+            self.assertTrue(value['window_delivered'])
+            self.assertTrue(value['stable_sources'])
+            self.assertTrue(value['stable_merged'])
+            self.assertFalse(value['missing_relevant_targets'])
+            self.assertFalse(value['relevant_target_unknowns'])
+            self.assertEqual(len(value['readable_foreign_sentinels']), 4)
+            self.assertTrue(all(not entry['row']['read_issues']
+                                for entry in value['readable_foreign_sentinels']))
+            self.assertEqual(value['source'], baseline['source'])
+            self.assertEqual(value['foreign_merged'], baseline['foreign_merged'])
+            self.assertEqual(value['unknown_properties'], baseline['unknown_properties'])
+            self.assertEqual(len(value['unknown_properties']), 40)
+        for value in endpoints[1:]:
+            self.assertTrue(value['strict_sources_equal'])
+            self.assertTrue(value['strict_foreign_merged_equal'])
+        proof = run['editor_handler_proof']
+        self.assertTrue(proof['foreign_source_fields_and_order_unchanged'])
+        self.assertFalse(proof['complete_property_comparison'])
+        self.assertEqual(len(proof['installations']), 2)
+        self.assertEqual(len(proof['releases']), 2)
+        installed = [case for case in run['dispatch'] if case['stage'] == 'installed']
+        self.assertEqual(len(installed), 8)
+        for case in installed:
+            self.assertTrue(case['probe_poll'])
+            self.assertTrue(case['selection_changed'])
+            self.assertFalse(case['view_changed'])
+            self.assertEqual([call['target'] for call in case['callbacks']], [case['target']])
+
 
 class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
     def setUp(self):
@@ -1200,7 +1237,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.assertEqual(len(existing), 52)
         extensions = self.manifest['reviewed_existing_declarations'][UV_BRACKETS]['bindings']
         self.assertEqual(set(extensions), {'SELECTION_UV_SELECT_MORE', 'SELECTION_UV_SELECT_LESS'})
-        self.assertEqual(register.register(), 57)
+        self.assertEqual(register.register(), 59)
         draft_entries = self.manifest['ordinary_source_drafts']['groups']['selection_more_less']
         draft_bindings = {
             (id(getattr(more_less, symbol)), int(index))
@@ -1212,7 +1249,9 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             for index, _ in enumerate(action.keymap_bindings):
                 keymap, item = actual[next_index]
                 next_index += 1
-                if (id(action), index) in draft_bindings:
+                if ((id(action), index) in draft_bindings
+                        or action in (more_less.SELECTION_EDITOR_SELECT_MORE,
+                                      more_less.SELECTION_EDITOR_SELECT_LESS)):
                     continue
                 emitted = {
                     'scope': asdict(self.keymap_utils.capture_scope(keymap)),
@@ -1299,6 +1338,97 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.preferences.keymap.enable_keymaps = False
         self.assertEqual(register.register(), 0)
         self.assertEqual(self.addon_rows(), [])
+
+    def test_editor_guard_rows_use_only_exact_vertical_inputs_and_existing_toggle(self):
+        register = self.load_selection_register()
+        self.preferences.keymap.enable_keymaps = True
+        self.preferences.keymap.selection = types.SimpleNamespace(
+            enable_selection_keymaps=True, enable_selection_all_none=False,
+            enable_selection_circle=False, enable_selection_more_less=True,
+            enable_selection_tool_switch=False)
+        self.assertEqual(register.register(), 59)
+        rows = [(km, item) for km, item in register.registered_selection_keymaps
+                if item.idname.startswith('wm.bh_editor_select_')]
+        self.assertEqual(len(rows), 2)
+        for (keymap, item), direction, suffix in zip(rows, ('UP', 'DOWN'), ('more', 'less'), strict=True):
+            self.assertEqual(asdict(self.keymap_utils.capture_scope(keymap)),
+                             asdict(self.keymap_utils.KeymapScope('View2D', 'EMPTY', 'WINDOW')))
+            self.assertEqual(asdict(self.keymap_utils.capture_event(item)),
+                             asdict(self.keymap_utils.KeymapEvent('WHEEL' + direction + 'MOUSE',
+                                                                 shift=True, map_type='MOUSE')))
+            self.assertEqual(item.idname, 'wm.bh_editor_select_' + suffix)
+            self.assertEqual(dict(item.properties), {})
+        self.preferences.keymap.selection.enable_selection_more_less = False
+        self.assertEqual(register.register(), 0)
+        self.assertEqual(self.addon_rows(), [])
+
+    def test_editor_guards_respect_exact_context_and_underlying_poll(self):
+        self.stub('.operators', path='operators')
+        self.runtime.bpy.types.Operator = type('Operator', (), {})
+        operators = {}
+        for namespace, names in {
+            'action': ('select_more', 'select_less'), 'graph': ('select_more', 'select_less'),
+            'node': ('select_linked_to', 'select_linked_from'),
+            'sequencer': ('select_more', 'select_less'),
+        }.items():
+            for name in names:
+                operator = Mock(return_value={'FINISHED'})
+                operator.poll = Mock(return_value=True)
+                operators[namespace + '.' + name] = operator
+        self.runtime.bpy.ops = types.SimpleNamespace(**{
+            namespace: types.SimpleNamespace(**{name.split('.')[1]: operator
+                                                for name, operator in operators.items()
+                                                if name.startswith(namespace + '.')})
+            for namespace in ('action', 'graph', 'node', 'sequencer')})
+        module = self.load('operators.selection_more_less_ops')
+
+        def context(area_type, *, mode='DOPESHEET', ui_type='', tree=None,
+                    view_type='SEQUENCER', region='WINDOW'):
+            area = types.SimpleNamespace(type=area_type, ui_type=ui_type,
+                                         spaces=types.SimpleNamespace(active=types.SimpleNamespace(
+                                             mode=mode, edit_tree=tree, view_type=view_type)))
+            return types.SimpleNamespace(area=area, region=types.SimpleNamespace(type=region))
+
+        accepted = [
+            (context('DOPESHEET_EDITOR'), ('action.select_more', 'action.select_less')),
+            (context('GRAPH_EDITOR', mode='FCURVES'), ('graph.select_more', 'graph.select_less')),
+            (context('NODE_EDITOR', ui_type='CompositorNodeTree', tree=object()),
+             ('node.select_linked_to', 'node.select_linked_from')),
+            (context('SEQUENCE_EDITOR'), ('sequencer.select_more', 'sequencer.select_less')),
+        ]
+        for ctx, targets in accepted:
+            for cls, target in zip(module.classes, targets, strict=True):
+                with self.subTest(context=ctx.area.type, operator=cls.bl_idname):
+                    for operator in operators.values():
+                        operator.reset_mock()
+                        operator.poll.return_value = True
+                    self.assertTrue(cls.poll(ctx))
+                    self.assertEqual(cls().execute(ctx), {'FINISHED'})
+                    operators[target].assert_called_once_with('EXEC_DEFAULT')
+                    self.assertEqual(sum(operator.call_count for operator in operators.values()), 1)
+                    operators[target].reset_mock()
+                    operators[target].poll.return_value = False
+                    self.assertFalse(cls.poll(ctx))
+                    self.assertEqual(cls().execute(ctx), {'PASS_THROUGH'})
+                    operators[target].assert_not_called()
+
+        excluded = [context(name) for name in ('IMAGE_EDITOR', 'NLA_EDITOR', 'FILE_BROWSER', 'VIEW_3D')]
+        excluded.extend((context('DOPESHEET_EDITOR', mode='TIMELINE'),
+                         context('GRAPH_EDITOR', mode='DRIVERS'),
+                         context('NODE_EDITOR', ui_type='ShaderNodeTree', tree=object()),
+                         context('NODE_EDITOR', ui_type='CompositorNodeTree'),
+                         context('SEQUENCE_EDITOR', view_type='PREVIEW'),
+                         context('DOPESHEET_EDITOR', region='HEADER'),
+                         types.SimpleNamespace(area=None, region=None)))
+        for operator in operators.values():
+            operator.reset_mock()
+        for ctx in excluded:
+            for cls in module.classes:
+                self.assertFalse(cls.poll(ctx))
+                self.assertEqual(cls().execute(ctx), {'PASS_THROUGH'})
+        for operator in operators.values():
+            operator.assert_not_called()
+            operator.poll.assert_not_called()
 
     def load_transform_register(self):
         self.stub('.operators', path='operators')

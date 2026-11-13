@@ -40,6 +40,7 @@ PRODUCTION_PATHS = (
     'preferences/addon/keymaps/keymap_props_selection.py',
     'preferences/addon/keymaps/keymap_props_transform.py',
     'operators/box_xray_ops.py',
+    'operators/selection_more_less_ops.py', 'operators/operators_register.py',
     'keymaps/keymap_utils.py', 'keymaps/keymap_action_utils.py',
     'keymaps/keymaps_register.py', 'actions/operator_action.py', '__init__.py',
 )
@@ -105,7 +106,7 @@ def _run_session(args, root):
     if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
         environment['DELUXE_CATEGORY_ORDINARY_CLUSTER'] = getattr(args, 'ordinary_cluster', 'axis')
         environment['DELUXE_CATEGORY_INVERT_ZOOM'] = str(getattr(args, 'invert_zoom', None))
-    if args.mode in ('editor_observe', 'editor_probe'):
+    if args.mode in ('editor_observe', 'editor_probe', 'editor_production'):
         environment['DELUXE_CATEGORY_EDITOR_CLUSTER'] = getattr(args, 'editor_cluster', 'selection')
         environment['DELUXE_CATEGORY_EDITOR_INPUT_CONTROLS'] = '1' if getattr(args, 'editor_input_controls', False) else '0'
         environment['DELUXE_CATEGORY_EDITOR_PRIME_READINESS'] = '1' if getattr(args, 'editor_prime_readiness', False) else '0'
@@ -142,7 +143,7 @@ def _run_session(args, root):
     if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_ordinary.py', root / 'ordinary-fixture.py')
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
-    if args.mode in ('editor_observe', 'editor_probe'):
+    if args.mode in ('editor_observe', 'editor_probe', 'editor_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_editors.py', root / 'editor-fixture.py')
     policy = root / 'confinement.sb'
     policy.write_text('(version 1)\n(allow default)\n(deny network*)\n(deny file-write*)\n'
@@ -1233,6 +1234,21 @@ def native_main(root, mode):
         return {'scope': captured['scope'], 'row': next(row for row in captured['items']
                                                        if row['blender_id'] == item.id)}
 
+    def uv_repeat_item_fields(keymap, item):
+        values = {}
+        for field in ('id', 'idname', 'type', 'value', 'active', 'repeat',
+                      'is_user_modified', 'is_user_defined'):
+            try:
+                values[field] = getattr(item, field)
+            except (AttributeError, ReferenceError, RuntimeError) as error:
+                values[field] = {'read_error': type(error).__name__}
+        try:
+            values['map_is_user_modified'] = keymap.is_user_modified
+            values['item_pointer'] = item.as_pointer()
+        except (ReferenceError, RuntimeError) as error:
+            values['wrapper_error'] = type(error).__name__
+        return values
+
     def uv_repeat_install():
         request = rt.KeymapAssignment(
             'uv-repeat-g', rt.KeymapScope('UV Editor', 'EMPTY', 'WINDOW'),
@@ -1294,28 +1310,51 @@ def native_main(root, mode):
     def uv_repeat_save():
         keymap, item = uv_repeat_matches()[0]
         source_before = uv_repeat_owned_source()
+        evidence = {
+            'event': 'F20/PRESS', 'repeat': True, 'active': False,
+            'immediate_save': False, 'layer': 'owned merged user item',
+            'actual_before_edit': uv_repeat_item_fields(keymap, item),
+            'owned_source_before': source_before,
+        }
+        receipt['uv_repeat_probe']['saved_edit'] = evidence
         item.type = 'F20'
         item.active = False
+        evidence['actual_before_save'] = uv_repeat_item_fields(keymap, item)
         # Save in the same callback, before the lifecycle watcher gets a tick.
-        bpy.ops.wm.save_userpref()
+        evidence['save_result'] = sorted(bpy.ops.wm.save_userpref())
+        evidence['immediate_save'] = True
+        evidence['held_wrapper_after_save'] = uv_repeat_item_fields(keymap, item)
         saved = root / 'saved-cases'
         saved.mkdir()
         shutil.copyfile(root / 'config/userpref.blend', saved / 'userpref.blend')
         source_after = uv_repeat_owned_source()
+        evidence['owned_source_after'] = source_after
+        evidence['owned_source_unchanged'] = source_after == source_before
+        record('uv_repeat_immediate_save_recorded')
         assert source_after == source_before, 'Merged edit unexpectedly changed the owned addon source'
-        assert item.is_user_modified and item.type == 'F20' and not item.active and item.repeat
+        # Saving may rebuild the merged map. Reacquire from the exact scope and
+        # target after an explicit update rather than trusting an old RNA wrapper.
+        configs.update()
+        matches = uv_repeat_matches()
+        evidence['merged_matches_after_update'] = len(matches)
+        record('uv_repeat_saved_map_updated')
+        assert len(matches) == 1
+        keymap, item = matches[0]
+        actual = uv_repeat_item_fields(keymap, item)
+        evidence['reacquired_after_update'] = actual
+        evidence['map_is_user_modified_after_edit'] = keymap.is_user_modified
+        record('uv_repeat_saved_item_reacquired')
+        assert actual['type'] == 'F20', actual
+        assert actual['value'] == 'PRESS', actual
+        assert actual['active'] is False, actual
+        assert actual['repeat'] is True, actual
+        assert actual['is_user_modified'] is True, actual
         manifest = {'owner': 'category03:uv-repeat-probe', 'request_id': 'uv-repeat-g',
                     'preference_sha256': sha(saved / 'userpref.blend'),
                     'declared_source': source_before,
                     'expected_edit': {'event': 'F20/PRESS', 'active': False, 'repeat': True}}
         (saved / 'uv-repeat-expected.json').write_text(json.dumps(manifest, indent=2) + '\n')
-        receipt['uv_repeat_probe']['saved_edit'] = {
-            'event': 'F20/PRESS', 'repeat': True, 'active': False,
-            'immediate_save': True, 'layer': 'owned merged user item',
-            'map_is_user_modified_after_edit': keymap.is_user_modified,
-            'owned_source_before': source_before, 'owned_source_after': source_after,
-            'owned_source_unchanged': True, 'saved_manifest': manifest,
-        }
+        evidence['saved_manifest'] = manifest
         uv_repeat_release()
         # The runtime should restore the saved override for this same owner.
         uv_repeat_install_edited()
@@ -1328,9 +1367,17 @@ def native_main(root, mode):
         state['uv_repeat_handle'] = rt.register_feature('category03:uv-repeat-probe', assignments=(request,))
         configs.update()
         matches = uv_repeat_matches()
+        receipt['uv_repeat_probe']['restoration_match_count'] = len(matches)
         assert len(matches) == 1
         keymap, item = matches[0]
-        assert item.type == 'F20' and not item.active and item.repeat and item.is_user_modified
+        actual = uv_repeat_item_fields(keymap, item)
+        receipt['uv_repeat_probe']['restoration_actual_item'] = actual
+        record('uv_repeat_restoration_item_observed')
+        assert actual['type'] == 'F20', actual
+        assert actual['value'] == 'PRESS', actual
+        assert actual['active'] is False, actual
+        assert actual['repeat'] is True, actual
+        assert actual['is_user_modified'] is True, actual
         owned_source = uv_repeat_owned_source()
         expected_source = (state['uv_repeat_incoming_manifest']['declared_source']
                            if mode == 'uv_g_reopen' else receipt['uv_repeat_probe']['saved_edit']['owned_source_before'])
@@ -1712,6 +1759,85 @@ def native_main(root, mode):
             steps, receipt, record, window, area, exporter, probe=mode == 'ordinary_probe',
             cluster=os.environ.get('DELUXE_CATEGORY_ORDINARY_CLUSTER', 'axis'), invert_zoom=inversion,
             ledger_path=root / 'ordinary-ledger.jsonl').append()
+    elif mode == 'editor_production':
+        helper = load_file('category03_editor_fixture', root / 'editor-fixture.py')
+        cluster = os.environ.get('DELUXE_CATEGORY_EDITOR_CLUSTER', 'selection')
+        fixture = helper.EditorCases(steps, receipt, record, window, area, exporter,
+                                     cluster=cluster, matched_endpoints=True, input_controls=True)
+        state['editor_fixture'] = fixture
+        def production_editor_setup():
+            prefs.keymap.selection.enable_selection_more_less = False
+            prefs.keymap.selection.enable_selection_all_none = False
+            prefs.keymap.selection.enable_selection_circle = False
+            prefs.keymap.selection.enable_selection_tool_switch = False
+            set_groups(False, True, False)
+            module = next(module for module in addon.operators_register.OPERATOR_MODULES
+                          if module.__name__.endswith('.selection_more_less_ops'))
+            codes = {module.WM_OT_BH_editor_select_more.execute.__code__: 'UP',
+                     module.WM_OT_BH_editor_select_less.execute.__code__: 'DOWN'}
+            previous = sys.getprofile()
+            state['previous_profile'] = previous
+            def observe(frame, event, argument):
+                if event == 'call' and frame.f_code in codes:
+                    direction = codes[frame.f_code]
+                    context = frame.f_locals['context']
+                    kind = fixture.guarded_kind(context)
+                    fixture.callbacks.append({'direction': direction,
+                                              'target': helper.TARGETS[kind][direction][0] if kind else None,
+                                              'operator': 'wm.bh_editor_select_' + ('more' if direction == 'UP' else 'less')})
+                if previous is not None:
+                    previous(frame, event, argument)
+            sys.setprofile(observe)
+        steps.append(production_editor_setup)
+        fixture.append_matched_endpoint('before_production_guard')
+        steps.append(fixture.start)
+        def production_editor_metadata():
+            fixture.state['stage'] = 'production_guarded_editor'
+            fixture.state['production_operators'] = ['wm.bh_editor_select_more', 'wm.bh_editor_select_less']
+        steps.append(production_editor_metadata)
+        kinds = tuple(helper.TARGETS) if cluster == 'selection' else helper.PASSTHROUGH
+        for kind in kinds:
+            fixture.case(kind, 'UP', 'before_install', direct=False)
+        def production_editor_on():
+            prefs.keymap.selection.enable_selection_more_less = True
+            kmreg.refresh()
+            configs.update()
+            selected = [row for row in owned_rows()['selection']
+                        if row['idname'] in fixture.state['production_operators']]
+            assert len(selected) == 2
+            observed = []
+            for direction, target in zip(('UP', 'DOWN'), fixture.state['production_operators']):
+                expected = {**fixture.exact_descriptor(direction), 'target': target}
+                matches = [row for keymap in configs.user.keymaps
+                           if all(getattr(keymap, field, None) == value
+                                  for field, value in helper.PROBE_SCOPE.items())
+                           for row in exporter._capture_map(keymap, bpy.types.OperatorProperties)['items']
+                           if row['target'] == target]
+                assert len(matches) == 1 and fixture.exact_row(matches[0], expected)
+                observed.append({'scope': helper.PROBE_SCOPE, 'row': matches[0]})
+            fixture.state['installations'].append({'production': True, 'exact_guard_rows': observed})
+            record('production_editor_guard_enabled')
+        steps.append(production_editor_on)
+        for kind in kinds:
+            for direction in ('UP', 'DOWN'):
+                fixture.case(kind, direction, 'installed', direct=cluster == 'selection')
+        def production_editor_off():
+            prefs.keymap.selection.enable_selection_more_less = False
+            kmreg.refresh()
+            configs.update()
+            assert not any(item.idname in fixture.state['production_operators']
+                           for keymap in configs.user.keymaps for item in keymap.keymap_items)
+            fixture.state['releases'].append({'production': True, 'merged_probe_rows_absent': True,
+                                             'immediate_source': fixture.source_maps()})
+            record('production_editor_guard_disabled')
+        steps.append(production_editor_off)
+        fixture.append_matched_endpoint('after_first_production_release')
+        fixture.case(kinds[0], 'UP', 'after_release', direct=False)
+        steps.append(production_editor_on)
+        fixture.case(kinds[0], 'UP', 'reinstalled', direct=False)
+        steps.append(production_editor_off)
+        fixture.append_matched_endpoint('after_second_production_release')
+        steps.append(fixture.cleanup)
     elif mode in ('editor_observe', 'editor_probe'):
         steps.append(lambda: set_groups(False, mode == 'editor_observe', False))
         helper = load_file('category03_editor_fixture', root / 'editor-fixture.py')
@@ -1827,7 +1953,7 @@ def cli():
     parser.add_argument('--blender', type=Path, required=True)
     parser.add_argument('--profile-source', type=Path, help='Read-only protected input hashes; not loaded in factory cases')
     parser.add_argument('--provider-source', type=Path)
-    parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'selection', 'selection_failures',
+    parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
                                          'transform', 'image', 'persistence', 'reopen'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')

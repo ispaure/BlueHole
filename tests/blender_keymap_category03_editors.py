@@ -37,6 +37,9 @@ EDITOR_SCOPES = {
 CONTROL_SPACES = {
     'dopesheet': 'DOPESHEET_EDITOR', 'graph': 'GRAPH_EDITOR', 'node': 'NODE_EDITOR',
     'sequencer': 'SEQUENCE_EDITOR',
+    'image': 'IMAGE_EDITOR', 'nla': 'NLA_EDITOR', 'file_browser': 'FILE_BROWSER',
+    'timeline': 'DOPESHEET_EDITOR', 'sequencer_preview': 'SEQUENCE_EDITOR',
+    'node_without_tree': 'NODE_EDITOR',
 }
 CONTROL_KEYS = {'window': 'F21', 'editor': 'F22'}
 ERRORS = (AttributeError, KeyError, ReferenceError, RuntimeError, StopIteration,
@@ -52,8 +55,8 @@ class EditorCases:
 
         if cluster not in ('selection', 'passthrough'):
             raise ValueError('Unknown editor proof cluster')
-        if input_controls and (probe or cluster != 'selection'):
-            raise ValueError('Input controls require the read-only selection cluster')
+        if input_controls and probe:
+            raise ValueError('Input controls require reference or production observation')
         self.bpy, self.steps, self.receipt, self.record = bpy, steps, receipt, record
         self.window, self.area, self.exporter = window, area, exporter
         self.probe, self.cluster = probe, cluster
@@ -342,7 +345,7 @@ class EditorCases:
 
     def install_input_controls(self, kind):
         scopes = {'window': ('Window', 'EMPTY')}
-        if kind is not None:
+        if kind in EDITOR_SCOPES:
             scopes['editor'] = (EDITOR_SCOPES[kind], CONTROL_SPACES[kind])
         keys = {CONTROL_KEYS[label] for label in scopes}
         occupied = [
@@ -665,7 +668,8 @@ class EditorCases:
                 return
 
             def work():
-                for control_key in CONTROL_KEYS.values():
+                for label in row['input_controls']:
+                    control_key = CONTROL_KEYS[label]
                     self.event(control_key, 'PRESS', point=values['input_point'])
                     self.event(control_key, 'RELEASE', point=values['input_point'])
             attempt('native_keyboard_controls', work)
@@ -750,6 +754,9 @@ class EditorCases:
                         self.operator(self.exact_descriptor(direction)['target']).poll()
                         if self.owned else None
                     )
+                    if self.state.get('production_operators'):
+                        guard = self.state['production_operators'][DIRECTIONS.index(direction)]
+                        row['probe_poll'] = self.operator(guard).poll()
                 values['callbacks_before'] = len(self.callbacks)
                 row['before'] = values['read']()
                 row['view_before'] = self.view()

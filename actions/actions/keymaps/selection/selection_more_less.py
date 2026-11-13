@@ -253,6 +253,26 @@ SELECTION_SEQUENCER_SELECT_LESS = OperatorAction(
 # ----------------------------------------------------------------------------------------------------------------------
 # ACTION LIST
 
+# The higher-priority View2D handler reaches these exact vertical-wheel routes
+# only when the corresponding guarded editor selection operator can run.
+SELECTION_EDITOR_SELECT_MORE = OperatorAction(
+    operator='wm.bh_editor_select_more',
+    text='Grow Editor Selection',
+    keymap_bindings=(
+        KeymapBinding(keymap_name='View2D', space_type='EMPTY',
+                      key='WHEELUPMOUSE', shift=True),
+    ),
+)
+
+SELECTION_EDITOR_SELECT_LESS = OperatorAction(
+    operator='wm.bh_editor_select_less',
+    text='Shrink Editor Selection',
+    keymap_bindings=(
+        KeymapBinding(keymap_name='View2D', space_type='EMPTY',
+                      key='WHEELDOWNMOUSE', shift=True),
+    ),
+)
+
 SELECTION_MORE_LESS_ACTIONS: list[OperatorAction] = [
     SELECTION_DOPESHEET_SELECT_MORE,
     SELECTION_DOPESHEET_SELECT_LESS,
@@ -293,6 +313,9 @@ SELECTION_MORE_LESS_ACTIONS: list[OperatorAction] = [
 
     SELECTION_SEQUENCER_SELECT_MORE,
     SELECTION_SEQUENCER_SELECT_LESS,
+
+    SELECTION_EDITOR_SELECT_MORE,
+    SELECTION_EDITOR_SELECT_LESS,
 ]
 
 

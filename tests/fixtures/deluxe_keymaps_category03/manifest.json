@@ -344,8 +344,10 @@
         "owned_addon_run_id": "handler_probe-1794545957790082000",
         "readonly_reference_run_id": "reference-evidence-1794546022214537000",
         "dispatch_cases": [
-          "handler_circle_object_add", "handler_circle_object_subtract",
-          "handler_circle_uv_add", "handler_circle_uv_subtract"
+          "handler_circle_object_add",
+          "handler_circle_object_subtract",
+          "handler_circle_uv_add",
+          "handler_circle_uv_subtract"
         ],
         "observation": "Owned probe and copied reference matched selection counts in each case: Object 0 to 2 and 1 to 0, UV 0 to 4 and 64 to 60.",
         "production_verification": {
@@ -362,7 +364,10 @@
       "native_evidence": {
         "run_id": "selection-1794542407253275000",
         "dispatch_cases": [
-          "uv_select_all_ctrl", "uv_deselect_all_ctrl", "uv_select_all_cmd", "uv_deselect_all_cmd"
+          "uv_select_all_ctrl",
+          "uv_deselect_all_ctrl",
+          "uv_select_all_cmd",
+          "uv_deselect_all_cmd"
         ],
         "isolation_case": "selection_all_none_toggle_isolation"
       },
@@ -444,11 +449,17 @@
       "source": "actions/actions/keymaps/selection/selection_more_less.py",
       "intent_source": {
         "path": "overlays/deluxe/docs/Blue Hole Keymaps.md",
-        "lines": [174, 175]
+        "lines": [
+          174,
+          175
+        ]
       },
       "native_evidence": {
         "run_id": "selection-1794542407253275000",
-        "dispatch_cases": ["more_less_uv_RIGHT_BRACKET", "more_less_uv_LEFT_BRACKET"]
+        "dispatch_cases": [
+          "more_less_uv_RIGHT_BRACKET",
+          "more_less_uv_LEFT_BRACKET"
+        ]
       },
       "bindings": {
         "SELECTION_UV_SELECT_MORE": {
@@ -473,7 +484,11 @@
         "fixture": "native.json",
         "run_id": "transform-1794542483357451000",
         "context": "Object Mode",
-        "dispatch_cases": ["transform_W_shift", "transform_E_shift", "transform_R_shift"]
+        "dispatch_cases": [
+          "transform_W_shift",
+          "transform_E_shift",
+          "transform_R_shift"
+        ]
       },
       "accepted_full_user_rows": {
         "TRANSFORM_TOOL_CURVES_MOVE": "b4a63c8ec232616638ac3f01c4152134ad26a948e8aee3f0b8b852fd930acba5",
@@ -544,8 +559,11 @@
           }
         },
         "source": "actions/actions/keymaps/selection/selection_more_less.py",
-        "source_sha256": "0193ccc9d191ee9764cb1f4d2eb597a17e1ca589e755527e3b3ec1a4240e9da8",
-        "preference": "enable_selection_more_less"
+        "source_sha256": "e66f92232986827bcb4e699fbdbf14eef1a8ae6f4314530626864031377cd362",
+        "preference": "enable_selection_more_less",
+        "historical_source_sha256": [
+          "0193ccc9d191ee9764cb1f4d2eb597a17e1ca589e755527e3b3ec1a4240e9da8"
+        ]
       },
       "selection_tool_switch": {
         "actions": {
@@ -615,7 +633,10 @@
         ]
       },
       "retained_by_03": {
-        "declaration_groups": ["selection_more_less_uv_brackets", "selection_all_none"],
+        "declaration_groups": [
+          "selection_more_less_uv_brackets",
+          "selection_all_none"
+        ],
         "transform_boundary": {
           "W": "a9dc6ac09d9444be9a00e38676d4b30769d5505508485f3083b4749db4a90e01",
           "G": "a617d6ba7bffe5931c516dd6f7be58620c8bc146f29634ef62a12c2935a891da",
@@ -642,21 +663,60 @@
       "reference_run_id": "reference-evidence-1794546783689968000",
       "reference_status": "All eight effects observed with positive Window, editor and unmodified wheel controls. Strict cleanup failed on foreign property readability changes.",
       "earlier_reference_non_effects": "Input delivery was unverified.",
-      "outstanding": ["outside-context poll and pass-through", "saved user edit and reopen"]
+      "outstanding": [
+        "outside-context poll and pass-through",
+        "saved user edit and reopen"
+      ]
     },
     "selection_wheel_controls": {
       "run_id": "selection_failures-1794543558832094000",
-      "observed_shortcut_modes": ["mesh", "curve"],
-      "unchanged_selection_after_shortcut": ["dopesheet", "graph", "node", "sequencer"],
-      "fixture_errors": ["mask"]
+      "observed_shortcut_modes": [
+        "mesh",
+        "curve"
+      ],
+      "unchanged_selection_after_shortcut": [
+        "dopesheet",
+        "graph",
+        "node",
+        "sequencer"
+      ],
+      "fixture_errors": [
+        "mask"
+      ]
     },
     "transform_dispatch": {
       "run_id": "transform-1794542483357451000",
       "object_mode_cases": [
-        "transform_W", "transform_E", "transform_R", "transform_W_gizmo_active",
+        "transform_W",
+        "transform_E",
+        "transform_R",
+        "transform_W_gizmo_active",
         "object_context_menu_with_active_move_gizmo"
       ],
       "mesh_edit_mode_case": "mesh_face_select_with_active_move_gizmo"
     }
+  },
+  "guarded_editor_route": {
+    "status": "production source implemented; native acceptance pending",
+    "source": "actions/actions/keymaps/selection/selection_more_less.py",
+    "operator_source": "operators/selection_more_less_ops.py",
+    "registration_source": "operators/operators_register.py",
+    "preference": "enable_selection_more_less",
+    "new_bindings": 2,
+    "events": [
+      "Shift-WHEELUPMOUSE/PRESS",
+      "Shift-WHEELDOWNMOUSE/PRESS"
+    ],
+    "scope": {
+      "name": "View2D",
+      "space_type": "EMPTY",
+      "region_type": "WINDOW"
+    },
+    "fixture_proof": "editor_probe-1794550412457976000",
+    "remaining": [
+      "outside-context native pass-through",
+      "production native dispatch and toggle",
+      "immediate-save/fresh-reopen of edited owned rows"
+    ]
   }
 }

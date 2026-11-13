@@ -144,14 +144,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Twenty-nine category checks currently pass. They cover exact assigned IDs and
+Thirty-two category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 30 factory attempts and twelve copied-reference attempts. A completed
+retains 32 factory attempts and twelve copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -224,10 +224,21 @@ still failed. The failure and unknowns are retained. The narrow next check must
 capture immediately around input-row removal, keyconfig update and control-class
 unregistration, then repeat the same readiness protocol after cleanup. It must
 retain the immediate failure and require strict equality after settling.
-The owned guarded View2D experiment produced
-all eight selection effects, restored factory behavior when removed, and passed
-its source-preservation checks. It has no production implementation, and
-unrelated-editor pass-through plus saved-edit controls remain pending. Exact
+The owned guarded View2D experiment produced all eight selection effects and
+restored factory behavior when removed. A later 14-observation run used matching
+Dopesheet context and readiness/update lifecycles at three endpoints. Both
+releases preserved exact source and foreign merged snapshots; all ten relevant
+targets and four foreign sentinels were readable. Forty other unknown entries
+remained identical, so their underlying property values remain unproved.
+
+The coordinator approved the production counterpart in three files: two fixed
+More/Less operator classes, ordered operator lifecycle wiring and two exact
+View2D Shift-wheel declarations in the existing More/Less feature. Its polls
+accept only WINDOW-region Dopesheet DOPESHEET, Graph FCURVES, Compositor nodes
+with an edit tree and Sequencer SEQUENCER, plus the underlying operator poll.
+Portable tests verify rejected contexts and poll-failure pass-through. Production
+native dispatch, unrelated-editor pass-through, feature toggles and saved-edit
+controls remain pending. Existing horizontal declarations stay unchanged. Exact
 owner-05 inactive scroll rows stay with that owner for global reconciliation.
 Mask's corrected fixture and Particle selection remain unverified.
 
@@ -258,6 +269,13 @@ owned source and user override, and binds a fresh-reader expectation to the save
 preference hash. Brief 02 establishes native saved-diff restoration but does not
 explicitly test this aggregate marker. Production G remains unchanged until the
 scoped persistence proof and production check pass.
+The next writer attempt stopped at a compound immediate post-save assertion
+using the previously held merged RNA wrapper. It did not retain the individual
+field values, so it does not identify a runtime defect. Reopen was skipped and
+the only created input binary was removed. The revised fixture records each
+field before/after save, performs an explicit keyconfig update, reacquires the
+exact merged row and then tests the recomputed metadata. It preserves the
+immediate-save timing and exact owned-source/foreign comparisons.
 
 Earlier G controls lacked repeat history, used stale BMesh data, had no rotation
 effect, or ended in a crash. Those attempts remain inconclusive. The latest
@@ -285,8 +303,8 @@ cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
 Required native work includes the stable editor baseline, outside-context and
 lifecycle controls, Circle/Framing saved edits across a fresh process, Image
 framing/pan/zoom, the axis reference readiness check, remaining ordinary clusters,
-and focused middle-mouse/subtract and modal/tool probes. G awaits the scoped
-ordinary-assignment proof before a production decision. Existing proofs need no broader
+and focused middle-mouse/subtract and modal/tool probes. G awaits saved-edit and
+fresh-reopen proof before a production decision. Existing proofs need no broader
 rerun unless affected source changes.
 
 Of 140 active full-side delta candidates, twenty-three have implemented declarations:
