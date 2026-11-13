@@ -1,0 +1,2982 @@
+{
+  "schema_version": 1,
+  "status": "integrated checks passed; coordinator acceptance pending",
+  "date": "2026-11-12",
+  "baseline_revision": "104394cd19d59ac44340afc22ec8d8c55c32629b",
+  "branch": "blender-5.2.2/alpha",
+  "commonutils_revision": "c86007d36e5606c4bb3eda3db853dbd5195717d7",
+  "workspace_source_sha256": {
+    "__init__.py": "cf84c5c43b7ede1aa709d9cf19b90b73671051c0e9f91a4b6155534c57ff1f72",
+    "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+    "keymaps/keymap_utils.py": "5c637a6fe9c251d05ccc399a6dc36a2735c4b0221670a9aec1d229f2c771f27d",
+    "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+    "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382"
+  },
+  "native_test_sha256": "e258e5162d09b0dd6b7615fda74287459fe420aed82c072a777ccdfde5fb5b17",
+  "compatibility_fixture_minimum": [
+    4,
+    5,
+    1
+  ],
+  "source_declared_minimum": [
+    5,
+    2,
+    2
+  ],
+  "portable_checks": {
+    "runtime_tests": 60,
+    "baseline_tests": 19,
+    "pie_action_tests": 2,
+    "shared_contract_tests": 3,
+    "repository_discovery_gap": "Unrestricted unittest discovery had six errors because build_manager is not importable in this environment. Build/manager adapters were outside this work and were not changed."
+  },
+  "cases": [
+    {
+      "mode": "write",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 24.9017,
+      "runtime": {
+        "schema_version": 1,
+        "mode": "write",
+        "status": "complete",
+        "steps": [
+          {
+            "label": "isolated_runtime_loaded",
+            "seconds": 0.36784
+          },
+          {
+            "label": "gui_timer_scheduled",
+            "seconds": 0.3688
+          },
+          {
+            "label": "keyboard_sentinel",
+            "seconds": 6.31257
+          },
+          {
+            "label": "stock_baseline",
+            "seconds": 7.01257
+          },
+          {
+            "label": "stock_replacement",
+            "seconds": 8.06259
+          },
+          {
+            "label": "stock_poll_fallback",
+            "seconds": 8.76257
+          },
+          {
+            "label": "stock_pass_through",
+            "seconds": 9.46256
+          },
+          {
+            "label": "installed_provider_baseline",
+            "seconds": 10.86257
+          },
+          {
+            "label": "installed_provider_replacement",
+            "seconds": 11.91256
+          },
+          {
+            "label": "installed_provider_poll_fallback",
+            "seconds": 12.61256
+          },
+          {
+            "label": "installed_provider_pass_through",
+            "seconds": 13.31255
+          },
+          {
+            "label": "provider_unregister_register_recovered_by_watcher",
+            "seconds": 14.71255,
+            "observed_seconds_since_available": 0.694385166047141
+          },
+          {
+            "label": "installed_provider_reload_replacement",
+            "seconds": 15.41256
+          },
+          {
+            "label": "modal_baseline",
+            "seconds": 18.21254
+          },
+          {
+            "label": "modal_replacement_cancel",
+            "seconds": 20.31254
+          },
+          {
+            "label": "modal_release_fallback",
+            "seconds": 22.41255
+          },
+          {
+            "label": "edited_targets_twenty_checks_no_creation_attempts",
+            "seconds": 23.0025,
+            "attempts": 0
+          },
+          {
+            "label": "complete",
+            "seconds": 23.12081
+          }
+        ],
+        "dispatch": [
+          {
+            "case": "keyboard_sentinel",
+            "calls": [
+              "sentinel"
+            ],
+            "selected": 1,
+            "provider_changed": false
+          },
+          {
+            "case": "stock_baseline",
+            "calls": [],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "stock_replacement",
+            "calls": [
+              "stock"
+            ],
+            "selected": 1,
+            "provider_changed": false
+          },
+          {
+            "case": "stock_poll_fallback",
+            "calls": [],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "stock_pass_through",
+            "calls": [
+              "stock"
+            ],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "installed_provider_baseline",
+            "calls": [],
+            "selected": 3,
+            "provider_changed": true
+          },
+          {
+            "case": "installed_provider_replacement",
+            "calls": [
+              "provider"
+            ],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "installed_provider_poll_fallback",
+            "calls": [],
+            "selected": 3,
+            "provider_changed": true
+          },
+          {
+            "case": "installed_provider_pass_through",
+            "calls": [
+              "provider"
+            ],
+            "selected": 3,
+            "provider_changed": true
+          },
+          {
+            "case": "installed_provider_reload_replacement",
+            "calls": [
+              "provider"
+            ],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "modal_baseline",
+            "drag_distance": 0.6208054485208607,
+            "final_distance": 0.5587248798325128
+          },
+          {
+            "case": "modal_replacement_cancel",
+            "drag_distance": 0.6208054485208607,
+            "final_distance": 0.0
+          },
+          {
+            "case": "modal_release_fallback",
+            "drag_distance": 0.6208054485208607,
+            "final_distance": 0.5587248798325128
+          }
+        ],
+        "invariants": [
+          {
+            "label": "stock_add_preserves_foreign",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "provider_add_preserves_foreign",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "modal_add_preserves_foreign",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "intentional_edit_restored",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "all_owned_before_immediate_edit",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "immediate_edit_save",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          },
+          {
+            "label": "edited_targets_twenty_checks_no_recreation",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          },
+          {
+            "label": "foreign_edits_after_release",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          }
+        ],
+        "diagnostics": [
+          {
+            "label": "add_stock",
+            "values": [
+              {
+                "owner_id": "native:stock",
+                "request_id": "stock",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "default",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_modal",
+            "values": [
+              {
+                "owner_id": "native:modal",
+                "request_id": "modal",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+                "observed_role": "default",
+                "observed_context": "transform_translate_precision_cancel",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_stock",
+            "values": [
+              {
+                "owner_id": "native:stock",
+                "request_id": "stock",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "default",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_modal",
+            "values": [
+              {
+                "owner_id": "native:modal",
+                "request_id": "modal",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+                "observed_role": "default",
+                "observed_context": "transform_translate_precision_cancel",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          }
+        ],
+        "native_test_sha256": "6efe4303a4fe97d06ff005805bef8ed1bee99f941f13574e4cbfa0ee01fcdfb4",
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf",
+          "background": false
+        },
+        "source_sha256": {
+          "keymaps/keymap_utils.py": "30c94ed2df867024e898d2f251f5f52d6fc8bbabe96cf46b538912c051f10cb9",
+          "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+          "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+          "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+          "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+        },
+        "provider": {
+          "module": "MACHIN3tools",
+          "version": [
+            1,
+            13,
+            2,
+            "DeusEx"
+          ],
+          "kind": "installed third-party source copied into disposable profile",
+          "configured_feature": "activate_smooth"
+        },
+        "selectors": {
+          "stock": {
+            "scope": {
+              "name": "Object Mode",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "A",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 0,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "object.select_all",
+              "properties": [
+                [
+                  "action",
+                  "SELECT"
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328"
+          },
+          "provider": {
+            "scope": {
+              "name": "3D View Generic",
+              "space_type": "VIEW_3D",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "TAB",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 1,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "machin3.toggle_smooth",
+              "properties": [
+                [
+                  "mode",
+                  "SUBD"
+                ],
+                [
+                  "toggle_korean_bevel_overlays",
+                  true
+                ],
+                [
+                  "toggle_subd_overlays",
+                  false
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "addon",
+            "ledger_id": "",
+            "sample_id": "installed-machin3-smooth-v1"
+          },
+          "modal": {
+            "scope": {
+              "name": "Transform Modal Map",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": true,
+              "is_tool": null
+            },
+            "event": {
+              "type": "LEFT_SHIFT",
+              "value": "ANY",
+              "any": true,
+              "shift": -1,
+              "ctrl": -1,
+              "alt": -1,
+              "oskey": -1,
+              "hyper": -1,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "",
+              "properties": [],
+              "modal_value": "PRECISION"
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea"
+          }
+        },
+        "unchanged_reconciliation": {
+          "iterations": 20,
+          "max_seconds": 0.0008960000704973936,
+          "before": {
+            "checked": 116,
+            "created": 5,
+            "removed": 2,
+            "reinsertions": 0,
+            "features": 2,
+            "owned": 3,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 3
+          },
+          "after": {
+            "checked": 176,
+            "created": 5,
+            "removed": 2,
+            "reinsertions": 0,
+            "features": 2,
+            "owned": 3,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 3
+          }
+        },
+        "immediate_save_without_reconciliation": true,
+        "watcher": {
+          "ticks": 73,
+          "max_seconds": 0.0031745838932693005,
+          "last_seconds": 0.0001661251299083233,
+          "category_refreshes": 1,
+          "errors": 0
+        },
+        "remaining_native_fixture_items": [],
+        "cleanup": {
+          "checked": 343,
+          "created": 9,
+          "removed": 9,
+          "reinsertions": 0,
+          "features": 0,
+          "owned": 0,
+          "retained_edited": 0,
+          "pending_cleanup": 0,
+          "tracked_resources": 0
+        }
+      },
+      "protected_hashes_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_hashes_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "input_hashes_before": {},
+      "input_hashes_after": {}
+    },
+    {
+      "mode": "read",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 7.8325,
+      "runtime": {
+        "schema_version": 1,
+        "mode": "read",
+        "status": "complete",
+        "steps": [
+          {
+            "label": "isolated_runtime_loaded",
+            "seconds": 0.92106
+          },
+          {
+            "label": "gui_timer_scheduled",
+            "seconds": 0.92136
+          },
+          {
+            "label": "complete",
+            "seconds": 6.09277
+          }
+        ],
+        "dispatch": [],
+        "invariants": [
+          {
+            "label": "fresh_reopen_foreign_edits",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          },
+          {
+            "label": "edited_targets_remain_after_later_add",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          },
+          {
+            "label": "edited_targets_remain_after_later_remove",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          }
+        ],
+        "diagnostics": [
+          {
+            "label": "add_stock",
+            "values": [
+              {
+                "owner_id": "native:stock",
+                "request_id": "stock",
+                "status": "pending",
+                "reason": "merged_source_missing_or_edited",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "user",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "pending",
+                "reason": "merged_source_missing_or_edited",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "user",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_modal",
+            "values": [
+              {
+                "owner_id": "native:modal",
+                "request_id": "modal",
+                "status": "pending",
+                "reason": "merged_source_missing_or_edited",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+                "observed_role": "user",
+                "observed_context": "transform_translate_precision_cancel",
+                "pending_capability": "modal_head",
+                "dispatch_evidence": false
+              }
+            ]
+          }
+        ],
+        "native_test_sha256": "6efe4303a4fe97d06ff005805bef8ed1bee99f941f13574e4cbfa0ee01fcdfb4",
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf",
+          "background": false
+        },
+        "source_sha256": {
+          "keymaps/keymap_utils.py": "30c94ed2df867024e898d2f251f5f52d6fc8bbabe96cf46b538912c051f10cb9",
+          "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+          "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+          "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+          "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+        },
+        "provider": {
+          "module": "MACHIN3tools",
+          "version": [
+            1,
+            13,
+            2,
+            "DeusEx"
+          ],
+          "kind": "installed third-party source copied into disposable profile",
+          "configured_feature": "activate_smooth"
+        },
+        "selectors": {
+          "stock": {
+            "scope": {
+              "name": "Object Mode",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "A",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 0,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "object.select_all",
+              "properties": [
+                [
+                  "action",
+                  "SELECT"
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328"
+          },
+          "provider": {
+            "scope": {
+              "name": "3D View Generic",
+              "space_type": "VIEW_3D",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "TAB",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 1,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "machin3.toggle_smooth",
+              "properties": [
+                [
+                  "mode",
+                  "SUBD"
+                ],
+                [
+                  "toggle_korean_bevel_overlays",
+                  true
+                ],
+                [
+                  "toggle_subd_overlays",
+                  false
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "addon",
+            "ledger_id": "",
+            "sample_id": "installed-machin3-smooth-v1"
+          },
+          "modal": {
+            "scope": {
+              "name": "Transform Modal Map",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": true,
+              "is_tool": null
+            },
+            "event": {
+              "type": "LEFT_SHIFT",
+              "value": "ANY",
+              "any": true,
+              "shift": -1,
+              "ctrl": -1,
+              "alt": -1,
+              "oskey": -1,
+              "hyper": -1,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "",
+              "properties": [],
+              "modal_value": "PRECISION"
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea"
+          }
+        },
+        "watcher": {
+          "ticks": 2,
+          "max_seconds": 0.00025387504138052464,
+          "last_seconds": 0.00025387504138052464,
+          "category_refreshes": 1,
+          "errors": 0
+        },
+        "remaining_native_fixture_items": [],
+        "cleanup": {
+          "checked": 4,
+          "created": 2,
+          "removed": 2,
+          "reinsertions": 0,
+          "features": 0,
+          "owned": 0,
+          "retained_edited": 0,
+          "pending_cleanup": 0,
+          "tracked_resources": 0
+        }
+      },
+      "protected_hashes_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_hashes_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "input_hashes_before": {
+        "present.blend": "10d22e289fd30c1568493d2472ce2f529136f9ac699f6e33f29afcceee04e7fd",
+        "expected.json": "bcec1df208718aafae488342eaa615afa3473338daf82269c9cd99ef2ce3facf",
+        "control.blend": "be0817a243c1b64bc445e3cb01bcc58e67a260d9ddb75f9e198d5879876bda62"
+      },
+      "input_hashes_after": {
+        "present.blend": "10d22e289fd30c1568493d2472ce2f529136f9ac699f6e33f29afcceee04e7fd",
+        "expected.json": "bcec1df208718aafae488342eaa615afa3473338daf82269c9cd99ef2ce3facf",
+        "control.blend": "be0817a243c1b64bc445e3cb01bcc58e67a260d9ddb75f9e198d5879876bda62"
+      }
+    },
+    {
+      "mode": "mechanics",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 9.9981,
+      "runtime": {
+        "schema_version": 1,
+        "mode": "mechanics",
+        "status": "complete",
+        "steps": [
+          {
+            "label": "isolated_runtime_loaded",
+            "seconds": 0.38218
+          },
+          {
+            "label": "gui_timer_scheduled",
+            "seconds": 0.38253
+          },
+          {
+            "label": "fail_closed_and_transaction_cases",
+            "seconds": 5.18974
+          },
+          {
+            "label": "requested_before_provider_registration",
+            "seconds": 5.42097
+          },
+          {
+            "label": "late_provider_recovered_by_actual_watcher",
+            "seconds": 5.76341
+          },
+          {
+            "label": "repeated_overtaking_stops_after_two_reinsertions",
+            "seconds": 6.13028
+          },
+          {
+            "label": "copied_pre_repriority_pairs_release_current_request_and_preserve_lookalike",
+            "seconds": 6.46969
+          },
+          {
+            "label": "native_removal_failures_retain_ownership_and_recover_without_duplicates",
+            "seconds": 6.8253
+          },
+          {
+            "label": "disabled_installed_provider_exact_lookalike_rejected",
+            "seconds": 7.17124
+          },
+          {
+            "label": "modal_switch_away_back_leaves_no_owned_copy",
+            "seconds": 7.51897
+          },
+          {
+            "label": "owned_edits_preserved_and_explicitly_accounted",
+            "seconds": 7.86972
+          },
+          {
+            "label": "complete",
+            "seconds": 8.21966
+          }
+        ],
+        "dispatch": [],
+        "invariants": [
+          {
+            "label": "unsupported_veto_has_no_effect",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "conflicting_owner_has_no_foreign_effect",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "selector_fixture_restored",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "partial_failure_recovery_stale_lookalike",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          }
+        ],
+        "diagnostics": [
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "missing",
+            "values": [
+              {
+                "owner_id": "native:selector:missing",
+                "request_id": "missing",
+                "status": "pending",
+                "reason": "source_missing_or_edited",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "active",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "originally_inactive",
+            "values": [
+              {
+                "owner_id": "native:selector:originally_inactive",
+                "request_id": "originally_inactive",
+                "status": "pending",
+                "reason": "source_missing_or_edited",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "active",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "ambiguous",
+            "values": [
+              {
+                "owner_id": "native:selector:ambiguous",
+                "request_id": "ambiguous",
+                "status": "unsupported",
+                "reason": "ambiguous_source",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "active",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "pending",
+                "reason": "source_missing_or_edited",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "pending",
+                "reason": "provider_unavailable",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "disabled_provider_exact_lookalike",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "pending",
+                "reason": "provider_unavailable",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_modal",
+            "values": [
+              {
+                "owner_id": "native:modal",
+                "request_id": "modal",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+                "observed_role": "default",
+                "observed_context": "transform_translate_precision_cancel",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          }
+        ],
+        "native_test_sha256": "6efe4303a4fe97d06ff005805bef8ed1bee99f941f13574e4cbfa0ee01fcdfb4",
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf",
+          "background": false
+        },
+        "source_sha256": {
+          "keymaps/keymap_utils.py": "30c94ed2df867024e898d2f251f5f52d6fc8bbabe96cf46b538912c051f10cb9",
+          "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+          "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+          "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+          "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+        },
+        "provider": {
+          "module": "MACHIN3tools",
+          "version": [
+            1,
+            13,
+            2,
+            "DeusEx"
+          ],
+          "kind": "installed third-party source copied into disposable profile",
+          "configured_feature": "activate_smooth"
+        },
+        "selectors": {
+          "stock": {
+            "scope": {
+              "name": "Object Mode",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "A",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 0,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "object.select_all",
+              "properties": [
+                [
+                  "action",
+                  "SELECT"
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328"
+          },
+          "provider": {
+            "scope": {
+              "name": "3D View Generic",
+              "space_type": "VIEW_3D",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "TAB",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 1,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "machin3.toggle_smooth",
+              "properties": [
+                [
+                  "mode",
+                  "SUBD"
+                ],
+                [
+                  "toggle_korean_bevel_overlays",
+                  true
+                ],
+                [
+                  "toggle_subd_overlays",
+                  false
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "addon",
+            "ledger_id": "",
+            "sample_id": "installed-machin3-smooth-v1"
+          },
+          "modal": {
+            "scope": {
+              "name": "Transform Modal Map",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": true,
+              "is_tool": null
+            },
+            "event": {
+              "type": "LEFT_SHIFT",
+              "value": "ANY",
+              "any": true,
+              "shift": -1,
+              "ctrl": -1,
+              "alt": -1,
+              "oskey": -1,
+              "hyper": -1,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "",
+              "properties": [],
+              "modal_value": "PRECISION"
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea"
+          }
+        },
+        "overtaking": {
+          "before": {
+            "checked": 11,
+            "created": 7,
+            "removed": 2,
+            "reinsertions": 0,
+            "features": 2,
+            "owned": 3,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 3
+          },
+          "after": {
+            "checked": 11,
+            "created": 9,
+            "removed": 4,
+            "reinsertions": 2,
+            "features": 2,
+            "owned": 3,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 3
+          },
+          "diagnostics": [
+            {
+              "owner_id": "native:provider",
+              "request_id": "provider",
+              "status": "unsupported",
+              "reason": "provider_priority_conflict",
+              "ledger_id": "",
+              "sample_id": "installed-machin3-smooth-v1",
+              "observed_role": "addon",
+              "observed_context": "machin3tools_object_toggle_smooth",
+              "pending_capability": "ordinary_tail",
+              "dispatch_evidence": false
+            }
+          ]
+        },
+        "native_removal_fault_injection": {
+          "failure_attempts": 8,
+          "cases": [
+            "rollback",
+            "release_and_replay",
+            "repriority"
+          ],
+          "note": "Injected exception at native removal call boundary; not an observed Blender failure."
+        },
+        "owned_user_edit": "saved diff dormant on disable; restored on re-enable after empty-map cleanup",
+        "direct_source_edit": {
+          "release": [
+            [
+              "edit",
+              "user_edited_owned_item_retained"
+            ]
+          ],
+          "retained_count": 1,
+          "behavior": "visible user-adopted row; reported, never silently recreated"
+        },
+        "watcher": {
+          "ticks": 13,
+          "max_seconds": 0.0023314168211072683,
+          "last_seconds": 0.00017625000327825546,
+          "category_refreshes": 1,
+          "errors": 0
+        },
+        "remaining_native_fixture_items": [],
+        "cleanup": {
+          "checked": 41,
+          "created": 19,
+          "removed": 17,
+          "reinsertions": 3,
+          "features": 0,
+          "owned": 0,
+          "retained_edited": 0,
+          "pending_cleanup": 0,
+          "tracked_resources": 0
+        }
+      },
+      "protected_hashes_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_hashes_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "input_hashes_before": {},
+      "input_hashes_after": {}
+    },
+    {
+      "mode": "owned-read",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 7.8549,
+      "runtime": {
+        "schema_version": 1,
+        "mode": "owned-read",
+        "status": "complete",
+        "steps": [
+          {
+            "label": "isolated_runtime_loaded",
+            "seconds": 0.93992
+          },
+          {
+            "label": "gui_timer_scheduled",
+            "seconds": 0.94022
+          },
+          {
+            "label": "owned_user_edit_fresh_reopen_and_release",
+            "seconds": 5.69687
+          },
+          {
+            "label": "complete",
+            "seconds": 6.05175
+          }
+        ],
+        "dispatch": [],
+        "invariants": [],
+        "diagnostics": [],
+        "native_test_sha256": "6efe4303a4fe97d06ff005805bef8ed1bee99f941f13574e4cbfa0ee01fcdfb4",
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf",
+          "background": false
+        },
+        "source_sha256": {
+          "keymaps/keymap_utils.py": "30c94ed2df867024e898d2f251f5f52d6fc8bbabe96cf46b538912c051f10cb9",
+          "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+          "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+          "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+          "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+        },
+        "provider": {
+          "module": "MACHIN3tools",
+          "version": [
+            1,
+            13,
+            2,
+            "DeusEx"
+          ],
+          "kind": "installed third-party source copied into disposable profile",
+          "configured_feature": "activate_smooth"
+        },
+        "selectors": {
+          "stock": {
+            "scope": {
+              "name": "Object Mode",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "A",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 0,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "object.select_all",
+              "properties": [
+                [
+                  "action",
+                  "SELECT"
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328"
+          },
+          "provider": {
+            "scope": {
+              "name": "3D View Generic",
+              "space_type": "VIEW_3D",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "TAB",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 1,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "machin3.toggle_smooth",
+              "properties": [
+                [
+                  "mode",
+                  "SUBD"
+                ],
+                [
+                  "toggle_korean_bevel_overlays",
+                  true
+                ],
+                [
+                  "toggle_subd_overlays",
+                  false
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "addon",
+            "ledger_id": "",
+            "sample_id": "installed-machin3-smooth-v1"
+          },
+          "modal": {
+            "scope": {
+              "name": "Transform Modal Map",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": true,
+              "is_tool": null
+            },
+            "event": {
+              "type": "LEFT_SHIFT",
+              "value": "ANY",
+              "any": true,
+              "shift": -1,
+              "ctrl": -1,
+              "alt": -1,
+              "oskey": -1,
+              "hyper": -1,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "",
+              "properties": [],
+              "modal_value": "PRECISION"
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea"
+          }
+        },
+        "owned_user_edit_reopened": {
+          "type": "F23",
+          "marker": "owned-user-edit",
+          "active": true,
+          "is_user_modified": true
+        },
+        "watcher": {
+          "ticks": 2,
+          "max_seconds": 0.0002480410039424896,
+          "last_seconds": 0.0002480410039424896,
+          "category_refreshes": 1,
+          "errors": 0
+        },
+        "remaining_native_fixture_items": [],
+        "cleanup": {
+          "checked": 4,
+          "created": 3,
+          "removed": 3,
+          "reinsertions": 0,
+          "features": 0,
+          "owned": 0,
+          "retained_edited": 0,
+          "pending_cleanup": 0,
+          "tracked_resources": 0
+        }
+      },
+      "protected_hashes_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_hashes_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "input_hashes_before": {
+        "owned-present.blend": "e9cdec6aa0876bb4af7a9b6cc3fada5e6131274cca3cf2098fdf7f7fd952e3cd"
+      },
+      "input_hashes_after": {
+        "owned-present.blend": "e9cdec6aa0876bb4af7a9b6cc3fada5e6131274cca3cf2098fdf7f7fd952e3cd"
+      }
+    },
+    {
+      "mode": "lifecycle",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 14.0662,
+      "runtime": {
+        "schema_version": 1,
+        "mode": "lifecycle",
+        "status": "complete",
+        "steps": [
+          {
+            "label": "lifecycle_scheduled",
+            "seconds": 2e-05
+          },
+          {
+            "label": "addon_enabled",
+            "seconds": 4.0721,
+            "init_timer": true,
+            "addon_flag": true,
+            "preferences_ready": true
+          },
+          {
+            "label": "waiting_for_startup",
+            "seconds": 4.88607,
+            "init_timer": true,
+            "addon_flag": true,
+            "error": null,
+            "preferences_ready": true,
+            "configs": {
+              "addon": true,
+              "user": true,
+              "active": true
+            }
+          },
+          {
+            "label": "addon_ready",
+            "seconds": 5.38606,
+            "runtime": {
+              "checked": 2,
+              "created": 2,
+              "removed": 0,
+              "reinsertions": 0,
+              "features": 1,
+              "owned": 2,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 2
+            }
+          },
+          {
+            "label": "global_and_pie_enabled",
+            "seconds": 6.73155,
+            "runtime": {
+              "checked": 6,
+              "created": 338,
+              "removed": 170,
+              "reinsertions": 0,
+              "features": 165,
+              "owned": 168,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 168
+            }
+          },
+          {
+            "label": "global_off_retains_obligatory_pipeline_and_independent_pie",
+            "seconds": 6.95573,
+            "counts": {
+              "Mesh": 0,
+              "Navigation": 0,
+              "Object": 0,
+              "Pipeline": 2,
+              "Sculpt": 0,
+              "Selection": 0,
+              "Transform": 0,
+              "UV": 0,
+              "Pie": 22
+            }
+          },
+          {
+            "label": "pie_disabled_independently",
+            "seconds": 6.97877
+          },
+          {
+            "label": "global_and_pie_enabled",
+            "seconds": 8.08126,
+            "runtime": {
+              "checked": 10,
+              "created": 724,
+              "removed": 556,
+              "reinsertions": 0,
+              "features": 165,
+              "owned": 168,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 168
+            }
+          },
+          {
+            "label": "global_off_retains_obligatory_pipeline_and_independent_pie",
+            "seconds": 8.30325,
+            "counts": {
+              "Mesh": 0,
+              "Navigation": 0,
+              "Object": 0,
+              "Pipeline": 2,
+              "Sculpt": 0,
+              "Selection": 0,
+              "Transform": 0,
+              "UV": 0,
+              "Pie": 22
+            }
+          },
+          {
+            "label": "pie_disabled_independently",
+            "seconds": 8.32638
+          },
+          {
+            "label": "partial_category_failure_rolled_back_and_recovered",
+            "seconds": 9.29904,
+            "runtime": {
+              "checked": 14,
+              "created": 1066,
+              "removed": 920,
+              "reinsertions": 0,
+              "features": 144,
+              "owned": 146,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 146
+            }
+          },
+          {
+            "label": "active_keyconfig_round_trip",
+            "seconds": 9.31708,
+            "during": {
+              "checked": 35,
+              "created": 1066,
+              "removed": 920,
+              "reinsertions": 0,
+              "features": 144,
+              "owned": 146,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 146
+            },
+            "after": {
+              "checked": 42,
+              "created": 1066,
+              "removed": 920,
+              "reinsertions": 0,
+              "features": 144,
+              "owned": 146,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 146
+            }
+          },
+          {
+            "label": "unchanged_watcher_twenty_ticks",
+            "seconds": 9.91015,
+            "max_seconds": 0.009216791950166225,
+            "before": {
+              "checked": 74,
+              "created": 1066,
+              "removed": 920,
+              "reinsertions": 0,
+              "features": 144,
+              "owned": 146,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 146
+            },
+            "after": {
+              "checked": 231,
+              "created": 1066,
+              "removed": 920,
+              "reinsertions": 0,
+              "features": 144,
+              "owned": 146,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 146
+            },
+            "watcher": {
+              "ticks": 37,
+              "max_seconds": 0.00921620917506516,
+              "last_seconds": 0.00013433280400931835,
+              "category_refreshes": 14,
+              "errors": 0
+            }
+          },
+          {
+            "label": "addon_disabled_all_owned_resources_drained",
+            "seconds": 10.43911,
+            "runtime": {
+              "checked": 263,
+              "created": 1066,
+              "removed": 1066,
+              "reinsertions": 0,
+              "features": 0,
+              "owned": 0,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 0
+            }
+          },
+          {
+            "label": "addon_enabled",
+            "seconds": 10.80615,
+            "init_timer": true,
+            "addon_flag": true,
+            "preferences_ready": true
+          },
+          {
+            "label": "addon_ready",
+            "seconds": 11.30376,
+            "runtime": {
+              "checked": 265,
+              "created": 1068,
+              "removed": 1066,
+              "reinsertions": 0,
+              "features": 1,
+              "owned": 2,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 2
+            }
+          },
+          {
+            "label": "addon_disabled_all_owned_resources_drained",
+            "seconds": 11.8068,
+            "runtime": {
+              "checked": 269,
+              "created": 1068,
+              "removed": 1068,
+              "reinsertions": 0,
+              "features": 0,
+              "owned": 0,
+              "retained_edited": 0,
+              "pending_cleanup": 0,
+              "tracked_resources": 0
+            }
+          },
+          {
+            "label": "complete",
+            "seconds": 12.30376
+          }
+        ],
+        "native_test_sha256": "6efe4303a4fe97d06ff005805bef8ed1bee99f941f13574e4cbfa0ee01fcdfb4",
+        "source_sha256": {
+          "keymaps/keymap_utils.py": "30c94ed2df867024e898d2f251f5f52d6fc8bbabe96cf46b538912c051f10cb9",
+          "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+          "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+          "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+          "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+        },
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf"
+        }
+      },
+      "protected_hashes_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_hashes_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "input_hashes_before": {},
+      "input_hashes_after": {}
+    }
+  ],
+  "cleanup": {
+    "all_children_exited": true,
+    "all_protected_inputs_unchanged": true,
+    "saved_comparison_bytes_unchanged": true,
+    "owned_resource_copies_remaining": 0,
+    "runs": [
+      {
+        "mode": "read",
+        "removed_directories": [
+          "resources",
+          "config",
+          "scripts",
+          "extensions",
+          "datafiles",
+          "tmp",
+          "cache",
+          "incoming"
+        ]
+      },
+      {
+        "mode": "owned-read",
+        "removed_directories": [
+          "resources",
+          "config",
+          "scripts",
+          "extensions",
+          "datafiles",
+          "tmp",
+          "cache",
+          "incoming"
+        ]
+      },
+      {
+        "mode": "lifecycle",
+        "removed_directories": [
+          "resources",
+          "config",
+          "scripts",
+          "extensions",
+          "datafiles",
+          "tmp",
+          "cache"
+        ]
+      },
+      {
+        "mode": "write",
+        "removed_directories": [
+          "resources",
+          "config",
+          "scripts",
+          "extensions",
+          "datafiles",
+          "tmp",
+          "cache",
+          "saved-cases"
+        ]
+      },
+      {
+        "mode": "mechanics",
+        "removed_directories": [
+          "resources",
+          "config",
+          "scripts",
+          "extensions",
+          "datafiles",
+          "tmp",
+          "cache",
+          "saved-cases"
+        ]
+      }
+    ],
+    "review_rechecks": [
+      {
+        "mode": "write",
+        "removed_directories": [
+          "resources",
+          "config",
+          "scripts",
+          "extensions",
+          "datafiles",
+          "tmp",
+          "cache",
+          "saved-cases"
+        ]
+      },
+      {
+        "mode": "mechanics",
+        "removed_directories": [
+          "resources",
+          "config",
+          "scripts",
+          "extensions",
+          "datafiles",
+          "tmp",
+          "cache",
+          "saved-cases"
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Blender 4.5.1 GUI evidence only; no 5.2.2 execution claim.",
+    "Generic per-item suppression remains unsupported.",
+    "A direct RNA edit to an owned source row is retained as explicit user data and diagnosed; it may outlive unload. The native test removes its intentional edited fixture row by exact reference after verifying transfer.",
+    "Normal merged Preferences edits are dormant while their owned source is disabled, and reopen/re-enable restores them.",
+    "Other editor/tool/handler/modal contexts and accepted baseline uncertainties remain gated; no category migration.",
+    "An unobserved native recreation with both the same address and KeyMapItem.id cannot be distinguished perfectly through the RNA API; no universal author-history guarantee.",
+    "Modal replacement is limited to the verified active/default native alias; switching away withdraws it.",
+    "Provider replacement requires enabled MACHIN3tools 1.13.2, its enabled smooth feature, available operator and its exact registered source pair.",
+    "The runtime consumes only explicit customization requests. The full baseline inventory is evidence, not a replay catalog. Versioned JSON catalog/persistence implementation is outside brief 02.",
+    "Provider retained-wrapper reuse before first successful observation, or reuse with the same native address and item ID, is unobservable. Successful observation captures the ID; later differing IDs through that retained wrapper are refused."
+  ],
+  "review_rechecks": [
+    {
+      "mode": "write",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 24.9582,
+      "runtime": {
+        "schema_version": 1,
+        "mode": "write",
+        "status": "complete",
+        "steps": [
+          {
+            "label": "isolated_runtime_loaded",
+            "seconds": 0.38067
+          },
+          {
+            "label": "gui_timer_scheduled",
+            "seconds": 0.38159
+          },
+          {
+            "label": "keyboard_sentinel",
+            "seconds": 6.3829
+          },
+          {
+            "label": "stock_baseline",
+            "seconds": 7.0829
+          },
+          {
+            "label": "stock_replacement",
+            "seconds": 8.13289
+          },
+          {
+            "label": "stock_poll_fallback",
+            "seconds": 8.83289
+          },
+          {
+            "label": "stock_pass_through",
+            "seconds": 9.53289
+          },
+          {
+            "label": "installed_provider_baseline",
+            "seconds": 10.93288
+          },
+          {
+            "label": "installed_provider_replacement",
+            "seconds": 11.98289
+          },
+          {
+            "label": "installed_provider_poll_fallback",
+            "seconds": 12.68289
+          },
+          {
+            "label": "installed_provider_pass_through",
+            "seconds": 13.3829
+          },
+          {
+            "label": "provider_unregister_register_recovered_by_watcher",
+            "seconds": 14.78288,
+            "observed_seconds_since_available": 0.6941723329946399
+          },
+          {
+            "label": "installed_provider_reload_replacement",
+            "seconds": 15.4829
+          },
+          {
+            "label": "modal_baseline",
+            "seconds": 18.28288
+          },
+          {
+            "label": "modal_replacement_cancel",
+            "seconds": 20.38287
+          },
+          {
+            "label": "modal_release_fallback",
+            "seconds": 22.48288
+          },
+          {
+            "label": "edited_targets_twenty_checks_no_creation_attempts",
+            "seconds": 23.07622,
+            "attempts": 0
+          },
+          {
+            "label": "complete",
+            "seconds": 23.19094
+          }
+        ],
+        "dispatch": [
+          {
+            "case": "keyboard_sentinel",
+            "calls": [
+              "sentinel"
+            ],
+            "selected": 1,
+            "provider_changed": false
+          },
+          {
+            "case": "stock_baseline",
+            "calls": [],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "stock_replacement",
+            "calls": [
+              "stock"
+            ],
+            "selected": 1,
+            "provider_changed": false
+          },
+          {
+            "case": "stock_poll_fallback",
+            "calls": [],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "stock_pass_through",
+            "calls": [
+              "stock"
+            ],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "installed_provider_baseline",
+            "calls": [],
+            "selected": 3,
+            "provider_changed": true
+          },
+          {
+            "case": "installed_provider_replacement",
+            "calls": [
+              "provider"
+            ],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "installed_provider_poll_fallback",
+            "calls": [],
+            "selected": 3,
+            "provider_changed": true
+          },
+          {
+            "case": "installed_provider_pass_through",
+            "calls": [
+              "provider"
+            ],
+            "selected": 3,
+            "provider_changed": true
+          },
+          {
+            "case": "installed_provider_reload_replacement",
+            "calls": [
+              "provider"
+            ],
+            "selected": 3,
+            "provider_changed": false
+          },
+          {
+            "case": "modal_baseline",
+            "drag_distance": 0.6208054485208607,
+            "final_distance": 0.5587248798325128
+          },
+          {
+            "case": "modal_replacement_cancel",
+            "drag_distance": 0.6208054485208607,
+            "final_distance": 0.0
+          },
+          {
+            "case": "modal_release_fallback",
+            "drag_distance": 0.6208054485208607,
+            "final_distance": 0.5587248798325128
+          }
+        ],
+        "invariants": [
+          {
+            "label": "stock_add_preserves_foreign",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "provider_add_preserves_foreign",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "modal_add_preserves_foreign",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "intentional_edit_restored",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "all_owned_before_immediate_edit",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "immediate_edit_save",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          },
+          {
+            "label": "edited_targets_twenty_checks_no_recreation",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          },
+          {
+            "label": "foreign_edits_after_release",
+            "passed": true,
+            "expected": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9",
+            "observed": "173fba6f28964dad167ca13ecb4b412c41ec7ab52b5d6227b56619e761018dd9"
+          }
+        ],
+        "diagnostics": [
+          {
+            "label": "add_stock",
+            "values": [
+              {
+                "owner_id": "native:stock",
+                "request_id": "stock",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "default",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_modal",
+            "values": [
+              {
+                "owner_id": "native:modal",
+                "request_id": "modal",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+                "observed_role": "default",
+                "observed_context": "transform_translate_precision_cancel",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_stock",
+            "values": [
+              {
+                "owner_id": "native:stock",
+                "request_id": "stock",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "default",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_modal",
+            "values": [
+              {
+                "owner_id": "native:modal",
+                "request_id": "modal",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+                "observed_role": "default",
+                "observed_context": "transform_translate_precision_cancel",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          }
+        ],
+        "native_test_sha256": "7700c3e4c172da1b58612618c1f9f7d766177a5bfba187acd8a8111523fe1cca",
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf",
+          "background": false
+        },
+        "source_sha256": {
+          "keymaps/keymap_utils.py": "b139ae35e814dac94f01178ce248c958e0250cd49a6e593b383c0f85df06c624",
+          "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+          "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+          "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+          "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+        },
+        "provider": {
+          "module": "MACHIN3tools",
+          "version": [
+            1,
+            13,
+            2,
+            "DeusEx"
+          ],
+          "kind": "installed third-party source copied into disposable profile",
+          "configured_feature": "activate_smooth"
+        },
+        "selectors": {
+          "stock": {
+            "scope": {
+              "name": "Object Mode",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "A",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 0,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "object.select_all",
+              "properties": [
+                [
+                  "action",
+                  "SELECT"
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328"
+          },
+          "provider": {
+            "scope": {
+              "name": "3D View Generic",
+              "space_type": "VIEW_3D",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "TAB",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 1,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "machin3.toggle_smooth",
+              "properties": [
+                [
+                  "mode",
+                  "SUBD"
+                ],
+                [
+                  "toggle_korean_bevel_overlays",
+                  true
+                ],
+                [
+                  "toggle_subd_overlays",
+                  false
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "addon",
+            "ledger_id": "",
+            "sample_id": "installed-machin3-smooth-v1"
+          },
+          "modal": {
+            "scope": {
+              "name": "Transform Modal Map",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": true,
+              "is_tool": null
+            },
+            "event": {
+              "type": "LEFT_SHIFT",
+              "value": "ANY",
+              "any": true,
+              "shift": -1,
+              "ctrl": -1,
+              "alt": -1,
+              "oskey": -1,
+              "hyper": -1,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "",
+              "properties": [],
+              "modal_value": "PRECISION"
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea"
+          }
+        },
+        "unchanged_reconciliation": {
+          "iterations": 20,
+          "max_seconds": 0.0008692089468240738,
+          "before": {
+            "checked": 116,
+            "created": 5,
+            "removed": 2,
+            "reinsertions": 0,
+            "features": 2,
+            "owned": 3,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 3
+          },
+          "after": {
+            "checked": 176,
+            "created": 5,
+            "removed": 2,
+            "reinsertions": 0,
+            "features": 2,
+            "owned": 3,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 3
+          }
+        },
+        "immediate_save_without_reconciliation": true,
+        "watcher": {
+          "ticks": 73,
+          "max_seconds": 0.00298754102550447,
+          "last_seconds": 0.00017175008542835712,
+          "category_refreshes": 1,
+          "errors": 0
+        },
+        "remaining_native_fixture_items": [],
+        "cleanup": {
+          "checked": 343,
+          "created": 9,
+          "removed": 9,
+          "reinsertions": 0,
+          "features": 0,
+          "owned": 0,
+          "retained_edited": 0,
+          "pending_cleanup": 0,
+          "tracked_resources": 0
+        }
+      },
+      "protected_hashes_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_hashes_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "input_hashes_before": {},
+      "input_hashes_after": {}
+    },
+    {
+      "mode": "mechanics",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 9.9005,
+      "runtime": {
+        "schema_version": 1,
+        "mode": "mechanics",
+        "status": "complete",
+        "steps": [
+          {
+            "label": "isolated_runtime_loaded",
+            "seconds": 0.37148
+          },
+          {
+            "label": "gui_timer_scheduled",
+            "seconds": 0.37184
+          },
+          {
+            "label": "fail_closed_and_transaction_cases",
+            "seconds": 5.08772
+          },
+          {
+            "label": "requested_before_provider_registration",
+            "seconds": 5.32244
+          },
+          {
+            "label": "late_provider_recovered_by_actual_watcher",
+            "seconds": 5.66476
+          },
+          {
+            "label": "repeated_overtaking_stops_after_two_reinsertions",
+            "seconds": 6.03144
+          },
+          {
+            "label": "copied_pre_repriority_pairs_release_current_request_and_preserve_lookalike",
+            "seconds": 6.37081
+          },
+          {
+            "label": "native_removal_failures_retain_ownership_and_recover_without_duplicates",
+            "seconds": 6.72828
+          },
+          {
+            "label": "disabled_installed_provider_exact_lookalike_rejected",
+            "seconds": 7.07214
+          },
+          {
+            "label": "modal_switch_away_back_leaves_no_owned_copy",
+            "seconds": 7.42025
+          },
+          {
+            "label": "owned_edits_preserved_and_explicitly_accounted",
+            "seconds": 7.77072
+          },
+          {
+            "label": "complete",
+            "seconds": 8.1207
+          }
+        ],
+        "dispatch": [],
+        "invariants": [
+          {
+            "label": "unsupported_veto_has_no_effect",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "conflicting_owner_has_no_foreign_effect",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "selector_fixture_restored",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          },
+          {
+            "label": "partial_failure_recovery_stale_lookalike",
+            "passed": true,
+            "expected": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0",
+            "observed": "03e9f2a8e2ceb5fd24718fddba488b733575b8929e37d1a80d7ea0f536a101b0"
+          }
+        ],
+        "diagnostics": [
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "missing",
+            "values": [
+              {
+                "owner_id": "native:selector:missing",
+                "request_id": "missing",
+                "status": "pending",
+                "reason": "source_missing_or_edited",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "active",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "originally_inactive",
+            "values": [
+              {
+                "owner_id": "native:selector:originally_inactive",
+                "request_id": "originally_inactive",
+                "status": "pending",
+                "reason": "source_missing_or_edited",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "active",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "ambiguous",
+            "values": [
+              {
+                "owner_id": "native:selector:ambiguous",
+                "request_id": "ambiguous",
+                "status": "unsupported",
+                "reason": "ambiguous_source",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+                "observed_role": "active",
+                "observed_context": "stock_object_mode_select_all",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "pending",
+                "reason": "source_missing_or_edited",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_provider",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "pending",
+                "reason": "provider_unavailable",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "disabled_provider_exact_lookalike",
+            "values": [
+              {
+                "owner_id": "native:provider",
+                "request_id": "provider",
+                "status": "pending",
+                "reason": "provider_unavailable",
+                "ledger_id": "",
+                "sample_id": "installed-machin3-smooth-v1",
+                "observed_role": "addon",
+                "observed_context": "machin3tools_object_toggle_smooth",
+                "pending_capability": "ordinary_tail",
+                "dispatch_evidence": false
+              }
+            ]
+          },
+          {
+            "label": "add_modal",
+            "values": [
+              {
+                "owner_id": "native:modal",
+                "request_id": "modal",
+                "status": "applied",
+                "reason": "structural_registration",
+                "ledger_id": "deluxe-baseline-2026-11-12-v1",
+                "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+                "observed_role": "default",
+                "observed_context": "transform_translate_precision_cancel",
+                "pending_capability": "",
+                "dispatch_evidence": false
+              }
+            ]
+          }
+        ],
+        "native_test_sha256": "e258e5162d09b0dd6b7615fda74287459fe420aed82c072a777ccdfde5fb5b17",
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf",
+          "background": false
+        },
+        "source_sha256": {
+          "keymaps/keymap_utils.py": "5c637a6fe9c251d05ccc399a6dc36a2735c4b0221670a9aec1d229f2c771f27d",
+          "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+          "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+          "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+          "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+        },
+        "provider": {
+          "module": "MACHIN3tools",
+          "version": [
+            1,
+            13,
+            2,
+            "DeusEx"
+          ],
+          "kind": "installed third-party source copied into disposable profile",
+          "configured_feature": "activate_smooth"
+        },
+        "selectors": {
+          "stock": {
+            "scope": {
+              "name": "Object Mode",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "A",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 0,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "object.select_all",
+              "properties": [
+                [
+                  "action",
+                  "SELECT"
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328"
+          },
+          "provider": {
+            "scope": {
+              "name": "3D View Generic",
+              "space_type": "VIEW_3D",
+              "region_type": "WINDOW",
+              "is_modal": false,
+              "is_tool": null
+            },
+            "event": {
+              "type": "TAB",
+              "value": "PRESS",
+              "any": false,
+              "shift": 0,
+              "ctrl": 0,
+              "alt": 1,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "machin3.toggle_smooth",
+              "properties": [
+                [
+                  "mode",
+                  "SUBD"
+                ],
+                [
+                  "toggle_korean_bevel_overlays",
+                  true
+                ],
+                [
+                  "toggle_subd_overlays",
+                  false
+                ]
+              ],
+              "modal_value": ""
+            },
+            "source_role": "addon",
+            "ledger_id": "",
+            "sample_id": "installed-machin3-smooth-v1"
+          },
+          "modal": {
+            "scope": {
+              "name": "Transform Modal Map",
+              "space_type": "EMPTY",
+              "region_type": "WINDOW",
+              "is_modal": true,
+              "is_tool": null
+            },
+            "event": {
+              "type": "LEFT_SHIFT",
+              "value": "ANY",
+              "any": true,
+              "shift": -1,
+              "ctrl": -1,
+              "alt": -1,
+              "oskey": -1,
+              "hyper": -1,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "KEYBOARD"
+            },
+            "target": {
+              "idname": "",
+              "properties": [],
+              "modal_value": "PRECISION"
+            },
+            "source_role": "default",
+            "ledger_id": "deluxe-baseline-2026-11-12-v1",
+            "sample_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea"
+          }
+        },
+        "overtaking": {
+          "before": {
+            "checked": 11,
+            "created": 7,
+            "removed": 2,
+            "reinsertions": 0,
+            "features": 2,
+            "owned": 3,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 3
+          },
+          "after": {
+            "checked": 11,
+            "created": 9,
+            "removed": 4,
+            "reinsertions": 2,
+            "features": 2,
+            "owned": 3,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 3
+          },
+          "diagnostics": [
+            {
+              "owner_id": "native:provider",
+              "request_id": "provider",
+              "status": "unsupported",
+              "reason": "provider_priority_conflict",
+              "ledger_id": "",
+              "sample_id": "installed-machin3-smooth-v1",
+              "observed_role": "addon",
+              "observed_context": "machin3tools_object_toggle_smooth",
+              "pending_capability": "ordinary_tail",
+              "dispatch_evidence": false
+            }
+          ]
+        },
+        "native_removal_fault_injection": {
+          "failure_attempts": 8,
+          "cases": [
+            "rollback",
+            "release_and_replay",
+            "renamed_request_conflict",
+            "different_owner_conflict",
+            "repriority"
+          ],
+          "note": "Injected exception at native removal call boundary; not an observed Blender failure."
+        },
+        "owned_user_edit": "saved diff dormant on disable; restored on re-enable after empty-map cleanup",
+        "direct_source_edit": {
+          "release": [
+            [
+              "edit",
+              "user_edited_owned_item_retained"
+            ]
+          ],
+          "retained_count": 1,
+          "behavior": "visible user-adopted row; reported, never silently recreated"
+        },
+        "watcher": {
+          "ticks": 13,
+          "max_seconds": 0.002234957879409194,
+          "last_seconds": 0.00015691597945988178,
+          "category_refreshes": 1,
+          "errors": 0
+        },
+        "remaining_native_fixture_items": [],
+        "cleanup": {
+          "checked": 42,
+          "created": 20,
+          "removed": 18,
+          "reinsertions": 3,
+          "features": 0,
+          "owned": 0,
+          "retained_edited": 0,
+          "pending_cleanup": 0,
+          "tracked_resources": 0
+        }
+      },
+      "protected_hashes_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_hashes_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "input_hashes_before": {},
+      "input_hashes_after": {}
+    }
+  ],
+  "source_provenance": "Each case records its exact source and driver hashes. The original five-process suite is retained as accepted evidence for unchanged paths. Targeted writer/provider and ownership rechecks cover the later cleanup-admission and captured-provider-ID fixes. The ownership recheck uses the final workspace and driver hashes; the writer precedes only the final same-owner/new-request cleanup admission edge and its fixture assertion. The aggregate workspace hashes identify the final delivered source, not a claim that all historical cases ran that revision."
+}

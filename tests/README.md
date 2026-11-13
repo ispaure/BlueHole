@@ -1,5 +1,13 @@
 # Blue Hole validation
 
+## Deluxe runtime keymaps
+
+`python3 -m unittest discover -s tests -p 'test_keymap_runtime.py' -q` checks
+exact ownership, replacement gates, rollback, bounded reconciliation and lifecycle.
+The GUI driver `tests/blender_keymap_runtime.py` exercises the integrated runtime
+with a real installed provider and disposable resources. See the
+[runtime contract and native command](../docs/deluxe-keymaps-runtime.md).
+
 Run `python -m unittest discover -s tests -v` for the existing adapter contracts.
 They use isolated fixtures and the actual vendored library without Blender startup.
 They do not connect to Perforce or validate add-on registration.
