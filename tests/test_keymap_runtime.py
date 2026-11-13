@@ -1611,6 +1611,13 @@ class LifecycleIntegrationTests(unittest.TestCase):
         sys.modules[name] = orchestrator
         spec.loader.exec_module(orchestrator)
         self.orchestrator = orchestrator
+        # This harness substitutes all native category registrars. Keep the
+        # same fixture for the Deluxe branch, which now installs one catalog.
+        def register_deluxe(_catalog):
+            return sum(module.register() for category, module in self.category_modules.items()
+                       if self.preferences.keymap.enable_keymaps or category == 'Pipeline')
+
+        orchestrator.deluxe_profile = lambda: types.SimpleNamespace(register=register_deluxe)
         self.addCleanup(orchestrator.unregister)
 
     def addon_names(self):

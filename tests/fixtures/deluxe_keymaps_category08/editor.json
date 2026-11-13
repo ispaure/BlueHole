@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "catalog_version": 1,
+  "base": {"preset": "Blender", "reference_version": "4.5.1", "ledger": "synthetic-editor"},
+  "categories": {
+    "navigation": {"label": "Navigation"},
+    "selection": {"label": "Selection", "enabled": false}
+  },
+  "sections": {
+    "framing": {"label": "Framing", "category": "navigation", "order": 0},
+    "overview": {"label": "Overview", "category": "navigation", "order": 1},
+    "provider": {"label": "Provider", "category": "selection"}
+  },
+  "events": {
+    "frame": {"type": "F"},
+    "provider-fit": {"type": "F24", "shift": true}
+  },
+  "commands": {
+    "frame-selected": {"operator": "view3d.view_selected", "properties": {"use_all_regions": false}},
+    "frame-all-regions": {"operator": "view3d.view_selected", "properties": {"use_all_regions": true}},
+    "provider-fit": {"operator": "uv.zenuv_fit_to_trim", "provider": "Zen UV", "properties": {}},
+    "select-none": {"operator": "object.select_all", "properties": {"action": "DESELECT"}}
+  },
+  "assignments": {
+    "view-frame": {"section": "framing", "feature": "view-frame", "event": "frame", "command": "frame-selected", "scope": {"name": "3D View", "space_type": "VIEW_3D"}, "order": 0},
+    "image-frame": {"section": "overview", "feature": "image-frame", "event": "frame", "command": "frame-all-regions", "scope": {"name": "Image", "space_type": "IMAGE_EDITOR"}, "order": 1},
+    "uv-provider-fit": {"section": "provider", "feature": "uv-provider-fit", "event": "provider-fit", "command": "provider-fit", "scope": {"name": "UV Editor"}, "order": 2}
+  },
+  "suppressions": {}
+}

@@ -9,6 +9,11 @@ The keymap system reads those action definitions and registers their
 `KeymapBinding` entries into Blender's keyconfig when the addon loads or
 when preferences change.
 
+
+Configured Deluxe uses [versioned profiles](../docs/deluxe-keymap-profiles.md)
+and the same runtime ownership ledger. The action path described below continues
+to supply standard Keymaps, standard Pie and the existing preference panels.
+
 ---
 
 # Architecture Overview

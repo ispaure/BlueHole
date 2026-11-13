@@ -30,6 +30,7 @@ __status__ = 'Production'
 # IMPORTS
 
 import time
+from pathlib import Path
 
 import bpy
 
@@ -75,6 +76,7 @@ keymap_module_lst = (
 _enabled = False
 _registering = False
 _preference_state = None
+_profile_store = None
 _legacy_profile = False
 _last_error = None
 _wait_interval = 0.25
@@ -136,6 +138,46 @@ def _bind_category(module):
     keymap_utils.bind_category_pairs(module.KEYMAP_CATEGORY, lists[0])
 
 
+def deluxe_profile():
+    """Return the configured Deluxe editing API on Blender's main thread."""
+    global _profile_store
+    if not _ready() or not prefs().keymap.deluxe_configured:
+        raise ValueError('Configure Deluxe keymaps before opening the profile editor')
+    if _profile_store is None:
+        from .deluxe_profiles import ProfileStore, JSONFile
+
+        path = bpy.utils.user_resource('CONFIG', path='blue-hole-deluxe-keymaps.json')
+        if not path:
+            raise ValueError('Blender user configuration directory is unavailable')
+        defaults = JSONFile(Path(__file__).with_name('deluxe-defaults.json')).read_json()
+        _profile_store = ProfileStore(
+            defaults, path, prefs, _install_profile,
+            allowed=lambda: runtime_keymaps_allowed(bpy.context, prefs().keymap))
+        if _profile_store.load_issue:
+            log(Severity.WARNING, TOOL_NAME, 'Deluxe profile recovery: ' + _profile_store.load_issue)
+    return _profile_store
+
+
+def _install_profile(candidate, previous):
+    """Apply through the same registrar and reject newly failed native work."""
+    global _preference_state
+    from .deluxe_schema import ProfileError
+
+    if not _enabled or _registering or not _ready() or not prefs().keymap.deluxe_configured:
+        raise ProfileError('Deluxe keymap runtime is unavailable')
+    store = deluxe_profile()
+    before = store.registration_results() if previous is not None else None
+    try:
+        _apply_categories(profile=candidate)
+        if keymap_utils.pending_cleanup():
+            raise ProfileError('Native keymap cleanup is pending')
+        if before is not None:
+            store.check_registration(candidate, before)
+    except Exception:
+        _preference_state = None
+        raise
+
+
 def _clear_categories():
     errors = []
     for module in (pie_keymaps_register, *reversed(keymap_module_lst)):
@@ -159,7 +201,7 @@ def _clear_categories():
         log(Severity.WARNING, TOOL_NAME, f'{category} cleanup reported {error}.')
 
 
-def _apply_categories():
+def _apply_categories(*, profile=None):
     global _registering, _preference_state
     if _registering or not _ready():
         return 0
@@ -169,14 +211,20 @@ def _apply_categories():
         _clear_categories()
         p = prefs()
         if runtime_keymaps_allowed(bpy.context, p.keymap):
-            for module in (*keymap_module_lst, pie_keymaps_register):
-                _bind_category(module)
-                # Pipeline retains Save As. Standard Pie has its own opt-in.
-                if not p.keymap.enable_keymaps and (
-                        module is not pipeline_keymaps_register
-                        and (module is not pie_keymaps_register or p.keymap.deluxe_configured)):
-                    continue
-                total += module.register()
+            modules = (*keymap_module_lst, pie_keymaps_register)
+            if p.keymap.deluxe_configured:
+                for module in modules:
+                    _bind_category(module)
+                total = deluxe_profile().register(profile)
+                for module in modules:
+                    keymap_utils.sync_category_pairs(module.KEYMAP_CATEGORY)
+            else:
+                for module in modules:
+                    _bind_category(module)
+                    if not p.keymap.enable_keymaps and module not in (
+                            pipeline_keymaps_register, pie_keymaps_register):
+                        continue
+                    total += module.register()
         _preference_state = _preference_signature()
         watcher_stats['category_refreshes'] += 1
         return total
@@ -235,7 +283,7 @@ def register():
 
 
 def unregister():
-    global _enabled, _preference_state, _last_error
+    global _enabled, _preference_state, _last_error, _profile_store
     _enabled = False
     if bpy.app.timers.is_registered(_watch_keymaps):
         bpy.app.timers.unregister(_watch_keymaps)
@@ -244,6 +292,9 @@ def unregister():
     finally:
         _preference_state = None
         _last_error = None
+        if _profile_store is not None:
+            _profile_store.close()
+        _profile_store = None
 
 
 def refresh():

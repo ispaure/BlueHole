@@ -40,13 +40,17 @@ def remove_existing_action_keymaps_from_keyconfig(category, kc, action):
 def _binding_scope(binding, config):
     stated = KeymapScope(binding.keymap_name, binding.space_type,
                          binding.region_type, False, binding.is_tool)
-    if config is None or binding.is_tool is not None:
+    return resolve_scope(stated, config)
+
+
+def resolve_scope(stated, config):
+    if config is None or stated.is_tool is not None:
         return stated
     try:
         candidates = [capture_scope(map_) for map_ in config.keymaps
-                      if map_.name == binding.keymap_name
-                      and map_.space_type == binding.space_type
-                      and map_.region_type == binding.region_type
+                      if map_.name == stated.name
+                      and map_.space_type == stated.space_type
+                      and map_.region_type == stated.region_type
                       and not map_.is_modal]
     except (AttributeError, ReferenceError, RuntimeError, TypeError):
         return stated
