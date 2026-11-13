@@ -1,183 +1,222 @@
-"""Exercise Deluxe installation against temporary files without Blender or PySide."""
+"""Exercise Deluxe activation and legacy recovery without touching Blender profiles."""
 
+from hashlib import sha256
 import importlib
 from pathlib import Path
-import stat
 import sys
 from tempfile import TemporaryDirectory
-import types
+from types import ModuleType, SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
 
 
-class DeluxePreferencesTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        # Load the real implementation and commonUtils without running add-on startup.
-        package_name = '_bluehole_deluxe_tests'
-        package = types.ModuleType(package_name)
-        package.__path__ = [str(Path(__file__).resolve().parents[1])]
-        blender_utils = types.ModuleType(f'{package_name}.blenderUtils')
-        blender_utils.blenderFile = types.SimpleNamespace(
-            get_userpref_path=Mock(), get_keyconfig_path=Mock())
-        sys.modules[package_name] = package
-        sys.modules[blender_utils.__name__] = blender_utils
-        cls.module = importlib.import_module(f'{package_name}.overlays.deluxe.applyDeluxePrefs')
-        cls.module.ui.use_pyside = False
-        cls.addClassCleanup(lambda: [sys.modules.pop(name, None)
-            for name in tuple(sys.modules)
-            if name == package_name or name.startswith(package_name + '.')])
+class Settings(dict):
+    """Model Blender RNA defaults separately from saved ID properties."""
+    def __init__(self, **defaults):
+        super().__init__()
+        self.defaults = defaults
+        self.bl_rna = SimpleNamespace(properties=[
+            SimpleNamespace(type='BOOLEAN', identifier=name) for name in defaults
+        ])
 
+    def __getattr__(self, name):
+        if name not in self.defaults:
+            raise AttributeError(name)
+        return self.get(name, self.defaults[name])
+
+    def is_property_set(self, name):
+        return name in self
+
+
+class DeluxePreferencesTests(unittest.TestCase):
     def setUp(self):
         temp = TemporaryDirectory()
         self.addCleanup(temp.cleanup)
-        root = Path(temp.name)
-        self.payload = root / 'payload'
-        (self.payload / 'keyconfig').mkdir(parents=True)
-        (self.payload / 'userpref.blend').write_bytes(b'deluxe preferences')
-        (self.payload / 'keyconfig' / 'BH_Keymaps.py').write_bytes(b'deluxe keymaps')
-        self.prefs = root / 'config' / 'userpref.blend'
-        self.keymap = root / 'scripts' / 'presets' / 'keyconfig' / 'BH_Keymaps.py'
-        self.log = Mock()
-        self.notice = Mock()
-        self.exit = Mock(side_effect=SystemExit)
-        for target, value in (
-            ('get_payload_dir', Mock(return_value=self.payload)),
-            ('warning_bh_deluxe', Mock(return_value=True)),
-            ('log', self.log),
-            ('notice_blender_closure', self.notice),
-        ):
-            patcher = patch.object(self.module, target, value)
-            patcher.start()
-            self.addCleanup(patcher.stop)
-        for target, value in (
-            ('get_userpref_path', self.prefs),
-            ('get_keyconfig_path', self.keymap.parent),
-        ):
-            patcher = patch.object(self.module.blenderFile, target, Mock(return_value=value))
-            patcher.start()
-            self.addCleanup(patcher.stop)
-        patcher = patch.object(self.module.sys, 'exit', self.exit)
+        self.root = Path(temp.name)
+        self.saved = self.root / 'config/userpref.blend'
+        self.preset = self.root / 'scripts/presets/keyconfig/BH_Keymaps.py'
+        self.saved.parent.mkdir()
+        self.preset.parent.mkdir(parents=True)
+
+        package_name = '_bluehole_deluxe_tests'
+        package = ModuleType(package_name)
+        package.__path__ = [str(Path(__file__).resolve().parents[1])]
+        blender = ModuleType('bpy')
+        blender.utils = SimpleNamespace(
+            user_resource=lambda kind, *, path: str(self.root / kind.lower() / path),
+            preset_find=lambda name, *_args, **_kwargs: (
+                str(self.preset) if name == self.preset.stem and self.preset.is_file() else None),
+        )
+        patcher = patch.dict(sys.modules, {package_name: package, 'bpy': blender})
         patcher.start()
         self.addCleanup(patcher.stop)
+        self.module = importlib.import_module(f'{package_name}.overlays.deluxe.applyDeluxePrefs')
+        keymaps = importlib.import_module(f'{package_name}.keymaps')
+        self.refresh = Mock()
+        keymaps.keymaps_register = SimpleNamespace(refresh=self.refresh)
+        sys.modules[f'{package_name}.preferences.addon.keymap_props'] = SimpleNamespace(
+            KEYMAP_CATEGORIES=('navigation',),
+        )
 
-    def assert_failed(self, text):
-        self.assertFalse(self.module.apply_deluxe_prefs())
-        self.notice.assert_not_called()
-        self.exit.assert_not_called()
-        errors = [call for call in self.log.call_args_list if call.kwargs.get('popup')]
-        self.assertEqual(len(errors), 1)
-        self.assertEqual(errors[0].args[0], self.module.Severity.ERROR)
-        self.assertIn(text, errors[0].args[2])
+        self.pref = SimpleNamespace(
+            keymap=Settings(enable_keymaps=False, deluxe_configured=False),
+            pie=Settings(enable_pie_menus=False, enable_editor_pie_shortcuts=True),
+            thirdparty=SimpleNamespace(
+                auto_constraints=Settings(enable_modal=True),
+                x_ray_selection_tools=Settings(enable_xray=True),
+            ),
+        )
+        self.pref.keymap.navigation = Settings(enable_navigation_keymaps=True)
+        self.factory = SimpleNamespace(name='Blender')
+        self.configs = SimpleNamespace(active=self.factory, default=self.factory,
+                                       user=SimpleNamespace(keymaps=[]))
+        self.context = SimpleNamespace(
+            preferences=SimpleNamespace(
+                keymap=SimpleNamespace(active_keyconfig='Blender'), is_dirty=False,
+                inputs=SimpleNamespace(invert_mouse_zoom=False), addons={'existing': object()},
+            ),
+            window_manager=SimpleNamespace(keyconfigs=self.configs),
+        )
 
-    def test_read_only_files_are_overwritten_and_verified(self):
-        for path in (self.prefs, self.keymap):
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes(b'old settings')
-            path.chmod(stat.S_IRUSR)
-        with self.assertRaises(SystemExit):
-            self.module.apply_deluxe_prefs()
-        self.assertEqual(self.prefs.read_bytes(), b'deluxe preferences')
-        self.assertEqual(self.keymap.read_bytes(), b'deluxe keymaps')
-        self.assertTrue(self.prefs.stat().st_mode & stat.S_IWUSR)
-        self.notice.assert_called_once()
+    def apply(self, **kwargs):
+        self.module.apply_deluxe_prefs(self.context, self.pref, **kwargs)
 
-    @unittest.skipIf(sys.platform == 'win32', 'POSIX permission bits require a POSIX filesystem')
-    def test_install_preserves_private_existing_preferences_permissions(self):
-        self.prefs.parent.mkdir(parents=True)
-        self.prefs.write_bytes(b'private preferences')
-        self.prefs.chmod(0o400)
-        with self.assertRaises(SystemExit):
-            self.module.apply_deluxe_prefs()
-        self.assertEqual(stat.S_IMODE(self.prefs.stat().st_mode), 0o600)
-        backups = list(self.prefs.parent.glob(self.prefs.name + '.previous-*'))
-        self.assertEqual(len(backups), 1)
-        self.assertEqual(stat.S_IMODE(backups[0].stat().st_mode), 0o600)
+    def test_fresh_activation_enables_defaults_without_writing_profile(self):
+        self.assertFalse(self.pref.keymap.enable_keymaps)
+        self.assertFalse(self.pref.pie.enable_pie_menus)
+        self.apply()
+        self.assertTrue(self.pref.keymap.deluxe_configured)
+        self.assertTrue(self.pref.keymap.enable_keymaps)
+        self.assertTrue(self.pref.keymap.navigation.enable_navigation_keymaps)
+        self.assertTrue(self.pref.pie.enable_pie_menus)
+        self.assertTrue(self.pref.pie.enable_editor_pie_shortcuts)
+        self.assertFalse(self.context.preferences.inputs.invert_mouse_zoom)
+        self.assertFalse(self.saved.exists())
+        self.assertFalse(self.preset.exists())
+        self.assertTrue(self.context.preferences.is_dirty)
+        self.refresh.assert_called_once_with()
 
-    def test_linked_preferences_fail_without_changing_link_target(self):
-        self.prefs.parent.mkdir(parents=True)
-        original = self.prefs.parent / 'original.blend'
-        original.write_bytes(b'linked preferences')
-        original.chmod(stat.S_IRUSR)
-        mode = stat.S_IMODE(original.stat().st_mode)
-        self.prefs.symlink_to(original)
-        self.assert_failed('Refusing to replace linked preferences')
-        self.assertTrue(self.prefs.is_symlink())
-        self.assertEqual(original.read_bytes(), b'linked preferences')
-        self.assertEqual(stat.S_IMODE(original.stat().st_mode), mode)
+    def test_saved_choices_survive_activation_disable_and_reenable(self):
+        self.pref.pie['enable_pie_menus'] = False
+        self.pref.keymap.navigation['enable_navigation_keymaps'] = False
+        self.pref.thirdparty.auto_constraints['enable_modal'] = False
+        self.apply()
+        self.module.disable_deluxe_keymaps(self.context, self.pref)
+        self.assertFalse(self.pref.keymap.enable_keymaps)
+        self.apply()
+        self.assertTrue(self.pref.keymap.enable_keymaps)
+        self.assertFalse(self.pref.pie.enable_pie_menus)
+        self.assertFalse(self.pref.keymap.navigation.enable_navigation_keymaps)
+        self.assertFalse(self.pref.thirdparty.auto_constraints.enable_modal)
 
-    def test_missing_destination_folders_are_created(self):
-        with self.assertRaises(SystemExit):
-            self.module.apply_deluxe_prefs()
-        self.assertEqual(self.prefs.read_bytes(), b'deluxe preferences')
-        self.assertEqual(self.keymap.read_bytes(), b'deluxe keymaps')
+    def test_explicit_reset_restores_feature_defaults_without_enabling_deluxe(self):
+        self.pref.keymap.navigation['enable_navigation_keymaps'] = False
+        self.pref.pie.update(enable_pie_menus=False, enable_editor_pie_shortcuts=False)
+        self.pref.thirdparty.auto_constraints['enable_modal'] = False
+        self.module.reset_deluxe_groups(self.context, self.pref)
+        self.assertTrue(self.pref.keymap.navigation.enable_navigation_keymaps)
+        self.assertTrue(self.pref.pie.enable_pie_menus)
+        self.assertTrue(self.pref.pie.enable_editor_pie_shortcuts)
+        self.assertTrue(self.pref.thirdparty.auto_constraints.enable_modal)
+        self.assertFalse(self.pref.keymap.enable_keymaps)
 
-    def test_missing_payload_aborts_before_any_overwrite(self):
-        self.prefs.parent.mkdir()
-        self.prefs.write_bytes(b'original')
-        (self.payload / 'keyconfig' / 'BH_Keymaps.py').unlink()
-        self.assert_failed('missing or empty')
-        self.assertEqual(self.prefs.read_bytes(), b'original')
+    def test_current_and_missing_legacy_presets_cannot_be_overlaid(self):
+        for active in (SimpleNamespace(name='BH_Keymaps'), self.factory):
+            with self.subTest(active=active):
+                self.configs.active = active
+                self.context.preferences.keymap.active_keyconfig = 'BH_Keymaps'
+                with self.assertRaisesRegex(ValueError, 'select Blender'):
+                    self.apply(reviewed=True)
+        self.assertFalse(self.pref.keymap.deluxe_configured)
+        self.refresh.assert_not_called()
 
-    def test_locked_destination_shows_underlying_error(self):
-        with patch.object(self.module, 'copyfile', side_effect=PermissionError('File is locked')):
-            self.assert_failed('PermissionError: File is locked')
+    def test_known_profile_waits_for_review_with_or_without_old_backups(self):
+        self.saved.write_bytes(b'legacy plus personal preferences')
+        self.preset.write_bytes(b'legacy plus personal shortcuts')
+        personal = SimpleNamespace(is_user_modified=True)
+        self.configs.user.keymaps.append(personal)
+        prior = self.saved.with_name('userpref.blend.previous-abc')
+        for with_backup in (False, True):
+            with self.subTest(with_backup=with_backup):
+                if with_backup:
+                    prior.write_bytes(b'older settings')
+                self.assertTrue(self.module.has_legacy_profile(self.context))
+                with self.assertRaisesRegex(ValueError, 'Review the saved shortcuts'):
+                    self.apply()
+                self.assertFalse(self.pref.keymap.deluxe_configured)
+        addon = self.context.preferences.addons['existing']
+        self.apply(reviewed=True)
+        self.assertEqual(self.saved.read_bytes(), b'legacy plus personal preferences')
+        self.assertEqual(self.preset.read_bytes(), b'legacy plus personal shortcuts')
+        self.assertEqual(prior.read_bytes(), b'older settings')
+        self.assertIs(self.configs.user.keymaps[0], personal)
+        self.assertIs(self.context.preferences.addons['existing'], addon)
+        self.refresh.assert_called_once_with()
 
-    def test_incorrect_copy_is_detected(self):
-        def corrupt_copy(source, destination):
-            destination.write_bytes(b'wrong contents')
-        with patch.object(self.module, 'copyfile', side_effect=corrupt_copy):
-            self.assert_failed('Content verification failed')
+    def test_ambiguous_preset_and_unattributed_saved_edits_require_review(self):
+        self.configs.active = SimpleNamespace(name='Custom')
+        with self.assertRaisesRegex(ValueError, 'select Blender'):
+            self.apply()
+        self.assertEqual(self.configs.active.name, 'Custom')
+        self.configs.active = self.factory
+        self.configs.user.keymaps.append(SimpleNamespace(is_user_modified=True))
+        with self.assertRaisesRegex(ValueError, 'Review the saved shortcuts'):
+            self.apply()
 
-    def test_second_copy_failure_reports_partial_installation(self):
-        copyfile = self.module.copyfile
-        def fail_keymap(source, destination):
-            if source.name == self.keymap.name:
-                raise PermissionError('Keymap locked')
-            return copyfile(source, destination)
-        with patch.object(self.module, 'copyfile', side_effect=fail_keymap):
-            self.assert_failed('Keymap locked')
-        self.assertIn(str(self.prefs), self.log.call_args.args[2])
-        self.assertEqual(self.prefs.read_bytes(), b'deluxe preferences')
+    def test_exact_legacy_preferences_detected_with_preset_missing(self):
+        payload = b'original shipped settings'
+        self.saved.write_bytes(payload)
+        with patch.multiple(self.module, LEGACY_PREFERENCES_SIZE=len(payload),
+                            LEGACY_PREFERENCES_HASH=sha256(payload).hexdigest()):
+            self.assertTrue(self.module.has_legacy_profile(self.context))
+            self.saved.write_bytes(b'different preferences')
+            self.assertFalse(self.module.has_legacy_profile(self.context))
 
-    def test_partial_copy_failure_preserves_original_preferences(self):
-        self.prefs.parent.mkdir(parents=True)
-        self.prefs.write_bytes(b'original preferences')
-        def interrupted(source, destination):
-            destination.write_bytes(b'partial')
-            raise OSError('interrupted copy')
-        with patch.object(self.module, 'copyfile', side_effect=interrupted):
-            self.assert_failed('interrupted copy')
-        self.assertEqual(self.prefs.read_bytes(), b'original preferences')
-        self.assertFalse(list(self.prefs.parent.glob('.bluehole-preferences-*')))
+    def test_preference_backup_alone_does_not_stamp_profile(self):
+        self.saved.with_name('userpref.blend.previous-abc').write_bytes(b'ordinary recovery data')
+        self.assertFalse(self.module.has_legacy_profile(self.context))
+        self.preset.with_name('BH_Keymaps.py.previous-abc').write_bytes(b'previous preset')
+        self.assertTrue(self.module.has_legacy_profile(self.context))
 
-    def test_corrupted_copy_preserves_original_preferences(self):
-        self.prefs.parent.mkdir(parents=True)
-        self.prefs.write_bytes(b'original preferences')
-        with patch.object(self.module, 'copyfile', side_effect=lambda source, target: target.write_bytes(b'bad')):
-            self.assert_failed('Content verification failed')
-        self.assertEqual(self.prefs.read_bytes(), b'original preferences')
-        self.assertFalse(list(self.prefs.parent.glob('.bluehole-preferences-*')))
+    def test_backup_keeps_originals_and_never_overwrites_a_prior_copy(self):
+        self.saved.write_bytes(b'saved preferences')
+        self.preset.write_bytes(b'personal legacy preset')
+        self.configs.active = SimpleNamespace(name='BH_Keymaps')
+        first = self.module.backup_keymap_setup(self.context)
+        self.saved.write_bytes(b'newly saved preferences')
+        second = self.module.backup_keymap_setup(self.context)
+        self.assertNotEqual(first, second)
+        self.assertEqual((first / self.saved.name).read_bytes(), b'saved preferences')
+        self.assertEqual((second / self.saved.name).read_bytes(), b'newly saved preferences')
+        self.assertEqual((second / self.preset.name).read_bytes(), b'personal legacy preset')
+        self.assertEqual(self.preset.read_bytes(), b'personal legacy preset')
+        self.assertEqual(self.saved.read_bytes(), b'newly saved preferences')
 
-    def test_success_retains_original_preferences_and_keymap_as_recovery_copies(self):
-        for target in (self.prefs, self.keymap):
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(b'original settings')
-        with self.assertRaises(SystemExit):
-            self.module.apply_deluxe_prefs()
-        for target in (self.prefs, self.keymap):
-            backups = list(target.parent.glob(target.name + '.previous-*'))
-            self.assertEqual(len(backups), 1)
-            self.assertEqual(backups[0].read_bytes(), b'original settings')
-            self.assertFalse(list(target.parent.glob('.bluehole-preferences-*')))
+    def test_backup_failure_removes_partial_recovery_and_keeps_source(self):
+        self.saved.write_bytes(b'saved preferences')
+        self.preset.write_bytes(b'legacy preset')
+        original = self.module.atomic_write_bytes
+        def fail_preset_copy(path, *args, **kwargs):
+            if path.name != self.saved.name:
+                raise PermissionError('blocked')
+            return original(path, *args, **kwargs)
 
-    def test_user_cancellation_does_not_copy_or_show_error(self):
-        with patch.object(self.module, 'warning_bh_deluxe', return_value=False):
-            self.assertFalse(self.module.apply_deluxe_prefs())
-        self.assertFalse(self.prefs.exists())
-        self.notice.assert_not_called()
-        self.exit.assert_not_called()
-        self.assertFalse(any(call.kwargs.get('popup') for call in self.log.call_args_list))
+        with patch.object(self.module, 'atomic_write_bytes', side_effect=fail_preset_copy):
+            with self.assertRaisesRegex(PermissionError, 'blocked'):
+                self.module.backup_keymap_setup(self.context)
+        self.assertFalse(list(self.saved.parent.glob('bluehole-keymap-recovery-*')))
+        self.assertEqual(self.saved.read_bytes(), b'saved preferences')
+        self.assertEqual(self.preset.read_bytes(), b'legacy preset')
+
+    def test_failed_refresh_restores_the_exact_previous_choices(self):
+        self.pref.pie['enable_pie_menus'] = False
+        self.refresh.side_effect = [RuntimeError('failed refresh'), None]
+        with self.assertRaisesRegex(RuntimeError, 'failed refresh'):
+            self.apply()
+        self.assertEqual(dict(self.pref.keymap), {})
+        self.assertEqual(dict(self.pref.pie), {'enable_pie_menus': False})
+        self.assertFalse(self.context.preferences.is_dirty)
+        self.assertEqual(self.refresh.call_count, 2)
 
 
 if __name__ == '__main__':

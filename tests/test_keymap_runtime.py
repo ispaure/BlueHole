@@ -7,6 +7,7 @@ in the bounded Blender receipts; these cases exercise ownership and recovery.
 import importlib.util
 from pathlib import Path
 import sys
+from tempfile import TemporaryDirectory
 import types
 import unittest
 from unittest.mock import patch
@@ -1534,6 +1535,13 @@ class LifecycleIntegrationTests(unittest.TestCase):
 
         self.runtime.bpy.app = types.SimpleNamespace(timers=Timers(self.timers))
         self.runtime.bpy.types = types.SimpleNamespace(PropertyGroup=type('PropertyGroup', (), {}))
+        self.runtime.bpy.context.preferences = types.SimpleNamespace(
+            keymap=types.SimpleNamespace(active_keyconfig='Blender'))
+        resources = Path(self.enterContext(TemporaryDirectory()))
+        self.runtime.bpy.utils = types.SimpleNamespace(
+            user_resource=lambda kind, *, path: str(resources / kind / path),
+            preset_find=lambda *args, **kwargs: None,
+        )
 
         def preference_group(**values):
             group = types.SimpleNamespace(**values)
@@ -1542,7 +1550,7 @@ class LifecycleIntegrationTests(unittest.TestCase):
             return group
 
         self.preferences = types.SimpleNamespace(
-            keymap=preference_group(enable_keymaps=True),
+            keymap=preference_group(enable_keymaps=True, deluxe_configured=False),
             pie=preference_group(enable_pie_menus=True),
             thirdparty=preference_group(enable_thirdparty=True),
             is_ready=lambda: True)
@@ -1560,6 +1568,7 @@ class LifecycleIntegrationTests(unittest.TestCase):
         diagnostics = stub_module(prefix + '.Lib.commonUtils.runtime.diagnostics')
         diagnostics.log = lambda *args: None
         diagnostics.Severity = types.SimpleNamespace(INFO=1, WARNING=2, DEBUG=3)
+        stub_module(prefix + '.Lib.commonUtils.persistence').atomic_write_bytes = lambda *args: None
         stub_module(prefix + '.debug.debug_flags')
         preference_module = stub_module(prefix + '.preferences.prefs')
         preference_module.prefs = lambda: self.preferences
@@ -1627,6 +1636,32 @@ class LifecycleIntegrationTests(unittest.TestCase):
         self.orchestrator.unregister()
         self.assertEqual(self.addon_names(), [])
         self.assertEqual(self.timers, {})
+
+    def test_legacy_profile_blocks_saved_runtime_switches_until_review(self):
+        settings = self.runtime.bpy.context.preferences.keymap
+        settings.active_keyconfig = 'BH_Keymaps'
+        self.orchestrator.register()
+        self.assertEqual(self.addon_names(), [])
+        settings.active_keyconfig = 'Blender'
+        self.orchestrator._watch_keymaps()
+        self.assertEqual(self.addon_names(), [])
+        self.preferences.keymap.deluxe_configured = True
+        self.orchestrator._watch_keymaps()
+        self.assertEqual(len(self.addon_names()), 10)
+        settings.active_keyconfig = 'BH_Keymaps'
+        self.orchestrator._watch_keymaps()
+        self.assertEqual(self.addon_names(), [])
+
+    def test_disabling_deluxe_drains_pies_without_changing_the_saved_pie_switch(self):
+        self.preferences.keymap.deluxe_configured = True
+        self.orchestrator.register()
+        self.preferences.keymap.enable_keymaps = False
+        self.orchestrator.refresh()
+        self.assertEqual(self.addon_names(), ['bluehole.pipeline'])
+        self.assertTrue(self.preferences.pie.enable_pie_menus)
+        self.preferences.keymap.enable_keymaps = True
+        self.orchestrator.refresh()
+        self.assertEqual(len(self.addon_names()), 10)
 
     def test_later_category_failure_drains_earlier_work_and_timer(self):
         self.fail_category = 'Sculpt'

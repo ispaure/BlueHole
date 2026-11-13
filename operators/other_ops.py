@@ -20,6 +20,7 @@ import bpy
 from bpy.props import *
 from ..Lib.commonUtils.integrations.web import open_url
 from ..overlays.deluxe import applyDeluxePrefs
+from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -42,13 +43,77 @@ class WM_OT_URLOpen(bpy.types.Operator):
 
 
 class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
-    """ Apply Blue Hole Deluxe Preferences """
+    """Enable the Deluxe shortcut catalog on the built-in Blender preset"""
     bl_idname = "wm.bh_apply_deluxe_prefs"
-    bl_label = "Apply DELUXE Preferences"
+    bl_label = "Enable Deluxe Keymaps"
     bl_options = {'INTERNAL'}
 
-    def execute(self, _context):
-        return {'FINISHED'} if applyDeluxePrefs.apply_deluxe_prefs() else {'CANCELLED'}
+    reviewed: BoolProperty(
+        name="I reviewed saved shortcuts and resolved legacy conflicts",
+        options={'SKIP_SAVE'},
+    )
+
+    def invoke(self, context, _event):
+        self.reviewed = False
+        if (applyDeluxePrefs.uses_blender_keyconfig(context.window_manager.keyconfigs)
+                and applyDeluxePrefs.needs_keymap_review(context, prefs().prefs)):
+            return context.window_manager.invoke_props_dialog(self, width=470)
+        return self.execute(context)
+
+    def draw(self, _context):
+        self.layout.label(text="Back up your saved setup before changing shortcuts.")
+        self.layout.label(text="Review Blender Preferences > Keymap for old Deluxe edits.")
+        self.layout.label(text="Keep personal shortcuts and remove any conflicting legacy edits.")
+        self.layout.prop(self, 'reviewed')
+
+    def execute(self, context):
+        try:
+            applyDeluxePrefs.apply_deluxe_prefs(context, prefs().prefs, reviewed=self.reviewed)
+        except (ValueError, RuntimeError) as error:
+            self.report({'WARNING'}, str(error))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
+class WM_OT_Disable_Deluxe_Keymaps(bpy.types.Operator):
+    """Disable Deluxe shortcuts and keep your feature settings"""
+    bl_idname = "wm.bh_disable_deluxe_keymaps"
+    bl_label = "Disable Deluxe Keymaps"
+    bl_options = {'INTERNAL'}
+
+    def execute(self, context):
+        applyDeluxePrefs.disable_deluxe_keymaps(context, prefs().prefs)
+        return {'FINISHED'}
+
+
+class WM_OT_Backup_Keymap_Setup(bpy.types.Operator):
+    """Copy saved Blender preferences and the available preset for rollback"""
+    bl_idname = "wm.bh_backup_keymap_setup"
+    bl_label = "Back Up Saved Keymap Setup"
+    bl_options = {'INTERNAL'}
+
+    def execute(self, context):
+        try:
+            backup = applyDeluxePrefs.backup_keymap_setup(context)
+        except (ValueError, OSError) as error:
+            self.report({'WARNING'}, str(error))
+            return {'CANCELLED'}
+        self.report({'INFO'}, f'Keymap setup copied to {backup}')
+        return {'FINISHED'}
+
+
+class WM_OT_Reset_Deluxe_Keymaps(bpy.types.Operator):
+    """Restore the default Deluxe feature switches"""
+    bl_idname = "wm.bh_reset_deluxe_keymaps"
+    bl_label = "Reset Deluxe Feature Switches"
+    bl_options = {'INTERNAL'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def execute(self, context):
+        applyDeluxePrefs.reset_deluxe_groups(context, prefs().prefs)
+        return {'FINISHED'}
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -58,6 +123,9 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
 classes = (
     WM_OT_URLOpen,
     WM_OT_Apply_Deluxe_Prefs,
+    WM_OT_Disable_Deluxe_Keymaps,
+    WM_OT_Backup_Keymap_Setup,
+    WM_OT_Reset_Deluxe_Keymaps,
 )
 
 

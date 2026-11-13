@@ -36,6 +36,7 @@ import bpy
 from ..Lib.commonUtils.runtime.diagnostics import *
 from . import keymap_utils
 from ..preferences.prefs import prefs
+from ..overlays.deluxe import applyDeluxePrefs
 from ..debug.debug_flags import *
 from .pie import pie_keymaps_register
 from . import mesh_keymaps_register
@@ -74,6 +75,7 @@ keymap_module_lst = (
 _enabled = False
 _registering = False
 _preference_state = None
+_legacy_profile = False
 _last_error = None
 _wait_interval = 0.25
 WATCH_INTERVAL = 0.25
@@ -110,8 +112,19 @@ def _boolean_preferences(group):
 
 def _preference_signature():
     p = prefs()
-    return tuple((name, _boolean_preferences(getattr(p, name)))
-                 for name in ('keymap', 'pie', 'thirdparty') if hasattr(p, name))
+    allowed = runtime_keymaps_allowed(bpy.context, p.keymap)
+    switches = tuple((name, _boolean_preferences(getattr(p, name)))
+                     for name in ('keymap', 'pie', 'thirdparty'))
+    return allowed, switches
+
+
+def runtime_keymaps_allowed(context, settings):
+    """Guard saved opt-ins and preset switches through Blender's own UI."""
+    if applyDeluxePrefs.legacy_preset_active(context):
+        return False
+    if settings.deluxe_configured:
+        return applyDeluxePrefs.uses_blender_keyconfig(context.window_manager.keyconfigs)
+    return not _legacy_profile
 
 
 def _bind_category(module):
@@ -155,12 +168,15 @@ def _apply_categories():
     try:
         _clear_categories()
         p = prefs()
-        for module in (*keymap_module_lst, pie_keymaps_register):
-            _bind_category(module)
-            # Pipeline chooses its obligatory actions itself; Pie has its own gate.
-            if module not in (pipeline_keymaps_register, pie_keymaps_register) and not p.keymap.enable_keymaps:
-                continue
-            total += module.register()
+        if runtime_keymaps_allowed(bpy.context, p.keymap):
+            for module in (*keymap_module_lst, pie_keymaps_register):
+                _bind_category(module)
+                # Pipeline retains Save As. Standard Pie has its own opt-in.
+                if not p.keymap.enable_keymaps and (
+                        module is not pipeline_keymaps_register
+                        and (module is not pie_keymaps_register or p.keymap.deluxe_configured)):
+                    continue
+                total += module.register()
         _preference_state = _preference_signature()
         watcher_stats['category_refreshes'] += 1
         return total
@@ -203,7 +219,9 @@ def _watch_keymaps():
 
 
 def register():
-    global _enabled
+    global _enabled, _legacy_profile
+    _legacy_profile = (not prefs().keymap.deluxe_configured
+                       and applyDeluxePrefs.has_legacy_profile(bpy.context))
     _enabled = True
     try:
         total = _apply_categories()

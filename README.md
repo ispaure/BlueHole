@@ -13,9 +13,10 @@ Follow the [installation guide](https://blue-hole.weebly.com/installation.html),
 then enable Blue Hole in Blender's add-on preferences. Start with the standard
 mode and enable the keymaps and tools you need.
 
-**Deluxe mode replaces Blender's `userpref.blend` after confirmation.** It keeps
-a recovery copy of the previous preferences. Read the prompt before accepting;
-this affects your Blender setup, not just Blue Hole.
+Choose **Enable Deluxe Keymaps** under **Updates & Deluxe** in the Blue Hole
+header menu to load the Deluxe shortcut catalog on the built-in Blender preset.
+Existing Deluxe users can back up and review their saved bindings before
+switching. [Activation and recovery guide](overlays/deluxe/README.md)
 
 ## What you can do
 
@@ -47,8 +48,7 @@ keymaps and menu preferences belong to your Blender installation.
 
 Run `python -m unittest discover -s tests -v` for adapter checks outside Blender.
 GitHub runs them on Windows, macOS and Linux. They check shared command contracts
-and preference-installation failure handling; they do not exercise a live engine,
-Perforce server or Blender desktop session.
+and Deluxe activation and recovery with disposable fixtures.
 
 Portable contracts can also run inside Blender's embedded Python with the
 [isolated smoke-test launcher](tests/README.md#embedded-shared-library-smoke-test).

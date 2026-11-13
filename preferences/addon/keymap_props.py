@@ -49,6 +49,7 @@ _KEYMAP_DRAW_MODULES = {
     'PIPELINE': keymap_props_pipeline,
     'OTHER': keymap_props_other,
 }
+KEYMAP_CATEGORIES = tuple(name.lower() for name in _KEYMAP_DRAW_MODULES)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -94,16 +95,32 @@ class KeymapPG(bpy.types.PropertyGroup):
         default=False,
         update=_update_keymaps
     )
+    deluxe_configured: BoolProperty(default=False, options={'HIDDEN'})
 
 
 def draw(preference, context, layout):
+    from ...keymaps import keymaps_register
+
     # -------------------------------------------------------------------------------------------------
     # KEYMAPS
     # -------------------------------------------------------------------------------------------------
     column_keymap = layout.column()
+    column_keymap.operator_context = 'INVOKE_DEFAULT'
 
-    row = column_keymap.row()
-    row.prop(preference.keymap, 'enable_keymaps')
+    if not preference.keymap.deluxe_configured:
+        column_keymap.operator('wm.bh_apply_deluxe_prefs')
+
+    if not keymaps_register.runtime_keymaps_allowed(context, preference.keymap):
+        column_keymap.label(text='Deluxe requires the Blender preset and a reviewed keymap setup.', icon='INFO')
+        column_keymap.operator('wm.bh_backup_keymap_setup')
+        return
+
+    label = 'Enable Deluxe Keymaps' if preference.keymap.deluxe_configured else 'Enable Keymaps'
+    column_keymap.prop(preference.keymap, 'enable_keymaps', text=label)
+
+    if preference.keymap.deluxe_configured:
+        column_keymap.operator('wm.bh_reset_deluxe_keymaps')
+        column_keymap.prop(context.preferences.inputs, 'invert_mouse_zoom')
 
     if not preference.keymap.enable_keymaps:
         row = column_keymap.row()

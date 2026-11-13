@@ -1,4 +1,6 @@
-Here is the list of **Key Mappings** relevant to artists in Blender.
+These tables describe shortcuts from the reference Blender setup. For the active
+runtime catalog, see **Addon Settings > Keymaps** in Blue Hole preferences.
+See the [Deluxe guide](../README.md) for activation, migration, and known gaps.
 
 > [!NOTE] Mouse-related acronyms
 > Note the mouse-related acronyms:

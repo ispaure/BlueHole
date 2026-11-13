@@ -1,27 +1,62 @@
-# Blue Hole Deluxe
-Blue Hole Deluxe is a custom configuration for Blender that changes the userpref.blend file, applying new `keymaps` and `pie menus`. Install instructions here: https://blue-hole.weebly.com/installation.html
+# Deluxe keymaps
 
-## Deluxe Overrides the UserPref.blend preference file!
-If you are attached to your current settings, back them up before installing Blue Hole Deluxe.
+Enable Blue Hole, then choose **Enable Deluxe Keymaps** under **Updates &
+Deluxe** in the Blue Hole header menu. Deluxe uses the built-in **Blender**
+preset. Blue Hole adds the shortcuts and pies at runtime. Every feature group
+starts enabled in a fresh profile. The standard Blue Hole installation keeps
+its existing Keymaps and Pie Menus opt-ins.
 
-## Documentation
-The Documentation for Blue Hole Deluxe can be accessed in Blender through the Blue Hole header menu.
+Use **Addon Settings > Keymaps**, **Pie Menus**, and **Third-Party Add-ons** in
+Blue Hole preferences to change features. **Disable Deluxe Keymaps** removes
+the runtime catalog and its pie shortcuts and keeps your feature choices for
+the next enable. Save Preferences to keep your choices across sessions.
+The standard Blue Hole Save As shortcut is part of Blue Hole's pipeline while
+the add-on is enabled. Disable Blue Hole to restore the stock Save As shortcut.
 
-## Verified installation and recovery
+**Reset Deluxe Feature Switches** restores the Blue Hole keymap, pie, and
+supported third-party shortcut switches to their Deluxe defaults. It leaves
+the current activation state and your Blender bindings in place. **Invert
+Mouse Zoom** is available in the Keymaps panel as a separate Blender input
+preference. Set it to match your preferred zoom direction.
 
-Each preferences/keymap payload is copied to private staging beside its target
-and verified before publication. Interrupted or corrupt copies leave the existing
-file intact. Publication retains the previous file as `<name>.previous-<id>` in
-the same directory and logs its path. Keep those recovery files until the new
-configuration has been checked. To restore, close Blender and copy the selected
-recovery file back to its original name.
+## Move an existing profile to runtime Deluxe
 
-The two files are installed separately. If the second fails, the first may already
-be installed; the error lists verified destinations and Blender stays open.
-Recovery copies are never cleaned automatically. Existing read-only targets are
-made writable only after staging has passed verification; those permissions
-are retained on the installed file. Linked targets are rejected before changing
-their permissions or content. No-replace publication
-rejects a target created by another writer; failed restoration retains and reports
-the old recovery file. Adapter tests use temporary settings outside Blender; a
-live Blender 5.2.2 installation remains a separate validation step.
+The previous installer copied both a preset and a preferences file. The new
+version waits for a reviewed switch when it finds evidence of that installation.
+It also asks you to review saved keymap edits on first Deluxe activation.
+Blender can carry saved edits across a preset switch, and their origins can be
+ambiguous.
+
+1. Save your current Blender preferences. Choose **Back Up Saved Keymap Setup**
+   under **Updates & Deluxe**. The command reports a new recovery directory
+   next to the saved preferences. It copies the saved settings and available
+   preset. Keep any older recovery copies too.
+2. In **Preferences > Keymap**, select **Blender**. Review saved customizations
+   and resolve shortcuts that came from the old Deluxe setup. Keep personal
+   bindings. If you are unsure which edits to keep, use your current setup
+   until you can review them. You can compare against a pre-Deluxe backup
+   in a separate Blender profile if one is available.
+3. Choose **Enable Deluxe Keymaps** and confirm your review. Check your
+   shortcuts, then use Blender's **Save Preferences** when ready.
+
+To return to the previous setup, disable Deluxe and select the old preset in
+**Preferences > Keymap**. To recover the exact settings from the backup, close
+Blender and keep a copy of your current files first. Restore the saved
+`userpref.blend` and, if needed, the matching preset to the active profile.
+That restores other preferences as of the backup too. The runtime activation
+keeps the legacy preset, recovery copies, ordinary preferences, and installed
+add-ons in place.
+
+## Shortcut coverage
+
+Shortcuts that need external add-ons depend on those add-ons being installed
+and enabled. Supported overrides wait for the provider's bindings. Known
+gaps include unsupported native modal bindings, the two Zen UV shortcuts in
+the factory-profile test, and the SpaceMouse Roll CCW pair whose hardware
+behavior still needs verification. Some composed UV, Sculpt, Tool Pie, and
+export workflows still need native parity checks. The detailed exceptions are
+recorded in the [Navigation, Selection and Transform](../../docs/deluxe-keymaps-category03.md),
+[Object, Mesh and UV](../../docs/deluxe-keymaps-category04.md), and
+[Sculpt, Pipeline, Other and Pie](../../docs/deluxe-keymaps-category05.md)
+receipts. The old preset and preference snapshot remain reference inputs in
+the source checkout. The installable ZIP contains the runtime catalog.

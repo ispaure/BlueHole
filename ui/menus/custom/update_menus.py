@@ -19,7 +19,9 @@ __status__ = 'Production'
 import bpy
 
 # Blue Hole
+from ....keymaps import keymaps_register
 from ....operators import other_ops
+from ....preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # MENUS
@@ -31,7 +33,14 @@ class BLUE_HOLE_MT_update_deluxe(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator(other_ops.WM_OT_Apply_Deluxe_Prefs.bl_idname)
+        settings = prefs().keymap
+        layout.operator_context = 'INVOKE_DEFAULT'
+        operator = (other_ops.WM_OT_Disable_Deluxe_Keymaps
+                    if settings.deluxe_configured and settings.enable_keymaps
+                    and keymaps_register.runtime_keymaps_allowed(context, settings)
+                    else other_ops.WM_OT_Apply_Deluxe_Prefs)
+        layout.operator(operator.bl_idname)
+        layout.operator(other_ops.WM_OT_Backup_Keymap_Setup.bl_idname)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

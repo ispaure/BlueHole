@@ -1,8 +1,9 @@
 Here is the list of Pie Menus for Blue Hole.
   
 > [!NOTE] Dependencies
-> **Note that the Deluxe edition of Blue Hole is required for any Pie Menu shown here.**
-> Added dependencies are noted (whenever applicable). The menu would still popup but some option(s) may be missing, with shown warnings.
+> Enable Deluxe keymaps for the reference pie shortcuts, or opt in to the
+> standard Blue Hole pie menus separately. Some menu actions require other
+> add-ons. See the [Deluxe guide](../README.md) for the runtime setup.
   
   
 # 📖 TABLE OF CONTENTS

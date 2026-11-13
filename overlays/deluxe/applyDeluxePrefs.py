@@ -1,129 +1,138 @@
-"""
-Apply Blue Hole Deluxe Preferences
-"""
+"""Activate Deluxe keymaps and help artists review legacy profiles."""
 
-# ----------------------------------------------------------------------------------------------------------------------
-# AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
-
-__author__ = 'Marc-André Voyer'
-__copyright__ = 'Copyright (C) 2020-2026, Marc-André Voyer'
-__license__ = "MIT License"
-__maintainer__ = 'Marc-André Voyer'
-__email__ = 'marcandre.voyer@gmail.com'
-__status__ = 'Production'
-
-# ----------------------------------------------------------------------------------------------------------------------
-# IMPORTS
-
-
-import sys
-from shutil import copyfile, copymode
+from hashlib import sha256
 from pathlib import Path
-from tempfile import TemporaryDirectory
-from ...blenderUtils import blenderFile
-from ...Lib.commonUtils.runtime.diagnostics import log, Severity
-from ...Lib.commonUtils.filesystem import files as fileUtils
-from ...Lib.commonUtils.filesystem.links import is_junction
-from ...Lib.commonUtils import ui
-from ...Lib.commonUtils.persistence import promote_path
+from shutil import rmtree
+from tempfile import mkdtemp
+
+import bpy
+
+from ...Lib.commonUtils.persistence import atomic_write_bytes
+
+LEGACY_PRESET = 'BH_Keymaps'
+LEGACY_PREFERENCES_SIZE = 968903
+LEGACY_PREFERENCES_HASH = 'bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314'
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+def _preferences_path():
+    return Path(bpy.utils.user_resource('CONFIG', path='userpref.blend'))
 
 
-TOOL_NAME = 'Applying Blue Hole Deluxe Preferences'
+def _legacy_preset_path():
+    return bpy.utils.preset_find(LEGACY_PRESET, 'keyconfig', display_name=False)
 
 
-def _copy_and_verify(source: Path, destination: Path):
-    """Verify private staging before publication, retaining previous settings."""
-    if destination.is_symlink() or is_junction(destination):
-        raise ValueError('Refusing to replace linked preferences')
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    with TemporaryDirectory(prefix='.bluehole-preferences-', dir=destination.parent) as temporary:
-        staged = Path(temporary) / destination.name
-        log(Severity.INFO, TOOL_NAME, f'Staging "{source}" for "{destination}"')
-        copyfile(source, staged)
-        if staged.read_bytes() != source.read_bytes():
-            raise OSError(f'Content verification failed for "{destination}"; '
-                          'the staged file does not match the Deluxe payload.')
-
-        if destination.exists():
-            before_mode = destination.stat().st_mode
-            fileUtils.File(destination).make_writable()
-            copymode(destination, staged)
-            log(Severity.INFO, TOOL_NAME,
-                f'Made destination writable: "{destination}" '
-                f'(mode {oct(before_mode)} -> {oct(destination.stat().st_mode)})')
-        backup = promote_path(staged, destination)
-        if backup is not None:
-            log(Severity.INFO, TOOL_NAME, f'Recovery copy retained at "{backup}"')
-
-    log(Severity.INFO, TOOL_NAME,
-        f'Verified "{destination}" ({destination.stat().st_size} bytes)')
-
-
-def apply_deluxe_prefs() -> bool:
-    """ Applies the Deluxe Blue Hole Preferences, by overwriting the userpref.blend and keymaps file. """
-
-    # Leave an out for the user.
-    if not warning_bh_deluxe():
-        log(Severity.INFO, TOOL_NAME, 'Cancelled by the user; no files copied.')
-        return False
-
-    verified = []
-    stage = 'Resolving installation paths'
+def has_legacy_profile(context):
+    """Recognize installer artifacts, including an exact payload without its preset."""
+    if legacy_preset_active(context) or _legacy_preset_path():
+        return True
+    path = _preferences_path()
     try:
-        copies = (
-            (get_payload_dir() / 'userpref.blend', Path(blenderFile.get_userpref_path())),
-            (get_payload_dir() / 'keyconfig' / 'BH_Keymaps.py',
-             Path(blenderFile.get_keyconfig_path(), 'BH_Keymaps.py')),
-        )
-        # Check both payloads before overwriting either destination.
-        for source, destination in copies:
-            stage = f'Checking payload "{source}"'
-            log(Severity.INFO, TOOL_NAME, f'Source: "{source}"\nDestination: "{destination}"')
-            if not source.is_file() or source.stat().st_size == 0:
-                raise OSError(f'Deluxe payload is missing or empty: "{source}"')
-
-        for source, destination in copies:
-            stage = f'Installing "{source}" to "{destination}"'
-            _copy_and_verify(source, destination)
-            verified.append(str(destination))
-
-    except Exception as error:
-        completed = '\n'.join(verified) if verified else 'None'
-        msg = (f'Applying Deluxe preferences did not complete.\n\n'
-               f'Step: {stage}\n'
-               f'Error: {type(error).__name__}: {error}\n\n'
-               f'Files copied and verified:\n{completed}\n\n'
-               'Blender will remain open. Some files may already have been changed. '
-               'Check the paths and folder permissions above. If a file is locked by another '
-               'application, close that application and try again.')
-        log(Severity.ERROR, TOOL_NAME, msg, popup=True)
+        # The previous installer could leave a recovery copy in both locations.
+        presets = Path(bpy.utils.user_resource('SCRIPTS', path='presets/keyconfig'))
+        if (any(presets.glob(LEGACY_PRESET + '.py.previous-*'))
+                and any(path.parent.glob(path.name + '.previous-*'))):
+            return True
+        return (path.stat().st_size == LEGACY_PREFERENCES_SIZE
+                and sha256(path.read_bytes()).hexdigest() == LEGACY_PREFERENCES_HASH)
+    except FileNotFoundError:
         return False
-
-    # Say that operation was done and Blender will terminate
-    notice_blender_closure()
-    sys.exit()
-
-
-def get_payload_dir():
-    return Path(__file__).parent / 'payload'
+    except OSError:
+        # An unreadable profile cannot be classified safely.
+        return True
 
 
-def warning_bh_deluxe() -> bool:
-    msg = ('You are about to apply the Blue Hole DELUXE preferences.\n\n'
-           'IMPORTANT: This action will OVERWRITE YOUR CURRENT BLENDER SETTINGS ("userpref.blend" file). '
-           'If you wish to preserve your existing preferences, please create a backup before continuing.\n\n'
-           'After installation, you will be prompted to close Blender. Ensure all work is saved now before proceeding.'
-           '\n\n'
-           'Do you want to continue?')
-    return ui.display_msg_box_ok_cancel('WARNING: APPLY BLUE HOLE DELUXE PREFERENCES', msg)
+def legacy_preset_active(context):
+    return context.preferences.keymap.active_keyconfig in {LEGACY_PRESET, 'BH Keymaps'}
 
 
-def notice_blender_closure():
-    msg = ('Blue Hole DELUXE preferences have been installed successfully. \n\n'
-           'Blender will now close to complete the installation. \n\n'
-           'Please restart Blender to experience the DELUXE configuration.')
-    log(Severity.INFO, 'BLUE HOLE DELUXE', msg, popup=True)
+def uses_blender_keyconfig(configs):
+    return configs.default is not None and configs.active == configs.default
+
+
+def backup_keymap_setup(context):
+    """Keep private copies of the saved preferences and available preset for rollback."""
+    path = _preferences_path()
+    if not path.is_file():
+        raise ValueError('Save Blender Preferences before backing up the keymap setup.')
+    configs = context.window_manager.keyconfigs
+    name = configs.active.name
+    preset = _legacy_preset_path()
+    if not uses_blender_keyconfig(configs):
+        preset = bpy.utils.preset_find(name, 'keyconfig', display_name=False)
+        if not preset:
+            raise ValueError('Export the active keymap preset in Blender Preferences before switching.')
+    backup = Path(mkdtemp(prefix='bluehole-keymap-recovery-', dir=path.parent))
+    try:
+        atomic_write_bytes(backup / path.name, path.read_bytes(), overwrite=False, file_mode=0o600)
+        if preset:
+            source = Path(preset)
+            atomic_write_bytes(backup / source.name, source.read_bytes(), overwrite=False, file_mode=0o600)
+    except BaseException:
+        rmtree(backup)
+        raise
+    return backup
+
+
+def needs_keymap_review(context, preference):
+    if preference.keymap.deluxe_configured:
+        return False
+    configs = context.window_manager.keyconfigs
+    return has_legacy_profile(context) or any(km.is_user_modified for km in configs.user.keymaps)
+
+
+def _set_keymap_options(context, options):
+    # Set the backing values together and rebuild the runtime once.
+    from ...keymaps import keymaps_register
+
+    previous = [(group, name, group.get(name)) for group, name, _ in options]
+
+    def write(group, name, value):
+        if value is None:
+            if name in group:
+                del group[name]
+        else:
+            group[name] = value
+
+    try:
+        for group, name, value in options:
+            write(group, name, value)
+        keymaps_register.refresh()
+    except Exception:
+        for group, name, value in previous:
+            write(group, name, value)
+        keymaps_register.refresh()
+        raise
+    context.preferences.is_dirty = True
+
+
+def apply_deluxe_prefs(context, preference, *, reviewed=False):
+    if (legacy_preset_active(context)
+            or not uses_blender_keyconfig(context.window_manager.keyconfigs)):
+        raise ValueError('Back up your current setup, then select Blender in Preferences > Keymap.')
+    if needs_keymap_review(context, preference) and not reviewed:
+        raise ValueError('Review the saved shortcuts before enabling Deluxe keymaps.')
+
+    options = [(preference.keymap, 'deluxe_configured', True),
+               (preference.keymap, 'enable_keymaps', True)]
+    if not preference.pie.is_property_set('enable_pie_menus'):
+        options.append((preference.pie, 'enable_pie_menus', True))
+    _set_keymap_options(context, options)
+
+
+def disable_deluxe_keymaps(context, preference):
+    _set_keymap_options(context, [(preference.keymap, 'enable_keymaps', False)])
+
+
+def reset_deluxe_groups(context, preference):
+    """Restore feature switch defaults while keeping activation and user bindings."""
+    from ...preferences.addon.keymap_props import KEYMAP_CATEGORIES
+
+    groups = [getattr(preference.keymap, name) for name in KEYMAP_CATEGORIES]
+    groups.extend((preference.thirdparty.auto_constraints, preference.thirdparty.x_ray_selection_tools))
+    options = [(group, prop.identifier, None) for group in groups
+               for prop in group.bl_rna.properties
+               if prop.type == 'BOOLEAN' and prop.identifier.startswith('enable_')]
+    options.extend(((preference.pie, 'enable_pie_menus', True),
+                    (preference.pie, 'enable_editor_pie_shortcuts', None)))
+    _set_keymap_options(context, options)

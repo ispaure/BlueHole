@@ -18,6 +18,8 @@ FILES={'__init__.py','LICENSE.md','url_database.ini'}
 DIRECTORIES={'actions','blenderUtils','debug','environment','keymaps','operators','overlays',
              'preferences','ui','unrealUtils','wrappers','Lib','envFiles'}
 EXCLUDE={'.git','.github','__pycache__','tests','test-results','.venv','docs','user_docs','.ruff_cache'}
+# Keep the historical parity inputs in the checkout and outside installable ZIPs.
+LEGACY_DELUXE_PAYLOAD=PurePosixPath('overlays/deluxe/payload')
 
 
 def git(*args):
@@ -59,6 +61,7 @@ def members():
         if not name:continue
         path=PurePosixPath(name)
         if path.is_absolute() or '..' in path.parts:raise ValueError('Unsafe archive path.')
+        if path.is_relative_to(LEGACY_DELUXE_PAYLOAD):continue
         if any(part in EXCLUDE or part.endswith('.egg-info') for part in path.parts):continue
         if path.parts[0] not in DIRECTORIES and name not in FILES:continue
         if path.parts[0]=='envFiles' and path.parts[1:2]!=('default',):continue

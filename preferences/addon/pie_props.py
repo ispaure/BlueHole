@@ -56,10 +56,18 @@ class PiePG(bpy.types.PropertyGroup):
 
 
 def draw(preference, context, layout):
+    from ...keymaps import keymaps_register
+
     # -------------------------------------------------------------------------------------------------
     # PIE MENUS
     # -------------------------------------------------------------------------------------------------
     column_pie = layout.column()
+    if not keymaps_register.runtime_keymaps_allowed(context, preference.keymap):
+        column_pie.label(text='Review your keymap setup in Blue Hole’s Keymaps panel.', icon='INFO')
+        return
+    if preference.keymap.deluxe_configured and not preference.keymap.enable_keymaps:
+        column_pie.label(text='Enable Deluxe Keymaps to use Deluxe pie shortcuts.')
+        return
 
     draw_action_feature_keymaps(
         column=column_pie,
