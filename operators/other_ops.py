@@ -19,11 +19,23 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 from ..Lib.commonUtils.integrations.web import open_url
+from ..Lib.commonUtils.runtime.diagnostics import Severity, log
 from ..overlays.deluxe import applyDeluxePrefs
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
+
+
+def _keymap_error(operator, context, error, message):
+    log(Severity.ERROR, operator.bl_label, f'{type(error).__name__}: {message}')
+    if not bpy.app.background:
+        def draw(menu, _context):
+            menu.layout.label(text=message)
+
+        context.window_manager.popup_menu(draw, title=operator.bl_label, icon='ERROR')
+    operator.report({'WARNING'}, message)
+    return {'CANCELLED'}
 
 
 class WM_OT_URLOpen(bpy.types.Operator):
@@ -62,6 +74,7 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
 
     def draw(self, _context):
         self.layout.label(text="Back up your saved setup before changing shortcuts.")
+        self.layout.operator('wm.bh_backup_keymap_setup')
         self.layout.label(text="Review Blender Preferences > Keymap for old Deluxe edits.")
         self.layout.label(text="Keep personal shortcuts and remove any conflicting legacy edits.")
         self.layout.prop(self, 'reviewed')
@@ -69,9 +82,10 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
     def execute(self, context):
         try:
             applyDeluxePrefs.apply_deluxe_prefs(context, prefs().prefs, reviewed=self.reviewed)
-        except (ValueError, RuntimeError) as error:
-            self.report({'WARNING'}, str(error))
-            return {'CANCELLED'}
+        except Exception as error:
+            message = str(error) if isinstance(error, (ValueError, applyDeluxePrefs.ActivationError)) else (
+                'Blender could not apply Deluxe keymaps. See the Blue Hole log and try again.')
+            return _keymap_error(self, context, error, message)
         return {'FINISHED'}
 
 
@@ -96,8 +110,10 @@ class WM_OT_Backup_Keymap_Setup(bpy.types.Operator):
         try:
             backup = applyDeluxePrefs.backup_keymap_setup(context)
         except (ValueError, OSError) as error:
-            self.report({'WARNING'}, str(error))
-            return {'CANCELLED'}
+            message = str(error) if isinstance(error, ValueError) else (
+                'Could not create the backup. Check that Blender’s configuration folder is writable '
+                'and has free space, then try again.')
+            return _keymap_error(self, context, error, message)
         self.report({'INFO'}, f'Keymap setup copied to {backup}')
         return {'FINISHED'}
 

@@ -8,6 +8,13 @@ beside the selected item's settings in wide windows. In narrow windows the
 settings appear below the list. Assignment search spans all sections. The
 category and section menus browse one section at a time when search is empty.
 
+If activation asks for a review, **Back Up Saved Keymap Setup** copies the
+saved Blender preferences and available preset before you review conflicting
+shortcuts. Save Blender Preferences first if there is no saved file. Activation
+and backup failures show the next step in Blender and log the failure. If the
+runtime cannot rebuild the shortcuts, activation restores the prior preference
+choices.
+
 - The Assignments list shows each command's source, such as Blender, Blue Hole
   or a named add-on. Select an assignment to see its settings and section.
   The section link opens its assignments and the checkbox stages its enabled

@@ -326,8 +326,6 @@ def unregister():
 
 
 def refresh():
-    """Refresh category requests without creating another watcher."""
-    if _registering:
-        return
-    if _enabled:
-        _apply_categories()
+    """Return the installed count, or None if a refresh could not start."""
+    if _enabled and not _registering and _ready():
+        return _apply_categories()

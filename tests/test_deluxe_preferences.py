@@ -52,8 +52,10 @@ class DeluxePreferencesTests(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.module = importlib.import_module(f'{package_name}.overlays.deluxe.applyDeluxePrefs')
         keymaps = importlib.import_module(f'{package_name}.keymaps')
-        self.refresh = Mock()
-        keymaps.keymaps_register = SimpleNamespace(refresh=self.refresh)
+        self.refresh = Mock(return_value=12)
+        self.pending_cleanup = Mock(return_value=())
+        keymaps.keymaps_register = SimpleNamespace(
+            refresh=self.refresh, keymap_utils=SimpleNamespace(pending_cleanup=self.pending_cleanup))
         sys.modules[f'{package_name}.preferences.addon.keymap_props'] = SimpleNamespace(
             KEYMAP_CATEGORIES=('navigation',),
         )
@@ -217,6 +219,26 @@ class DeluxePreferencesTests(unittest.TestCase):
         self.assertEqual(dict(self.pref.pie), {'enable_pie_menus': False})
         self.assertFalse(self.context.preferences.is_dirty)
         self.assertEqual(self.refresh.call_count, 2)
+
+    def test_busy_runtime_and_pending_cleanup_leave_activation_off(self):
+        for count, pending, message in ((None, (), 'still starting'),
+                                        (12, ('owned shortcut',), 'still releasing prior keymaps')):
+            with self.subTest(message=message):
+                self.refresh.return_value = count
+                self.pending_cleanup.return_value = pending
+                with self.assertRaisesRegex(RuntimeError, message):
+                    self.apply()
+                self.assertEqual(dict(self.pref.keymap), {})
+                self.assertEqual(dict(self.pref.pie), {})
+                self.assertFalse(self.context.preferences.is_dirty)
+
+    def test_failed_rollback_preserves_preference_choices_and_explains_recovery(self):
+        self.refresh.side_effect = [RuntimeError('apply failed'), RuntimeError('rollback failed')]
+        with self.assertRaisesRegex(RuntimeError, 'Reopen Blender'):
+            self.apply()
+        self.assertEqual(dict(self.pref.keymap), {})
+        self.assertEqual(dict(self.pref.pie), {})
+        self.assertFalse(self.context.preferences.is_dirty)
 
 
 if __name__ == '__main__':
