@@ -16,8 +16,8 @@ __status__ = 'Production'
 # IMPORTS
 
 from .keymap_action_utils import ensure_action_keymaps
-from ..actions.operator_action import unregister_registered_keymaps
-from ..actions.actions.keymaps.object_actions import get_object_actions
+from .keymap_utils import drain_legacy
+from ..actions.actions.keymaps.object import get_enabled_object_catalog
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -38,13 +38,10 @@ def get_enabled_object_actions():
     """
     Return the list of object actions that should currently be registered.
     """
-    actions = []
-
-    if not prefs().keymap.object.enable_object_keymaps:
-        return actions
-
-    actions.extend(get_object_actions())
-    return actions
+    preferences = prefs().keymap
+    if not preferences.enable_keymaps or not preferences.object.enable_object_keymaps:
+        return []
+    return get_enabled_object_catalog(preferences.object)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -68,5 +65,6 @@ def register() -> int:
 
 def unregister() -> int:
     unregistered_count = len(registered_object_keymaps)
-    unregister_registered_keymaps(registered_object_keymaps)
+    drain_legacy(KEYMAP_CATEGORY)
+    registered_object_keymaps.clear()
     return unregistered_count

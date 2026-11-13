@@ -16,23 +16,15 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-from bpy.props import *
+from bpy.props import BoolProperty
 
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+from ....actions.actions.keymaps.object import OBJECT_KEYMAP_GROUPS, get_object_group_actions
+from .keymap_props_modeling_ui import draw_modeling_keymaps
 
 
-def _update_enable_object_keymaps(self, context):
-    """
-    Enable or disable Blue Hole object keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    pass
+def _update_keymaps(self, context):
+    from ....keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class ObjectKeymapPG(bpy.types.PropertyGroup):
@@ -41,50 +33,34 @@ class ObjectKeymapPG(bpy.types.PropertyGroup):
         name='Enable Object Keymaps',
         description='Enable Blue Hole object keymaps',
         default=True,
-        update=_update_enable_object_keymaps
+        update=_update_keymaps,
     )
 
-    enable_object_selection_shortcuts: BoolProperty(
-        name='Enable Object Selection Shortcuts',
-        description='Enable Blue Hole object selection shortcuts',
+    enable_object_mode_shortcuts: BoolProperty(
+        name='Enable Mode Switching',
+        description='Switch object and edit modes',
         default=True,
+        update=_update_keymaps,
     )
 
     enable_object_action_shortcuts: BoolProperty(
-        name='Enable Object Action Shortcuts',
-        description='Enable Blue Hole object action shortcuts',
+        name='Enable Object Actions',
+        description='Use object shortcuts such as Delete and Join Groups',
         default=True,
+        update=_update_keymaps,
     )
 
-    enable_object_tool_shortcuts: BoolProperty(
-        name='Enable Object Tool Shortcuts',
-        description='Enable Blue Hole object tool shortcuts',
-        default=True,
-    )
+    # Retain the saved IDs of the original placeholder groups.
+    enable_object_selection_shortcuts: BoolProperty(default=True)
+    enable_object_tool_shortcuts: BoolProperty(default=True)
 
 
 def draw(preference, context, layout):
-    # -------------------------------------------------------------------------------------------------
-    # OBJECT KEYMAPS
-    # -------------------------------------------------------------------------------------------------
-    column_object = layout.column()
-
-    row = column_object.row()
-    row.prop(preference.keymap.object, 'enable_object_keymaps')
-
-    if not preference.keymap.object.enable_object_keymaps:
-        row = column_object.row()
-        row.label(text='Object keymaps are currently disabled.')
+    preferences = preference.keymap.object
+    column = layout.column()
+    column.prop(preferences, 'enable_object_keymaps')
+    if not preferences.enable_object_keymaps:
         return
 
-    row = column_object.row()
-    row.prop(preference.keymap.object, 'enable_object_selection_shortcuts')
-
-    row = column_object.row()
-    row.prop(preference.keymap.object, 'enable_object_action_shortcuts')
-
-    row = column_object.row()
-    row.prop(preference.keymap.object, 'enable_object_tool_shortcuts')
-
-    row = column_object.row()
-    row.label(text='Object keymap settings will appear here.')
+    for group, toggle in OBJECT_KEYMAP_GROUPS.items():
+        draw_modeling_keymaps(column, preferences, toggle, get_object_group_actions(group))

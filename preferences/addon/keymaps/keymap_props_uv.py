@@ -16,23 +16,15 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-from bpy.props import *
+from bpy.props import BoolProperty
 
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+from ....actions.actions.keymaps.uv import UV_KEYMAP_GROUPS, get_uv_group_actions
+from .keymap_props_modeling_ui import draw_modeling_keymaps
 
 
-def _update_enable_uv_keymaps(self, context):
-    """
-    Enable or disable Blue Hole UV keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    pass
+def _update_keymaps(self, context):
+    from ....keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class UVKeymapPG(bpy.types.PropertyGroup):
@@ -41,50 +33,37 @@ class UVKeymapPG(bpy.types.PropertyGroup):
         name='Enable UV Keymaps',
         description='Enable Blue Hole UV keymaps',
         default=True,
-        update=_update_enable_uv_keymaps
+        update=_update_keymaps,
     )
 
     enable_uv_selection_shortcuts: BoolProperty(
         name='Enable UV Selection Shortcuts',
-        description='Enable Blue Hole UV selection shortcuts',
+        description='Use UV loop, linked and Tweak selection shortcuts',
         default=True,
+        update=_update_keymaps,
     )
 
     enable_uv_tool_shortcuts: BoolProperty(
         name='Enable UV Tool Shortcuts',
-        description='Enable Blue Hole UV tool shortcuts',
+        description='Use UV Box tool and cursor shortcuts',
         default=True,
+        update=_update_keymaps,
     )
 
     enable_uv_action_shortcuts: BoolProperty(
         name='Enable UV Action Shortcuts',
-        description='Enable Blue Hole UV action shortcuts',
+        description='Use UV hide and fit shortcuts',
         default=True,
+        update=_update_keymaps,
     )
 
 
 def draw(preference, context, layout):
-    # -------------------------------------------------------------------------------------------------
-    # UV KEYMAPS
-    # -------------------------------------------------------------------------------------------------
-    column_uv = layout.column()
-
-    row = column_uv.row()
-    row.prop(preference.keymap.uv, 'enable_uv_keymaps')
-
-    if not preference.keymap.uv.enable_uv_keymaps:
-        row = column_uv.row()
-        row.label(text='UV keymaps are currently disabled.')
+    preferences = preference.keymap.uv
+    column = layout.column()
+    column.prop(preferences, 'enable_uv_keymaps')
+    if not preferences.enable_uv_keymaps:
         return
 
-    row = column_uv.row()
-    row.prop(preference.keymap.uv, 'enable_uv_selection_shortcuts')
-
-    row = column_uv.row()
-    row.prop(preference.keymap.uv, 'enable_uv_tool_shortcuts')
-
-    row = column_uv.row()
-    row.prop(preference.keymap.uv, 'enable_uv_action_shortcuts')
-
-    row = column_uv.row()
-    row.label(text='UV keymap settings will appear here.')
+    for group, toggle in UV_KEYMAP_GROUPS.items():
+        draw_modeling_keymaps(column, preferences, toggle, get_uv_group_actions(group))

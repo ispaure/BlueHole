@@ -16,30 +16,15 @@ __status__ = 'Production'
 # IMPORTS
 
 import bpy
-from bpy.props import *
+from bpy.props import BoolProperty
 
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+from ....actions.actions.keymaps.mesh import MESH_KEYMAP_GROUPS, get_mesh_group_actions
+from .keymap_props_modeling_ui import draw_modeling_keymaps
 
 
-def _update_enable_mesh_keymaps(self, context):
-    """
-    Enable or disable Blue Hole mesh keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    # Example:
-    # from ...keymaps.mesh import mesh_keymaps_register
-    #
-    # if self.enable_mesh_keymaps:
-    #     mesh_keymaps_register.register()
-    # else:
-    #     mesh_keymaps_register.unregister()
-    pass
+def _update_keymaps(self, context):
+    from ....keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class MeshKeymapPG(bpy.types.PropertyGroup):
@@ -48,43 +33,33 @@ class MeshKeymapPG(bpy.types.PropertyGroup):
         name='Enable Mesh Keymaps',
         description='Enable Blue Hole mesh keymaps',
         default=True,
-        update=_update_enable_mesh_keymaps
-    )
-
-    enable_mesh_selection_grow_shrink: BoolProperty(
-        name='Enable Grow / Shrink Selection',
-        description='Enable Blue Hole mesh selection grow and shrink shortcuts',
-        default=True,
-        # update=_update_enable_mesh_selection_grow_shrink
+        update=_update_keymaps,
     )
 
     enable_mesh_modeling_shortcuts: BoolProperty(
         name='Enable Modeling Shortcuts',
-        description='Enable Blue Hole mesh modeling shortcuts',
+        description='Use mesh modeling shortcuts',
         default=True,
-        # update=_update_enable_mesh_modeling_shortcuts
+        update=_update_keymaps,
     )
+
+    enable_mesh_tool_shortcuts: BoolProperty(
+        name='Enable Mesh Tool Shortcuts',
+        description='Use additional shortcuts in Edit Mesh tools',
+        default=True,
+        update=_update_keymaps,
+    )
+
+    # Selection More / Less is supplied by the Selection category.
+    enable_mesh_selection_grow_shrink: BoolProperty(default=True)
 
 
 def draw(preference, context, layout):
-    # -------------------------------------------------------------------------------------------------
-    # MESH KEYMAPS
-    # -------------------------------------------------------------------------------------------------
-    column_mesh = layout.column()
-
-    row = column_mesh.row()
-    row.prop(preference.keymap.mesh, 'enable_mesh_keymaps')
-
-    if not preference.keymap.mesh.enable_mesh_keymaps:
-        row = column_mesh.row()
-        row.label(text='Mesh keymaps are currently disabled.')
+    preferences = preference.keymap.mesh
+    column = layout.column()
+    column.prop(preferences, 'enable_mesh_keymaps')
+    if not preferences.enable_mesh_keymaps:
         return
 
-    row = column_mesh.row()
-    row.prop(preference.keymap.mesh, 'enable_mesh_selection_grow_shrink')
-
-    row = column_mesh.row()
-    row.prop(preference.keymap.mesh, 'enable_mesh_modeling_shortcuts')
-
-    row = column_mesh.row()
-    row.label(text='Mesh keymap settings will appear here.')
+    for group, toggle in MESH_KEYMAP_GROUPS.items():
+        draw_modeling_keymaps(column, preferences, toggle, get_mesh_group_actions(group))
