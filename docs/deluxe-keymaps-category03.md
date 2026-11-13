@@ -98,8 +98,9 @@ The owned probe matched all four copied-reference selection effects. The actual
 production runtime then selected/deselected the target object or four UV corners
 without moving the view. Disabling removed only these four rows and restored
 stock Shift-middle navigation; reenabling restored selection. Other category
-rows and foreign source fields/order stayed unchanged. Saved user edits across a
-fresh process remain pending.
+rows and foreign source fields/order stayed unchanged. A production save/reopen
+pair also preserved an edited Shift-F20 binding with radius 31 across immediate
+save, feature toggles and a fresh process. The same pair preserved Framing F19.
 
 ## Ordinary candidate drafts
 
@@ -138,8 +139,15 @@ IDs. The seven-handler fixture separately compares middle click, drag and
 second-press drag, circle entry versus actual brush selection, Object subtract
 and Mesh/UV shortest-path controls. The ordinary fixture now adds a native F23 Window delivery control before each
 shortcut and skips unverified input; it retains direct operator effect controls.
-Both fixtures preserve foreign source fields/order;
-the axis and handler subsets have run, while other clusters remain pending.
+Both fixtures check foreign source fields/order. The axis and handler subsets
+have run. A wheel-zoom production/reference pair found no view change from either
+synthetic WHEELIN/OUT event, although direct zoom changed distance from 10 to 12
+or 8.33 on both setups. The positive keyboard control does not establish wheel
+event delivery. Both wheel bindings remain unverified; a physical wheel/trackpad
+witness belongs in integrated 06 if needed. The copied-reference strict cleanup
+check separately failed on 192 property-readability changes, with row IDs/order
+and all other fields unchanged. Protected inputs and host resource cleanup passed.
+Other ordinary clusters remain pending.
 
 ## Verification and boundaries
 
@@ -149,14 +157,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Forty-one category checks currently pass. They cover exact assigned IDs and
+Forty-two category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 41 factory attempts and twelve copied-reference attempts. A completed
+retains 47 factory attempts and thirteen copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -265,8 +273,14 @@ observations and two more exact releases. Image View, NLA, Timeline and nodes
 without a tree had positive controls and rejected the selection guard. File
 Browser received the keyboard control but its unmodified wheel did not move the
 view; Sequencer Preview used hidden-region coordinates [0,0] and sent its control
-to the status bar. Those two contexts remain unverified. Both children completed
-native unregister/watcher shutdown and host resource cleanup.
+to the status bar. Those historical observations remain inconclusive. Both
+children completed native unregister/watcher shutdown and host resource cleanup.
+The corrected File Browser/Preview run then passed eight observations with visible
+region coordinates and owned scrollable File Browser content. Every Window control
+arrived in its expected WINDOW or PREVIEW region, unmodified wheel changed the
+view, and Shift-wheel changed the view without invoking selection or changing it.
+Both matched releases preserved foreign identities/fields/order/readability;
+native and host cleanup passed.
 Existing horizontal declarations stay unchanged. Exact
 owner-05 inactive scroll rows stay with that owner for global reconciliation.
 Mask's corrected fixture and Particle selection remain unverified.
@@ -350,9 +364,8 @@ confinement and disposable minimum-version adaptation. Original app/profile and
 provider sources remain read-only. Process, source hash, protected-input and
 cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
 
-Required native work includes File Browser/Sequencer Preview input controls and
-editor persistence, Circle/Framing saved edits across a fresh process, Image
-framing/pan/zoom, the axis reference readiness check, remaining ordinary clusters,
+Required native work includes Image framing/pan/zoom, the axis reference readiness
+check, remaining ordinary clusters,
 and focused middle-mouse/subtract and modal/tool probes. G behavior and production persistence are accepted; composed UV/global
 parity remains. Existing proofs need no broader
 rerun unless affected source changes.
@@ -380,15 +393,19 @@ Blender nor supplies a reason to defer a confirmed customization. The shared
 runtime change remains limited to the approved property normalization repair;
 accepted 01/02 fixtures are unchanged. Required gaps keep brief 03 open.
 
-### Prepared shared work
+### Shared persistence and remaining work
 
-`tests/blender_keymap_category03_persistence.py` prepares the editor and combined
+`tests/blender_keymap_category03_persistence.py` verified the editor and combined
 Circle/Framing save/reopen pairs using actual category toggles, exact runtime
 ownership, immediate save, merged-item reacquisition and source-bound input
 manifests. Complete matched snapshots retain every foreign row; only a proven
-owned saved edit can explain its map-level modified flag. These new pairs have
-not been run natively. The remaining File Browser/Preview control cluster uses
-owned scrollable content and visible-region coordinates; it is also unrun.
+owned saved edit can explain its map-level modified flag. All four processes
+passed: the inactive editor Shift-F18 override, Framing F19 and Circle Shift-F20
+with radius 31 survived immediate saves, off/on cycles and fresh processes.
+Original declarations and foreign source rows/order/readability were preserved;
+saved preference inputs and their manifests were removed after verified readers.
+The corrected File Browser/Preview control cluster also passed using owned
+scrollable content and visible-region coordinates.
 
 The ignored mechanism plan partitions all 100 remaining IDs into ordinary
 declarations (13), modal events (33), middle-mouse tool dispatch (19), selection
@@ -396,5 +413,6 @@ replacement/fallback (22), navigation timing/context (5), release confirmation
 (4), and conflicting reference intentions (4). Registration/persistence proof
 can be reused where source, selector and context warrant it. Nine ordinary rows
 were explicitly approved for reuse, with the three remaining spot checks retained.
-A source-bound single-step launcher prepares a compact wheel-zoom factory/
-reference pair and the shared lifecycle/control checks without starting them.
+A source-bound single-step launcher retains the exact wheel comparison and shared
+lifecycle/control commands. Another native allocation is required for further
+families; the inconclusive wheel pair will not be repeated unchanged.

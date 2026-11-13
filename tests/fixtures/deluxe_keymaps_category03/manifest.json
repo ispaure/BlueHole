@@ -711,7 +711,7 @@
     }
   },
   "guarded_editor_route": {
-    "status": "production selection/toggle/preservation proved; two outside controls and persistence pending",
+    "status": "production selection, outside-context controls, toggles, preservation and immediate-save/fresh-reopen proved in 4.5.1",
     "source": "actions/actions/keymaps/selection/selection_more_less.py",
     "operator_source": "operators/selection_more_less_ops.py",
     "registration_source": "operators/operators_register.py",
@@ -727,11 +727,7 @@
       "region_type": "WINDOW"
     },
     "fixture_proof": "editor_probe-1794550412457976000",
-    "remaining": [
-      "File Browser movable-scroll positive control",
-      "Sequencer Preview visible-region input delivery",
-      "immediate-save/fresh-reopen of edited owned rows"
-    ],
+    "remaining": [],
     "partial_production_attempt": {
       "run_id": "editor_production-1794551586350622000",
       "status": "host timeout at 75.013 seconds",
@@ -764,7 +760,7 @@
       "all_foreign_merged_snapshots_exact": true,
       "passthrough": "not run",
       "in_process_cleanup": "assertion stopped addon unregister; host child exit/resource cleanup verified",
-      "followup": "Read-only live registered-pair/runtime provenance for exactly these two rows; compare their semantic fields/order separately; strict identity for all foreign rows. Prepared, not natively run."
+      "followup": "Completed in accepted_production_selection and partial_outside_context_run; exact live Pipeline ownership provenance separates two recreated owned IDs from strict foreign identity checks. Historical failure retained."
     },
     "accepted_production_selection": "editor_production-1794553648264616000",
     "partial_outside_context_run": "editor_production-1794553721545059000",
@@ -778,6 +774,24 @@
       "positive_control_observations": 14,
       "file_browser": "Window delivery passed; unmodified wheel and view were unchanged, so fallback remains inconclusive in three observations",
       "sequencer_preview": "Three observations skipped after input coordinates [0,0] delivered Window control to STATUSBAR/HEADER; no preview behavior conclusion"
+    },
+    "production_persistence": {
+      "writer": "editor_save-1794555923466868000",
+      "reader": "editor_reopen-1794556023841045000",
+      "override": "Shift-F18/PRESS inactive; exact declared source unchanged"
+    },
+    "accepted_remaining_outside_contexts": {
+      "run_id": "editor_production-1794556971140047000",
+      "observations": 8,
+      "contexts": [
+        "File Browser WINDOW",
+        "Sequencer PREVIEW"
+      ],
+      "input_controls": "Window delivery in expected region and positive unmodified-wheel view effect in every observation",
+      "selection": "guard poll false; no callback or selection change",
+      "shift_wheel": "view changed in every observation",
+      "matched_releases": 2,
+      "foreign_identity_fields_order_readability": "preserved; two live-proven owned Pipeline generations compared semantically"
     }
   },
   "uv_repeat_route": {
@@ -820,7 +834,7 @@
     "production_reader": "uv_g_production_reopen-1794554208354408000"
   },
   "prepared_persistence": {
-    "status": "source-bound fixtures prepared; native unrun",
+    "status": "both actual production pairs passed in 4.5.1; saved inputs removed after fresh readers",
     "helper": "tests/blender_keymap_category03_persistence.py",
     "helper_sha256": "a65f63b918f7bf3564a3434d047d6e9e582393305ebf764a063e7a834419932e",
     "modes": {
@@ -835,7 +849,26 @@
     },
     "source_and_foreign_proof": "Same-context complete source/foreign snapshots, live Pipeline generation provenance, exact edited owned source/identity and separately recorded map marker",
     "saved_inputs": "userpref.blend plus category-persistence-expected.json, bound to actual staged production and all executed fixture hashes",
-    "remaining_controls": "editor_production --editor-cluster remaining; visible Preview input and owned 256-directory File Browser list, native unrun"
+    "remaining_controls": "File Browser/Preview control follow-up passed in editor_production-1794556971140047000; historical inconclusive observations retained",
+    "runs": {
+      "editor": {
+        "writer": "editor_save-1794555923466868000",
+        "reader": "editor_reopen-1794556023841045000"
+      },
+      "circle_and_framing": {
+        "writer": "persistence-1794556127823686000",
+        "reader": "reopen-1794556179765247000"
+      }
+    },
+    "verified_overrides": {
+      "editor_more": "Shift-F18 inactive",
+      "framing": "F19 active",
+      "circle": "Shift-F20 active with radius 31"
+    },
+    "restorations_per_pair": {
+      "writer": 1,
+      "fresh_reader": 2
+    }
   },
   "accepted_mechanism_reuse": {
     "status": "implemented with approved mechanism reuse",
@@ -914,5 +947,23 @@
     "implemented": 32,
     "transferred_04": 8,
     "remaining_03": 100
+  },
+  "ordinary_wheel_comparison": {
+    "status": "synthetic dispatch unverified in both configurations; direct operators work",
+    "production_run": "ordinary_production-1794556417707599000",
+    "reference_run": "reference-evidence-1794556566035547000",
+    "row_ids": [
+      "1498e141d9619244e98c6eaae90422084cc4c9f90c27406fa4f33c1b936e729b",
+      "291b254de1dbbd4fa32d997de0e25aa91eea9e2306902ea8e09ef3ca3580c549"
+    ],
+    "keyboard_control": "delivered to VIEW_3D/WINDOW; does not prove wheel dispatch",
+    "synthetic_wheel_effect": "none on either setup; distance stayed 10",
+    "direct_control_distances": [
+      12.0,
+      8.333333015441895
+    ],
+    "reference_preservation": "strict comparison failed on read_issues of 192 rows; IDs/order and other fields unchanged; retained as failed",
+    "host_cleanup": "both children exited, owned roots removed and protected input hashes unchanged",
+    "next": "preserve selectors; physical wheel/trackpad witness through integrated 06 if required; do not repeat identical synthetic pair"
   }
 }

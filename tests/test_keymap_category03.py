@@ -1045,7 +1045,8 @@ class Category03NativeReceiptTests(unittest.TestCase):
     def test_production_editor_ownership_toggles_and_outside_context_limits(self):
         selection = self.runs['editor_production-1794553648264616000']
         outside = self.runs['editor_production-1794553721545059000']
-        for run, count in ((selection, 14), (outside, 20)):
+        corrected_outside = self.runs['editor_production-1794556971140047000']
+        for run, count in ((selection, 14), (outside, 20), (corrected_outside, 8)):
             self.assertEqual(run['native_status'], 'complete')
             self.assertEqual(len(run['dispatch']), count)
             self.assertTrue(run['watcher_stopped'])
@@ -1089,6 +1090,51 @@ class Category03NativeReceiptTests(unittest.TestCase):
             self.assertFalse(case['selection_changed'])
             expected = 'inconclusive' if case['kind'] == 'file_browser' else 'observed_view_change'
             self.assertEqual(delivery['unmodified_wheel']['status'], expected)
+        for case in corrected_outside['dispatch']:
+            delivery = case['input_delivery']
+            self.assertTrue(delivery['window_delivered'])
+            self.assertEqual(delivery['expected_region'],
+                             'PREVIEW' if case['kind'] == 'sequencer_preview' else 'WINDOW')
+            self.assertEqual(delivery['unmodified_wheel']['status'], 'observed_view_change')
+            self.assertFalse(case['probe_poll'])
+            self.assertEqual(case['callbacks'], [])
+            self.assertFalse(case['selection_changed'])
+            self.assertTrue(case['view_changed'])
+
+    def test_shared_production_persistence_restores_editor_circle_and_framing_edits(self):
+        pairs = (
+            ('editor_save-1794555923466868000', 'editor_reopen-1794556023841045000', {'editor_more'}),
+            ('persistence-1794556127823686000', 'reopen-1794556179765247000', {'circle', 'framing'}),
+        )
+        for writer_id, reader_id, names in pairs:
+            writer, reader = self.runs[writer_id], self.runs[reader_id]
+            manifest = writer['production_persistence']['saved_manifest']
+            self.assertTrue(writer['production_persistence']['immediate_save'])
+            self.assertTrue(writer['production_persistence']['declared_sources_unchanged'])
+            self.assertEqual(reader['production_persistence']['verified_incoming_manifest'], manifest)
+            self.assertEqual(writer['source_sha256'], reader['source_sha256'])
+            for run in (writer, reader):
+                self.assertEqual(run['native_status'], 'complete')
+                self.assertTrue(run['watcher_stopped'])
+                self.assertEqual(run['cleanup']['owned'], 0)
+                proof = run['production_persistence']
+                self.assertEqual(proof['fresh_process'], run is reader)
+                self.assertEqual(len(proof['restorations']), 2 if run is reader else 1)
+                for restored in proof['restorations']:
+                    self.assertEqual(set(restored), names)
+                    for name, value in restored.items():
+                        row = value['row']
+                        self.assertTrue(row['is_user_modified'])
+                        self.assertTrue(value['map_is_user_modified'])
+                        self.assertEqual(row['event']['type'], {
+                            'editor_more': 'F18', 'framing': 'F19', 'circle': 'F20'}[name])
+                        self.assertEqual(row['active'], name != 'editor_more')
+                        if name == 'circle':
+                            self.assertEqual(row['properties']['radius'], 31)
+                for endpoint in run['editor_matched_endpoints']['endpoints'][1:]:
+                    self.assertTrue(endpoint['source_comparison']['accepted_sources_equal'])
+                    self.assertTrue(endpoint['strict_foreign_merged_preservation'])
+                    self.assertTrue(endpoint['expected_owned_map_edit_markers'])
 
 
 class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
