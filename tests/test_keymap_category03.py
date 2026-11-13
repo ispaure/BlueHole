@@ -1114,6 +1114,110 @@ class Category03NativeReceiptTests(unittest.TestCase):
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
 
+    def test_image_q_reference_has_exact_release_companion_and_direct_gap_is_retained(self):
+        factory = self.runs['ordinary_production-1794575338527776000']
+        reference = self.reference_runs['reference-evidence-1794575403713345000']['observations']
+        companion = '2cc296fd06d5bf974968ac07da759dec261c268a1dd598c61175b5b4f11e7f65'
+        self.assertIn(companion, self.manifest['authorized_transfers']['04']['groups']['uv_q_boundary'])
+        for run, reference_mode in ((factory, False), (reference, True)):
+            case = next(c for c in run['dispatch']
+                        if c['tested_key'] == 'Q' and c['context_variant']['image_mode'] == 'UV')
+            self.assertTrue(case['input_delivery']['delivered'] and case['start_control_valid'])
+            self.assertEqual(case['before']['active_tool'], 'builtin.select')
+            self.assertEqual(case['after']['active_tool'], 'builtin.select_box')
+            self.assertEqual(case['after_second_input']['active_tool'],
+                             'builtin.select_box' if reference_mode else 'builtin.select_circle')
+            self.assertEqual([call['properties']['values']['cycle'] for call in case['tool_dispatch']],
+                             [True, False, True, False] if reference_mode else [True, True])
+            self.assertTrue(all(call['properties']['is_property_set']['space_type'] is False
+                                and call['resolved_space_type'] == 'IMAGE_EDITOR'
+                                for call in case['tool_dispatch']))
+            release_rows = [x for x in case['tool_rows_before_input']['user']
+                            if x['scope']['name'] == 'UV Editor'
+                            and x['row']['target'] == 'wm.tool_set_by_id']
+            self.assertEqual(len(release_rows), int(reference_mode))
+            if reference_mode:
+                item = release_rows[0]
+                self.assertEqual((item['row']['event']['type'], item['row']['event']['value']), ('Q', 'RELEASE'))
+                self.assertFalse(item['row']['properties']['cycle'])
+                self.assertTrue(item['operator_properties']['is_property_set']['cycle'])
+                self.assertFalse(item['operator_properties']['is_property_set']['space_type'])
+            control = case['direct_control']
+            self.assertEqual(control['result'], ['FINISHED'])
+            self.assertEqual(control['after']['active_tool'], 'builtin.select_circle')
+            self.assertFalse(control['positive_tool_effect'])
+
+    def test_image_tool_controls_separate_uv_transforms_from_view_cancellation(self):
+        factory = self.runs['ordinary_production-1794575338527776000']
+        reference = self.reference_runs['reference-evidence-1794575403713345000']['observations']
+        for run, reference_mode in ((factory, False), (reference, True)):
+            self.assertEqual(len(run['dispatch']), 8)
+            for case in run['dispatch']:
+                key, mode = case['tested_key'], case['context_variant']['image_mode']
+                self.assertNotIn('error', case)
+                self.assertTrue(case['input_delivery']['delivered'] and case['context_ready'])
+                control = case['direct_control']
+                self.assertEqual(control['properties']['space_type'], 'IMAGE_EDITOR')
+                self.assertEqual(control['captured_binding_properties']['space_type'], 'EMPTY')
+                if mode == 'VIEW':
+                    self.assertEqual(control['result'], ['CANCELLED'])
+                    self.assertFalse(control['positive_tool_effect'])
+                    self.assertEqual(case['after']['active_tool'], 'builtin.sample')
+                    self.assertEqual(case['after_second_input']['active_tool'], 'builtin.sample')
+                    self.assertEqual(len(case['tool_dispatch']), 2)
+                    self.assertTrue(all(call['result'] == ['CANCELLED'] for call in case['tool_dispatch']))
+                elif key != 'Q':
+                    self.assertTrue(control['positive_tool_effect'])
+                    self.assertEqual(control['after']['active_tool'], 'builtin.transform')
+                    self.assertEqual(case['tool_dispatch'], [])
+                    self.assertEqual(case['after']['active_tool'], 'builtin.select_box')
+                    self.assertEqual(case['after_second_input']['active_tool'], 'builtin.select_box')
+                    self.assertEqual(case['after']['modal_operators'], ['TRANSFORM_OT_' + {
+                        'W': 'translate', 'E': 'rotate', 'R': 'resize'}[key]])
+                    second = ({'W': 'edge_slide', 'E': 'trackball', 'R': 'resize'} if reference_mode
+                              else {'W': 'translate', 'E': 'rotate', 'R': 'rotate'})
+                    self.assertEqual(case['after_second_input']['modal_operators'], ['TRANSFORM_OT_' + second[key]])
+
+    def test_image_reference_strict_failure_keeps_map_recreation_readability_and_row_loss(self):
+        factory = self.runs['ordinary_production-1794575338527776000']
+        reference = self.reference_runs['reference-evidence-1794575403713345000']
+        self.assertEqual(factory['native_status'], 'complete')
+        self.assertTrue(factory['ordinary_proof']['strict_source_and_merged_preservation'])
+        self.assertEqual(reference['observations']['status'], 'error')
+        proof = reference['observations']['ordinary_proof']
+        self.assertFalse(proof['strict_source_and_merged_preservation'])
+        changes = proof['foreign_source_changes']
+        self.assertEqual(len(changes['removed']), 7)
+        self.assertEqual(len(changes['added']), 7)
+        source_fields, merged_fields, removed_targets = Counter(), Counter(), Counter()
+        for change in changes['changed_in_place']:
+            self.assertIn(change['role'], ('active', 'addon'))
+            before, after = change['before'], change['after']
+            self.assertEqual([r['blender_id'] for r in before['items']], [r['blender_id'] for r in after['items']])
+            for a, b in zip(before['items'], after['items']):
+                source_fields.update(key for key in a if a[key] != b[key])
+        self.assertEqual(source_fields, {'read_issues': 192})
+        for old in changes['removed']:
+            new, = [row for row in changes['added']
+                    if row['role'] == old['role'] and row['map']['scope'] == old['map']['scope']]
+            self.assertEqual(old['role'], 'user')
+            self.assertNotEqual(old['pointer'], new['pointer'])
+            a = {r['blender_id']: r for r in old['map']['items']}
+            b = {r['blender_id']: r for r in new['map']['items']}
+            self.assertLessEqual(b.keys(), a.keys())
+            self.assertEqual([r['blender_id'] for r in old['map']['items'] if r['blender_id'] in b], list(b))
+            for i in a.keys() & b.keys():
+                merged_fields.update(key for key in a[i] if a[i][key] != b[i][key])
+            removed_targets.update(a[i]['target'] for i in a.keys() - b.keys())
+        self.assertEqual(merged_fields, {'read_issues': 146})
+        self.assertEqual(removed_targets, {'uv.toolkit_center_cursor_and_frame_all': 45,
+                                           'uv.toolkit_distribute': 1})
+        self.assertTrue(proof['input_control']['released'] and proof['tool_dispatch_observer_released'])
+        self.assertEqual(proof['owned_created'], proof['owned_released'])
+        self.assertTrue(reference['protected_unchanged'])
+        self.assertEqual(reference['cleanup']['remaining_resources'], [])
+        self.assertFalse(self.manifest['image_tool_control_repair']['accounting_changes'])
+
     def test_uv_extend_production_matches_addition_under_actual_runtime_identity(self):
         route = self.manifest['uv_extend_route']
         run = self.runs['uv_extend_production-1794574142641917000']

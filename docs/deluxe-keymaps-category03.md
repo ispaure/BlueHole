@@ -204,14 +204,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Ninety-eight category checks currently pass. They cover exact assigned IDs and
+One hundred and one category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains64 factory attempts and20 copied-reference attempts. A completed
+retains65 factory attempts and21 copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -944,3 +944,50 @@ observer restoration and strict merged failures. The proposed native comparison
 is one factory production child and one copied-reference child, each capped75
 seconds and run sequentially only under an exact grant. No native child has run
 for this repair, no additional mapping is accepted, and accounting stays38/eight/94.
+
+
+Batch39 executed the frozen Image control pair at59c2d16, strictly sequential:
+factory `ordinary_production-1794575338527776000` completed31.4437 seconds;
+reference `reference-evidence-1794575403713345000` completed all eight cases in
+39.906 seconds but retained native status error at strict preservation.
+
+| Context/input | Factory | Copied reference | Direct control |
+| --- | --- | --- | --- |
+| VIEW Q/W/E/R | Both tool calls CANCELLED, Sample unchanged | Same | CANCELLED; no positive effect |
+| UV Q | Select → Box → Circle; one cycling call per key cycle | Select → Box → Box; cycling then noncycling call per cycle | FINISHED but selects Circle in both; Box positive check remains false |
+| UV W/E/R | First input starts Translate/Rotate/Resize; no tool call | Same first input and no tool call | Transform tool selected positively for all three keys in both |
+
+The second UV W/E/R inputs retained separate modal differences: factory remains
+Translate/Rotate then switches Resize→Rotate; reference switches Translate→Edge
+Slide, Rotate→Trackball and remains Resize. These do not establish ordinary Image
+tool-alias dispatch. Every Window delivery, context and distinct-start check
+passed. Captured keymap space_type=EMPTY was unset; dispatched tool calls resolved
+IMAGE_EDITOR. The corrected controls therefore separate tool availability from
+native-handler routing without treating FINISHED as a selection effect.
+
+The exact noncycling companion is UV Editor **Q/RELEASE** row `2cc296fd…`, already
+transferred to04. Reference active/user ID281 has name and cycle explicitly set,
+space_type unset, cycle=False and no modifiers/repeat. It matches the additional
+call after the Image cycling call. This trace spans an entire PRESS/RELEASE cycle;
+a phase-separated composition check belongs to04/06. Its exact plan is recorded
+in the04 handoff. The03 Image Q PRESS row stays open while preserving its matched
+cycling call; no temporary04 dependency or equivalent Q rerun is introduced here.
+
+Factory strict source/merged preservation passed. Reference retained seven merged
+map pointer replacements,192 source read_issues changes (191 active, one add-on),
+146 merged read_issues changes and UV Editor318→272 from45 foreign
+uv.toolkit_center_cursor_and_frame_all plus one uv.toolkit_distribute removal.
+Other compared fields and surviving relative order matched; cause remains
+unestablished. Full raw snapshots and native error remain, without normalization.
+Both F23 controls and Python observers were released; factory unregister and
+watcher shutdown passed. PIDs30695/30912 and all temporary roots were absent,
+protected inputs and45 frozen source hashes exact. No further allocation remains.
+
+All101 category checks pass. Every prior64 factory/20 reference receipt is
+unchanged; totals are65/21. No new candidate is accepted and accounting remains
+38/eight/94. The next03 source-only proposal groups four 3D View fallback Circle
+RIGHTMOUSE CLICK_DRAG bindings (SET, Shift ADD, Ctrl/Cmd SUB). It requires one
+shared projected selection scene, independently positive exact-mode circle
+controls, actual fallback-tool readback and per-modifier exact-event witnesses.
+No fixture, production mapping, runtime change or new native run is authorized
+by that proposal.

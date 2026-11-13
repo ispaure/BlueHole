@@ -3630,5 +3630,32 @@
       "preservation_comparisons": 2,
       "owned_cleanup_verified": true
     }
+  },
+  "image_tool_control_repair": {
+    "status": "Batch39 recorded; all four exact rows remain unresolved",
+    "checkpoint": "59c2d1682efad4047258a476960354a11d008ec7",
+    "row_ids": [
+      "75c4bbefab8e3cc7a898801350b900eae9aceea836329b236df37a0c14952850",
+      "318ab4227e9699b1b4279142e4c99a612fec5ebf27e2f6a663adb07e6c88a02d",
+      "ba40873fbf25c357c6c711911eaa483711dba3a101390e753d9e7d2eabcce1a6",
+      "ff57544c10325e3984fef99805970ba7d3fa9d4bc93e6aa1e388e7f21b22e749"
+    ],
+    "native_runs": {
+      "factory": "ordinary_production-1794575338527776000",
+      "reference": "reference-evidence-1794575403713345000"
+    },
+    "factory_strict_preservation": true,
+    "reference_strict_preservation": false,
+    "uv_q_companion_row_id": "2cc296fd06d5bf974968ac07da759dec261c268a1dd598c61175b5b4f11e7f65",
+    "uv_q_companion_owner": "04 via existing authorized transfer",
+    "uv_q_positive_direct_control": false,
+    "uv_transform_tool_positive_direct_controls": [
+      "W",
+      "E",
+      "R"
+    ],
+    "production_changes": false,
+    "runtime_changes": false,
+    "accounting_changes": false
   }
 }
