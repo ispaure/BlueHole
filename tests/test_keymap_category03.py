@@ -252,8 +252,11 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
         extend = self.manifest['object_extend_route']
         self.assertNotIn(extend['row_id'], reviewed_rows)
         reviewed_rows[extend['row_id']] = extend['declaration']
+        uv_extend = self.manifest['uv_extend_route']
+        self.assertNotIn(uv_extend['row_id'], reviewed_rows)
+        reviewed_rows[uv_extend['row_id']] = uv_extend['declaration']
         self.assertEqual(self.manifest['candidate_accounting'], {
-            'implemented': 37, 'transferred_04': 8, 'remaining_03': 95})
+            'implemented': 38, 'transferred_04': 8, 'remaining_03': 94})
         self.assertEqual({
             row_id: review['declaration']
             for row_id, review in self.rows.items() if 'declaration' in review
@@ -886,6 +889,53 @@ class Category03NativeReceiptTests(unittest.TestCase):
         cls.native = unpack_native(read_json(CATEGORY / cls.verification['fixture']))
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
+
+    def test_uv_extend_production_matches_addition_under_actual_runtime_identity(self):
+        route = self.manifest['uv_extend_route']
+        run = self.runs['uv_extend_production-1794574142641917000']
+        self.assertEqual(run['native_status'], 'complete')
+        for path, expected in route['source_sha256'].items():
+            self.assertEqual(run['source_sha256'][path], expected)
+        proof = run['uv_extend_production']
+        self.assertFalse(proof['direct_candidate_injection'])
+        self.assertFalse(proof['shared_runtime_capability_changes'])
+        cell, = proof['cells']
+        self.assertEqual(cell['ledger_id'], route['row_id'])
+        self.assertTrue(cell['production_additive_effects'])
+        self.assertTrue(cell['exact_cell_preservation'])
+        self.assertTrue(cell['direct_control']['positive_addition'])
+        self.assertEqual(len(cell['trials']), 2)
+        for trial, initial in zip(cell['trials'], (True, False)):
+            phases = {p['phase']: p['snapshot'] for p in trial['phases']}
+            self.assertEqual(phases['after_press']['target_selected'], initial)
+            self.assertTrue(phases['after_release']['target_selected'])
+            self.assertTrue(phases['after_release']['bystander_selected'])
+            self.assertTrue(trial['input_delivery']['delivered'])
+            self.assertTrue(trial['exact_map_event_witnessed'])
+            self.assertTrue(trial['expected_selection_observed'])
+            self.assertTrue(trial['geometry_and_tool_unchanged'])
+            self.assertEqual(trial['witness_order'], {'indices': [0], 'competing_indices': [1, 27]})
+            self.assertEqual(trial['exact_candidate_counts'], {
+                role: {route['row_id']: count}
+                for role, count in (('default', 0), ('active', 0), ('addon', 1), ('user', 1))})
+        install, = proof['installs']
+        self.assertEqual(install['owner_id'],
+                         'legacy:Selection:de1a2030dc8d4baa0792cff32127ec7f6c081ec3d3dfa7bf5e7764c26a191a80')
+        self.assertEqual(install['request_id'], '0:UV Editor:LEFTMOUSE:CLICK')
+        self.assertTrue(install['runtime_owned_valid'])
+        self.assertEqual(install['registered_pair_matches'], 1)
+        self.assertEqual(len(proof['releases']), 2)
+        self.assertTrue(all(release['accepted_preservation'] for release in proof['releases']))
+        self.assertTrue(proof['exact_source_and_merged_preservation'])
+        self.assertEqual(proof['combined_cleanup_errors'], [])
+        self.assertEqual(proof['cleanup_errors'], [])
+        for key in ('owned', 'pending_cleanup', 'tracked_resources'):
+            self.assertEqual(run['cleanup'][key], 0)
+        self.assertTrue(run['watcher_stopped'])
+        self.assertTrue(run['protected_unchanged'])
+        self.assertEqual(run['remaining_owned_resources'], [])
+        self.assertEqual(self.native['candidate_accounting'], self.manifest['candidate_accounting'])
+        self.assertFalse(route['acceptance']['PRESS_rows_accepted'])
 
     def test_uv_extend_reference_effects_match_but_final_strict_failure_remains(self):
         run = self.reference_runs['reference-evidence-1794573067246147000']

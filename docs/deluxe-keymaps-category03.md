@@ -204,14 +204,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Eighty-eight category checks currently pass. They cover exact assigned IDs and
+Eighty-nine category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains63 factory attempts and20 copied-reference attempts. A completed
+retains64 factory attempts and20 copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -417,13 +417,13 @@ and focused middle-mouse and modal/tool probes. G behavior and production persis
 parity remains. Existing proofs need no broader
 rerun unless affected source changes.
 
-Of 140 active full-side delta candidates, 37 have implemented declarations:
+Of 140 active full-side delta candidates, 38 have implemented declarations:
 thirteen framing, six UV selection additions, four Circle inputs and twelve
 ordinary declarations accepted through explicit mechanism reuse, plus Object
 Subtract Selection accepted after batch31 and Extend Selection by Center after
-batch34. Exactly eight UV-specific Q,
+batch34, plus ordinary UV Extend after batch38. Exactly eight UV-specific Q,
 loop/linked and Tweak fallback rows were explicitly transferred to 04. The
-remaining 95 stay with 03: 10 ordinary candidates (nine declarations still draft), 68 currently
+remaining 94 stay with 03: 10 ordinary candidates (nine declarations still draft), 67 currently
 unsupported or unproved handler/modal/tool/replacement cases, 13 observations of
 active-role absence, and four conflicting bindings. Active-role absence alone
 does not prove unavailability. Each has row-specific next steps in the refreshed
@@ -458,9 +458,9 @@ saved preference inputs and their manifests were removed after verified readers.
 The corrected File Browser/Preview control cluster also passed using owned
 scrollable content and visible-region coordinates.
 
-The current mechanism partition contains 95 remaining IDs: ordinary
+The current mechanism partition contains 94 remaining IDs: ordinary
 declarations (10), modal events (33), middle-mouse tool dispatch (19), selection
-replacement/fallback (20), navigation timing/context (5), release confirmation
+replacement/fallback (19), navigation timing/context (5), release confirmation
 (4), and conflicting reference intentions (4). Registration/persistence proof
 can be reused where source, selector and context warrant it. Twelve ordinary rows
 were explicitly approved for reuse. Ctrl-F1 retains its spot check. The two UV
@@ -889,3 +889,25 @@ reference, stock, second install or save/reopen replay. No new native allocation
 is assumed. All88 category tests pass, including both editable Extend actions,
 exact stock preservation, production scheduling/cleanup and retained reference
 strict failure. Accounting remains37/eight/95 pending production acceptance.
+
+
+Batch38 `uv_extend_production-1794574142641917000` at `469b6ac` completed in
+18.2231 seconds. Both actual-production states passed: an already selected UV
+stayed selected, and an unselected UV became selected on RELEASE after an
+unchanged PRESS. The selected bystander, geometry and tool were preserved.
+F23 input delivery, exact CLICK witnesses and the independent UV-coordinate ADD
+control passed. Runtime ownership and the registered pair matched the declared
+UV action; merged order was witness0/candidate1/stock27, with no direct candidate
+injection. One real group install/release and the final comparison passed,
+separating only the two previously live-proven Pipeline source generations.
+Strict cell/control-release comparisons passed; all owned resources were released,
+the watcher stopped, PID28641 and all temporary roots were absent, and protected
+inputs plus all45 frozen source hashes were unchanged.
+
+The coordinator accepted only ordinary UV CLICK row `0e8d690a…`, bringing current
+accounting to38 implemented/eight transferred/94 remaining. The two tool PRESS
+rows and batch37's final strict reference failure remain unresolved and retained.
+The lossless receipt preserves all63 prior factory and20 reference records and
+now contains64 factory/20 reference attempts. All89 category tests pass. The next
+work is the exact four-row Image Q/W/E/R shared test-control repair; no production
+or runtime change or additional native allocation follows from this acceptance.

@@ -1620,9 +1620,9 @@
     }
   },
   "candidate_accounting": {
-    "implemented": 37,
+    "implemented": 38,
     "transferred_04": 8,
-    "remaining_03": 95
+    "remaining_03": 94
   },
   "ordinary_wheel_comparison": {
     "status": "synthetic dispatch unverified in both configurations; direct operators work",
@@ -3519,7 +3519,7 @@
     }
   },
   "uv_extend_route": {
-    "status": "Conditional ordinary mapping applied after matching reference effects and verified owned cleanup; native production check pending",
+    "status": "Accepted ordinary UV Extend production effects, actual identity and exact preservation at469b6ac with existing group/lifecycle reuse",
     "row_id": "0e8d690a0470457363cd15ff3448c54325c24261cae1dc525ebff9c3dd459f1d",
     "binding": {
       "active": true,
@@ -3601,6 +3601,34 @@
     "lifecycle_plan": "Actual owner/request/full binding and registered pair; toggle shared Extend once on/off with other preferences unchanged. F23/witness absent at toggle endpoints. Reuse accepted ordinary editable persistence/group lifecycle; no stock/reference/save-reopen replay.",
     "stock_changes": false,
     "runtime_capability_changes": false,
-    "candidate_accounting_changed": false
+    "candidate_accounting_changed": true,
+    "acceptance": {
+      "approved_by": "Coordinator01a1d36b-dbd5-7933-9457-8e055db2b96d",
+      "row_id": "0e8d690a0470457363cd15ff3448c54325c24261cae1dc525ebff9c3dd459f1d",
+      "production_run": "uv_extend_production-1794574142641917000",
+      "production_checkpoint": "469b6ac",
+      "dispatch_status": "accepted_exact_context",
+      "accepted_context": "UV vertex selection, sync off, sticky disabled, Select Box; ordinary UV Editor Shift+LEFTMOUSE CLICK",
+      "ordinary_lifecycle_reused": true,
+      "stock_controls": "batch35, revalidated by batch36",
+      "reference_run": "reference-evidence-1794573067246147000",
+      "reference_strict_failure_retained": true,
+      "PRESS_rows_accepted": false,
+      "new_persistence_run": false
+    },
+    "native_result": {
+      "run": "uv_extend_production-1794574142641917000",
+      "status": "complete",
+      "seconds": 18.2231,
+      "actual_identity": {
+        "owner_id": "legacy:Selection:de1a2030dc8d4baa0792cff32127ec7f6c081ec3d3dfa7bf5e7764c26a191a80",
+        "request_id": "0:UV Editor:LEFTMOUSE:CLICK"
+      },
+      "native_cases": 2,
+      "installs": 1,
+      "group_releases": 1,
+      "preservation_comparisons": 2,
+      "owned_cleanup_verified": true
+    }
   }
 }
