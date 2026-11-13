@@ -212,6 +212,34 @@ class ProfileTests(unittest.TestCase):
         reopened = self.api.ProfileStore(self.defaults, self.path, lambda: self.settings, None)
         self.assertEqual(reopened.snapshot(), committed)
 
+    def test_checkout_edit_preserves_catalog_format_and_private_profile_is_independent(self):
+        checkout = self.path.with_name('deluxe-defaults.json')
+        checkout.write_bytes(DEFAULTS.read_bytes())
+        defaults = read(checkout)
+        checkout_store = self.api.ProfileStore.open_catalog(checkout, lambda: self.settings, lambda *args: None)
+        draft = checkout_store.begin()
+        draft.update('sections', 'navigation.view_framing', label='Framing from checkout')
+        catalog = checkout_store.apply(draft)
+        self.assertEqual(read(checkout), catalog)
+        changed = [(before, after) for before, after in zip(DEFAULTS.read_text().splitlines(),
+                                                            checkout.read_text().splitlines()) if before != after]
+        self.assertEqual(len(changed), 1)
+        self.assertIn('Framing from checkout', changed[0][1])
+        self.assertFalse(self.path.exists())
+        private_store = self.api.ProfileStore(defaults, self.path, lambda: self.settings, lambda *args: None)
+        draft = private_store.begin()
+        draft.update('sections', 'navigation.view_framing', label='Private framing')
+        private_store.apply(draft)
+        self.assertEqual(read(checkout), catalog)
+        self.assertEqual(read(self.path)['changes']['sections']['navigation.view_framing']['label'],
+                         'Private framing')
+        checkout.write_text('{')
+        recovered = self.api.ProfileStore.open_catalog(checkout, lambda: self.settings, lambda *args: None)
+        self.assertEqual(recovered.snapshot(), catalog)
+        self.assertEqual(recovered.load_issue, 'invalid_profile_recovered_previous')
+        recovered.apply(recovered.begin())
+        self.assertEqual(read(checkout), catalog)
+
     def test_native_install_failure_rolls_back(self):
         def install(candidate, previous):
             self.installed = deepcopy(candidate)

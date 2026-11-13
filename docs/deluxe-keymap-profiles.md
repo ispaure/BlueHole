@@ -66,22 +66,26 @@ open.
 
 ## Persistence and recovery
 
+**Apply Changes** saves `keymaps/deluxe-defaults.json` in the active Blue Hole
+installation. With the Logistics **Local** source, the installation links to
+the checkout, so the edit appears in Git. With **GitHub**, the edit goes into
+the preset's installed Blue Hole copy. The next Blue Hole update installs its
+shipped catalog. Existing per-preset override files stay on disk for reference
+and the editor now loads the bundled catalog.
+
 Apply validates the draft, compares the in-memory and on-disk revisions under
 the shared file lock, installs and verifies the candidate runtime, and then
-publishes the sparse overlay atomically through commonUtils. A failed install or
+publishes the catalog atomically through commonUtils. A failed install or
 prepublication write restores the committed runtime. An interrupted process
-restarts from the last published overlay. An unreadable overlay recovers the
+restarts from the last published catalog. An unreadable profile recovers the
 known-good in-session profile, recovery copy or shipped defaults and exposes a
 diagnostic. The original file is retained until the next explicit Apply. The
 recovery copy is refreshed after successful publication.
 
-Compatible catalog updates keep existing IDs and merge the saved fields over
-new defaults. This includes disabled categories and sections. Unknown versions
-and incompatible bases trigger recovery. Schema and ID changes that would
-invalidate saved references require a future explicit migration. Native
-Preferences changes remain Blender-managed. The existing Deluxe reset button
-restores its Blender preference switches. The profile API's draft reset restores
-the shipped profile and takes effect on Apply.
+Unknown versions and incompatible bases trigger recovery. Native Preferences
+changes remain Blender-managed. The existing Deluxe reset button restores its
+Blender preference switches. **Reset Draft** restores the catalog loaded when
+the editor opened and takes effect on Apply.
 
 The portable catalog test uses one digest of the ordered pre-conversion groups,
 scope, events, command properties and active state. Category 03–05 comparison

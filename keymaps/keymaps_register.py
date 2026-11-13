@@ -146,14 +146,11 @@ def deluxe_profile():
     if not _ready() or not prefs().keymap.deluxe_configured:
         raise ValueError('Configure Deluxe keymaps before opening the profile editor')
     if _profile_store is None:
-        from .deluxe_profiles import ProfileStore, JSONFile
+        from .deluxe_profiles import ProfileStore
 
-        path = bpy.utils.user_resource('CONFIG', path='blue-hole-deluxe-keymaps.json')
-        if not path:
-            raise ValueError('Blender user configuration directory is unavailable')
-        defaults = JSONFile(Path(__file__).with_name('deluxe-defaults.json')).read_json()
-        _profile_store = ProfileStore(
-            defaults, path, prefs, _install_profile,
+        path = Path(__file__).resolve().with_name('deluxe-defaults.json')
+        _profile_store = ProfileStore.open_catalog(
+            path, prefs, _install_profile,
             allowed=lambda: runtime_keymaps_allowed(bpy.context, prefs().keymap))
         if _profile_store.load_issue:
             log(Severity.WARNING, TOOL_NAME, 'Deluxe profile recovery: ' + _profile_store.load_issue)

@@ -4,10 +4,12 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import replace
 from hashlib import sha256
+import json
 from pathlib import Path
 from uuid import uuid4
 
 from ..Lib.commonUtils.formats.jsonType import JSONFile
+from ..Lib.commonUtils.persistence.atomic import atomic_write_bytes
 from ..Lib.commonUtils.persistence.locking import file_lock
 from ..Lib.commonUtils.runtime.operations import MutationIncomplete
 from . import keymap_utils as runtime
@@ -93,14 +95,28 @@ class Draft:
 
 
 class ProfileStore:
-    """A shipped catalog, a sparse local overlay, and the runtime apply callback."""
+    """Transactional catalog editing with a runtime apply callback."""
 
-    def __init__(self, defaults, path, preferences, install, *, allowed=lambda: True):
+    @classmethod
+    def open_catalog(cls, path, preferences, install, *, allowed=lambda: True):
+        """Edit the active add-on's full catalog in place."""
+        path = Path(path)
+        for source in (path, path.with_suffix('.previous.json')):
+            try:
+                defaults = JSONFile(source).read_json()
+                validate_catalog(defaults)
+                return cls(defaults, path, preferences, install, allowed=allowed, edit_defaults=True)
+            except (OSError, ValueError, RecursionError):
+                continue
+        raise ProfileError('Cannot open the bundled Deluxe keymap catalog')
+
+    def __init__(self, defaults, path, preferences, install, *, allowed=lambda: True, edit_defaults=False):
         validate_catalog(defaults)
         self._defaults = deepcopy(defaults)
         self._catalog = deepcopy(defaults)
         self.resolver = Resolver(defaults)
         self.path = Path(path)
+        self.edit_defaults = edit_defaults
         self._file = JSONFile(self.path)
         self._backup = JSONFile(self.path.with_suffix('.previous.json'))
         self._lock = self.path.with_suffix('.lock')
@@ -140,18 +156,22 @@ class ProfileStore:
 
     def _read(self):
         try:
-            catalog = merge_profile(self._defaults, self._file.read_json())
+            stored = self._file.read_json()
+            catalog = stored if self.edit_defaults else merge_profile(self._defaults, stored)
             self._validate(catalog)
             return catalog, None
         except FileNotFoundError:
-            return self.defaults(), None
+            if not self.edit_defaults:
+                return self.defaults(), None
         except (OSError, ValueError, RecursionError):
-            try:
-                catalog = merge_profile(self._defaults, self._backup.read_json())
-                self._validate(catalog)
-                return catalog, 'invalid_profile_recovered_previous'
-            except (OSError, ValueError, RecursionError):
-                return self.defaults(), 'invalid_profile_recovered_defaults'
+            pass
+        try:
+            stored = self._backup.read_json()
+            catalog = stored if self.edit_defaults else merge_profile(self._defaults, stored)
+            self._validate(catalog)
+            return catalog, 'invalid_profile_recovered_previous'
+        except (OSError, ValueError, RecursionError):
+            return self.defaults(), 'invalid_profile_recovered_defaults'
 
     def _validate(self, catalog):
         validate_catalog(catalog)
@@ -260,7 +280,7 @@ class ProfileStore:
         """Install then publish. Restore the committed runtime if either step fails."""
         self.validate(draft)
         candidate = deepcopy(draft._catalog)
-        overlay = profile_overlay(self._defaults, candidate)
+        stored = candidate if self.edit_defaults else profile_overlay(self._defaults, candidate)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with file_lock(self._lock) as acquired:
             require(acquired, 'Another Blender process is saving this profile')
@@ -270,12 +290,16 @@ class ProfileStore:
                 return self.snapshot()
             previous = self._catalog
             # Keep an independently validated recovery copy before changing runtime.
-            self._backup.write_json(profile_overlay(self._defaults, previous), compact=True)
+            backup = previous if self.edit_defaults else profile_overlay(self._defaults, previous)
+            self._backup.write_json(backup, compact=True)
             try:
                 self._install(candidate, previous)
                 require(self._disk_revision() == self._revision, 'Profile file changed during apply')
                 try:
-                    self._file.write_json(overlay, compact=True)
+                    if self.edit_defaults:
+                        self._publish_catalog(candidate)
+                    else:
+                        self._file.write_json(stored, compact=True)
                 except MutationIncomplete as issue:
                     if not issue.result.destination_published:
                         raise
@@ -291,13 +315,39 @@ class ProfileStore:
             self.load_issue = None
             draft.discard()
             try:
-                self._backup.write_json(overlay, compact=True)
+                self._backup.write_json(stored, compact=True)
             except OSError:
                 self.load_issue = 'profile_saved_recovery_copy_unavailable'
             return self.snapshot()
 
+    def _publish_catalog(self, catalog):
+        """Keep the shipped one-row-per-line layout for review in Git."""
+        def dump(value):
+            return json.dumps(value, ensure_ascii=False, allow_nan=False)
+
+        def table(rows):
+            if not rows:
+                return '{}'
+            return '{\n' + ',\n'.join(f'    {dump(key)}: {dump(row)}' for key, row in rows.items()) + '\n  }'
+
+        original = self._catalog
+        lines = []
+        for key, value in catalog.items():
+            if key in TABLES:
+                rows = {id_: value[id_] for id_ in original.get(key, {}) if id_ in value}
+                rows.update(value)
+                formatted = table(rows)
+            elif isinstance(value, dict):
+                formatted = table(value)
+            else:
+                formatted = dump(value)
+            lines.append(f'  {dump(key)}: {formatted}')
+        atomic_write_bytes(self.path, ('{\n' + ',\n'.join(lines) + '\n}\n').encode('utf-8'),
+                           validate=lambda: require(self._disk_revision() == self._revision,
+                                                    'Profile file changed during apply'))
+
     def reload(self):
-        """Load a compatible overlay or recover the last known good catalog."""
+        """Load a compatible profile or retain the last known good catalog."""
         require(not self._closed, 'Deluxe profile editor has been unloaded')
         revision = self._disk_revision()
         candidate, issue = self._read()
