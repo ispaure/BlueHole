@@ -4,8 +4,10 @@ Configured Deluxe reads [deluxe-defaults.json](../keymaps/deluxe-defaults.json)
 on the built-in Blender preset. The catalog preserves source registration order
 and feature grouping from cutover `fa7891a`. It contains 795 assignments across
 10 categories and 29 sections. Four Navigation assignments record intentional
-precedence changes for otherwise stock-equivalent rows. The reference ledger is
-`deluxe-baseline-2026-11-12-v1`. Untouched Blender and add-on bindings are inherited
+precedence changes for otherwise stock-equivalent rows. The Object Modes
+assignment for `3` enters Face Select on meshes and Pose Mode on armatures.
+It uses the same Object Mode registration rule as the other mode shortcuts.
+The reference ledger is `deluxe-baseline-2026-11-12-v1`. Untouched Blender and add-on bindings are inherited
 from the current keyconfig. The reference captures remain verification evidence.
 
 Version 1 separates categories, sections, events, commands, assignments and

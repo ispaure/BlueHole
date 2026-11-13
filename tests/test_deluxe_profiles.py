@@ -68,12 +68,27 @@ class ProfileTests(unittest.TestCase):
                                             for row in catalog[table].values() if row.get('switch')}
         settings = switch_paths(paths)
         _, groups = resolver.plan(catalog, settings)
-        # One digest of the ordered pre-cutover runtime action groups from 07.
-        payload = [(owner.split(':')[1], [
-            [asdict(request.scope), asdict(request.event), request.target.idname,
-             dict(request.target.properties), request.active] for request in requests
-            if request.request_id in catalog['assignments']])
-            for owner, requests in groups.items()]
+        # Compare the ordered pre-cutover groups from 07, accounting for the
+        # context-sensitive 3 shortcut and the two provider scope changes.
+        face_id, = [id_ for id_, row in catalog['assignments'].items()
+                    if row['command'] == 'object-face-select-or-pose']
+        face, = [request for requests in groups.values() for request in requests
+                 if request.request_id == face_id]
+        self.assertEqual(face.scope, self.core.KeymapScope('Object Non-modal'))
+        self.assertEqual(face.event, self.core.KeymapEvent('THREE'))
+        self.assertEqual(face.target, self.core.KeymapTarget('object.bh_face_select_or_pose'))
+        old_pose = resolver.target(catalog['commands']['object-mode-set-fa1f913c4675'])
+        self.assertEqual(old_pose, self.core.KeymapTarget('object.mode_set', {'mode': 'POSE'}))
+        def reference_row(request):
+            scope, target = request.scope, request.target
+            if target.idname in ('mesh.smart_delete', 'object.join_group_override'):
+                scope = self.core.KeymapScope('3D View', 'VIEW_3D')
+            if request.request_id == face_id:
+                target = old_pose
+            return [asdict(scope), asdict(request.event), target.idname, dict(target.properties), request.active]
+
+        payload = [(owner.split(':')[1], [reference_row(request) for request in requests
+                    if request.request_id in catalog['assignments']]) for owner, requests in groups.items()]
         blob = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()
         self.assertEqual(hashlib.sha256(blob).hexdigest(), '9c48fa5b54876c7377817d306874f8ee96eb69518ae9947f5d64f92b95e4360c')
         self.assertEqual(sum(len(rows) for _, rows in payload), 795)
@@ -123,6 +138,19 @@ class ProfileTests(unittest.TestCase):
         _, groups = resolver.plan(catalog, settings)
         self.assertEqual([row.scope.name for row in groups['legacy:Object:deluxe-recreated-mode']],
                          ['Object Non-modal'])
+
+    def test_reference_command_providers(self):
+        catalog = read(DEFAULTS)
+        resolver = self.resolver.Resolver(catalog)
+        for operator, provider, scope in (('mesh.smart_delete', 'Interactive Tools', 'Mesh'),
+                                          ('object.join_group_override', 'Group Pro', 'Object Mode')):
+            command, = resolver.commands[operator]
+            command_id, = [id_ for id_, row in catalog['commands'].items() if row == command]
+            assignment, = [row for row in catalog['assignments'].values() if row['command'] == command_id]
+            self.assertEqual(assignment['scope'], {'name': scope})
+            meta = resolver.describe_command(command)
+            self.assertEqual(meta['owner'], provider)
+            self.assertEqual(meta['availability'], 'waiting_for_provider')
 
     def test_round_trip_shared_edit_clone_and_group_crud(self):
         draft = self.store.begin()

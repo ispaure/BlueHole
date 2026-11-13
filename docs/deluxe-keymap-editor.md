@@ -80,6 +80,8 @@ the command source separately. Search by source to find direct add-on commands.
 
 | Add-on | Where to find it | Availability and fallback |
 | --- | --- | --- |
+| Group Pro | **Object → Actions** for Join Groups | Ctrl+J requires `object.join_group_override`. Blender Join remains available without Group Pro. |
+| Interactive Tools | **Mesh → Modeling** for Smart Delete | Alt+D requires `mesh.smart_delete`. |
 | Zen UV | **UV → Tools** for Move Cursor, **UV → Actions** for Fit to Trim | Deluxe checks `uv.zenuv_move_cursor_to` and `uv.zenuv_fit_to_trim` individually. In Blender 4.5.1 without Zen UV, both assignments remained visible as **Waiting for add-on** and neither registered a binding. |
 | autoConstraints | **Third-Party Add-ons → Auto Constraints**, with W/E/R in **Transform → Modal tools** | The panel checks `transform.translate_auto_constraint`. Each shortcut checks its own Translate, Rotate or Resize provider operator and uses the corresponding Blender transform when the operator is missing or the integration is off. |
 | X-Ray Selection Tools | **Third-Party Add-ons → X-Ray Selection Tools**, with Q in **Selection → Tool switch** | The panel checks `mesh.select_box_xray`. Object and Mesh try their respective X-Ray Box tools when enabled and use Blender's Box Select if activation fails. Curve and Curves use Blender's Box Select. The 4.5.1 replay tested both provider and fallback behavior with X-Ray Selection Tools 4.9.0. |
@@ -87,7 +89,22 @@ the command source separately. Search by source to find direct add-on commands.
 
 The **Third-Party Add-ons** controls reflect whether their Deluxe sections
 are enabled. The availability checks read registered Blender operators.
-Provider-enabled Zen UV and autoConstraints dispatch still need verification.
+In a disposable Blender 5.2.2 preset, Reference's autoConstraints 1.4.1
+received native W/E/R input. In Mesh Edit Mode, Alt+D invoked Interactive
+Tools 1.4.1 Smart Delete and removed the selected faces. In Object Mode,
+Ctrl+J invoked Group Pro 3.0.6 and joined two test meshes. Their mode-specific
+keymaps let the provider commands run ahead of Blender's own bindings.
+Without the add-ons, the assignments showed **Waiting for add-on** and
+registered no keymap items.
+
+Reference's Zen UV 5.0.3.0 and X-Ray Selection Tools 4.9.0 failed to load
+on 5.2.2. Zen UV's two bindings stayed inactive and Q used Blender Box Select.
+The [X-Ray Selection Tools 4.10.2 update](https://extensions.blender.org/add-ons/xray-selection-tools/versions/)
+loaded in a separate 5.2.2 preset. Q activated X-Ray Box in Object and Mesh
+and returned to Blender Box Select after the integration was switched off.
+[Zen UV 5.4](https://zenmastersteam.github.io/Zen-UV/latest/) lists support for
+Blender 5.2 LTS. Verify both UV shortcuts with a compatible package before
+adding them back to the artist guide.
 
 A disposable Logistics preset on Blender 5.2.2 verified the Sections,
 Assignments and Commands views, shared and single-assignment capture,

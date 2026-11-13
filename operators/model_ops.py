@@ -42,6 +42,24 @@ class WM_OT_MergeLast(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class OBJECT_OT_BH_FaceSelectOrPose(bpy.types.Operator):
+    """Enter face selection on a mesh or Pose Mode on an armature"""
+    bl_idname = "object.bh_face_select_or_pose"
+    bl_label = "Face Select / Pose Mode"
+    bl_options = {'INTERNAL'}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.active_object
+        return (obj is not None and obj.type in {'MESH', 'ARMATURE'}
+                and bpy.ops.object.mode_set.poll())
+
+    def execute(self, context):
+        if context.active_object.type == 'MESH':
+            return bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={'FACE'})
+        return bpy.ops.object.mode_set(mode='POSE')
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -49,6 +67,7 @@ class WM_OT_MergeLast(bpy.types.Operator):
 
 classes = (
     WM_OT_MergeLast,
+    OBJECT_OT_BH_FaceSelectOrPose,
 )
 
 

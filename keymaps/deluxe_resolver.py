@@ -34,6 +34,7 @@ OBJECT_MODE = runtime.KeymapScope('Object Mode')
 COLLECTION_NUMBER_EVENTS = frozenset(runtime.KeymapEvent(key) for key in (
     'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'ZERO'))
 MODE_OPERATORS = frozenset({'object.mode_set', 'object.mode_set_with_submode'})
+CONTEXT_MODE_OPERATORS = frozenset({'object.bh_face_select_or_pose'})
 
 
 def profile_assignment_id(request_id):
@@ -375,8 +376,9 @@ class Resolver:
             # selection. The original route remains available in other modes.
             if (request.active and scope in OBJECT_NON_MODAL_SCOPES
                     and replace(event, repeat=False) in COLLECTION_NUMBER_EVENTS
-                    and command['operator'] in MODE_OPERATORS
-                    and command['properties'].get('mode') not in (None, 'OBJECT')):
+                    and (command['operator'] in CONTEXT_MODE_OPERATORS
+                         or command['operator'] in MODE_OPERATORS
+                         and command['properties'].get('mode') not in (None, 'OBJECT'))):
                 requests.append(replace(request, request_id=id_ + ':object-mode', scope=OBJECT_MODE))
         return state, groups
 
