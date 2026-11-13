@@ -33,6 +33,7 @@ PRODUCTION_PATHS = (
     'actions/actions/keymaps/selection/__init__.py',
     'actions/actions/keymaps/transform/transform_tools_modal.py',
     'actions/actions/keymaps/transform/transform_tools_gizmo.py',
+    'actions/actions/keymaps/transform/__init__.py',
     'keymaps/navigation_keymaps_register.py',
     'keymaps/selection_keymaps_register.py',
     'keymaps/transform_keymaps_register.py',
@@ -268,7 +269,7 @@ def native_main(root, mode):
         (root / 'native.json').write_text(json.dumps(receipt, indent=2) + '\n')
         print('CATEGORY03 ' + label, flush=True)
 
-    if mode in ('reopen', 'uv_g_reopen'):
+    if mode in ('reopen', 'uv_g_reopen', 'uv_g_production_reopen'):
         shutil.copyfile(root / 'incoming/userpref.blend', root / 'config/userpref.blend')
         bpy.ops.wm.read_userpref()
         bpy.context.preferences.use_preferences_save = False
@@ -283,6 +284,8 @@ def native_main(root, mode):
     state = {'sentinel': 0, 'wrapper_calls': []}
     sentinel_pairs = []
     steps = []
+    uv_repeat_production = mode.startswith('uv_g_production')
+    uv_repeat_reopen = mode in ('uv_g_reopen', 'uv_g_production_reopen')
 
     def region():
         return next(r for r in area.regions if r.type == 'WINDOW')
@@ -316,6 +319,8 @@ def native_main(root, mode):
 
     def initialize():
         assert addon._keymaps_registered, addon._post_register_error
+        if mode.startswith('uv_g_'):
+            prefs.keymap.transform.enable_transform_action_shortcuts = False
         prefs.keymap.enable_keymaps = True
         prefs.pie.enable_pie_menus = False
         kmreg.refresh()
@@ -1201,28 +1206,64 @@ def native_main(root, mode):
                 and km.region_type == 'WINDOW'
                 for item in km.keymap_items if item.idname == 'screen.repeat_last']
 
+    def uv_repeat_request():
+        if not uv_repeat_production:
+            return 'category03:uv-repeat-probe', rt.KeymapAssignment(
+                'uv-repeat-g', rt.KeymapScope('UV Editor', 'EMPTY', 'WINDOW'),
+                rt.KeymapEvent('G', repeat=True), rt.KeymapTarget(idname='screen.repeat_last'),
+                declared_properties_only=True)
+        # Derive the expected identity from the real public declaration. Only
+        # the category register below creates/releases its production handle.
+        adapter = importlib.import_module(PACKAGE + '.keymaps.keymap_action_utils')
+        actions = kmreg.transform_keymaps_register.get_transform_action_shortcuts()
+        assert len(actions) == 1 and len(actions[0].keymap_bindings) == 1
+        action = actions[0]
+        binding = action.keymap_bindings[0]
+        request = rt.KeymapAssignment(
+            f'0:{binding.keymap_name}:{binding.key}:{binding.value}',
+            adapter._binding_scope(binding, configs.addon), adapter._event(binding),
+            rt.KeymapTarget(idname=action.get_idname(), properties=action.get_props(bpy.context)),
+            declared_properties_only=True, active=binding.active)
+        owner = 'legacy:Transform:' + hashlib.sha256(repr((request,)).encode('utf-8')).hexdigest()
+        return owner, request
+
     def uv_repeat_start():
         selection_setup('uv')
         with override():
             bpy.ops.wm.tool_set_by_id(name='builtin.select_box')
             bpy.ops.image.view_all()
         configs.update()
-        if mode == 'uv_g_reopen':
+        owner, request = uv_repeat_request()
+        if uv_repeat_reopen:
             incoming = json.loads((root / 'incoming/uv-repeat-expected.json').read_text())
             assert incoming['preference_sha256'] == sha(root / 'incoming/userpref.blend')
-            assert incoming['owner'] == 'category03:uv-repeat-probe'
-            assert incoming['request_id'] == 'uv-repeat-g'
+            assert incoming['owner'] == owner
+            assert incoming['request_id'] == request.request_id
             assert incoming['expected_edit'] == {'event': 'F20/PRESS', 'active': False, 'repeat': True}
             state['uv_repeat_incoming_manifest'] = incoming
         assert not uv_repeat_matches(), 'Existing UV repeat row would make the owned probe ambiguous'
+        if uv_repeat_production:
+            # A category refresh legitimately recreates its own W/E/R items.
+            # Compare their declarations separately; compare all foreign raw
+            # snapshots with Transform absent at both endpoints, without
+            # discarding IDs or other fields from any foreign row.
+            state['uv_other_transform_rows'] = owned_rows()['transform']
+            set_groups(False, False, False)
         receipt['uv_repeat_probe'] = {
-            'status': 'fixture only; production G unchanged',
-            'owner': 'category03:uv-repeat-probe',
+            'status': ('actual production Transform Actions toggle' if uv_repeat_production
+                       else 'isolated fixture; production Actions disabled'),
+            'owner': owner, 'request_id': request.request_id,
+            'production_identity': uv_repeat_production,
             'stock_uv_selector': 'a617d6ba7bffe5931c516dd6f7be58620c8bc146f29634ef62a12c2935a891da',
             'owner05_screen_row': '404d0973700b95f4354799748f01445ff8aefb0031509c88fa0c71647bdcfd2b',
             'source_and_foreign_merged_before': uv_repeat_sources(),
             'installations': [], 'releases': [],
         }
+        if uv_repeat_production:
+            receipt['uv_repeat_probe']['preservation_endpoint'] = 'Transform category off at both complete snapshot endpoints'
+            receipt['uv_repeat_probe']['other_transform_declarations'] = state['uv_other_transform_rows']
+            set_groups(False, False, True)
+            assert owned_rows()['transform'] == state['uv_other_transform_rows']
         if 'uv_repeat_incoming_manifest' in state:
             receipt['uv_repeat_probe']['verified_incoming_manifest'] = state['uv_repeat_incoming_manifest']
 
@@ -1250,15 +1291,12 @@ def native_main(root, mode):
         return values
 
     def uv_repeat_install():
-        request = rt.KeymapAssignment(
-            'uv-repeat-g', rt.KeymapScope('UV Editor', 'EMPTY', 'WINDOW'),
-            rt.KeymapEvent('G', repeat=True), rt.KeymapTarget(idname='screen.repeat_last'),
-            declared_properties_only=True)
-        handle = rt.register_feature('category03:uv-repeat-probe', assignments=(request,))
-        state['uv_repeat_handle'] = handle
-        configs.update()
+        owner, request = uv_repeat_request()
+        handle = uv_repeat_enable(owner, request)
         proof = receipt['uv_repeat_probe']
-        entry = {'assignment': asdict(request), 'diagnostics': [asdict(d) for d in handle.diagnostics],
+        entry = {'assignment': asdict(request), 'owner': owner,
+                 'via_production_toggle': uv_repeat_production,
+                 'diagnostics': [asdict(d) for d in handle.diagnostics],
                  'owned_count': len(handle.owned_pairs),
                  'merged': [exporter._capture_map(km, bpy.types.OperatorProperties)
                             for km in configs.user.keymaps if km.name == 'UV Editor']}
@@ -1268,17 +1306,39 @@ def native_main(root, mode):
         matches = uv_repeat_matches()
         assert len(matches) == 1, 'Expected one exact effective UV repeat candidate'
         _, item = matches[0]
-        expected_key = 'F20' if mode == 'uv_g_reopen' else 'G'
+        expected_key = 'F20' if uv_repeat_reopen else 'G'
         assert item.type == expected_key and item.value == 'PRESS' and item.repeat
         assert not any((item.shift, item.ctrl, item.alt, item.oskey, item.any))
-        if mode != 'uv_g_reopen':
+        if not uv_repeat_reopen:
             assert item.active
+
+    def uv_repeat_enable(owner, request):
+        if uv_repeat_production:
+            prefs.keymap.transform.enable_transform_action_shortcuts = True
+            kmreg.refresh()
+            # Read-only ownership evidence; registration uses only the public
+            # preference/category path, never a fixture register_feature call.
+            handle = rt._FEATURES.get(owner)
+            assert handle is not None and handle.assignments == (request,)
+        else:
+            handle = rt.register_feature(owner, assignments=(request,))
+        state['uv_repeat_handle'] = handle
+        configs.update()
+        return handle
 
     def uv_repeat_release():
         handle = state.pop('uv_repeat_handle', None)
         if handle is None:
             return
-        handle.release()
+        if uv_repeat_production:
+            prefs.keymap.transform.enable_transform_action_shortcuts = False
+            kmreg.refresh()
+            assert handle.owner_id not in rt._FEATURES
+            assert not uv_repeat_matches()
+            assert owned_rows()['transform'] == state['uv_other_transform_rows']
+            set_groups(False, False, False)
+        else:
+            handle.release()
         configs.update()
         proof = receipt['uv_repeat_probe']
         after = uv_repeat_sources()
@@ -1291,7 +1351,7 @@ def native_main(root, mode):
             for keymap in expected['user']:
                 if keymap['scope']['name'] == 'UV Editor':
                     aggregate_marker = {'before': keymap['is_user_modified'], 'expected_after': True,
-                                        'reason': 'verified edit of the fixture-owned merged row'}
+                                        'reason': 'verified edit of the owned merged row'}
                     keymap['is_user_modified'] = True
         entry = {'source_and_foreign_merged_after': after,
                  'strict_snapshot_equality': after == proof['source_and_foreign_merged_before'],
@@ -1301,11 +1361,16 @@ def native_main(root, mode):
                                           for role in ('default', 'active', 'addon')),
                  'retained_source_edit_count': len(rt.retained_edits()),
                  'owned_candidate_absent': not uv_repeat_matches()}
+        if uv_repeat_production:
+            entry['other_transform_declarations_preserved_after_actions_off'] = True
         proof['releases'].append(entry)
         record('uv_repeat_candidate_released')
         assert entry['strict_preservation'], 'UV repeat release changed captured foreign fields/order/readability'
         assert entry['source_maps_exact'] and entry['retained_source_edit_count'] == 0
         assert entry['owned_candidate_absent']
+        if uv_repeat_production:
+            set_groups(False, False, True)
+            assert owned_rows()['transform'] == state['uv_other_transform_rows']
 
     def uv_repeat_save():
         keymap, item = uv_repeat_matches()[0]
@@ -1349,7 +1414,9 @@ def native_main(root, mode):
         assert actual['active'] is False, actual
         assert actual['repeat'] is True, actual
         assert actual['is_user_modified'] is True, actual
-        manifest = {'owner': 'category03:uv-repeat-probe', 'request_id': 'uv-repeat-g',
+        owner, request = uv_repeat_request()
+        manifest = {'owner': owner, 'request_id': request.request_id,
+                    'production_identity': uv_repeat_production,
                     'preference_sha256': sha(saved / 'userpref.blend'),
                     'declared_source': source_before,
                     'expected_edit': {'event': 'F20/PRESS', 'active': False, 'repeat': True}}
@@ -1360,12 +1427,8 @@ def native_main(root, mode):
         uv_repeat_install_edited()
 
     def uv_repeat_install_edited():
-        request = rt.KeymapAssignment(
-            'uv-repeat-g', rt.KeymapScope('UV Editor', 'EMPTY', 'WINDOW'),
-            rt.KeymapEvent('G', repeat=True), rt.KeymapTarget(idname='screen.repeat_last'),
-            declared_properties_only=True)
-        state['uv_repeat_handle'] = rt.register_feature('category03:uv-repeat-probe', assignments=(request,))
-        configs.update()
+        owner, request = uv_repeat_request()
+        uv_repeat_enable(owner, request)
         matches = uv_repeat_matches()
         receipt['uv_repeat_probe']['restoration_match_count'] = len(matches)
         assert len(matches) == 1
@@ -1380,13 +1443,13 @@ def native_main(root, mode):
         assert actual['is_user_modified'] is True, actual
         owned_source = uv_repeat_owned_source()
         expected_source = (state['uv_repeat_incoming_manifest']['declared_source']
-                           if mode == 'uv_g_reopen' else receipt['uv_repeat_probe']['saved_edit']['owned_source_before'])
+                           if uv_repeat_reopen else receipt['uv_repeat_probe']['saved_edit']['owned_source_before'])
         assert owned_source['scope'] == expected_source['scope']
         assert {k: v for k, v in owned_source['row'].items() if k != 'blender_id'} == {
             k: v for k, v in expected_source['row'].items() if k != 'blender_id'}
         receipt['uv_repeat_probe']['saved_edit_restored'] = {
             'event': item.type, 'active': item.active, 'repeat': item.repeat,
-            'is_user_modified': item.is_user_modified, 'fresh_process': mode == 'uv_g_reopen',
+            'is_user_modified': item.is_user_modified, 'fresh_process': uv_repeat_reopen,
             'map_is_user_modified_after_edit': keymap.is_user_modified,
             'exact_declared_source_restored': owned_source,
         }
@@ -1685,14 +1748,15 @@ def native_main(root, mode):
     elif mode == 'uv_g_control':
         steps.append(lambda: set_groups(False, False, True))
         uv_transform_case('G', prior_rotation=True)
-    elif mode in ('uv_g_probe', 'uv_g_save', 'uv_g_reopen'):
+    elif mode in ('uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production',
+                  'uv_g_production_save', 'uv_g_production_reopen'):
         steps.extend((lambda: set_groups(False, False, True), uv_repeat_start))
-        if mode == 'uv_g_reopen':
+        if uv_repeat_reopen:
             steps.extend((uv_repeat_install_edited, uv_repeat_release,
                           uv_repeat_install_edited, uv_repeat_release))
         else:
             steps.append(uv_repeat_install)
-            if mode == 'uv_g_save':
+            if mode in ('uv_g_save', 'uv_g_production_save'):
                 steps.extend((uv_repeat_save, uv_repeat_release))
             else:
                 uv_transform_case('G', expectation='empty_history')
@@ -1702,6 +1766,9 @@ def native_main(root, mode):
                 uv_transform_case('W', shift=True, expectation='move_tool')
                 steps.append(uv_repeat_release)
                 uv_transform_case('G', prior_rotation=True, expectation='translate')
+                if uv_repeat_production:
+                    uv_transform_case('W', expectation='translate')
+                    uv_transform_case('W', shift=True, expectation='move_tool')
                 steps.append(uv_repeat_install)
                 uv_transform_case('G', prior_rotation=True, expectation='single_repeat')
                 steps.append(uv_repeat_release)
@@ -1787,13 +1854,17 @@ def native_main(root, mode):
                                               'operator': 'wm.bh_editor_select_' + ('more' if direction == 'UP' else 'less')})
                 if previous is not None:
                     previous(frame, event, argument)
-            sys.setprofile(observe)
+            # Observe the actual input dispatch interval only. Snapshot capture
+            # and JSON serialization need no execute-call profiling.
+            fixture.before_shortcut = lambda: sys.setprofile(observe)
+            fixture.after_shortcut = lambda: sys.setprofile(previous)
         steps.append(production_editor_setup)
         fixture.append_matched_endpoint('before_production_guard')
         steps.append(fixture.start)
         def production_editor_metadata():
             fixture.state['stage'] = 'production_guarded_editor'
             fixture.state['production_operators'] = ['wm.bh_editor_select_more', 'wm.bh_editor_select_less']
+            fixture.state['callback_observation'] = 'read-only profile during shortcut dispatch; disabled before snapshots'
         steps.append(production_editor_metadata)
         kinds = tuple(helper.TARGETS) if cluster == 'selection' else helper.PASSTHROUGH
         for kind in kinds:
@@ -1953,7 +2024,7 @@ def cli():
     parser.add_argument('--blender', type=Path, required=True)
     parser.add_argument('--profile-source', type=Path, help='Read-only protected input hashes; not loaded in factory cases')
     parser.add_argument('--provider-source', type=Path)
-    parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
+    parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
                                          'transform', 'image', 'persistence', 'reopen'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')

@@ -606,8 +606,11 @@
           }
         },
         "source": "actions/actions/keymaps/transform/transform_tools_modal.py",
-        "source_sha256": "c96ecb1a43a89d4ae43d97f80b979378e90acbb09323a22377c8e24579a19f66",
-        "preference": "enable_transform_tools_modal"
+        "source_sha256": "8f94c479a500bf1e481ea8f6aaf44438999fd56b81e1617ee1e3bd07d92d4d73",
+        "preference": "enable_transform_tools_modal",
+        "historical_source_sha256": [
+          "c96ecb1a43a89d4ae43d97f80b979378e90acbb09323a22377c8e24579a19f66"
+        ]
       }
     }
   },
@@ -717,6 +720,52 @@
       "outside-context native pass-through",
       "production native dispatch and toggle",
       "immediate-save/fresh-reopen of edited owned rows"
+    ],
+    "partial_production_attempt": {
+      "run_id": "editor_production-1794551586350622000",
+      "status": "host timeout at 75.013 seconds",
+      "observed_enabled_effects": 5,
+      "observations_total": 9,
+      "final_preservation_reached": false,
+      "recommended_ceiling_seconds": 150
+    }
+  },
+  "uv_repeat_route": {
+    "status": "production source implemented; native production acceptance pending",
+    "source": "actions/actions/keymaps/transform/transform_tools_modal.py",
+    "source_sha256": {
+      "actions/actions/keymaps/transform/transform_tools_modal.py": "8f94c479a500bf1e481ea8f6aaf44438999fd56b81e1617ee1e3bd07d92d4d73",
+      "actions/actions/keymaps/transform/__init__.py": "6cdb22f83fa9f8531324c62aec8fc1fccd8d5367124a43804f5a7ffc0d8fd1cd",
+      "keymaps/transform_keymaps_register.py": "469a42609f2a66096547f3b01601c855db5db1f9aa337509b0a81960c7f1c08f",
+      "preferences/addon/keymaps/keymap_props_transform.py": "0913737c3f052982199d60855a390580bcc7e3a741fa0428a98f7390f8f692a3"
+    },
+    "preference": "enable_transform_action_shortcuts",
+    "scope": {
+      "name": "UV Editor",
+      "space_type": "EMPTY",
+      "region_type": "WINDOW"
+    },
+    "target": "screen.repeat_last",
+    "event": {
+      "type": "G",
+      "value": "PRESS",
+      "repeat": true
+    },
+    "stock_selector": "a617d6ba7bffe5931c516dd6f7be58620c8bc146f29634ef62a12c2935a891da",
+    "owner05_screen_row": "404d0973700b95f4354799748f01445ff8aefb0031509c88fa0c71647bdcfd2b",
+    "probe_dispatch": "uv_g_probe-1794549192779191000",
+    "probe_writer": "uv_g_save-1794551925248438000",
+    "probe_reader": "uv_g_reopen-1794552019120090000",
+    "production_modes": [
+      "uv_g_production",
+      "uv_g_production_save",
+      "uv_g_production_reopen"
+    ],
+    "identity": "Actual legacy:Transform adapter identity; production path differs from category03:uv-repeat-probe",
+    "remaining": [
+      "actual production dispatch, Actions off/on and strict foreign preservation",
+      "production owned immediate-save and hash-bound fresh reopen",
+      "owner04 composition and owner06 integrated parity"
     ]
   }
 }

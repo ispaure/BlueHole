@@ -15,7 +15,7 @@ __status__ = 'Production'
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORTS
 
-from .transform_tools_modal import TRANSFORM_TOOLS_MODAL_ACTIONS
+from .transform_tools_modal import TRANSFORM_TOOLS_MODAL_ACTIONS, TRANSFORM_ACTION_SHORTCUTS
 from .transform_tools_gizmo import TRANSFORM_TOOLS_GIZMO_ACTIONS
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ from .transform_tools_gizmo import TRANSFORM_TOOLS_GIZMO_ACTIONS
 _TRANSFORM_ACTIONS = (
     *TRANSFORM_TOOLS_MODAL_ACTIONS,
     *TRANSFORM_TOOLS_GIZMO_ACTIONS,
+    *TRANSFORM_ACTION_SHORTCUTS,
 )
 
 # ----------------------------------------------------------------------------------------------------------------------

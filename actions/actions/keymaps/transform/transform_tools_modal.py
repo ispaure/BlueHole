@@ -509,3 +509,21 @@ def get_transform_tools_modal_actions() -> list[OperatorAction]:
     Return all declared Blue Hole transform modal operator actions.
     """
     return TRANSFORM_TOOLS_MODAL_ACTIONS
+
+
+# Local UV precedence for the reference Screen G / Repeat Last behavior.
+# Stock UV Translate selector: a617d6ba7bffe5931c516dd6f7be58620c8bc146f29634ef62a12c2935a891da
+# Reference Screen trigger (owner 05): 404d0973700b95f4354799748f01445ff8aefb0031509c88fa0c71647bdcfd2b
+TRANSFORM_UV_REPEAT_LAST = OperatorAction(
+    operator='screen.repeat_last',
+    text='Repeat Last (UV)',
+    keymap_bindings=(
+        KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='G', repeat=True),
+    ),
+)
+
+TRANSFORM_ACTION_SHORTCUTS = [TRANSFORM_UV_REPEAT_LAST]
+
+
+def get_transform_action_shortcuts() -> list[OperatorAction]:
+    return TRANSFORM_ACTION_SHORTCUTS

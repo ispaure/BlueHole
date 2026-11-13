@@ -65,6 +65,8 @@ class EditorCases:
         self.matched_endpoints = matched_endpoints
         self.endpoint_label = None
         self.matched_baseline = None
+        self.before_shortcut = None
+        self.after_shortcut = None
         self.readiness = None
         self.control_class = None
         self.control_items, self.control_maps, self.control_callbacks = [], [], []
@@ -766,10 +768,14 @@ class EditorCases:
                 point = values.get('input_point')
                 if not self.input_controls:
                     self.event('MOUSEMOVE', 'NOTHING')
+                if self.before_shortcut is not None:
+                    self.before_shortcut()
                 self.event(key, 'PRESS', point=point, shift=True)
             attempt('native_input', work)
 
         def observe():
+            if self.after_shortcut is not None:
+                self.after_shortcut()
             if 'before' not in row:
                 return
 

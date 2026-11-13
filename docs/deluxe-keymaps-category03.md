@@ -144,14 +144,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Thirty-two category checks currently pass. They cover exact assigned IDs and
+Thirty-four category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 32 factory attempts and twelve copied-reference attempts. A completed
+retains 35 factory attempts and twelve copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -237,8 +237,14 @@ View2D Shift-wheel declarations in the existing More/Less feature. Its polls
 accept only WINDOW-region Dopesheet DOPESHEET, Graph FCURVES, Compositor nodes
 with an edit tree and Sequencer SEQUENCER, plus the underlying operator poll.
 Portable tests verify rejected contexts and poll-failure pass-through. Production
-native dispatch, unrelated-editor pass-through, feature toggles and saved-edit
-controls remain pending. Existing horizontal declarations stay unchanged. Exact
+dispatch reached five passing selection effects before its 75-second host limit:
+Dopesheet More/Less, Graph More/Less and Node More, with positive input controls.
+The host terminated and cleaned up the owned child; final in-process cleanup and
+preservation checks were not reached. The remaining cases, unrelated-editor
+pass-through, feature toggles and saved-edit controls remain pending. A 150-second
+ceiling is prepared from measured case times. Read-only callback profiling now
+covers only the shortcut dispatch interval; its timing benefit is unmeasured.
+Existing horizontal declarations stay unchanged. Exact
 owner-05 inactive scroll rows stay with that owner for global reconciliation.
 Mask's corrected fixture and Particle selection remain unverified.
 
@@ -248,8 +254,8 @@ completed a nonzero rotation through a temporary native F23 control, recorded
 Development G then started a fresh translation. Reference G immediately repeated
 the rotation, and subsequent mouse motion did not translate. This is consistent
 with the owner-05 **Screen G → Repeat Last** row; the earlier W-then-G sequence
-could not distinguish repeat from fresh translation. Production G remains
-unchanged. Ownership is settled: 03 owns the exact local UV Translate selector and
+could not distinguish repeat from fresh translation. Ownership is settled: 03
+owns the exact local UV Translate selector and
 UV precedence, 05 owns Screen Repeat Last, 04 verifies UV composition and 06
 integrated parity. One isolated UV Editor G/PRESS → Repeat Last assignment through
 the existing runtime passed seven native cases: known Rotate and Translate repeat
@@ -267,8 +273,7 @@ skipped, and the saved binary was removed. A prepared follow-up separates that
 aggregate marker from exact foreign-row/source comparisons, proves the intended
 owned source and user override, and binds a fresh-reader expectation to the saved
 preference hash. Brief 02 establishes native saved-diff restoration but does not
-explicitly test this aggregate marker. Production G remains unchanged until the
-scoped persistence proof and production check pass.
+explicitly test this aggregate marker.
 The next writer attempt stopped at a compound immediate post-save assertion
 using the previously held merged RNA wrapper. It did not retain the individual
 field values, so it does not identify a runtime defect. Reopen was skipped and
@@ -276,6 +281,23 @@ the only created input binary was removed. The revised fixture records each
 field before/after save, performs an explicit keyconfig update, reacquires the
 exact merged row and then tests the recomputed metadata. It preserves the
 immediate-save timing and exact owned-source/foreign comparisons.
+
+The revised writer and fresh reader both passed. The saved wrapper had been
+reused for an unrelated empty/ESC item; exact reacquisition recovered the intended
+F20/PRESS inactive, repeat-enabled user edit. The original owned G declaration
+stayed unchanged, the override survived two releases/reinstalls and a fresh
+process, and all foreign source/item fields/order/readability matched. Only the
+separately recorded aggregate marker reflected the owned saved edit.
+
+Production now declares one UV Editor/EMPTY/WINDOW G/PRESS binding to
+`screen.repeat_last`, with repeat enabled, under the existing Transform Actions
+toggle and editable keymap UI. Modal W/E/R and Gizmo controls remain independent.
+The public Transform action catalog includes the action. The stock G entry and
+global Screen row are unchanged. Portable checks cover the production identity,
+toggle and existing controls. Actual production dispatch and a separate immediate
+save/fresh reopen pair are prepared, because the adapter's `legacy:Transform`
+identity differs from the isolated probe owner. These native checks remain
+pending desktop allocation.
 
 Earlier G controls lacked repeat history, used stale BMesh data, had no rotation
 effect, or ended in a crash. Those attempts remain inconclusive. The latest
@@ -303,8 +325,8 @@ cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
 Required native work includes the stable editor baseline, outside-context and
 lifecycle controls, Circle/Framing saved edits across a fresh process, Image
 framing/pan/zoom, the axis reference readiness check, remaining ordinary clusters,
-and focused middle-mouse/subtract and modal/tool probes. G awaits saved-edit and
-fresh-reopen proof before a production decision. Existing proofs need no broader
+and focused middle-mouse/subtract and modal/tool probes. G awaits actual production dispatch and
+fresh-reopen acceptance. Existing proofs need no broader
 rerun unless affected source changes.
 
 Of 140 active full-side delta candidates, twenty-three have implemented declarations:

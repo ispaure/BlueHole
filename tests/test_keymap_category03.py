@@ -851,6 +851,38 @@ class Category03NativeReceiptTests(unittest.TestCase):
                 self.assertTrue(new['is_user_modified'])
         self.assertEqual(changes, 1)
 
+    def test_uv_repeat_saved_edit_reacquisition_and_fresh_reopen(self):
+        writer = self.runs['uv_g_save-1794551925248438000']
+        reader = self.runs['uv_g_reopen-1794552019120090000']
+        saved = writer['uv_repeat_probe']['saved_edit']
+        self.assertTrue(saved['immediate_save'])
+        self.assertTrue(saved['owned_source_unchanged'])
+        self.assertEqual(saved['owned_source_before'], saved['owned_source_after'])
+        # Preserve the evidence that a held RNA wrapper was reused by save.
+        self.assertEqual(saved['actual_before_save']['idname'], 'screen.repeat_last')
+        self.assertNotEqual(saved['held_wrapper_after_save']['idname'], 'screen.repeat_last')
+        actual = saved['reacquired_after_update']
+        self.assertEqual((actual['idname'], actual['type'], actual['value']),
+                         ('screen.repeat_last', 'F20', 'PRESS'))
+        self.assertFalse(actual['active'])
+        self.assertTrue(actual['repeat'])
+        self.assertTrue(actual['is_user_modified'])
+        self.assertEqual(reader['uv_repeat_probe']['verified_incoming_manifest'], saved['saved_manifest'])
+        for run in (writer, reader):
+            self.assertEqual(run['native_status'], 'complete')
+            proof = run['uv_repeat_probe']
+            restored = proof['saved_edit_restored']
+            self.assertEqual((restored['event'], restored['active'], restored['repeat']),
+                             ('F20', False, True))
+            self.assertEqual(restored['fresh_process'], run is reader)
+            self.assertTrue(restored['is_user_modified'])
+            self.assertEqual(len(proof['releases']), 2)
+            for release in proof['releases']:
+                self.assertTrue(release['strict_preservation'])
+                self.assertTrue(release['source_maps_exact'])
+                self.assertTrue(release['owned_candidate_absent'])
+                self.assertEqual(release['retained_source_edit_count'], 0)
+
     def test_matched_editor_guard_preserves_exact_endpoints_and_unknowns(self):
         run = self.runs['editor_probe-1794550412457976000']
         self.assertEqual(run['native_status'], 'complete')
@@ -1452,6 +1484,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             enable_transform_keymaps=True,
             enable_transform_tools_gizmo=True,
             enable_transform_tools_modal=False,
+            enable_transform_action_shortcuts=False,
         )
         modes = {
             'Armature', 'Curve', 'Curves', 'Grease Pencil Edit Mode', 'Lattice',
@@ -1498,6 +1531,56 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
                 self.assertEqual(item.idname, template['target'])
                 self.assertEqual(dict(item.properties), template['properties'])
 
+    def test_uv_repeat_production_toggle_preserves_modal_gizmo_and_stock(self):
+        for path, expected in self.manifest['uv_repeat_route']['source_sha256'].items():
+            self.assertEqual(sha256((ROOT / path).read_bytes()).hexdigest(), expected)
+        register = self.load_transform_register()
+        module = self.load('actions.actions.keymaps.transform.transform_tools_modal')
+        aggregate = self.load('actions.actions.keymaps.transform')
+        action, = module.get_transform_action_shortcuts()
+        self.assertIn(action, aggregate.get_all_transform_actions())
+        self.preferences.keymap.enable_keymaps = True
+        prefs = types.SimpleNamespace(
+            enable_transform_keymaps=True, enable_transform_tools_gizmo=True,
+            enable_transform_tools_modal=True, enable_transform_action_shortcuts=False,
+            active_transform_keymap_tab='ACTIONS')
+        self.preferences.keymap.transform = prefs
+        stock = self.runtime.map('default', 'UV Editor', space='EMPTY')
+        stock_g = row('transform.translate', key='G')
+        stock.keymap_items.append_fixture(stock_g)
+        existing = register.get_enabled_transform_actions()
+        count = register.register()
+        self.assertGreater(count, 0)
+        prefs.enable_transform_action_shortcuts = True
+        self.assertEqual(register.get_enabled_transform_actions(), [*existing, action])
+        self.assertEqual(register.register(), count + 1)
+        keymap, item = register.registered_transform_keymaps[-1]
+        self.assertEqual((keymap.name, keymap.space_type, keymap.region_type),
+                         ('UV Editor', 'EMPTY', 'WINDOW'))
+        self.assertEqual((item.idname, item.type, item.value, item.repeat, item.active),
+                         ('screen.repeat_last', 'G', 'PRESS', True, True))
+        self.assertFalse(any((item.shift, item.ctrl, item.alt, item.oskey, item.any)))
+        self.assertEqual(dict(item.properties), {})
+        owners = [handle for handle in self.keymap_utils._FEATURES.values()
+                  if any(request.target.idname == 'screen.repeat_last'
+                         for request in handle.assignments)]
+        self.assertEqual(len(owners), 1)
+        self.assertTrue(owners[0].owner_id.startswith('legacy:Transform:'))
+        self.assertEqual(owners[0].assignments[0].request_id, '0:UV Editor:G:PRESS')
+        prefs.enable_transform_action_shortcuts = False
+        self.assertEqual(register.register(), count)
+        self.assertEqual(register.get_enabled_transform_actions(), existing)
+        self.assertEqual(list(stock.keymap_items), [stock_g])
+        self.assertTrue(stock_g.active)
+        prefs.enable_transform_action_shortcuts = True
+        self.assertEqual(register.register(), count + 1)
+        ui = self.load('preferences.addon.keymaps.keymap_props_transform')
+        layout = Mock()
+        ui.draw(self.preferences, self.runtime.bpy.context, layout)
+        self.draw_feature.assert_called_once_with(
+            column=layout.column.return_value, feature_owner=prefs,
+            feature_prop_name='enable_transform_action_shortcuts', actions=[action])
+
     def test_ordinary_drafts_emit_the_21_reviewed_bindings_under_existing_controls(self):
         draft = self.manifest['ordinary_source_drafts']
         self.assertEqual(draft['status'], 'native-dispatch-pending')
@@ -1512,7 +1595,8 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
                                                 enable_selection_circle=False),
                           self.load('actions.actions.keymaps.selection').get_all_selection_actions()),
             'transform': (transform, transform.get_enabled_transform_actions,
-                          types.SimpleNamespace(enable_transform_keymaps=True),
+                          types.SimpleNamespace(enable_transform_keymaps=True,
+                                                enable_transform_action_shortcuts=False),
                           self.load('actions.actions.keymaps.transform').get_all_transform_actions()),
         }
         self.preferences.keymap.enable_keymaps = True

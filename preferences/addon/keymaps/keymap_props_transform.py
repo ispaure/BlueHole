@@ -18,7 +18,7 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 
-from ....actions.actions.keymaps.transform.transform_tools_modal import get_transform_tools_modal_actions
+from ....actions.actions.keymaps.transform.transform_tools_modal import get_transform_tools_modal_actions, get_transform_action_shortcuts
 from ....actions.actions.keymaps.transform.transform_tools_gizmo import get_transform_tools_gizmo_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
@@ -138,5 +138,9 @@ def draw(preference, context, layout):
         row.prop(preference.keymap.transform, 'enable_transform_orientation_shortcuts')
 
     elif preference.keymap.transform.active_transform_keymap_tab == 'ACTIONS':
-        row = column_transform.row()
-        row.prop(preference.keymap.transform, 'enable_transform_action_shortcuts')
+        draw_action_feature_keymaps(
+            column=column_transform,
+            feature_owner=preference.keymap.transform,
+            feature_prop_name='enable_transform_action_shortcuts',
+            actions=get_transform_action_shortcuts(),
+        )
