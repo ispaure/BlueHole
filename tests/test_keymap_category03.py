@@ -1105,9 +1105,9 @@ class Category03NativeReceiptTests(unittest.TestCase):
         production = self.runs['ordinary_production-1794557329510485000']
         reference = next(run for run in self.native['reference_runs']
                          if run['id'] == 'reference-evidence-1794557393495550000')
-        self.assertEqual(set(self.manifest['blocking_dispatch_reconciliation']), {
+        self.assertEqual(set(self.manifest['historical_dispatch_mismatches']), {
             case['ledger_id'] for case in production['dispatch'][:2]})
-        for item in self.manifest['blocking_dispatch_reconciliation'].values():
+        for item in self.manifest['historical_dispatch_mismatches'].values():
             self.assertEqual(item['status'], 'implemented-dispatch-mismatch')
         for cases, expected in ((production['dispatch'], (4, 4)),
                                 (reference['observations']['dispatch'], (9, 1))):
@@ -1175,10 +1175,41 @@ class Category03NativeReceiptTests(unittest.TestCase):
         self.assertTrue(all(owner['owner_id'].startswith('legacy:Selection:')
                             for owner in proof['installs'][0]['actual_owners']))
 
-    def test_shared_production_persistence_restores_editor_circle_and_framing_edits(self):
+    def test_uv_arrow_production_preserves_context_fallback_and_matched_endpoints(self):
+        run = self.runs['uv_arrow_production-1794559722114724000']
+        proof = run['uv_arrow_precedence']
+        self.assertEqual(run['native_status'], 'complete')
+        self.assertEqual(proof['status'], 'complete')
+        self.assertTrue(proof['production'])
+        self.assertEqual(len(run['dispatch']), 13)
+        self.assertTrue(all(case['passed'] and case['input_delivery']['delivered'] for case in run['dispatch']))
+        self.assertEqual(self.manifest['blocking_dispatch_reconciliation'], {})
+        self.assertEqual(len(self.manifest['resolved_dispatch_reconciliation']), 2)
+        for install in proof['installs']:
+            self.assertEqual(install['owned_pair_count'], 2)
+            self.assertEqual(install['registered_pair_matches'], [1, 1])
+            self.assertTrue(all(owner['owner_id'].startswith('legacy:Selection:')
+                                for owner in install['actual_owners']))
+        self.assertEqual(len(proof['releases']), 2)
+        for endpoint in proof['releases']:
+            self.assertTrue(endpoint['accepted_preservation'])
+            self.assertTrue(endpoint['source_comparison']['strict_foreign_identity_equal'])
+            self.assertTrue(endpoint['source_comparison']['owned_semantics_and_order_equal'])
+            self.assertTrue(endpoint['strict_foreign_merged_equal'])
+            for maps in endpoint['maps'].values():
+                self.assertFalse(any(row['target'] == 'wm.category03_ordinary_control'
+                                     for keymap in maps for row in keymap['items']))
+        final = proof['final_without_control']
+        self.assertTrue(final['source_comparison']['accepted_sources_equal'])
+        self.assertTrue(final['strict_foreign_merged_equal'])
+        self.assertTrue(run['watcher_stopped'])
+        self.assertEqual(run['cleanup']['owned'], 0)
+
+    def test_shared_production_persistence_restores_editor_circle_framing_and_arrow_edits(self):
         pairs = (
             ('editor_save-1794555923466868000', 'editor_reopen-1794556023841045000', {'editor_more'}),
             ('persistence-1794556127823686000', 'reopen-1794556179765247000', {'circle', 'framing'}),
+            ('uv_arrow_save-1794559822761297000', 'uv_arrow_reopen-1794559885933843000', {'uv_arrow_more'}),
         )
         for writer_id, reader_id, names in pairs:
             writer, reader = self.runs[writer_id], self.runs[reader_id]
@@ -1201,8 +1232,10 @@ class Category03NativeReceiptTests(unittest.TestCase):
                         self.assertTrue(row['is_user_modified'])
                         self.assertTrue(value['map_is_user_modified'])
                         self.assertEqual(row['event']['type'], {
-                            'editor_more': 'F18', 'framing': 'F19', 'circle': 'F20'}[name])
-                        self.assertEqual(row['active'], name != 'editor_more')
+                            'editor_more': 'F18', 'framing': 'F19', 'circle': 'F20', 'uv_arrow_more': 'F17'}[name])
+                        self.assertEqual(row['active'], name not in ('editor_more', 'uv_arrow_more'))
+                        if name == 'uv_arrow_more':
+                            self.assertTrue(row['event']['repeat'])
                         if name == 'circle':
                             self.assertEqual(row['properties']['radius'], 31)
                 for endpoint in run['editor_matched_endpoints']['endpoints'][1:]:

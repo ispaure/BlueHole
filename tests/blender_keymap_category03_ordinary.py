@@ -44,6 +44,9 @@ CLUSTERS = {
         'c668cd6405ddd1e2b7c17a066eeea197ea8063eac81bc238742430ad3a8eb973',  # 3D View: ESC
     ),
 }
+CLUSTER_SUBSETS = {
+    'uv_cursor': ('uv_edit', ('ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1',)),
+}
 MODIFIERS = ('shift', 'ctrl', 'alt', 'oskey')
 ITEM_FIELDS = ('type', 'value', 'any', *MODIFIERS, 'key_modifier', 'repeat', 'direction')
 CASE_ERRORS = (AttributeError, KeyError, ReferenceError, RuntimeError, StopIteration,
@@ -89,7 +92,11 @@ class OrdinaryCases:
         self.probe, self.cluster, self.invert_zoom = probe, cluster, invert_zoom
         if invert_zoom is not None and cluster != 'wheel_zoom':
             raise ValueError('invert_zoom applies only to wheel_zoom')
-        ids = CLUSTERS[cluster]
+        if cluster in CLUSTER_SUBSETS:
+            parent, ids = CLUSTER_SUBSETS[cluster]
+            assert set(ids) <= set(CLUSTERS[parent])
+        else:
+            ids = CLUSTERS[cluster]
         if ledger_path is None:
             ledger_path = Path(exporter.__file__).parent / 'fixtures/deluxe_keymaps/reconciliation-ledger.jsonl'
         found = {}
