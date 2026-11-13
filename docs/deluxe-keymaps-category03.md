@@ -144,14 +144,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Thirty-six category checks currently pass. They cover exact assigned IDs and
+Thirty-eight category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 36 factory attempts and twelve copied-reference attempts. A completed
+retains 39 factory attempts and twelve copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -252,8 +252,16 @@ rows. The failed receipt and interrupted in-process cleanup remain recorded; the
 owned child exited and host resource cleanup passed. A bounded fixture revision
 now requires live runtime ownership and registered-pair provenance for exactly
 those two generations, compares their semantic fields/order separately, and
-keeps every foreign identity strict. This revision is not yet natively run;
-the outside-context cluster was skipped.
+keeps every foreign identity strict. The corrected production selection run then
+passed all 14 observations, both
+toggle cycles and both matched releases, with live ownership proven for exactly
+those two recreated Pipeline rows. The outside-context run completed 20
+observations and two more exact releases. Image View, NLA, Timeline and nodes
+without a tree had positive controls and rejected the selection guard. File
+Browser received the keyboard control but its unmodified wheel did not move the
+view; Sequencer Preview used hidden-region coordinates [0,0] and sent its control
+to the status bar. Those two contexts remain unverified. Both children completed
+native unregister/watcher shutdown and host resource cleanup.
 Existing horizontal declarations stay unchanged. Exact
 owner-05 inactive scroll rows stay with that owner for global reconciliation.
 Mask's corrected fixture and Particle selection remain unverified.
@@ -265,8 +273,8 @@ Development G then started a fresh translation. Reference G immediately repeated
 the rotation, and subsequent mouse motion did not translate. This is consistent
 with the owner-05 **Screen G → Repeat Last** row; the earlier W-then-G sequence
 could not distinguish repeat from fresh translation. Ownership is settled: 03
-owns the exact local UV Translate selector and
-UV precedence, 05 owns Screen Repeat Last, 04 verifies UV composition and 06
+owns the exact local UV Translate selector and UV precedence, 05 owns Screen
+Repeat Last, 04 verifies UV composition and 06
 integrated parity. One isolated UV Editor G/PRESS → Repeat Last assignment through
 the existing runtime passed seven native cases: known Rotate and Translate repeat
 exactly once immediately, subsequent motion does not start a new transform, empty
@@ -304,10 +312,12 @@ Production now declares one UV Editor/EMPTY/WINDOW G/PRESS binding to
 toggle and editable keymap UI. Modal W/E/R and Gizmo controls remain independent.
 The public Transform action catalog includes the action. The stock G entry and
 global Screen row are unchanged. Portable checks cover the production identity,
-toggle and existing controls. Actual production dispatch and a separate immediate
-save/fresh reopen pair are prepared, because the adapter's `legacy:Transform`
-identity differs from the isolated probe owner. These native checks remain
-pending desktop allocation.
+toggle and existing controls. Actual production dispatch now passes nine native cases using its real
+`legacy:Transform` identity: the repeat/fallback cases, W/Shift-W with Actions
+on and off, two installs and two exact releases. Source and foreign merged
+snapshots match, and unrelated Transform declarations remain unchanged.
+Production immediate-save/fresh-reopen is prepared but remains unrun, because
+this identity differs from the isolated probe owner.
 
 Earlier G controls lacked repeat history, used stale BMesh data, had no rotation
 effect, or ended in a crash. Those attempts remain inconclusive. The latest
@@ -332,10 +342,10 @@ confinement and disposable minimum-version adaptation. Original app/profile and
 provider sources remain read-only. Process, source hash, protected-input and
 cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
 
-Required native work includes the stable editor baseline, outside-context and
-lifecycle controls, Circle/Framing saved edits across a fresh process, Image
+Required native work includes File Browser/Sequencer Preview input controls and
+editor persistence, Circle/Framing saved edits across a fresh process, Image
 framing/pan/zoom, the axis reference readiness check, remaining ordinary clusters,
-and focused middle-mouse/subtract and modal/tool probes. G awaits actual production dispatch and
+and focused middle-mouse/subtract and modal/tool probes. G awaits production immediate-save and
 fresh-reopen acceptance. Existing proofs need no broader
 rerun unless affected source changes.
 

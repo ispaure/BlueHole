@@ -884,6 +884,34 @@ class Category03NativeReceiptTests(unittest.TestCase):
                 self.assertTrue(release['owned_candidate_absent'])
                 self.assertEqual(release['retained_source_edit_count'], 0)
 
+    def test_uv_repeat_actual_production_identity_and_behavior(self):
+        run = self.runs['uv_g_production-1794553968267516000']
+        self.assertEqual(run['native_status'], 'complete')
+        proof = run['uv_repeat_probe']
+        self.assertTrue(proof['production_identity'])
+        self.assertTrue(proof['owner'].startswith('legacy:Transform:'))
+        self.assertEqual(proof['request_id'], '0:UV Editor:G:PRESS')
+        for path, expected in self.manifest['uv_repeat_route']['source_sha256'].items():
+            self.assertEqual(run['source_sha256'][path], expected)
+        self.assertEqual(len(proof['installations']), 2)
+        for entry in proof['installations']:
+            self.assertTrue(entry['via_production_toggle'])
+            self.assertEqual(entry['owner'], proof['owner'])
+            self.assertEqual(entry['owned_count'], 1)
+            self.assertTrue(entry['assignment']['event']['repeat'])
+        self.assertEqual(len(proof['releases']), 2)
+        for release in proof['releases']:
+            self.assertTrue(release['strict_preservation'])
+            self.assertTrue(release['strict_snapshot_equality'])
+            self.assertTrue(release['source_maps_exact'])
+            self.assertTrue(release['other_transform_declarations_preserved_after_actions_off'])
+            self.assertTrue(release['owned_candidate_absent'])
+        self.assertEqual(Counter(case['expectation'] for case in run['dispatch']), {
+            'empty_history': 1, 'single_repeat': 3, 'translate': 3, 'move_tool': 2})
+        empty = run['dispatch'][0]
+        self.assertEqual(empty['history_before_input'], [])
+        self.assertFalse(empty['repeat_poll_before_input'])
+
     def test_matched_editor_guard_preserves_exact_endpoints_and_unknowns(self):
         run = self.runs['editor_probe-1794550412457976000']
         self.assertEqual(run['native_status'], 'complete')
@@ -982,6 +1010,54 @@ class Category03NativeReceiptTests(unittest.TestCase):
         invalid_proof[0]['runtime_owned_valid'] = False
         with self.assertRaises(AssertionError):
             compare(before, after, a, invalid_proof)
+
+    def test_production_editor_ownership_toggles_and_outside_context_limits(self):
+        selection = self.runs['editor_production-1794553648264616000']
+        outside = self.runs['editor_production-1794553721545059000']
+        for run, count in ((selection, 14), (outside, 20)):
+            self.assertEqual(run['native_status'], 'complete')
+            self.assertEqual(len(run['dispatch']), count)
+            self.assertTrue(run['watcher_stopped'])
+            self.assertEqual(run['cleanup']['owned'], 0)
+            for endpoint in run['editor_matched_endpoints']['endpoints']:
+                proof = endpoint['owned_source_generations']
+                self.assertEqual(len(proof), 2)
+                for entry in proof:
+                    self.assertTrue(entry['runtime_owned_valid'])
+                    self.assertTrue(entry['registered_pair_matches'])
+                    self.assertTrue(entry['owner_id'].startswith('legacy:Pipeline:'))
+                    self.assertEqual(entry['row']['target'], 'wm.bh_save_as_mainfile')
+                if not endpoint.get('is_baseline'):
+                    self.assertFalse(endpoint['strict_sources_equal'])
+                    self.assertTrue(endpoint['strict_foreign_merged_equal'])
+                    self.assertEqual(endpoint['source_comparison'], {
+                        'strict_raw_sources_equal': False, 'strict_foreign_identity_equal': True,
+                        'owned_semantics_and_order_equal': True, 'proven_owned_generations': 2,
+                        'accepted_sources_equal': True})
+        for case in selection['dispatch']:
+            self.assertFalse(case.get('errors'))
+            self.assertEqual(case['input_delivery']['counts_in_expected_window_region'],
+                             {'window': 1, 'editor': 1})
+            self.assertEqual(case['input_delivery']['unmodified_wheel']['status'], 'observed_view_change')
+            enabled = case['stage'] in ('installed', 'reinstalled')
+            self.assertEqual(case['selection_changed'], enabled)
+            self.assertEqual([call['target'] for call in case['callbacks']],
+                             [case['target']] if enabled else [])
+            if enabled:
+                self.assertFalse(case['view_changed'])
+        for case in outside['dispatch']:
+            delivery = case['input_delivery']
+            if case['kind'] == 'sequencer_preview':
+                self.assertFalse(delivery['window_delivered'])
+                self.assertEqual(case['wheel_observation'], 'window_control_missing')
+                self.assertNotIn('probe_poll', case)
+                continue
+            self.assertTrue(delivery['window_delivered'])
+            self.assertFalse(case['probe_poll'])
+            self.assertEqual(case['callbacks'], [])
+            self.assertFalse(case['selection_changed'])
+            expected = 'inconclusive' if case['kind'] == 'file_browser' else 'observed_view_change'
+            self.assertEqual(delivery['unmodified_wheel']['status'], expected)
 
 
 class Category03RegistrationTests(Category03Evidence, unittest.TestCase):

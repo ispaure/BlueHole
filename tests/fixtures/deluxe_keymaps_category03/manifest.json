@@ -700,7 +700,7 @@
     }
   },
   "guarded_editor_route": {
-    "status": "production source implemented; native acceptance pending",
+    "status": "production selection/toggle/preservation proved; two outside controls and persistence pending",
     "source": "actions/actions/keymaps/selection/selection_more_less.py",
     "operator_source": "operators/selection_more_less_ops.py",
     "registration_source": "operators/operators_register.py",
@@ -717,8 +717,8 @@
     },
     "fixture_proof": "editor_probe-1794550412457976000",
     "remaining": [
-      "outside-context native pass-through",
-      "production native dispatch and toggle",
+      "File Browser movable-scroll positive control",
+      "Sequencer Preview visible-region input delivery",
       "immediate-save/fresh-reopen of edited owned rows"
     ],
     "partial_production_attempt": {
@@ -754,10 +754,23 @@
       "passthrough": "not run",
       "in_process_cleanup": "assertion stopped addon unregister; host child exit/resource cleanup verified",
       "followup": "Read-only live registered-pair/runtime provenance for exactly these two rows; compare their semantic fields/order separately; strict identity for all foreign rows. Prepared, not natively run."
+    },
+    "accepted_production_selection": "editor_production-1794553648264616000",
+    "partial_outside_context_run": "editor_production-1794553721545059000",
+    "outside_context_limits": {
+      "positive_control_contexts": [
+        "image",
+        "nla",
+        "timeline",
+        "node_without_tree"
+      ],
+      "positive_control_observations": 14,
+      "file_browser": "Window delivery passed; unmodified wheel and view were unchanged, so fallback remains inconclusive in three observations",
+      "sequencer_preview": "Three observations skipped after input coordinates [0,0] delivered Window control to STATUSBAR/HEADER; no preview behavior conclusion"
     }
   },
   "uv_repeat_route": {
-    "status": "production source implemented; native production acceptance pending",
+    "status": "production behavior/toggle/preservation proved; production persistence pending",
     "source": "actions/actions/keymaps/transform/transform_tools_modal.py",
     "source_sha256": {
       "actions/actions/keymaps/transform/transform_tools_modal.py": "8f94c479a500bf1e481ea8f6aaf44438999fd56b81e1617ee1e3bd07d92d4d73",
@@ -789,9 +802,9 @@
     ],
     "identity": "Actual legacy:Transform adapter identity; production path differs from category03:uv-repeat-probe",
     "remaining": [
-      "actual production dispatch, Actions off/on and strict foreign preservation",
-      "production owned immediate-save and hash-bound fresh reopen",
+      "actual production owned immediate-save and hash-bound fresh reopen",
       "owner04 composition and owner06 integrated parity"
-    ]
+    ],
+    "production_behavior_run": "uv_g_production-1794553968267516000"
   }
 }
