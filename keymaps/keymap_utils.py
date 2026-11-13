@@ -42,6 +42,52 @@ def _freeze(value):
     raise ValueError('unreadable_property_schema')
 
 
+def _freeze_rna_array(prop, value):
+    """Read a fixed numeric RNA array with its complete declared shape.
+
+    Only Blender's observed array/vector/matrix classes are accepted here. This
+    does not make arbitrary iterable objects valid descriptor/property values.
+    """
+    try:
+        from mathutils import Matrix, Vector
+    except ImportError as exc:
+        raise ValueError('unreadable_property_schema') from exc
+    array_type = getattr(getattr(bpy, 'types', None), 'bpy_prop_array', None)
+    scalar_type = {'BOOLEAN': bool, 'INT': int, 'FLOAT': float}.get(prop.type)
+    raw_dimensions = tuple(prop.array_dimensions)
+    if scalar_type is None or len(raw_dimensions) != 3:
+        raise ValueError('unreadable_property_schema')
+    dimensions = []
+    ended = False
+    for dimension in raw_dimensions:
+        if type(dimension) is not int or dimension < 0 or (ended and dimension):
+            raise ValueError('unreadable_property_schema')
+        if dimension == 0:
+            ended = True
+        else:
+            dimensions.append(dimension)
+    if (not dimensions or type(prop.array_length) is not int
+            or math.prod(dimensions) != prop.array_length):
+        raise ValueError('unreadable_property_schema')
+
+    def read(part, depth):
+        if depth == len(dimensions):
+            if type(part) is not scalar_type:
+                raise ValueError('unreadable_property_schema')
+            return _freeze(part)  # Reject nonfinite floats; canonicalize negative zero.
+        remaining = len(dimensions) - depth
+        kind = type(part)
+        if not ((isinstance(array_type, type) and kind is array_type)
+                or (scalar_type is float and kind is Vector and remaining == 1)
+                or (scalar_type is float and kind is Matrix and remaining == 2)):
+            raise ValueError('unreadable_property_schema')
+        if len(part) != dimensions[depth]:
+            raise ValueError('unreadable_property_schema')
+        return tuple(read(part[index], depth + 1) for index in range(dimensions[depth]))
+
+    return read(value, 0)
+
+
 def _pointer(obj):
     try:
         return ('native', obj.as_pointer())
@@ -315,10 +361,60 @@ def _properties(item):
             value = getattr(props, name)
             if prop.type == 'ENUM' and value == '':
                 raise _Pending('unreadable_property_schema')
-            values[name] = _freeze(value)
+            if getattr(prop, 'is_array', False):
+                values[name] = _freeze_rna_array(prop, value)
+            elif prop.type == 'ENUM' and getattr(prop, 'is_enum_flag', False) is True:
+                allowed = _enum_flag_identifiers(prop)
+                if type(value) is not set or any(type(v) is not str or v not in allowed for v in value):
+                    raise ValueError('unreadable_property_schema')
+                values[name] = tuple(sorted(value))
+            else:
+                values[name] = _freeze(value)
     except (AttributeError, ReferenceError, RuntimeError, TypeError, ValueError) as exc:
         raise _Pending('unreadable_property_schema') from exc
     return _freeze(values)
+
+
+def _enum_flag_identifiers(prop):
+    if prop.type != 'ENUM' or getattr(prop, 'is_enum_flag', False) is not True:
+        raise ValueError('unreadable_property_schema')
+    identifiers = tuple(item.identifier for item in prop.enum_items)
+    if not identifiers or any(type(identifier) is not str for identifier in identifiers):
+        raise ValueError('unreadable_property_schema')
+    # Empty enum identifiers are UI separators, never selectable flags.
+    allowed = frozenset(identifier for identifier in identifiers if identifier)
+    if not allowed:
+        raise ValueError('unreadable_property_schema')
+    return allowed
+
+
+def _set_property(item, name, value):
+    """Convert reviewed canonical flags/matrix rows to native RNA setter input."""
+    properties = item.properties
+    schema = getattr(getattr(properties, 'bl_rna', None), 'properties', ())
+    prop = next((prop for prop in schema if prop.identifier == name), None)
+    if prop is not None and prop.type == 'ENUM' and getattr(prop, 'is_enum_flag', False) is True:
+        allowed = _enum_flag_identifiers(prop)
+        if (type(value) is not tuple
+                or any(type(flag) is not str or flag not in allowed for flag in value)
+                or value != tuple(sorted(set(value)))):
+            raise ValueError('unreadable_property_schema')
+        value = set(value)
+    elif prop is not None and prop.type == 'FLOAT' and getattr(prop, 'is_array', False):
+        from mathutils import Matrix
+        if type(getattr(properties, name)) is Matrix:
+            # Native RNA tuple input is column-major for this property, whereas
+            # Matrix readback and our canonical signature preserve logical rows.
+            # The observed typed Matrix setter preserves that same row ordering.
+            if (type(value) is not tuple or not value
+                    or any(type(row) is not tuple or not row
+                           or any(type(part) is not float for part in row) for row in value)):
+                raise ValueError('unreadable_property_schema')
+            matrix = Matrix(value)
+            if _freeze_rna_array(prop, matrix) != value:
+                raise ValueError('unreadable_property_schema')
+            value = matrix
+    setattr(properties, name, value)
 
 
 def _target(item, modal):
@@ -645,7 +741,7 @@ def _create_assignment(request, owner_id):
                    request_id=request.request_id)
     try:
         for key, value in request.target.properties:
-            setattr(item.properties, key, value)
+            _set_property(item, key, value)
         item.active = request.active
         if request.declared_properties_only:
             actual = _snapshot(item, False)
@@ -961,7 +1057,7 @@ def _create_override(request, proof, owner_id):
                    owner_id=owner_id, request_id=request.request_id)
     try:
         for key, value in request.replacement.properties:
-            setattr(item.properties, key, value)
+            _set_property(item, key, value)
         _validate_created(owned, request.selector.event, request.replacement)
         _merged_order(request, owned, source_item)
         _COUNTS['created'] += 1

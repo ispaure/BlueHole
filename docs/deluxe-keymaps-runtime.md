@@ -47,6 +47,21 @@ reviewed selector in its declaration and attach its accepted ledger/sample ID;
 it must not learn a user's changed binding and then silently replace it.
 A name or ledger ID does not prove ownership or provide a capability.
 
+Brief 03's bounded category probe exposed native numeric-array and enum-flag
+readback gaps. The current correction accepts fixed-size RNA bool/int/float
+arrays through the observed `bpy_prop_array`, `Vector` and `Matrix` classes,
+validating complete shape, scalar types and finite values. An RNA ENUM flag uses
+readable allowed identifiers and a sorted immutable flag tuple, including the
+empty tuple. Explicit flag assignments use a sorted unique tuple; only the
+schema-aware setter converts that tuple to Blender's set input. Matrix assignments
+use the observed typed setter to preserve logical row order during native
+readback. Generic iterable
+or set acceptance, pointer/collection support and capability policy are unchanged.
+The 69 portable regressions and five affected native assignment/readback/release
+cases pass, including edited-source preservation. Evidence is tracked in the
+[category receipt](deluxe-keymaps-category03.md). The original
+brief 02 native receipt remains historical evidence for its recorded source.
+
 `KeymapScope` includes name, space, region, modal state and observable tool state.
 Blender 4.5.1 does not expose tool state; `None` retains that uncertainty. Events
 include `any`, tri-state modifiers, hyper when exposed, key modifier, direction,

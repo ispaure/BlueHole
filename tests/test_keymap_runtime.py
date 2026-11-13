@@ -11,7 +11,7 @@ import types
 import unittest
 from unittest.mock import patch
 
-from runtime_keymap_fakes import FakeConfig, FakeRuntime, MergedMaps, ReusedIdWrapper, row
+from runtime_keymap_fakes import FakeConfig, FakeProperties, FakeRuntime, MergedMaps, ReusedIdWrapper, row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -107,6 +107,249 @@ class RuntimeKeymapTests(unittest.TestCase):
 
     def reasons(self, handle):
         return {diagnostic.reason for diagnostic in handle.diagnostics}
+
+    def numeric_rna_types(self):
+        """Minimal stand-ins for the three classes observed in the native probe."""
+        class NativeSequence:
+            def __init__(self, values):
+                self.values = tuple(values)
+            def __len__(self):
+                return len(self.values)
+            def __getitem__(self, index):
+                return self.values[index]
+            def __iter__(self):
+                return iter(self.values)
+        class Vector(NativeSequence):
+            pass
+        class Matrix(NativeSequence):
+            def __init__(self, values):
+                super().__init__(Vector(v) for v in values)
+        class RNAArray(NativeSequence):
+            pass
+        module = types.ModuleType('mathutils')
+        module.Vector, module.Matrix = Vector, Matrix
+        replacement = patch.dict(sys.modules, {'mathutils': module})
+        replacement.start()
+        self.addCleanup(replacement.stop)
+        self.runtime.bpy.types = types.SimpleNamespace(bpy_prop_array=RNAArray)
+        return Vector, Matrix, RNAArray
+
+    def array_property(self, kind, dimensions, length, name='value'):
+        return types.SimpleNamespace(identifier=name, type=kind, is_array=True,
+                                     array_dimensions=dimensions, array_length=length)
+
+    def test_native_numeric_arrays_have_exact_immutable_shape_and_scalar_types(self):
+        Vector, Matrix, RNAArray = self.numeric_rna_types()
+        cases = (
+            ('FLOAT', (2, 0, 0), 2, Vector((2.5, -0.0)), (2.5, 0.0)),
+            ('FLOAT', (2, 3, 0), 6, Matrix(((1., 2., 3.), (4., 5., 6.))),
+             ((1., 2., 3.), (4., 5., 6.))),
+            ('BOOLEAN', (3, 0, 0), 3, RNAArray((True, False, True)), (True, False, True)),
+            ('INT', (2, 0, 0), 2, RNAArray((2, -3)), (2, -3)),
+        )
+        for kind, dimensions, length, value, expected in cases:
+            with self.subTest(kind=kind, dimensions=dimensions):
+                item = row(prop_values={'value': value})
+                item.properties.bl_rna.properties = [self.array_property(kind, dimensions, length)]
+                self.assertEqual(self.utils._properties(item), (('value', expected),))
+                # Descriptors use ordinary tuples; native readback converges on
+                # exactly the same signature without broadening generic _freeze.
+                self.assertEqual(self.utils._target(item, False), self.target(value=expected))
+                with self.assertRaises(ValueError):
+                    self.utils._freeze(value)
+
+    def test_numeric_array_shape_or_schema_mismatch_fails_closed(self):
+        Vector, Matrix, RNAArray = self.numeric_rna_types()
+        cases = (
+            ('FLOAT', (3, 0, 0), 3, Vector((1., 2.))),
+            ('FLOAT', (2, 2, 0), 4, Matrix(((1., 2.), (3.,)))),
+            ('FLOAT', (2, 2, 0), 4, Vector((1., 2., 3., 4.))),
+            ('FLOAT', (2, 0, 0), 3, Vector((1., 2.))),
+            ('FLOAT', (2, 0, 1), 2, Vector((1., 2.))),
+            ('FLOAT', (0, 0, 0), 0, Vector(())),
+            ('FLOAT', (-1, 0, 0), -1, Vector(())),
+            ('FLOAT', (True, 0, 0), 1, Vector((1.,))),
+            ('ENUM', (2, 0, 0), 2, RNAArray(('A', 'B'))),
+        )
+        for kind, dimensions, length, value in cases:
+            with self.subTest(kind=kind, dimensions=dimensions, value=value):
+                item = row(prop_values={'value': value})
+                item.properties.bl_rna.properties = [self.array_property(kind, dimensions, length)]
+                with self.assertRaises(self.utils._Pending):
+                    self.utils._properties(item)
+
+    def test_numeric_arrays_reject_nonfinite_wrong_scalar_and_generic_iterables(self):
+        Vector, Matrix, RNAArray = self.numeric_rna_types()
+        class UnknownIterable:
+            def __iter__(self):
+                raise AssertionError('Must reject this class without iterating')
+        cases = (
+            ('FLOAT', Vector((float('nan'), 0.))),
+            ('FLOAT', Vector((float('inf'), 0.))),
+            ('FLOAT', Vector((1, 2.))),
+            ('FLOAT', Vector((True, 2.))),
+            ('BOOLEAN', RNAArray((1, False))),
+            ('INT', RNAArray((True, 2))),
+            ('INT', RNAArray((1., 2))),
+            ('FLOAT', [1., 2.]),
+            ('FLOAT', (1., 2.)),
+            ('FLOAT', UnknownIterable()),
+        )
+        for kind, value in cases:
+            with self.subTest(kind=kind, value=type(value).__name__):
+                with self.assertRaises(ValueError):
+                    self.utils._freeze_rna_array(self.array_property(kind, (2, 0, 0), 2), value)
+        # This array fix does not admit enum-flag sets or pointer collections.
+        with self.assertRaises(ValueError):
+            self.utils._freeze({'INCREMENT'})
+        for kind in ('POINTER', 'COLLECTION'):
+            item = row(prop_values={'value': Vector((1., 2.))})
+            item.properties.bl_rna.properties = [self.array_property(kind, (2, 0, 0), 2)]
+            with self.assertRaises(self.utils._Pending):
+                self.utils._properties(item)
+
+    def test_numeric_array_assignment_readback_release_and_failed_shape_rollback(self):
+        Vector, _, _ = self.numeric_rna_types()
+        source = self.source(row('foreign.inherited'))
+        addon = self.addon()
+        runtime_test = self
+        class PanProperties(FakeProperties):
+            def __init__(self):
+                super().__init__({'offset': Vector((0., 0.))})
+                self.bl_rna.properties = [runtime_test.array_property('FLOAT', (2, 0, 0), 2, 'offset')]
+            def __setattr__(self, name, value):
+                if name == 'offset':
+                    value = Vector(value)
+                return super().__setattr__(name, value)
+        original_new = addon.keymap_items.new
+        def create(*args, **kwargs):
+            item = original_new(*args, **kwargs)
+            item.properties = PanProperties()
+            return item
+        with patch.object(addon.keymap_items, 'new', side_effect=create):
+            request = self.assignment(target=self.target('image.view_pan', offset=(2.5, -3.25)))
+            handle = self.utils.register_feature('array-owner', assignments=(request,))
+            self.assertEqual(len(handle.owned_pairs), 1)
+            self.assertEqual(self.utils._target(handle.owned_pairs[0][1], False), request.target)
+            handle.release()
+            self.assertEqual(len(addon.keymap_items), 0)
+            self.assertEqual(len(source.keymap_items), 1)
+            bad = self.assignment(target=self.target('image.view_pan', offset=(2.5,)))
+            failed = self.utils.register_feature('bad-array-owner', assignments=(bad,))
+            self.assertFalse(failed.owned_pairs)
+            self.assertEqual(len(addon.keymap_items), 0)
+            self.assertIn('unreadable_property_schema', self.reasons(failed))
+            failed.release()
+            self.assertEqual(self.utils.runtime_stats()['tracked_resources'], 0)
+
+    def test_typed_matrix_setter_preserves_rows_without_relaxing_shape_or_types(self):
+        _, Matrix, _ = self.numeric_rna_types()
+        schema = self.array_property('FLOAT', (2, 2, 0), 4, 'matrix')
+        class MatrixProperties(FakeProperties):
+            def __setattr__(self, name, value):
+                if name == 'matrix':
+                    # This mirrors the separately observed native distinction:
+                    # tuple input uses columns; typed Matrix input preserves rows.
+                    value = value if type(value) is Matrix else Matrix(zip(*value))
+                return super().__setattr__(name, value)
+        item = row()
+        item.properties = MatrixProperties({'matrix': Matrix(((0., 0.), (0., 0.)))})
+        item.properties.bl_rna.properties = [schema]
+        canonical = ((1., 2.), (3., 4.))
+        self.utils._set_property(item, 'matrix', canonical)
+        self.assertEqual(self.utils._properties(item), (('matrix', canonical),))
+        for invalid in (((1.,), (2.,)), ((1, 2), (3, 4)), ((float('inf'), 2.), (3., 4.)),
+                        ((True, 2.), (3., 4.)), ((1., 2.),), (1., 2.)):
+            with self.subTest(invalid=invalid), self.assertRaises((ValueError, TypeError)):
+                self.utils._set_property(item, 'matrix', invalid)
+            self.assertEqual(self.utils._properties(item), (('matrix', canonical),))
+
+    def flag_property(self, *, flag=True, identifiers=('EDGE', 'VERTEX'), name='snap_elements'):
+        return types.SimpleNamespace(identifier=name, type='ENUM', is_array=False,
+                                     is_enum_flag=flag, enum_items=[
+                                         types.SimpleNamespace(identifier=value) for value in identifiers])
+
+    def test_rna_enum_flags_are_sorted_and_empty_flags_preserved(self):
+        for value, expected in (({'VERTEX', 'EDGE'}, ('EDGE', 'VERTEX')), (set(), ())):
+            item = row(prop_values={'snap_elements': value})
+            item.properties.bl_rna.properties = [self.flag_property()]
+            self.assertEqual(self.utils._properties(item), (('snap_elements', expected),))
+            self.assertEqual(item.properties.snap_elements, value)
+        with self.assertRaises(ValueError):
+            self.utils._freeze({'VERTEX'})  # Generic descriptors still reject sets.
+
+    def test_rna_enum_flags_reject_unreadable_schema_and_malformed_members(self):
+        cases = (
+            (self.flag_property(), {'UNKNOWN'}),
+            (self.flag_property(), {1}),
+            (self.flag_property(), ('VERTEX',)),
+            (self.flag_property(), frozenset({'VERTEX'})),
+            (self.flag_property(flag=False), {'VERTEX'}),
+            (self.flag_property(identifiers=()), set()),
+            (self.flag_property(identifiers=(None,)), set()),
+            (self.flag_property(identifiers=('',)), set()),
+        )
+        for schema, value in cases:
+            with self.subTest(schema=schema, value=value):
+                item = row(prop_values={'snap_elements': value})
+                item.properties.bl_rna.properties = [schema]
+                with self.assertRaises(self.utils._Pending):
+                    self.utils._properties(item)
+        missing = self.flag_property()
+        del missing.enum_items
+        item = row(prop_values={'snap_elements': set()})
+        item.properties.bl_rna.properties = [missing]
+        with self.assertRaises(self.utils._Pending):
+            self.utils._properties(item)
+
+    def test_flag_setter_requires_canonical_tuple_and_uses_schema_specific_set(self):
+        item = row(prop_values={'snap_elements': set()})
+        item.properties.bl_rna.properties = [self.flag_property()]
+        for value in (('EDGE', 'VERTEX'), ()):
+            self.utils._set_property(item, 'snap_elements', value)
+            self.assertIs(type(item.properties.snap_elements), set)
+            self.assertEqual(self.utils._properties(item), (('snap_elements', value),))
+        before = item.properties.snap_elements.copy()
+        for value in (('VERTEX', 'EDGE'), ('EDGE', 'EDGE'), ('UNKNOWN',), {1}, ['EDGE'], {'EDGE'}):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.utils._set_property(item, 'snap_elements', value)
+            self.assertEqual(item.properties.snap_elements, before)
+        # An ordinary tuple property is not silently converted to a set.
+        ordinary = row(prop_values={'offset': (0., 0.)})
+        self.utils._set_property(ordinary, 'offset', (1., 2.))
+        self.assertIs(type(ordinary.properties.offset), tuple)
+
+    def test_flag_assignment_rollback_and_edited_source_preservation(self):
+        source = self.source(row('foreign.inherited'))
+        addon = self.addon()
+        original_new = addon.keymap_items.new
+        def create(*args, **kwargs):
+            item = original_new(*args, **kwargs)
+            item.properties = FakeProperties({'snap_elements': set()})
+            item.properties.bl_rna.properties = [self.flag_property()]
+            return item
+        with patch.object(addon.keymap_items, 'new', side_effect=create):
+            request = self.assignment(target=self.target('transform.translate', snap_elements=('EDGE', 'VERTEX')))
+            handle = self.utils.register_feature('flags-owner', assignments=(request,))
+            self.assertEqual(len(handle.owned_pairs), 1)
+            km, item = handle.owned_pairs[0]
+            self.assertEqual(self.utils._target(item, False), request.target)
+            count = addon.keymap_items.created
+            handle.refresh()
+            self.assertEqual(addon.keymap_items.created, count)
+            item.properties.snap_elements = {'VERTEX'}
+            handle.release()
+            self.assertTrue(self.utils.retained_edits())
+            self.assertIn(item, tuple(addon.keymap_items))
+            km.keymap_items.remove(item)  # Test author removes its intentional retained edit.
+            self.assertFalse(self.utils.retained_edits())
+            failed = self.utils.register_feature('bad-flags-owner', assignments=(
+                self.assignment(target=self.target('transform.translate', snap_elements=('UNKNOWN',))),))
+            self.assertFalse(failed.owned_pairs)
+            self.assertEqual(len(addon.keymap_items), 0)
+            self.assertEqual(len(source.keymap_items), 1)
+            failed.release()
+            self.assertEqual(self.utils.runtime_stats()['tracked_resources'], 0)
 
     def test_forward_prepend_priority_and_exact_release(self):
         original = row(prop_values={'action': 'SELECT'})
