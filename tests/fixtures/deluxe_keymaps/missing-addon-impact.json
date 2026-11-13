@@ -1,0 +1,2320 @@
+{
+  "attribution_limit": "Unresolved operators can also be obsolete Blender or preset entries. Names alone do not establish add-on ownership.",
+  "isolation_failure_resolved": {
+    "id": "addon-43c072ff8b",
+    "loaded_in_final_captures": true,
+    "mitigation": "six copied preset-directory preferences redirected before registration"
+  },
+  "missing_entries": [
+    {
+      "id": "addon-20ab44cb24",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-5aae0aee70",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-935b2825f9",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-eae937bd55",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-d42a977adf",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-0d76a57f34",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-58d9e33c41",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-9ef24bd3ec",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-064fbaa108",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-a456ccd341",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-422908ebb9",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-a8308e3a8b",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-d222c12e3f",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    },
+    {
+      "id": "addon-7c5c0cba6e",
+      "impact_status": "undetermined from absent source; not evidence that every unresolved operator belongs to this module",
+      "next_verification": "Resolve the alias in the private module inventory; if intended, supply its source in a disposable profile and capture its registration delta. Otherwise record it as an obsolete preference entry.",
+      "source_status": "absent from checked reference profile and bundled add-on/extension locations"
+    }
+  ],
+  "schema_version": 1,
+  "unresolved_reference_candidates": [
+    {
+      "active": true,
+      "operator": "node.nw_link_active_to_selected",
+      "owner": "05",
+      "row_id": "0092c471685178590d29cb6ce1d8176f2f08d23d6744435590dd4bd9b7791890",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "012a970683dc5b8c2bb3f0064b0d7e6bc1c002fc69c715bf6ddd9cfc893b64f6",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": false,
+      "operator": "machin3.smart_vert",
+      "owner": "05",
+      "row_id": "0160d9597a5208d9a88e9b32ad99aabadc03992d9f1c2b2d46714233321190d8",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Mesh",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.add_search",
+      "owner": "05",
+      "row_id": "0164c820eeb445926623a536c5b83714b828fbd5e9347c21cd0503e9ed451729",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Generic",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "019ca78838c9641f9b2189c5e1be143b0be571ce2f4dd23f54756485080999ad",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Weight Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "028db1c010ea3c65fe45303575900ed2703187c64c97273e3b7b39ec4a375607",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "02f6b636fb079a0ed5f6951477548124ce98631844c32b8b3e4983b0f350e82a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "033fe5cd381967eb6b2885290c8fe7b3e70dce1a85a18a3e0e102e6285fdcb52",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "04128eb73260b6f7bc50137f1c3561a65d110f0187a7ed0fc90f7dd359d78f34",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_center_cursor_and_frame_all",
+      "owner": "04",
+      "row_id": "053bd36d88063680fd7ce6c948bed16f29df372e861298da951c012378b35c68",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_reload_images",
+      "owner": "05",
+      "row_id": "058eb2f38bf17cf925ca347a9190becde569c2af03a4e65f7ba4e015e6434190",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "object.cablerator_helper_switch_handle",
+      "owner": "04",
+      "row_id": "06797339e66def68053707ef49f8d01e9f9b2c0bdbbd34f4c0d1e6078cc38a5d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Curve",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "06892b9b8886dc654030e9fba71e9dcf72bb6499c689832a75bd6a77292dcf1b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "079f778604748da42e80f9f2eaa6300dd0013c1c96f02763c456b3b3bedbec54",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_del_unused",
+      "owner": "05",
+      "row_id": "0ad695b10e373c10626e3880b234058175c7bfdd2f11bd988316c339006b207b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_detach_outputs",
+      "owner": "05",
+      "row_id": "0da3bc85642a4876e047851da32a8ead8de02f34b40978d0c938854abdfc10c2",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "0e2e8402b8783a0c6122168d604b69d30eba10cfa2a254c601b2f75dac232f1b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "0e44131b3d8898b88cb552bfa9830767c9a8cc2b4168ed072384f68edcf9a333",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Weight Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_lazy_mix",
+      "owner": "05",
+      "row_id": "0f677ce8b902717540c42048342f741f24330b820c79b39a4b7a77a6e042dc82",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "hardflow.topbar_activate",
+      "owner": "05",
+      "row_id": "157d192333e6ceab38e72d9aa2df97f76c4d6819598f276bd18e5269a562f8fd",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "17269eb950b297825afe37efbb114f3fe14158e7a9b35d91f927b8deb037a5e7",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_scale_individual_origins",
+      "owner": "04",
+      "row_id": "18905cd4932ac1a919f0cddfde99cec3b0430d97ce5d1daec5ce26a9bd37ec9d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "199109d03e53bc6cd079089c497cb291263e49450b32c04381c380149853ab59",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.pmi_data_edit",
+      "owner": "05",
+      "row_id": "19d7a9c8c837e83d595242e0cad0bf03e591d72d492ecd0d14f0c44428fff007",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen Editing",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "1a6e1220fba11595d75f439c5645352bf53e6244c030eaadb8fe11cb7dad4aed",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.wheel",
+      "owner": "05",
+      "row_id": "1bd57e5aded683760e16ce4d98d8efbf0b8e0e72a35f3ea3bfd5563c95f01f2a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Image Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "machin3.call_decal_operator",
+      "owner": "05",
+      "row_id": "1beba651c09928b24756b4cd741b37075206600c9a0a7f6eaa2c4f2158c97807",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Object Mode",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "1d990e8d84e6a8a2611acecf3f7a8f60a416a7a61d0d28bf0020186c35f7782a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "1e34eea223c3fa5844321863426e01f44353257747f79f8d999081b9f2688ac6",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_invert_selection",
+      "owner": "04",
+      "row_id": "1e37cd40755ddb5aa43d7ba95b4032c907929fe0058c1b9f4aa1790d17c90742",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "objectshaderfx_copy",
+      "owner": "05",
+      "row_id": "1f0693edc12b05df2b3c3526ee54005379e6d30b923be4a584173f46e3845c86",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Property Editor",
+        "region_type": "WINDOW",
+        "space_type": "PROPERTIES"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "1f51a8983183565d4f4f465a3569fb7dc64be763d50727b981f3b89dd2a11045",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "text.uncomment",
+      "owner": "05",
+      "row_id": "1f55daefada47059830662595f0e42c763c3251ae7d5082d1d470cfc44ed423a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Text",
+        "region_type": "WINDOW",
+        "space_type": "TEXT_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "2325ad78675b3eefe82cf0c6ca36eedff1a703324940d24a93740dc0c2e27a28",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_link_out",
+      "owner": "05",
+      "row_id": "23943aaf938e09ee138d727be80ab3fcd97bf3cffa7f5d8c763b3f6cfdfc6b83",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "24dd3cd4f763841207d60bb6c6b7066f7daedc8a04ff85d281259a1f0efdf6a1",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_select_parent_child",
+      "owner": "05",
+      "row_id": "27c50c550430ef1bbfbe0b247979e9b06e637a1a329888e56f00f2eb14aa2962",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_reset_nodes",
+      "owner": "05",
+      "row_id": "2802b12b184ce98621b2645bb79117353bb0db421ceec5ba103485b82fe9d178",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_preview_node",
+      "owner": "05",
+      "row_id": "28ffb24cff4f1b29c1aa0d0ad378a3b349ac3c693d6bd77a6bd350b446ae1a31",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "29574dcff050f0f51fdad06f8258565af71a2b5460f8069e60609a0caa6ad244",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Image Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "2a9c10b760af3db368581ced92417022e6b7f61daccb7e692614712b28f32a3c",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.cmp_send_select_maya_unreal_fb",
+      "owner": "05",
+      "row_id": "2b1b5c569bed652795379e38c48d5ed37e1e02694cf8d82d01b84e3cc8cad0ef",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Window",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "clip.graph_select_all",
+      "owner": "05",
+      "row_id": "2b7e65f77550a5d9b370a7f6ef38117804087a9e0a3d7bfa2f358b27e29fef61",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Clip Graph Editor",
+        "region_type": "WINDOW",
+        "space_type": "CLIP_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "2cc936e14d513ef9a05b45d61c1f54bcabf1bcf749ef7cda2df40c8eb4ee2967",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": false,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "2fca09a401f418fc637bb764cb54311ff984d74e12f1513f30bed777a0c36fb3",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "2ff47c8c34be3929068970766e462bbeba92ebc77b6736affb7bfd590ba14588",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "32a6173272fc30b6f3570a93f9e1bef80a841cfc11ecb4d7a2dacd5d87f07650",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "32d220a4222aa37b89aa27e0862a72443f1dd814b14addf03a10dbbcceae4065",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "33a8af48ef01cbe049cd7e46d3a18ff23eabb9a1c36dfc8c280e166c64e8c40c",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "3a18ef70744b0249f38025d2a7131dfc9b37de6ebec707d04f6a990cca8c6b1a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "3b631d4c2f1753c6577e7765bd0ba7a032f8621bdfd0595301b943f754c4474c",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "3f4b27a9431c1e3a65e603365322c6e3f5c3dcd2bf14b93488814813dca0e84b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Image Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "4005be801d0fcc1d8eec8bd6b4366a7615d85150cd06ec1451befb9475b44fc8",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_modify_labels",
+      "owner": "05",
+      "row_id": "4005ed7a91aebdac33fcec959e53ff4c9e44291c4663c760768235226ec111c3",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "4125003402cb35e53fbb6e3576e6221a3e0e047370c7cb0cdc630af9cd1c101a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_link_active_to_selected",
+      "owner": "05",
+      "row_id": "429f70465a2ea70a15815b2b154f71beb42d6afa3609a4181a5c2901a9fe26c1",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "mesh.prop_edit_pie",
+      "owner": "04",
+      "row_id": "42a5c7adc406d33962e161ae35b1a831e7f5997c4289baa95ad47411f80e7d67",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_align_nodes",
+      "owner": "05",
+      "row_id": "4480697d59d50c495b9932730ff06100cd63935c3bf0b9d897616e8b427dff2d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "45e31f301cddb5953e6b05b337bc1ad11fa91b1ec27481c6b02d52806e39c001",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_preview_node",
+      "owner": "05",
+      "row_id": "45e825e6c29330ce93d593c9b785f6d016dd290bd8b25c7885eea2a19ae54334",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "4a3e07a67de4a70228012a20191fc6555ab00ed394966b0c062bba31adacf27f",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "object.cablerator_helper_add_hook",
+      "owner": "04",
+      "row_id": "50df4db3d83561ffbcf4ff28706b450c990fa76be97647ccefade450f2047fc1",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Curve",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.pme_user_pie_menu_call",
+      "owner": "05",
+      "row_id": "511791ab06e42550920e4d11b444939bfcd895c435f87729335c8dcfc641f823",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Weight Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "517f3941e940b3699f061bb04ce9126ac0641846c993745bc7e898b415ba50e9",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "object.gpencil_modifier_copy",
+      "owner": "05",
+      "row_id": "53492b926c6378cd9ca533ec37c48ab0ad9439d2cf9f4d81136f91710daa01ab",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Property Editor",
+        "region_type": "WINDOW",
+        "space_type": "PROPERTIES"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "536d5fc5bf085efcfbde6ab6b0b827476a4dcce7a6a066d10d1058d039f655af",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "57fcc15779e8f1e2471d022269e1dbb69943d98fd0714be52951698cdaf619e8",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Image Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "57ffaced1834551c2787868d362af3e8a37dccd8fca293b0229b5dacdaa3b8cd",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "59c29aeb473eafb966a06be1d57c4ae839bc2b114b4313fa4343f687b34c964b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "59d0522d849ef292a8a60ed7bc8a11f249f42bde0dbbe9ff1aed90317717698d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "5a06215126bb20778e4224347201fc1028fd8a19021449a4d1b5fc09d588881f",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "5adbe81be5c6109a82b5034a39d1556ac274ed892af8bf8adef2e797f13d74bb",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "637a796b459a003383e83f62bcead175160cffccba3ab97cb0a300e44640a156",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_link_active_to_selected",
+      "owner": "05",
+      "row_id": "6b1469d963d121141340e0cadc4d20409da69f77b3728a383eb216f290d4d536",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_copy_label",
+      "owner": "05",
+      "row_id": "6c54f4ac4d57e7bc2c93666221c130f7c9e6aa5ee7407c1a48dffc13c3624f6e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "6c92a907a2bcbd6949faeefb018c79b7d5312e837211f12b5a74025feb83d286",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Vertex Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.wheel",
+      "owner": "05",
+      "row_id": "7025329535de1ffe3d4358eb9fe95a561053d3a06d0b375e2a0092452f1dcbc6",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Image Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "object.gpencil_modifier_remove",
+      "owner": "05",
+      "row_id": "736e16e7897dd657e64c631836c9021644014cb813d9e2d11ff608f604d27b28",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Property Editor",
+        "region_type": "WINDOW",
+        "space_type": "PROPERTIES"
+      }
+    },
+    {
+      "active": true,
+      "operator": "cbl.one_hook",
+      "owner": "05",
+      "row_id": "73c8e5f9c05c3c4680f249fce31baded9822cd80f31fc0e59ae36955b858b72b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Curve",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.wheel",
+      "owner": "05",
+      "row_id": "759f8f5cd2ac6150bd80298f4564f10c9fd5c688e4a9e6ce82b00a71070f1764",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Vertex Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.pmi_data_edit",
+      "owner": "05",
+      "row_id": "7631486669a49e69eeade913c1973066c6cd7f53a6557ad6a4ee60433ded9c50",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen Editing",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "ar.record_selector_up",
+      "owner": "05",
+      "row_id": "77efe83d462f7d86474a05daae2e1fe1c380dc3e3a48538e4573b7d3ff8c544b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "785cdc58583f92d35bf14bebae483a37ef8e5eae8cc780f6a57cd16a04ced2f3",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "ar.record_play",
+      "owner": "05",
+      "row_id": "7947499c11c8d3a98ea7f7441f973f95c3640ca6f7e4860044b750cb6aaf1c92",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "797d4b1b45c455cf2872f919b3d06864043d6043349a95bce99724e1617304d1",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "7bd2a9bb93084e910090e535671002eebafb40acdfa4e8cf4ced4dcc1e47291a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_split_faces_move",
+      "owner": "04",
+      "row_id": "7c64d0b1b3b7e544785d0ade58785d223731c81ce56ad5f77575fa51d55e2666",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "sculpt.wheel",
+      "owner": "05",
+      "row_id": "7ca7f29e8d56039228ad5835d260bc43fffdf68541146b15f5f8c80bcd8edc4b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "7cbc85a909ec14235798d242ea2c2d0334b9ff6b67ee4643dc12820b9d473704",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Vertex Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "7db840f47e4f2a4221e6cc3d51d4c9d09505ae4e9b5a88a3b0eb677a803a2904",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "7f3bb21ac916af3a0dd19dc2751832ded13e71ef49a5c155189e61f0a6f2628d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "space_data.show_region_ui",
+      "owner": "05",
+      "row_id": "8100689a33e7370fd73a009c9457c058248ad1a3fcdf3f8f0aa24c03a8587a16",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Dopesheet Generic",
+        "region_type": "WINDOW",
+        "space_type": "DOPESHEET_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "814dc32c96360ab80b142dbaa34be15a3d3c12621c615eb1cab7f19db3c2946e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "816a377a7882e6615ba2961f35e9e2bded0d8f0a23b51996fb9bcae776164857",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.pme_user_pie_menu_call",
+      "owner": "05",
+      "row_id": "85a72fa02cf12ddc97cef0461b85b5fb7f8483409f5a6a4e44d499024ef957ed",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Graph Editor",
+        "region_type": "WINDOW",
+        "space_type": "GRAPH_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "86d2b759a6bec7e355f3122f239f50a067cddeb1bdd2af652d20b8611c47528b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.face_select_reveal",
+      "owner": "05",
+      "row_id": "8877f7259450196b5a47f33a49c415c48b97d85daaa676ae0505025ce46bcd57",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Paint Face Mask (Weight, Vertex, Texture)",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.bh_send_selected_unreal",
+      "owner": "05",
+      "row_id": "8cb910770aa0cc433182c3f2cc2cd82eb68f955efcd954d4363ee1900e882b93",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Window",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "91d75a77915da0e6e5e95f06cf7f7ad9edfdc80ad82b3f1033aa1b3ef2cdc867",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "pose.bone_layers",
+      "owner": "05",
+      "row_id": "91e755f44e552f9cf0b33c3d36e8d377449d9cbba71a5a55d87c9297f0a68b4e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Pose",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": false,
+      "operator": "pme.window_auto_close",
+      "owner": "05",
+      "row_id": "923bb5296df1b400caa0db92dfb9efb0815d2c24381a65b7936ac0cde0587a28",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen Editing",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_frame_selected",
+      "owner": "05",
+      "row_id": "926242168dce2ad624678320b841d19be341cd5a79cba4ed3b428d9414dbec94",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "machin3.select_decals",
+      "owner": "05",
+      "row_id": "94c71ad60fb50e43466b0d6f9676a0e2bdbd906aa3def4e904dacb4731dcabd4",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Object Mode",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "968e0b94a6648ab7596b9b94788bc14e444320eb0d16d6735a246458dc7b3d10",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_link_active_to_selected",
+      "owner": "05",
+      "row_id": "97b7bf0c55ed76dc3b50df07c95569953a15b8e403f7fa860a72ec4a71d64a75",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.pmi_icon_select",
+      "owner": "05",
+      "row_id": "9af1d2c857848cad6288b069a3a547acd6a3936ed6211cf3b15a5260fb1c5dae",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen Editing",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "9bd565a94fc61404b5a2021dc97992f69c555119bfb3cbe44ca2b5bb21613f42",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_select_parent_child",
+      "owner": "05",
+      "row_id": "9e5539b5d6744abbe9f84b4cbe93a66306e4f9056239bdb40732935f6808cce0",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_swap_links",
+      "owner": "05",
+      "row_id": "9fd01da0b673fe76b4e82eaab81760581362edf75a2554a919df9ff0b7813759",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "a0eb88f13aab93e18dc46345cfca83d9b61cc435afcb0660ec542231071ee271",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "text.uncomment",
+      "owner": "05",
+      "row_id": "a4bde602fadcb43744bade217e2512cf430205b2bfbd038674359e265382e1cd",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Text",
+        "region_type": "WINDOW",
+        "space_type": "TEXT_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_add_textures_for_principled",
+      "owner": "05",
+      "row_id": "a52317f608ea77bc7a53910cd5f35154b1275fb744a14374d85c5188e20cb1bd",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_viewer_focus",
+      "owner": "05",
+      "row_id": "a6ce0cf64ece4447cdd7760a89bf4a71fb942fc03bbc68b1330f0832622e2e4c",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "poselib.apply_pose_asset_for_keymap",
+      "owner": "05",
+      "row_id": "a8a765ec09bcd7705c488bd40f6f9a71d6b149bc3c233ebeb3f070dfece69960",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "File Browser Main",
+        "region_type": "WINDOW",
+        "space_type": "FILE_BROWSER"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "a8c6108e9186492c770ee11b51dc4c220f56e71d621ffa833a9f0d2c06705a6b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "aba7a3c907bdca488844479eb5f0fee68b144e177e6f6bba3ef6f258219c9919",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "gpencil.active_frames_delete_all",
+      "owner": "05",
+      "row_id": "ac4390e352c49697a57aef68a778555407b9b5318e07c0b24ae4596a71656ac6",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Grease Pencil",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "acb3bc38443269b268a0a0f34753dbdf52ccbe5a8e98e5ed1a42b52118441801",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "acf853f299048573b170442cdf790441431ec1b5668b03bd62e22ec12be4af35",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_scale_individual_origins",
+      "owner": "04",
+      "row_id": "b38433bc8b280aceea4e534724c9286564abefed7ffe47e5bc794ef93ef19e1d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "b6a580c2ef723562df897167af8c6e3b1c90ce292268c4e153fecf841b9cf6aa",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "b708f87b09f87fe3f2c73186b2c69b9133688727fe59732e40daa0babe0b8f38",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_center_cursor_and_frame_all",
+      "owner": "04",
+      "row_id": "b76da007b8f916e7b38e8fcd80a17af951b0ecd3f6a87ced4c805d785f80b7dc",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_distribute",
+      "owner": "04",
+      "row_id": "b9025db39ec5ab8be96b148f39057519b4481981c4fd6903b35de8e1c9b18a79",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "b988f0099e88b76ab56be6a5db9689e57c64719056b28c592db0b30aead3d45d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_factor",
+      "owner": "05",
+      "row_id": "bc8db9f7613a14f61bf2ec4b0a5c10ecb03cf6e391261f971ddc05649c9150fe",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_invert_selection",
+      "owner": "04",
+      "row_id": "bcbc6b44b86fd09cf1ea956e30b0f095d61dac2ac0cf0677e8bc716dd92f5632",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "object.cablerator_helper_add_point",
+      "owner": "04",
+      "row_id": "bfb18dc0bb1e623be0deb41843dd8693f2e619eac56f77ad1193ac53d910367b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Curve",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_lazy_connect",
+      "owner": "05",
+      "row_id": "c1fdd19ba0e652cb960fff5976555c8a0ab9975c305d49b7addf25bcf66ba55b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_unwrap_selected",
+      "owner": "04",
+      "row_id": "c26c14fb61f0c04534123fc9aa5c49fa7c7e6136d9c6ce45e9ce14c52b5e75bf",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "c40ce99bd8015435c63f1bbfc5cbd948fc6870d968cbc89daebbe55a346a7465",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_add_texture",
+      "owner": "05",
+      "row_id": "c7f6b54e1b2c13f96cbd8c025122a19f276b249c68fe677976e8d5add24a765a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_link_active_to_selected",
+      "owner": "05",
+      "row_id": "c84164f9533d242dc9581b52fb57ce6bf0011400a7682da4c4a90c439a047e66",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "c8ab6301cd2f5254475c846a6750101cb449dcda0dff1e91fb36fd6cc228cade",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_bg_reset",
+      "owner": "05",
+      "row_id": "c91087ec5ab9b355f592e0d85a921e907afabea4ba8c407ed31702e9f8c9d31c",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "object.gpencil_modifier_copy",
+      "owner": "05",
+      "row_id": "c980d45e16fe26ca28d3cc021959c65736de7ba166a649a8ff5653b5e80b440b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Property Editor",
+        "region_type": "WINDOW",
+        "space_type": "PROPERTIES"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "c9842c86504a3e7c7b510b64e14fe17b26710cc2e74d7739762109d6acd255ce",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "cf2d62f50cced6bec431804877fd75dac1819e3e93573ee1eb1ab83deeda4c94",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_clear_label",
+      "owner": "05",
+      "row_id": "cf33fcef1040054e4955d0b4631d7a3cf052d018e51de77b29cf546e7e174507",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_link_active_to_selected",
+      "owner": "05",
+      "row_id": "d1ac8e5ccddad43c3484557d535306b5afdfc77ee112bb35afd74b3c9f8e2cbb",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "d1fb7bff072c3676d9e1ac28a28f1e949b05936b8ace0c8abc32ddc1e1471843",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "d59dfca7f6a1d88835a5e2b15bbfc093f3a4fc76e009b811f14fa3cdfe4b7b6a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "d6936d44531ba623998396ef13d00bd9100864ee762c76ec059dd76307e5b702",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_lazy_connect",
+      "owner": "05",
+      "row_id": "db92c872868a09aa9db9dee09ca1f029420ed2944ab314250e339368d59370b3",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.pme_user_pie_menu_call",
+      "owner": "05",
+      "row_id": "dc3907620a912987811b7abf9474576a72a754c486f7cf3fdfa0931c1943d24d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Weight Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "sculpt.set_detail_size",
+      "owner": "05",
+      "row_id": "dd2f8e4b03b33b03fe1c7ee2cf43f418f8f18578511700eee49934caf63378f9",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "wm.pme_user_pie_menu_call",
+      "owner": "05",
+      "row_id": "de4008ba5ccee5cc52c644a36871679f03cdaa29d744c01d3813c7880521ca5e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Graph Editor",
+        "region_type": "WINDOW",
+        "space_type": "GRAPH_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "object.gpencil_modifier_remove",
+      "owner": "05",
+      "row_id": "e23904f6568bc738e86acd04444197cd8af284627be92a8d4b9ada545f997afc",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Property Editor",
+        "region_type": "WINDOW",
+        "space_type": "PROPERTIES"
+      }
+    },
+    {
+      "active": true,
+      "operator": "object.cablerator_helper_unrotate",
+      "owner": "04",
+      "row_id": "e247f39ebf576f55d6917443eed71ab50510312fed2311bb824da92b41f63ebf",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Curve",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "e330458b15e6b5768c641d69141a71e3af0854e67e51e5ce9ad103053e19125e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "e3507c7c5718358ef23541c9dc903e1d26aecb5f347db2a5c3e434b9b9d87f80",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "ar.command_add",
+      "owner": "05",
+      "row_id": "e3ce3b351ef779e38a599fdca00a66c7f4e6fb61cc9268089334025fda3e3d9f",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "cbl.cut_cable",
+      "owner": "05",
+      "row_id": "e634d12b70bac53312a91429172538168d535b7ad261f1534a0b6cbf1bfa5291",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Curve",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "e675c7f5b036e8e417ddde00e2c41eed10e0be24fafc97198c8b46ee9021c15e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_batch_change",
+      "owner": "05",
+      "row_id": "e6e4f9599f7c7d2308f2a1dd1e095fa8f52c3bd641dcbde288e9080799493b40",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "ea1e708975e322d7311eab707776b2c7e510e619f9d5272790128f61c33e2df2",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "uv.toolkit_unwrap_selected",
+      "owner": "04",
+      "row_id": "eaadc6ab2b6e56e0b55b83a18fed664f51fe436d0640e6389fee9118bba0a141",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "gpencil.active_frames_delete_all",
+      "owner": "05",
+      "row_id": "eb6ce7271194db915e8de68901789a2b4a6b4d9d5b7b6a1484b59f71d7654f99",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Grease Pencil",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.add_search",
+      "owner": "05",
+      "row_id": "ebeca89af448f8097a7996ad3b8ad614e636d96cfd73ebcbe7d6bcaa92425780",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Generic",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "ar.record_selector_down",
+      "owner": "05",
+      "row_id": "eced28b08c605cd698467198d931baf4cf0a614d1d38bbce7c4ec452552d665d",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "ed40de0d2d45ebe4f466c3a888675b1374113301e0405ce4d3d7b91ad2c369b7",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "pme.pm_edit",
+      "owner": "05",
+      "row_id": "eef62d527429082eea6084fe5a74901f0bdb237381582ee3fbf931ce10284e0c",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen Editing",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "objectshaderfx_copy",
+      "owner": "05",
+      "row_id": "efbdfcb7793d755f79aeb9b1b2c37e13faa3ea80303d64c6fbcb93cc3b2d1b50",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Property Editor",
+        "region_type": "WINDOW",
+        "space_type": "PROPERTIES"
+      }
+    },
+    {
+      "active": true,
+      "operator": "paint.brush_select",
+      "owner": "05",
+      "row_id": "f41e97be5ffdcf88eb15cb74a87873751e033d26c3967874107303ba02893e01",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Sculpt",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": false,
+      "operator": "pme.window_auto_close",
+      "owner": "05",
+      "row_id": "f4de83bbc5eedd1d8aa2b441e8d1e8167df1e9a43497c87ce88e74465551822c",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen Editing",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": false,
+      "operator": "pme.window_auto_close",
+      "owner": "05",
+      "row_id": "f7d3d6af219b391e6ac4a82b952447cffd14d41a84433ae5271273790344ea6b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Screen Editing",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "weight.wheel",
+      "owner": "05",
+      "row_id": "fae127936e09a29b8428b2247f1739c1e31ef94aee3110f543fa973ee0595514",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Weight Paint",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": true,
+      "operator": "node.nw_merge_nodes",
+      "owner": "05",
+      "row_id": "fcb2332aa970a2bb4ceb1fc253e9f79475c185d46a202c21b9c730e5dc8755df",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Node Editor",
+        "region_type": "WINDOW",
+        "space_type": "NODE_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "clip.graph_select_all",
+      "owner": "05",
+      "row_id": "fd884af3c077232dc035367dc9d75b70885ca1001af9577da3c8c1e35975ab8b",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Clip Graph Editor",
+        "region_type": "WINDOW",
+        "space_type": "CLIP_EDITOR"
+      }
+    },
+    {
+      "active": true,
+      "operator": "machin3.call_decal_pie",
+      "owner": "05",
+      "row_id": "fe9c17daf31e3ab27fdc3fc5f5b5f4601747af08bff6a66ea66096596d0d8c02",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Object Mode",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    },
+    {
+      "active": false,
+      "operator": "machin3.call_decal_pie",
+      "owner": "05",
+      "row_id": "ff8ae151eead62688cc1ef89a69371285ee9f14215aead20933693df4f52307a",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Mesh",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      }
+    }
+  ]
+}

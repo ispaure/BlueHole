@@ -4,6 +4,20 @@ Run `python -m unittest discover -s tests -v` for the existing adapter contracts
 They use isolated fixtures and the actual vendored library without Blender startup.
 They do not connect to Perforce or validate add-on registration.
 
+## Deluxe keymap baseline
+
+`python3 -m unittest discover -s tests -p 'test_keymap_baseline.py' -v` checks
+the read-only Blender exporter, deterministic row/duplicate identities, conservative
+comparisons, collisions, and ownership ledger. Sanitized native fixtures are in
+`tests/fixtures/deluxe_keymaps/`; private captures and disposable resources belong
+only under ignored `test-results/deluxe-keymaps-baseline/`.
+
+See [the baseline receipt](../docs/deluxe-keymaps-baseline.md) for snapshot/comparison
+commands, GUI isolation, source preservation, actual input outcomes, and unresolved
+rows. Development source on `blender-5.2.2/alpha` was tested with the explicitly
+approved Blender 4.5.1 reference app. Only disposable compatibility-test copies
+lowered the declared minimum; this does not establish Blender 5.2.2 compatibility.
+
 ## Embedded shared-library smoke test
 
 With an installed Blender executable, run from the repository root:

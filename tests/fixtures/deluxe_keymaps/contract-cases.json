@@ -1,0 +1,1024 @@
+{
+  "cases": [
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 1,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "KEYBOARD",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "Q",
+        "value": "PRESS"
+      },
+      "occurrence_id": "58b8a3573a0a5bebfbbf1462687d26d96d40848b534e4ffd1d1af9fc9e316eb2",
+      "row_id": "fe9c17daf31e3ab27fdc3fc5f5b5f4601747af08bff6a66ea66096596d0d8c02",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Object Mode",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "machin3.call_decal_pie"
+    },
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "84dbef553b9d556f87342f37bf6974161eddeca2c22817c04b96e1426dcf2253",
+      "row_id": "96b4d85eca0ab0a6b90ef9fbb951b880f5ec4bf60cf3a36124a1b73167a01275",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "NORTH",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "ca3c38cc21bda35bdd70ce1afc19d30a62eaf838765026b755e8ab640d67b579",
+      "row_id": "f87a2f2728398c900402115ae77f9ffa8641bb3913693f61733c62ee57767633",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 0,
+        "type": "LEFTMOUSE",
+        "value": "PRESS"
+      },
+      "occurrence_id": "795459e8891aea2834ffc656d245f60b305fe32ac285ed5a103f7ce8fc16c18a",
+      "row_id": "2db2585be4b88076f57f712e720aaa060a4fcce4c5fdd2e5ded8ad15d3e79afd",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.rotate"
+    },
+    {
+      "active": false,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "a9259e4b38c488d9d0007b6f868fee05040d9f861755e038061f0cb57a860cdd",
+      "row_id": "a63452c53c55968e12ac6dab240415532078a414fe21cdd51c2938e678c2a86f",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 1,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "973748b9d0498631de79392e2b037326216b20b4afb1ed06abfc7d1b879d78da",
+      "row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": false,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 1,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "0f5f69eaae22de2fcc64d0a1bbcec36c2b3ff6705fcf66370b22d143925c8214",
+      "row_id": "edba632c7d8155e7286880a67538de29fc4f1ca6bd72f9944e38b9506e7bec83",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "SOUTH",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "942e1308714fe1f4fb8cbca61af648315646da7a0028d561c90caf17b95e633f",
+      "row_id": "b6e62ceca8b51ebf50a9e4e045b01a6557b92ed3b76cb81093f808f50db5f5d0",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "WEST",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "4dd1acea5242e7650db51604c1aa0a7509a2a761f4942a2bf6e7da9a6813e025",
+      "row_id": "88b9c9a89ece5608151b887738c792e6c5e798cf59b0ab8c90705c9debbaf914",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "EAST",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "269669bce9be93a8148eab83e34c9e3360b840f2739012c8f89315a3325e131c",
+      "row_id": "858c02cc6e9603bbe73e744489592a32c2387ee14b143710bfec2ab8fc248f02",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "full",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": -1,
+        "any": true,
+        "ctrl": -1,
+        "direction": "ANY",
+        "hyper": -1,
+        "key_modifier": "NONE",
+        "map_type": "KEYBOARD",
+        "oskey": -1,
+        "repeat": false,
+        "shift": -1,
+        "type": "ESC",
+        "value": "PRESS"
+      },
+      "occurrence_id": "2ed9b25d3236e083ba9e3f8496f6b6a6b640d97eba114d30e8a823b73f93c6df",
+      "row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+      "scope": {
+        "is_modal": true,
+        "is_tool": null,
+        "name": "Transform Modal Map",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "CANCEL"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "KEYBOARD",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 0,
+        "type": "Q",
+        "value": "CLICK"
+      },
+      "occurrence_id": "3e084c3a47847b5888deb3f47f2dfccca367ddc9f3b2a642ce98b23a3e94d1f5",
+      "row_id": "4ce73660bd5e5feaf6aecc5c0b4f8c66c04a1d37160bf2fefa77f994b5b66847",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Object Mode",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "wm.bh_tool_select_box_xray_object"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 1,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "KEYBOARD",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "Q",
+        "value": "PRESS"
+      },
+      "occurrence_id": "58b8a3573a0a5bebfbbf1462687d26d96d40848b534e4ffd1d1af9fc9e316eb2",
+      "row_id": "fe9c17daf31e3ab27fdc3fc5f5b5f4601747af08bff6a66ea66096596d0d8c02",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Object Mode",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "machin3.call_decal_pie"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "KEYBOARD",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 0,
+        "type": "Q",
+        "value": "RELEASE"
+      },
+      "occurrence_id": "c1adbb3f7cb81073c63602b410e39b816e07a7040d20a9cd79f815617097b305",
+      "row_id": "86fcae04df534a067526b3c7ff0c0f1763aa0e81040ef620d671f69d022b88a0",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Object Mode",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "wm.tool_set_by_id"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "84dbef553b9d556f87342f37bf6974161eddeca2c22817c04b96e1426dcf2253",
+      "row_id": "96b4d85eca0ab0a6b90ef9fbb951b880f5ec4bf60cf3a36124a1b73167a01275",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "EAST",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "269669bce9be93a8148eab83e34c9e3360b840f2739012c8f89315a3325e131c",
+      "row_id": "858c02cc6e9603bbe73e744489592a32c2387ee14b143710bfec2ab8fc248f02",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "WEST",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "4dd1acea5242e7650db51604c1aa0a7509a2a761f4942a2bf6e7da9a6813e025",
+      "row_id": "88b9c9a89ece5608151b887738c792e6c5e798cf59b0ab8c90705c9debbaf914",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "SOUTH",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "942e1308714fe1f4fb8cbca61af648315646da7a0028d561c90caf17b95e633f",
+      "row_id": "b6e62ceca8b51ebf50a9e4e045b01a6557b92ed3b76cb81093f808f50db5f5d0",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "NORTH",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "ca3c38cc21bda35bdd70ce1afc19d30a62eaf838765026b755e8ab640d67b579",
+      "row_id": "f87a2f2728398c900402115ae77f9ffa8641bb3913693f61733c62ee57767633",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 0,
+        "type": "LEFTMOUSE",
+        "value": "PRESS"
+      },
+      "occurrence_id": "795459e8891aea2834ffc656d245f60b305fe32ac285ed5a103f7ce8fc16c18a",
+      "row_id": "2db2585be4b88076f57f712e720aaa060a4fcce4c5fdd2e5ded8ad15d3e79afd",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.rotate"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 0,
+        "type": "LEFTMOUSE",
+        "value": "PRESS"
+      },
+      "occurrence_id": "7fb8de4885b286d41368cce2163b1d3d3d1ea7efd87d1aec6358f13193b90119",
+      "row_id": "2db2585be4b88076f57f712e720aaa060a4fcce4c5fdd2e5ded8ad15d3e79afd",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.rotate"
+    },
+    {
+      "active": false,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "a9259e4b38c488d9d0007b6f868fee05040d9f861755e038061f0cb57a860cdd",
+      "row_id": "a63452c53c55968e12ac6dab240415532078a414fe21cdd51c2938e678c2a86f",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 1,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "973748b9d0498631de79392e2b037326216b20b4afb1ed06abfc7d1b879d78da",
+      "row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": false,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 1,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "0f5f69eaae22de2fcc64d0a1bbcec36c2b3ff6705fcf66370b22d143925c8214",
+      "row_id": "edba632c7d8155e7286880a67538de29fc4f1ca6bd72f9944e38b9506e7bec83",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "NORTH",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "ff30ca51f05ee4b61a1d9b5b1c94dbc48ad02b0852b0c9348058b4736339d865",
+      "row_id": "f87a2f2728398c900402115ae77f9ffa8641bb3913693f61733c62ee57767633",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "SOUTH",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "927e7ac2b7362d8cb25782c5780d4f5a3e1a1ee5830b0cd5429316ae30cc3680",
+      "row_id": "b6e62ceca8b51ebf50a9e4e045b01a6557b92ed3b76cb81093f808f50db5f5d0",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "WEST",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "f397f43a7f4f2ad2c03ed682d84d5369301402e274635b4909f32765d3393398",
+      "row_id": "88b9c9a89ece5608151b887738c792e6c5e798cf59b0ab8c90705c9debbaf914",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "EAST",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "a422b8012b98012f007ef58473d5ac3f3c66fb9b27545f9f0ccf1f5151e7c4d6",
+      "row_id": "858c02cc6e9603bbe73e744489592a32c2387ee14b143710bfec2ab8fc248f02",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "occurrence_id": "cfd4219568c5584259ca206feebbe34bc67cbfb8e48d35c3eace7bdd1cfcad4f",
+      "row_id": "96b4d85eca0ab0a6b90ef9fbb951b880f5ec4bf60cf3a36124a1b73167a01275",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.view_axis"
+    },
+    {
+      "active": true,
+      "capture": "no-overrides",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": -1,
+        "any": true,
+        "ctrl": -1,
+        "direction": "ANY",
+        "hyper": -1,
+        "key_modifier": "NONE",
+        "map_type": "KEYBOARD",
+        "oskey": -1,
+        "repeat": false,
+        "shift": -1,
+        "type": "ESC",
+        "value": "PRESS"
+      },
+      "occurrence_id": "2ed9b25d3236e083ba9e3f8496f6b6a6b640d97eba114d30e8a823b73f93c6df",
+      "row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+      "scope": {
+        "is_modal": true,
+        "is_tool": null,
+        "name": "Transform Modal Map",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "CANCEL"
+    },
+    {
+      "active": true,
+      "capture": "development-reference",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 1,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "KEYBOARD",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "Q",
+        "value": "PRESS"
+      },
+      "occurrence_id": "58b8a3573a0a5bebfbbf1462687d26d96d40848b534e4ffd1d1af9fc9e316eb2",
+      "row_id": "fe9c17daf31e3ab27fdc3fc5f5b5f4601747af08bff6a66ea66096596d0d8c02",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "Object Mode",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "machin3.call_decal_pie"
+    },
+    {
+      "active": false,
+      "capture": "development-reference",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "a9259e4b38c488d9d0007b6f868fee05040d9f861755e038061f0cb57a860cdd",
+      "row_id": "a63452c53c55968e12ac6dab240415532078a414fe21cdd51c2938e678c2a86f",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": true,
+      "capture": "development-reference",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 1,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "973748b9d0498631de79392e2b037326216b20b4afb1ed06abfc7d1b879d78da",
+      "row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": false,
+      "capture": "development-reference",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": 1,
+        "any": false,
+        "ctrl": 1,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "occurrence_id": "0f5f69eaae22de2fcc64d0a1bbcec36c2b3ff6705fcf66370b22d143925c8214",
+      "row_id": "edba632c7d8155e7286880a67538de29fc4f1ca6bd72f9944e38b9506e7bec83",
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    {
+      "active": true,
+      "capture": "development-reference",
+      "contract": "preserve order, modal scope, inactive state and user overrides; verify dispatch before replacement",
+      "event": {
+        "alt": -1,
+        "any": true,
+        "ctrl": -1,
+        "direction": "ANY",
+        "hyper": -1,
+        "key_modifier": "NONE",
+        "map_type": "KEYBOARD",
+        "oskey": -1,
+        "repeat": false,
+        "shift": -1,
+        "type": "ESC",
+        "value": "PRESS"
+      },
+      "occurrence_id": "2ed9b25d3236e083ba9e3f8496f6b6a6b640d97eba114d30e8a823b73f93c6df",
+      "row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+      "scope": {
+        "is_modal": true,
+        "is_tool": null,
+        "name": "Transform Modal Map",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "CANCEL"
+    }
+  ],
+  "consumers": [
+    "02",
+    "06"
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,3175 @@
+{
+  "metadata": {
+    "blender": {
+      "background": false,
+      "build_branch": "blender-v4.5-release",
+      "build_commit_date": "2025-07-29",
+      "build_commit_time": "05:31",
+      "build_hash": "b0a72b245dcf",
+      "build_platform": "Darwin",
+      "version": [
+        4,
+        5,
+        1
+      ],
+      "version_cycle": "release",
+      "version_string": "4.5.1 LTS"
+    },
+    "fixture": "native-sample-stock",
+    "subset": "3D View/Object Mode/Transform Modal Map/Window; A,Q,ESC,LEFTMOUSE only; orders are local to this subset"
+  },
+  "roles": {
+    "active": {
+      "alias_of": null,
+      "available": true,
+      "maps": [
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 12,
+              "native_row_id": "3ce10710e69a5948cc96d86078d966797d02a5a3e49e17682ec3f9a12f7c1ade",
+              "occurrence_id": "3d3ff421113e3163fa4bfeee16dc7d615be6a14757f1d6fa23d51b2cb0d7bbc6",
+              "order": 0,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "3ce10710e69a5948cc96d86078d966797d02a5a3e49e17682ec3f9a12f7c1ade",
+              "target": "wm.quit_blender"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 13,
+              "native_row_id": "cb3c90491e66eb80920fa31281c2c01759aa018dc1b0e102de408618741559eb",
+              "occurrence_id": "724a78f99fedd044559f2dbd843e354dbc1114442f2b982e9159e4249ba76c88",
+              "order": 1,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "cb3c90491e66eb80920fa31281c2c01759aa018dc1b0e102de408618741559eb",
+              "target": "wm.quit_blender"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 14,
+              "native_row_id": "a71c27072c83404c83085319a341bccfc1dc82ed9015ee59a7c6eb7c4bb78691",
+              "occurrence_id": "eaaf3a5192abc141044614eb7567ff00eff7f9f526e7d0cae95744fb3167f79c",
+              "order": 2,
+              "properties": {
+                "name": "SCREEN_MT_user_menu"
+              },
+              "read_issues": {},
+              "row_id": "a71c27072c83404c83085319a341bccfc1dc82ed9015ee59a7c6eb7c4bb78691",
+              "target": "wm.call_menu"
+            }
+          ],
+          "order": 0,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "Window",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 2,
+              "native_row_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+              "occurrence_id": "2da1d445e50e33cff79d6188effa04a18707ec6da3e978880a8e04db62e1f4b5",
+              "order": 0,
+              "properties": {
+                "action": "SELECT"
+              },
+              "read_issues": {},
+              "row_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 3,
+              "native_row_id": "ebd8d59afbaa86f9964abd8c4c882b24cec360b24e8545cbd397ac627588a5c6",
+              "occurrence_id": "01344ebcde398296cd424ffcdbc0dd71f086ffe0e80eacdd1c803512809e36cc",
+              "order": 1,
+              "properties": {
+                "action": "DESELECT"
+              },
+              "read_issues": {},
+              "row_id": "ebd8d59afbaa86f9964abd8c4c882b24cec360b24e8545cbd397ac627588a5c6",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "DOUBLE_CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 6,
+              "native_row_id": "bb40bafe57ec830743d3a8601000a433142b7f308478bbf869d3f4cee1d34184",
+              "occurrence_id": "d3561491a6c2371844e4c02c1d97661d8af692373dc3588f5f2fd17fb3a0516e",
+              "order": 2,
+              "properties": {
+                "action": "DESELECT"
+              },
+              "read_issues": {},
+              "row_id": "bb40bafe57ec830743d3a8601000a433142b7f308478bbf869d3f4cee1d34184",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK_DRAG"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 23,
+              "native_row_id": "968ff2562097d0fd107465a5c9829862adf22281971947970489eff4cd34c279",
+              "occurrence_id": "6d62c4377181176d606191850843a1e1308858b54a9ef4f69653e0c1d6d21ad3",
+              "order": 3,
+              "properties": {
+                "constraint_axis": [
+                  false,
+                  false,
+                  false
+                ],
+                "cursor_transform": false,
+                "gpencil_strokes": false,
+                "mirror": false,
+                "orient_matrix": [
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                ],
+                "orient_matrix_type": "GLOBAL",
+                "orient_type": "GLOBAL",
+                "proportional_edit_falloff": "SMOOTH",
+                "proportional_size": 1.0,
+                "release_confirm": false,
+                "remove_on_cancel": false,
+                "snap": false,
+                "snap_align": false,
+                "snap_elements": [
+                  "INCREMENT"
+                ],
+                "snap_normal": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "snap_point": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "snap_target": "CLOSEST",
+                "texture_space": false,
+                "translate_origin": false,
+                "use_accurate": false,
+                "use_automerge_and_split": false,
+                "use_duplicated_keyframes": false,
+                "use_proportional_connected": false,
+                "use_proportional_edit": false,
+                "use_proportional_projected": false,
+                "use_snap_edit": true,
+                "use_snap_nonedit": true,
+                "use_snap_project": false,
+                "use_snap_selectable": false,
+                "use_snap_self": true,
+                "value": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "view2d_edge_pan": false
+              },
+              "read_issues": {},
+              "row_id": "968ff2562097d0fd107465a5c9829862adf22281971947970489eff4cd34c279",
+              "target": "transform.translate"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 33,
+              "native_row_id": "86aa03eb8a65845ee70eaf28d84291045780f8cbd78159e6a0de9f3eca5b9cb8",
+              "occurrence_id": "59562085b44b2fe769a0ae813dc7a8419cceacb973ae8a266872974bf59e6c23",
+              "order": 4,
+              "properties": {
+                "name": "VIEW3D_MT_add"
+              },
+              "read_issues": {},
+              "row_id": "86aa03eb8a65845ee70eaf28d84291045780f8cbd78159e6a0de9f3eca5b9cb8",
+              "target": "wm.call_menu"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 34,
+              "native_row_id": "d46c281db5246c37560c5d963be6ab8c03da1939917020c3d32cf9ff04398ce1",
+              "occurrence_id": "4fec8dce8721f56ee2b82bbc6c9a72dc5b53d7fabccc22efd98d13e6275d7bc2",
+              "order": 5,
+              "properties": {
+                "name": "VIEW3D_MT_object_apply"
+              },
+              "read_issues": {},
+              "row_id": "d46c281db5246c37560c5d963be6ab8c03da1939917020c3d32cf9ff04398ce1",
+              "target": "wm.call_menu"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 35,
+              "native_row_id": "d26c51bac307a1b0291f7ce0b0edff7b33c26e23e795a123f6b7d35e2af90475",
+              "occurrence_id": "79cddde04be183a12f0610fdc0ac71216b053a612f45493b6b8b17d5cdd601de",
+              "order": 6,
+              "properties": {
+                "name": "VIEW3D_MT_object_apply"
+              },
+              "read_issues": {},
+              "row_id": "d26c51bac307a1b0291f7ce0b0edff7b33c26e23e795a123f6b7d35e2af90475",
+              "target": "wm.call_menu"
+            }
+          ],
+          "order": 1,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "Object Mode",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 105,
+              "native_row_id": "e6d83d45f1836c9eecf4366b312327db7e2157a9b962eb4a6931f9ca70077dd6",
+              "occurrence_id": "00adf7e0c7dd33aaf4d949fd0c28e4ace5084f3ab85981801a1a3f24b4bff291",
+              "order": 0,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": true,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "e6d83d45f1836c9eecf4366b312327db7e2157a9b962eb4a6931f9ca70077dd6",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 106,
+              "native_row_id": "a7ec93364df103d03cf79d12fe12ab80e00b36aaf01be88d8cf06e6b254e631d",
+              "occurrence_id": "5095c05e8698b6a0cd47edbd3aafdfe3d42c550cde9ddf03624b29b530ffac91",
+              "order": 1,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "a7ec93364df103d03cf79d12fe12ab80e00b36aaf01be88d8cf06e6b254e631d",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 107,
+              "native_row_id": "2a2afd973a69a961eae2661202b667c73eae31556ab7bbeec502f746bbf181c0",
+              "occurrence_id": "79db10b7aa935b8e1d6a40c9d80cc2980243838615c437f8e52d6041efc3a6d8",
+              "order": 2,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": true,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "2a2afd973a69a961eae2661202b667c73eae31556ab7bbeec502f746bbf181c0",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 108,
+              "native_row_id": "f33578f15e8bd108c710b0cb2dc3eaf3fe900e2011af912da8e54354433cd526",
+              "occurrence_id": "85a16e615acee95a38c04133b61f157ada6e7e6a3d5f290aa35a0733bba38865",
+              "order": 3,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": true,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "f33578f15e8bd108c710b0cb2dc3eaf3fe900e2011af912da8e54354433cd526",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 109,
+              "native_row_id": "68bf01fb7d7d9a56206882405205336ee2cdc0e1d1e1b2d5cf824d9779de0f62",
+              "occurrence_id": "5198d817e7af193cc31d91f975d8425e9f0720d8bfed2caf3e65431c9485f1dc",
+              "order": 4,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "68bf01fb7d7d9a56206882405205336ee2cdc0e1d1e1b2d5cf824d9779de0f62",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 110,
+              "native_row_id": "4b0804a9a14135505b4bb747a327063796dab714ec18c2422dc44470567d396f",
+              "occurrence_id": "2019487b0a53e8a43c20ff209e3db0894e2e14f23f4fe06f4ebfb8e6c0522e00",
+              "order": 5,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "4b0804a9a14135505b4bb747a327063796dab714ec18c2422dc44470567d396f",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 111,
+              "native_row_id": "a05125e1c1229ddc626192407de94fc8420e355050738c1abff8ba2c85a73735",
+              "occurrence_id": "7285ad295ce3b7a24a900a958af6fb8f957166d5fee24a1a02c72b40c7800455",
+              "order": 6,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "a05125e1c1229ddc626192407de94fc8420e355050738c1abff8ba2c85a73735",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 112,
+              "native_row_id": "9918598f92931f2af438516f093ce76acd10b5259e1273108c7034e7f5f2240b",
+              "occurrence_id": "b9c5726aa8f91bf8a8beac322a52eccd8a714b17467fd2484f2e8f9dca58bb2e",
+              "order": 7,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "9918598f92931f2af438516f093ce76acd10b5259e1273108c7034e7f5f2240b",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 113,
+              "native_row_id": "112be4403a2b3fe309f0671c2b58652237dbca03dd6cd274c01d541c606af77e",
+              "occurrence_id": "8f6be127e9e5fa9d41c5ad9bfbf6d5a1262ab11392c7a8b18d61adb8dd6a14f5",
+              "order": 8,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "112be4403a2b3fe309f0671c2b58652237dbca03dd6cd274c01d541c606af77e",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 114,
+              "native_row_id": "52ca3bdaa3fe268fe0a073afbb14f3327e0ec71a1b0b27548832f5488aad2b81",
+              "occurrence_id": "fc6394739d98ace18f024b164d9ba6487daec6337df635d5f8736ad335075eca",
+              "order": 9,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "52ca3bdaa3fe268fe0a073afbb14f3327e0ec71a1b0b27548832f5488aad2b81",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 115,
+              "native_row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+              "occurrence_id": "973748b9d0498631de79392e2b037326216b20b4afb1ed06abfc7d1b879d78da",
+              "order": 10,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 116,
+              "native_row_id": "9b660a7d323d2c0ac185fd4db271e444d81c12231378e5b2ff7b0302ae357fe5",
+              "occurrence_id": "009b214f61a41e30e8915526799a48dbcd7c8319b2c33ecc851d1aeaa171b3a1",
+              "order": 11,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "9b660a7d323d2c0ac185fd4db271e444d81c12231378e5b2ff7b0302ae357fe5",
+              "target": "view3d.select"
+            }
+          ],
+          "order": 2,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "3D View",
+            "region_type": "WINDOW",
+            "space_type": "VIEW_3D"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": -1,
+                "any": true,
+                "ctrl": -1,
+                "direction": "ANY",
+                "hyper": -1,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": -1,
+                "repeat": false,
+                "shift": -1,
+                "type": "LEFTMOUSE",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 0,
+              "native_row_id": "bfae1e13c301c9492a4060862c77418e7a7f37e95e92b55d9b3e7f811d3c1140",
+              "occurrence_id": "d356e0ae436806a7128f1502983a6ff719ec9d2b113120d347abc87ec23ae881",
+              "order": 0,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "bfae1e13c301c9492a4060862c77418e7a7f37e95e92b55d9b3e7f811d3c1140",
+              "target": "CONFIRM"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": -1,
+                "any": true,
+                "ctrl": -1,
+                "direction": "ANY",
+                "hyper": -1,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": -1,
+                "repeat": false,
+                "shift": -1,
+                "type": "ESC",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 5,
+              "native_row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+              "occurrence_id": "2ed9b25d3236e083ba9e3f8496f6b6a6b640d97eba114d30e8a823b73f93c6df",
+              "order": 1,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+              "target": "CANCEL"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 26,
+              "native_row_id": "02bb104818deb52ab214e9578c196936bfdc0b31df54420fbdcfa2886b71288b",
+              "occurrence_id": "d7a61aa96cb4b79a5f4a3a478bb6567564183a25813f1194e0851b781ddce4f8",
+              "order": 2,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "02bb104818deb52ab214e9578c196936bfdc0b31df54420fbdcfa2886b71288b",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 27,
+              "native_row_id": "7b41e0411ac5e8705788e10f88dc0312eacc2fff39c3d74e7ff27e8a15840d26",
+              "occurrence_id": "baa4cdeca0f782f3c123a42adfdc20c8cdf1a7ad2fee38d12da83b4abc11ec22",
+              "order": 3,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "7b41e0411ac5e8705788e10f88dc0312eacc2fff39c3d74e7ff27e8a15840d26",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 28,
+              "native_row_id": "fa17ff42edd60a6eeb473920bb31bfcec33c87d82f7d7fab5fa13c533ae833bd",
+              "occurrence_id": "f9575a30158f5e4355ac87e89561c7a23f8418489bdf118a4c6df5889ee026d8",
+              "order": 4,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "fa17ff42edd60a6eeb473920bb31bfcec33c87d82f7d7fab5fa13c533ae833bd",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 29,
+              "native_row_id": "3a96e1f25a6d52129061fd37bf8e8a727f303f89218f9c8ad1f9da5dff21e183",
+              "occurrence_id": "0a85a7e49f50a69b6742c7175ba44d86cf673ecfd669f26feea50d7ed5df3645",
+              "order": 5,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "3a96e1f25a6d52129061fd37bf8e8a727f303f89218f9c8ad1f9da5dff21e183",
+              "target": "REMOVE_SNAP"
+            }
+          ],
+          "order": 3,
+          "scope": {
+            "is_modal": true,
+            "is_tool": null,
+            "name": "Transform Modal Map",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        }
+      ],
+      "name": "active"
+    },
+    "addon": {
+      "alias_of": null,
+      "available": true,
+      "maps": [],
+      "name": "addon"
+    },
+    "default": {
+      "alias_of": null,
+      "available": true,
+      "maps": [
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 12,
+              "native_row_id": "3ce10710e69a5948cc96d86078d966797d02a5a3e49e17682ec3f9a12f7c1ade",
+              "occurrence_id": "3d3ff421113e3163fa4bfeee16dc7d615be6a14757f1d6fa23d51b2cb0d7bbc6",
+              "order": 0,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "3ce10710e69a5948cc96d86078d966797d02a5a3e49e17682ec3f9a12f7c1ade",
+              "target": "wm.quit_blender"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 13,
+              "native_row_id": "cb3c90491e66eb80920fa31281c2c01759aa018dc1b0e102de408618741559eb",
+              "occurrence_id": "724a78f99fedd044559f2dbd843e354dbc1114442f2b982e9159e4249ba76c88",
+              "order": 1,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "cb3c90491e66eb80920fa31281c2c01759aa018dc1b0e102de408618741559eb",
+              "target": "wm.quit_blender"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 14,
+              "native_row_id": "a71c27072c83404c83085319a341bccfc1dc82ed9015ee59a7c6eb7c4bb78691",
+              "occurrence_id": "eaaf3a5192abc141044614eb7567ff00eff7f9f526e7d0cae95744fb3167f79c",
+              "order": 2,
+              "properties": {
+                "name": "SCREEN_MT_user_menu"
+              },
+              "read_issues": {},
+              "row_id": "a71c27072c83404c83085319a341bccfc1dc82ed9015ee59a7c6eb7c4bb78691",
+              "target": "wm.call_menu"
+            }
+          ],
+          "order": 0,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "Window",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 2,
+              "native_row_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+              "occurrence_id": "2da1d445e50e33cff79d6188effa04a18707ec6da3e978880a8e04db62e1f4b5",
+              "order": 0,
+              "properties": {
+                "action": "SELECT"
+              },
+              "read_issues": {},
+              "row_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 3,
+              "native_row_id": "ebd8d59afbaa86f9964abd8c4c882b24cec360b24e8545cbd397ac627588a5c6",
+              "occurrence_id": "01344ebcde398296cd424ffcdbc0dd71f086ffe0e80eacdd1c803512809e36cc",
+              "order": 1,
+              "properties": {
+                "action": "DESELECT"
+              },
+              "read_issues": {},
+              "row_id": "ebd8d59afbaa86f9964abd8c4c882b24cec360b24e8545cbd397ac627588a5c6",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "DOUBLE_CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 6,
+              "native_row_id": "bb40bafe57ec830743d3a8601000a433142b7f308478bbf869d3f4cee1d34184",
+              "occurrence_id": "d3561491a6c2371844e4c02c1d97661d8af692373dc3588f5f2fd17fb3a0516e",
+              "order": 2,
+              "properties": {
+                "action": "DESELECT"
+              },
+              "read_issues": {},
+              "row_id": "bb40bafe57ec830743d3a8601000a433142b7f308478bbf869d3f4cee1d34184",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK_DRAG"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 23,
+              "native_row_id": "968ff2562097d0fd107465a5c9829862adf22281971947970489eff4cd34c279",
+              "occurrence_id": "6d62c4377181176d606191850843a1e1308858b54a9ef4f69653e0c1d6d21ad3",
+              "order": 3,
+              "properties": {
+                "constraint_axis": [
+                  false,
+                  false,
+                  false
+                ],
+                "cursor_transform": false,
+                "gpencil_strokes": false,
+                "mirror": false,
+                "orient_matrix": [
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                ],
+                "orient_matrix_type": "GLOBAL",
+                "orient_type": "GLOBAL",
+                "proportional_edit_falloff": "SMOOTH",
+                "proportional_size": 1.0,
+                "release_confirm": false,
+                "remove_on_cancel": false,
+                "snap": false,
+                "snap_align": false,
+                "snap_elements": [
+                  "INCREMENT"
+                ],
+                "snap_normal": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "snap_point": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "snap_target": "CLOSEST",
+                "texture_space": false,
+                "translate_origin": false,
+                "use_accurate": false,
+                "use_automerge_and_split": false,
+                "use_duplicated_keyframes": false,
+                "use_proportional_connected": false,
+                "use_proportional_edit": false,
+                "use_proportional_projected": false,
+                "use_snap_edit": true,
+                "use_snap_nonedit": true,
+                "use_snap_project": false,
+                "use_snap_selectable": false,
+                "use_snap_self": true,
+                "value": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "view2d_edge_pan": false
+              },
+              "read_issues": {},
+              "row_id": "968ff2562097d0fd107465a5c9829862adf22281971947970489eff4cd34c279",
+              "target": "transform.translate"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 33,
+              "native_row_id": "86aa03eb8a65845ee70eaf28d84291045780f8cbd78159e6a0de9f3eca5b9cb8",
+              "occurrence_id": "59562085b44b2fe769a0ae813dc7a8419cceacb973ae8a266872974bf59e6c23",
+              "order": 4,
+              "properties": {
+                "name": "VIEW3D_MT_add"
+              },
+              "read_issues": {},
+              "row_id": "86aa03eb8a65845ee70eaf28d84291045780f8cbd78159e6a0de9f3eca5b9cb8",
+              "target": "wm.call_menu"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 34,
+              "native_row_id": "d46c281db5246c37560c5d963be6ab8c03da1939917020c3d32cf9ff04398ce1",
+              "occurrence_id": "4fec8dce8721f56ee2b82bbc6c9a72dc5b53d7fabccc22efd98d13e6275d7bc2",
+              "order": 5,
+              "properties": {
+                "name": "VIEW3D_MT_object_apply"
+              },
+              "read_issues": {},
+              "row_id": "d46c281db5246c37560c5d963be6ab8c03da1939917020c3d32cf9ff04398ce1",
+              "target": "wm.call_menu"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 35,
+              "native_row_id": "d26c51bac307a1b0291f7ce0b0edff7b33c26e23e795a123f6b7d35e2af90475",
+              "occurrence_id": "79cddde04be183a12f0610fdc0ac71216b053a612f45493b6b8b17d5cdd601de",
+              "order": 6,
+              "properties": {
+                "name": "VIEW3D_MT_object_apply"
+              },
+              "read_issues": {},
+              "row_id": "d26c51bac307a1b0291f7ce0b0edff7b33c26e23e795a123f6b7d35e2af90475",
+              "target": "wm.call_menu"
+            }
+          ],
+          "order": 1,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "Object Mode",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 105,
+              "native_row_id": "e6d83d45f1836c9eecf4366b312327db7e2157a9b962eb4a6931f9ca70077dd6",
+              "occurrence_id": "00adf7e0c7dd33aaf4d949fd0c28e4ace5084f3ab85981801a1a3f24b4bff291",
+              "order": 0,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": true,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "e6d83d45f1836c9eecf4366b312327db7e2157a9b962eb4a6931f9ca70077dd6",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 106,
+              "native_row_id": "a7ec93364df103d03cf79d12fe12ab80e00b36aaf01be88d8cf06e6b254e631d",
+              "occurrence_id": "5095c05e8698b6a0cd47edbd3aafdfe3d42c550cde9ddf03624b29b530ffac91",
+              "order": 1,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "a7ec93364df103d03cf79d12fe12ab80e00b36aaf01be88d8cf06e6b254e631d",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 107,
+              "native_row_id": "2a2afd973a69a961eae2661202b667c73eae31556ab7bbeec502f746bbf181c0",
+              "occurrence_id": "79db10b7aa935b8e1d6a40c9d80cc2980243838615c437f8e52d6041efc3a6d8",
+              "order": 2,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": true,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "2a2afd973a69a961eae2661202b667c73eae31556ab7bbeec502f746bbf181c0",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 108,
+              "native_row_id": "f33578f15e8bd108c710b0cb2dc3eaf3fe900e2011af912da8e54354433cd526",
+              "occurrence_id": "85a16e615acee95a38c04133b61f157ada6e7e6a3d5f290aa35a0733bba38865",
+              "order": 3,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": true,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "f33578f15e8bd108c710b0cb2dc3eaf3fe900e2011af912da8e54354433cd526",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 109,
+              "native_row_id": "68bf01fb7d7d9a56206882405205336ee2cdc0e1d1e1b2d5cf824d9779de0f62",
+              "occurrence_id": "5198d817e7af193cc31d91f975d8425e9f0720d8bfed2caf3e65431c9485f1dc",
+              "order": 4,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "68bf01fb7d7d9a56206882405205336ee2cdc0e1d1e1b2d5cf824d9779de0f62",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 110,
+              "native_row_id": "4b0804a9a14135505b4bb747a327063796dab714ec18c2422dc44470567d396f",
+              "occurrence_id": "2019487b0a53e8a43c20ff209e3db0894e2e14f23f4fe06f4ebfb8e6c0522e00",
+              "order": 5,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "4b0804a9a14135505b4bb747a327063796dab714ec18c2422dc44470567d396f",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 111,
+              "native_row_id": "a05125e1c1229ddc626192407de94fc8420e355050738c1abff8ba2c85a73735",
+              "occurrence_id": "7285ad295ce3b7a24a900a958af6fb8f957166d5fee24a1a02c72b40c7800455",
+              "order": 6,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "a05125e1c1229ddc626192407de94fc8420e355050738c1abff8ba2c85a73735",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 112,
+              "native_row_id": "9918598f92931f2af438516f093ce76acd10b5259e1273108c7034e7f5f2240b",
+              "occurrence_id": "b9c5726aa8f91bf8a8beac322a52eccd8a714b17467fd2484f2e8f9dca58bb2e",
+              "order": 7,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "9918598f92931f2af438516f093ce76acd10b5259e1273108c7034e7f5f2240b",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 113,
+              "native_row_id": "112be4403a2b3fe309f0671c2b58652237dbca03dd6cd274c01d541c606af77e",
+              "occurrence_id": "8f6be127e9e5fa9d41c5ad9bfbf6d5a1262ab11392c7a8b18d61adb8dd6a14f5",
+              "order": 8,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "112be4403a2b3fe309f0671c2b58652237dbca03dd6cd274c01d541c606af77e",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 114,
+              "native_row_id": "52ca3bdaa3fe268fe0a073afbb14f3327e0ec71a1b0b27548832f5488aad2b81",
+              "occurrence_id": "fc6394739d98ace18f024b164d9ba6487daec6337df635d5f8736ad335075eca",
+              "order": 9,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "52ca3bdaa3fe268fe0a073afbb14f3327e0ec71a1b0b27548832f5488aad2b81",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 115,
+              "native_row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+              "occurrence_id": "973748b9d0498631de79392e2b037326216b20b4afb1ed06abfc7d1b879d78da",
+              "order": 10,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 116,
+              "native_row_id": "9b660a7d323d2c0ac185fd4db271e444d81c12231378e5b2ff7b0302ae357fe5",
+              "occurrence_id": "009b214f61a41e30e8915526799a48dbcd7c8319b2c33ecc851d1aeaa171b3a1",
+              "order": 11,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "9b660a7d323d2c0ac185fd4db271e444d81c12231378e5b2ff7b0302ae357fe5",
+              "target": "view3d.select"
+            }
+          ],
+          "order": 2,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "3D View",
+            "region_type": "WINDOW",
+            "space_type": "VIEW_3D"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": -1,
+                "any": true,
+                "ctrl": -1,
+                "direction": "ANY",
+                "hyper": -1,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": -1,
+                "repeat": false,
+                "shift": -1,
+                "type": "LEFTMOUSE",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 0,
+              "native_row_id": "bfae1e13c301c9492a4060862c77418e7a7f37e95e92b55d9b3e7f811d3c1140",
+              "occurrence_id": "d356e0ae436806a7128f1502983a6ff719ec9d2b113120d347abc87ec23ae881",
+              "order": 0,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "bfae1e13c301c9492a4060862c77418e7a7f37e95e92b55d9b3e7f811d3c1140",
+              "target": "CONFIRM"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": -1,
+                "any": true,
+                "ctrl": -1,
+                "direction": "ANY",
+                "hyper": -1,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": -1,
+                "repeat": false,
+                "shift": -1,
+                "type": "ESC",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 5,
+              "native_row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+              "occurrence_id": "2ed9b25d3236e083ba9e3f8496f6b6a6b640d97eba114d30e8a823b73f93c6df",
+              "order": 1,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+              "target": "CANCEL"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 26,
+              "native_row_id": "02bb104818deb52ab214e9578c196936bfdc0b31df54420fbdcfa2886b71288b",
+              "occurrence_id": "d7a61aa96cb4b79a5f4a3a478bb6567564183a25813f1194e0851b781ddce4f8",
+              "order": 2,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "02bb104818deb52ab214e9578c196936bfdc0b31df54420fbdcfa2886b71288b",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 27,
+              "native_row_id": "7b41e0411ac5e8705788e10f88dc0312eacc2fff39c3d74e7ff27e8a15840d26",
+              "occurrence_id": "baa4cdeca0f782f3c123a42adfdc20c8cdf1a7ad2fee38d12da83b4abc11ec22",
+              "order": 3,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "7b41e0411ac5e8705788e10f88dc0312eacc2fff39c3d74e7ff27e8a15840d26",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 28,
+              "native_row_id": "fa17ff42edd60a6eeb473920bb31bfcec33c87d82f7d7fab5fa13c533ae833bd",
+              "occurrence_id": "f9575a30158f5e4355ac87e89561c7a23f8418489bdf118a4c6df5889ee026d8",
+              "order": 4,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "fa17ff42edd60a6eeb473920bb31bfcec33c87d82f7d7fab5fa13c533ae833bd",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 29,
+              "native_row_id": "3a96e1f25a6d52129061fd37bf8e8a727f303f89218f9c8ad1f9da5dff21e183",
+              "occurrence_id": "0a85a7e49f50a69b6742c7175ba44d86cf673ecfd669f26feea50d7ed5df3645",
+              "order": 5,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "3a96e1f25a6d52129061fd37bf8e8a727f303f89218f9c8ad1f9da5dff21e183",
+              "target": "REMOVE_SNAP"
+            }
+          ],
+          "order": 3,
+          "scope": {
+            "is_modal": true,
+            "is_tool": null,
+            "name": "Transform Modal Map",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        }
+      ],
+      "name": "default"
+    },
+    "user": {
+      "alias_of": null,
+      "available": true,
+      "maps": [
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 12,
+              "native_row_id": "3ce10710e69a5948cc96d86078d966797d02a5a3e49e17682ec3f9a12f7c1ade",
+              "occurrence_id": "3d3ff421113e3163fa4bfeee16dc7d615be6a14757f1d6fa23d51b2cb0d7bbc6",
+              "order": 0,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "3ce10710e69a5948cc96d86078d966797d02a5a3e49e17682ec3f9a12f7c1ade",
+              "target": "wm.quit_blender"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 13,
+              "native_row_id": "cb3c90491e66eb80920fa31281c2c01759aa018dc1b0e102de408618741559eb",
+              "occurrence_id": "724a78f99fedd044559f2dbd843e354dbc1114442f2b982e9159e4249ba76c88",
+              "order": 1,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "cb3c90491e66eb80920fa31281c2c01759aa018dc1b0e102de408618741559eb",
+              "target": "wm.quit_blender"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "Q",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 14,
+              "native_row_id": "a71c27072c83404c83085319a341bccfc1dc82ed9015ee59a7c6eb7c4bb78691",
+              "occurrence_id": "eaaf3a5192abc141044614eb7567ff00eff7f9f526e7d0cae95744fb3167f79c",
+              "order": 2,
+              "properties": {
+                "name": "SCREEN_MT_user_menu"
+              },
+              "read_issues": {},
+              "row_id": "a71c27072c83404c83085319a341bccfc1dc82ed9015ee59a7c6eb7c4bb78691",
+              "target": "wm.call_menu"
+            }
+          ],
+          "order": 0,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "Window",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 2,
+              "native_row_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+              "occurrence_id": "2da1d445e50e33cff79d6188effa04a18707ec6da3e978880a8e04db62e1f4b5",
+              "order": 0,
+              "properties": {
+                "action": "SELECT"
+              },
+              "read_issues": {},
+              "row_id": "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 3,
+              "native_row_id": "ebd8d59afbaa86f9964abd8c4c882b24cec360b24e8545cbd397ac627588a5c6",
+              "occurrence_id": "01344ebcde398296cd424ffcdbc0dd71f086ffe0e80eacdd1c803512809e36cc",
+              "order": 1,
+              "properties": {
+                "action": "DESELECT"
+              },
+              "read_issues": {},
+              "row_id": "ebd8d59afbaa86f9964abd8c4c882b24cec360b24e8545cbd397ac627588a5c6",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "DOUBLE_CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 6,
+              "native_row_id": "bb40bafe57ec830743d3a8601000a433142b7f308478bbf869d3f4cee1d34184",
+              "occurrence_id": "d3561491a6c2371844e4c02c1d97661d8af692373dc3588f5f2fd17fb3a0516e",
+              "order": 2,
+              "properties": {
+                "action": "DESELECT"
+              },
+              "read_issues": {},
+              "row_id": "bb40bafe57ec830743d3a8601000a433142b7f308478bbf869d3f4cee1d34184",
+              "target": "object.select_all"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK_DRAG"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 23,
+              "native_row_id": "968ff2562097d0fd107465a5c9829862adf22281971947970489eff4cd34c279",
+              "occurrence_id": "6d62c4377181176d606191850843a1e1308858b54a9ef4f69653e0c1d6d21ad3",
+              "order": 3,
+              "properties": {
+                "constraint_axis": [
+                  false,
+                  false,
+                  false
+                ],
+                "cursor_transform": false,
+                "gpencil_strokes": false,
+                "mirror": false,
+                "orient_matrix": [
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                ],
+                "orient_matrix_type": "GLOBAL",
+                "orient_type": "GLOBAL",
+                "proportional_edit_falloff": "SMOOTH",
+                "proportional_size": 1.0,
+                "release_confirm": false,
+                "remove_on_cancel": false,
+                "snap": false,
+                "snap_align": false,
+                "snap_elements": [
+                  "INCREMENT"
+                ],
+                "snap_normal": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "snap_point": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "snap_target": "CLOSEST",
+                "texture_space": false,
+                "translate_origin": false,
+                "use_accurate": false,
+                "use_automerge_and_split": false,
+                "use_duplicated_keyframes": false,
+                "use_proportional_connected": false,
+                "use_proportional_edit": false,
+                "use_proportional_projected": false,
+                "use_snap_edit": true,
+                "use_snap_nonedit": true,
+                "use_snap_project": false,
+                "use_snap_selectable": false,
+                "use_snap_self": true,
+                "value": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "view2d_edge_pan": false
+              },
+              "read_issues": {},
+              "row_id": "968ff2562097d0fd107465a5c9829862adf22281971947970489eff4cd34c279",
+              "target": "transform.translate"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 33,
+              "native_row_id": "86aa03eb8a65845ee70eaf28d84291045780f8cbd78159e6a0de9f3eca5b9cb8",
+              "occurrence_id": "59562085b44b2fe769a0ae813dc7a8419cceacb973ae8a266872974bf59e6c23",
+              "order": 4,
+              "properties": {
+                "name": "VIEW3D_MT_add"
+              },
+              "read_issues": {},
+              "row_id": "86aa03eb8a65845ee70eaf28d84291045780f8cbd78159e6a0de9f3eca5b9cb8",
+              "target": "wm.call_menu"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 34,
+              "native_row_id": "d46c281db5246c37560c5d963be6ab8c03da1939917020c3d32cf9ff04398ce1",
+              "occurrence_id": "4fec8dce8721f56ee2b82bbc6c9a72dc5b53d7fabccc22efd98d13e6275d7bc2",
+              "order": 5,
+              "properties": {
+                "name": "VIEW3D_MT_object_apply"
+              },
+              "read_issues": {},
+              "row_id": "d46c281db5246c37560c5d963be6ab8c03da1939917020c3d32cf9ff04398ce1",
+              "target": "wm.call_menu"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 35,
+              "native_row_id": "d26c51bac307a1b0291f7ce0b0edff7b33c26e23e795a123f6b7d35e2af90475",
+              "occurrence_id": "79cddde04be183a12f0610fdc0ac71216b053a612f45493b6b8b17d5cdd601de",
+              "order": 6,
+              "properties": {
+                "name": "VIEW3D_MT_object_apply"
+              },
+              "read_issues": {},
+              "row_id": "d26c51bac307a1b0291f7ce0b0edff7b33c26e23e795a123f6b7d35e2af90475",
+              "target": "wm.call_menu"
+            }
+          ],
+          "order": 1,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "Object Mode",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 105,
+              "native_row_id": "e6d83d45f1836c9eecf4366b312327db7e2157a9b962eb4a6931f9ca70077dd6",
+              "occurrence_id": "00adf7e0c7dd33aaf4d949fd0c28e4ace5084f3ab85981801a1a3f24b4bff291",
+              "order": 0,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": true,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "e6d83d45f1836c9eecf4366b312327db7e2157a9b962eb4a6931f9ca70077dd6",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 106,
+              "native_row_id": "a7ec93364df103d03cf79d12fe12ab80e00b36aaf01be88d8cf06e6b254e631d",
+              "occurrence_id": "5095c05e8698b6a0cd47edbd3aafdfe3d42c550cde9ddf03624b29b530ffac91",
+              "order": 1,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "a7ec93364df103d03cf79d12fe12ab80e00b36aaf01be88d8cf06e6b254e631d",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 107,
+              "native_row_id": "2a2afd973a69a961eae2661202b667c73eae31556ab7bbeec502f746bbf181c0",
+              "occurrence_id": "79db10b7aa935b8e1d6a40c9d80cc2980243838615c437f8e52d6041efc3a6d8",
+              "order": 2,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": true,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "2a2afd973a69a961eae2661202b667c73eae31556ab7bbeec502f746bbf181c0",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 108,
+              "native_row_id": "f33578f15e8bd108c710b0cb2dc3eaf3fe900e2011af912da8e54354433cd526",
+              "occurrence_id": "85a16e615acee95a38c04133b61f157ada6e7e6a3d5f290aa35a0733bba38865",
+              "order": 3,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": true,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "f33578f15e8bd108c710b0cb2dc3eaf3fe900e2011af912da8e54354433cd526",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 109,
+              "native_row_id": "68bf01fb7d7d9a56206882405205336ee2cdc0e1d1e1b2d5cf824d9779de0f62",
+              "occurrence_id": "5198d817e7af193cc31d91f975d8425e9f0720d8bfed2caf3e65431c9485f1dc",
+              "order": 4,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "68bf01fb7d7d9a56206882405205336ee2cdc0e1d1e1b2d5cf824d9779de0f62",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 110,
+              "native_row_id": "4b0804a9a14135505b4bb747a327063796dab714ec18c2422dc44470567d396f",
+              "occurrence_id": "2019487b0a53e8a43c20ff209e3db0894e2e14f23f4fe06f4ebfb8e6c0522e00",
+              "order": 5,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "4b0804a9a14135505b4bb747a327063796dab714ec18c2422dc44470567d396f",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 111,
+              "native_row_id": "a05125e1c1229ddc626192407de94fc8420e355050738c1abff8ba2c85a73735",
+              "occurrence_id": "7285ad295ce3b7a24a900a958af6fb8f957166d5fee24a1a02c72b40c7800455",
+              "order": 6,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": false,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "a05125e1c1229ddc626192407de94fc8420e355050738c1abff8ba2c85a73735",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 112,
+              "native_row_id": "9918598f92931f2af438516f093ce76acd10b5259e1273108c7034e7f5f2240b",
+              "occurrence_id": "b9c5726aa8f91bf8a8beac322a52eccd8a714b17467fd2484f2e8f9dca58bb2e",
+              "order": 7,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "9918598f92931f2af438516f093ce76acd10b5259e1273108c7034e7f5f2240b",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 113,
+              "native_row_id": "112be4403a2b3fe309f0671c2b58652237dbca03dd6cd274c01d541c606af77e",
+              "occurrence_id": "8f6be127e9e5fa9d41c5ad9bfbf6d5a1262ab11392c7a8b18d61adb8dd6a14f5",
+              "order": 8,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": false
+              },
+              "read_issues": {},
+              "row_id": "112be4403a2b3fe309f0671c2b58652237dbca03dd6cd274c01d541c606af77e",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 114,
+              "native_row_id": "52ca3bdaa3fe268fe0a073afbb14f3327e0ec71a1b0b27548832f5488aad2b81",
+              "occurrence_id": "fc6394739d98ace18f024b164d9ba6487daec6337df635d5f8736ad335075eca",
+              "order": 9,
+              "properties": {
+                "center": false,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "52ca3bdaa3fe268fe0a073afbb14f3327e0ec71a1b0b27548832f5488aad2b81",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 115,
+              "native_row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+              "occurrence_id": "973748b9d0498631de79392e2b037326216b20b4afb1ed06abfc7d1b879d78da",
+              "order": 10,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+              "target": "view3d.select"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 1,
+                "type": "LEFTMOUSE",
+                "value": "CLICK"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 116,
+              "native_row_id": "9b660a7d323d2c0ac185fd4db271e444d81c12231378e5b2ff7b0302ae357fe5",
+              "occurrence_id": "009b214f61a41e30e8915526799a48dbcd7c8319b2c33ecc851d1aeaa171b3a1",
+              "order": 11,
+              "properties": {
+                "center": true,
+                "deselect": false,
+                "deselect_all": false,
+                "enumerate": true,
+                "extend": false,
+                "location": [
+                  0,
+                  0
+                ],
+                "object": false,
+                "select_passthrough": false,
+                "toggle": true
+              },
+              "read_issues": {},
+              "row_id": "9b660a7d323d2c0ac185fd4db271e444d81c12231378e5b2ff7b0302ae357fe5",
+              "target": "view3d.select"
+            }
+          ],
+          "order": 2,
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "3D View",
+            "region_type": "WINDOW",
+            "space_type": "VIEW_3D"
+          }
+        },
+        {
+          "items": [
+            {
+              "active": true,
+              "event": {
+                "alt": -1,
+                "any": true,
+                "ctrl": -1,
+                "direction": "ANY",
+                "hyper": -1,
+                "key_modifier": "NONE",
+                "map_type": "MOUSE",
+                "oskey": -1,
+                "repeat": false,
+                "shift": -1,
+                "type": "LEFTMOUSE",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 0,
+              "native_row_id": "bfae1e13c301c9492a4060862c77418e7a7f37e95e92b55d9b3e7f811d3c1140",
+              "occurrence_id": "d356e0ae436806a7128f1502983a6ff719ec9d2b113120d347abc87ec23ae881",
+              "order": 0,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "bfae1e13c301c9492a4060862c77418e7a7f37e95e92b55d9b3e7f811d3c1140",
+              "target": "CONFIRM"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": -1,
+                "any": true,
+                "ctrl": -1,
+                "direction": "ANY",
+                "hyper": -1,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": -1,
+                "repeat": false,
+                "shift": -1,
+                "type": "ESC",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 5,
+              "native_row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+              "occurrence_id": "2ed9b25d3236e083ba9e3f8496f6b6a6b640d97eba114d30e8a823b73f93c6df",
+              "order": 1,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "4dc6bb01f6a0ad0b0ccb432a1653c06ee33d5c84233b0cac277819f705a423ab",
+              "target": "CANCEL"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 26,
+              "native_row_id": "02bb104818deb52ab214e9578c196936bfdc0b31df54420fbdcfa2886b71288b",
+              "occurrence_id": "d7a61aa96cb4b79a5f4a3a478bb6567564183a25813f1194e0851b781ddce4f8",
+              "order": 2,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "02bb104818deb52ab214e9578c196936bfdc0b31df54420fbdcfa2886b71288b",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 1,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 27,
+              "native_row_id": "7b41e0411ac5e8705788e10f88dc0312eacc2fff39c3d74e7ff27e8a15840d26",
+              "occurrence_id": "baa4cdeca0f782f3c123a42adfdc20c8cdf1a7ad2fee38d12da83b4abc11ec22",
+              "order": 3,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "7b41e0411ac5e8705788e10f88dc0312eacc2fff39c3d74e7ff27e8a15840d26",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 0,
+                "any": false,
+                "ctrl": 1,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 28,
+              "native_row_id": "fa17ff42edd60a6eeb473920bb31bfcec33c87d82f7d7fab5fa13c533ae833bd",
+              "occurrence_id": "f9575a30158f5e4355ac87e89561c7a23f8418489bdf118a4c6df5889ee026d8",
+              "order": 4,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "fa17ff42edd60a6eeb473920bb31bfcec33c87d82f7d7fab5fa13c533ae833bd",
+              "target": "ADD_SNAP"
+            },
+            {
+              "active": true,
+              "event": {
+                "alt": 1,
+                "any": false,
+                "ctrl": 0,
+                "direction": "ANY",
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "map_type": "KEYBOARD",
+                "oskey": 0,
+                "repeat": false,
+                "shift": 0,
+                "type": "A",
+                "value": "PRESS"
+              },
+              "is_user_defined": false,
+              "is_user_modified": false,
+              "native_order": 29,
+              "native_row_id": "3a96e1f25a6d52129061fd37bf8e8a727f303f89218f9c8ad1f9da5dff21e183",
+              "occurrence_id": "0a85a7e49f50a69b6742c7175ba44d86cf673ecfd669f26feea50d7ed5df3645",
+              "order": 5,
+              "properties": {},
+              "read_issues": {},
+              "row_id": "3a96e1f25a6d52129061fd37bf8e8a727f303f89218f9c8ad1f9da5dff21e183",
+              "target": "REMOVE_SNAP"
+            }
+          ],
+          "order": 3,
+          "scope": {
+            "is_modal": true,
+            "is_tool": null,
+            "name": "Transform Modal Map",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          }
+        }
+      ],
+      "name": "user"
+    }
+  },
+  "schema_version": 1,
+  "visibility": "sanitized-sample"
+}

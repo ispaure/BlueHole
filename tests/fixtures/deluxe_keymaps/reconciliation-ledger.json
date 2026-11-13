@@ -1,0 +1,17 @@
+{
+  "acceptance": "open; see capture-manifest gaps",
+  "entries_file": "reconciliation-ledger.jsonl",
+  "id": "deluxe-baseline-2026-11-12-v1",
+  "owners": {
+    "03": 1032,
+    "04": 302,
+    "05": 3175
+  },
+  "presence_format": "Omitted capture/role counts are zero",
+  "row_count": 4509,
+  "schema_version": 1,
+  "source_branch": "blender-5.2.2/alpha",
+  "source_revision": "ea3acf8300881fbbac540dbd7f3194af8693dc17",
+  "test_blender": "4.5.1 LTS",
+  "universe": "Unique semantic rows participating in stock, controlled layer, packaged, or development differences against full. Industry-only comparator rows are excluded from migration ownership."
+}

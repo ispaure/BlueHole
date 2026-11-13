@@ -1,0 +1,2403 @@
+{
+  "addon_inventory": [
+    {
+      "id": "addon-aed55b5d53",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "addon-3f9e84f03e",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        2,
+        1,
+        3
+      ]
+    },
+    {
+      "id": "addon-20ab44cb24",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "BlueHole",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        6,
+        9,
+        21
+      ]
+    },
+    {
+      "id": "addon-5aae0aee70",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-935b2825f9",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-eae937bd55",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-0a382ba604",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        7,
+        20,
+        8
+      ]
+    },
+    {
+      "id": "addon-5d0cce9b32",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "addon-73f958a56a",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "addon-d42a977adf",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-587c23a59f",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        0,
+        9
+      ]
+    },
+    {
+      "id": "addon-0d76a57f34",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-1e35c051f6",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        0,
+        9,
+        88,
+        7
+      ]
+    },
+    {
+      "id": "addon-d8f0d3aa11",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        13,
+        2
+      ]
+    },
+    {
+      "id": "addon-7d57848d58",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        0,
+        19,
+        0
+      ]
+    },
+    {
+      "id": "addon-58d9e33c41",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-af19644c87",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "addon-fafbe0f113",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        5,
+        0,
+        3,
+        0
+      ]
+    },
+    {
+      "id": "addon-843cc98dde",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        36
+      ]
+    },
+    {
+      "id": "addon-4cda868b53",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        4,
+        1
+      ]
+    },
+    {
+      "id": "addon-17d7d28059",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        9,
+        2
+      ]
+    },
+    {
+      "id": "addon-9ef24bd3ec",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-728f1ec3b2",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        3,
+        0,
+        6
+      ]
+    },
+    {
+      "id": "addon-064fbaa108",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-b460933fd0",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        3,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "addon-a456ccd341",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-43c072ff8b",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        3,
+        76,
+        21
+      ]
+    },
+    {
+      "id": "addon-422908ebb9",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-612cf5a21c",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "addon-a8308e3a8b",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-d222c12e3f",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-e39af7409d",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "addon-352f1f6397",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        0,
+        4,
+        6
+      ]
+    },
+    {
+      "id": "addon-443ff9977e",
+      "loaded": true,
+      "status": "loaded",
+      "version": null
+    },
+    {
+      "id": "addon-5d990a171e",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        4,
+        5,
+        1
+      ]
+    },
+    {
+      "id": "addon-7c5c0cba6e",
+      "loaded": false,
+      "status": "absent from checked reference profile and bundled add-on/extension locations",
+      "version": null
+    },
+    {
+      "id": "addon-77748e59e4",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        4,
+        1
+      ]
+    },
+    {
+      "id": "addon-2387a18df6",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "addon-881e13f8d6",
+      "loaded": true,
+      "status": "loaded",
+      "version": null
+    },
+    {
+      "id": "addon-7fbc6c8d41",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        2,
+        0
+      ]
+    },
+    {
+      "id": "addon-1e2ab81371",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        5,
+        13,
+        0
+      ]
+    },
+    {
+      "id": "addon-43cd14e3cb",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        4,
+        5,
+        47
+      ]
+    },
+    {
+      "id": "addon-73a5b3183e",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        4,
+        7,
+        7
+      ]
+    },
+    {
+      "id": "addon-41f8b826fb",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        1,
+        18,
+        8
+      ]
+    },
+    {
+      "id": "addon-6047e4d1f9",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        2,
+        0
+      ]
+    },
+    {
+      "id": "addon-ba6bd94376",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        3,
+        4,
+        2
+      ]
+    },
+    {
+      "id": "addon-bf4ec026d7",
+      "loaded": true,
+      "status": "loaded",
+      "version": [
+        4,
+        9,
+        0
+      ]
+    }
+  ],
+  "captures": {
+    "development": {
+      "active_keyconfig": "Blender",
+      "active_options": {
+        "bl_idname": "\u0006",
+        "gizmo_action": "DRAG",
+        "rmb_action": "TWEAK",
+        "select_mouse": "LEFT",
+        "spacebar_action": "PLAY",
+        "tool_key_mode": "IMMEDIATE",
+        "use_alt_click_leader": false,
+        "use_alt_cursor": false,
+        "use_alt_navigation": true,
+        "use_alt_tool": false,
+        "use_file_single_click": false,
+        "use_pie_click_drag": false,
+        "use_region_toggle_pie": false,
+        "use_select_all_toggle": false,
+        "use_v3d_shade_ex_pie": false,
+        "use_v3d_tab_menu": false,
+        "v3d_alt_mmb_drag_action": "RELATIVE",
+        "v3d_mmb_action": "ORBIT",
+        "v3d_tilde_action": "VIEW"
+      },
+      "bluehole": {
+        "declared_blender": [
+          4,
+          5,
+          1
+        ],
+        "initialization_timer_pending": false,
+        "keymap_modules": {
+          "keymaps_register": {
+            "keymap_module_lst": 8
+          },
+          "mesh_keymaps_register": {
+            "registered_mesh_keymaps": 0
+          },
+          "navigation_keymaps_register": {
+            "registered_navigation_keymaps": 0
+          },
+          "object_keymaps_register": {
+            "registered_object_keymaps": 0
+          },
+          "pie_keymaps_register": {
+            "registered_pie_keymaps": 0
+          },
+          "pipeline_keymaps_register": {
+            "registered_pipeline_keymaps": 2
+          },
+          "sculpt_keymaps_register": {
+            "registered_sculpt_keymaps": 0
+          },
+          "selection_keymaps_register": {
+            "registered_selection_keymaps": 0
+          },
+          "transform_keymaps_register": {
+            "registered_transform_keymaps": 0
+          },
+          "uv_keymaps_register": {
+            "registered_uv_keymaps": 0
+          }
+        },
+        "loaded": true,
+        "version": [
+          6,
+          9,
+          21
+        ]
+      },
+      "bluehole_owned_rows": 2,
+      "coverage": "development source; copied minimum version changed from 5.2.2 to 4.5.1 for authorized test",
+      "gui": true,
+      "id": "development-4.5.1",
+      "input_evidence_relation": "Refreshed export matches all previously captured scope, order, target, event, activation, user flags and property values; newly readable vector/matrix values added",
+      "input_evidence_snapshot_sha256": "04df8ef5daf85f8c3b4571ab1023c37f1295401bde9eb8e9830442c5c94c0dcd",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": []
+          },
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": []
+          },
+          {
+            "after_tool": "builtin.move",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": false
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 0,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": null,
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": false,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 9,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "7b71b144ee7c69b8926aa28e6698ec3f8602da4a3dbaf842ea261d915490d38e",
+            "elapsed": 5.209
+          },
+          {
+            "digest": "7b71b144ee7c69b8926aa28e6698ec3f8602da4a3dbaf842ea261d915490d38e",
+            "elapsed": 6.202
+          },
+          {
+            "digest": "7b71b144ee7c69b8926aa28e6698ec3f8602da4a3dbaf842ea261d915490d38e",
+            "elapsed": 7.2
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 9,
+      "role_counts": {
+        "active": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "addon": {
+          "inactive": 0,
+          "maps": 3,
+          "modified_items": 0,
+          "rows": 7,
+          "rows_with_read_issues": 0
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3656,
+          "rows_with_read_issues": 166
+        }
+      },
+      "saved_override_restore": null,
+      "snapshot_sha256": "cacd57caa82ecef757692011df905894a20cf91eaac836f496f0a0f91768dc0a",
+      "source_code": {
+        "bluehole_python_tree_sha256": "a5a7119642da0a4cd775df5d516522acb5803c776b48c16acad1bd4e81e5f24e",
+        "python_files": 815
+      },
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 0,
+      "window_count": 1
+    },
+    "development-reference": {
+      "active_keyconfig": "BH_Keymaps",
+      "active_options": {},
+      "bluehole": {
+        "declared_blender": [
+          4,
+          5,
+          1
+        ],
+        "initialization_timer_pending": false,
+        "keymap_modules": {
+          "keymaps_register": {
+            "keymap_module_lst": 8
+          },
+          "mesh_keymaps_register": {
+            "registered_mesh_keymaps": 0
+          },
+          "navigation_keymaps_register": {
+            "registered_navigation_keymaps": 32
+          },
+          "object_keymaps_register": {
+            "registered_object_keymaps": 0
+          },
+          "pie_keymaps_register": {
+            "registered_pie_keymaps": 22
+          },
+          "pipeline_keymaps_register": {
+            "registered_pipeline_keymaps": 2
+          },
+          "sculpt_keymaps_register": {
+            "registered_sculpt_keymaps": 0
+          },
+          "selection_keymaps_register": {
+            "registered_selection_keymaps": 56
+          },
+          "transform_keymaps_register": {
+            "registered_transform_keymaps": 87
+          },
+          "uv_keymaps_register": {
+            "registered_uv_keymaps": 0
+          }
+        },
+        "loaded": true,
+        "version": [
+          6,
+          9,
+          21
+        ]
+      },
+      "bluehole_owned_rows": 199,
+      "coverage": "development source in copied reference profile; copied minimum 5.2.2 changed to 4.5.1 for authorized test",
+      "gui": true,
+      "id": "development-reference-4.5.1",
+      "input_evidence_relation": "Refreshed export matches all previously captured scope, order, target, event, activation, user flags and property values; newly readable vector/matrix values added",
+      "input_evidence_snapshot_sha256": "60057836837f4063699e788abfc771bde97f7de4171401ff7b4dd6b32622244d",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 3,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_tool": "builtin.move",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": false
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 1,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": null,
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": true,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 34,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "6fd1dc8653b98b906005bc2130102903d17ec572b2f1313b33dceaad884c7f82",
+            "elapsed": 10.47
+          },
+          {
+            "digest": "6fd1dc8653b98b906005bc2130102903d17ec572b2f1313b33dceaad884c7f82",
+            "elapsed": 11.463
+          },
+          {
+            "digest": "6fd1dc8653b98b906005bc2130102903d17ec572b2f1313b33dceaad884c7f82",
+            "elapsed": 12.429
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 48,
+      "role_counts": {
+        "active": {
+          "inactive": 125,
+          "maps": 253,
+          "modified_items": 0,
+          "rows": 4026,
+          "rows_with_read_issues": 970
+        },
+        "addon": {
+          "inactive": 6,
+          "maps": 93,
+          "modified_items": 0,
+          "rows": 634,
+          "rows_with_read_issues": 47
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 301,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 67,
+          "maps": 302,
+          "modified_items": 492,
+          "rows": 4241,
+          "rows_with_read_issues": 605
+        }
+      },
+      "saved_override_restore": null,
+      "snapshot_sha256": "db198042ca432425ecdd5f4ed2590a5b81b15689758601bc874c434885554254",
+      "source_code": {
+        "bluehole_python_tree_sha256": "a5a7119642da0a4cd775df5d516522acb5803c776b48c16acad1bd4e81e5f24e",
+        "python_files": 815
+      },
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 14,
+      "window_count": 1
+    },
+    "full": {
+      "active_keyconfig": "BH_Keymaps",
+      "active_options": {},
+      "bluehole": {
+        "declared_blender": [
+          4,
+          5,
+          1
+        ],
+        "initialization_timer_pending": false,
+        "keymap_modules": {
+          "keymaps_register": {
+            "keymap_module_lst": 8
+          },
+          "mesh_keymaps_register": {
+            "registered_mesh_keymaps": 0
+          },
+          "navigation_keymaps_register": {
+            "registered_navigation_keymaps": 32
+          },
+          "object_keymaps_register": {
+            "registered_object_keymaps": 0
+          },
+          "pie_keymaps_register": {
+            "registered_pie_keymaps": 22
+          },
+          "pipeline_keymaps_register": {
+            "registered_pipeline_keymaps": 2
+          },
+          "sculpt_keymaps_register": {
+            "registered_sculpt_keymaps": 0
+          },
+          "selection_keymaps_register": {
+            "registered_selection_keymaps": 56
+          },
+          "transform_keymaps_register": {
+            "registered_transform_keymaps": 87
+          },
+          "uv_keymaps_register": {
+            "registered_uv_keymaps": 0
+          }
+        },
+        "loaded": true,
+        "version": [
+          6,
+          9,
+          21
+        ]
+      },
+      "bluehole_owned_rows": 199,
+      "coverage": "copied reference addons",
+      "gui": true,
+      "id": "full-4.5.1",
+      "input_evidence_relation": "Refreshed export matches all previously captured scope, order, target, event, activation, user flags and property values; newly readable vector/matrix values added",
+      "input_evidence_snapshot_sha256": "4a70a1f68187df47523819ab080203121fb7b69fc8a3d9f51cd494752d5c45d9",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 3,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_tool": "builtin.move",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7407954931259155,
+              0.5335595607757568,
+              0.23850306868553162,
+              0.33113816380500793
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": true
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 1,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": null,
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": true,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 34,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "a621d9f8bab0b2c13913dbb6aeb4df4d81e9488f597ce25e4dbec19f7ce94114",
+            "elapsed": 10.741
+          },
+          {
+            "digest": "a621d9f8bab0b2c13913dbb6aeb4df4d81e9488f597ce25e4dbec19f7ce94114",
+            "elapsed": 11.728
+          },
+          {
+            "digest": "a621d9f8bab0b2c13913dbb6aeb4df4d81e9488f597ce25e4dbec19f7ce94114",
+            "elapsed": 12.695
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 48,
+      "role_counts": {
+        "active": {
+          "inactive": 125,
+          "maps": 253,
+          "modified_items": 0,
+          "rows": 4026,
+          "rows_with_read_issues": 970
+        },
+        "addon": {
+          "inactive": 6,
+          "maps": 94,
+          "modified_items": 0,
+          "rows": 634,
+          "rows_with_read_issues": 47
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 301,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 67,
+          "maps": 302,
+          "modified_items": 501,
+          "rows": 4263,
+          "rows_with_read_issues": 605
+        }
+      },
+      "saved_override_restore": null,
+      "snapshot_sha256": "98b255aa0f7427a2c5d8a457fcd984f8b1bdf4af688853c1e10084caeefba78e",
+      "source_code": {
+        "bluehole_python_tree_sha256": "c2b21e75a996dfa1bfeb25596586a0f813c55e44aeec5626723783345c0e5dbe",
+        "python_files": 246
+      },
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 14,
+      "window_count": 1
+    },
+    "industry": {
+      "active_keyconfig": "industry_compatible",
+      "active_options": {},
+      "bluehole": {
+        "declared_blender": [],
+        "initialization_timer_pending": false,
+        "loaded": false,
+        "version": []
+      },
+      "bluehole_owned_rows": 0,
+      "coverage": "factory bundled addons",
+      "gui": true,
+      "id": "industry-4.5.1",
+      "input_evidence_relation": "Refreshed export matches all previously captured scope, order, target, event, activation, user flags and property values; newly readable vector/matrix values added",
+      "input_evidence_snapshot_sha256": "9877db4341f4a0831de7f8a921ccf8091d7876da5cc1a3049d78066a06f52fc3",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": []
+          },
+          {
+            "after_selected": 3,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_tool": "builtin.select_box",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7407954931259155,
+              0.5335595607757568,
+              0.23850306868553162,
+              0.33113816380500793
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": true
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 0,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": "Industry case predates startup-popup dismissal; initial negative/control results are inconclusive",
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": false,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 8,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "dbcc1fe6cf0f01d1aa99d6b9b348bc2d30021acc52b7bf7a581eb83070cf974f",
+            "elapsed": 4.361
+          },
+          {
+            "digest": "dbcc1fe6cf0f01d1aa99d6b9b348bc2d30021acc52b7bf7a581eb83070cf974f",
+            "elapsed": 5.367
+          },
+          {
+            "digest": "dbcc1fe6cf0f01d1aa99d6b9b348bc2d30021acc52b7bf7a581eb83070cf974f",
+            "elapsed": 6.362
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 8,
+      "role_counts": {
+        "active": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3139,
+          "rows_with_read_issues": 158
+        },
+        "addon": {
+          "inactive": 0,
+          "maps": 2,
+          "modified_items": 0,
+          "rows": 5,
+          "rows_with_read_issues": 0
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3140,
+          "rows_with_read_issues": 158
+        }
+      },
+      "saved_override_restore": null,
+      "snapshot_sha256": "f7660b7e9ed039d877af99b9b98d95b0b6282025fcb62b5ed6ede06c61c5e98c",
+      "source_code": null,
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 0,
+      "window_count": 1
+    },
+    "neither": {
+      "active_keyconfig": "Blender",
+      "active_options": {
+        "bl_idname": "\u0006",
+        "gizmo_action": "DRAG",
+        "rmb_action": "TWEAK",
+        "select_mouse": "LEFT",
+        "spacebar_action": "SEARCH",
+        "tool_key_mode": "TOOL",
+        "use_alt_click_leader": false,
+        "use_alt_cursor": false,
+        "use_alt_navigation": true,
+        "use_alt_tool": false,
+        "use_file_single_click": false,
+        "use_pie_click_drag": true,
+        "use_region_toggle_pie": false,
+        "use_select_all_toggle": false,
+        "use_v3d_shade_ex_pie": false,
+        "use_v3d_tab_menu": false,
+        "v3d_alt_mmb_drag_action": "RELATIVE",
+        "v3d_mmb_action": "ORBIT",
+        "v3d_tilde_action": "VIEW"
+      },
+      "bluehole": {
+        "declared_blender": [
+          4,
+          5,
+          1
+        ],
+        "initialization_timer_pending": false,
+        "keymap_modules": {
+          "keymaps_register": {
+            "keymap_module_lst": 8
+          },
+          "mesh_keymaps_register": {
+            "registered_mesh_keymaps": 0
+          },
+          "navigation_keymaps_register": {
+            "registered_navigation_keymaps": 32
+          },
+          "object_keymaps_register": {
+            "registered_object_keymaps": 0
+          },
+          "pie_keymaps_register": {
+            "registered_pie_keymaps": 22
+          },
+          "pipeline_keymaps_register": {
+            "registered_pipeline_keymaps": 2
+          },
+          "sculpt_keymaps_register": {
+            "registered_sculpt_keymaps": 0
+          },
+          "selection_keymaps_register": {
+            "registered_selection_keymaps": 56
+          },
+          "transform_keymaps_register": {
+            "registered_transform_keymaps": 87
+          },
+          "uv_keymaps_register": {
+            "registered_uv_keymaps": 0
+          }
+        },
+        "loaded": true,
+        "version": [
+          6,
+          9,
+          21
+        ]
+      },
+      "bluehole_owned_rows": 199,
+      "coverage": "copied reference addons",
+      "gui": true,
+      "id": "neither-4.5.1",
+      "input_evidence_relation": "Same snapshot",
+      "input_evidence_snapshot_sha256": "89a341377a2f70acf37a50152efdacfce049da13f96a1a544ae69ff3d38656f7",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 3,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_tool": "builtin.move",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7407954931259155,
+              0.5335595607757568,
+              0.23850306868553162,
+              0.33113816380500793
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": true
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 1,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": null,
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": true,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 34,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "ad5b72805df22ac18ab6957880269db38937bd741f10078bacbd8afda346864a",
+            "elapsed": 10.395
+          },
+          {
+            "digest": "ad5b72805df22ac18ab6957880269db38937bd741f10078bacbd8afda346864a",
+            "elapsed": 11.349
+          },
+          {
+            "digest": "ad5b72805df22ac18ab6957880269db38937bd741f10078bacbd8afda346864a",
+            "elapsed": 12.38
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 48,
+      "role_counts": {
+        "active": {
+          "inactive": 0,
+          "maps": 301,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "addon": {
+          "inactive": 6,
+          "maps": 94,
+          "modified_items": 0,
+          "rows": 634,
+          "rows_with_read_issues": 47
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 301,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 6,
+          "maps": 302,
+          "modified_items": 0,
+          "rows": 4264,
+          "rows_with_read_issues": 213
+        }
+      },
+      "saved_override_restore": {
+        "map_count": 302,
+        "method": "snapshot map identities; restore_to_default with fresh lookup and update each time"
+      },
+      "snapshot_sha256": "89a341377a2f70acf37a50152efdacfce049da13f96a1a544ae69ff3d38656f7",
+      "source_code": {
+        "bluehole_python_tree_sha256": "c2b21e75a996dfa1bfeb25596586a0f813c55e44aeec5626723783345c0e5dbe",
+        "python_files": 246
+      },
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 14,
+      "window_count": 1
+    },
+    "no-overrides": {
+      "active_keyconfig": "BH_Keymaps",
+      "active_options": {},
+      "bluehole": {
+        "declared_blender": [
+          4,
+          5,
+          1
+        ],
+        "initialization_timer_pending": false,
+        "keymap_modules": {
+          "keymaps_register": {
+            "keymap_module_lst": 8
+          },
+          "mesh_keymaps_register": {
+            "registered_mesh_keymaps": 0
+          },
+          "navigation_keymaps_register": {
+            "registered_navigation_keymaps": 32
+          },
+          "object_keymaps_register": {
+            "registered_object_keymaps": 0
+          },
+          "pie_keymaps_register": {
+            "registered_pie_keymaps": 22
+          },
+          "pipeline_keymaps_register": {
+            "registered_pipeline_keymaps": 2
+          },
+          "sculpt_keymaps_register": {
+            "registered_sculpt_keymaps": 0
+          },
+          "selection_keymaps_register": {
+            "registered_selection_keymaps": 56
+          },
+          "transform_keymaps_register": {
+            "registered_transform_keymaps": 87
+          },
+          "uv_keymaps_register": {
+            "registered_uv_keymaps": 0
+          }
+        },
+        "loaded": true,
+        "version": [
+          6,
+          9,
+          21
+        ]
+      },
+      "bluehole_owned_rows": 199,
+      "coverage": "copied reference addons",
+      "gui": true,
+      "id": "no-overrides-4.5.1",
+      "input_evidence_relation": "Refreshed export matches all previously captured scope, order, target, event, activation, user flags and property values; newly readable vector/matrix values added",
+      "input_evidence_snapshot_sha256": "2bd3dcd912180aa71125bd34d0a37de2a96bf09bcd15821aca6c2344952a243d",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": []
+          },
+          {
+            "after_selected": 3,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_tool": "builtin.move",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7407954931259155,
+              0.5335595607757568,
+              0.23850306868553162,
+              0.33113816380500793
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": true
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 1,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": null,
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": true,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 34,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "ab75cb6e57f831fc5fd610e141bb23da34d2b22038c29b6b248d0e0672fa2fe6",
+            "elapsed": 10.61
+          },
+          {
+            "digest": "ab75cb6e57f831fc5fd610e141bb23da34d2b22038c29b6b248d0e0672fa2fe6",
+            "elapsed": 11.6
+          },
+          {
+            "digest": "ab75cb6e57f831fc5fd610e141bb23da34d2b22038c29b6b248d0e0672fa2fe6",
+            "elapsed": 12.563
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 48,
+      "role_counts": {
+        "active": {
+          "inactive": 125,
+          "maps": 253,
+          "modified_items": 0,
+          "rows": 4026,
+          "rows_with_read_issues": 970
+        },
+        "addon": {
+          "inactive": 6,
+          "maps": 94,
+          "modified_items": 0,
+          "rows": 634,
+          "rows_with_read_issues": 47
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 301,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 120,
+          "maps": 302,
+          "modified_items": 12,
+          "rows": 4481,
+          "rows_with_read_issues": 600
+        }
+      },
+      "saved_override_restore": {
+        "map_count": 302,
+        "method": "snapshot map identities; restore_to_default with fresh lookup and update each time"
+      },
+      "snapshot_sha256": "110f33b99c9f72d7c263fdd9a9c145cd3225f313ac36b38733f431e7679c93a5",
+      "source_code": {
+        "bluehole_python_tree_sha256": "c2b21e75a996dfa1bfeb25596586a0f813c55e44aeec5626723783345c0e5dbe",
+        "python_files": 246
+      },
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 14,
+      "window_count": 1
+    },
+    "no-preset": {
+      "active_keyconfig": "Blender",
+      "active_options": {
+        "bl_idname": "\u0006",
+        "gizmo_action": "DRAG",
+        "rmb_action": "TWEAK",
+        "select_mouse": "LEFT",
+        "spacebar_action": "SEARCH",
+        "tool_key_mode": "TOOL",
+        "use_alt_click_leader": false,
+        "use_alt_cursor": false,
+        "use_alt_navigation": true,
+        "use_alt_tool": false,
+        "use_file_single_click": false,
+        "use_pie_click_drag": true,
+        "use_region_toggle_pie": false,
+        "use_select_all_toggle": false,
+        "use_v3d_shade_ex_pie": false,
+        "use_v3d_tab_menu": false,
+        "v3d_alt_mmb_drag_action": "RELATIVE",
+        "v3d_mmb_action": "ORBIT",
+        "v3d_tilde_action": "VIEW"
+      },
+      "bluehole": {
+        "declared_blender": [
+          4,
+          5,
+          1
+        ],
+        "initialization_timer_pending": false,
+        "keymap_modules": {
+          "keymaps_register": {
+            "keymap_module_lst": 8
+          },
+          "mesh_keymaps_register": {
+            "registered_mesh_keymaps": 0
+          },
+          "navigation_keymaps_register": {
+            "registered_navigation_keymaps": 32
+          },
+          "object_keymaps_register": {
+            "registered_object_keymaps": 0
+          },
+          "pie_keymaps_register": {
+            "registered_pie_keymaps": 22
+          },
+          "pipeline_keymaps_register": {
+            "registered_pipeline_keymaps": 2
+          },
+          "sculpt_keymaps_register": {
+            "registered_sculpt_keymaps": 0
+          },
+          "selection_keymaps_register": {
+            "registered_selection_keymaps": 56
+          },
+          "transform_keymaps_register": {
+            "registered_transform_keymaps": 87
+          },
+          "uv_keymaps_register": {
+            "registered_uv_keymaps": 0
+          }
+        },
+        "loaded": true,
+        "version": [
+          6,
+          9,
+          21
+        ]
+      },
+      "bluehole_owned_rows": 199,
+      "coverage": "copied reference addons",
+      "gui": true,
+      "id": "no-preset-4.5.1",
+      "input_evidence_relation": "Refreshed export matches all previously captured scope, order, target, event, activation, user flags and property values; newly readable vector/matrix values added",
+      "input_evidence_snapshot_sha256": "6da78a755e635037c342406a06d7822bfbeb8224d8984d7d496e7e2c20f174c2",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 3,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_tool": "builtin.move",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": false
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 1,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": null,
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": true,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 34,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "452b4b7616aa35bae472eb62370625377cc3edac4e48bc05217b944d313e2933",
+            "elapsed": 10.283
+          },
+          {
+            "digest": "452b4b7616aa35bae472eb62370625377cc3edac4e48bc05217b944d313e2933",
+            "elapsed": 11.237
+          },
+          {
+            "digest": "452b4b7616aa35bae472eb62370625377cc3edac4e48bc05217b944d313e2933",
+            "elapsed": 12.267
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 48,
+      "role_counts": {
+        "active": {
+          "inactive": 0,
+          "maps": 301,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "addon": {
+          "inactive": 6,
+          "maps": 94,
+          "modified_items": 0,
+          "rows": 634,
+          "rows_with_read_issues": 47
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 301,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 12,
+          "maps": 302,
+          "modified_items": 75,
+          "rows": 4133,
+          "rows_with_read_issues": 213
+        }
+      },
+      "saved_override_restore": null,
+      "snapshot_sha256": "b03cd3708fe2f777891569063e8c1a21d1fbf839d8e570212d4888677571cc18",
+      "source_code": {
+        "bluehole_python_tree_sha256": "c2b21e75a996dfa1bfeb25596586a0f813c55e44aeec5626723783345c0e5dbe",
+        "python_files": 246
+      },
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 14,
+      "window_count": 1
+    },
+    "packaged": {
+      "active_keyconfig": "BH_Keymaps",
+      "active_options": {},
+      "bluehole": {
+        "declared_blender": [
+          4,
+          5,
+          1
+        ],
+        "initialization_timer_pending": false,
+        "keymap_modules": {
+          "keymaps_register": {
+            "keymap_module_lst": 8
+          },
+          "mesh_keymaps_register": {
+            "registered_mesh_keymaps": 0
+          },
+          "navigation_keymaps_register": {
+            "registered_navigation_keymaps": 32
+          },
+          "object_keymaps_register": {
+            "registered_object_keymaps": 0
+          },
+          "pie_keymaps_register": {
+            "registered_pie_keymaps": 22
+          },
+          "pipeline_keymaps_register": {
+            "registered_pipeline_keymaps": 2
+          },
+          "sculpt_keymaps_register": {
+            "registered_sculpt_keymaps": 0
+          },
+          "selection_keymaps_register": {
+            "registered_selection_keymaps": 56
+          },
+          "transform_keymaps_register": {
+            "registered_transform_keymaps": 87
+          },
+          "uv_keymaps_register": {
+            "registered_uv_keymaps": 0
+          }
+        },
+        "loaded": true,
+        "version": [
+          6,
+          9,
+          21
+        ]
+      },
+      "bluehole_owned_rows": 199,
+      "coverage": "copied reference addons",
+      "gui": true,
+      "id": "packaged-4.5.1",
+      "input_evidence_relation": "Refreshed export matches all previously captured scope, order, target, event, activation, user flags and property values; newly readable vector/matrix values added",
+      "input_evidence_snapshot_sha256": "87b8a45b95a32e88b2b43854c121e8c4ee86024f1c8df29dd2cff5e2a2a320a4",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 3,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_tool": "builtin.move",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7407954931259155,
+              0.5335595607757568,
+              0.23850306868553162,
+              0.33113816380500793
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": true
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 1,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": null,
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": true,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 34,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "2c9bbf6ea586901ead2af9410a71f888cb65f3a09b49a68506d41d120aa8cdc7",
+            "elapsed": 10.508
+          },
+          {
+            "digest": "2c9bbf6ea586901ead2af9410a71f888cb65f3a09b49a68506d41d120aa8cdc7",
+            "elapsed": 11.49
+          },
+          {
+            "digest": "2c9bbf6ea586901ead2af9410a71f888cb65f3a09b49a68506d41d120aa8cdc7",
+            "elapsed": 12.457
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 48,
+      "role_counts": {
+        "active": {
+          "inactive": 125,
+          "maps": 253,
+          "modified_items": 0,
+          "rows": 4026,
+          "rows_with_read_issues": 970
+        },
+        "addon": {
+          "inactive": 6,
+          "maps": 94,
+          "modified_items": 0,
+          "rows": 634,
+          "rows_with_read_issues": 47
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 301,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 66,
+          "maps": 302,
+          "modified_items": 495,
+          "rows": 4260,
+          "rows_with_read_issues": 605
+        }
+      },
+      "saved_override_restore": null,
+      "snapshot_sha256": "33ae955c7f7cf0d4b72edf961e5728baf7d67a726acb4f8b3af4549a48c27c8c",
+      "source_code": {
+        "bluehole_python_tree_sha256": "c2b21e75a996dfa1bfeb25596586a0f813c55e44aeec5626723783345c0e5dbe",
+        "python_files": 246
+      },
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 14,
+      "window_count": 1
+    },
+    "stock": {
+      "active_keyconfig": "Blender",
+      "active_options": {
+        "bl_idname": "\u0006",
+        "gizmo_action": "DRAG",
+        "rmb_action": "TWEAK",
+        "select_mouse": "LEFT",
+        "spacebar_action": "PLAY",
+        "tool_key_mode": "IMMEDIATE",
+        "use_alt_click_leader": false,
+        "use_alt_cursor": false,
+        "use_alt_navigation": true,
+        "use_alt_tool": false,
+        "use_file_single_click": false,
+        "use_pie_click_drag": false,
+        "use_region_toggle_pie": false,
+        "use_select_all_toggle": false,
+        "use_v3d_shade_ex_pie": false,
+        "use_v3d_tab_menu": false,
+        "v3d_alt_mmb_drag_action": "RELATIVE",
+        "v3d_mmb_action": "ORBIT",
+        "v3d_tilde_action": "VIEW"
+      },
+      "bluehole": {
+        "declared_blender": [],
+        "initialization_timer_pending": false,
+        "loaded": false,
+        "version": []
+      },
+      "bluehole_owned_rows": 0,
+      "coverage": "factory bundled addons",
+      "gui": true,
+      "id": "stock-4.5.1",
+      "input_evidence_relation": "Refreshed export matches all previously captured scope, order, target, event, activation, user flags and property values; newly readable vector/matrix values added",
+      "input_evidence_snapshot_sha256": "5c0b7a80bbd830948510adc440702b9c22355debacec1474023f862d9a5a0dc0",
+      "input_outcomes": {
+        "cases": [
+          {
+            "after_selected": 3,
+            "before_selected": 0,
+            "event": {
+              "type": "A"
+            },
+            "id": "plain-a-selection-control",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_selected": 0,
+            "before_selected": 0,
+            "event": {
+              "ctrl": true,
+              "type": "A"
+            },
+            "id": "ctrl-a-object-selection",
+            "operator_history": [
+              "OBJECT_OT_select_all"
+            ]
+          },
+          {
+            "after_tool": "builtin.move",
+            "before_tool": "builtin.move",
+            "event": {
+              "type": "Q",
+              "value": "press/release"
+            },
+            "id": "q-tool-selection"
+          },
+          {
+            "after_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "before_quaternion": [
+              0.7123758792877197,
+              0.4410620927810669,
+              0.28735825419425964,
+              0.4641229212284088
+            ],
+            "event": {
+              "alt": true,
+              "drag": [
+                90,
+                40
+              ],
+              "type": "LEFTMOUSE"
+            },
+            "id": "alt-left-drag-rotate",
+            "rotation_changed": false
+          }
+        ],
+        "context": {
+          "editor": "VIEW_3D",
+          "mode": "OBJECT",
+          "region": "WINDOW"
+        },
+        "keyboard_dispatch_control": 1,
+        "method": "Blender native Window.event_simulate dispatch in GUI; no direct invocation of tested shortcut"
+      },
+      "input_probe_limit": null,
+      "inputs": {
+        "drag_threshold": 30,
+        "drag_threshold_mouse": 3,
+        "drag_threshold_tablet": 10,
+        "invert_mouse_zoom": false,
+        "invert_zoom_wheel": false,
+        "mouse_double_click_time": 350,
+        "mouse_emulate_3_button_modifier": "ALT",
+        "move_threshold": 2,
+        "ndof_sensitivity": 4.0,
+        "touchpad_scroll_direction": "TRADITIONAL",
+        "use_emulate_numpad": false,
+        "use_mouse_depth_navigate": false,
+        "use_mouse_emulate_3_button": false,
+        "use_multitouch_gestures": true,
+        "use_rotate_around_active": false,
+        "use_zoom_to_mouse": false,
+        "view_rotate_method": "TURNTABLE",
+        "view_rotate_sensitivity_trackball": 1.0,
+        "view_rotate_sensitivity_turntable": 0.006981316953897476,
+        "view_zoom_axis": "VERTICAL",
+        "view_zoom_method": "DOLLY"
+      },
+      "loaded_addons": 8,
+      "readiness": {
+        "samples": [
+          {
+            "digest": "1a904e82b9fe4b8b6d3e92dfa2ebb2a74e1adafd0062c3a23d228bd6ff696a3b",
+            "elapsed": 4.42
+          },
+          {
+            "digest": "1a904e82b9fe4b8b6d3e92dfa2ebb2a74e1adafd0062c3a23d228bd6ff696a3b",
+            "elapsed": 5.415
+          },
+          {
+            "digest": "1a904e82b9fe4b8b6d3e92dfa2ebb2a74e1adafd0062c3a23d228bd6ff696a3b",
+            "elapsed": 6.411
+          }
+        ],
+        "status": "stable"
+      },
+      "requested_addons": 8,
+      "role_counts": {
+        "active": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "addon": {
+          "inactive": 0,
+          "maps": 2,
+          "modified_items": 0,
+          "rows": 5,
+          "rows_with_read_issues": 0
+        },
+        "default": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3653,
+          "rows_with_read_issues": 166
+        },
+        "user": {
+          "inactive": 0,
+          "maps": 247,
+          "modified_items": 0,
+          "rows": 3654,
+          "rows_with_read_issues": 166
+        }
+      },
+      "saved_override_restore": null,
+      "snapshot_sha256": "0e8967948c1ab02fbf38f5b724a85a7f9cf9e7fd5b2df12759f49551bc091b14",
+      "source_code": null,
+      "source_hashes": {
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3"
+      },
+      "source_preserved": true,
+      "unavailable_addons": 0,
+      "window_count": 1
+    }
+  },
+  "controlled_checks": {
+    "active_options_match_with_same_preset": true,
+    "addon_semantic_multisets_identical": true,
+    "input_preferences_identical": true,
+    "loaded_addons_identical": true
+  },
+  "exporter_sha256": "c67147ffe92af139ea10da7959716c52c2bdff36e205d41c80c1b1888da740bb",
+  "gaps": [
+    {
+      "count": 14,
+      "id": "missing-configured-addons",
+      "next": "Resolve aliases against private snapshot module inventory; confirm these are obsolete preference entries or provide their intended installed sources, then recapture affected rows.",
+      "status": "source inputs absent; not an isolation startup failure"
+    },
+    {
+      "id": "rna-property-gaps",
+      "next": "Resolve linked operator/add-on availability and compare literal preset properties with live RNA before accepting affected migrations.",
+      "status": "unknown operators, unavailable properties and unresolved enums remain explicit per row"
+    },
+    {
+      "id": "dispatch-precedence",
+      "next": "Confirm relevant cross-map/tool/modal contexts and collision winners in brief 06; carry unresolved contracts into 02.",
+      "status": "literal same-scope overlap candidates; only selected input outcomes measured"
+    },
+    {
+      "id": "restored-modified-flags",
+      "next": "Affected row IDs are flagged in the ledger. Separate regenerated preset/runtime state from saved residue before assigning exact override provenance.",
+      "status": "12 items in eight maps retain modified flags with BH_Keymaps active after per-map restore; the neither case has zero"
+    },
+    {
+      "id": "reference-context-scope",
+      "next": "Use 06 for required additional editor, tool, mode and modal contexts.",
+      "status": "controlled reload from binary preferences with factory scene; arbitrary artist projects not inspected"
+    },
+    {
+      "id": "development-compatibility",
+      "next": "Use recorded discrepancies for 02\u201306; no Blender 5.2.2 execution claim.",
+      "status": "development source tested in authorized Blender 4.5.1 with only disposable minimum-version metadata changed"
+    }
+  ],
+  "id": "deluxe-baseline-2026-11-12-v1",
+  "isolation": {
+    "app_copy_created": false,
+    "native_gui": true,
+    "network": "denied",
+    "path_redirections": 17,
+    "preference_load_interception": [
+      "addons",
+      "scripts",
+      "keyconfig"
+    ],
+    "preferences_autosave": false,
+    "profile_copy_method": "byte copies; no hardlinks",
+    "startup_default_redirects": 6,
+    "user_resource_overrides": [
+      "RESOURCES",
+      "CONFIG",
+      "SCRIPTS",
+      "EXTENSIONS",
+      "DATAFILES"
+    ],
+    "writes": "owned session directory plus null device only"
+  },
+  "python": [
+    3,
+    11,
+    11
+  ],
+  "reference_aliases": [
+    "<reference app>",
+    "<reference profile>"
+  ],
+  "schema_version": 1,
+  "source_branch": "blender-5.2.2/alpha",
+  "source_revision": "ea3acf8300881fbbac540dbd7f3194af8693dc17",
+  "test_blender": {
+    "background": false,
+    "build_branch": "blender-v4.5-release",
+    "build_commit_date": "2025-07-29",
+    "build_commit_time": "05:31",
+    "build_hash": "b0a72b245dcf",
+    "build_platform": "Darwin",
+    "version": [
+      4,
+      5,
+      1
+    ],
+    "version_cycle": "release",
+    "version_string": "4.5.1 LTS"
+  },
+  "vendored_commonutils": "c86007d36e5606c4bb3eda3db853dbd5195717d7"
+}
