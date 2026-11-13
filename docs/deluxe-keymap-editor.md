@@ -65,6 +65,24 @@ category and section menus browse one section at a time when search is empty.
   after reviewing them. **Reset Feature Switches** acts on the separate Blender
   preference switches.
 
+## Add-on shortcuts
+
+The original **Third-Party Add-ons** tab groups Blue Hole's optional
+integrations by add-on. The editor groups assignments by workflow and shows
+the command source separately. Search by source to find direct add-on commands.
+
+| Add-on | Where to find it | Availability and fallback |
+| --- | --- | --- |
+| Zen UV | **UV → Tools** for Move Cursor, **UV → Actions** for Fit to Trim | Deluxe checks `uv.zenuv_move_cursor_to` and `uv.zenuv_fit_to_trim` individually. In Blender 4.5.1 without Zen UV, both assignments remained visible as **Waiting for add-on** and neither registered a binding. |
+| autoConstraints | **Third-Party Add-ons → Auto Constraints**, with W/E/R in **Transform → Modal tools** | The panel checks `transform.translate_auto_constraint`. Each shortcut checks its own Translate, Rotate or Resize provider operator and uses the corresponding Blender transform when the operator is missing or the integration is off. |
+| X-Ray Selection Tools | **Third-Party Add-ons → X-Ray Selection Tools**, with Q in **Selection → Tool switch** | The panel checks `mesh.select_box_xray`. Object and Mesh try their respective X-Ray Box tools when enabled and use Blender's Box Select if activation fails. Curve and Curves use Blender's Box Select. The 4.5.1 replay tested both provider and fallback behavior with X-Ray Selection Tools 4.9.0. |
+| Blender FBX | **Pipeline → Export** | Deluxe checks `export_scene.fbx`. The bundled exporter registered in Blender 4.5.1, and Ctrl+Shift+E exported the test mesh. |
+
+The **Third-Party Add-ons** controls reflect whether their Deluxe sections
+are enabled. The availability checks read registered Blender operators.
+Provider-enabled Zen UV and autoConstraints dispatch, and Blender 5.2.2,
+still need verification.
+
 The [profile API contract](deluxe-keymap-profiles.md) describes persistence,
 validation and recovery. The existing Blender Keymap preferences retain
 control of inherited bindings and native saved edits.
