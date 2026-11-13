@@ -73,6 +73,30 @@ class WM_OT_BH_ResizeAutoConstraint(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class UV_OT_BH_PlaceAndMoveCursor(bpy.types.Operator):
+    """Place the UV cursor at the press and let Blender drag it until release"""
+    bl_idname = "uv.bh_place_and_move_cursor"
+    bl_label = "Place and Move UV Cursor"
+    bl_options = {'INTERNAL'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.mode == 'EDIT_MESH'
+                and context.area is not None and context.area.ui_type == 'UV'
+                and context.region is not None and context.region.type == 'WINDOW'
+                and bpy.ops.uv.cursor_set.poll() and bpy.ops.transform.translate.poll())
+
+    def invoke(self, context, event):
+        location = context.region.view2d.region_to_view(event.mouse_region_x, event.mouse_region_y)
+        if 'FINISHED' not in bpy.ops.uv.cursor_set('EXEC_DEFAULT', location=location):
+            return {'CANCELLED'}
+
+        result = bpy.ops.transform.translate(
+            'INVOKE_DEFAULT', cursor_transform=True, release_confirm=True)
+        # Translate owns the modal handler and consumes the release.
+        return {'FINISHED'} if 'RUNNING_MODAL' in result else {'CANCELLED'}
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -81,7 +105,8 @@ class WM_OT_BH_ResizeAutoConstraint(bpy.types.Operator):
 classes = (
     WM_OT_BH_TranslateAutoConstraint,
     WM_OT_BH_RotateAutoConstraint,
-    WM_OT_BH_ResizeAutoConstraint
+    WM_OT_BH_ResizeAutoConstraint,
+    UV_OT_BH_PlaceAndMoveCursor,
 )
 
 

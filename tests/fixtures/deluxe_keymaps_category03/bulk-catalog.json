@@ -111,18 +111,6 @@
       "property_source": "preset properties; merged reference activates the row"
     },
     {
-      "row_id": "653400cbc0a3037540a2a42b8f1ffdb90f62ad2c8155bf0bedafda0ffb86ed20",
-      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
-      "symbol": "DELUXE_UV_CURSOR_TRANSLATE_MIDDLEMOUSE_PRESS_ANY",
-      "group": "transform",
-      "status": "added-declaration",
-      "reference_order": [
-        51,
-        3
-      ],
-      "property_source": "preset explicit properties; merged reference activation/order"
-    },
-    {
       "row_id": "89cb7f518397c9ec8d21dddbc23755ab4b9a08e57064b70b853537c726ec3ee0",
       "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
       "symbol": "DELUXE_EDIT_ARMATURE_ROLL_TRANSFORM_MIDDLEMOUSE_PRESS_ANY",
@@ -666,10 +654,19 @@
     }
   ],
   "modal_exception_count": 33,
-  "new_declaration_count": 46,
-  "declaration_count": 55,
+  "combined_replacements": [
+    {
+      "row_id": "653400cbc0a3037540a2a42b8f1ffdb90f62ad2c8155bf0bedafda0ffb86ed20",
+      "reference_order": [51, 3],
+      "combined_with": "4e2dc6fd4bdf26e2c0269c8384d35da4826c1a0f5d698621dabde8752cdacfa4",
+      "category": "04",
+      "operator": "uv.bh_place_and_move_cursor"
+    }
+  ],
+  "new_declaration_count": 45,
+  "declaration_count": 54,
   "notes": [
-    "These 55 rows were previously behaviorally unresolved. Declaration coverage does not add native acceptance.",
+    "The original 55 rows were previously behaviorally unresolved. One is now covered by the combined UV Cursor binding in 04.",
     "The seven merged-only rows use captured user overrides, including active=True and release_confirm=False.",
     "Unknown is_tool metadata stays unset. No runtime or vendor changes.",
     "New rows are in reverse per-map reference order for the existing Blender add-on merge. Existing group precedence is retained; cross-group dispatch remains covered only by prior native evidence."
@@ -718,6 +715,6 @@
     "actions/actions/keymaps/selection/selection_more_less.py": "6243684d09b82e8cedc02f4ce3635e1f3df0af214af7c2ed2a90588196c44b5f",
     "actions/actions/keymaps/selection/selection_tool_switch.py": "e4f14e038a944e561e225ffc6c3d17cac47d1d0f93f8de2c7a7201fbe13a4d7c",
     "actions/actions/keymaps/transform/transform_tools_gizmo.py": "9fdc0215edfa462e9e1034dc8a41067adf2bd8c4210738b834fdf0d6a6061d83",
-    "actions/actions/keymaps/transform/transform_tools_modal.py": "c13f29894626f0534bfd9eaba33cf208798a4ea9070e0e8ec4fa819b1b3466e8"
+    "actions/actions/keymaps/transform/transform_tools_modal.py": "585079149fb11f9e404a44e0eab05547ea6cf718018d9c5318daa5f46eefd891"
   }
 }

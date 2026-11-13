@@ -75,6 +75,24 @@ nearby Object and UV rows already assigned to 05 for integration.
 
 ## Verification and handoff
 
+Brief 06's UV Cursor follow-up combines the reference's Set Cursor row
+(`4e2dc6fd…`, merged position [51, 2]) and Translate row (`653400cb…`,
+[51, 3]) into one `uv.bh_place_and_move_cursor` binding under UV Tool Shortcuts.
+On unmodified middle press in the UV Cursor tool, it uses the event's region
+coordinates to place the cursor, then invokes native Translate with
+`cursor_transform=True` and `release_confirm=True`. The Transform catalog's
+duplicate event claim was removed. Both full reference IDs and their mapping
+remain in the 03 and 04 bulk receipts.
+
+One confined Blender 4.5.1 LTS run (build `b0a72b245dcf`, base `9871112`)
+matched the copied reference's cursor coordinates and native Translate modal
+state at all eight click and drag observations. The merged map had one active
+middle-press binding and no assignment conflict. The process exited 0 in
+32.5 seconds, removed the disposable profile, preserved the payload hashes,
+and stopped the watcher with zero owned or pending runtime resources.
+The local receipt is
+`test-results/deluxe-keymaps-category06/candidate-uv-cursor-combined.json`.
+
 The portable bulk check exercises the normal category registers and compares
 every emitted row with the 01 ledger and explicit preset properties. It compares
 merged per-map order, preference group filtering, release, and coverage
@@ -86,5 +104,5 @@ cycles. Observe Box on release using the direct noncycling Box control in the
 Image Editor, and exercise the UV selection toggle with a double-click pick or
 the right-press Tweak fallback in the applicable tool state. The copied
 reference's earlier strict preservation failure and its inconclusive Box
-direct-control result remain in the 03 receipt. This migration did not launch
-Blender or establish new native dispatch, sync-selection, or persistence evidence.
+direct-control result remain in the 03 receipt. The original catalog pass used
+portable checks. The native follow-up above covers the UV Cursor gesture.

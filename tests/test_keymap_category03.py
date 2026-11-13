@@ -2946,9 +2946,10 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             if entry['status'] == 'added-declaration':
                 ordered.setdefault((entry['path'], expected['scope']['name']), []).append(
                     entry['reference_order'][1])
-        self.assertEqual(len(seen), 55)
+        self.assertEqual(len(seen), receipt['declaration_count'])
         self.assertEqual(sum(e['status'] == 'added-declaration'
-                             for e in receipt['ordinary_declarations']), 46)
+                             for e in receipt['ordinary_declarations']),
+                         receipt['new_declaration_count'])
         for positions in ordered.values():
             self.assertEqual(positions, sorted(positions, reverse=True))
         exceptions = {e['row_id'] for e in receipt['ordinary_exceptions']}
@@ -2959,7 +2960,9 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
                       if review['runtime_disposition'] == 'review-full-side-candidate'}
         accounted = {row_id for row_id in candidates
                      if 'declaration' in self.rows[row_id] or 'authorized_transfer' in self.rows[row_id]}
-        self.assertEqual(candidates, seen | exceptions | accounted)
+        combined = {entry['row_id'] for entry in receipt['combined_replacements']}
+        self.assertFalse(combined & seen)
+        self.assertEqual(candidates, seen | exceptions | accounted | combined)
 
         self.stub('.blenderUtils.operatorUtils', op_exists=lambda _idname: True)
         ui = self.load('preferences.addon.keymaps.keymap_props_selection')

@@ -138,15 +138,28 @@ class Category04CatalogTest(unittest.TestCase):
                 event = adapter._event(binding)
                 id_ = entry['row_id']
                 ref = ledger[id_]['binding']
+                replacement = entry.get('replacement')
+                target = ref['target']
+                if replacement:
+                    companion = ledger[replacement['also_covers']]['binding']
+                    self.assertEqual(companion['scope'], ref['scope'])
+                    self.assertEqual(companion['event'], ref['event'])
+                    self.assertEqual(companion['target'], 'transform.translate')
+                    self.assertTrue(companion['properties']['cursor_transform'])
+                    self.assertTrue(companion['properties']['release_confirm'])
+                    target = replacement['operator']
                 self.assertEqual(asdict(scope), ref['scope'], id_)
                 self.assertEqual(asdict(event), ref['event'], id_)
-                self.assertEqual(action.get_idname(), ref['target'], id_)
+                self.assertEqual(action.get_idname(), target, id_)
                 self.assertEqual(binding.active, ref['active'], id_)
                 self.assertIn(tuple(entry['reference_order']), positions[id_], id_)
                 self.assertIn(action, getattr(module, f'get_{category}_group_actions')(entry['group']))
                 effective = {k: property_value(v) for k, v in ref['properties'].items()}
                 properties = action.get_props()
-                if entry['properties_source'] == 'reference preset explicit':
+                if replacement:
+                    effective = {}
+                    self.assertEqual(properties, effective, id_)
+                elif entry['properties_source'] == 'reference preset explicit':
                     key = (scope.name, scope.space_type, scope.region_type,
                            ref['target'], event.type, event.value)
                     matches = [props for input_, props in preset[key]
@@ -160,11 +173,11 @@ class Category04CatalogTest(unittest.TestCase):
                     self.assertLessEqual(properties.items(), effective.items(), id_)
                 else:
                     self.assertEqual(properties, effective, id_)
-                key = (scope, event, ref['target'])
+                key = (scope, event, target)
                 self.assertNotIn(key, catalog)
                 catalog[key] = (action, binding)
                 source_rows[key].append(effective)
-                expected[scope].append((entry['reference_order'][1], event, ref['target'], binding.active))
+                expected[scope].append((entry['reference_order'][1], event, target, binding.active))
                 if not any(utils.capture_scope(m) == scope for m in runtime.configs.default.keymaps):
                     stock = runtime.map('default', scope.name, space=scope.space_type)
                     stock.keymap_items.append_fixture(row('wm.inherited_stock', key='F23'))

@@ -72,7 +72,7 @@
     {"row_id": "5cd2afd24dcb993de0c225921c2f69d83dbd583fc10135d98675b8c1db1412e0", "category": "uv", "group": "actions", "reference_order": [147, 280], "properties_source": "reference preset explicit"},
     {"row_id": "5fccd93d8aaf46c90ef18b42dc08a3e5d9babfb4263350b867b8c2dcf76b39fd", "category": "uv", "group": "selection", "reference_order": [147, 270], "properties_source": "reference preset explicit"},
     {"row_id": "4be43c65802782650d9b12591136efbc6aa3bd962b6c0b77b96e059c2fac8c40", "category": "uv", "group": "selection", "reference_order": [147, 269], "properties_source": "reference preset explicit"},
-    {"row_id": "4e2dc6fd4bdf26e2c0269c8384d35da4826c1a0f5d698621dabde8752cdacfa4", "category": "uv", "group": "tools", "reference_order": [51, 2], "properties_source": "reference preset explicit"}
+    {"row_id": "4e2dc6fd4bdf26e2c0269c8384d35da4826c1a0f5d698621dabde8752cdacfa4", "category": "uv", "group": "tools", "reference_order": [51, 2], "properties_source": "reference preset explicit", "replacement": {"operator": "uv.bh_place_and_move_cursor", "also_covers": "653400cbc0a3037540a2a42b8f1ffdb90f62ad2c8155bf0bedafda0ffb86ed20"}}
   ],
   "exceptions": {
     "unavailable-operator-schema": [

@@ -138,8 +138,9 @@ _UV_CATALOG = (
             'UV Editor', 'EMPTY', 'LEFTMOUSE', value='DOUBLE_CLICK', shift=True, alt=True),),
     )),
     # 4e2dc6fd4bdf26e2c0269c8384d35da4826c1a0f5d698621dabde8752cdacfa4
+    # 653400cbc0a3037540a2a42b8f1ffdb90f62ad2c8155bf0bedafda0ffb86ed20
     ('tools', OperatorAction(
-        operator='uv.cursor_set', text='Set UV Cursor',
+        operator='uv.bh_place_and_move_cursor', text='Place and Move UV Cursor',
         keymap_bindings=(KeymapBinding(
             'Image Editor Tool: Uv, Cursor', 'IMAGE_EDITOR', 'MIDDLEMOUSE'),),
     )),

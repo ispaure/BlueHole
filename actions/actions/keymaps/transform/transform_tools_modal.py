@@ -538,14 +538,6 @@ DELUXE_3D_VIEW_TRANSLATE_MIDDLEMOUSE_PRESS_ANY_SHIFTCTRL = OperatorAction(
         key='MIDDLEMOUSE', shift=True, ctrl=True),),
 )
 
-# 653400cbc0a3037540a2a42b8f1ffdb90f62ad2c8155bf0bedafda0ffb86ed20
-DELUXE_UV_CURSOR_TRANSLATE_MIDDLEMOUSE_PRESS_ANY = OperatorAction(
-    operator='transform.translate', text='UV Cursor', props={'cursor_transform': True, 'release_confirm': True},
-    keymap_bindings=(KeymapBinding(
-        keymap_name='Image Editor Tool: Uv, Cursor', space_type='IMAGE_EDITOR',
-        key='MIDDLEMOUSE'),),
-)
-
 # 89cb7f518397c9ec8d21dddbc23755ab4b9a08e57064b70b853537c726ec3ee0
 DELUXE_EDIT_ARMATURE_ROLL_TRANSFORM_MIDDLEMOUSE_PRESS_ANY = OperatorAction(
     operator='transform.transform', text='Edit Armature, Roll', props={'mode': 'BONE_ROLL', 'release_confirm': True},
@@ -724,7 +716,6 @@ DELUXE_SHEAR_SHEAR_MIDDLEMOUSE_CLICK_DRAG_NORTH = OperatorAction(
 
 TRANSFORM_TOOLS_MODAL_ACTIONS.extend([
     DELUXE_3D_VIEW_TRANSLATE_MIDDLEMOUSE_PRESS_ANY_SHIFTCTRL,
-    DELUXE_UV_CURSOR_TRANSLATE_MIDDLEMOUSE_PRESS_ANY,
     DELUXE_EDIT_ARMATURE_ROLL_TRANSFORM_MIDDLEMOUSE_PRESS_ANY,
     DELUXE_EDIT_ARMATURE_BONE_SIZE_TRANSFORM_MIDDLEMOUSE_PRESS_ANY,
     DELUXE_EDIT_ARMATURE_BONE_ENVELOPE_BBONE_RESIZE_MIDDLEMOUSE_PRESS_ANY,
