@@ -105,13 +105,13 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
         name='Selection Keymap Tab',
         description='Active selection keymap feature tab',
         items=[
-            ('BASIC', 'Click / Box', ''),
             ('MORE_LESS', 'Select Less / More', ''),
             ('TOOL_SWITCH', 'Tool Switch', ''),
             ('ALL_NONE', 'All / None / Invert', ''),
             ('CIRCLE', 'Circle Selection', ''),
             ('SUBTRACT', 'Subtract Selection', ''),
             ('EXTEND', 'Extend Selection', ''),
+            ('BASIC', 'Click / Box', ''),
         ],
         default='MORE_LESS'
     )

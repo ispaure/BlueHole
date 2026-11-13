@@ -2963,6 +2963,9 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
 
         self.stub('.blenderUtils.operatorUtils', op_exists=lambda _idname: True)
         ui = self.load('preferences.addon.keymaps.keymap_props_selection')
+        self.assertEqual([item[0] for item in ui.SelectionKeymapPG.__annotations__[
+            'active_selection_keymap_tab']['items']],
+            ['MORE_LESS', 'TOOL_SWITCH', 'ALL_NONE', 'CIRCLE', 'SUBTRACT', 'EXTEND', 'BASIC'])
         preferences = types.SimpleNamespace(**{
             name: definition['default'] for name, definition in ui.SelectionKeymapPG.__annotations__.items()})
         for name in vars(preferences):
