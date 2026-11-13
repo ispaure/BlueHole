@@ -543,7 +543,7 @@
           }
         },
         "source": "actions/actions/keymaps/navigation/viewport_movement.py",
-        "source_sha256": "b7f9f2b3862f256e72c741dadf8f7c541fbf67027ed10d6f5384cdb02cb106fe",
+        "source_sha256": "8209d0bccf32df5ac0c4fa5f9bb156dcb79b9fb67d61c59ad73e388da07149d9",
         "preference": "enable_navigation_viewport_movement"
       },
       "selection_more_less": {
@@ -582,7 +582,7 @@
           }
         },
         "source": "actions/actions/keymaps/selection/selection_tool_switch.py",
-        "source_sha256": "53894b38e1c6d85e9502fe17070827e66f16b9e0e11f77af5560acfda8f6daff",
+        "source_sha256": "e4f14e038a944e561e225ffc6c3d17cac47d1d0f93f8de2c7a7201fbe13a4d7c",
         "preference": "enable_selection_tool_switch"
       },
       "transform_tools_gizmo": {
@@ -607,7 +607,7 @@
           }
         },
         "source": "actions/actions/keymaps/transform/transform_tools_modal.py",
-        "source_sha256": "8f94c479a500bf1e481ea8f6aaf44438999fd56b81e1617ee1e3bd07d92d4d73",
+        "source_sha256": "c13f29894626f0534bfd9eaba33cf208798a4ea9070e0e8ec4fa819b1b3466e8",
         "preference": "enable_transform_tools_modal",
         "historical_source_sha256": [
           "c96ecb1a43a89d4ae43d97f80b979378e90acbb09323a22377c8e24579a19f66"

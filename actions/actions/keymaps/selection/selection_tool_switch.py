@@ -113,3 +113,17 @@ def get_selection_tool_switch_actions() -> list[OperatorAction]:
     Return all declared Blue Hole selection tool switching operator actions.
     """
     return SELECTION_TOOL_SWITCH_ACTIONS
+
+
+# Exact ordinary Deluxe rows; source order reverses the merged reference order.
+# bb1eb3f8dd9726854e0a572adfcd9b762c8eaed94fee78ab96fd5e996fbdc06e
+DELUXE_3D_VIEW_GENERIC_TOOL_SET_BY_ID_BUTTON4MOUSE_CLICK_ANY = OperatorAction(
+    operator='wm.tool_set_by_id', text='3D View Generic', props={'name': 'builtin.select_box'},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='3D View Generic', space_type='VIEW_3D',
+        key='BUTTON4MOUSE', value='CLICK'),),
+)
+
+SELECTION_TOOL_SWITCH_ACTIONS.extend([
+    DELUXE_3D_VIEW_GENERIC_TOOL_SET_BY_ID_BUTTON4MOUSE_CLICK_ANY,
+])

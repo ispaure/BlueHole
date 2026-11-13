@@ -2,10 +2,47 @@
 
 Brief 03 reconciles these categories against the accepted
 [baseline ledger](deluxe-keymaps-baseline.md) and uses the existing
-[reversible runtime](deluxe-keymaps-runtime.md). Category implementation and
-native verification are in progress. View Framing, six UV selection additions, Circle Selection, the Gizmo scope correction and Q
-PRESS declarations pass portable checks. Bounded native observations are recorded below;
-they do not establish complete category parity.
+[reversible runtime](deluxe-keymaps-runtime.md).
+
+## Current catalog handoff — bulk restoration
+
+The user and coordinator replaced the per-row acceptance gate with bulk catalog
+restoration. This patch adds **46 ordinary bindings**: 24 Transform, 3 Navigation,
+and 19 Selection. Another 9 previously unresolved rows already had declarations.
+The existing groups expose these rows for editing; a small Click / Box Selection
+group holds nine click and box bindings. All / None also includes Invert.
+
+Of the 140 active full-side candidates, **93 now have implementation declarations**
+(38 with prior native acceptance plus 55 with catalog comparison), **8 belong to
+04**, and **39 remain explicit exceptions**. The original 1,032-row audit and its
+historical 38/8/94 native accounting are retained unchanged. Inherited stock and
+provider rows remain inherited.
+
+The [compact catalog receipt](../tests/fixtures/deluxe_keymaps_category03/bulk-catalog.json)
+lists every added/already-declared row and exact exception IDs. Source checks cover
+category, scope, event, declared properties, activation, and reference order among
+new rows in each map. New source rows reverse the captured per-map order to account
+for Blender's forward-prepend add-on merge. Existing group precedence remains in
+place; cross-group dispatch is not newly established by this comparison.
+
+The seven merged-only rows retain the captured user customizations: active cursor
+translation, Image Generic pan, Button 5 walk, and four release-confirm overrides.
+Only explicit operator properties are assigned; effective RNA defaults are not
+copied wholesale. Tool-map metadata that was unavailable remains unspecified.
+
+The remaining exceptions are 33 native modal-token rows needing the shared runtime
+capability, two UV Shift-press selection conflicts, two middle-mouse navigation
+phase conflicts, and two contradictory NDOF roll directions. UV Q release remains
+with 04, Screen G with 05; the existing local UV G route is preserved. Image Q
+composition and previously observed dispatch/control gaps remain recorded below.
+
+No new Blender session was launched. The coordinator deferred the short smoke run
+until the combined 03–05 catalog is ready. Prior native observations are reused;
+catalog restoration does not claim additional native acceptance or 5.2.2 parity.
+All 110 portable category checks pass, including the bulk ledger comparison and
+independent Click / Box toggle; changed sources compile and the diff check passes.
+The shared runtime, vendor revision, protected preset, and native evidence are
+unchanged. The earlier sections below retain the detailed historical evidence.
 
 ## Base and reconciliation
 

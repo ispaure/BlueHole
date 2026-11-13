@@ -62,3 +62,80 @@ SELECTION_CIRCLE_ACTIONS: list[OperatorAction] = [
 def get_selection_circle_actions() -> list[OperatorAction]:
     """Return all declared Circle Selection actions."""
     return SELECTION_CIRCLE_ACTIONS
+
+
+# Exact ordinary Deluxe rows; source order reverses the merged reference order.
+# 92a7039705de2b45a0588e10374abc4e0f035051c795ea9c103791f905ef0c5d
+DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_CTRL = OperatorAction(
+    operator='uv.select_circle', text='UV Select Circle (fallback)', props={'wait_for_input': False, 'mode': 'SUB'},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='Image Editor Tool: Uv, Select Circle (fallback)', space_type='IMAGE_EDITOR',
+        key='RIGHTMOUSE', value='CLICK_DRAG', ctrl=True),),
+)
+
+# dc1f8f23cd102dcfe2bc4fe2f6b8c0aa13881c75cb947cce60e75d5b24e6edc1
+DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_OSKEY = OperatorAction(
+    operator='uv.select_circle', text='UV Select Circle (fallback)', props={'wait_for_input': False, 'mode': 'SUB'},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='Image Editor Tool: Uv, Select Circle (fallback)', space_type='IMAGE_EDITOR',
+        key='RIGHTMOUSE', value='CLICK_DRAG', oskey=True),),
+)
+
+# e0a16ccd3f8f3ddbc61c3da5aa90aecac16e1300a4eb7b43d4b022d762e52939
+DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_SHIFT = OperatorAction(
+    operator='uv.select_circle', text='UV Select Circle (fallback)', props={'wait_for_input': False, 'mode': 'ADD'},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='Image Editor Tool: Uv, Select Circle (fallback)', space_type='IMAGE_EDITOR',
+        key='RIGHTMOUSE', value='CLICK_DRAG', shift=True),),
+)
+
+# 2ed8a85dcb09992dc6546c894b6f704f5882c2183cb4d1c96ac1a665ba3c6dbc
+DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY = OperatorAction(
+    operator='uv.select_circle', text='UV Select Circle (fallback)', props={'wait_for_input': False},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='Image Editor Tool: Uv, Select Circle (fallback)', space_type='IMAGE_EDITOR',
+        key='RIGHTMOUSE', value='CLICK_DRAG'),),
+)
+
+# a7abdb0f1a76a33e484bc02febb2b5cb9a4bf9502e1a5a0a1c1ed2ee736e22c1
+DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_CTRL = OperatorAction(
+    operator='view3d.select_circle', text='Select Circle (fallback)', props={'wait_for_input': False, 'mode': 'SUB'},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='3D View Tool: Select Circle (fallback)', space_type='VIEW_3D',
+        key='RIGHTMOUSE', value='CLICK_DRAG', ctrl=True),),
+)
+
+# 7fc3ba226f32b930e4353fe72a7969cb36cd337d65892409fe36d2df9efad4f5
+DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_OSKEY = OperatorAction(
+    operator='view3d.select_circle', text='Select Circle (fallback)', props={'wait_for_input': False, 'mode': 'SUB'},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='3D View Tool: Select Circle (fallback)', space_type='VIEW_3D',
+        key='RIGHTMOUSE', value='CLICK_DRAG', oskey=True),),
+)
+
+# ec35cef734a1d37ca52f86c49d84a2926f2edf50f31a11afdc35f4c1bd656082
+DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_SHIFT = OperatorAction(
+    operator='view3d.select_circle', text='Select Circle (fallback)', props={'wait_for_input': False, 'mode': 'ADD'},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='3D View Tool: Select Circle (fallback)', space_type='VIEW_3D',
+        key='RIGHTMOUSE', value='CLICK_DRAG', shift=True),),
+)
+
+# 44692afb55e6f42196d8f7d04c6395271b307cd4aac003b0a4675e3a30c98037
+DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY = OperatorAction(
+    operator='view3d.select_circle', text='Select Circle (fallback)', props={'wait_for_input': False},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='3D View Tool: Select Circle (fallback)', space_type='VIEW_3D',
+        key='RIGHTMOUSE', value='CLICK_DRAG'),),
+)
+
+SELECTION_CIRCLE_ACTIONS.extend([
+    DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_CTRL,
+    DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_OSKEY,
+    DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_SHIFT,
+    DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY,
+    DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_CTRL,
+    DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_OSKEY,
+    DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_SHIFT,
+    DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY,
+])

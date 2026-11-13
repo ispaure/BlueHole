@@ -20,11 +20,13 @@ from .selection_all_none import SELECTION_ALL_NONE_ACTIONS
 from .selection_circle import SELECTION_CIRCLE_ACTIONS
 from .selection_subtract import SELECTION_SUBTRACT_ACTIONS
 from .selection_extend import SELECTION_EXTEND_ACTIONS
+from .selection_basic import SELECTION_BASIC_ACTIONS
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ACTION GROUPS
 
 _SELECTION_ACTIONS = (
+    *SELECTION_BASIC_ACTIONS,
     *SELECTION_MORE_LESS_ACTIONS,
     *SELECTION_ALL_NONE_ACTIONS,
     *SELECTION_CIRCLE_ACTIONS,

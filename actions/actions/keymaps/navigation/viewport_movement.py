@@ -350,3 +350,35 @@ def get_navigation_viewport_movement_actions() -> list[OperatorAction]:
     Return all declared Blue Hole navigation viewport operator actions.
     """
     return NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS
+
+
+# Exact ordinary Deluxe rows; source order reverses the merged reference order.
+# 79811b1035a4078080a23ea2c1eb6ef38496afdb30c30ca0b9eae2e2e54368f5
+DELUXE_3D_VIEW_WALK_BUTTON5MOUSE_PRESS_ANY = OperatorAction(
+    operator='view3d.walk', text='3D View', props={},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='3D View', space_type='VIEW_3D',
+        key='BUTTON5MOUSE'),),
+)
+
+# 1404ab1c6c160db6f75f516f8724fe0b0119eda3555a7bc2a43180c87a06aea2
+DELUXE_3D_VIEW_WALK_BUTTON4MOUSE_PRESS_ANY = OperatorAction(
+    operator='view3d.walk', text='3D View', props={},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='3D View', space_type='VIEW_3D',
+        key='BUTTON4MOUSE'),),
+)
+
+# 35e3bd7fab0c37c5c067d33bf943cb327fa9ea3b458e33d2ddf9a072e51a38cd
+DELUXE_IMAGE_GENERIC_VIEW_PAN_MIDDLEMOUSE_PRESS_ANY = OperatorAction(
+    operator='image.view_pan', text='Image Generic', props={},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='Image Generic', space_type='IMAGE_EDITOR',
+        key='MIDDLEMOUSE'),),
+)
+
+NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS.extend([
+    DELUXE_3D_VIEW_WALK_BUTTON5MOUSE_PRESS_ANY,
+    DELUXE_3D_VIEW_WALK_BUTTON4MOUSE_PRESS_ANY,
+    DELUXE_IMAGE_GENERIC_VIEW_PAN_MIDDLEMOUSE_PRESS_ANY,
+])

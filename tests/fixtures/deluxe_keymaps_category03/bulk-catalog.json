@@ -1,0 +1,723 @@
+{
+  "schema_version": 1,
+  "policy": "Restore exact ordinary catalog rows without per-row native acceptance; retain concrete exceptions and prior evidence. Combined 03\u201305 smoke deferred to coordinator.",
+  "baseline": "deluxe-baseline-2026-11-12-v1",
+  "prior_native_accepted": 38,
+  "transferred_to_04": 8,
+  "ordinary_declarations": [
+    {
+      "row_id": "1498e141d9619244e98c6eaae90422084cc4c9f90c27406fa4f33c1b936e729b",
+      "path": "actions/actions/keymaps/navigation/viewport_movement.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        46,
+        55
+      ]
+    },
+    {
+      "row_id": "291b254de1dbbd4fa32d997de0e25aa91eea9e2306902ea8e09ef3ca3580c549",
+      "path": "actions/actions/keymaps/navigation/viewport_movement.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        46,
+        54
+      ]
+    },
+    {
+      "row_id": "318ab4227e9699b1b4279142e4c99a612fec5ebf27e2f6a663adb07e6c88a02d",
+      "path": "actions/actions/keymaps/transform/transform_tools_gizmo.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        166,
+        43
+      ]
+    },
+    {
+      "row_id": "75c4bbefab8e3cc7a898801350b900eae9aceea836329b236df37a0c14952850",
+      "path": "actions/actions/keymaps/selection/selection_tool_switch.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        166,
+        42
+      ]
+    },
+    {
+      "row_id": "a15ff41f58e3a58fe77ab5d970e06f238a62dbb08e41283277d47c86e2c3a489",
+      "path": "actions/actions/keymaps/selection/selection_tool_switch.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        27,
+        52
+      ]
+    },
+    {
+      "row_id": "ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        147,
+        306
+      ]
+    },
+    {
+      "row_id": "ba40873fbf25c357c6c711911eaa483711dba3a101390e753d9e7d2eabcce1a6",
+      "path": "actions/actions/keymaps/transform/transform_tools_gizmo.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        166,
+        44
+      ]
+    },
+    {
+      "row_id": "c668cd6405ddd1e2b7c17a066eeea197ea8063eac81bc238742430ad3a8eb973",
+      "path": "actions/actions/keymaps/selection/selection_more_less.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        46,
+        134
+      ]
+    },
+    {
+      "row_id": "ff57544c10325e3984fef99805970ba7d3fa9d4bc93e6aa1e388e7f21b22e749",
+      "path": "actions/actions/keymaps/transform/transform_tools_gizmo.py",
+      "status": "existing-declaration",
+      "reference_order": [
+        166,
+        45
+      ]
+    },
+    {
+      "row_id": "64793560d160e29318d58c922bcb7cc1c4c952d758dffff9a992100420e70aae",
+      "path": "actions/actions/keymaps/selection/selection_all_none.py",
+      "symbol": "DELUXE_IMAGE_PAINT_SELECT_ALL_A_PRESS_ANY_ALT",
+      "group": "all_none",
+      "status": "added-declaration",
+      "reference_order": [
+        27,
+        53
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "2da275dfdea64e1af816040ce670cc617972adff6d71209a08deb648aa0f9386",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_3D_VIEW_TRANSLATE_MIDDLEMOUSE_PRESS_ANY_SHIFTCTRL",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        46,
+        120
+      ],
+      "property_source": "preset properties; merged reference activates the row"
+    },
+    {
+      "row_id": "653400cbc0a3037540a2a42b8f1ffdb90f62ad2c8155bf0bedafda0ffb86ed20",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_UV_CURSOR_TRANSLATE_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        51,
+        3
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "89cb7f518397c9ec8d21dddbc23755ab4b9a08e57064b70b853537c726ec3ee0",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_ARMATURE_ROLL_TRANSFORM_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        59,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "e282d1da12fee44a1c6e0f0b9bd9d3780e406aeebc48132c53a9aa2271b2e307",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_ARMATURE_BONE_SIZE_TRANSFORM_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        60,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "d4d197feac7d4ae1e9048a60e7b762e02e21bd57f61c873fd8401b6beda437b5",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_ARMATURE_BONE_ENVELOPE_BBONE_RESIZE_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        61,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "bcae02cd13d1e011539c5d8dbdb29bf943eb66f8c2fc7789a493d317f55fa589",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_MESH_RANDOMIZE_VERTEX_RANDOM_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        78,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "4ad6a1a938b0cf3b49f37d25f11cf2e4c4ad56f31c7f1882a5b5c642d90c624d",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_MESH_EDGE_SLIDE_EDGE_SLIDE_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        79,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "85a2956c0e0c91c3b8e855f46e6a482d14473619ba732632f58ef27b2b4e53f7",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_MESH_VERTEX_SLIDE_VERT_SLIDE_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        80,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "f957e81133575b0b522168c54f283c11ce51f67c0198e9cdc13a01633ea0023f",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_MESH_SHRINK_FATTEN_SHRINK_FATTEN_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        81,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "0b3b17fdcef721534f7b102fd7d77e15e574080eda30999affa7d8af661ac929",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_MESH_PUSH_PULL_PUSH_PULL_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        82,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "bb82015ee5df69300ab84e2cc780f7e4265dc768586571ce0091bd6ebf382806",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_MESH_TO_SPHERE_TOSPHERE_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        83,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "579a61643a511284f84f4524b20e68fc53814c4f4c95dbb21bd108a2089690d3",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_CURVE_RADIUS_TRANSFORM_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        90,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "a923a65228974defa24e62f1dd309499b690215cf898aebdb5679a8ccb6a388b",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_CURVE_TILT_TILT_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        91,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "2a27ddc3e73f8afe2399cbc08bad0a8408803fc0818169bb9a23f27afac22783",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_EDIT_CURVE_RANDOMIZE_VERTEX_RANDOM_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        92,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "577f32f9ae4962d85fbd32829eec7b7908a681ad80488896451b2a48ab705b70",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_UV_MOVE_TRANSLATE_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        205,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "c8a157e968c2607ba0cd2cb4a2282753fd6214c6b6930ed5091294ac08eb1b6c",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_UV_ROTATE_ROTATE_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        206,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "70940e43122d3439e725435a71d452868374be484e3d4db437f5a55d322613d8",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_UV_SCALE_RESIZE_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        207,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "ab3b061abbe012204066c8bcbd2afbc7d174b58fefe67e141f5fa9edde8c7dec",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_TWEAK_FALLBACK_TRANSLATE_LEFTMOUSE_CLICK_DRAG_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        219,
+        1
+      ],
+      "property_source": "merged reference changes only stock release_confirm"
+    },
+    {
+      "row_id": "a4c80c54d92171e6b4b488d4258342c1a8c12eeb20e6059d4449cdbbe915c8b7",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_MOVE_TRANSLATE_LEFTMOUSE_CLICK_DRAG_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        227,
+        0
+      ],
+      "property_source": "merged reference changes only stock release_confirm"
+    },
+    {
+      "row_id": "fd6e0ab6011eb8dd92255819fc80d0d36caacfacadee35caabc03d8778a03ee4",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_ROTATE_ROTATE_LEFTMOUSE_CLICK_DRAG_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        228,
+        0
+      ],
+      "property_source": "merged reference changes only stock release_confirm"
+    },
+    {
+      "row_id": "3edd30f9cef4a7830f5777df1e5a44531013979666e863323bce96ea1fe09ca8",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_SCALE_RESIZE_LEFTMOUSE_CLICK_DRAG_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        229,
+        0
+      ],
+      "property_source": "merged reference changes only stock release_confirm"
+    },
+    {
+      "row_id": "ddc19ef6688d562af64ea4ec6fb9601a124ec28047493c892bbbfbc32aa8d217",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_SHEAR_SHEAR_MIDDLEMOUSE_PRESS_ANY",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        230,
+        5
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "97098068e63f25cdc5a79f13d2ac15994d2852e42867f7a21024572271d2b4f4",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_SHEAR_SHEAR_MIDDLEMOUSE_CLICK_DRAG_SOUTH",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        230,
+        4
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "0708447fb1e254a30e01393ad0de5e9465ef39a0c915d9c1d16f4a2ac3556059",
+      "path": "actions/actions/keymaps/transform/transform_tools_modal.py",
+      "symbol": "DELUXE_SHEAR_SHEAR_MIDDLEMOUSE_CLICK_DRAG_NORTH",
+      "group": "transform",
+      "status": "added-declaration",
+      "reference_order": [
+        230,
+        3
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "ac5981ba17b4e3a48dc23fa51cdbc6e401b4ff10561f28af79feca5deece4567",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_WEIGHT_PAINT_SELECT_LEFTMOUSE_PRESS_ANY_CTRL",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        21,
+        16
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "49b3885cf9a2e5349064008da0b14aed1868a09241c5a98a4f2ba6fee97dd83a",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_WEIGHT_PAINT_SELECT_LEFTMOUSE_PRESS_ANY_OSKEY",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        21,
+        15
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "d7fc62a0a019529f9554ca26539348dca401f4cc598926cb05a76e05fec27068",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_UV_TWEAK_SELECT_LEFTMOUSE_PRESS_ANY",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        47,
+        0
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "30a77ec81c2e833653a17f00083c6ca759afc3dbde6897b1a1f5b35d47a6aece",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_UV_TWEAK_FALLBACK_SELECT_LEFTMOUSE_PRESS_ANY",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        201,
+        2
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "a93f6fc5872027b0dc80be1747bf599d6013febf8c8ef3c5e9aa29642c5d4d98",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_UV_SELECT_BOX_FALLBACK_SELECT_BOX_RIGHTMOUSE_CLICK_DRAG_ANY_CTRL",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        202,
+        3
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "d8be63c7eb0147a512889f23d423a58562752ba8516730f7fdb11409f794e0c8",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_UV_SELECT_BOX_FALLBACK_SELECT_BOX_RIGHTMOUSE_CLICK_DRAG_ANY_OSKEY",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        202,
+        2
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "1849aa1a60ed68999ae073d9f74cd6ebec307c35c8e8012a84810ee737b978ff",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_UV_SELECT_BOX_FALLBACK_SELECT_BOX_RIGHTMOUSE_CLICK_DRAG_ANY_SHIFT",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        202,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "0977fa3b1bec3fa3cc36a746422d0e63cdddc8600b40bce2b7a624fc2dcfd763",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_UV_SELECT_BOX_FALLBACK_SELECT_BOX_RIGHTMOUSE_CLICK_DRAG_ANY",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        202,
+        0
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "725039f48e3f530d2754e960958a47323fbeebbbcc63fcbe458d072ad2332805",
+      "path": "actions/actions/keymaps/selection/selection_basic.py",
+      "symbol": "DELUXE_TWEAK_SELECT_LEFTMOUSE_PRESS_ANY",
+      "group": "basic",
+      "status": "added-declaration",
+      "reference_order": [
+        218,
+        0
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "92a7039705de2b45a0588e10374abc4e0f035051c795ea9c103791f905ef0c5d",
+      "path": "actions/actions/keymaps/selection/selection_circle.py",
+      "symbol": "DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_CTRL",
+      "group": "circle",
+      "status": "added-declaration",
+      "reference_order": [
+        203,
+        3
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "dc1f8f23cd102dcfe2bc4fe2f6b8c0aa13881c75cb947cce60e75d5b24e6edc1",
+      "path": "actions/actions/keymaps/selection/selection_circle.py",
+      "symbol": "DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_OSKEY",
+      "group": "circle",
+      "status": "added-declaration",
+      "reference_order": [
+        203,
+        2
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "e0a16ccd3f8f3ddbc61c3da5aa90aecac16e1300a4eb7b43d4b022d762e52939",
+      "path": "actions/actions/keymaps/selection/selection_circle.py",
+      "symbol": "DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_SHIFT",
+      "group": "circle",
+      "status": "added-declaration",
+      "reference_order": [
+        203,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "2ed8a85dcb09992dc6546c894b6f704f5882c2183cb4d1c96ac1a665ba3c6dbc",
+      "path": "actions/actions/keymaps/selection/selection_circle.py",
+      "symbol": "DELUXE_UV_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY",
+      "group": "circle",
+      "status": "added-declaration",
+      "reference_order": [
+        203,
+        0
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "a7abdb0f1a76a33e484bc02febb2b5cb9a4bf9502e1a5a0a1c1ed2ee736e22c1",
+      "path": "actions/actions/keymaps/selection/selection_circle.py",
+      "symbol": "DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_CTRL",
+      "group": "circle",
+      "status": "added-declaration",
+      "reference_order": [
+        223,
+        3
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "7fc3ba226f32b930e4353fe72a7969cb36cd337d65892409fe36d2df9efad4f5",
+      "path": "actions/actions/keymaps/selection/selection_circle.py",
+      "symbol": "DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_OSKEY",
+      "group": "circle",
+      "status": "added-declaration",
+      "reference_order": [
+        223,
+        2
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "ec35cef734a1d37ca52f86c49d84a2926f2edf50f31a11afdc35f4c1bd656082",
+      "path": "actions/actions/keymaps/selection/selection_circle.py",
+      "symbol": "DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY_SHIFT",
+      "group": "circle",
+      "status": "added-declaration",
+      "reference_order": [
+        223,
+        1
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "44692afb55e6f42196d8f7d04c6395271b307cd4aac003b0a4675e3a30c98037",
+      "path": "actions/actions/keymaps/selection/selection_circle.py",
+      "symbol": "DELUXE_SELECT_CIRCLE_FALLBACK_SELECT_CIRCLE_RIGHTMOUSE_CLICK_DRAG_ANY",
+      "group": "circle",
+      "status": "added-declaration",
+      "reference_order": [
+        223,
+        0
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "79811b1035a4078080a23ea2c1eb6ef38496afdb30c30ca0b9eae2e2e54368f5",
+      "path": "actions/actions/keymaps/navigation/viewport_movement.py",
+      "symbol": "DELUXE_3D_VIEW_WALK_BUTTON5MOUSE_PRESS_ANY",
+      "group": "navigation",
+      "status": "added-declaration",
+      "reference_order": [
+        46,
+        142
+      ],
+      "property_source": "merged reference user-added operator with default properties"
+    },
+    {
+      "row_id": "1404ab1c6c160db6f75f516f8724fe0b0119eda3555a7bc2a43180c87a06aea2",
+      "path": "actions/actions/keymaps/navigation/viewport_movement.py",
+      "symbol": "DELUXE_3D_VIEW_WALK_BUTTON4MOUSE_PRESS_ANY",
+      "group": "navigation",
+      "status": "added-declaration",
+      "reference_order": [
+        46,
+        133
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    },
+    {
+      "row_id": "35e3bd7fab0c37c5c067d33bf943cb327fa9ea3b458e33d2ddf9a072e51a38cd",
+      "path": "actions/actions/keymaps/navigation/viewport_movement.py",
+      "symbol": "DELUXE_IMAGE_GENERIC_VIEW_PAN_MIDDLEMOUSE_PRESS_ANY",
+      "group": "navigation",
+      "status": "added-declaration",
+      "reference_order": [
+        165,
+        11
+      ],
+      "property_source": "merged reference user-added operator with default properties"
+    },
+    {
+      "row_id": "bb1eb3f8dd9726854e0a572adfcd9b762c8eaed94fee78ab96fd5e996fbdc06e",
+      "path": "actions/actions/keymaps/selection/selection_tool_switch.py",
+      "symbol": "DELUXE_3D_VIEW_GENERIC_TOOL_SET_BY_ID_BUTTON4MOUSE_CLICK_ANY",
+      "group": "tool_switch",
+      "status": "added-declaration",
+      "reference_order": [
+        16,
+        16
+      ],
+      "property_source": "preset explicit properties; merged reference activation/order"
+    }
+  ],
+  "ordinary_exceptions": [
+    {
+      "row_id": "db66d17a9af566c8cbe574022a8be9da2b9c82397876f6fc0c8a69b5d6ed1c7e",
+      "reason": "UV Shift-press selection pass-through conflict"
+    },
+    {
+      "row_id": "e1c7c89e3738f8a7ec537e2adc7f5f5a283a537bc2776edb4fa9476745994f6a",
+      "reason": "UV Shift-press selection pass-through conflict"
+    },
+    {
+      "row_id": "8841a3ec92f013414a5605b56569fc265b5b1743077e10e3bf47654eb4c1fd15",
+      "reason": "MMB press competes with click/drag navigation"
+    },
+    {
+      "row_id": "b6416d727eed141c0a7c9f3cad583323ba3fa836ac7f12d5d29cf4dd30b07434",
+      "reason": "MMB press competes with click/drag navigation"
+    },
+    {
+      "row_id": "3a7e459ee43234e3c2adc4a6a0d265f0d68f2ff9a6daa9346f773588ac71e21a",
+      "reason": "Same NDOF event has contradictory active directions"
+    },
+    {
+      "row_id": "b5f52a1311f1967f17b2980ad0898f797ff7de72ff783086d0afcb128857d2e6",
+      "reason": "Same NDOF event has contradictory active directions"
+    }
+  ],
+  "modal_exception_count": 33,
+  "new_declaration_count": 46,
+  "declaration_count": 55,
+  "notes": [
+    "These 55 rows were previously behaviorally unresolved. Declaration coverage does not add native acceptance.",
+    "The seven merged-only rows use captured user overrides, including active=True and release_confirm=False.",
+    "Unknown is_tool metadata stays unset. No runtime or vendor changes.",
+    "New rows are in reverse per-map reference order for the existing Blender add-on merge. Existing group precedence is retained; cross-group dispatch remains covered only by prior native evidence."
+  ],
+  "modal_exception_row_ids": [
+    "0dd61953921be43e14f44d6a11e254d3ab97f195b2d4e3378ce25db5c9ea95b2",
+    "14a31b19fd09640a9209a90636a42d9675a810350b2080ec472e8b32c72836a5",
+    "1e704a50639bc2d19c9fbf9b200b35bc00759dfe33f1eb0579decbfb24d8e3e4",
+    "20d7bf1d2d0b1dadae14f5b18ec65175589236237ba14e23c7894dfa1ce2c27d",
+    "299e9dbeb54d018fa47270d4aef02ecc9143a6bc0882df7d3dc0c836fa2df822",
+    "2e3b9f70bb813c07ca32f12aeb3996b11f104ed2f938b22d0daa76d74ae79345",
+    "339fa01d7324a65bd144ff0eb8988f4f57447621684c50ac4ea5b49fc56cd0f0",
+    "3bef36cea8604aaeee91c5d61b911d497cd7faed987c31dd58a76997fae004bc",
+    "3c979867919b86d817b71a9d4a1b4f85645c2ac8ca4528618571c73406d069da",
+    "4c8bd9be79cb5b1dad5793d5886cb919d93504719841f770ab259108b400049a",
+    "4d21e6e2e18a0bc8d281539354ab03cf32a81da2f714c8fadc046c9d5dc61de2",
+    "592bfc1a60466c66870db0a4a86335b3ca4a47cae4ae00c7bbd26595c55ec699",
+    "5efb4fbe97ae1ba2d72d7100772ff25bdab64134fe3e1997369d7c14a53ab225",
+    "6297b7666080a185e6d7df88a0f4eabb539009fe2ab34ca31441432852d5b720",
+    "686f31c91b7c01423bac4381acb93d0525e547ac15bbef38aa5db5fbcf6a8acb",
+    "693cf9609db8dbe4e8d5d756094366220332d448646665dd4cb5d048a65ec5cc",
+    "73627845d3085f1762493dc37cf61ab4aae4bfa0d44b431eaaf9a0421f5a9631",
+    "946db78d5ea07f60f2101249c00af64f02cb3f82b234d9e397e2e5c216bd41bf",
+    "95d1e4739cb33e21cb88513fd041e4a20cd56a06dd022e945218fb4d65af778e",
+    "990062557c70a56323568236c540b59b3c54d09e4cbb86ed742fa187b21d2b9e",
+    "9fad693a3ea8bcf1557c567c0c28d1021016e6ddcd510288ac80e686fb673dff",
+    "9fcc1d29aac0afe7a5bdb36e12dff75d7abef2cd33593e3877761f3845d18dc2",
+    "b2d8af5989f0b2d840d431a7afa30fdde278883c42a0a8b041cfa6bbeba9c755",
+    "b521d79403beb643e3ecdbd46345ffabae85c295ca3b64dc37937c5d9f1bd737",
+    "bb2613d269188c3bf2a2c4bf69f9aa03d2a68c527bcf624cc7c96efdd80b90d1",
+    "c3c514d82d0263bc7f5263280a379e47fa19223b0916b9cc55820289d8e2211b",
+    "cb1fdb6adc6598d7b82f5a2d948d49fd7880bbf5b5e0f8ce484450983d21322f",
+    "db08ec9a4bff77e724949c2adf822949d1d51941710b9cdb61ae697387038b9a",
+    "dbc22e3ad559b5ea7ddc81028fe4b6bbcb386a42e2028c9a1378353ef9570d29",
+    "e994b34922aa9a6f7705e9719b93f959f7e5846ef6cfea3c8890ba3fcbe3157d",
+    "eedd3962c36abb85f3bb5d1aa87f05b3ca3b09caaea352d25e05fafb445853cf",
+    "f26495539a29d87f909bfb0dad18d898f63d151a86bfed2abbe6e728c03f93dc",
+    "f5f8266fe85016f42c11bc4a803121eddc5b67921e573b076b223e96e65897e3"
+  ],
+  "modal_exception_reason": "Native modal token maps require the shared runtime capability; ordinary OperatorAction cannot express them. Existing modal alias persistence failure remains unresolved.",
+  "current_source_sha256": {
+    "actions/actions/keymaps/navigation/viewport_movement.py": "8209d0bccf32df5ac0c4fa5f9bb156dcb79b9fb67d61c59ad73e388da07149d9",
+    "actions/actions/keymaps/selection/selection_all_none.py": "9c046bfbf1028f5d296c6635aad02558a5473e9ed7a70f98e777e51922128b4b",
+    "actions/actions/keymaps/selection/selection_basic.py": "ab6838e2c8bdae240109dcf1138e0608a69d9081dad506ab070806d6c04f5665",
+    "actions/actions/keymaps/selection/selection_circle.py": "3a31f4e51944d7d54f6035c253d678b8e10dc7e92d7a7d4b1093c093c18834f7",
+    "actions/actions/keymaps/selection/selection_more_less.py": "6243684d09b82e8cedc02f4ce3635e1f3df0af214af7c2ed2a90588196c44b5f",
+    "actions/actions/keymaps/selection/selection_tool_switch.py": "e4f14e038a944e561e225ffc6c3d17cac47d1d0f93f8de2c7a7201fbe13a4d7c",
+    "actions/actions/keymaps/transform/transform_tools_gizmo.py": "9fdc0215edfa462e9e1034dc8a41067adf2bd8c4210738b834fdf0d6a6061d83",
+    "actions/actions/keymaps/transform/transform_tools_modal.py": "c13f29894626f0534bfd9eaba33cf208798a4ea9070e0e8ec4fa819b1b3466e8"
+  }
+}

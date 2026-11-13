@@ -44,3 +44,17 @@ SELECTION_ALL_NONE_ACTIONS: list[OperatorAction] = [
 def get_selection_all_none_actions() -> list[OperatorAction]:
     """Return all declared Selection All / None actions."""
     return SELECTION_ALL_NONE_ACTIONS
+
+
+# Exact ordinary Deluxe rows; source order reverses the merged reference order.
+# 64793560d160e29318d58c922bcb7cc1c4c952d758dffff9a992100420e70aae
+DELUXE_IMAGE_PAINT_SELECT_ALL_A_PRESS_ANY_ALT = OperatorAction(
+    operator='uv.select_all', text='Image Paint', props={'action': 'INVERT'},
+    keymap_bindings=(KeymapBinding(
+        keymap_name='Image Paint', space_type='EMPTY',
+        key='A', alt=True, repeat=True),),
+)
+
+SELECTION_ALL_NONE_ACTIONS.extend([
+    DELUXE_IMAGE_PAINT_SELECT_ALL_A_PRESS_ANY_ALT,
+])

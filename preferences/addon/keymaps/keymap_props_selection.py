@@ -26,6 +26,7 @@ from ....actions.actions.keymaps.selection.selection_all_none import get_selecti
 from ....actions.actions.keymaps.selection.selection_circle import get_selection_circle_actions
 from ....actions.actions.keymaps.selection.selection_subtract import get_selection_subtract_actions
 from ....actions.actions.keymaps.selection.selection_extend import get_selection_extend_actions
+from ....actions.actions.keymaps.selection.selection_basic import get_selection_basic_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -43,6 +44,13 @@ def _update_keymaps(self, context):
 
 
 class SelectionKeymapPG(bpy.types.PropertyGroup):
+
+    enable_selection_basic: BoolProperty(
+        name='Enable Click / Box Selection',
+        description='Enable click selection and box selection tool shortcuts',
+        default=True,
+        update=_update_keymaps
+    )
 
     enable_selection_keymaps: BoolProperty(
         name='Enable Selection Keymaps',
@@ -66,8 +74,8 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
     )
 
     enable_selection_all_none: BoolProperty(
-        name='Enable Select All / None',
-        description='Enable shortcuts to select or deselect all UVs',
+        name='Enable Select All / None / Invert',
+        description='Enable shortcuts to select, deselect, or invert selection',
         default=True,
         update=_update_keymaps
     )
@@ -97,9 +105,10 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
         name='Selection Keymap Tab',
         description='Active selection keymap feature tab',
         items=[
+            ('BASIC', 'Click / Box', ''),
             ('MORE_LESS', 'Select Less / More', ''),
             ('TOOL_SWITCH', 'Tool Switch', ''),
-            ('ALL_NONE', 'Select All / None', ''),
+            ('ALL_NONE', 'All / None / Invert', ''),
             ('CIRCLE', 'Circle Selection', ''),
             ('SUBTRACT', 'Subtract Selection', ''),
             ('EXTEND', 'Extend Selection', ''),
@@ -125,7 +134,15 @@ def draw(preference, context, layout):
     row = column_selection.row()
     row.prop(preference.keymap.selection, 'active_selection_keymap_tab', expand=True)
 
-    if preference.keymap.selection.active_selection_keymap_tab == 'MORE_LESS':
+    if preference.keymap.selection.active_selection_keymap_tab == 'BASIC':
+        draw_action_feature_keymaps(
+            column=column_selection,
+            feature_owner=preference.keymap.selection,
+            feature_prop_name='enable_selection_basic',
+            actions=get_selection_basic_actions(),
+        )
+
+    elif preference.keymap.selection.active_selection_keymap_tab == 'MORE_LESS':
         draw_action_feature_keymaps(
             column=column_selection,
             feature_owner=preference.keymap.selection,
