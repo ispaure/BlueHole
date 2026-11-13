@@ -439,8 +439,9 @@ class ObjectSubtractCases(HandlerCases):
 
     LEDGER_ID = '8674bcb4d856346f287980fd961ade31095f1165d1f6e25725e4c06b81f582f3'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, initial_selected=True, case_label=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.initial_selected = initial_selected
         self.scope_names.update(('Window', 'Screen', 'Frames', 'View2D'))
         self.binding = BINDINGS[self.LEDGER_ID]
         self.allocations = []
@@ -448,8 +449,8 @@ class ObjectSubtractCases(HandlerCases):
         self.control_class = None
         self.input_callbacks = []
         self.initial_maps = None
-        self.result = {'case': 'focused_ctrl_click_object_subtract',
-                       'ledger_id': self.LEDGER_ID, 'phases': []}
+        self.result = {'case': case_label or 'focused_ctrl_click_object_subtract',
+                       'ledger_id': self.LEDGER_ID, 'initial_selected': initial_selected, 'phases': []}
 
     def maps(self):
         return {role: [self.capture(km) for km in getattr(self.configs, role).keymaps
@@ -478,10 +479,11 @@ class ObjectSubtractCases(HandlerCases):
     def start(self):
         self.configs.update()
         self.initial_maps = self.maps()
-        self.receipt['subtract_proof'] = {
+        self.proof = {
             'ledger_ids': [self.LEDGER_ID], 'production_capability_enabled': False,
             'probe': self.probe, 'maps_before_without_control': self.initial_maps,
         }
+        self.receipt['subtract_proof'] = self.proof
         self.receipt['dispatch'].append(self.result)
         if self.probe:
             event = {name: self.binding['event'][name] for name in
@@ -514,7 +516,7 @@ class ObjectSubtractCases(HandlerCases):
                                   ('target', 'event', 'active', 'properties', 'read_issues'))
                                for km in maps if km['scope'] == self.binding['scope']
                                for row in km['items'])
-        self.receipt['subtract_proof']['exact_candidate_counts'] = counts
+        self.proof['exact_candidate_counts'] = counts
         self.record('focused_subtract_ready')
         if self.probe:
             assert counts['addon'] == counts['user'] == 1, 'Exact probe admission failed'
@@ -530,7 +532,7 @@ class ObjectSubtractCases(HandlerCases):
         return value
 
     def prepare(self):
-        self.setup('object', subtract=True)
+        self.setup('object', subtract=self.initial_selected)
         with self.context():
             self.bpy.context.view_layer.update()
         self.result['target_object'] = self.values['object_name']
@@ -554,7 +556,7 @@ class ObjectSubtractCases(HandlerCases):
                                          'delivered': expected in self.input_callbacks}
         assert self.result['input_delivery']['delivered']
         before = self.snapshot('before_press')
-        assert before['target_visible'] and before['target_selected']
+        assert before['target_visible'] and before['target_selected'] == self.initial_selected
         assert before['mode'] == 'OBJECT' and not before['modal_operators']
         self.result['native_candidates'] = self.maps()
 
@@ -564,7 +566,8 @@ class ObjectSubtractCases(HandlerCases):
 
     def reset_direct_control(self):
         after = self.snapshot('after_release')
-        self.result['native_subtraction_observed'] = not after['target_selected']
+        self.result['native_target_unselected'] = not after['target_selected']
+        self.result['native_subtraction_observed'] = self.initial_selected and not after['target_selected']
         assert not after['modal_operators'], 'Unexpected modal after Ctrl-click'
         with self.context():
             obj = self.bpy.data.objects[self.values['object_name']]
@@ -617,7 +620,7 @@ class ObjectSubtractCases(HandlerCases):
             self.control_class = None
         self.configs.update()
         after = self.maps()
-        proof = self.receipt['subtract_proof']
+        proof = self.proof
         proof.update(maps_after_without_control=after, cleanup_errors=errors,
                      exact_source_and_merged_preservation=after == self.initial_maps)
         self.record('focused_subtract_cleanup')
@@ -629,4 +632,147 @@ class ObjectSubtractCases(HandlerCases):
                            lambda: self.event('LEFTMOUSE', ctrl=True), self.release_input,
                            self.reset_direct_control, self.direct_control,
                            self.verify_direct_control, self.cleanup))
+        return self
+
+
+class ObjectSubtractProductionCases:
+    """Actual ordinary group, with matched stock/on/off selected-state trials."""
+
+    def __init__(self, steps, receipt, record, window, area, exporter, runtime, production):
+        self.steps, self.receipt, self.record = steps, receipt, record
+        self.arguments = (steps, receipt, record, window, area, exporter)
+        self.inspector = ObjectSubtractCases(*self.arguments)
+        self.runtime, self.production = runtime, production
+        self.configs = self.inspector.configs
+        self.fixtures = []
+        self.baseline = None
+        self.enabled = False
+        self.closed = False
+        self.proof = {'test_only_driver': True, 'direct_candidate_injection': False,
+                      'installs': [], 'releases': [], 'trials': [],
+                      'scope': 'Actual Selection group; native effects scoped to Object mode'}
+        receipt['subtract_production'] = self.proof
+
+    def start(self):
+        self.configs.update()
+        self.baseline = self.inspector.maps()
+        self.baseline_owners = self.production['source_provenance'](self.baseline)
+        self.baseline_preferences = self.production['other_preferences']()
+        self.proof.update(baseline_maps=self.baseline, baseline_owned_generations=self.baseline_owners,
+                          other_preferences=self.baseline_preferences)
+        self.record('subtract_production_ready')
+
+    def candidate_count(self, role):
+        binding = self.inspector.binding
+        return sum(all(row[field] == binding[field] for field in
+                       ('target', 'event', 'active', 'properties', 'read_issues'))
+                   for km in self.inspector.maps()[role] if km['scope'] == binding['scope']
+                   for row in km['items'])
+
+    def toggle(self, enabled):
+        self.production['toggle'](enabled)
+        self.enabled = enabled
+        assert self.production['other_preferences']() == self.baseline_preferences
+        rt = self.runtime
+        pairs = self.production['registered_pairs']()
+        matches = []
+        for owner_id, handle in rt._FEATURES.items():
+            if not owner_id.startswith('legacy:Selection:'):
+                continue
+            for request_id, owned in handle._owned.items():
+                if owned.item.idname != 'view3d.select':
+                    continue
+                source = self.inspector.capture(owned.map)
+                row = next(row for row in source['items'] if row['blender_id'] == owned.item.id)
+                if not all(row[field] == self.inspector.binding[field] for field in
+                           ('target', 'event', 'active', 'properties', 'read_issues')):
+                    continue
+                assert rt._valid_owned(owned)
+                assert source['scope'] == self.inspector.binding['scope']
+                assert sum(rt._same(km, owned.map) and rt._same(item, owned.item)
+                           for km, item in pairs) == 1
+                matches.append({'owner_id': owner_id, 'request_id': request_id,
+                                'source_row': row, 'runtime_owned_valid': True,
+                                'registered_pair_matches': 1})
+        assert len(matches) == int(enabled)
+        assert self.candidate_count('addon') == self.candidate_count('user') == int(enabled)
+        if enabled:
+            if self.proof['installs']:
+                assert matches[0]['owner_id'] == self.proof['installs'][0]['owner_id']
+            self.proof['installs'].extend(matches)
+            self.record('subtract_production_enabled')
+        else:
+            self.preservation('subtract_production_disabled')
+
+    def preservation(self, label):
+        self.configs.update()
+        current = self.inspector.maps()
+        roles = ('default', 'active', 'addon')
+        owners = self.production['source_provenance'](current)
+        comparison = self.production['compare_sources'](
+            {role: self.baseline[role] for role in roles},
+            {role: current[role] for role in roles}, self.baseline_owners, owners)
+        proof = {'label': label, 'maps': current, 'source_comparison': comparison,
+                 'owned_source_generations': owners,
+                 'strict_foreign_merged_equal': current['user'] == self.baseline['user']}
+        proof['accepted_preservation'] = (comparison['accepted_sources_equal']
+                                           and proof['strict_foreign_merged_equal'])
+        self.proof['releases'].append(proof)
+        self.record(label)
+        assert proof['accepted_preservation']
+
+    def trial(self, stage, enabled, selected):
+        label = 'production_subtract_' + stage + ('_selected' if selected else '_unselected')
+        fixture = ObjectSubtractCases(*self.arguments, initial_selected=selected, case_label=label)
+        self.fixtures.append(fixture)
+        fixture.append()
+
+        def check():
+            self.assert_trial_effect(fixture.result, selected, enabled)
+            assert fixture.proof['exact_source_and_merged_preservation']
+            assert fixture.proof['exact_candidate_counts']['addon'] == int(enabled)
+            assert fixture.proof['exact_candidate_counts']['user'] == int(enabled)
+            self.proof['trials'].append({'case': label, 'group_enabled': enabled,
+                                        'initial_selected': selected, 'result': fixture.result,
+                                        'preservation': fixture.proof})
+            self.record(label + '_verified')
+
+        self.steps.append(check)
+
+    @staticmethod
+    def assert_trial_effect(result, initial_selected, enabled):
+        phases = {phase['phase']: phase['snapshot'] for phase in result['phases']}
+        assert phases['before_press']['target_selected'] == initial_selected
+        assert result['direct_control']['positive_subtraction']
+        if enabled:
+            assert not phases['after_release']['target_selected'], 'Production must only deselect'
+
+    def cleanup(self):
+        if self.closed:
+            return
+        errors = []
+        for fixture in self.fixtures:
+            try:
+                fixture.cleanup()
+            except Exception as exc:
+                errors.append(type(exc).__name__ + ': ' + str(exc))
+        try:
+            if self.baseline is not None:
+                if self.enabled:
+                    self.toggle(False)
+                else:
+                    self.preservation('subtract_production_final_preservation')
+        finally:
+            self.proof['cleanup_errors'] = errors
+        assert not errors
+        self.closed = True
+
+    def append(self):
+        self.steps.append(self.start)
+        for stage, enabled in (('stock_before', False), ('enabled', True), ('stock_after', False)):
+            if stage != 'stock_before':
+                self.steps.append(lambda value=enabled: self.toggle(value))
+            for selected in (True, False):
+                self.trial(stage, enabled, selected)
+        self.steps.extend((lambda: self.toggle(True), lambda: self.toggle(False), self.cleanup))
         return self

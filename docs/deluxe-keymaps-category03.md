@@ -637,6 +637,27 @@ matched isolated scene. The earlier handler probe already had candidate items
 and lacked its direct control/isolated target, so it cannot fill that gap.
 The narrow production reservation is one ordinary editable view3d.select
 Ctrl-LEFTMOUSE/CLICK declaration under a new independent Subtract Selection group.
-An actual-production off/on/off check must measure inherited stock behavior,
-independent group toggling and exact preservation. No new production declaration,
-shared runtime capability or candidate-accounting acceptance is claimed yet.
+The approved source draft now registers that declaration through the existing
+ordinary action machinery, with its own Subtract Selection toggle and editable
+tab. Stock bindings and existing preferences remain unchanged. No shared runtime
+capability is added, and candidate accounting remains 35 implemented, eight
+transferred and 97 remaining until native production acceptance.
+
+The prepared `subtract_production` fixture runs six matched trials: selected and
+unselected targets with the group off, on, then off again. Each trial resets the
+scene, verifies input delivery at the projected target point, and independently
+resets selection before its direct positive control. Enabled trials must finish
+unselected; stock outcomes are recorded without assuming their behavior. The
+fixture checks the actual registered legacy:Selection identity and complete
+emitted binding, then performs a second install/release. No candidate is injected
+by the test. F23 controls are absent at toggle comparison endpoints. Foreign
+source and merged maps remain strict, with only the existing two live-proven
+Pipeline source generations compared separately.
+
+All 62 category tests pass. Offscreen scheduling validates six trials and 72
+fixture steps. Existing focused modes explicitly leave the new group off unless
+their fixture enables it; inspection still covers the default production catalog.
+Ordinary editable persistence reuses the accepted mechanism; this checkpoint
+does not claim a new native save/reopen run. One bounded factory production
+child is prepared and awaits exact allocation. Historical native receipts remain
+58 factory and 18 reference attempts, including the retained batch30 errors.

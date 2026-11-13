@@ -325,6 +325,23 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
 
 
 class Category03ModalProbeTests(unittest.TestCase):
+    def test_subtraction_production_rejects_selecting_an_unselected_target(self):
+        from blender_keymap_category03_handlers import ObjectSubtractProductionCases
+        for initial, final, enabled, accepted in (
+                (True, False, True, True), (False, False, True, True),
+                (False, True, True, False), (True, True, True, False),
+                (False, True, False, True), (True, False, False, True)):
+            with self.subTest(initial=initial, final=final, enabled=enabled):
+                result = {'phases': [
+                    {'phase': 'before_press', 'snapshot': {'target_selected': initial}},
+                    {'phase': 'after_release', 'snapshot': {'target_selected': final}}],
+                    'direct_control': {'positive_subtraction': True}}
+                if accepted:
+                    ObjectSubtractProductionCases.assert_trial_effect(result, initial, enabled)
+                else:
+                    with self.assertRaises(AssertionError):
+                        ObjectSubtractProductionCases.assert_trial_effect(result, initial, enabled)
+
     def test_subtraction_control_accepts_finished_passthrough_only_with_effect(self):
         from blender_keymap_category03_handlers import ObjectSubtractCases
         fixture = ObjectSubtractCases.__new__(ObjectSubtractCases)
@@ -1651,6 +1668,9 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
                                  'x': 0, 'y': 0},
             'view3d.select_circle': {'mode': 'SET', 'radius': 25, 'wait_for_input': True,
                                      'x': 0, 'y': 0},
+            'view3d.select': {'center': False, 'deselect': False, 'deselect_all': False,
+                              'enumerate': False, 'extend': False, 'location': [0, 0],
+                              'object': False, 'select_passthrough': False, 'toggle': False},
             'wm.tool_set_by_id': {
                 'as_fallback': False, 'cycle': False, 'name': '', 'space_type': 'EMPTY',
             },
@@ -1785,6 +1805,61 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.addCleanup(register.unregister)
         return register
 
+    def test_subtract_group_is_editable_independent_and_preserves_stock(self):
+        register = self.load_selection_register()
+        module = self.load('actions.actions.keymaps.selection.selection_subtract')
+        selection = self.load('actions.actions.keymaps.selection')
+        circle = self.load('actions.actions.keymaps.selection.selection_circle')
+        self.stub('.blenderUtils.operatorUtils', op_exists=lambda _idname: True)
+        ui = self.load('preferences.addon.keymaps.keymap_props_selection')
+        definitions = ui.SelectionKeymapPG.__annotations__
+        prefs = types.SimpleNamespace(**{name: definition['default']
+                                        for name, definition in definitions.items()})
+        self.assertTrue(prefs.enable_selection_subtract)
+        prefs.enable_selection_more_less = prefs.enable_selection_tool_switch = False
+        prefs.enable_selection_all_none = prefs.enable_selection_subtract = False
+        self.preferences.keymap.selection = prefs
+        self.preferences.keymap.enable_keymaps = True
+        action, = module.get_selection_subtract_actions()
+        self.assertIn(action, selection.get_all_selection_actions())
+        expected = self.ledger['8674bcb4d856346f287980fd961ade31095f1165d1f6e25725e4c06b81f582f3']['binding']
+        stock_binding = self.ledger['f33578f15e8bd108c710b0cb2dc3eaf3fe900e2011af912da8e54354433cd526']['binding']
+        stock_item = row('view3d.select', key='LEFTMOUSE', value='CLICK', ctrl=True,
+                         prop_values=stock_binding['properties'])
+        stock = self.runtime.map('default', '3D View', space='VIEW_3D')
+        stock.keymap_items.append_fixture(stock_item)
+        self.assertEqual(register.get_enabled_selection_actions(), circle.get_selection_circle_actions())
+        self.assertEqual(register.register(), 4)
+        prefs.enable_selection_subtract = True
+        self.assertEqual(register.register(), 5)
+        self.assert_registered_binding(register.registered_selection_keymaps[-1], expected)
+        self.assertEqual(dict(register.registered_selection_keymaps[-1][1].properties), expected['properties'])
+        owners = [handle for handle in self.keymap_utils._FEATURES.values()
+                  if any(request.target.idname == 'view3d.select' for request in handle.assignments)]
+        self.assertEqual(len(owners), 1)
+        self.assertTrue(owners[0].owner_id.startswith('legacy:Selection:'))
+        self.assertEqual(owners[0].assignments[0].request_id, '0:3D View:LEFTMOUSE:CLICK')
+        prefs.enable_selection_subtract = False
+        self.assertEqual(register.register(), 4)
+        self.assertEqual(register.get_enabled_selection_actions(), circle.get_selection_circle_actions())
+        prefs.enable_selection_subtract = True
+        self.assertEqual(register.register(), 5)
+        prefs.active_selection_keymap_tab = 'SUBTRACT'
+        layout = Mock()
+        ui.draw(self.preferences, self.runtime.bpy.context, layout)
+        self.draw_feature.assert_called_once_with(
+            column=layout.column.return_value, feature_owner=prefs,
+            feature_prop_name='enable_selection_subtract', actions=[action])
+        prefs.enable_selection_keymaps = False
+        self.assertEqual(register.register(), 0)
+        prefs.enable_selection_keymaps = True
+        self.assertEqual(register.register(), 5)
+        self.preferences.keymap.enable_keymaps = False
+        self.assertEqual(register.register(), 0)
+        self.assertEqual(list(stock.keymap_items), [stock_item])
+        self.assertTrue(stock_item.active)
+        self.assertEqual(dict(stock_item.properties), stock_binding['properties'])
+
     def test_q_tool_switch_changes_only_click_to_press_for_existing_wrappers(self):
         register = self.load_selection_register()
         tool_switch = self.load('actions.actions.keymaps.selection.selection_tool_switch')
@@ -1795,6 +1870,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             enable_selection_keymaps=True,
             enable_selection_all_none=False,
             enable_selection_circle=False,
+            enable_selection_subtract=False,
             enable_selection_more_less=False,
             enable_selection_tool_switch=True,
         )
@@ -1850,6 +1926,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.assertIn('ALL_NONE', {entry[0] for entry in
                                   definitions['active_selection_keymap_tab']['items']})
         selection_prefs.enable_selection_circle = False
+        selection_prefs.enable_selection_subtract = False
         self.assertEqual(register.register(), 0)
 
         actions = [getattr(all_none, symbol) for symbol in feature['actions']]
@@ -1919,6 +1996,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             enable_selection_keymaps=True,
             enable_selection_all_none=False,
             enable_selection_circle=False,
+            enable_selection_subtract=False,
             enable_selection_more_less=True,
             enable_selection_tool_switch=False,
         )
@@ -1990,6 +2068,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.assertTrue(getattr(selection_prefs, preference))
         self.assertIn('CIRCLE', {entry[0] for entry in
                                 definitions['active_selection_keymap_tab']['items']})
+        selection_prefs.enable_selection_subtract = False
         self.assertEqual(register.register(), 0)
 
         actions = [getattr(circle, symbol) for symbol in feature['actions']]
@@ -2038,7 +2117,8 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.preferences.keymap.enable_keymaps = True
         self.preferences.keymap.selection = types.SimpleNamespace(
             enable_selection_keymaps=True, enable_selection_all_none=False,
-            enable_selection_circle=False, enable_selection_more_less=True,
+            enable_selection_circle=False, enable_selection_subtract=False,
+            enable_selection_more_less=True,
             enable_selection_tool_switch=False)
         self.assertEqual(register.register(), 59)
         rows = [(km, item) for km, item in register.registered_selection_keymaps
@@ -2342,7 +2422,8 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             'selection': (selection, selection.get_enabled_selection_actions,
                           types.SimpleNamespace(enable_selection_keymaps=True,
                                                 enable_selection_all_none=False,
-                                                enable_selection_circle=False),
+                                                enable_selection_circle=False,
+                                                enable_selection_subtract=False),
                           self.load('actions.actions.keymaps.selection').get_all_selection_actions()),
             'transform': (transform, transform.get_enabled_transform_actions,
                           types.SimpleNamespace(enable_transform_keymaps=True,

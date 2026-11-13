@@ -2124,5 +2124,96 @@
       "production_implemented": false,
       "candidate_accounting_changed": false
     }
+  },
+  "object_subtract_route": {
+    "status": "approved source draft; actual production native acceptance pending",
+    "row_id": "8674bcb4d856346f287980fd961ade31095f1165d1f6e25725e4c06b81f582f3",
+    "binding": {
+      "active": true,
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 1,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 0,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "properties": {
+        "center": false,
+        "deselect": true,
+        "deselect_all": false,
+        "enumerate": false,
+        "extend": false,
+        "location": [
+          0,
+          0
+        ],
+        "object": false,
+        "select_passthrough": false,
+        "toggle": false
+      },
+      "read_issues": {},
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    "source_sha256": {
+      "actions/actions/keymaps/selection/selection_subtract.py": "af2d0260cecf07b3feef2a6c151fbeab51bed893d7dd4bf1d39cbe775a61b1e7",
+      "actions/actions/keymaps/selection/__init__.py": "c5b376204a3f9e0d1f7b7671884880d3fc01bddd1cc5fc75fc0509389959f934",
+      "keymaps/selection_keymaps_register.py": "891488cf7f9848a0d06e40670a5f926d4f45c728e18fc3cd8a7afff47032569a",
+      "preferences/addon/keymaps/keymap_props_selection.py": "67d52d65af39e7c0da6017a3b945ee9354ce46cdc05417b7c315eb0c833cb9b5"
+    },
+    "preference": "enable_selection_subtract",
+    "tab": "SUBTRACT",
+    "registration": "existing ordinary ensure_action_keymaps / legacy:Selection",
+    "stock_changes": false,
+    "runtime_capability_changes": false,
+    "candidate_accounting_changed": false,
+    "native_mode": "subtract_production",
+    "native_trial_sequence": [
+      {
+        "case": "production_subtract_stock_before_selected",
+        "initial_selected": true,
+        "direct_candidate_injection": false
+      },
+      {
+        "case": "production_subtract_stock_before_unselected",
+        "initial_selected": false,
+        "direct_candidate_injection": false
+      },
+      {
+        "case": "production_subtract_enabled_selected",
+        "initial_selected": true,
+        "direct_candidate_injection": false
+      },
+      {
+        "case": "production_subtract_enabled_unselected",
+        "initial_selected": false,
+        "direct_candidate_injection": false
+      },
+      {
+        "case": "production_subtract_stock_after_selected",
+        "initial_selected": true,
+        "direct_candidate_injection": false
+      },
+      {
+        "case": "production_subtract_stock_after_unselected",
+        "initial_selected": false,
+        "direct_candidate_injection": false
+      }
+    ],
+    "persistence": "Reuse accepted ordinary declaration/editor/persistence mechanism; unchanged registration and edit identity. No additional save/reopen child proposed.",
+    "pending_acceptance": "Six same-point stock/on/off selected and unselected trials; exact actual ownership/admission; independent direct controls; two installs/releases; strict foreign preservation."
   }
 }

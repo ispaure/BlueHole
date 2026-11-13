@@ -24,6 +24,7 @@ from ....actions.actions.keymaps.selection.selection_more_less import get_select
 from ....actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
 from ....actions.actions.keymaps.selection.selection_all_none import get_selection_all_none_actions
 from ....actions.actions.keymaps.selection.selection_circle import get_selection_circle_actions
+from ....actions.actions.keymaps.selection.selection_subtract import get_selection_subtract_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -77,6 +78,13 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
         update=_update_keymaps
     )
 
+    enable_selection_subtract: BoolProperty(
+        name='Enable Subtract Selection',
+        description='Ctrl-click to remove an item from the selection',
+        default=True,
+        update=_update_keymaps
+    )
+
     active_selection_keymap_tab: EnumProperty(
         name='Selection Keymap Tab',
         description='Active selection keymap feature tab',
@@ -85,6 +93,7 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
             ('TOOL_SWITCH', 'Tool Switch', ''),
             ('ALL_NONE', 'Select All / None', ''),
             ('CIRCLE', 'Circle Selection', ''),
+            ('SUBTRACT', 'Subtract Selection', ''),
         ],
         default='MORE_LESS'
     )
@@ -137,4 +146,12 @@ def draw(preference, context, layout):
             feature_owner=preference.keymap.selection,
             feature_prop_name='enable_selection_circle',
             actions=get_selection_circle_actions(),
+        )
+
+    elif preference.keymap.selection.active_selection_keymap_tab == 'SUBTRACT':
+        draw_action_feature_keymaps(
+            column=column_selection,
+            feature_owner=preference.keymap.selection,
+            feature_prop_name='enable_selection_subtract',
+            actions=get_selection_subtract_actions(),
         )
