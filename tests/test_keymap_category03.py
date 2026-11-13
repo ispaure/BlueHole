@@ -525,6 +525,54 @@ class Category03ModalProbeTests(unittest.TestCase):
         self.assertEqual(merged, ['witness', 'candidate', 'stock'])
         self.assertEqual(fixture.cell_allocations, fixture.allocations)
 
+    def test_uv_extend_reference_is_only_two_click_states_without_candidate_insertion(self):
+        from blender_keymap_category03_handlers import UVExtendCases, UVExtendReferenceCases
+        ledger = {row['row_id']: row for row in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        bindings = {UVExtendCases.CELLS[0][0]: ledger[UVExtendCases.CELLS[0][0]]['binding']}
+        configs = types.SimpleNamespace(**{role: types.SimpleNamespace(keymaps=[])
+                                          for role in ('default', 'active', 'addon', 'user')})
+        fake_bpy = types.SimpleNamespace(context=types.SimpleNamespace(
+            window_manager=types.SimpleNamespace(keyconfigs=configs)))
+        with patch.dict(sys.modules, {'bpy': fake_bpy}):
+            steps, receipt = [], {'dispatch': []}
+            fixture = UVExtendReferenceCases(steps, receipt, Mock(), None, None, None, bindings=bindings)
+            for method in ('prepare', 'start', 'begin_cell', 'prepare_cell', 'install_candidate',
+                           'begin_trial', 'press_input', 'release_input', 'finish_trial', 'release_cell', 'cleanup'):
+                setattr(fixture, method, Mock())
+            fixture.append()
+            self.assertEqual(len(steps), 16)
+            for step in steps:
+                step()
+            self.assertEqual(fixture.begin_cell.call_args_list[0].args, UVExtendCases.CELLS[0])
+            fixture.begin_cell.assert_called_once()
+            self.assertEqual([call.args for call in fixture.begin_trial.call_args_list], [(True, False), (False, False)])
+            fixture.install_candidate.assert_not_called()
+            self.assertTrue(receipt['uv_extend_proof']['reference'])
+            self.assertFalse(receipt['uv_extend_proof']['probe'])
+            with self.assertRaises(AssertionError):
+                UVExtendReferenceCases([], {'dispatch': []}, Mock(), None, None, None, bindings=bindings, probe=True)
+
+    def test_uv_extend_reference_requires_active_user_binding_and_keeps_addon_empty(self):
+        from blender_keymap_category03_handlers import UVExtendReferenceCases
+        fixture = UVExtendReferenceCases.__new__(UVExtendReferenceCases)
+        ledger = {row['row_id']: row for row in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        row_id = UVExtendReferenceCases.CELLS[0][0]
+        fixture.binding = ledger[row_id]['binding']
+        fixture.bindings, fixture.cell = {row_id: fixture.binding}, {'ledger_id': row_id}
+        fixture.control_class = types.SimpleNamespace(bl_idname='wm.uv_reference_witness')
+        candidate = copy.deepcopy(fixture.binding)
+        witness = {**candidate, 'target': fixture.control_class.bl_idname, 'properties': {}}
+        maps = {'default': [], 'active': [{'scope': candidate['scope'], 'items': [candidate]}],
+                'addon': [{'scope': candidate['scope'], 'items': [witness]}],
+                'user': [{'scope': candidate['scope'], 'items': [witness, candidate]}]}
+        fixture.maps, fixture.record = Mock(return_value=maps), Mock()
+        fixture.result = {'case': 'reference_admission'}
+        fixture.candidate_maps(False)
+        maps['addon'][0]['items'].append(candidate)
+        with self.assertRaises(AssertionError):
+            fixture.candidate_maps(False)
+        self.assertEqual(fixture.result['exact_candidate_counts']['addon'][row_id], 1)
+
     def test_extend_production_reuses_two_states_without_probe_injection(self):
         from blender_keymap_category03_handlers import ObjectExtendProductionCases, ObjectExtendTrial
         ledger = {r['row_id']: r for r in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
@@ -798,6 +846,52 @@ class Category03NativeReceiptTests(unittest.TestCase):
         cls.native = unpack_native(read_json(CATEGORY / cls.verification['fixture']))
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
+
+    def test_uv_extend_corrected_click_matches_addition_with_verified_stock_reuse(self):
+        run = self.runs['uv_extend_probe-1794572360320071000']
+        self.assertEqual(run['native_status'], 'complete')
+        proof = run['uv_extend_proof']
+        self.assertEqual(proof['stock_click_reuse']['run'], 'uv_extend_probe-1794571757033229000')
+        self.assertEqual(proof['stock_click_reuse']['input_sha256'],
+                         'ad20dd8fe6eb010f0597f1df0126bd8f7b8fa5318b13709525fe1fe7a89b3fe4')
+        cell = proof['cells'][0]
+        self.assertEqual(len(cell['reused_stock_trials']), 2)
+        self.assertEqual(len(cell['trials']), 2)
+        self.assertTrue(cell['matched_stock_probe_effects'])
+        for trial, initial in zip(cell['trials'], (True, False)):
+            phases = {p['phase']: p['snapshot'] for p in trial['phases']}
+            self.assertEqual(phases['after_press']['target_selected'], initial)
+            self.assertTrue(phases['after_release']['target_selected'])
+            self.assertTrue(phases['after_release']['bystander_selected'])
+            self.assertTrue(trial['exact_map_event_witnessed'])
+            self.assertTrue(trial['expected_selection_observed'])
+            self.assertEqual(trial['witness_order'], {'indices': [0], 'competing_indices': [1, 27]})
+        self.assertTrue(proof['exact_source_and_merged_preservation'])
+        self.assertTrue(run['protected_unchanged'])
+        self.assertTrue(run['watcher_stopped'])
+        self.assertFalse(run['remaining_owned_resources'])
+        self.assertFalse(run['cleanup']['owned'])
+
+    def test_uv_extend_tool_press_admission_does_not_hide_nonadditive_effects(self):
+        run = self.runs['uv_extend_probe-1794572360320071000']
+        for cell in run['uv_extend_proof']['cells'][1:]:
+            self.assertEqual(cell['event'], 'PRESS')
+            self.assertTrue(cell['direct_control']['positive_addition'])
+            self.assertIsNone(cell['tool_readback']['keymap'])
+            self.assertIsNone(cell['tool_readback']['keymap_fallback'])
+            self.assertFalse(cell['matched_stock_probe_effects'])
+            self.assertTrue(cell['exact_cell_preservation'])
+            self.assertEqual(len(cell['trials']), 4)
+            for trial in cell['trials']:
+                phases = {p['phase']: p['snapshot'] for p in trial['phases']}
+                expected = False if trial['probe'] else not trial['initial_selected']
+                self.assertEqual(phases['after_press']['target_selected'], expected)
+                self.assertEqual(phases['after_release']['target_selected'], expected)
+                self.assertTrue(phases['after_release']['bystander_selected'])
+                self.assertTrue(trial['exact_map_event_witnessed'])
+                self.assertTrue(trial['geometry_and_tool_unchanged'])
+                self.assertTrue(trial['input_delivery']['delivered'])
+                self.assertEqual(trial['expected_selection_observed'], not trial['probe'])
 
     def test_uv_extend_stock_click_controls_and_pre_input_failure_are_retained(self):
         run = self.runs['uv_extend_probe-1794571757033229000']

@@ -1020,12 +1020,14 @@ class UVExtendCases(ObjectSubtractCases):
     CONTROL_MODIFIERS = {'shift': True, 'ctrl': False, 'alt': False, 'oskey': False}
     LABEL_PREFIX = 'uv_extend'
     UV_POSITIONS = ((.2, .2), (.8, .2), (.8, .8), (.2, .8))
+    REFERENCE = False
 
     def __init__(self, *args, bindings, stock_click_controls=None, **kwargs):
         super().__init__(*args, binding=bindings[self.CELLS[0][0]], **kwargs)
         assert set(bindings) == {cell[0] for cell in self.CELLS}
         self.bindings = bindings
         self.stock_click_controls = stock_click_controls
+        assert not (self.REFERENCE and (self.probe or stock_click_controls))
         if stock_click_controls:
             assert self.probe and stock_click_controls['binding'] == bindings[self.CELLS[0][0]]
             assert stock_click_controls['ledger_id'] == self.CELLS[0][0]
@@ -1040,7 +1042,8 @@ class UVExtendCases(ObjectSubtractCases):
         self.cell = None
         self.cell_allocations = []
         self.proof = {'test_only_driver': True, 'production_capability_enabled': False,
-                      'ledger_ids': list(bindings), 'probe': self.probe, 'cells': [],
+                      'ledger_ids': list(bindings), 'probe': self.probe,
+                      'reference': self.REFERENCE, 'cells': [],
                       'lifecycle': 'Reuse accepted ordinary lifecycle; no save/reopen or product toggle suite'}
         if stock_click_controls:
             self.proof['stock_click_reuse'] = stock_click_controls
@@ -1240,7 +1243,9 @@ class UVExtendCases(ObjectSubtractCases):
         self.record(self.result['case'] + '_admission_maps')
         for role, rows in counts.items():
             for ledger_id, count in rows.items():
-                assert count == int(probe and role in ('addon', 'user') and ledger_id == self.cell['ledger_id'])
+                expected = (role in ('active', 'user') if self.REFERENCE else
+                            probe and role in ('addon', 'user'))
+                assert count == int(expected and ledger_id == self.cell['ledger_id'])
         user_map, = relevant['user']
         witness = [i for i, item in enumerate(user_map['items'])
                    if item['target'] == self.control_class.bl_idname]
@@ -1256,8 +1261,9 @@ class UVExtendCases(ObjectSubtractCases):
         self.initial_selected = selected
         self.reset_selection(selected)
         self.result = {'case': 'uv_extend_' + self.cell['ledger_id'][:8] +
-                       ('_probe' if probe else '_stock') + ('_selected' if selected else '_unselected'),
-                       'ledger_id': self.cell['ledger_id'], 'probe': probe,
+                       ('_reference' if self.REFERENCE else '_probe' if probe else '_stock') +
+                       ('_selected' if selected else '_unselected'),
+                       'ledger_id': self.cell['ledger_id'], 'probe': probe, 'reference': self.REFERENCE,
                        'initial_selected': selected, 'phases': []}
         self.cell['trials'].append(self.result)
         self.receipt['dispatch'].append(self.result)
@@ -1308,7 +1314,7 @@ class UVExtendCases(ObjectSubtractCases):
             self.input_callbacks.count(expected) == 1 and
             self.result['callbacks_after_press'].count(expected) == int(self.cell['event'] == 'PRESS'))
         self.result['expected_selection_observed'] = (
-            after['target_selected'] == (True if self.result['probe'] else not self.initial_selected)
+            after['target_selected'] == (True if self.result['probe'] or self.REFERENCE else not self.initial_selected)
             and after['bystander_selected'] and sorted(after['selected']) ==
             ([[0, 0], [0, 2]] if after['target_selected'] else [[0, 2]]))
         before = self.result['phases'][0]['snapshot']
@@ -1343,6 +1349,9 @@ class UVExtendCases(ObjectSubtractCases):
         self.cell['exact_cell_preservation'] = self.cell['maps_after_witness'] == self.cell['maps_before_witness']
         trials = self.cell['reused_stock_trials'] + self.cell['trials']
         self.cell['matched_stock_probe_effects'] = self.probe and self.matched_effects(trials)
+        self.cell['reference_additive_effects'] = (self.REFERENCE and len(trials) == 2 and all(
+            row['exact_map_event_witnessed'] and row['expected_selection_observed']
+            and row['geometry_and_tool_unchanged'] for row in trials))
         self.cell['production_accepted'] = False
         self.record('uv_extend_cell_released')
         assert self.cell['exact_cell_preservation'], 'UV cell source/merged maps changed'
@@ -1362,6 +1371,13 @@ class UVExtendCases(ObjectSubtractCases):
             self.steps.append(self.release_cell)
         self.steps.append(self.cleanup)
         return self
+
+
+class UVExtendReferenceCases(UVExtendCases):
+    """Two ordinary CLICK reference states; no candidate or tool PRESS probe."""
+
+    CELLS = UVExtendCases.CELLS[:1]
+    REFERENCE = True
 
 
 class ObjectExtendProductionCases(ObjectSubtractProductionCases):

@@ -204,7 +204,7 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Eighty-one category checks currently pass. They cover exact assigned IDs and
+Eighty-five category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
@@ -801,3 +801,51 @@ proposal has59 steps and ten new observations, retaining separate primary and
 fallback PRESS baselines. No identical retry or new allocation is assumed.
 All81 category tests pass, including failure-position retention, reversed-merge
 ordering, the reduced schedule, native stock effects and strict cleanup.
+
+Batch36 `uv_extend_probe-1794572360320071000` completed its ten new observations
+in30.4034 seconds at `6cccfad`. The hash-bound two stock CLICK controls from
+batch35 passed the promised same-binding/tool/UV-position/projected-point checks.
+Both ordinary UV Editor CLICK candidate states gave additive behavior: selected
+stayed selected and unselected became selected on RELEASE. The exact CLICK
+witness ran, the selected bystander stayed selected, and geometry/tool state
+stayed unchanged. Merged order was witness0, candidate1, stock27.
+
+Both primary and fallback tool PRESS maps were independently reached by their
+exact witnesses. Stock toggled the target in both starting states. With the
+candidate, both starting states ended unselected on PRESS and stayed unselected
+on RELEASE, despite positive independent direct ADD controls. Tool keymap fields
+were null; tool IDs and the fallback ID were retained. These effects are
+consistent with the source-backed ADD-then-stock-XOR pass-through hypothesis,
+but no internal C operator-call sequence was traced. The two PRESS rows remain
+unresolved; there is no justification for an equivalent repeat.
+
+All ten input controls, three direct positive controls, per-cell strict map
+comparisons and final strict source/merged comparison passed. No fixture cleanup
+errors occurred. Native owned/pending/tracked resources were zero, watcher
+stopped, PID26059 and all temporary roots absent. All46 frozen inputs and
+protected files matched. Batch36 is released; no other child ran. The receipt
+contains63 factory/19 reference attempts, with all62 prior factory/19 reference
+records unchanged. Accounting remains37/eight/95; this is factory probe evidence,
+not copied-reference parity or actual product registration.
+
+A minimal copied-reference fixture is prepared for only ordinary CLICK row
+`0e8d690a0470457363cd15ff3448c54325c24261cae1dc525ebff9c3dd459f1d`.
+It reuses eleven unchanged geometry/control/input methods, requires the exact
+active/user binding with no add-on candidate, and observes two initial states
+in16 fixture steps plus two reference-start ESC steps. The two PRESS cells and
+candidate insertion are excluded. Strict preservation failures remain failures,
+even when the separately recorded selection effects match. The reference
+launcher can now accept a shorter positive ceiling up to its existing110-second
+maximum; the proposed single child is capped75 seconds. No allocation or launch
+is assumed.
+
+The conditional ordinary mapping is an unapplied patch adding one
+`SELECTION_UV_EXTEND` declaration (`uv.select`, extend=True, Shift+LEFTMOUSE CLICK
+in UV Editor) to the existing Extend group and toggle. The two PRESS bindings
+are excluded. It awaits reference evidence and coordinator source approval.
+The next grouped investigation is Image Q/W/E/R: four ordinary rows sharing
+`wm.tool_set_by_id` context resolution and tool/cycle controls. The known
+explicit-default `space_type=EMPTY` control error must be repaired once, with
+actual property-set-state captured, while preserving the existing Q second-press
+divergence. This offscreen group proposal adds no native allocation or product
+change. All85 category tests pass.
