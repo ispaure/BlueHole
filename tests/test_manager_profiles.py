@@ -21,11 +21,11 @@ class ManagerProfileTests(unittest.TestCase):
             legacy = root / 'projects/io.github.ispaure.bluehole.json'
             save_profile(legacy, {'tools.blender': 'original', 'tools.shared_source': 'shared'},
                          allowed={'tools.blender','tools.shared_source'})
-            def call(profile, action, values):
+            def call(profile, action, values, environment=None):
                 output = io.StringIO()
                 payload = json.dumps(dict(schema=1, action=action, values=values, settings_profile=str(profile)))
                 with patch('sys.stdin', io.StringIO(payload)), contextlib.redirect_stdout(output), \
-                        patch('build_manager.registry.config_directory', return_value=root), patch.dict(os.environ, {}, clear=True):
+                        patch('build_manager.registry.config_directory', return_value=root), patch.dict(os.environ, environment or {}, clear=True):
                     manager_bridge.main()
                 return json.loads(output.getvalue())['result']
             first, second = root/'one/profile.json', root/'two/profile.json'
@@ -35,6 +35,31 @@ class ManagerProfileTests(unittest.TestCase):
             self.assertEqual(call(second, 'settings', {})['tools.blender']['value'], 'second')
             self.assertEqual(load_profile(first)['tools.shared_source'], 'shared')
             self.assertEqual(load_profile(legacy)['tools.blender'], 'original')
+            legacy_before = legacy.read_bytes()
+            environment = {'BLUEHOLE_BLENDER': '/fixture/environment-blender'}
+            row = call(first, 'settings', {}, environment)['tools.blender']
+            self.assertEqual(row['reset'], dict(overridden=True, value='/fixture/environment-blender',
+                                                origin='environment BLUEHOLE_BLENDER'))
+            before = first.read_bytes()
+            with self.assertRaises(ValueError):
+                call(first, 'save_settings', {'changes': {}, 'resets': ['auth.github_reference']})
+            self.assertEqual(first.read_bytes(), before)
+            call(first, 'save_settings', {'changes': {'tools.hosted_evidence': ''},
+                                          'resets': ['tools.blender']}, environment)
+            self.assertEqual(call(first, 'settings', {}, environment)['tools.blender']['value'],
+                             '/fixture/environment-blender')
+            inherited = call(first, 'settings', {})['tools.blender']
+            self.assertEqual(inherited['value'], '')
+            self.assertEqual(inherited['origin'], 'tracked unconfigured default')
+            self.assertFalse(inherited['reset']['overridden'])
+            self.assertEqual(call(first, 'settings', {})['tools.hosted_evidence']['origin'],
+                             'private project tooling profile')
+            self.assertEqual(load_profile(first), {'tools.shared_source': 'shared', 'tools.hosted_evidence': ''})
+            self.assertEqual(load_profile(second)['tools.blender'], 'second')
+            third = root/'three/profile.json'
+            call(third, 'save_settings', {'changes': {}, 'resets': ['tools.blender']})
+            self.assertEqual(load_profile(third), {'tools.shared_source': 'shared'})
+            self.assertEqual(legacy.read_bytes(), legacy_before)
 
     def test_real_project_bridge_resolves_project_vendored_dependency(self):
         from build_manager.bridge import ProjectBridge
