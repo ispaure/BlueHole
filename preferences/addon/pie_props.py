@@ -68,6 +68,11 @@ def draw(preference, context, layout):
     if preference.keymap.deluxe_configured and not preference.keymap.enable_keymaps:
         column_pie.label(text='Enable Deluxe Keymaps to use Deluxe pie shortcuts.')
         return
+    if preference.keymap.deluxe_configured:
+        column_pie.prop(preference.pie, 'enable_pie_menus')
+        column_pie.prop(preference.pie, 'enable_editor_pie_shortcuts')
+        column_pie.label(text='Edit Deluxe pie shortcuts in Keymaps under the Pie category.')
+        return
 
     draw_action_feature_keymaps(
         column=column_pie,

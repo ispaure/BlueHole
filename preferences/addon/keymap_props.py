@@ -119,8 +119,12 @@ def draw(preference, context, layout):
     column_keymap.prop(preference.keymap, 'enable_keymaps', text=label)
 
     if preference.keymap.deluxe_configured:
-        column_keymap.operator('wm.bh_reset_deluxe_keymaps')
+        from .keymaps import deluxe_editor
+
+        column_keymap.operator('wm.bh_reset_deluxe_keymaps', text='Reset Feature Switches')
         column_keymap.prop(context.preferences.inputs, 'invert_mouse_zoom')
+        deluxe_editor.draw(context, column_keymap)
+        return
 
     if not preference.keymap.enable_keymaps:
         row = column_keymap.row()
@@ -161,10 +165,16 @@ classes = (
 
 
 def register():
+    from .keymaps import deluxe_editor
+
     for cls in classes:
         bpy.utils.register_class(cls)
+    deluxe_editor.register()
 
 
 def unregister():
+    from .keymaps import deluxe_editor
+
+    deluxe_editor.unregister()
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
