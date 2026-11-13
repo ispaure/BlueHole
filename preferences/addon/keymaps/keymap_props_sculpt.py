@@ -1,6 +1,4 @@
-"""
-Sculpt keymap preferences for Blue Hole.
-"""
+"""Preferences for Sculpt shortcuts."""
 
 # ----------------------------------------------------------------------------------------------------------------------
 # AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
@@ -12,79 +10,54 @@ __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
-# ----------------------------------------------------------------------------------------------------------------------
-# IMPORTS
-
 import bpy
-from bpy.props import *
+from bpy.props import BoolProperty
 
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+from ....actions.actions.keymaps.sculpt import SCULPT_KEYMAP_GROUPS, get_sculpt_group_actions
+from .keymap_props_modeling_ui import draw_modeling_keymaps
 
 
-def _update_enable_sculpt_keymaps(self, context):
-    """
-    Enable or disable Blue Hole sculpt keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    pass
+def _update_keymaps(self, context):
+    from ....keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class SculptKeymapPG(bpy.types.PropertyGroup):
 
     enable_sculpt_keymaps: BoolProperty(
         name='Enable Sculpt Keymaps',
-        description='Enable Blue Hole sculpt keymaps',
         default=True,
-        update=_update_enable_sculpt_keymaps
+        update=_update_keymaps,
     )
-
     enable_sculpt_tool_shortcuts: BoolProperty(
         name='Enable Sculpt Tool Shortcuts',
-        description='Enable Blue Hole sculpt tool shortcuts',
         default=True,
+        update=_update_keymaps,
     )
-
+    enable_sculpt_brush_controls: BoolProperty(
+        name='Enable Brush Controls',
+        default=True,
+        update=_update_keymaps,
+    )
+    enable_sculpt_masking_shortcuts: BoolProperty(
+        name='Enable Masking and Visibility',
+        default=True,
+        update=_update_keymaps,
+    )
     enable_sculpt_action_shortcuts: BoolProperty(
-        name='Enable Sculpt Action Shortcuts',
-        description='Enable Blue Hole sculpt action shortcuts',
+        name='Enable Sculpt Actions',
         default=True,
+        update=_update_keymaps,
     )
 
-    enable_sculpt_simulation_shortcuts: BoolProperty(
-        name='Enable Sculpt Simulation Shortcuts',
-        description='Enable Blue Hole sculpt simulation shortcuts',
-        default=True,
-    )
+    # Preserve the saved ID of the former placeholder.
+    enable_sculpt_simulation_shortcuts: BoolProperty(default=True)
 
 
 def draw(preference, context, layout):
-    # -------------------------------------------------------------------------------------------------
-    # SCULPT KEYMAPS
-    # -------------------------------------------------------------------------------------------------
-    column_sculpt = layout.column()
-
-    row = column_sculpt.row()
-    row.prop(preference.keymap.sculpt, 'enable_sculpt_keymaps')
-
-    if not preference.keymap.sculpt.enable_sculpt_keymaps:
-        row = column_sculpt.row()
-        row.label(text='Sculpt keymaps are currently disabled.')
-        return
-
-    row = column_sculpt.row()
-    row.prop(preference.keymap.sculpt, 'enable_sculpt_tool_shortcuts')
-
-    row = column_sculpt.row()
-    row.prop(preference.keymap.sculpt, 'enable_sculpt_action_shortcuts')
-
-    row = column_sculpt.row()
-    row.prop(preference.keymap.sculpt, 'enable_sculpt_simulation_shortcuts')
-
-    row = column_sculpt.row()
-    row.label(text='Sculpt keymap settings will appear here.')
+    settings = preference.keymap.sculpt
+    column = layout.column()
+    column.prop(settings, 'enable_sculpt_keymaps')
+    if settings.enable_sculpt_keymaps:
+        for group, toggle in SCULPT_KEYMAP_GROUPS.items():
+            draw_modeling_keymaps(column, settings, toggle, get_sculpt_group_actions(group))

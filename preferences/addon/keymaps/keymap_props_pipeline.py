@@ -1,6 +1,4 @@
-"""
-Pipeline keymap preferences for Blue Hole.
-"""
+"""Preferences for optional Pipeline shortcuts."""
 
 # ----------------------------------------------------------------------------------------------------------------------
 # AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
@@ -12,79 +10,41 @@ __maintainer__ = 'Marc-André Voyer'
 __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
-# ----------------------------------------------------------------------------------------------------------------------
-# IMPORTS
-
 import bpy
-from bpy.props import *
+from bpy.props import BoolProperty
 
-# ----------------------------------------------------------------------------------------------------------------------
-# DEBUG
-
-show_verbose = True
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CODE
+from ....actions.actions.keymaps.pipeline import PIPELINE_KEYMAP_GROUPS, get_pipeline_group_actions
+from .keymap_props_modeling_ui import draw_modeling_keymaps
 
 
-def _update_enable_pipeline_keymaps(self, context):
-    """
-    Enable or disable Blue Hole pipeline keymaps.
-    """
-    # TODO: Replace with the real register module once it exists.
-    pass
+def _update_keymaps(self, context):
+    from ....keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class PipelineKeymapPG(bpy.types.PropertyGroup):
 
     enable_pipeline_keymaps: BoolProperty(
-        name='Enable Pipeline Keymaps',
-        description='Enable Blue Hole pipeline keymaps',
+        name='Enable Optional Pipeline Keymaps',
         default=True,
-        update=_update_enable_pipeline_keymaps
+        update=_update_keymaps,
     )
-
     enable_pipeline_export_shortcuts: BoolProperty(
         name='Enable Export Shortcuts',
-        description='Enable Blue Hole export shortcuts',
         default=True,
+        update=_update_keymaps,
     )
 
-    enable_pipeline_send_shortcuts: BoolProperty(
-        name='Enable Send Shortcuts',
-        description='Enable Blue Hole send shortcuts',
-        default=True,
-    )
-
-    enable_pipeline_container_shortcuts: BoolProperty(
-        name='Enable Container Shortcuts',
-        description='Enable Blue Hole asset container shortcuts',
-        default=True,
-    )
+    # Preserve saved IDs of the former placeholders.
+    enable_pipeline_send_shortcuts: BoolProperty(default=True)
+    enable_pipeline_container_shortcuts: BoolProperty(default=True)
 
 
 def draw(preference, context, layout):
-    # -------------------------------------------------------------------------------------------------
-    # PIPELINE KEYMAPS
-    # -------------------------------------------------------------------------------------------------
-    column_pipeline = layout.column()
-
-    row = column_pipeline.row()
-    row.prop(preference.keymap.pipeline, 'enable_pipeline_keymaps')
-
-    if not preference.keymap.pipeline.enable_pipeline_keymaps:
-        row = column_pipeline.row()
-        row.label(text='Pipeline keymaps are currently disabled.')
-        return
-
-    row = column_pipeline.row()
-    row.prop(preference.keymap.pipeline, 'enable_pipeline_export_shortcuts')
-
-    row = column_pipeline.row()
-    row.prop(preference.keymap.pipeline, 'enable_pipeline_send_shortcuts')
-
-    row = column_pipeline.row()
-    row.prop(preference.keymap.pipeline, 'enable_pipeline_container_shortcuts')
-
-    row = column_pipeline.row()
-    row.label(text='Pipeline keymap settings will appear here.')
+    settings = preference.keymap.pipeline
+    column = layout.column()
+    column.prop(settings, 'enable_pipeline_keymaps')
+    if settings.enable_pipeline_keymaps:
+        for group, toggle in PIPELINE_KEYMAP_GROUPS.items():
+            draw_modeling_keymaps(column, settings, toggle, get_pipeline_group_actions(group))
+    column.label(text='Blue Hole Save As is available in Blender Preferences → Keymap.')

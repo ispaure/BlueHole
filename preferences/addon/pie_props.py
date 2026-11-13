@@ -19,9 +19,11 @@ import bpy
 
 from bpy.props import *
 
-from ...actions.actions.pie_actions import PIE_ACTIONS
 from ...actions.operator_action import OperatorAction
+from ...keymaps.pie.editor_actions import EDITOR_PIE_ACTIONS
+from ...keymaps.pie.pie_keymaps_register import get_blue_hole_pie_actions
 from .keymaps.keymap_ui_utils import draw_action_feature_keymaps
+from .keymaps.keymap_props_modeling_ui import draw_modeling_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
@@ -33,15 +35,8 @@ show_verbose = True
 
 
 def _update_enable_pie_menus(self, context):
-    """
-    Enable or disable Blue Hole pie menu keymaps.
-    """
-    from ...keymaps.pie import pie_keymaps_register
-
-    if self.enable_pie_menus:
-        pie_keymaps_register.register()
-    else:
-        pie_keymaps_register.unregister()
+    from ...keymaps import keymaps_register
+    keymaps_register.refresh()
 
 
 class PiePG(bpy.types.PropertyGroup):
@@ -51,6 +46,12 @@ class PiePG(bpy.types.PropertyGroup):
         description="Enable Blue Hole pie menu shortcuts",
         default=False,
         update=_update_enable_pie_menus
+    )
+    enable_editor_pie_shortcuts: BoolProperty(
+        name='Enable Editor Pie Shortcuts',
+        description='Enable additional Blender editor pie shortcuts',
+        default=True,
+        update=_update_enable_pie_menus,
     )
 
 
@@ -64,9 +65,12 @@ def draw(preference, context, layout):
         column=column_pie,
         feature_owner=preference.pie,
         feature_prop_name='enable_pie_menus',
-        actions=PIE_ACTIONS,
+        actions=get_blue_hole_pie_actions(preference.keymap.enable_keymaps),
         label_fn=lambda action: _get_menu_label(_get_pie_menu_idname(action)),
     )
+    if preference.keymap.enable_keymaps and preference.pie.enable_pie_menus:
+        draw_modeling_keymaps(column_pie, preference.pie, 'enable_editor_pie_shortcuts',
+                              reversed(EDITOR_PIE_ACTIONS))
 
 
 def _get_menu_label(menu_idname: str) -> str:

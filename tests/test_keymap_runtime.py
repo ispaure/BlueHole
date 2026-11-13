@@ -1565,7 +1565,7 @@ class LifecycleIntegrationTests(unittest.TestCase):
         preference_module.prefs = lambda: self.preferences
 
         category_names = ('Mesh', 'Navigation', 'Object', 'Pipeline', 'Sculpt',
-                          'Selection', 'Transform', 'UV', 'Pie')
+                          'Selection', 'Transform', 'UV', 'Other', 'Pie')
         for category_index, category in enumerate(category_names):
             stem = category.lower() + '_keymaps_register'
             path = prefix + ('.keymaps.pie.' if category == 'Pie' else '.keymaps.') + stem
@@ -1609,7 +1609,7 @@ class LifecycleIntegrationTests(unittest.TestCase):
 
     def test_global_off_preserves_pipeline_and_independent_pie(self):
         self.orchestrator.register()
-        self.assertEqual(len(self.addon_names()), 9)
+        self.assertEqual(len(self.addon_names()), 10)
         self.assertEqual(len(self.timers), 1)
         names_before = tuple(self.addon_names())
         creations = self.runtime.configs.addon.keymaps.get('3D View').keymap_items.created

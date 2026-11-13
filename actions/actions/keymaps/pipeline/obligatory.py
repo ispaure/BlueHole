@@ -29,6 +29,7 @@ def _save_as_bindings(
     """
     Return the default Blue Hole keymap bindings for Save As Mainfile.
     Uses Ctrl+Shift+S on Windows/Linux and Command+Shift+S on macOS.
+    Source order is reversed when Blender prepends the bindings.
     """
     return (
         KeymapBinding(

@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
-from ..actions.actions.keymaps.sculpt_actions import get_sculpt_actions
+from ..actions.actions.keymaps.sculpt import get_enabled_sculpt_catalog
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -38,13 +38,10 @@ def get_enabled_sculpt_actions():
     """
     Return the list of sculpt actions that should currently be registered.
     """
-    actions = []
-
-    if not prefs().keymap.sculpt.enable_sculpt_keymaps:
-        return actions
-
-    actions.extend(get_sculpt_actions())
-    return actions
+    settings = prefs().keymap.sculpt
+    if not settings.enable_sculpt_keymaps:
+        return []
+    return get_enabled_sculpt_catalog(settings)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

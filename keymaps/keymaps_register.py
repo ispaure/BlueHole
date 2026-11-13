@@ -46,6 +46,7 @@ from . import sculpt_keymaps_register
 from . import selection_keymaps_register
 from . import transform_keymaps_register
 from . import uv_keymaps_register
+from . import other_keymaps_register
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONSTANTS
@@ -64,6 +65,7 @@ keymap_module_lst = (
     selection_keymaps_register,
     transform_keymaps_register,
     uv_keymaps_register,
+    other_keymaps_register,
 )
 
 

@@ -17,7 +17,7 @@ __status__ = 'Production'
 
 from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
-from ..actions.actions.keymaps.pipeline_actions import get_pipeline_actions
+from ..actions.actions.keymaps.pipeline import get_enabled_pipeline_catalog
 from ..actions.actions.keymaps.pipeline.obligatory import get_obligatory_pipeline_actions
 from ..preferences.prefs import prefs
 
@@ -39,18 +39,13 @@ def get_enabled_pipeline_actions():
     """
     Return the list of pipeline actions that should currently be registered.
     """
+    # Always include obligatory pipeline actions (e.g. custom Save As...)
     actions = []
 
-    # Always include obligatory pipeline actions (e.g. custom Save As...)
+    settings = prefs().keymap
+    if settings.enable_keymaps and settings.pipeline.enable_pipeline_keymaps:
+        actions.extend(get_enabled_pipeline_catalog(settings.pipeline))
     actions.extend(get_obligatory_pipeline_actions())
-
-    if not prefs().keymap.enable_keymaps:
-        return actions
-
-    if not prefs().keymap.pipeline.enable_pipeline_keymaps:
-        return actions
-
-    actions.extend(get_pipeline_actions())
     return actions
 
 

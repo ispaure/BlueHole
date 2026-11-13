@@ -22,6 +22,7 @@ from .keymaps import (
     keymap_props_mesh,
     keymap_props_navigation,
     keymap_props_object,
+    keymap_props_other,
     keymap_props_pipeline,
     keymap_props_sculpt,
     keymap_props_selection,
@@ -46,6 +47,7 @@ _KEYMAP_DRAW_MODULES = {
     'UV': keymap_props_uv,
     'SCULPT': keymap_props_sculpt,
     'PIPELINE': keymap_props_pipeline,
+    'OTHER': keymap_props_other,
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -71,6 +73,7 @@ class KeymapPG(bpy.types.PropertyGroup):
             ('UV', 'UV', ''),
             ('SCULPT', 'Sculpt', ''),
             ('PIPELINE', 'Pipeline', ''),
+            ('OTHER', 'Other', ''),
         ],
         default='SELECTION'
     )
@@ -83,6 +86,7 @@ class KeymapPG(bpy.types.PropertyGroup):
     uv: PointerProperty(type=keymap_props_uv.UVKeymapPG)
     sculpt: PointerProperty(type=keymap_props_sculpt.SculptKeymapPG)
     pipeline: PointerProperty(type=keymap_props_pipeline.PipelineKeymapPG)
+    other: PointerProperty(type=keymap_props_other.OtherKeymapPG)
 
     enable_keymaps: BoolProperty(
         name='Enable Keymaps',
@@ -132,6 +136,7 @@ classes = (
     keymap_props_uv.UVKeymapPG,
     keymap_props_sculpt.SculptKeymapPG,
     keymap_props_pipeline.PipelineKeymapPG,
+    keymap_props_other.OtherKeymapPG,
 
     # Import KeymapPG last
     KeymapPG,
