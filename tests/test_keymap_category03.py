@@ -328,6 +328,48 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
 
 
 class Category03ModalProbeTests(unittest.TestCase):
+    def test_extend_probe_uses_exact_selector_six_states_and_owned_modifiers(self):
+        from blender_keymap_category03_handlers import (
+            BINDINGS, ObjectExtendCases, ObjectExtendTrial, ObjectSubtractCases)
+        ledger = {r['row_id']: r for r in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        binding = ledger[ObjectExtendTrial.LEDGER_ID]['binding']
+        self.assertEqual(binding['scope']['name'], '3D View')
+        self.assertEqual((binding['event']['type'], binding['event']['value']), ('LEFTMOUSE', 'CLICK'))
+        self.assertEqual(ObjectExtendTrial.CONTROL_MODIFIERS,
+                         {name: bool(binding['event'][name]) for name in ('shift', 'oskey', 'ctrl', 'alt')})
+        self.assertEqual(ObjectSubtractCases.CONTROL_MODIFIERS, {})
+        self.assertEqual(len(BINDINGS), 7)
+        fake_bpy = types.SimpleNamespace(context=types.SimpleNamespace(
+            window_manager=types.SimpleNamespace(keyconfigs=object())))
+        with patch.dict(sys.modules, {'bpy': fake_bpy}):
+            for probe, count, step_count in ((True, 6, 68), (False, 2, 24)):
+                steps, receipt = [], {'dispatch': []}
+                fixture = ObjectExtendCases(steps, receipt, lambda *a, **k: None,
+                                            None, None, None, binding, probe=probe).append()
+                self.assertEqual(len(steps), step_count)
+                self.assertEqual(len(fixture.fixtures), count)
+                self.assertEqual([f.initial_selected for f in fixture.fixtures], [True, False] * (count // 2))
+                self.assertEqual([f.probe for f in fixture.fixtures],
+                                 [False, False, True, True, False, False] if probe else [False, False])
+                self.assertTrue(all(f.binding == binding for f in fixture.fixtures))
+
+    def test_extend_controls_require_active_state_and_positive_add_without_bystander_loss(self):
+        from blender_keymap_category03_handlers import ObjectExtendTrial
+        initial = {'target_selected': True, 'target_active': True,
+                   'bystander_selected': True, 'bystander_visible': True}
+        ObjectExtendTrial.assert_initial_state(initial, True)
+        with self.assertRaises(AssertionError):
+            ObjectExtendTrial.assert_initial_state({**initial, 'target_active': False}, True)
+        control = {'result': ['FINISHED', 'PASS_THROUGH']}
+        after = {'target_selected': True, 'target_active': True, 'bystander_selected': True}
+        ObjectExtendTrial.assert_positive_control(control, after)
+        for key in after:
+            with self.subTest(missing_effect=key), self.assertRaises(AssertionError):
+                ObjectExtendTrial.assert_positive_control(control, {**after, key: False})
+        for result in (['PASS_THROUGH'], ['FINISHED', 'CANCELLED'], ['RUNNING_MODAL']):
+            with self.subTest(result=result), self.assertRaises(AssertionError):
+                ObjectExtendTrial.assert_positive_control({'result': result}, after)
+
     def test_subtraction_production_rejects_selecting_an_unselected_target(self):
         from blender_keymap_category03_handlers import ObjectSubtractProductionCases
         for initial, final, enabled, accepted in (

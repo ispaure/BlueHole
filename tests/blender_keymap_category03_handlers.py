@@ -438,12 +438,15 @@ class ObjectSubtractCases(HandlerCases):
     """Focused future fixture; no Circle, navigation or shortest-path replay."""
 
     LEDGER_ID = '8674bcb4d856346f287980fd961ade31095f1165d1f6e25725e4c06b81f582f3'
+    CONTROL_MODIFIERS = {}
+    PROOF_KEY = 'subtract_proof'
+    LABEL_PREFIX = 'focused_subtract'
 
-    def __init__(self, *args, initial_selected=True, case_label=None, **kwargs):
+    def __init__(self, *args, initial_selected=True, case_label=None, binding=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.initial_selected = initial_selected
         self.scope_names.update(('Window', 'Screen', 'Frames', 'View2D'))
-        self.binding = BINDINGS[self.LEDGER_ID]
+        self.binding = binding if binding is not None else BINDINGS[self.LEDGER_ID]
         self.allocations = []
         self.created_maps = []
         self.control_class = None
@@ -483,7 +486,7 @@ class ObjectSubtractCases(HandlerCases):
             'ledger_ids': [self.LEDGER_ID], 'production_capability_enabled': False,
             'probe': self.probe, 'maps_before_without_control': self.initial_maps,
         }
-        self.receipt['subtract_proof'] = self.proof
+        self.receipt[self.PROOF_KEY] = self.proof
         self.receipt['dispatch'].append(self.result)
         if self.probe:
             event = {name: self.binding['event'][name] for name in
@@ -494,21 +497,25 @@ class ObjectSubtractCases(HandlerCases):
         assert not any(item.type == 'F23' for km in self.configs.user.keymaps
                        for item in km.keymap_items)
         callbacks, bpy = self.input_callbacks, self.bpy
+        modifiers = self.CONTROL_MODIFIERS
 
         class WM_OT_category03_subtract_control(bpy.types.Operator):
             bl_idname = 'wm.category03_subtract_control'
             bl_label = 'Category 03 subtraction input control'
 
             def invoke(self, context, event):
-                callbacks.append({'area': context.area.type, 'region': context.region.type,
-                                  'point': [event.mouse_region_x, event.mouse_region_y]})
+                delivery = {'area': context.area.type, 'region': context.region.type,
+                            'point': [event.mouse_region_x, event.mouse_region_y]}
+                if modifiers:
+                    delivery['modifiers'] = {name: getattr(event, name) for name in modifiers}
+                callbacks.append(delivery)
                 return {'FINISHED'}
 
         bpy.utils.register_class(WM_OT_category03_subtract_control)
         self.control_class = WM_OT_category03_subtract_control
         self.add_item({'name': 'Window', 'space_type': 'EMPTY', 'region_type': 'WINDOW'},
                       WM_OT_category03_subtract_control.bl_idname,
-                      {'type': 'F23', 'value': 'PRESS'}, {})
+                      {'type': 'F23', 'value': 'PRESS', **modifiers}, {})
         self.configs.update()
         counts = {}
         for role, maps in self.maps().items():
@@ -517,7 +524,7 @@ class ObjectSubtractCases(HandlerCases):
                                for km in maps if km['scope'] == self.binding['scope']
                                for row in km['items'])
         self.proof['exact_candidate_counts'] = counts
-        self.record('focused_subtract_ready')
+        self.record(self.LABEL_PREFIX + '_ready')
         if self.probe:
             assert counts['addon'] == counts['user'] == 1, 'Exact probe admission failed'
 
@@ -528,7 +535,7 @@ class ObjectSubtractCases(HandlerCases):
                      'target_visible': obj.visible_get(), 'mode': self.bpy.context.mode,
                      'area': self.area.type, 'region': self.region().type}
         self.result['phases'].append({'phase': phase, 'snapshot': value})
-        self.record('focused_subtract_' + phase)
+        self.record(self.LABEL_PREFIX + '_' + phase)
         return value
 
     def prepare(self):
@@ -548,10 +555,12 @@ class ObjectSubtractCases(HandlerCases):
         assert 0 <= x < self.region().width and 0 <= y < self.region().height
         self.result['projected_point'] = list(self.values['point'])
         self.event('MOUSEMOVE', 'NOTHING')
-        self.press('F23')
+        self.press('F23', **self.CONTROL_MODIFIERS)
 
     def before_input(self):
         expected = {'area': 'VIEW_3D', 'region': 'WINDOW', 'point': self.result['projected_point']}
+        if self.CONTROL_MODIFIERS:
+            expected['modifiers'] = self.CONTROL_MODIFIERS
         self.result['input_delivery'] = {'callbacks': list(self.input_callbacks),
                                          'delivered': expected in self.input_callbacks}
         assert self.result['input_delivery']['delivered']
@@ -623,7 +632,7 @@ class ObjectSubtractCases(HandlerCases):
         proof = self.proof
         proof.update(maps_after_without_control=after, cleanup_errors=errors,
                      exact_source_and_merged_preservation=after == self.initial_maps)
-        self.record('focused_subtract_cleanup')
+        self.record(self.LABEL_PREFIX + '_cleanup')
         assert not errors and proof['exact_source_and_merged_preservation']
         self.initial_maps = None
 
@@ -775,4 +784,187 @@ class ObjectSubtractProductionCases:
             for selected in (True, False):
                 self.trial(stage, enabled, selected)
         self.steps.extend((lambda: self.toggle(True), lambda: self.toggle(False), self.cleanup))
+        return self
+
+
+class ObjectExtendTrial(ObjectSubtractCases):
+    """One exact Cmd+Shift-click trial using the accepted geometry and journal."""
+
+    LEDGER_ID = 'fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d'
+    CONTROL_MODIFIERS = {'shift': True, 'oskey': True, 'ctrl': False, 'alt': False}
+    PROOF_KEY = 'extend_trial_proof'
+    LABEL_PREFIX = 'focused_extend'
+
+    def prepare(self):
+        super().prepare()
+        bpy = self.bpy
+        with self.context():
+            target = bpy.data.objects[self.values['object_name']]
+            bystander = bpy.data.objects.get('Category Extend Bystander')
+            if bystander is None:
+                bpy.ops.mesh.primitive_cube_add()
+                bystander = bpy.context.object
+                bystander.name = 'Category Extend Bystander'
+            bystander.location = (3, 0, 0)
+            bystander.scale = (0.25, 0.25, 0.25)
+            bystander.hide_set(False)
+            bystander.select_set(True)
+            target.select_set(self.initial_selected)
+            bpy.context.view_layer.objects.active = target if self.initial_selected else bystander
+            bpy.context.view_layer.update()
+        self.values['bystander_name'] = bystander.name
+
+    def read(self):
+        value = super().read()
+        target = self.bpy.data.objects[self.values['object_name']]
+        bystander = self.bpy.data.objects[self.values['bystander_name']]
+        active = self.bpy.context.view_layer.objects.active
+        return {**value, 'target_active': active == target,
+                'active_object': active.name if active else None,
+                'bystander_selected': bystander.select_get(),
+                'bystander_visible': bystander.visible_get()}
+
+    @staticmethod
+    def assert_initial_state(snapshot, selected):
+        assert snapshot['target_selected'] == selected
+        assert snapshot['target_active'] == selected
+        assert snapshot['bystander_selected'] and snapshot['bystander_visible']
+
+    def before_input(self):
+        super().before_input()
+        self.assert_initial_state(self.result['phases'][-1]['snapshot'], self.initial_selected)
+
+    def release_input(self):
+        self.snapshot('after_press')
+        self.event('LEFTMOUSE', 'RELEASE', **self.CONTROL_MODIFIERS)
+
+    def reset_direct_control(self):
+        after = self.snapshot('after_release')
+        assert not after['modal_operators'], 'Unexpected modal after Cmd+Shift-click'
+        self.result['native_target_selected'] = after['target_selected']
+        with self.context():
+            target = self.bpy.data.objects[self.values['object_name']]
+            bystander = self.bpy.data.objects[self.values['bystander_name']]
+            target.select_set(False)
+            bystander.select_set(True)
+            self.bpy.context.view_layer.objects.active = bystander
+            self.bpy.context.view_layer.update()
+        before = self.snapshot('direct_reset')
+        self.assert_initial_state(before, False)
+        assert before['target_visible']
+
+    def direct_control(self):
+        with self.context():
+            operator = self.bpy.ops.view3d.select
+            control = {'poll': operator.poll(), 'point': list(self.values['point']),
+                       'properties': {'center': True, 'extend': True},
+                       'method': 'independently reset same-origin add control; not dispatch evidence'}
+            self.result['direct_control'] = control
+            assert control['poll']
+            control['result'] = sorted(operator('EXEC_DEFAULT', location=self.values['point'],
+                                                center=True, extend=True))
+
+    @staticmethod
+    def assert_positive_control(control, after):
+        result = set(control['result'])
+        assert ('FINISHED' in result
+                and not result.intersection({'CANCELLED', 'RUNNING_MODAL', 'INTERFACE'})
+                and after['target_selected'] and after['target_active']
+                and after['bystander_selected'])
+
+    def verify_direct_control(self):
+        after = self.snapshot('after_direct')
+        control = self.result['direct_control']
+        control['positive_addition'] = (after['target_selected'] and after['target_active']
+                                        and after['bystander_selected'])
+        self.assert_positive_control(control, after)
+
+    def append(self):
+        self.steps.extend((self.start, self.prepare, self.aim_target, self.before_input,
+                           lambda: self.event('LEFTMOUSE', **self.CONTROL_MODIFIERS),
+                           self.release_input, self.reset_direct_control, self.direct_control,
+                           self.verify_direct_control, self.cleanup))
+        return self
+
+
+class ObjectExtendCases:
+    """Factory stock/probe/restored-stock comparison, never a production action."""
+
+    def __init__(self, steps, receipt, record, window, area, exporter, binding, *, probe=False):
+        self.steps, self.receipt, self.record = steps, receipt, record
+        self.arguments = (steps, receipt, record, window, area, exporter)
+        self.binding, self.probe = binding, probe
+        self.inspector = ObjectExtendTrial(*self.arguments, binding=binding)
+        self.fixtures, self.baseline, self.closed = [], None, False
+        self.proof = {'ledger_id': ObjectExtendTrial.LEDGER_ID,
+                      'test_only_driver': True, 'production_capability_enabled': False,
+                      'probe': probe, 'trials': []}
+        receipt['extend_proof'] = self.proof
+
+    def start(self):
+        self.inspector.configs.update()
+        self.baseline = self.inspector.maps()
+        self.proof['maps_before'] = self.baseline
+        self.record('extend_comparison_ready')
+
+    def trial(self, stage, selected, probe):
+        label = 'extend_' + stage + ('_selected_active' if selected else '_unselected')
+        fixture = ObjectExtendTrial(*self.arguments, binding=self.binding, probe=probe,
+                                    initial_selected=selected, case_label=label)
+        self.fixtures.append(fixture)
+        fixture.append()
+
+        def verify():
+            phases = {p['phase']: p['snapshot'] for p in fixture.result['phases']}
+            if self.proof['trials']:
+                assert fixture.result['projected_point'] == self.proof['trials'][0]['result']['projected_point']
+            if probe:
+                assert phases['after_release']['target_selected']
+                assert phases['after_release']['target_active']
+                assert phases['after_release']['bystander_selected']
+            counts = fixture.proof['exact_candidate_counts']
+            assert counts['addon'] == counts['user'] == int(probe)
+            assert fixture.proof['exact_source_and_merged_preservation']
+            self.proof['trials'].append({'case': label, 'stage': stage, 'probe': probe,
+                                        'result': fixture.result, 'preservation': fixture.proof})
+            self.record(label + '_verified')
+
+        self.steps.append(verify)
+
+    def cleanup(self):
+        if self.closed:
+            return
+        errors = []
+        for fixture in self.fixtures:
+            try:
+                fixture.cleanup()
+            except Exception as exc:
+                errors.append(type(exc).__name__ + ': ' + str(exc))
+        self.proof['cleanup_errors'] = errors
+        if len(self.proof['trials']) == 6:
+            outcomes = []
+            for trial in self.proof['trials']:
+                after = next(p['snapshot'] for p in trial['result']['phases']
+                             if p['phase'] == 'after_release')
+                outcomes.append({key: after[key] for key in
+                                 ('target_selected', 'target_active', 'bystander_selected')})
+            self.proof['stock_behavior_restored'] = outcomes[:2] == outcomes[4:]
+        if self.baseline is not None:
+            self.inspector.configs.update()
+            current = self.inspector.maps()
+            self.proof['maps_after'] = current
+            self.proof['exact_final_preservation'] = current == self.baseline
+            self.record('extend_comparison_cleanup')
+            assert self.proof['exact_final_preservation']
+        assert not errors
+        assert self.proof.get('stock_behavior_restored', True)
+        self.closed = True
+
+    def append(self):
+        self.steps.append(self.start)
+        stages = ('stock_before', 'probe', 'stock_after') if self.probe else ('stock_observe',)
+        for stage in stages:
+            for selected in (True, False):
+                self.trial(stage, selected, stage == 'probe')
+        self.steps.append(self.cleanup)
         return self
