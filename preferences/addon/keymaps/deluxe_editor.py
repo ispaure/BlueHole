@@ -1,5 +1,7 @@
 """Assignments and Commands views inside Blue Hole's Keymaps preferences."""
 
+import sys
+
 import bpy
 
 from . import deluxe_editor_ops as ops
@@ -102,6 +104,7 @@ def group_controls(layout, current, preview):
     if section is None:
         return
     row = group.row(align=True)
+    ops.operator_button(row, 'show_section_commands', 'View Commands', current.section, icon='FORWARD')
     if section.get('required'):
         row.label(text='Required section', icon='LOCKED')
     else:
@@ -159,8 +162,13 @@ def assignments(layout, current, preview, query):
         event = shortcut(catalog['events'][row['event']])
         scope = context_label(row['scope'])
         owner = meta['owner']
-        if find(' '.join((ops.command_name(current, row['command']), event, scope, owner,
-                          catalog['sections'][row['section']]['label'])), query):
+        operator = catalog['commands'][row['command']].get('operator', '')
+        if query.casefold().startswith('key:'):
+            matches = event.split(' (', 1)[0].casefold() == query[4:].strip().casefold()
+        else:
+            matches = find(' '.join((ops.command_name(current, row['command']), operator, event,
+                                     scope, owner, catalog['sections'][row['section']]['label'])), query)
+        if matches:
             found.append((id_, command, event, scope, owner))
     if not found:
         layout.label(text='No matching assignments' if query else 'No assignments in this section')
@@ -169,13 +177,19 @@ def assignments(layout, current, preview, query):
         current.assignment = shown[0][0] if shown else ''
     for id_, command, event, scope, owner in shown:
         box = layout.split(factor=0.45, align=True)
-        icon = 'RADIOBUT_ON' if id_ == current.assignment else 'RADIOBUT_OFF'
-        ops.operator_button(box, 'assignment', command, id_, icon=icon, depress=id_ == current.assignment)
+        header = box.row(align=True)
+        expanded = id_ == current.assignment and current.assignment_open
+        ops.operator_button(header, 'assignment', command, id_,
+                            icon='TRIA_DOWN' if expanded else 'TRIA_RIGHT', depress=expanded)
+        assignment = catalog['assignments'][id_]
+        toggle(header, 'assignments', id_, assignment, required=not preview['assignments'][id_]['editable'])
         details = box.split(factor=0.45, align=True)
-        details.label(text=event)
+        capture = details.row(align=True)
+        capture.enabled = preview['assignments'][id_]['editable']
+        capture.operator(ops.BH_OT_deluxe_capture.bl_idname, text=event).assignment = id_
         details.label(text=f'{scope} · {owner}')
-    if current.assignment:
-        inspector(layout.box(), current, preview, current.assignment)
+        if expanded:
+            inspector(layout.box(), current, preview, id_)
     if section:
         rules(layout, current, preview)
 
@@ -195,7 +209,14 @@ def inspector(layout, current, preview, id_):
         head.label(text='Deluxe default')
     else:
         head.label(text='Customized')
-    layout.label(text=f'{shortcut(event)}  ·  {context_label(row["scope"])}  ·  {meta["owner"]}')
+    section = current.catalog['sections'][row['section']]
+    category = current.catalog['categories'][section['category']]
+    path = f"{category['label']} / {section['label']}"
+    location = layout.row(align=True)
+    ops.operator_button(location, 'show_assignments', path, row['section'], icon='FILE_FOLDER')
+    toggle(location, 'sections', row['section'], section, required=section.get('required', False))
+    if not preview['sections'][row['section']]:
+        location.label(text='Section inactive', icon='INFO')
     if not state['eligible'] or not state['active']:
         layout.label(text='Inactive', icon='INFO')
     if meta['availability'] != 'available':
@@ -217,6 +238,7 @@ def inspector(layout, current, preview, id_):
     if not state['editable']:
         layout.label(text='Required shortcut', icon='LOCKED')
         return
+    shortcut_controls(layout, current, id_, event)
     actions = layout.row(align=True)
     op = actions.operator(ops.BH_OT_deluxe_capture.bl_idname, text='Capture for This Assignment', icon='REC')
     op.assignment = id_
@@ -226,19 +248,48 @@ def inspector(layout, current, preview, id_):
         op = actions.operator(ops.BH_OT_deluxe_capture.bl_idname, text=f'Capture for All {count}', icon='LINKED')
         op.assignment, op.shared = id_, True
     actions.operator(ops.BH_OT_deluxe_mapping.bl_idname, text='Assignment Settings').assignment = id_
-    toggle(actions, 'assignments', id_, row)
     ops.operator_button(actions, 'remove_assignment', '', id_, icon='TRASH')
-    if meta['fields']:
-        command_fields(layout, current, preview, row['command'], assignment=id_)
+    command_fields(layout, current, row['command'], assignment=id_)
     ops.operator_button(layout, 'show_command', 'View Command', id_, icon='FORWARD')
 
 
-def command_fields(layout, current, preview, id_, assignment=''):
+def shortcut_controls(layout, current, assignment, event):
+    view = ops.state(bpy.context)
+    options = ops.resolver.input_options()['event']
+    line = layout.row(align=True)
+    line.operator(ops.BH_OT_deluxe_capture.bl_idname, text=shortcut(event), icon='EVENT_A').assignment = assignment
+    for key, default, label in (('value', 'PRESS', ''), ('repeat', False, 'Repeat')):
+        value = event.get(key, default)
+        prop = 'option' if key == 'value' else 'boolean'
+        control = ops.inline_value(view, key, prop, value, assignment=assignment, items=options.get(key, ()))
+        line.prop(control, prop, text=label)
+    mods = layout.row(align=True)
+    any_mod = ops.inline_value(view, 'any', 'boolean', event.get('any', False), assignment=assignment)
+    mods.prop(any_mod, 'boolean', text='Any', toggle=True)
+    controls = mods.row(align=True)
+    controls.enabled = not event.get('any', False)
+    oskey = {'darwin': 'Cmd', 'win32': 'Win'}.get(sys.platform, 'OS Key')
+    for key, label in (('shift', 'Shift'), ('ctrl', 'Ctrl'), ('alt', 'Alt'), ('oskey', oskey)):
+        value = event.get(key, False)
+        button = controls.operator(ops.BH_OT_deluxe_inline_edit.bl_idname,
+                                   text=label + (' (Either)' if value == -1 else ''), depress=bool(value))
+        button.assignment, button.field = assignment, key
+    modifier = ops.inline_value(view, 'key_modifier', 'option', event.get('key_modifier', 'NONE'),
+                                assignment=assignment, items=options['key_modifier'])
+    mods.prop(modifier, 'option', text='')
+    if event.get('value') == 'CLICK_DRAG':
+        control = ops.inline_value(view, 'direction', 'option', event.get('direction', 'ANY'),
+                                   assignment=assignment, items=options['direction'])
+        layout.prop(control, 'option', text='Direction')
+
+
+def command_fields(layout, current, id_, assignment=''):
     command = current.catalog['commands'][id_]
-    meta = (preview['commands'][id_] if assignment else
-            current.store.resolver.describe_command(command, include_unset=True))
+    meta = current.store.resolver.describe_command(command, include_unset=not assignment)
     properties = command.get('properties', {})
     fields = meta['fields']
+    editable = all(not current.catalog['sections'][current.catalog['assignments'][aid]['section']].get('required')
+                   for aid in current.draft.uses('commands', id_))
     for explicit, heading in ((True, 'Configured Settings'), (False, 'Additional Blender Settings')):
         names = [name for name in fields if (name in properties) == explicit]
         if not names:
@@ -246,19 +297,33 @@ def command_fields(layout, current, preview, id_, assignment=''):
         group = layout.column(align=True)
         if not assignment:
             group.label(text=heading)
+        grid = group.grid_flow(columns=2, align=True)
         for name in names:
             field = fields[name]
             value = properties.get(name, field.get('default'))
             label = field.get('label', title(name))
+            cell = grid.box().row(align=True)
+            prop = ops.INLINE_VALUES.get(field.get('type'))
+            if editable and field.get('editable') and prop and not (field['shape'] or field['flags']):
+                control = ops.inline_value(ops.state(bpy.context), name, prop, value,
+                                           command=id_, items=field['enum_items'])
+                cell.prop(control, prop, text=label)
+                if explicit:
+                    reset = cell.operator(ops.BH_OT_deluxe_inline_edit.bl_idname, text='', icon='X')
+                    reset.command, reset.field = id_, name
+                if assignment:
+                    edit = cell.operator(ops.BH_OT_deluxe_field.bl_idname, text='', icon='DUPLICATE')
+                    edit.command, edit.field, edit.assignment = id_, name, assignment
+                continue
             if value is not None:
                 label += ': ' + display_value(value)
             if not explicit and value is not None:
                 label += ' (default)'
-            if field.get('editable'):
-                op = group.operator(ops.BH_OT_deluxe_field.bl_idname, text=label, icon='GREASEPENCIL')
+            if editable and field.get('editable'):
+                op = cell.operator(ops.BH_OT_deluxe_field.bl_idname, text=label, icon='GREASEPENCIL')
                 op.command, op.field, op.assignment = id_, name, assignment
             else:
-                group.label(text=label, icon='LOCKED')
+                cell.label(text=label, icon='LOCKED')
     if not meta['editable'] and not assignment:
         layout.label(text='No editable settings for this command', icon='INFO')
 
@@ -278,6 +343,9 @@ def commands(layout, current, preview, query):
     section_menu.enabled = bool(current.command_category)
     section_menu.menu(BH_MT_deluxe_command_sections.__name__,
                       text=section.get('label', 'All Sections'), icon='DOWNARROW_HLT')
+    if section:
+        toggle(row, 'sections', current.command_section, section, required=section.get('required', False))
+        ops.operator_button(row, 'show_assignments', 'View Assignments', current.command_section, icon='FORWARD')
     found = []
     for id_ in current.command_ids():
         meta = preview['commands'][id_]
@@ -293,22 +361,25 @@ def commands(layout, current, preview, query):
         layout.label(text='No matching commands')
     for id_, name, meta in shown:
         row = layout.row(align=True)
-        ops.operator_button(row, 'command', name, id_, depress=id_ == current.command)
+        expanded = id_ == current.command and current.command_open
+        ops.operator_button(row, 'command', name, id_,
+                            icon='TRIA_DOWN' if expanded else 'TRIA_RIGHT', depress=expanded)
         row.label(text=STATUS_LABELS.get(meta['availability'], meta['owner']))
-    if not current.command:
-        return
-    id_ = current.command
-    meta = preview['commands'][id_]
-    box = layout.box()
-    box.label(text=f"{ops.command_name(current, id_)}  ·  {meta['owner']}")
-    if meta['availability'] != 'available':
-        box.label(text=STATUS_LABELS[meta['availability']], icon='ERROR')
+        if expanded:
+            command_details(layout.box(), current, id_)
+
+
+def command_details(layout, current, id_):
     uses = current.draft.uses('commands', id_)
-    if uses:
-        ops.draw_uses(box, current, 'commands', uses[0])
-    else:
-        box.label(text='Unused command')
-    command_fields(box, current, preview, id_)
+    sections = dict.fromkeys(current.catalog['assignments'][aid]['section'] for aid in uses)
+    for section_id in sections:
+        section = current.catalog['sections'][section_id]
+        category = current.catalog['categories'][section['category']]
+        label = f"{category['label']} / {section['label']}"
+        ops.operator_button(layout, 'show_assignments', label, section_id, icon='FORWARD')
+    if not uses:
+        layout.label(text='No assignment uses this command')
+    command_fields(layout, current, id_)
 
 
 def rules(layout, current, preview):
@@ -349,6 +420,8 @@ def draw(context, layout):
     toolbar = layout.row(align=True)
     toolbar.prop(view, 'tab', expand=True)
     toolbar.prop(view, 'search', text='', icon='VIEWZOOM')
+    if view.tab == 'ASSIGNMENTS':
+        toolbar.operator(ops.BH_OT_deluxe_capture.bl_idname, text='Find by Key').search = True
     transaction_controls(layout, current)
     try:
         preview = current.preview()

@@ -89,7 +89,9 @@ class Editor:
         self.category = 'navigation' if 'navigation' in self.catalog['categories'] else ''
         self.section = ''
         self.assignment = ''
+        self.assignment_open = True
         self.command = ''
+        self.command_open = True
         self.command_category = ''
         self.command_section = ''
         self.page = 0
@@ -176,7 +178,7 @@ class Editor:
         if shared:
             for id_ in self.draft.uses('events', event_id):
                 self.require_editable_assignment(id_)
-        else:
+        elif len(self.draft.uses('events', event_id)) > 1:
             event_id = self.draft.clone('events', assignment)
         self.draft.put('events', event_id, event)
         self.changed()

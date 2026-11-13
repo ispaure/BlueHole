@@ -7,7 +7,7 @@ import json
 from uuid import uuid4
 
 import bpy
-from bpy.props import (BoolProperty, EnumProperty, FloatProperty, IntProperty,
+from bpy.props import (BoolProperty, CollectionProperty, EnumProperty, FloatProperty, IntProperty,
                        PointerProperty, StringProperty)
 
 from ....keymaps import deluxe_resolver as resolver, keymap_utils as runtime, keymaps_register
@@ -63,6 +63,45 @@ class EditorOperator:
             _dialog_choices.pop(key, None)
 
 
+_inline_enums = {}
+_syncing_inline = False
+INLINE_VALUES = {'BOOLEAN': 'boolean', 'INT': 'integer', 'FLOAT': 'number',
+                 'STRING': 'string', 'ENUM': 'option'}
+EVENT_MODIFIERS = ('shift', 'ctrl', 'alt', 'oskey', 'hyper')
+
+
+def inline_options(control, _context):
+    return _inline_enums.get(control.choices_key, [])
+
+
+def inline_update(prop):
+    def update(control, context):
+        if _syncing_inline or _editor is None:
+            return
+        try:
+            value = getattr(control, prop)
+            if control.command:
+                _editor.edit_command(control.command, control.field, value)
+            else:
+                stage_event_field(_editor, control.assignment, control.field, value)
+        except ERRORS as error:
+            _editor.message = str(error)
+        redraw(context)
+    return update
+
+
+class BH_PG_deluxe_value(bpy.types.PropertyGroup):
+    command: StringProperty(options=HIDDEN)
+    assignment: StringProperty(options=HIDDEN)
+    field: StringProperty(options=HIDDEN)
+    choices_key: StringProperty(options=HIDDEN)
+    boolean: BoolProperty(update=inline_update('boolean'), options=TRANSIENT)
+    integer: IntProperty(update=inline_update('integer'), options=TRANSIENT)
+    number: FloatProperty(update=inline_update('number'), precision=6, options=TRANSIENT)
+    string: StringProperty(update=inline_update('string'), options=TRANSIENT)
+    option: EnumProperty(items=inline_options, update=inline_update('option'), options=TRANSIENT)
+
+
 class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
     def reset_page(self, _context):
         if _editor is not None:
@@ -76,10 +115,34 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
     live_source: EnumProperty(name='Source', items=[(key, label, '') for key, label in SOURCE_LABELS.items()],
                               options=TRANSIENT, update=lambda self, _context: setattr(self, 'live_page', 0))
     live_page: IntProperty(min=0, options=TRANSIENT)
+    values: CollectionProperty(type=BH_PG_deluxe_value, options=TRANSIENT)
 
 
 def state(context):
     return getattr(context.window_manager, WM_PROPERTY)
+
+
+def inline_value(view, field, prop, value, *, command='', assignment='', items=()):
+    """Bind a native widget to transient RNA, with changes staged in the draft."""
+    global _syncing_inline
+    name = f'{command or assignment}:{field}'
+    control = view.values.get(name)
+    _syncing_inline = True
+    try:
+        if control is None:
+            control = view.values.add()
+            control.name = name
+            control.command, control.assignment, control.field = command, assignment, field
+        if items:
+            control.choices_key = repr(items)
+            if control.choices_key not in _inline_enums:
+                _inline_enums[control.choices_key] = choices(
+                    (item, title(item), '') if isinstance(item, str) else item for item in items)
+        if getattr(control, prop) != value:
+            setattr(control, prop, value)
+    finally:
+        _syncing_inline = False
+    return control
 
 
 class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
@@ -95,15 +158,26 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
         return self.execute(context)
 
     def execute(self, context):
-        if self.action == 'show_command':
+        if self.action == 'show_assignments':
+            def show_assignments(current):
+                section = current.catalog['sections'][self.target]
+                view = state(context)
+                view.tab, view.search = 'ASSIGNMENTS', ''
+                current.category, current.section = section['category'], self.target
+                current.assignment, current.page = '', 0
+
+            return self.run(context, show_assignments)
+        if self.action in {'show_command', 'show_section_commands'}:
             def show(current):
                 view = state(context)
                 view.tab = 'COMMANDS'
-                assignment = current.catalog['assignments'][self.target]
-                current.command_section = assignment['section']
-                current.command_category = current.catalog['sections'][assignment['section']]['category']
-                current.command = assignment['command']
-                view.search = command_name(current, current.command)
+                assignment = current.catalog['assignments'].get(self.target, {})
+                section = assignment.get('section', self.target)
+                current.command_section = section
+                current.command_category = current.catalog['sections'][section]['category']
+                current.command = assignment.get('command', '')
+                current.command_open = True
+                view.search = command_name(current, current.command) if assignment else ''
 
             return self.run(context, show)
         return super().execute(context)
@@ -128,11 +202,14 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
         elif action == 'command_section':
             current.command_section = target
             current.page = 0
-        elif action in {'section', 'assignment', 'command'}:
+        elif action in {'assignment', 'command'}:
+            opened = getattr(current, action) != target or not getattr(current, action + '_open')
             setattr(current, action, target)
-            if action == 'section':
-                current.assignment = ''
-                current.page = 0
+            setattr(current, action + '_open', opened)
+        elif action == 'section':
+            setattr(current, action, target)
+            current.assignment = ''
+            current.page = 0
         elif action == 'page':
             current.page = int(target)
         elif action == 'order':
@@ -357,6 +434,40 @@ def stage_input(current, assignment, event, shared):
         current.changed('Shortcut added to the library')
 
 
+def stage_event_field(current, assignment, field, value):
+    row = current.catalog['assignments'][assignment]
+    event = dict(current.catalog['events'][row['event']])
+    event[field] = value
+    if field == 'type':
+        event['map_type'] = map_type(value)
+    elif field == 'any':
+        event.update(dict.fromkeys(EVENT_MODIFIERS, -1 if value else False))
+    stage_input(current, assignment, event, False)
+
+
+class BH_OT_deluxe_inline_edit(EditorOperator, bpy.types.Operator):
+    bl_idname = 'wm.bh_deluxe_inline_edit'
+    bl_label = 'Edit Keymap Setting'
+
+    assignment: StringProperty(options=HIDDEN)
+    command: StringProperty(options=HIDDEN)
+    field: StringProperty(options=HIDDEN)
+
+    @classmethod
+    def description(cls, _context, props):
+        return 'Use Blender default' if props.command else 'Cycle modifier: off, on, either'
+
+    def stage(self, current):
+        if self.command:
+            current.edit_command(self.command, self.field, None, unset=True)
+            return
+        require(self.field in EVENT_MODIFIERS, 'Unknown modifier')
+        row = current.catalog['assignments'][self.assignment]
+        event = current.catalog['events'][row['event']]
+        value = event.get(self.field) or False
+        stage_event_field(current, self.assignment, self.field, {-1: False, False: True, True: -1}[value])
+
+
 def draw_uses(layout, current, table, assignment, shared=True):
     row = current.catalog['assignments'][assignment]
     key = 'event' if table == 'events' else 'command'
@@ -372,6 +483,7 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
 
     assignment: StringProperty(options=HIDDEN)
     shared: BoolProperty(options=HIDDEN)
+    search: BoolProperty(options=HIDDEN)
 
     def invoke(self, context, _event):
         current = editor()
@@ -407,10 +519,16 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
                 'OSKEY', 'HYPER', 'NONE', 'MOUSEMOVE', 'INBETWEEN_MOUSEMOVE'} or event.type.startswith('TIMER'):
             return {'RUNNING_MODAL'}
         self.cancel(context)
-        return self.run(context, lambda current: stage_input(current, self.assignment, {
+        captured = {
             'type': event.type, 'map_type': map_type(event.type), 'shift': event.shift,
             'ctrl': event.ctrl, 'alt': event.alt, 'oskey': event.oskey,
-        }, self.shared))
+        }
+        if self.search:
+            state(context).search = 'Key: ' + shortcut(captured)
+            _editor.message = ''
+            redraw(context)
+            return {'FINISHED'}
+        return self.run(context, lambda current: stage_input(current, self.assignment, captured, self.shared))
 
 
 class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):
@@ -429,6 +547,12 @@ class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):
     option: EnumProperty(items=lambda self, _: enum_items(self, 'values'), options=TRANSIENT)
     enabled: BoolProperty(name='Flag enabled', options=TRANSIENT)
     use_default: BoolProperty(name='Use Blender default', options=TRANSIENT)
+
+    @classmethod
+    def description(cls, _context, props):
+        if props.assignment:
+            return 'Edit this setting, with the option to make a separate command for this assignment'
+        return cls.bl_label
 
     def invoke(self, context, _event):
         current = editor()
@@ -701,7 +825,8 @@ class BH_OT_deluxe_stage_binding(EditorOperator, bpy.types.Operator):
 
 
 classes = (
-    BH_PG_deluxe_editor, BH_OT_deluxe_edit, BH_OT_deluxe_section, BH_OT_deluxe_mapping,
+    BH_PG_deluxe_value, BH_PG_deluxe_editor, BH_OT_deluxe_edit, BH_OT_deluxe_inline_edit,
+    BH_OT_deluxe_section, BH_OT_deluxe_mapping,
     BH_OT_deluxe_shortcut, BH_OT_deluxe_capture, BH_OT_deluxe_field,
     BH_OT_deluxe_binding_picker, BH_OT_deluxe_stage_binding,
 )
@@ -717,6 +842,7 @@ def unregister():
     global _editor
     _editor = None
     _dialog_choices.clear()
+    _inline_enums.clear()
     delattr(bpy.types.WindowManager, WM_PROPERTY)
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

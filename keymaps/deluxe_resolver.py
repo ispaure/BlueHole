@@ -68,6 +68,10 @@ def _field(prop):
     return {
         'label': prop.name, 'type': kind, 'editable': not prop.is_readonly,
         'default': value, 'values': _enum(prop) if kind == 'ENUM' else (),
+        'enum_items': (tuple((item.identifier, getattr(item, 'name', item.identifier),
+                              getattr(item, 'description', ''))
+                             for item in prop.enum_items if item.identifier)
+                       if kind == 'ENUM' else ()),
         'flags': flags, 'shape': shape,
         'minimum': getattr(prop, 'hard_min', None), 'maximum': getattr(prop, 'hard_max', None),
         'max_length': getattr(prop, 'length_max', 0) if kind == 'STRING' else 0,
@@ -346,7 +350,8 @@ class Resolver:
             request = runtime.KeymapAssignment(
                 id_, scope, event, self.target(command), declared_properties_only=True,
                 active=row.get('active', True), ledger_id=catalog['base']['ledger'] if samples else '',
-                sample_id=samples[0] if samples else '')
+                sample_id=samples[0] if samples else '',
+                requires_operator=bool(command.get('provider')))
             groups.setdefault(owner, []).append(request)
         return state, groups
 

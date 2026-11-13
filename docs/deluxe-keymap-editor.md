@@ -5,10 +5,16 @@ configuring Deluxe on the Blender preset. Assignments show the command,
 shortcut, keymap context and source. Search spans all sections. The category
 and section menus browse one section at a time when search is empty.
 
+- Expand a row with its arrow to see its section and edit it in place. The
+  section link opens its assignments and the checkbox stages its enabled
+  state. **View Commands** and **View Assignments** switch between views for
+  that section. **Find by Key** captures a shortcut for search without editing
+  a binding. The search box also accepts a command name or operator ID.
 - Select an assignment and use **Capture for This Assignment** to give it its
   own shortcut. **Capture for All** changes the shared shortcut across the
-  listed contexts. Escape cancels capture. **Edit Shortcut** exposes the key,
-  event phase, modifiers, drag direction, key modifier and repeat.
+  listed contexts. Escape cancels capture. The expanded row offers inline
+  capture, event phase, repeat, and modifier controls for the current assignment.
+  **Edit Shortcut** also offers the full event settings and shared editing.
 - **Assignment Settings** lets you move the assignment or choose an existing
   command, shortcut and keymap. To add a mapping, add or select a section,
   choose **Add Assignment**, and select those three entries. **New Shortcut**
@@ -16,9 +22,10 @@ and section menus browse one section at a time when search is empty.
 - The **Commands** tab has its own category and section filters based on where
   each command is used. **All Categories** includes unused commands. The
   selected command shows configured settings and additional Blender settings
-  discovered from the operator. Edit a field there to change all uses, or
-  choose **Use Blender default** to remove its explicit value. The assignment inspector also offers
-  **This assignment only** in the field dialog, which clones the command.
+  discovered from the operator. Edit a field inline to change all uses. Use
+  the **×** beside a configured value to restore Blender's default. The
+  duplicate icon in an assignment's command settings opens the field dialog
+  with a **This assignment only** option, which clones the command.
   Boolean, integer, float, string, enum, enum-flag and fixed numeric array
   controls follow the resolver's RNA metadata. Flag and array controls edit
   one member at a time. Menu/tool routes and provider-managed values are

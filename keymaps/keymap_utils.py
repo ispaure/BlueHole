@@ -164,6 +164,7 @@ class KeymapAssignment:
     sample_id: str = ''
     declared_properties_only: bool = False
     active: bool = True
+    requires_operator: bool = False
 
 
 @dataclass(frozen=True)
@@ -1252,6 +1253,12 @@ class FeatureHandle:
                 else:
                     if request.scope.is_tool is not None and request.scope.is_tool is not False:
                         raise _Pending('unproved_tool_scope', 'unsupported')
+                    if request.requires_operator:
+                        namespace, name = request.target.idname.split('.')
+                        try:
+                            getattr(getattr(bpy.ops, namespace), name).get_rna_type()
+                        except (AttributeError, KeyError, RuntimeError, TypeError, ValueError):
+                            raise _Pending('waiting_for_provider') from None
                     staged.append((request, None))
             except _Pending as issue:
                 diagnostics.append(_diagnostic(self, request, issue.status, issue.reason, issue.role, issue.capability))

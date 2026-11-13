@@ -5,6 +5,7 @@ in the bounded Blender receipts; these cases exercise ownership and recovery.
 """
 
 import importlib.util
+from dataclasses import replace
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
@@ -545,6 +546,23 @@ class RuntimeKeymapTests(unittest.TestCase):
                          ['bluehole.replacement', 'bluehole.second'])
         handle.release()
         self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_missing_provider_waits_without_rebuilding_and_registers_when_available(self):
+        self.addon()
+        request = replace(self.assignment(), requires_operator=True)
+        with patch.object(self.utils, '_update_merged', wraps=self.utils._update_merged) as update:
+            handle = self.utils.register_feature('provider-wait', assignments=(request,))
+            handle.refresh()
+            self.assertEqual(handle.diagnostics[0].reason, 'waiting_for_provider')
+            self.assertFalse(handle.owned_pairs)
+            update.assert_not_called()
+            namespace, name = request.target.idname.split('.')
+            operator = types.SimpleNamespace(get_rna_type=lambda: object())
+            self.runtime.bpy.ops = types.SimpleNamespace(
+                **{namespace: types.SimpleNamespace(**{name: operator})})
+            handle.refresh()
+            self.assertEqual(len(handle.owned_pairs), 1)
+            update.assert_called_once()
 
     def test_property_setter_failure_removes_created_item(self):
         self.source(row())
