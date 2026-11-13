@@ -1232,6 +1232,39 @@ class Category03NativeReceiptTests(unittest.TestCase):
                     self.assertEqual(snapshot[key], case['before'][key])
         self.assertEqual(self.manifest['uv_cursor_dispatch']['status'], 'unverified: gesture and direct control had no effect in either setup')
 
+    def test_combined_context_receipt_retains_tool_effects_and_control_failures(self):
+        production = self.runs['ordinary_production-1794561360052050000']
+        reference = next(run for run in self.native['reference_runs']
+                         if run['id'] == 'reference-evidence-1794561456886365000')
+        prod, ref = production['dispatch'], reference['observations']['dispatch']
+        self.assertEqual(len(prod), 16)
+        self.assertEqual(len(ref), 16)
+        self.assertEqual(production['native_status'], 'complete')
+        self.assertEqual(reference['observations']['status'], 'error')
+        for left, right in zip(prod, ref):
+            self.assertEqual(left['ledger_id'], right['ledger_id'])
+            self.assertEqual(left['context_variant'], right['context_variant'])
+            for case in (left, right):
+                self.assertTrue(case['context_ready'])
+                self.assertTrue(case['input_delivery']['delivered'])
+                if case['target'] == 'wm.tool_set_by_id':
+                    self.assertTrue(case['start_control_valid'])
+                    self.assertEqual(case['error']['phase'], 'direct_fixture_control')
+                    self.assertEqual(case['error']['type'], 'RuntimeError')
+        for cases in (prod, ref):
+            self.assertEqual(sum('error' in case for case in cases), 14)
+            uv_t = next(case for case in cases if case['tested_key'] == 'T')
+            self.assertEqual(uv_t['before']['active_tool'], 'builtin.select_box')
+            self.assertEqual(uv_t['after']['active_tool'], 'builtin.transform')
+        # First-press agreement does not establish cycling parity.
+        prod_q, ref_q = prod[3], ref[3]
+        self.assertEqual(prod_q['after']['active_tool'], ref_q['after']['active_tool'])
+        self.assertEqual(prod_q['after_second_input']['active_tool'], 'builtin.select_circle')
+        self.assertEqual(ref_q['after_second_input']['active_tool'], 'builtin.select_box')
+        self.assertFalse(reference['observations']['ordinary_proof']['foreign_source_fields_and_order_unchanged'])
+        self.assertTrue(production['watcher_stopped'])
+        self.assertEqual(production['cleanup']['owned'], 0)
+
     def test_shared_production_persistence_restores_editor_circle_framing_and_arrow_edits(self):
         pairs = (
             ('editor_save-1794555923466868000', 'editor_reopen-1794556023841045000', {'editor_more'}),

@@ -1273,5 +1273,33 @@
       "scope": "4.5.1 UV IMAGE_EDITOR/WINDOW selection; VIEW_3D inherited frame jumps; feature off/on and fresh saved edit",
       "remaining": "owner05 global Frames ownership and owner06 composition; no 5.2.2 native claim"
     }
+  },
+  "ordinary_tools_selection_comparison": {
+    "status": "partial native behavior; direct tool controls invalid; no new accepted candidates",
+    "production_run": "ordinary_production-1794561360052050000",
+    "reference_run": "reference-evidence-1794561456886365000",
+    "observations_per_configuration": 16,
+    "exact_rows": 10,
+    "all_context_and_input_controls_passed": true,
+    "matching_positive_contexts": [
+      "UV T activates Transform",
+      "Vertex Paint face-mask Q cycles Box then Circle",
+      "Weight Paint face-mask Q cycles Circle then Lasso"
+    ],
+    "cycling_mismatch": "Image/UV Q first press Box on both; second press production Circle, reference Box",
+    "tool_direct_control_failure": "All 14 tool-case direct controls explicitly pass captured default space_type=EMPTY. Bundled wm.py space_type_from_operator uses that explicit value if is_property_set; only an unset property resolves the actual context space. These RuntimeErrors are fixture-control failures, not unavailable-tool conclusions. Native shortcut effects retain distinct-start/context/input evidence.",
+    "selection_limits": "Image Paint Invert poll false; Object ESC direct CANCELLED. No availability/parity conclusion.",
+    "reference_preservation": {
+      "status": "strict failure",
+      "changed_rows": 227,
+      "changed_fields": [
+        "read_issues",
+        "properties"
+      ],
+      "property_rows": 2,
+      "property_detail": "Weight Paint wm.pme_user_pie_menu_call IDs1/2 gained invoke_mode/keymap/pie_menu_name/slot readback; prior values unknown",
+      "native_ids_order_and_other_fields_unchanged": true
+    },
+    "remaining": "Record native property-set flags and prepare context-bound positive controls; reuse accepted lifecycle. No repeat pair or runtime expansion allocated."
   }
 }

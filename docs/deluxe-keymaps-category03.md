@@ -204,14 +204,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Forty-nine category checks currently pass. They cover exact assigned IDs and
+Fifty category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 54 factory attempts and fifteen copied-reference attempts. A completed
+retains 55 factory attempts and sixteen copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -468,12 +468,28 @@ A source-bound single-step launcher retains the exact wheel comparison and share
 lifecycle/control commands. Another native allocation is required for further
 families; the inconclusive wheel pair will not be repeated unchanged.
 
-The prepared combined tools/selection fixture covers ten exact rows in sixteen
+The combined tools/selection fixture covers ten exact rows in sixteen
 context observations per configuration. Image W/E/R/Q each run in VIEW and UV;
 Vertex/Weight Paint Q each run with selection masking off and face masking on.
 The bundled 4.5.1 tool definitions expose selection/transform tools in UV and
 conditionally expose paint selection tools, so a VIEW-only or unmasked failure
 cannot establish unavailability. Every observation retains its own reset,
 Window delivery, distinct starting-tool evidence and direct control. Factory
-and copied-reference configurations still require separate children. This
-combined fixture is prepared off desktop and has no native acceptance yet.
+and copied-reference configurations require separate children. Batch26 completed
+all sixteen observations in each child, with every context and Window control
+valid. UV T and masked Vertex/Weight Paint Q produced matching tool changes.
+Image/UV Q matched on its first press but production cycled to Circle on the
+second while reference stayed on Box; cycling parity remains open.
+
+All fourteen tool direct controls failed because the fixture explicitly passed
+captured default `space_type=EMPTY`. The bundled operator uses that value when
+the property is set, and derives the actual editor only when it is unset. These
+are control errors, not tool-unavailability evidence. A follow-up must record
+native property-set state and distinguish a context-derived positive control
+from exact keymap readback. Image Paint Invert polled false; Object ESC's direct
+control returned CANCELLED. Neither fixture establishes unavailable behavior.
+The copied reference also failed strict preservation on 227 rows: readability
+changed, and two Weight Paint provider rows exposed four additional properties.
+Native IDs, order and other fields were unchanged; newly readable values do not
+prove their previous values. Production native shutdown and both host cleanups
+passed, with protected input hashes exact and no copied resources remaining.
