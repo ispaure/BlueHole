@@ -28,6 +28,17 @@ ROUTING_OPERATORS = {
     'wm.context_toggle', 'wm.radial_control', 'wm.tool_set_by_id',
 }
 COMMAND_ERRORS = (AttributeError, KeyError, ReferenceError, RuntimeError, TypeError, ValueError)
+OBJECT_NON_MODAL_SCOPES = frozenset(runtime.KeymapScope('Object Non-modal', is_tool=is_tool)
+                                   for is_tool in (None, False))
+OBJECT_MODE = runtime.KeymapScope('Object Mode')
+COLLECTION_NUMBER_EVENTS = frozenset(runtime.KeymapEvent(key) for key in (
+    'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'ZERO'))
+MODE_OPERATORS = frozenset({'object.mode_set', 'object.mode_set_with_submode'})
+
+
+def profile_assignment_id(request_id):
+    """Map an Object Mode runtime companion back to its editable assignment."""
+    return request_id.partition(':')[0]
 
 
 def _enum(prop):
@@ -356,7 +367,16 @@ class Resolver:
                 active=row.get('active', True), ledger_id=catalog['base']['ledger'] if samples else '',
                 sample_id=samples[0] if samples else '',
                 requires_operator=bool(command.get('provider')))
-            groups.setdefault(owner, []).append(request)
+            requests = groups.setdefault(owner, [])
+            requests.append(request)
+            # The viewport dispatches Object Mode before Object Non-modal.
+            # Give compatible native mode changes a chance before stock collection
+            # selection. The original route remains available in other modes.
+            if (request.active and scope in OBJECT_NON_MODAL_SCOPES
+                    and replace(event, repeat=False) in COLLECTION_NUMBER_EVENTS
+                    and command['operator'] in MODE_OPERATORS
+                    and command['properties'].get('mode') not in (None, 'OBJECT')):
+                requests.append(replace(request, request_id=id_ + ':object-mode', scope=OBJECT_MODE))
         return state, groups
 
     @staticmethod

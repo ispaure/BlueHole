@@ -15,6 +15,12 @@ category and section menus browse one section at a time when search is empty.
   that section. Select **Key-Binding** in Assignments to type a shortcut such
   as `Shift F10` or `Ctrl Shift A`. Use **Name** to search by command name,
   operator ID, keymap, or add-on source such as `Zen UV`.
+- To create a number-key mode shortcut, choose the Blender mode command, an
+  unmodified number press, and the **Object Non-modal** keymap. Deluxe also
+  registers it in **Object Mode** so a compatible mode change runs before
+  Blender's collection shortcut. The same rule applies when you recreate an
+  assignment. **Enter Object Mode** keeps the collection shortcut available
+  when the object is already in Object Mode.
 - Click the key in the detail pane to capture a new key for that assignment.
   Expand **Linked assignments** to see the contexts affected by **Capture for
   All**. Escape cancels capture. The pane places the key, event phase,

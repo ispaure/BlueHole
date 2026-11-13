@@ -12,7 +12,7 @@ from ..Lib.commonUtils.persistence.locking import file_lock
 from ..Lib.commonUtils.runtime.operations import MutationIncomplete
 from . import keymap_utils as runtime
 from .keymap_action_utils import resolve_scope
-from .deluxe_resolver import Resolver, capture_candidate, selector_status
+from .deluxe_resolver import Resolver, capture_candidate, profile_assignment_id, selector_status
 from .deluxe_schema import (ProfileError, TABLES, identifier, merge_profile, profile_overlay,
                             require, same_value, selector_descriptor, validate_catalog)
 
@@ -207,7 +207,7 @@ class ProfileStore:
             for request in requests:
                 if request.active:
                     scope = resolve_scope(request.scope, config)
-                    active[scope, request.event].append(request.request_id)
+                    active[scope, request.event].append(profile_assignment_id(request.request_id))
         inherited = self._inherited_conflicts(active)
         conflicts = tuple(tuple(ids) for ids in active.values() if len(ids) > 1)
         required = {id_ for id_, row in catalog['sections'].items() if row.get('required')}
@@ -328,8 +328,14 @@ class ProfileStore:
 
     @staticmethod
     def registration_results():
-        return {d.request_id: (d.status, d.reason) for d in runtime.runtime_diagnostics()
-                if ':deluxe-' in d.owner_id}
+        results = {}
+        for diagnostic in runtime.runtime_diagnostics():
+            if ':deluxe-' not in diagnostic.owner_id:
+                continue
+            id_ = profile_assignment_id(diagnostic.request_id)
+            if id_ not in results or diagnostic.status != 'applied':
+                results[id_] = (diagnostic.status, diagnostic.reason)
+        return results
 
     def check_registration(self, catalog, before):
         """Reject new registration errors, preserving known or unavailable rows."""
@@ -338,6 +344,8 @@ class ProfileStore:
         for requests in groups.values():
             for request in requests:
                 id_ = request.request_id
+                if id_ not in catalog['assignments']:
+                    continue
                 status, reason = after.get(id_, ('pending', 'feature_registration_incomplete'))
                 if status == 'applied':
                     continue

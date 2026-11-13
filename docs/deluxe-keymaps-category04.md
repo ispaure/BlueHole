@@ -114,11 +114,24 @@ Bevel tool started native Bevel. Moving and releasing increased the cube's
 vertex count from 8 to 24 and ended the modal operation. Disabling and
 re-enabling Mesh Tool Shortcuts removed and restored its binding.
 
-The Mode Switching section removed and restored the Deluxe `1` binding
-in Object Non-modal, but pressing `1` in Object Mode left the cube in
-Object Mode. Disabling only the stock Object Mode `object.hide_collection`
-binding for `1` in the disposable profile let the Deluxe binding enter
-vertex Edit Mode. The test restored the stock binding before shutdown.
-Keep this cross-keymap precedence issue open under Brief 04. The replay
-covered `1` and recorded its results in
-`test-results/deluxe-keymaps-category04/native-followup/readback.json`.
+The [4.5.1 viewport handler order](https://github.com/blender/blender/blob/v4.5.1/source/blender/editors/space_view3d/space_view3d.cc#L336-L403)
+puts Object Mode before Object Non-modal. The old `BH_Keymaps.py` preset
+supplied its own Object Mode map without the stock collection-number
+bindings. A disposable replay activated that preset with factory user
+preferences and confirmed that `1` entered vertex Edit Mode. Switching to
+the stock Blender base restored all eight stock collection bindings. The
+initial Deluxe replay on that base confirmed that disabling only the stock
+`1` binding was sufficient to restore vertex Edit Mode.
+
+Deluxe now also registers a matching Object Mode item when an Object Non-modal
+assignment uses an unmodified number press for a native command that enters a
+mode. Blender prepends that item within Object Mode. The original assignment
+continues to dispatch in other modes, and Blender's native command can pass
+through to the collection shortcut when the target mode is incompatible.
+This rule follows the assignment's current settings, including when it is
+recreated under a new ID. The section switch removes both items. `4` returns
+to Object Mode from Edit Mode and still selects collection 4 in Object Mode.
+The replay covered `1` and `2` on a mesh, `3` on an armature, `4` from Edit
+Mode, `5`–`8` on a mesh, and stock collection behavior with `3` on a mesh,
+`4` in Object Mode, `Shift+1`, and `1` with the section off. See
+`test-results/deluxe-keymaps-category04/mode-numbers/readback.json`.

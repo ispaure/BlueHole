@@ -71,11 +71,12 @@ class ProfileTests(unittest.TestCase):
         # One digest of the ordered pre-cutover runtime action groups from 07.
         payload = [(owner.split(':')[1], [
             [asdict(request.scope), asdict(request.event), request.target.idname,
-             dict(request.target.properties), request.active] for request in requests])
+             dict(request.target.properties), request.active] for request in requests
+            if request.request_id in catalog['assignments']])
             for owner, requests in groups.items()]
         blob = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()
         self.assertEqual(hashlib.sha256(blob).hexdigest(), '9c48fa5b54876c7377817d306874f8ee96eb69518ae9947f5d64f92b95e4360c')
-        self.assertEqual(sum(map(len, groups.values())), 795)
+        self.assertEqual(sum(len(rows) for _, rows in payload), 795)
         stock = {}
         for row in map(json.loads, (FIXTURES / 'deluxe_keymaps/reconciliation-ledger.jsonl').read_text().splitlines()):
             if row['presence'].get('stock', {}).get('user'):
@@ -84,8 +85,17 @@ class ProfileTests(unittest.TestCase):
                        binding['target'], binding['active'])
                 stock.setdefault(key, []).append(row)
         precedence = []
+        object_mode_keys = []
         for requests in groups.values():
             for request in requests:
+                if request.request_id not in catalog['assignments']:
+                    original_id = self.resolver.profile_assignment_id(request.request_id)
+                    original, = [row for row in requests if row.request_id == original_id]
+                    self.assertEqual(request.scope, self.core.KeymapScope('Object Mode'))
+                    self.assertEqual(request.event, original.event)
+                    self.assertEqual(request.target, original.target)
+                    object_mode_keys.append(request.event.type)
+                    continue
                 assignment = catalog['assignments'][request.request_id]
                 key = request.scope, request.event, request.target.idname, request.active
                 for row in stock.get(key, ()):
@@ -100,6 +110,19 @@ class ProfileTests(unittest.TestCase):
                     self.assertIn(row['row_id'], assignment['samples'])
                     precedence.append(row['row_id'][:8])
         self.assertCountEqual(precedence, ('8125a8cf', '14a9687b', '94f907c3', 'eb202e0e'))
+        self.assertCountEqual(object_mode_keys, ('ONE', 'TWO', 'THREE', 'FIVE', 'SIX', 'SEVEN', 'EIGHT'))
+
+        old_id, = [id_ for id_, row in catalog['assignments'].items()
+                   if row['command'] == 'object-mode-set-with-submode-2a694a5467e5']
+        recreated = dict(catalog['assignments'].pop(old_id), feature='recreated-mode')
+        catalog['assignments']['recreated-mode'] = recreated
+        _, groups = resolver.plan(catalog, settings)
+        self.assertEqual([row.scope.name for row in groups['legacy:Object:deluxe-recreated-mode']],
+                         ['Object Non-modal', 'Object Mode'])
+        recreated['active'] = False
+        _, groups = resolver.plan(catalog, settings)
+        self.assertEqual([row.scope.name for row in groups['legacy:Object:deluxe-recreated-mode']],
+                         ['Object Non-modal'])
 
     def test_round_trip_shared_edit_clone_and_group_crud(self):
         draft = self.store.begin()
