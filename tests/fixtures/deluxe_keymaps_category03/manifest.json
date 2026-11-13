@@ -1949,5 +1949,82 @@
       "d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c",
       "e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111"
     ]
+  },
+  "modal_e_reference_witness": {
+    "status": "reference switching observed with strict preservation failure; matching factory comparison passed and remained Translate",
+    "reference_run": "reference-evidence-1794563307033648000",
+    "modal_fixture_sha256": "58ac1cf76815b26687a74b6cd331eaaca8773b06134e058acc4b492802973511",
+    "ordinary_fixture_sha256": "4a6fb81a0852cfabb936e7d65ab2224e4166b74da1f28786e2ba947f86aa05b9",
+    "behavior": {
+      "positive_rotate_control": true,
+      "cancel_restored_exact_geometry": true,
+      "positive_translate_control": true,
+      "native_operator_sequence": [
+        "TRANSFORM_OT_translate",
+        "TRANSFORM_OT_rotate",
+        "TRANSFORM_OT_trackball"
+      ],
+      "first_e_rotates": true,
+      "second_e_trackball": "Live native operator identity plus changed geometry; not inferred from geometry alone",
+      "ret_confirmed": true,
+      "extra_motion_unchanged": true,
+      "scope": "one copied-reference Object mode VIEW_3D/WINDOW witness; no production/capability acceptance"
+    },
+    "source_readability_changes": 192,
+    "merged_uv_editor_count": [
+      318,
+      272
+    ],
+    "removed_merged_uv_rows": 46,
+    "merged_readability_changes": 146,
+    "removed_targets": {
+      "uv.toolkit_center_cursor_and_frame_all": 45,
+      "uv.toolkit_distribute": 1
+    },
+    "transform_modal_map_exact_all_roles": true,
+    "foreign_loss_cause": "unknown; no source-value mutation or equality inferred",
+    "cleanup": "child exited, owned input released, exact copied roots removed, protected inputs unchanged",
+    "remaining": "Review exact two-alias disposable probe using native R templates; no production/runtime capability accepted"
+  },
+  "modal_e_factory_comparison": {
+    "factory_run": "modal_observe-1794564688446795000",
+    "reference_run": "reference-evidence-1794563307033648000",
+    "modal_fixture_sha256": "58ac1cf76815b26687a74b6cd331eaaca8773b06134e058acc4b492802973511",
+    "ordinary_fixture_sha256": "4a6fb81a0852cfabb936e7d65ab2224e4166b74da1f28786e2ba947f86aa05b9",
+    "behavior": {
+      "positive_rotate_control": true,
+      "cancel_restored_exact_geometry": true,
+      "positive_translate_control": true,
+      "native_operator_sequence": [
+        "TRANSFORM_OT_translate",
+        "TRANSFORM_OT_translate",
+        "TRANSFORM_OT_translate"
+      ],
+      "first_e_rotates": false,
+      "second_e_rotates": false,
+      "ret_confirmed": true,
+      "extra_motion_unchanged": true,
+      "same_helpers_as_reference": true,
+      "matched_context_and_counts": true,
+      "strict_source_and_merged_preservation": true,
+      "scope": "Factory Blender keyconfig, Object mode VIEW_3D/WINDOW, category switches off; no inserted modal rows"
+    },
+    "exact_e_rows_before": {
+      "299e9dbeb54d018fa47270d4aef02ecc9143a6bc0882df7d3dc0c836fa2df822": {
+        "default": 0,
+        "active": 0,
+        "addon": 0,
+        "user": 0
+      },
+      "95d1e4739cb33e21cb88513fd041e4a20cd56a06dd022e945218fb4d65af778e": {
+        "default": 0,
+        "active": 0,
+        "addon": 0,
+        "user": 0
+      }
+    },
+    "cleanup": "native owned/pending/tracked0, watcher stopped, PID and roots absent,40 frozen source hashes and protected inputs exact",
+    "runtime_changed": false,
+    "candidate_accounting_changed": false
   }
 }

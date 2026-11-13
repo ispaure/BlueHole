@@ -1265,6 +1265,74 @@ class Category03NativeReceiptTests(unittest.TestCase):
         self.assertTrue(production['watcher_stopped'])
         self.assertEqual(production['cleanup']['owned'], 0)
 
+    def test_reference_modal_switch_retains_identity_and_strict_merged_loss(self):
+        reference = next(run for run in self.native['reference_runs']
+                         if run['id'] == 'reference-evidence-1794563307033648000')
+        data = reference['observations']
+        self.assertEqual(data['status'], 'error')
+        control, switch = data['dispatch']
+        for case in (control, switch):
+            self.assertTrue(case['input_delivery']['delivered'])
+            self.assertTrue(case['initial_positive_effect'])
+            self.assertEqual(case['invoke_result'], ['RUNNING_MODAL'])
+        self.assertTrue(control['cancel_restored_geometry'])
+        self.assertTrue(switch['first_e_rotation_observed'])
+        self.assertTrue(switch['second_e_rotation_changed'])
+        self.assertTrue(switch['confirmation_stopped_motion'])
+        phases = {phase['phase']: phase['snapshot'] for phase in switch['phases']}
+        self.assertEqual([phases[phase]['modal_operators'] for phase in
+                          ('initial_motion', 'after_first_e_motion', 'after_second_e_motion')],
+                         [['TRANSFORM_OT_translate'], ['TRANSFORM_OT_rotate'], ['TRANSFORM_OT_trackball']])
+        self.assertEqual(phases['after_confirm']['modal_operators'], [])
+        self.assertEqual(phases['after_extra_motion'], phases['after_confirm'])
+        proof = data['modal_switch_proof']
+        self.assertFalse(proof['exact_source_and_merged_preservation'])
+        for role, before in proof['maps_before_without_control'].items():
+            after = proof['maps_after_without_control'][role]
+            self.assertEqual([km for km in before if km['scope']['name'] == 'Transform Modal Map'],
+                             [km for km in after if km['scope']['name'] == 'Transform Modal Map'])
+        before_uv = next(km for km in proof['maps_before_without_control']['user'] if km['scope']['name'] == 'UV Editor')
+        after_uv = next(km for km in proof['maps_after_without_control']['user'] if km['scope']['name'] == 'UV Editor')
+        self.assertEqual((len(before_uv['items']), len(after_uv['items'])), (318, 272))
+        remaining_ids = {row['blender_id'] for row in after_uv['items']}
+        self.assertEqual(Counter(row['target'] for row in before_uv['items']
+                                 if row['blender_id'] not in remaining_ids),
+                         {'uv.toolkit_center_cursor_and_frame_all': 45, 'uv.toolkit_distribute': 1})
+        self.assertTrue(data['ordinary_proof']['input_control']['released'])
+
+    def test_factory_modal_comparison_keeps_translate_and_exact_maps(self):
+        factory = self.runs['modal_observe-1794564688446795000']
+        reference = self.reference_runs['reference-evidence-1794563307033648000']
+        self.assertEqual(factory['native_status'], 'complete')
+        for key in ('modal_fixture_sha256', 'ordinary_fixture_sha256'):
+            self.assertEqual(factory[key], reference[key])
+        control, switch = factory['dispatch']
+        for case in (control, switch):
+            self.assertTrue(case['input_delivery']['delivered'])
+            self.assertTrue(case['invoke_poll'])
+            self.assertEqual(case['invoke_result'], ['RUNNING_MODAL'])
+            self.assertTrue(case['initial_positive_effect'])
+        self.assertTrue(control['cancel_restored_geometry'])
+        self.assertFalse(switch['first_e_rotation_observed'])
+        self.assertFalse(switch['second_e_rotation_changed'])
+        self.assertTrue(switch['confirmation_stopped_motion'])
+        phases = {phase['phase']: phase['snapshot'] for phase in switch['phases']}
+        for phase in ('initial_motion', 'after_first_e_motion', 'after_second_e_motion'):
+            self.assertEqual(phases[phase]['modal_operators'], ['TRANSFORM_OT_translate'])
+            self.assertEqual(phases[phase]['rotation_matrix'], phases['before']['rotation_matrix'])
+        self.assertEqual(phases['after_confirm']['modal_operators'], [])
+        self.assertEqual(phases['after_extra_motion'], phases['after_confirm'])
+        readiness = factory['modal_capture_readiness']
+        self.assertTrue(readiness['matched_context_and_counts'])
+        self.assertEqual(readiness['before_capture'], readiness['before_addon_shutdown'])
+        self.assertTrue(readiness['before_capture']['native_keyconfig_update'])
+        proof = factory['modal_switch_proof']
+        self.assertEqual(proof['modal_map_mutations'], 0)
+        self.assertEqual(proof['runtime_capability_changes'], 0)
+        self.assertTrue(proof['exact_source_and_merged_preservation'])
+        self.assertEqual(proof['maps_before_without_control'], proof['maps_after_without_control'])
+        self.assertTrue(factory['ordinary_proof']['input_control']['released'])
+
     def test_shared_production_persistence_restores_editor_circle_framing_and_arrow_edits(self):
         pairs = (
             ('editor_save-1794555923466868000', 'editor_reopen-1794556023841045000', {'editor_more'}),

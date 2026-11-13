@@ -142,9 +142,11 @@ def _run_session(args, root):
     shutil.copyfile(Path(__file__).resolve(), executed)
     if args.mode in ('handler_observe', 'handler_probe', 'circle_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_handlers.py', root / 'handler-fixture.py')
-    if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production'):
+    if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production', 'modal_observe'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_ordinary.py', root / 'ordinary-fixture.py')
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
+    if args.mode == 'modal_observe':
+        shutil.copyfile(REPO / 'tests/blender_keymap_category03_modal.py', root / 'modal-fixture.py')
     if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_editors.py', root / 'editor-fixture.py')
     if args.mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_save', 'uv_arrow_reopen'):
@@ -183,6 +185,8 @@ def _run_session(args, root):
         if (root / 'ordinary-fixture.py').exists():
             result['ordinary_fixture_sha256'] = sha(root / 'ordinary-fixture.py')
             result['ordinary_ledger_sha256'] = sha(root / 'ordinary-ledger.jsonl')
+        if (root / 'modal-fixture.py').exists():
+            result['modal_fixture_sha256'] = sha(root / 'modal-fixture.py')
         if (root / 'editor-fixture.py').exists():
             result['editor_fixture_sha256'] = sha(root / 'editor-fixture.py')
         if (root / 'persistence-fixture.py').exists():
@@ -1821,6 +1825,43 @@ def native_main(root, mode):
             steps, receipt, record, window, area, exporter,
             cluster='uv_edit', ledger_path=root / 'ordinary-ledger.jsonl')
         state['ordinary_fixture'] = helper.UVArrowPrecedenceCases(ordinary, rt, production=production).append()
+    elif mode == 'modal_observe':
+        steps.append(lambda: set_groups(False, False, False))
+        helper = load_file('category03_ordinary_fixture', root / 'ordinary-fixture.py')
+        modal = load_file('category03_modal_fixture', root / 'modal-fixture.py')
+        common = helper.OrdinaryCases(
+            steps, receipt, record, window, area, exporter,
+            cluster='modal_switch', ledger_path=root / 'ordinary-ledger.jsonl')
+
+        def modal_readiness(label):
+            configs.update()
+            with common.context():
+                snapshot = {
+                    'area': area.type, 'region': common.region().type,
+                    'mode': bpy.context.mode,
+                    'native_keyconfig_update': True,
+                    'active_default_alias': configs.active.as_pointer() == configs.default.as_pointer(),
+                    'modal_operators': [op.bl_idname for op in getattr(window, 'modal_operators', ())],
+                    'map_item_counts': {
+                        role: [{'name': km.name, 'space_type': km.space_type,
+                                'region_type': km.region_type, 'is_modal': km.is_modal,
+                                'items': len(km.keymap_items)}
+                               for km in getattr(configs, role).keymaps if km.name in common.scope_names]
+                        for role in ('default', 'active', 'addon', 'user')},
+                }
+            snapshots = receipt.setdefault('modal_capture_readiness', {})
+            snapshots[label] = snapshot
+            if label == 'before_capture':
+                assert snapshot['area'] == 'VIEW_3D' and snapshot['region'] == 'WINDOW'
+                assert snapshot['mode'] == 'OBJECT' and snapshot['active_default_alias']
+                assert not snapshot['modal_operators']
+            else:
+                snapshots['matched_context_and_counts'] = snapshot == snapshots.get('before_capture')
+            record('modal_readiness_' + label)
+
+        state['modal_readiness'] = modal_readiness
+        steps.append(lambda: modal_readiness('before_capture'))
+        state['ordinary_fixture'] = modal.ModalSwitchCases(common).append()
     elif mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
         steps.append(lambda: set_groups(mode == 'ordinary_production', mode == 'ordinary_production', mode == 'ordinary_production'))
         helper = load_file('category03_ordinary_fixture', root / 'ordinary-fixture.py')
@@ -1996,6 +2037,12 @@ def native_main(root, mode):
             except Exception:
                 ordinary_cleanup_error = traceback.format_exc()
                 receipt['ordinary_fixture_cleanup_error'] = ordinary_cleanup_error
+        if 'modal_readiness' in state:
+            try:
+                state['modal_readiness']('before_addon_shutdown')
+            except Exception:
+                receipt['modal_readiness_error'] = traceback.format_exc()
+                ordinary_cleanup_error = ordinary_cleanup_error or receipt['modal_readiness_error']
         if 'handler_fixture' in state:
             state['handler_fixture'].cleanup()
         release_walk_probe()
@@ -2053,7 +2100,7 @@ def cli():
     parser.add_argument('--provider-source', type=Path)
     parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'uv_arrow_probe', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
                                          'transform', 'image', 'persistence', 'reopen', 'editor_save', 'editor_reopen',
-                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen'), required=True)
+                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')
     parser.add_argument('--editor-matched-endpoints', action='store_true')

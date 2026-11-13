@@ -204,14 +204,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Fifty category checks currently pass. They cover exact assigned IDs and
+Fifty-two category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 55 factory attempts and sixteen copied-reference attempts. A completed
+retains 56 factory attempts and seventeen copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -500,12 +500,49 @@ and toggle mechanisms. Their positive effects need no rerun. This acceptance
 retains the direct-control and strict reference failures and makes no generalized
 dispatch, preservation or availability claim. Image/UV Q cycling remains open.
 
-The next prepared witness is read-only Transform Modal Map E switching in a
-copied reference. `tests/blender_keymap_category03_modal.py` reuses the ordinary
+The read-only Transform Modal Map E witness ran in a copied reference as batch27.
+`tests/blender_keymap_category03_modal.py` reuses the ordinary
 fixture's input and preservation controls. It requires a native Rotate movement
 and exact cancellation control, then observes a known Translate operation,
 first E, repeated E, confirmation and extra motion. Geometry snapshots must
 show the effects; a changed rotation alone does not identify Trackball. The
 24-step fixture retains both exact E token selectors and full source/merged maps,
-creates no modal items and enables no runtime capability. It is compiled and
-validated off desktop, with native execution still pending allocation.
+creates no modal items and enables no runtime capability.
+
+`reference-evidence-1794563307033648000` passed native Rotate/motion/cancel and
+Translate/motion controls. First E produced actual rotation with live
+`TRANSFORM_OT_rotate`; repeated E produced further rotation with live
+`TRANSFORM_OT_trackball`. This identifies the mode independently of the fixture's
+geometry-only caveat. RET ended the modal operation, and extra motion changed
+nothing. All captured Transform Modal Map snapshots stayed exact.
+
+The overall run failed strict preservation. Source comparisons retained 192
+readability changes. Separately, the merged user UV Editor shrank from 318 to
+272 rows: 45 `uv.toolkit_center_cursor_and_frame_all` rows and one
+`uv.toolkit_distribute` row disappeared. There were also 146 merged readability
+changes; surviving IDs and relative order stayed unchanged. The cause of the
+foreign row loss is unknown. These failures remain distinct from the observed
+E behavior. The child exited after 29.533 seconds, owned controls and all copied
+roots were removed, protected inputs were unchanged and the slot was released.
+
+Batch28 `modal_observe-1794564688446795000` ran the matching factory observer
+with both helpers identical to batch27. Rotate/motion/cancel and Translate/motion
+controls passed. E and repeated E left `TRANSFORM_OT_translate` active, continued
+changing location and left rotation unchanged. RET ended the operation and extra
+motion changed nothing. This establishes the scoped factory/reference behavior
+difference; it does not erase the reference preservation failure.
+
+Factory before-capture/before-shutdown context and complete map-count lists
+matched after native keyconfig updates. Full source and merged snapshots also
+matched exactly, including every Transform Modal Map. The child completed in
+17.4895 seconds. Owned control removal, addon unregister, zero ownership/pending
+cleanup/tracked resources and watcher shutdown passed. The owned PID and every
+temporary resource root were verified absent; all 40 frozen source hashes and
+protected inputs stayed exact. The slot is released, with no repeat allocation.
+
+The existing runtime still supports only its exact same-event
+precision-to-cancel modal proof. The next offscreen proposal is limited to two E
+aliases copied from observed R ROTATE/TRACKBALL templates in a disposable
+fixture, retaining original R behavior, exact ordering, partial-install rollback
+and owned user-edit handling. No production declaration or shared runtime was
+changed, and the other modal candidates remain unaccepted.
