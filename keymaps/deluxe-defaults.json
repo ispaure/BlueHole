@@ -751,7 +751,14 @@
     "wm-call-menu-pie-8b8401641702": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_sculpt_simulation"}},
     "wm-call-menu-pie-58f860c7bbb9": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_help"}},
     "wm-call-menu-pie-b6796dca85cc": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_dirs"}},
-    "wm-call-menu-pie-f7c2a4d1d214": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_import_export"}}
+    "wm-call-menu-pie-f7c2a4d1d214": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_import_export"}},
+    "pie-menu-curve-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_curve_action"}},
+    "pie-menu-curve-tool": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_curve_tool"}},
+    "pie-menu-mesh-tool": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_mesh_tool"}},
+    "pie-menu-mesh-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_mesh_action"}},
+    "pie-menu-mesh-action-uvspecial": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_mesh_action_uvspecial"}},
+    "pie-menu-object-tool": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_object_tool"}},
+    "pie-menu-object-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_object_action"}}
   },
   "assignments": {
     "mesh-3d-view-tool-edit-mesh-spin-duplicates-ba4711cb256e": {"order": 0, "section": "mesh.tools", "feature": "mesh-mesh-spin-caeddd2fe890", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-spin-037461d1155d", "scope": {"name": "3D View Tool: Edit Mesh, Spin Duplicates", "space_type": "VIEW_3D"}, "samples": ["20006917fb115bfe4e7a77704e45835b603cdc5f4ef12abe1f0af93dabd592e7"]},
@@ -1548,7 +1555,15 @@
     "pie-sculpt-1ea823f3cba1": {"order": 791, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-aeed432ff27d", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-8b8401641702", "scope": {"name": "Sculpt"}, "samples": ["cdbac1d415b13a777e1162bfea25cb3d17bfc828b4013492c4660017df89dc88"]},
     "pie-window-ffa6273f5ca5": {"order": 792, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-f40d1bc097cd", "event": "f1-press-eeb8926b59cd", "command": "wm-call-menu-pie-58f860c7bbb9", "scope": {"name": "Window"}, "samples": ["2e472f6926236039807cad7a3e88201ac7f05dd19e77a3f8c3716758e3ce4610"]},
     "pie-window-fc9a2cd4b28d": {"order": 793, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-a9d569983c57", "event": "f3-press-cf2a8a264cbf", "command": "wm-call-menu-pie-b6796dca85cc", "scope": {"name": "Window"}, "samples": ["77e7ec8d96b8d5814a5978d27b068fa95d465e22bc2f114bef2fd457f5ee4360"]},
-    "pie-window-70ccce0be59a": {"order": 794, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-626dabd4ae16", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-f7c2a4d1d214", "scope": {"name": "Window"}, "samples": ["86b8b5a12775156a7518b0ab13288c157249bf95a2766925992a4a52233fd8d0"]}
+    "pie-window-70ccce0be59a": {"order": 794, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-626dabd4ae16", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-f7c2a4d1d214", "scope": {"name": "Window"}, "samples": ["86b8b5a12775156a7518b0ab13288c157249bf95a2766925992a4a52233fd8d0"]},
+    "pie-curve-action": {"order": 795, "section": "pie.menus", "feature": "pie-curve-action", "event": "rightmouse-press-63f585520403", "command": "pie-menu-curve-action", "scope": {"name": "Curve"}, "samples": ["d432ac14abd383ca55efe72489756f7a20c2e59ce3c8047e5a920c06c9168995"]},
+    "pie-curve-tool": {"order": 796, "section": "pie.menus", "feature": "pie-curve-tool", "event": "rightmouse-press-d24507019d68", "command": "pie-menu-curve-tool", "scope": {"name": "Curve"}, "samples": ["5529828177a1aaeb168628a9dd6263adc06c63854463ae7391d358ce0fc0e030"]},
+    "pie-mesh-tool": {"order": 797, "section": "pie.menus", "feature": "pie-mesh-tool", "event": "rightmouse-press-d24507019d68", "command": "pie-menu-mesh-tool", "scope": {"name": "Mesh"}, "samples": ["135f17b7c5b588161b558ff0f98ee2e1fd3804bcfc969a89e0bb4692173d0b79"]},
+    "pie-mesh-action": {"order": 798, "section": "pie.menus", "feature": "pie-mesh-action", "event": "rightmouse-press-63f585520403", "command": "pie-menu-mesh-action", "scope": {"name": "Mesh"}, "samples": ["8cdd138fd7b99333b14290a967540a355eb5fa05de0d28b6e5ec620e002bc2bd"]},
+    "pie-mesh-action-uvspecial": {"order": 799, "section": "pie.menus", "feature": "pie-mesh-action-uvspecial", "event": "rightmouse-press-b44e4d3e981c", "command": "pie-menu-mesh-action-uvspecial", "scope": {"name": "Mesh"}, "samples": ["ac89af85d178f577f2b264119e87e8f575064be3f03f60812113299a4a50e415"]},
+    "pie-object-mode-global-import-export": {"order": 800, "section": "pie.menus", "feature": "pie-object-mode-global-import-export", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-f7c2a4d1d214", "scope": {"name": "Object Mode"}, "samples": ["2d95127bc7dca2e8b2682850b5dfd47f671203c57631aec9cbf90d97175908d8"]},
+    "pie-object-mode-object-tool": {"order": 801, "section": "pie.menus", "feature": "pie-object-mode-object-tool", "event": "rightmouse-press-d24507019d68", "command": "pie-menu-object-tool", "scope": {"name": "Object Mode"}, "samples": ["d791d21b08d0b34e1ff11f0cb156f4c568c3c7d4a1769c8ae94578a3cf6f27bb"]},
+    "pie-object-mode-object-action": {"order": 802, "section": "pie.menus", "feature": "pie-object-mode-object-action", "event": "rightmouse-press-63f585520403", "command": "pie-menu-object-action", "scope": {"name": "Object Mode"}, "samples": ["86d36dbe1514d153b3557d502d38591c87ff0a59591ff2e2a9b99e1a6406181e"]}
   },
   "suppressions": {}
 }

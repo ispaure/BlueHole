@@ -87,13 +87,21 @@ class ProfileTests(unittest.TestCase):
                 target = old_pose
             return [asdict(scope), asdict(request.event), target.idname, dict(target.properties), request.active]
 
+        restored_pies = {
+            'pie-curve-action', 'pie-curve-tool', 'pie-mesh-tool', 'pie-mesh-action',
+            'pie-mesh-action-uvspecial', 'pie-object-mode-global-import-export',
+            'pie-object-mode-object-tool', 'pie-object-mode-object-action',
+        }
         payload = [(owner.split(':')[1], [reference_row(request) for request in requests
-                    if request.request_id in catalog['assignments']]) for owner, requests in groups.items()]
+                    if request.request_id in catalog['assignments'] and request.request_id not in restored_pies])
+                   for owner, requests in groups.items()
+                   if any(request.request_id not in restored_pies for request in requests)]
         blob = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()
         self.assertEqual(hashlib.sha256(blob).hexdigest(), '9c48fa5b54876c7377817d306874f8ee96eb69518ae9947f5d64f92b95e4360c')
         self.assertEqual(sum(len(rows) for _, rows in payload), 795)
-        stock = {}
+        stock, ledger = {}, {}
         for row in map(json.loads, (FIXTURES / 'deluxe_keymaps/reconciliation-ledger.jsonl').read_text().splitlines()):
+            ledger[row['row_id']] = row['binding']
             if row['presence'].get('stock', {}).get('user'):
                 binding = row['binding']
                 key = (self.core.KeymapScope(**binding['scope']), self.core.KeymapEvent(**binding['event']),
@@ -112,6 +120,14 @@ class ProfileTests(unittest.TestCase):
                     object_mode_keys.append(request.event.type)
                     continue
                 assignment = catalog['assignments'][request.request_id]
+                if request.request_id in restored_pies:
+                    restored_pies.remove(request.request_id)
+                    sample, = assignment['samples']
+                    source = ledger[sample]
+                    self.assertEqual(request.scope, self.core.KeymapScope(**source['scope']))
+                    self.assertEqual(request.event, self.core.KeymapEvent(**source['event']))
+                    self.assertEqual(request.target, self.core.KeymapTarget(source['target'], source['properties']))
+                    self.assertEqual(request.active, source['active'])
                 key = request.scope, request.event, request.target.idname, request.active
                 for row in stock.get(key, ()):
                     if not all(row['binding']['properties'].get(k) == v for k, v in request.target.properties):
@@ -124,6 +140,7 @@ class ProfileTests(unittest.TestCase):
                     self.assertEqual(assignment.get('kind'), 'precedence')
                     self.assertIn(row['row_id'], assignment['samples'])
                     precedence.append(row['row_id'][:8])
+        self.assertFalse(restored_pies)
         self.assertCountEqual(precedence, ('8125a8cf', '14a9687b', '94f907c3', 'eb202e0e'))
         self.assertCountEqual(object_mode_keys, ('ONE', 'TWO', 'THREE', 'FIVE', 'SIX', 'SEVEN', 'EIGHT'))
 
