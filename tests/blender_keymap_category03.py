@@ -42,6 +42,7 @@ PRODUCTION_PATHS = (
     'preferences/addon/keymaps/keymap_props_transform.py',
     'operators/box_xray_ops.py',
     'operators/selection_more_less_ops.py', 'operators/operators_register.py',
+    'keymaps/pipeline_keymaps_register.py', 'actions/actions/keymaps/pipeline/obligatory.py',
     'keymaps/keymap_utils.py', 'keymaps/keymap_action_utils.py',
     'keymaps/keymaps_register.py', 'actions/operator_action.py', '__init__.py',
 )
@@ -1832,6 +1833,40 @@ def native_main(root, mode):
         fixture = helper.EditorCases(steps, receipt, record, window, area, exporter,
                                      cluster=cluster, matched_endpoints=True, input_controls=True)
         state['editor_fixture'] = fixture
+        def pipeline_source_provenance(sources):
+            # Prove both exact unrelated source identities from the live
+            # ownership ledger and the category's registered native pairs.
+            registered = kmreg.pipeline_keymaps_register.registered_pipeline_keymaps
+            result = []
+            for owner_id, handle in rt._FEATURES.items():
+                if not owner_id.startswith('legacy:Pipeline:'):
+                    continue
+                for request_id, owned in handle._owned.items():
+                    if owned.item.idname != 'wm.bh_save_as_mainfile':
+                        continue
+                    valid = rt._valid_owned(owned)
+                    pair_matches = sum(rt._same(km, owned.map) and rt._same(item, owned.item)
+                                       for km, item in registered)
+                    assert valid and pair_matches == 1
+                    assert rt._same(owned.config, configs.addon)
+                    scope = asdict(rt.capture_scope(owned.map))
+                    matches = [(i, j, row) for i, keymap in enumerate(sources['addon'])
+                               if keymap['scope'] == scope
+                               for j, row in enumerate(keymap['items'])
+                               if row['blender_id'] == owned.item.id]
+                    assert len(matches) == 1
+                    index, position, row = matches[0]
+                    request = next(r for r in handle.assignments if r.request_id == request_id)
+                    assert request.target.idname == 'wm.bh_save_as_mainfile'
+                    result.append({'owner_id': owner_id, 'request_id': request_id,
+                                   'runtime_owned_valid': valid, 'registered_pair_matches': True,
+                                   'native_map_pointer': owned.map.as_pointer(),
+                                   'native_item_pointer': owned.item.as_pointer(),
+                                   'map_index': index, 'row_index': position,
+                                   'scope': scope, 'row': row, 'request': asdict(request)})
+            assert len(result) == 2
+            return sorted(result, key=lambda proof: (proof['map_index'], proof['row_index']))
+        fixture.owned_source_provenance = pipeline_source_provenance
         def production_editor_setup():
             prefs.keymap.selection.enable_selection_more_less = False
             prefs.keymap.selection.enable_selection_all_none = False

@@ -1,6 +1,7 @@
 """Portable category 03 reconciliation and registration checks."""
 
 from collections import Counter
+import copy
 from dataclasses import asdict
 from hashlib import sha256
 import importlib
@@ -919,6 +920,68 @@ class Category03NativeReceiptTests(unittest.TestCase):
             self.assertTrue(case['selection_changed'])
             self.assertFalse(case['view_changed'])
             self.assertEqual([call['target'] for call in case['callbacks']], [case['target']])
+
+
+    def test_production_editor_retains_owned_generation_identity_failure(self):
+        run = self.runs['editor_production-1794553202272103000']
+        self.assertEqual(run['native_status'], 'error')
+        self.assertIn('Matched-context source comparison failed', run['error'])
+        self.assertIn('cleanup_error', run)
+        before, after = run['editor_matched_endpoints']['endpoints']
+        self.assertFalse(after['strict_sources_equal'])
+        self.assertTrue(after['strict_foreign_merged_equal'])
+        for role in ('default', 'active'):
+            self.assertEqual(before['source'][role], after['source'][role])
+        changes = []
+        for old_map, new_map in zip(before['source']['addon'], after['source']['addon'], strict=True):
+            self.assertEqual({k: v for k, v in old_map.items() if k != 'items'},
+                             {k: v for k, v in new_map.items() if k != 'items'})
+            for old, new in zip(old_map['items'], new_map['items'], strict=True):
+                if old != new:
+                    self.assertEqual(old['target'], 'wm.bh_save_as_mainfile')
+                    self.assertEqual({k: v for k, v in old.items() if k != 'blender_id'},
+                                     {k: v for k, v in new.items() if k != 'blender_id'})
+                    changes.append((old['blender_id'], new['blender_id']))
+        self.assertEqual(changes, [(18, 39), (19, 40)])
+        installed = [case for case in run['dispatch'] if case['stage'] == 'installed']
+        self.assertEqual(len(installed), 8)
+        for case in installed:
+            self.assertTrue(case['selection_changed'])
+            self.assertFalse(case['view_changed'])
+            self.assertEqual([call['target'] for call in case['callbacks']], [case['target']])
+            self.assertEqual(case['input_delivery']['counts_in_expected_window_region'],
+                             {'window': 1, 'editor': 1})
+            self.assertEqual(case['input_delivery']['unmodified_wheel']['status'], 'observed_view_change')
+
+    def test_editor_source_comparison_requires_exact_owned_provenance(self):
+        from blender_keymap_category03_editors import EditorCases
+        baseline, released = self.runs['editor_production-1794553202272103000']['editor_matched_endpoints']['endpoints']
+        before, after = baseline['source'], released['source']
+
+        def synthetic_provenance(source):
+            # Comparator test only: historical batch14 did not collect live
+            # ownership evidence and must remain a failed native receipt.
+            return [{'owner_id': 'legacy:Pipeline:synthetic', 'request_id': str(j),
+                     'runtime_owned_valid': True, 'registered_pair_matches': True,
+                     'map_index': 0, 'row_index': j, 'scope': source['addon'][0]['scope'],
+                     'row': source['addon'][0]['items'][j]} for j in (1, 2)]
+
+        a, b = synthetic_provenance(before), synthetic_provenance(after)
+        compare = EditorCases.compare_sources
+        result = compare(before, after, a, b)
+        self.assertTrue(result['accepted_sources_equal'])
+        self.assertFalse(result['strict_raw_sources_equal'])
+        self.assertFalse(compare(before, after)['accepted_sources_equal'])
+        foreign_edit = copy.deepcopy(after)
+        foreign_edit['addon'][0]['items'][0]['blender_id'] += 1
+        self.assertFalse(compare(before, foreign_edit, a, b)['strict_foreign_identity_equal'])
+        owned_edit = copy.deepcopy(after)
+        owned_edit['addon'][0]['items'][1]['active'] = False
+        self.assertFalse(compare(before, owned_edit, a, synthetic_provenance(owned_edit))['owned_semantics_and_order_equal'])
+        invalid_proof = copy.deepcopy(b)
+        invalid_proof[0]['runtime_owned_valid'] = False
+        with self.assertRaises(AssertionError):
+            compare(before, after, a, invalid_proof)
 
 
 class Category03RegistrationTests(Category03Evidence, unittest.TestCase):

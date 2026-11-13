@@ -1,5 +1,6 @@
 """Isolated native proof of guarded Shift-wheel editor selection."""
 
+import copy
 import math
 
 
@@ -67,6 +68,7 @@ class EditorCases:
         self.matched_baseline = None
         self.before_shortcut = None
         self.after_shortcut = None
+        self.owned_source_provenance = None
         self.readiness = None
         self.control_class = None
         self.control_items, self.control_maps, self.control_callbacks = [], [], []
@@ -207,6 +209,7 @@ class EditorCases:
                 row for row in unknown if row['target'] in relevant_targets]
             assert not self.readiness['unreadable_relevant_targets'], 'Relevant editor RNA is not readable'
         self.source_before = current
+        self.owned_sources_before = self.source_provenance(current)
         self.state = {
             'stage': 'owned_probe' if self.probe else 'readonly_reference_or_factory',
             'cluster': self.cluster,
@@ -215,6 +218,7 @@ class EditorCases:
             'owner05_scroll_rows': {key: {'stock': stock, 'full': full}
                                     for key, (stock, full) in SCROLL_ROWS.items()},
             'source_before': self.source_before,
+            'owned_source_generations_before': self.owned_sources_before,
             'merged_before': self.merged_rows(),
             'installations': [],
             'releases': [],
@@ -237,6 +241,49 @@ class EditorCases:
             for role, maps in sources.items() for keymap in maps for row in keymap['items']
             if row['read_issues']
         ]
+
+    def source_provenance(self, sources):
+        return self.owned_source_provenance(sources) if self.owned_source_provenance else []
+
+    @staticmethod
+    def compare_sources(before, after, before_owned=(), after_owned=()):
+        """Account only for two runtime-proven Pipeline Save As generations.
+
+        Raw snapshots stay intact. Every foreign ID, row position, property and
+        map field remains strict; owned semantic fields and positions are exact
+        too. Merely matching an operator name is never ownership evidence.
+        """
+        def partition(sources, provenance):
+            foreign = copy.deepcopy(sources)
+            owned = {}
+            if provenance:
+                assert len(provenance) == 2
+            for proof in provenance:
+                identity = (proof['owner_id'], proof['request_id'])
+                assert proof['owner_id'].startswith('legacy:Pipeline:')
+                assert proof['runtime_owned_valid'] and proof['registered_pair_matches']
+                assert identity not in owned
+                index, position = proof['map_index'], proof['row_index']
+                keymap = sources['addon'][index]
+                row = keymap['items'][position]
+                assert keymap['scope'] == proof['scope']
+                assert row == proof['row']
+                assert keymap['scope']['name'] == 'Window'
+                assert row['target'] == 'wm.bh_save_as_mainfile'
+                owned[identity] = {'map_index': index, 'row_index': position,
+                                   'scope': keymap['scope'],
+                                   'row': {k: v for k, v in row.items() if k != 'blender_id'}}
+                foreign['addon'][index]['items'][position] = {'proven_owned_generation': identity}
+            return foreign, owned
+
+        old_foreign, old_owned = partition(before, before_owned)
+        new_foreign, new_owned = partition(after, after_owned)
+        foreign_equal, owned_equal = old_foreign == new_foreign, old_owned == new_owned
+        return {'strict_raw_sources_equal': before == after,
+                'strict_foreign_identity_equal': foreign_equal,
+                'owned_semantics_and_order_equal': owned_equal,
+                'proven_owned_generations': len(old_owned),
+                'accepted_sources_equal': foreign_equal and owned_equal}
 
     def begin_readiness(self):
         initial = self.source_maps()
@@ -295,6 +342,7 @@ class EditorCases:
         sources, merged = self.source_maps(), self.foreign_merged_maps()
         value = self.readiness
         value['source'] = sources
+        value['owned_source_generations'] = self.source_provenance(sources)
         value['foreign_merged'] = merged
         value['unknown_properties'] = self.property_read_issues(sources)
         value['stable_sources'] = sources == value['first_primed_source']
@@ -322,15 +370,19 @@ class EditorCases:
             sentinels.append({'map': name, 'row': matches[0]})
         value['readable_foreign_sentinels'] = sentinels
         if self.matched_baseline is None:
-            self.matched_baseline = {'context': value['context'], 'source': sources, 'merged': merged}
+            self.matched_baseline = {'context': value['context'], 'source': sources, 'merged': merged,
+                                     'owned_sources': value['owned_source_generations']}
             value['is_baseline'] = True
         else:
             value['context_matches'] = value['context'] == self.matched_baseline['context']
             value['strict_sources_equal'] = sources == self.matched_baseline['source']
             value['strict_foreign_merged_equal'] = merged == self.matched_baseline['merged']
+            value['source_comparison'] = self.compare_sources(
+                self.matched_baseline['source'], sources,
+                self.matched_baseline['owned_sources'], value['owned_source_generations'])
             self.record('editor_matched_endpoint_compared')
             assert value['context_matches']
-            assert value['strict_sources_equal'], 'Matched-context source comparison failed'
+            assert value['source_comparison']['accepted_sources_equal'], 'Matched-context source comparison failed'
             assert value['strict_foreign_merged_equal'], 'Matched-context foreign merged comparison failed'
         self.endpoint_label = None
         self.record('editor_matched_endpoint_complete')
@@ -516,12 +568,14 @@ class EditorCases:
             return
         self.release()
         self.state['source_after'] = self.source_maps()
+        self.state['owned_source_generations_after'] = self.source_provenance(self.state['source_after'])
         self.state['unknown_properties_after'] = self.property_read_issues(self.state['source_after'])
         self.state['complete_property_comparison'] = not (
             self.state['unknown_properties_before'] or self.state['unknown_properties_after'])
-        self.state['foreign_source_fields_and_order_unchanged'] = (
-            self.state['source_after'] == self.source_before
-        )
+        self.state['source_comparison'] = self.compare_sources(
+            self.source_before, self.state['source_after'], self.owned_sources_before,
+            self.state['owned_source_generations_after'])
+        self.state['foreign_source_fields_and_order_unchanged'] = self.state['source_comparison']['accepted_sources_equal']
         self.state['known_source_fields_and_order_unchanged'] = self.state['foreign_source_fields_and_order_unchanged']
         assert self.state['foreign_source_fields_and_order_unchanged']
 

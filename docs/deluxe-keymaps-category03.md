@@ -144,14 +144,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Thirty-four category checks currently pass. They cover exact assigned IDs and
+Thirty-six category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 35 factory attempts and twelve copied-reference attempts. A completed
+retains 36 factory attempts and twelve copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -244,6 +244,16 @@ preservation checks were not reached. The remaining cases, unrelated-editor
 pass-through, feature toggles and saved-edit controls remain pending. A 150-second
 ceiling is prepared from measured case times. Read-only callback profiling now
 covers only the shortcut dispatch interval; its timing benefit is unmeasured.
+The next production run reached all eight selection effects in 50.5 seconds.
+Its first release failed strict source equality only on two internal IDs for
+unrelated Blue Hole Pipeline Save As registrations; all other source fields and
+all foreign merged snapshots matched. The shared refresh recreates those owned
+rows. The failed receipt and interrupted in-process cleanup remain recorded; the
+owned child exited and host resource cleanup passed. A bounded fixture revision
+now requires live runtime ownership and registered-pair provenance for exactly
+those two generations, compares their semantic fields/order separately, and
+keeps every foreign identity strict. This revision is not yet natively run;
+the outside-context cluster was skipped.
 Existing horizontal declarations stay unchanged. Exact
 owner-05 inactive scroll rows stay with that owner for global reconciliation.
 Mask's corrected fixture and Particle selection remain unverified.
