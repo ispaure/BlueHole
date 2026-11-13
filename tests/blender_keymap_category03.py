@@ -142,9 +142,9 @@ def _run_session(args, root):
         shutil.copytree(args.incoming, root / 'incoming')
     executed = root / 'executed-native-test.py'
     shutil.copyfile(Path(__file__).resolve(), executed)
-    if args.mode in ('handler_observe', 'handler_probe', 'circle_production', 'subtract_observe', 'subtract_probe', 'subtract_production', 'extend_observe', 'extend_probe', 'extend_production', 'uv_extend_observe', 'uv_extend_probe', 'uv_extend_production'):
+    if args.mode in ('handler_observe', 'handler_probe', 'circle_production', 'subtract_observe', 'subtract_probe', 'subtract_production', 'extend_observe', 'extend_probe', 'extend_production', 'uv_extend_observe', 'uv_extend_probe', 'uv_extend_production', 'circle_fallback_probe'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_handlers.py', root / 'handler-fixture.py')
-    if args.mode in ('extend_observe', 'extend_probe', 'extend_production', 'uv_extend_observe', 'uv_extend_probe', 'uv_extend_production'):
+    if args.mode in ('extend_observe', 'extend_probe', 'extend_production', 'uv_extend_observe', 'uv_extend_probe', 'uv_extend_production', 'circle_fallback_probe'):
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
     if args.mode == 'uv_extend_probe':
         shutil.copyfile(REPO / 'test-results/deluxe-keymaps-category03/uv-selection-stock-click-controls.json',
@@ -1833,6 +1833,14 @@ def native_main(root, mode):
                 'source_provenance': pipeline_source_provenance,
                 'compare_sources': comparison.EditorCases.compare_sources,
             }, binding=ledger[row_id]['binding']).append()
+    elif mode == 'circle_fallback_probe':
+        steps.append(lambda: set_groups(False, False, False))
+        handler = load_file('category03_circle_fallback_fixture', root / 'handler-fixture.py')
+        ledger = {row['row_id']: row for row in map(
+            json.loads, (root / 'ordinary-ledger.jsonl').read_text().splitlines())}
+        bindings = {row_id: ledger[row_id]['binding'] for row_id in handler.CircleFallbackCases.CELLS}
+        state['ordinary_fixture'] = handler.CircleFallbackCases(
+            steps, receipt, record, window, area, exporter, bindings=bindings, probe=True).append()
     elif mode in ('uv_extend_observe', 'uv_extend_probe'):
         steps.append(lambda: set_groups(False, False, False))
         handler = load_file('category03_uv_extend_fixture', root / 'handler-fixture.py')
@@ -2221,7 +2229,7 @@ def cli():
     parser.add_argument('--provider-source', type=Path)
     parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'uv_arrow_probe', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
                                          'transform', 'image', 'persistence', 'reopen', 'editor_save', 'editor_reopen',
-                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe', 'modal_alias_probe', 'subtract_observe', 'subtract_probe', 'subtract_production', 'extend_observe', 'extend_probe', 'extend_production', 'uv_extend_observe', 'uv_extend_probe', 'uv_extend_production'), required=True)
+                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe', 'modal_alias_probe', 'subtract_observe', 'subtract_probe', 'subtract_production', 'extend_observe', 'extend_probe', 'extend_production', 'uv_extend_observe', 'uv_extend_probe', 'uv_extend_production', 'circle_fallback_probe'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')
     parser.add_argument('--editor-matched-endpoints', action='store_true')

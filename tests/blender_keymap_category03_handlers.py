@@ -1381,6 +1381,346 @@ class UVExtendCases(ObjectSubtractCases):
         return self
 
 
+class CircleFallbackCases(ObjectSubtractCases):
+    """Four exact Object-mode fallback gestures; one disposable scene/journal."""
+
+    CELLS = (
+        '44692afb55e6f42196d8f7d04c6395271b307cd4aac003b0a4675e3a30c98037',
+        'ec35cef734a1d37ca52f86c49d84a2926f2edf50f31a11afdc35f4c1bd656082',
+        'a7abdb0f1a76a33e484bc02febb2b5cb9a4bf9502e1a5a0a1c1ed2ee736e22c1',
+        '7fc3ba226f32b930e4353fe72a7969cb36cd337d65892409fe36d2df9efad4f5',
+    )
+    LABEL_PREFIX = 'circle_fallback'
+    MODIFIERS = ('shift', 'ctrl', 'alt', 'oskey')
+    RADIUS = 25
+
+    def __init__(self, *args, bindings, reference=False, **kwargs):
+        super().__init__(*args, binding=bindings[self.CELLS[0]], **kwargs)
+        assert set(bindings) == set(self.CELLS)
+        assert self.probe != reference, 'Use exactly one factory probe or inherited reference path'
+        self.bindings, self.reference = bindings, reference
+        self.cell, self.result = None, None
+        self.cell_allocations = []
+        self.scope_names = {'Window', 'Screen', 'Frames', 'Object Mode', '3D View', '3D View Generic'}
+        self.scope_names.update(binding['scope']['name'] for binding in bindings.values())
+        self.scope_names.update(km.name for role in ('default', 'active', 'addon', 'user')
+                                for km in getattr(self.configs, role).keymaps
+                                if km.name.startswith('3D View Tool:'))
+        self.proof = {'test_only_driver': True, 'ledger_ids': list(self.CELLS),
+                      'probe': self.probe, 'reference': reference, 'cells': [],
+                      'production_capability_enabled': False,
+                      'lifecycle': 'Disposable owned rows; no product/persistence change'}
+        self.receipt['circle_fallback_proof'] = self.proof
+
+    def tool_state(self):
+        with self.context():
+            tool = self.bpy.context.workspace.tools.from_space_view3d_mode('OBJECT', create=False)
+            return {**{name: getattr(tool, name, None) for name in
+                       ('idname', 'idname_fallback', 'keymap', 'keymap_fallback')},
+                    'workspace_tool_type': self.bpy.context.scene.tool_settings.workspace_tool_type}
+
+    @staticmethod
+    def assert_fallback(tool, scope):
+        assert tool['idname'] == 'builtin.move'
+        assert tool['idname_fallback'] == 'builtin.select_circle'
+        assert tool['workspace_tool_type'] == 'FALLBACK'
+        assert tool['keymap_fallback'] is None or tool['keymap_fallback'] == scope
+
+    def prepare(self):
+        from mathutils import Quaternion
+        bpy = self.bpy
+        self.area.type = 'VIEW_3D'
+        with self.context():
+            if bpy.context.object and bpy.context.object.mode != 'OBJECT':
+                bpy.ops.object.mode_set(mode='OBJECT')
+            for obj in bpy.context.scene.objects:
+                obj.select_set(False)
+                obj.hide_set(True)
+            self.objects = {}
+            for name, location in (('target', (0, 0, 0)), ('bystander', (0, 3, 0)), ('sentinel', (0, -3, 0))):
+                bpy.ops.mesh.primitive_cube_add(size=.25, location=location)
+                obj = bpy.context.object
+                obj.name = 'Category03 Circle Fallback ' + name
+                self.objects[name] = obj
+            space = self.area.spaces.active
+            assert not space.local_view, 'Fixture needs a full owned viewport'
+            space.show_gizmo = False
+            view = space.region_3d
+            view.view_rotation = Quaternion((1, 0, 0, 0))
+            view.view_location = (0, 0, 0)
+            view.view_distance = 12
+            view.view_perspective = 'ORTHO'
+            assert bpy.ops.wm.tool_set_by_id(name='builtin.move') == {'FINISHED'}
+            assert bpy.ops.wm.tool_set_by_id(name='builtin.select_circle', as_fallback=True) == {'FINISHED'}
+            bpy.context.view_layer.update()
+        self.proof['tool_readback'] = self.tool_state()
+        self.assert_fallback(self.proof['tool_readback'], self.binding['scope']['name'])
+
+    @staticmethod
+    def paint_path(points, width, height, threshold, ui_scale):
+        import math
+        assert threshold >= 0 and math.isfinite(ui_scale) and ui_scale > 0
+        # This is a generous motion budget, not a claim about Blender's exact
+        # DPI threshold formula. Only the native CLICK_DRAG witness proves it.
+        step = max(64, math.ceil(threshold * max(1, ui_scale) * 4 + 8))
+        x, y = points['target']
+        path = [[x - 2 * step, y], [x - step, y], [x, y]]
+        margin = CircleFallbackCases.RADIUS + 8
+        assert all(margin <= px < width - margin and margin <= py < height - margin for px, py in path)
+        for name in ('bystander', 'sentinel'):
+            px, py = points[name]
+            assert margin <= px < width - margin and margin <= py < height - margin
+            nearest_x = min(x, max(path[0][0], px))
+            assert math.hypot(px - nearest_x, py - y) > 2 * margin, 'Bystander overlaps brush path'
+        return path
+
+    def measure(self):
+        from bpy_extras.view3d_utils import location_3d_to_region_2d
+        with self.context():
+            self.bpy.context.view_layer.update()
+            region, view = self.region(), self.area.spaces.active.region_3d
+            points = {name: location_3d_to_region_2d(region, view, obj.matrix_world.translation)
+                      for name, obj in self.objects.items()}
+            assert all(point is not None for point in points.values())
+            self.points = {name: list(map(int, point)) for name, point in points.items()}
+            inputs = self.bpy.context.preferences.inputs
+            threshold = inputs.drag_threshold_mouse
+            scale = self.bpy.context.preferences.system.ui_scale
+            self.path = self.paint_path(self.points, region.width, region.height, threshold, scale)
+        self.proof['geometry_control'] = {'projected_points': self.points, 'paint_path': self.path,
+                                         'radius': self.RADIUS, 'configured_drag_threshold': threshold,
+                                         'ui_scale': scale, 'native_threshold_crossing_unproved_until_witness': True}
+
+    def start(self):
+        self.configs.update()
+        self.initial_maps = self.maps()
+        self.proof['maps_before_without_control'] = self.initial_maps
+        assert not any(item.type == 'F23' for km in self.configs.user.keymaps for item in km.keymap_items)
+        fixture, bpy = self, self.bpy
+
+        class WM_OT_category03_circle_fallback_control(bpy.types.Operator):
+            bl_idname = 'wm.category03_circle_fallback_control'
+            bl_label = 'Category03 Circle fallback input witness'
+
+            def invoke(self, context, event):
+                fixture.input_callbacks.append({
+                    'ledger_id': fixture.cell['ledger_id'] if fixture.cell else None,
+                    'event': [event.type, event.value], 'area': context.area.type,
+                    'region': context.region.type, 'point': [event.mouse_region_x, event.mouse_region_y],
+                    'modifiers': {name: getattr(event, name) for name in fixture.MODIFIERS}})
+                return {'FINISHED'} if event.type == 'F23' else {'PASS_THROUGH'}
+
+        bpy.utils.register_class(WM_OT_category03_circle_fallback_control)
+        self.control_class = WM_OT_category03_circle_fallback_control
+        self.add_item({'name': 'Window', 'space_type': 'EMPTY', 'region_type': 'WINDOW'},
+                      self.control_class.bl_idname, {'type': 'F23', 'value': 'PRESS', 'any': True}, {})
+        self.configs.update()
+        self.record('circle_fallback_ready')
+
+    def reset_selection(self):
+        mode = self.binding['properties']['mode']
+        with self.context():
+            for name, obj in self.objects.items():
+                obj.select_set(name == 'bystander' or (name == 'target' and mode == 'SUB'))
+            self.bpy.context.view_layer.objects.active = self.objects['target']
+            self.bpy.context.view_layer.update()
+
+    def snapshot(self, phase):
+        with self.context():
+            view = self.area.spaces.active.region_3d
+            value = {'selected': sorted(name for name, obj in self.objects.items() if obj.select_get()),
+                     'geometry': {name: {'matrix': [list(row) for row in obj.matrix_world],
+                                         'vertices': [list(v.co) for v in obj.data.vertices],
+                                         'visible': obj.visible_get()} for name, obj in self.objects.items()},
+                     'view': {'rotation': list(view.view_rotation), 'location': list(view.view_location),
+                              'distance': view.view_distance, 'perspective': view.view_perspective},
+                     'tool': self.tool_state(), 'mode': self.bpy.context.mode,
+                     'area': self.area.type, 'region': self.region().type,
+                     'region_size': [self.region().width, self.region().height],
+                     'modal_operators_observable': hasattr(self.window, 'modal_operators'),
+                     'modal_operators': [o.bl_idname for o in getattr(self.window, 'modal_operators', ())]}
+        if self.result is not None:
+            self.result['phases'].append({'phase': phase, 'snapshot': value})
+        return value
+
+    @staticmethod
+    def expected_selection(mode):
+        return {'SET': ['target'], 'ADD': ['bystander', 'target'], 'SUB': ['bystander']}[mode]
+
+    @staticmethod
+    def stable_scene(before, after):
+        return all(before[key] == after[key] for key in ('geometry', 'view', 'tool', 'mode', 'area', 'region', 'region_size'))
+
+    @classmethod
+    def assert_positive_control(cls, mode, control):
+        before, after = control['before'], control['after']
+        assert control['poll'] and control['result'] == ['FINISHED']
+        assert before['selected'] == (['bystander', 'target'] if mode == 'SUB' else ['bystander'])
+        assert after['selected'] == cls.expected_selection(mode)
+        assert before['modal_operators_observable'] and after['modal_operators_observable']
+        assert cls.stable_scene(before, after) and not after['modal_operators']
+
+    def begin_cell(self, ledger_id):
+        assert not self.cell_allocations
+        self.binding = self.bindings[ledger_id]
+        self.mods = {name: bool(self.binding['event'][name]) for name in self.MODIFIERS}
+        self.cell = {'ledger_id': ledger_id, 'binding': self.binding, 'production_accepted': False}
+        self.proof['cells'].append(self.cell)
+        self.result = {'case': 'circle_fallback_' + ledger_id[:12], 'ledger_id': ledger_id,
+                       'reference': self.reference, 'probe': self.probe, 'phases': []}
+        self.cell['trial'] = self.result
+        self.receipt['dispatch'].append(self.result)
+        tool = self.tool_state()
+        self.cell['tool_readback'] = tool
+        self.assert_fallback(tool, self.binding['scope']['name'])
+        self.reset_selection()
+        before = self.snapshot('direct_reset')
+        with self.context():
+            op = self.bpy.ops.view3d.select_circle
+            props = {**self.binding['properties'], 'x': self.points['target'][0], 'y': self.points['target'][1]}
+            control = {'before': before, 'properties': props, 'poll': op.poll(),
+                       'positive_selection': False, 'method': 'independently reset region-pixel EXEC control'}
+            self.cell['direct_control'] = control
+            assert control['poll']
+            control['result'] = sorted(op('EXEC_DEFAULT', **props))
+        control['after'] = self.snapshot('after_direct')
+        self.record(self.result['case'] + '_control')
+        self.assert_positive_control(self.binding['properties']['mode'], control)
+        control['positive_selection'] = True
+        self.reset_selection()
+        self.configs.update()
+        self.cell['maps_before_witness'] = self.maps()
+
+    def candidate_maps(self, installed):
+        captured = self.maps()
+        counts = {role: {i: sum(all(row[field] == binding[field] for field in
+                        ('target', 'event', 'active', 'properties', 'read_issues'))
+                        for km in maps if km['scope'] == binding['scope'] for row in km['items'])
+                        for i, binding in self.bindings.items()} for role, maps in captured.items()}
+        relevant = {role: [km for km in maps if km['scope'] == self.binding['scope']]
+                    for role, maps in captured.items()}
+        self.result.setdefault('admission', []).append({'installed': installed, 'counts': counts, 'maps': relevant})
+        self.record(self.result['case'] + '_admission')
+        for role, values in counts.items():
+            for i, count in values.items():
+                expected = (role in ('active', 'user') if self.reference else
+                            installed and i == self.cell['ledger_id'] and role in ('addon', 'user'))
+                assert count == int(expected), 'Unexpected exact candidate count'
+        if installed:
+            km, = relevant['user']
+            witness = [i for i, row in enumerate(km['items']) if row['target'] == self.control_class.bl_idname]
+            competitors = [i for i, row in enumerate(km['items']) if row['active'] and
+                           row['event'] == self.binding['event'] and row['target'] != self.control_class.bl_idname]
+            self.result['witness_order'] = {'indices': witness, 'competing_indices': competitors}
+            self.record(self.result['case'] + '_order')
+            assert len(witness) == 1 and competitors and all(witness[0] < i for i in competitors)
+
+    def install_cell(self):
+        self.candidate_maps(False)
+        event = {name: self.binding['event'][name] for name in
+                 ('type', 'value', 'any', 'shift', 'ctrl', 'alt', 'oskey', 'key_modifier', 'repeat', 'direction')}
+        self.add_item(self.binding['scope'], self.control_class.bl_idname, {**event, 'head': True}, {})
+        self.cell_allocations.append(self.allocations[-1])
+        if self.probe:
+            # Candidate before witness in source -> witness first after prepend merge.
+            self.add_item(self.binding['scope'], self.binding['target'], {**event, 'head': True}, self.binding['properties'])
+            self.cell_allocations.append(self.allocations[-1])
+        self.configs.update()
+
+    def event_at(self, point, key, value='PRESS', mods=None):
+        r = self.region()
+        x, y = point
+        assert 0 <= x < r.width and 0 <= y < r.height
+        self.window.event_simulate(type=key, value=value, x=r.x + x, y=r.y + y,
+                                   **(self.mods if mods is None else mods))
+
+    def prime(self):
+        self.reset_selection()
+        self.input_callbacks.clear()
+        self.event_at(self.path[0], 'MOUSEMOVE', 'NOTHING')
+        self.event_at(self.path[0], 'F23')
+        self.event_at(self.path[0], 'F23', 'RELEASE')
+
+    def press_input(self):
+        expected = {'ledger_id': self.cell['ledger_id'], 'event': ['F23', 'PRESS'],
+                    'area': 'VIEW_3D', 'region': 'WINDOW', 'point': self.path[0], 'modifiers': self.mods}
+        self.result['input_delivery'] = {'callbacks': list(self.input_callbacks),
+                                         'delivered': self.input_callbacks.count(expected) == 1}
+        assert self.result['input_delivery']['delivered']
+        before = self.snapshot('before_press')
+        assert before['mode'] == 'OBJECT' and before['modal_operators_observable'] and not before['modal_operators']
+        assert all(obj['visible'] for obj in before['geometry'].values())
+        self.assert_fallback(before['tool'], self.binding['scope']['name'])
+        self.candidate_maps(True)
+        self.event_at(self.path[0], 'RIGHTMOUSE')
+
+    def motion(self, index):
+        self.snapshot('after_press' if index == 1 else 'after_first_motion')
+        self.result['callbacks_before_motion_' + str(index)] = list(self.input_callbacks)
+        self.event_at(self.path[index], 'MOUSEMOVE', 'NOTHING')
+
+    def release_input(self):
+        self.snapshot('after_second_motion')
+        self.result['callbacks_before_release'] = list(self.input_callbacks)
+        self.event_at(self.path[-1], 'RIGHTMOUSE', 'RELEASE')
+
+    def cancel(self):
+        self.snapshot('after_release')
+        self.result['callbacks_after_release'] = list(self.input_callbacks)
+        clear = dict.fromkeys(self.MODIFIERS, False)
+        self.event_at(self.path[-1], 'ESC', mods=clear)
+        self.event_at(self.path[-1], 'ESC', 'RELEASE', clear)
+
+    def finish(self):
+        after = self.snapshot('after_cancel')
+        phases = {row['phase']: row['snapshot'] for row in self.result['phases']}
+        witnessed = [row for row in self.result['callbacks_after_release']
+                     if row['event'] == ['RIGHTMOUSE', 'CLICK_DRAG']]
+        self.result['event_callbacks'] = list(self.input_callbacks)
+        self.result['exact_map_event_witnessed'] = (len(witnessed) == 1 and
+            witnessed[0]['ledger_id'] == self.cell['ledger_id'] and witnessed[0]['modifiers'] == self.mods
+            and witnessed[0]['area'] == 'VIEW_3D' and witnessed[0]['region'] == 'WINDOW'
+            and self.path[0][0] <= witnessed[0]['point'][0] <= self.path[-1][0]
+            and witnessed[0]['point'][1] == self.path[0][1]
+            and witnessed[0] in self.result['callbacks_before_release']
+            and witnessed[0] not in self.result['callbacks_before_motion_1'])
+        expected = self.expected_selection(self.binding['properties']['mode'])
+        self.result['expected_selection_observed'] = phases['after_release']['selected'] == after['selected'] == expected
+        self.result['geometry_view_and_tool_unchanged'] = all(
+            self.stable_scene(phases['before_press'], phases[name]) for name in
+            ('after_press', 'after_first_motion', 'after_second_motion', 'after_release', 'after_cancel'))
+        self.result['modal_cleanup_complete'] = after['modal_operators_observable'] and not after['modal_operators']
+        self.record(self.result['case'])
+        assert self.result['modal_cleanup_complete'], 'Circle gesture left a modal after ESC'
+
+    def release_cell(self):
+        for allocation in reversed(self.cell_allocations[:]):
+            km, item, pointer, native_id = allocation
+            live = [row for row in km.keymap_items if row.as_pointer() == pointer and row.id == native_id]
+            assert len(live) == 1, 'Owned Circle item generation missing or ambiguous'
+            km.keymap_items.remove(live[0])
+            self.allocations.remove(allocation)
+            self.cell_allocations.remove(allocation)
+        for km in self.created_maps[:]:
+            if not len(km.keymap_items):
+                self.configs.addon.keymaps.remove(km)
+                self.created_maps.remove(km)
+        self.configs.update()
+        self.cell['maps_after_witness'] = self.maps()
+        self.cell['strict_cell_preservation'] = self.cell['maps_after_witness'] == self.cell['maps_before_witness']
+        self.record('circle_fallback_cell_released')
+        assert self.cell['strict_cell_preservation'], 'Circle cell source/merged maps changed'
+
+    def append(self):
+        self.steps.extend((self.prepare, lambda: None, self.measure, self.start))
+        for row_id in self.CELLS:
+            self.steps.extend((lambda row_id=row_id: self.begin_cell(row_id), self.install_cell,
+                               self.prime, self.press_input, lambda: self.motion(1), lambda: self.motion(2),
+                               self.release_input, self.cancel, self.finish, self.release_cell))
+        self.steps.append(self.cleanup)
+        return self
+
+
 class UVExtendReferenceCases(UVExtendCases):
     """Two ordinary CLICK reference states; no candidate or tool PRESS probe."""
 

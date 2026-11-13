@@ -334,6 +334,176 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
         self.assertNotIn('declaration', self.rows[row_id])
 
 
+class Category03CircleFallbackFixtureTests(unittest.TestCase):
+    def fixture(self, reference=False):
+        from blender_keymap_category03_handlers import CircleFallbackCases
+        ledger = {r['row_id']: r for r in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        bindings = {i: ledger[i]['binding'] for i in CircleFallbackCases.CELLS}
+        configs = types.SimpleNamespace(**{role: types.SimpleNamespace(keymaps=[])
+                                          for role in ('default', 'active', 'addon', 'user')})
+        bpy = types.SimpleNamespace(context=types.SimpleNamespace(
+            window_manager=types.SimpleNamespace(keyconfigs=configs)))
+        with patch.dict(sys.modules, {'bpy': bpy}):
+            return CircleFallbackCases([], {'dispatch': []}, Mock(), None, None, None,
+                                       bindings=bindings, probe=not reference, reference=reference)
+
+    @staticmethod
+    def snapshot(selected):
+        return {'selected': selected, 'geometry': {'target': {'visible': True}}, 'view': {'distance': 12},
+                'tool': {'idname': 'builtin.move', 'idname_fallback': 'builtin.select_circle',
+                         'keymap': None, 'keymap_fallback': None, 'workspace_tool_type': 'FALLBACK'},
+                'mode': 'OBJECT', 'area': 'VIEW_3D', 'region': 'WINDOW', 'region_size': [800, 600],
+                'modal_operators_observable': True, 'modal_operators': []}
+
+    def test_circle_fallback_has_exact_four_modes_and_short_shared_schedule(self):
+        for reference in (False, True):
+            fixture = self.fixture(reference)
+            self.assertEqual([b['properties']['mode'] for b in fixture.bindings.values()], ['SET', 'ADD', 'SUB', 'SUB'])
+            self.assertEqual([tuple(k for k in fixture.MODIFIERS if b['event'][k])
+                              for b in fixture.bindings.values()], [(), ('shift',), ('ctrl',), ('oskey',)])
+            for binding in fixture.bindings.values():
+                self.assertEqual((binding['scope']['name'], binding['event']['type'], binding['event']['value']),
+                                 ('3D View Tool: Select Circle (fallback)', 'RIGHTMOUSE', 'CLICK_DRAG'))
+                self.assertFalse(binding['properties']['wait_for_input'])
+            methods = ('prepare', 'measure', 'start', 'begin_cell', 'install_cell', 'prime',
+                       'press_input', 'motion', 'release_input', 'cancel', 'finish', 'release_cell', 'cleanup')
+            for method in methods:
+                setattr(fixture, method, Mock())
+            fixture.append()
+            self.assertEqual(len(fixture.steps), 45)
+            for step in fixture.steps:
+                step()
+            self.assertEqual([c.args[0] for c in fixture.begin_cell.call_args_list], list(fixture.CELLS))
+            self.assertEqual([c.args[0] for c in fixture.motion.call_args_list], [1, 2] * 4)
+            fixture.cleanup.assert_called_once()
+
+    def test_circle_path_requires_visible_margin_and_separated_bystanders(self):
+        from blender_keymap_category03_handlers import CircleFallbackCases
+        points = {'target': [400, 300], 'bystander': [400, 450], 'sentinel': [400, 150]}
+        path = CircleFallbackCases.paint_path(points, 800, 600, 3, 2)
+        self.assertEqual(path, [[272, 300], [336, 300], [400, 300]])
+        for changed in ({'target': [50, 300]}, {'bystander': [320, 310]}, {'sentinel': [1, 150]}):
+            with self.assertRaises(AssertionError):
+                CircleFallbackCases.paint_path({**points, **changed}, 800, 600, 3, 2)
+        with self.assertRaises(AssertionError):
+            CircleFallbackCases.paint_path(points, 800, 600, 200, 2)
+
+    def test_circle_positive_controls_require_distinct_set_add_sub_effects(self):
+        from blender_keymap_category03_handlers import CircleFallbackCases
+        for mode, expected in (('SET', ['target']), ('ADD', ['bystander', 'target']), ('SUB', ['bystander'])):
+            before = self.snapshot(['bystander', 'target'] if mode == 'SUB' else ['bystander'])
+            after = self.snapshot(expected)
+            control = {'poll': True, 'result': ['FINISHED'], 'before': before, 'after': after}
+            CircleFallbackCases.assert_positive_control(mode, control)
+            for changed in ({'selected': before['selected']}, {'modal_operators': ['VIEW3D_OT_select_circle']},
+                            {'view': {'distance': 13}}, {'geometry': {}}, {'region_size': [100, 600]},
+                            {'modal_operators_observable': False}):
+                with self.subTest(mode=mode, changed=changed), self.assertRaises(AssertionError):
+                    CircleFallbackCases.assert_positive_control(mode, {**control, 'after': {**after, **changed}})
+
+    def test_circle_direct_control_uses_projected_pixels_and_independent_reset(self):
+        fixture = self.fixture()
+        fixture.points = {'target': [400, 300]}
+        before, after = self.snapshot(['bystander']), self.snapshot(['target'])
+        fixture.tool_state = Mock(return_value=before['tool'])
+        fixture.reset_selection = Mock()
+        fixture.snapshot = Mock(side_effect=[before, after])
+        fixture.context = nullcontext
+        op = Mock(return_value={'FINISHED'})
+        op.poll.return_value = True
+        fixture.bpy.ops = types.SimpleNamespace(view3d=types.SimpleNamespace(select_circle=op))
+        fixture.configs.update, fixture.maps = Mock(), Mock(return_value={})
+        fixture.begin_cell(fixture.CELLS[0])
+        op.assert_called_once_with('EXEC_DEFAULT', mode='SET', radius=25, wait_for_input=False, x=400, y=300)
+        self.assertEqual(fixture.reset_selection.call_count, 2)
+        self.assertTrue(fixture.cell['direct_control']['positive_selection'])
+        self.assertEqual(fixture.bindings[fixture.CELLS[0]]['properties']['x'], 0)
+
+    def test_circle_fallback_requires_actual_choice_and_mouse_witness_only_passes_through(self):
+        fixture = self.fixture()
+        tool = self.snapshot([])['tool']
+        fixture.assert_fallback(tool, fixture.binding['scope']['name'])
+        for changed in ({'idname_fallback': None}, {'workspace_tool_type': 'DEFAULT'},
+                        {'idname': 'builtin.select_circle'}, {'keymap_fallback': 'Another map'}):
+            with self.assertRaises(AssertionError):
+                fixture.assert_fallback({**tool, **changed}, fixture.binding['scope']['name'])
+        fixture.bpy.types = types.SimpleNamespace(Operator=object)
+        fixture.bpy.utils = types.SimpleNamespace(register_class=Mock())
+        fixture.configs.update, fixture.maps, fixture.add_item = Mock(), Mock(return_value={}), Mock()
+        fixture.start()
+        fixture.cell = {'ledger_id': fixture.CELLS[2]}
+        context = types.SimpleNamespace(area=types.SimpleNamespace(type='VIEW_3D'),
+                                        region=types.SimpleNamespace(type='WINDOW'))
+        for key, value in (('F23', 'PRESS'), ('RIGHTMOUSE', 'CLICK_DRAG')):
+            event = types.SimpleNamespace(type=key, value=value, mouse_region_x=300, mouse_region_y=300,
+                                          shift=False, ctrl=True, alt=False, oskey=False)
+            result = fixture.control_class().invoke(context, event)
+            self.assertEqual(result, {'FINISHED'} if key == 'F23' else {'PASS_THROUGH'})
+            self.assertEqual(fixture.input_callbacks[-1]['modifiers'],
+                             {'shift': False, 'ctrl': True, 'alt': False, 'oskey': False})
+
+    def test_circle_admission_keeps_failed_order_and_reference_sibling_counts(self):
+        for reference in (False, True):
+            fixture = self.fixture(reference)
+            fixture.cell = {'ledger_id': fixture.CELLS[0]}
+            fixture.control_class = types.SimpleNamespace(bl_idname='wm.circle_witness')
+            candidate = copy.deepcopy(fixture.binding)
+            witness = {**candidate, 'target': fixture.control_class.bl_idname, 'properties': {}}
+            siblings = list(fixture.bindings.values()) if reference else [candidate]
+            for wrong_order in (True, False):
+                fixture.result = {'case': 'circle_order'}
+                maps = {'default': [],
+                        'active': [{'scope': candidate['scope'], 'items': siblings}] if reference else [],
+                        'addon': [{'scope': candidate['scope'], 'items': [witness] if reference else [candidate, witness]}],
+                        'user': [{'scope': candidate['scope'], 'items': siblings + [witness] if wrong_order else [witness] + siblings}]}
+                fixture.maps = Mock(return_value=maps)
+                if wrong_order:
+                    with self.assertRaises(AssertionError):
+                        fixture.candidate_maps(True)
+                else:
+                    fixture.candidate_maps(True)
+                self.assertEqual(fixture.result['admission'][-1]['maps'], maps)
+                self.assertEqual(fixture.result['witness_order']['indices'], [len(siblings) if wrong_order else 0])
+
+    def test_circle_release_refuses_foreign_generation_and_keeps_strict_failure(self):
+        fixture = self.fixture()
+        foreign = types.SimpleNamespace(id=5, as_pointer=lambda: 10)
+        km = types.SimpleNamespace(keymap_items=[foreign])
+        allocation = (km, object(), 10, 4)
+        fixture.cell_allocations = [allocation]
+        fixture.allocations = [allocation]
+        with self.assertRaises(AssertionError):
+            fixture.release_cell()
+        self.assertEqual(fixture.allocations, [allocation])
+        self.assertEqual(km.keymap_items, [foreign])
+        fixture.cell_allocations = []
+        fixture.cell = {'maps_before_witness': {'source': 'unchanged'}}
+        fixture.configs.update = Mock()
+        fixture.maps = Mock(return_value={'source': 'changed'})
+        with self.assertRaises(AssertionError):
+            fixture.release_cell()
+        self.assertFalse(fixture.cell['strict_cell_preservation'])
+
+    def test_circle_effect_does_not_substitute_for_correct_drag_phase_and_modifier(self):
+        fixture = self.fixture()
+        fixture.cell = {'ledger_id': fixture.CELLS[0]}
+        fixture.mods = dict.fromkeys(fixture.MODIFIERS, False)
+        fixture.path = [[272, 300], [336, 300], [400, 300]]
+        before, after = self.snapshot(['bystander']), self.snapshot(['target'])
+        witness = {'ledger_id': fixture.CELLS[0], 'event': ['RIGHTMOUSE', 'CLICK_DRAG'],
+                   'area': 'VIEW_3D', 'region': 'WINDOW', 'point': [336, 300], 'modifiers': fixture.mods}
+        for change in ({}, {'modifiers': {**fixture.mods, 'ctrl': True}}, {'point': [336, 500]}):
+            callback = {**witness, **change}
+            fixture.result = {'case': 'drag', 'phases': [{'phase': name, 'snapshot': before if name == 'before_press' else after}
+                for name in ('before_press', 'after_press', 'after_first_motion', 'after_second_motion', 'after_release', 'after_cancel')],
+                'callbacks_after_release': [callback], 'callbacks_before_release': [callback], 'callbacks_before_motion_1': []}
+            fixture.input_callbacks = [callback]
+            fixture.snapshot = Mock(return_value=after)
+            fixture.finish()
+            self.assertTrue(fixture.result['expected_selection_observed'])
+            self.assertEqual(fixture.result['exact_map_event_witnessed'], not change)
+
+
 class Category03ImageToolFixtureTests(unittest.TestCase):
     def fixture(self):
         from blender_keymap_category03_ordinary import OrdinaryCases
