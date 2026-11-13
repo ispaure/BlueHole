@@ -19,6 +19,7 @@ from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
 from ..actions.actions.keymaps.navigation.viewport_movement import get_navigation_viewport_movement_actions
 from ..actions.actions.keymaps.navigation.viewport_axis import get_navigation_viewport_axis_actions
+from ..actions.actions.keymaps.navigation.view_framing import get_navigation_view_framing_actions
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -52,6 +53,9 @@ def get_enabled_navigation_actions():
 
     if prefs().keymap.navigation.enable_navigation_viewport_axis:
         actions.extend(get_navigation_viewport_axis_actions())
+
+    if prefs().keymap.navigation.enable_navigation_view_framing:
+        actions.extend(get_navigation_view_framing_actions())
 
     return actions
 

@@ -1,5 +1,16 @@
 # Blue Hole validation
 
+## Deluxe category 03
+
+`python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q` checks
+the category reconciliation boundary, exact reviewed declarations, toggle isolation,
+inherited row preservation and scoped native receipts. The separate
+`blender_keymap_category03_handlers.py`, `blender_keymap_category03_ordinary.py`,
+and `blender_keymap_category03_editors.py`
+fixtures prepare bounded reference/owned probes; they require the coordinated
+native input slot through the category driver. Native category verification is
+in progress; see the [category receipt](../docs/deluxe-keymaps-category03.md).
+
 ## Deluxe runtime keymaps
 
 `python3 -m unittest discover -s tests -p 'test_keymap_runtime.py' -q` checks

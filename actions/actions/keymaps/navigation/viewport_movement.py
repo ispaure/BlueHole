@@ -259,6 +259,26 @@ NAVIGATION_3D_VIEW_ZOOM = OperatorAction(
     keymap_bindings=_alt_right_mouse_bindings('3D View', space_type='VIEW_3D')
 )
 
+NAVIGATION_3D_VIEW_ZOOM_IN = OperatorAction(
+    operator='view3d.zoom',
+    text='Zoom In',
+    props={'delta': 1},
+    keymap_bindings=(
+        # 291b254de1dbbd4fa32d997de0e25aa91eea9e2306902ea8e09ef3ca3580c549
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='WHEELINMOUSE', alt=True),
+    ),
+)
+
+NAVIGATION_3D_VIEW_ZOOM_OUT = OperatorAction(
+    operator='view3d.zoom',
+    text='Zoom Out',
+    props={'delta': -1},
+    keymap_bindings=(
+        # 1498e141d9619244e98c6eaae90422084cc4c9f90c27406fa4f33c1b936e729b
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='WHEELOUTMOUSE', alt=True),
+    ),
+)
+
 
 # -------------------------------------------------------------------------------------------------
 # Image Editor
@@ -314,6 +334,8 @@ NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS: list[OperatorAction] = [
     NAVIGATION_3D_VIEW_MOVE,
     NAVIGATION_3D_VIEW_ROTATE,
     NAVIGATION_3D_VIEW_ZOOM,
+    NAVIGATION_3D_VIEW_ZOOM_IN,
+    NAVIGATION_3D_VIEW_ZOOM_OUT,
 
     NAVIGATION_IMAGE_PAN,
     NAVIGATION_IMAGE_ZOOM,

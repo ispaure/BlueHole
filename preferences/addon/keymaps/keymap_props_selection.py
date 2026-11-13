@@ -22,6 +22,8 @@ from bpy.props import *
 from ....blenderUtils.operatorUtils import op_exists
 from ....actions.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
 from ....actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
+from ....actions.actions.keymaps.selection.selection_all_none import get_selection_all_none_actions
+from ....actions.actions.keymaps.selection.selection_circle import get_selection_circle_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -61,12 +63,28 @@ class SelectionKeymapPG(bpy.types.PropertyGroup):
         update=_update_keymaps
     )
 
+    enable_selection_all_none: BoolProperty(
+        name='Enable Select All / None',
+        description='Enable shortcuts to select or deselect all UVs',
+        default=True,
+        update=_update_keymaps
+    )
+
+    enable_selection_circle: BoolProperty(
+        name='Enable Circle Selection',
+        description='Enable Circle Selection shortcuts in the 3D View and UV Editor',
+        default=True,
+        update=_update_keymaps
+    )
+
     active_selection_keymap_tab: EnumProperty(
         name='Selection Keymap Tab',
         description='Active selection keymap feature tab',
         items=[
             ('MORE_LESS', 'Select Less / More', ''),
             ('TOOL_SWITCH', 'Tool Switch', ''),
+            ('ALL_NONE', 'Select All / None', ''),
+            ('CIRCLE', 'Circle Selection', ''),
         ],
         default='MORE_LESS'
     )
@@ -103,4 +121,20 @@ def draw(preference, context, layout):
             feature_owner=preference.keymap.selection,
             feature_prop_name='enable_selection_tool_switch',
             actions=get_selection_tool_switch_actions(),
+        )
+
+    elif preference.keymap.selection.active_selection_keymap_tab == 'ALL_NONE':
+        draw_action_feature_keymaps(
+            column=column_selection,
+            feature_owner=preference.keymap.selection,
+            feature_prop_name='enable_selection_all_none',
+            actions=get_selection_all_none_actions(),
+        )
+
+    elif preference.keymap.selection.active_selection_keymap_tab == 'CIRCLE':
+        draw_action_feature_keymaps(
+            column=column_selection,
+            feature_owner=preference.keymap.selection,
+            feature_prop_name='enable_selection_circle',
+            actions=get_selection_circle_actions(),
         )

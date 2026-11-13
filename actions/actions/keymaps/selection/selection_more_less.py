@@ -98,6 +98,15 @@ SELECTION_OBJECT_SELECT_LESS = OperatorAction(
     keymap_bindings=_select_less_bindings('Object Mode')
 )
 
+SELECTION_3D_VIEW_OBJECT_SELECT_LESS = OperatorAction(
+    operator='object.select_less',
+    text='Shrink Object Selection',
+    keymap_bindings=(
+        # c668cd6405ddd1e2b7c17a066eeea197ea8063eac81bc238742430ad3a8eb973
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='ESC'),
+    ),
+)
+
 # Curve
 SELECTION_CURVE_SELECT_MORE = OperatorAction(
     operator='curve.select_more',
@@ -167,12 +176,24 @@ SELECTION_PARTICLE_SELECT_LESS = OperatorAction(
 # UV Editor
 SELECTION_UV_SELECT_MORE = OperatorAction(
     operator='uv.select_more',
-    keymap_bindings=_select_more_bindings('UV Editor')
+    keymap_bindings=(
+        *_select_more_bindings('UV Editor'),
+        # 8eb6e5854ee0f7d1373566729a5b84cb5a9df29927f63e89edd363a395539aa3
+        KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='RIGHT_BRACKET', repeat=True),
+        # 89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a
+        KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='UP_ARROW', repeat=True),
+    ),
 )
 
 SELECTION_UV_SELECT_LESS = OperatorAction(
     operator='uv.select_less',
-    keymap_bindings=_select_less_bindings('UV Editor')
+    keymap_bindings=(
+        *_select_less_bindings('UV Editor'),
+        # 8b319baccba2e5a7bac8671297fb7fd0ef7abef232d553f6f91bc56e5d383f52
+        KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='LEFT_BRACKET', repeat=True),
+        # a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839
+        KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='DOWN_ARROW', repeat=True),
+    ),
 )
 
 # Mask Editing
@@ -238,6 +259,7 @@ SELECTION_MORE_LESS_ACTIONS: list[OperatorAction] = [
 
     SELECTION_OBJECT_SELECT_MORE,
     SELECTION_OBJECT_SELECT_LESS,
+    SELECTION_3D_VIEW_OBJECT_SELECT_LESS,
 
     SELECTION_CURVE_SELECT_MORE,
     SELECTION_CURVE_SELECT_LESS,

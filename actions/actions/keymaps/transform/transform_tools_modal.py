@@ -149,6 +149,23 @@ TRANSFORM_TRANSLATE_UV_EDITOR = OperatorAction(
     keymap_bindings=_translate_bindings('UV Editor')
 )
 
+TRANSFORM_TRANSLATE_UV_CURSOR = OperatorAction(
+    operator='transform.translate',
+    text='Move UV Cursor',
+    props={'cursor_transform': True, 'release_confirm': True},
+    keymap_bindings=(
+        # ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1
+        KeymapBinding(
+            keymap_name='UV Editor',
+            space_type='EMPTY',
+            key='MIDDLEMOUSE',
+            value='CLICK_DRAG',
+            ctrl=True,
+            shift=True,
+        ),
+    ),
+)
+
 TRANSFORM_TRANSLATE_MASK_EDITING = OperatorAction(
     operator='transform.translate',
     text='Move Tool (Modal)',
@@ -437,6 +454,7 @@ TRANSFORM_TOOLS_MODAL_ACTIONS: list[OperatorAction] = [
     TRANSFORM_TRANSLATE_POINT_CLOUD,
     TRANSFORM_TRANSLATE_GREASE_PENCIL_EDIT_MODE,
     TRANSFORM_TRANSLATE_UV_EDITOR,
+    TRANSFORM_TRANSLATE_UV_CURSOR,
     TRANSFORM_TRANSLATE_MASK_EDITING,
     TRANSFORM_TRANSLATE_GRAPH_EDITOR,
     TRANSFORM_TRANSLATE_NODE_EDITOR,

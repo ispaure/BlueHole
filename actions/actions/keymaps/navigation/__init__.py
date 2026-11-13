@@ -17,6 +17,7 @@ __status__ = 'Production'
 
 from .viewport_movement import NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS
 from .viewport_axis import NAVIGATION_VIEWPORT_AXIS_ACTIONS
+from .view_framing import NAVIGATION_VIEW_FRAMING_ACTIONS
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ACTION GROUPS
@@ -24,6 +25,7 @@ from .viewport_axis import NAVIGATION_VIEWPORT_AXIS_ACTIONS
 _NAVIGATION_ACTIONS = (
     *NAVIGATION_VIEWPORT_MOVEMENT_ACTIONS,
     *NAVIGATION_VIEWPORT_AXIS_ACTIONS,
+    *NAVIGATION_VIEW_FRAMING_ACTIONS,
 )
 
 # ----------------------------------------------------------------------------------------------------------------------

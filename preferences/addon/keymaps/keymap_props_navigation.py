@@ -20,6 +20,7 @@ from bpy.props import *
 
 from ....actions.actions.keymaps.navigation.viewport_movement import get_navigation_viewport_movement_actions
 from ....actions.actions.keymaps.navigation.viewport_axis import get_navigation_viewport_axis_actions
+from ....actions.actions.keymaps.navigation.view_framing import get_navigation_view_framing_actions
 from .keymap_ui_utils import draw_action_feature_keymaps
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -126,5 +127,9 @@ def draw(preference, context, layout):
             )
 
     elif preference.keymap.navigation.active_navigation_keymap_tab == 'VIEW_FRAMING':
-        row = column_navigation.row()
-        row.prop(preference.keymap.navigation, 'enable_navigation_view_framing')
+        draw_action_feature_keymaps(
+            column=column_navigation,
+            feature_owner=preference.keymap.navigation,
+            feature_prop_name='enable_navigation_view_framing',
+            actions=get_navigation_view_framing_actions(),
+        )

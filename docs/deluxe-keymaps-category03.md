@@ -1,0 +1,292 @@
+# Deluxe Navigation, Selection and Transform
+
+Brief 03 reconciles these categories against the accepted
+[baseline ledger](deluxe-keymaps-baseline.md) and uses the existing
+[reversible runtime](deluxe-keymaps-runtime.md). Category implementation and
+native verification are in progress. View Framing, six UV selection additions, Circle Selection, the Gizmo scope correction and Q
+PRESS declarations pass portable checks. Bounded native observations are recorded below;
+they do not establish complete category parity.
+
+## Base and reconciliation
+
+The accepted comparison base is the built-in **Blender** keyconfig from
+`stock-4.5.1`, Blender 4.5.1 LTS build `b0a72b245dcf` on macOS arm64. The category
+manifest retains its exact keyconfig options and bundled source hashes. Industry
+Compatible is a comparator. The development branch remains
+`blender-5.2.2/alpha`; this evidence does not establish native 5.2.2 behavior.
+
+The reference-profile fallback uses SEARCH for spacebar, TOOL for tool-key mode,
+and enabled pie click-drag, whereas the accepted stock base uses PLAY, IMMEDIATE,
+and disabled pie click-drag. These differences and the separate input preference
+`invert_mouse_zoom` are comparison conditions. This category work does not
+activate or persist those options.
+
+The separate [category manifest](../tests/fixtures/deluxe_keymaps_category03/manifest.json)
+and [reconciliation rows](../tests/fixtures/deluxe_keymaps_category03/reconciliation.jsonl)
+account for all 1,032 assigned baseline IDs:
+
+| Audit classification | Rows | Interpretation |
+| --- | ---: | --- |
+| Existing | 280 | 157 captured Blue Hole rows and 123 complete inherited provider rows |
+| Base-equal | 160 | Same positive stock/full semantic occurrence counts |
+| Reference-delta | 392 | 140 active full-side candidates and 252 stock-side change observations |
+| Unresolved | 200 | 74 schema gaps, 123 absent in both merged controls, three attribution caveats |
+
+Provider inheritance remains explicit on another 44 schema-gated rows. Source
+declaration overlap and captured ownership do not prove effective dispatch. In
+particular, 66 of the 157 captured owned rows are absent from the development
+merged user capture and require targeted verification.
+
+These fixtures are accountability and parity evidence. Production does not load
+them to register the entire reference map. Unchanged stock/provider bindings
+remain inherited. Confirmed effective reference customizations are authorized for migration relative
+to the selected Blender base. Documentation is supporting evidence, not a separate
+intent gate. Missing rows or changed positions alone do not establish a removal. The retained-order audit found no
+inverted active literal-overlap pair involving these assigned rows. The unchanged
+PRECISION token remains inherited despite its changed list position.
+
+## View Framing declarations
+
+View Framing now uses its existing Navigation subfeature toggle and displays its
+bindings through the existing action UI. Five actions declare thirteen reviewed
+non-stock bindings; each binding cites its accepted ledger row.
+
+| Context/action | Inputs |
+| --- | --- |
+| 3D View: frame selected | F; Shift-Alt wheel up/right |
+| 3D View: frame selected in all regions | Shift-F |
+| 3D View: frame all | A; Shift-Alt wheel down/left |
+| Image: frame selected | F; Shift-Alt wheel up/right |
+| Image: frame all | A; Shift-Alt wheel down/left |
+
+Actual invocation depends on editor/mode/tool handlers. In the accepted full
+reference sample, A selected all objects even though a framing candidate existed.
+The new declarations preserve that distinction for native verification. Existing
+NDOF framing rows remain inherited. Older events are not removed by adding a new
+event.
+
+Existing movement/axis, More/Less and Q groups remain. Transform's Modal group
+contains operator-launch shortcuts; its Gizmo group contains tool activation.
+These are distinct from actual modal-token maps. Category/subfeature defaults
+remain enabled while the standard master switch remains opt-in. Pipeline and Pie
+retain their existing independent behavior; fresh Deluxe activation belongs to
+brief 07.
+
+## UV selection additions
+
+The existing UV More/Less actions now also accept `]` to grow and `[` to shrink
+selection, with key repeat enabled. The two exact ledger rows and the existing
+Deluxe shortcut table support these alternatives. Their declaration links are
+kept separate from the historical audit. All 52 existing wheel declarations
+retain their semantics and order. Native bracket input grew four selected UV corners to nine and shrank four to one.
+
+The coordinator approved a separate All/None feature for exactly four UV
+bindings: Ctrl-A / Ctrl-Shift-A and their macOS Command aliases. Native Ctrl and Command variants selected all 64 UV corners or deselected all
+four initially selected corners. Toggling this feature removed only its four rows,
+restored them exactly, and preserved the other groups and foreign default rows. None is inherited from the selected Blender
+base; Industry lineage for the Command aliases does not make them inherited
+when Blender is selected. No other editor or mode is added by analogy.
+
+## Circle Selection
+
+Four exact reference inputs now use a separate Circle toggle: Shift-middle mouse
+adds and Ctrl-middle mouse subtracts in the 3D View and UV Editor. The 3D inputs
+retain `wait_for_input=True`; UV retains `False`. ADD/SUB properties, radius and
+coordinates match the ledger, and the master remains opt-in.
+
+The owned probe matched all four copied-reference selection effects. The actual
+production runtime then selected/deselected the target object or four UV corners
+without moving the view. Disabling removed only these four rows and restored
+stock Shift-middle navigation; reenabling restored selection. Other category
+rows and foreign source fields/order stayed unchanged. Saved user edits across a
+fresh process remain pending.
+
+## Ordinary candidate drafts
+
+Twenty-one additional bindings are drafted in existing category modules and
+verified against exact accepted scopes, events, targets and declared properties.
+Their native acceptance remains pending; the manifest keeps them separate from
+the twenty-three implemented candidates (including Circle) and historical native receipts.
+Existing subfeature toggles control these drafts.
+The seven axis/Local View production inputs produced their expected effects.
+The first copied-reference run observed six matching effects, an unchanged first
+Ctrl-F1 case, and a strict property-readability comparison failure. A focused
+reference readiness check remains required before treating that cluster as complete.
+
+| Existing group | Draft inputs |
+| --- | --- |
+| Viewport Axis | Ctrl/Command F1–F3 absolute back/left/bottom views |
+| Viewport Movement | Alt wheel in/out zoom |
+| View Framing | Shift-I Local View |
+| More/Less | UV up/down arrows; 3D Escape → Object Select Less |
+| Q Tool Switch | Image, Image Paint, Vertex Paint and Weight Paint |
+| Transform Gizmo | Image W/E/R tool cycling; UV T tool cycling |
+| Transform Modal | Ctrl-Shift middle drag to move the UV cursor |
+
+The 22nd ordinary candidate is exactly Image Paint Alt-A → UV Select All
+(INVERT). The coordinator reserved `selection/selection_invert.py` and minimal
+Selection wiring, but that feature remains unimplemented until native polling
+and copied-reference dispatch prove support in **Image Paint**. The different
+stock UV Editor Alt-A context is not a substitute.
+
+The ordinary fixture separates stock observation, one exact owned probe at a
+time, and production-source observation. Five bounded clusters cover all 22
+IDs. The seven-handler fixture separately compares middle click, drag and
+second-press drag, circle entry versus actual brush selection, Object subtract
+and Mesh/UV shortest-path controls. Both preserve foreign source fields/order;
+the axis and handler subsets have run, while other clusters remain pending.
+
+## Verification and boundaries
+
+Run the portable category checks with:
+
+```sh
+python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
+```
+
+Twenty-seven category checks currently pass. They cover exact assigned IDs and
+comparison links, base identity, inherited order, declaration semantics, group
+isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
+Transform effects, corrected Selection controls, exact eight-row ownership
+transfer, and honest partial native receipts. The affected runtime suite has 69
+checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
+The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
+retains 28 factory attempts and twelve copied-reference attempts. A completed
+observation is not a successful process if that process later crashes.
+
+### Proven bounded behavior
+
+- **Navigation:** Alt-left orbit, Alt-middle pan, Alt-right zoom, F/Shift-F and
+  the four wheel framing directions changed measured view state. A selected
+  objects in both the development fixture and copied reference. Four directional
+  axis drags remained unchanged; middle-click front-axis worked. The copied
+  reference also left the tested north-axis drag unchanged with Select and Box
+  tools. A later controlled handler fixture established that copied-reference
+  plain middle drag pans, while the exact owned addon probe rotates. Both rotate
+  on second-press drag and do nothing on click followed by movement. This timing
+  mismatch remains unresolved. Mesh shortest-path selection worked in both;
+  Object subtract and UV shortest-path fixtures still need focused controls.
+- **Q and tools:** The original CLICK event produced no wrapper invocation.
+  Twenty owned PRESS probes established dispatch in Object, Mesh, Curve and
+  Curves across absent, enabled, preference-off, disabled and reenabled provider
+  states. The one-line production PRESS correction then passed all twenty cases
+  without probe bindings. Object/Mesh selected X-Ray Box when available and
+  enabled; all fallback cases selected built-in Box. Four corrected two-stage
+  native drags selected the Cube or a mesh vertex using both provider and
+  fallback tools. Earlier one-move drags selected nothing and remain inconclusive
+  fixture attempts. No provider wrapper implementation changed.
+- **Selection:** Both UV brackets and all four All/None aliases changed actual
+  UV selection, with independent toggle preservation. Corrected Mesh and legacy
+  Curve fixtures prove Shift-wheel grow/shrink. Curves, Lattice and Armature
+  also changed selection. The Object parent/child grow case worked; the initial
+  shrink case started from a child with no children and is not a valid control.
+- **Transform:** W/E/R changed position, rotation and scale and recorded the
+  corresponding Transform operators. Shift-W/E/R selected Move/Rotate/Scale.
+  W still translated with Move active. Right-click drew the context menu and a
+  face click changed the selected mesh face while Move stayed active. UV W
+  translated and Shift-W selected Move. The controlled G comparison below
+  establishes a separate reference Repeat Last behavior.
+- **Runtime property repair:** Local commit `f2e8b94` validates recognized native
+  numeric arrays/matrices and schema-gated enum-flag sets. Native Translate,
+  Rotate, Resize, Image Pan and Clip Pan assignment, complete source/merged
+  readback and release passed. Edited numeric/flag source rows survived release
+  and were removed by the fixture owner. Wrong shape, unknown flags and lossy
+  float readback were rejected. The typed Matrix setter preserves logical row
+  order. Generic iterables/sets, pointers/collections and new runtime capability
+  contexts remain unsupported. The earlier matrix transpose failures remain
+  recorded.
+
+### Remaining behavior and failed attempts
+
+The first Dopesheet, Graph, Node and Sequencer Shift-wheel fixtures did not
+change selection, despite successful direct controls. A corrected copied-reference
+run added native Window/editor sentinels and an unmodified-wheel view control at
+the same coordinates. All controls delivered, and **all eight reference selection
+inputs then worked**, including contraction of five selected strips to three.
+The earlier non-effects cannot establish a reference limitation.
+
+That run's strict cleanup comparison failed because 89 operator-property entries
+changed from `RNA_unavailable` to readable values. An offline comparison checked
+26 maps and 1,366 items: scope metadata, item identity/event/active/order and all
+previously readable properties were unchanged. Previously unreadable values
+cannot prove complete preservation. The next recheck used a native Window primer
+and two identical baseline snapshots with readable relevant operator properties.
+Unknown entries dropped from 119 to 30 before the baseline. All eight selection
+effects and input controls passed again, but cleanup made 87 entries unreadable
+(85 Node Editor and two Window rows), raising unknowns to 117. Stored property
+values and every other captured field/order remained equal; the strict comparison
+still failed. The failure and unknowns are retained. The narrow next check must
+capture immediately around input-row removal, keyconfig update and control-class
+unregistration, then repeat the same readiness protocol after cleanup. It must
+retain the immediate failure and require strict equality after settling.
+The owned guarded View2D experiment produced
+all eight selection effects, restored factory behavior when removed, and passed
+its source-preservation checks. It has no production implementation, and
+unrelated-editor pass-through plus saved-edit controls remain pending. Exact
+owner-05 inactive scroll rows stay with that owner for global reconciliation.
+Mask's corrected fixture and Particle selection remain unverified.
+
+The controlled UV G comparison now distinguishes behavior. Both configurations
+completed a nonzero rotation through a temporary native F23 control, recorded
+`TRANSFORM_OT_rotate` as the last operator, and removed that control before G.
+Development G then started a fresh translation. Reference G immediately repeated
+the rotation, and subsequent mouse motion did not translate. This is consistent
+with the owner-05 **Screen G → Repeat Last** row; the earlier W-then-G sequence
+could not distinguish repeat from fresh translation. Production G remains
+unchanged. Ownership is settled: 03 owns the exact local UV Translate selector and
+UV precedence, 05 owns Screen Repeat Last, 04 verifies UV composition and 06
+integrated parity. One isolated UV Editor G/PRESS → Repeat Last assignment through
+the existing runtime is authorized for preparation; native allocation and proof
+of histories, fallback, toggles and save/reopen remain required.
+
+Earlier G controls lacked repeat history, used stale BMesh data, had no rotation
+effect, or ended in a crash. Those attempts remain inconclusive. The latest
+successful controls establish the actual operation through native effects/history;
+they did not capture the temporary row's exact merged snapshot. Future control
+failures must distinguish merged-row admission from physical input delivery.
+
+Earlier Q instrumentation crashed before any Q/provider observation, and its
+crash text was removed before retention. The later reference failure also lost
+crash text during resource cleanup; retained launch logs and process failures
+remain explicit. Both launch paths now retain owned crash files before cleanup.
+The reference wrapper records PID, exit status, launch-log hash and retained
+crash hashes, including nested temporary paths. Four synthetic retention and
+retention-failure checks pass across both launchers without native launch. This repair does not
+recover the earlier missing crash text.
+
+The category GUI driver is prepared for registration, navigation, Q, Selection
+and Transform observations. It requires the coordinated desktop-input slot and
+explicit app/provider inputs. It reuses the accepted isolation recipe: five user
+resource redirects, disabled preference autosave, network denial, write
+confinement and disposable minimum-version adaptation. Original app/profile and
+provider sources remain read-only. Process, source hash, protected-input and
+cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
+
+Required native work includes the stable editor baseline, outside-context and
+lifecycle controls, Circle/Framing saved edits across a fresh process, Image
+framing/pan/zoom, the axis reference readiness check, remaining ordinary clusters,
+and focused middle-mouse/subtract and modal/tool probes. G awaits the scoped
+ordinary-assignment proof before a production decision. Existing proofs need no broader
+rerun unless affected source changes.
+
+Of 140 active full-side delta candidates, twenty-three have implemented declarations:
+thirteen framing, six UV selection additions and four Circle inputs. Exactly eight UV-specific Q,
+loop/linked and Tweak fallback rows were explicitly transferred to 04. The
+remaining 109 stay with 03: 22 ordinary candidates (21 now drafted), 70 currently
+unsupported or unproved handler/modal/tool/replacement cases, 13 observations of
+active-role absence, and four conflicting bindings. Active-role absence alone
+does not prove unavailability. Each has row-specific next steps in the refreshed
+reconciliation proposal. These counts describe disposition, not native parity.
+The original 01 ledger is unchanged. Generic UV More/Less, All/None and the W/G
+boundary remain with 03; Mesh loop and context-menu declarations retain their
+other owners while this brief tests relevant interactions.
+
+Generic suppression/per-item veto is unsupported. Existing ordinary/modal proof
+contexts do not automatically authorize these category contexts. Any required
+new capability returns to the coordinator with the exact ledger selector,
+native result and bounded proof proposal. Owned disposable probes may test
+precedence without mutating inherited item fields or bypassing production
+capability checks. Industry lineage neither makes a candidate inherited under
+Blender nor supplies a reason to defer a confirmed customization. The shared
+runtime change remains limited to the approved property normalization repair;
+accepted 01/02 fixtures are unchanged. Required gaps keep brief 03 open.

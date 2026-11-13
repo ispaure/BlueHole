@@ -1,0 +1,662 @@
+{
+  "schema_version": 1,
+  "category": "03",
+  "purpose": "Reconcile the Navigation, Selection, and Transform rows assigned by the accepted baseline. This fixture is review evidence.",
+  "baseline_id": "deluxe-baseline-2026-11-12-v1",
+  "audit_revision": "5aaf50368e118426cff69e9d107bd2113ba44d1f",
+  "source_branch": "blender-5.2.2/alpha",
+  "base": {
+    "keyconfig": "Blender",
+    "capture": "stock-4.5.1",
+    "blender": {
+      "background": false,
+      "build_branch": "blender-v4.5-release",
+      "build_commit_date": "2025-07-29",
+      "build_commit_time": "05:31",
+      "build_hash": "b0a72b245dcf",
+      "build_platform": "Darwin",
+      "version": [
+        4,
+        5,
+        1
+      ],
+      "version_cycle": "release",
+      "version_string": "4.5.1 LTS"
+    },
+    "options": {
+      "gizmo_action": "DRAG",
+      "rmb_action": "TWEAK",
+      "select_mouse": "LEFT",
+      "spacebar_action": "PLAY",
+      "tool_key_mode": "IMMEDIATE",
+      "use_alt_click_leader": false,
+      "use_alt_cursor": false,
+      "use_alt_navigation": true,
+      "use_alt_tool": false,
+      "use_file_single_click": false,
+      "use_pie_click_drag": false,
+      "use_region_toggle_pie": false,
+      "use_select_all_toggle": false,
+      "use_v3d_shade_ex_pie": false,
+      "use_v3d_tab_menu": false,
+      "v3d_alt_mmb_drag_action": "RELATIVE",
+      "v3d_mmb_action": "ORBIT",
+      "v3d_tilde_action": "VIEW"
+    },
+    "option_differences_from_neither": {
+      "spacebar_action": {
+        "stock": "PLAY",
+        "neither": "SEARCH"
+      },
+      "tool_key_mode": {
+        "stock": "IMMEDIATE",
+        "neither": "TOOL"
+      },
+      "use_pie_click_drag": {
+        "stock": false,
+        "neither": true
+      }
+    },
+    "bundled_keyconfig_source_sha256": {
+      "Blender.py": "741c38bcef052efdd2ded5cab5d3790307fd336000f0868433442e5acb8b4bcb",
+      "keymap_data/blender_default.py": "1881db1460b9d0984aba81a0ec8398efe5ef5de6fb81681d212e1d334d56a819"
+    },
+    "no_preset_and_neither_active_keyconfig": "Blender",
+    "platform": "macOS arm64"
+  },
+  "audit": {
+    "row_count": 1032,
+    "comparison_link_count": 2985,
+    "accepted_fixture_sha256": {
+      "tests/fixtures/deluxe_keymaps/capture-manifest.json": "4271cb64e4841a8dbd98e8f7c2fece9ac221814ecb03282c4d8b6e17841cf986",
+      "tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl": "a5a500da8d9ada01dc5cf8aa04111e9fd73864d933469ebfea4313ecebffb8e3",
+      "tests/fixtures/deluxe_keymaps/comparison-deltas.jsonl": "92ecdbc21652f221decbfcdd247c70dd5e163ec1230e67aad5311c79402a3464",
+      "tests/fixtures/deluxe_keymaps_runtime/integrated-native.json": "ced03a673ffc85dd0e2b7ebcaab8b60c0d0d976f9d7dca91184f4da1320f6584"
+    },
+    "count_capture_order": [
+      "stock",
+      "full",
+      "neither",
+      "no-preset",
+      "no-overrides",
+      "development-reference",
+      "industry"
+    ],
+    "count_role": {
+      "user_counts": "Merged user layer, by capture",
+      "addon_counts": "Add-on layer, by capture",
+      "full_active_count": "Full reference active layer",
+      "full_default_count": "Full reference default layer"
+    },
+    "comparison_link_fields": [
+      "kind",
+      "side",
+      "delta_id"
+    ],
+    "static_source_overlap_fields": [
+      "module",
+      "symbol",
+      "match",
+      "declared_space_type"
+    ],
+    "contract_evidence": "contract_captures links to matching samples in the accepted contract-cases.json.",
+    "classification_counts": {
+      "base-equal": 160,
+      "existing": 280,
+      "reference-delta": 392,
+      "unresolved": 200
+    },
+    "runtime_disposition_counts": {
+      "inherit": 327,
+      "preserve-existing-declaration": 157,
+      "review-full-side-candidate": 140,
+      "stock-side-change": 252,
+      "unresolved": 156
+    },
+    "evidence_counts": {
+      "stock_full_equal_positive": 167,
+      "base_equal_with_reorder_evidence": 57,
+      "provider_inherited": 167,
+      "raw_stock_count_difference": 686,
+      "unresolved_schema_gap": 74,
+      "unresolved_ambiguity_flag": 77,
+      "captured_exact_development_ownership": 157,
+      "static_declaration_overlap": 163,
+      "owned_but_absent_from_development_user": 66,
+      "provider_inherited_with_schema_gap": 44,
+      "static_overlap_without_exact_development_ownership": 6,
+      "new_full_side_with_static_overlap": 0,
+      "stock_count_difference_missing_comparison": 0
+    },
+    "candidate_counts": {
+      "schema_gated_stock_difference": 28,
+      "complete_stock_difference_full_side": 239,
+      "complete_stock_difference_stock_side": 252,
+      "reference_delta_stock_side": 252,
+      "reference_delta_full_side": 140
+    },
+    "unresolved_partition": {
+      "absent_from_both_merged_user_roles": 123,
+      "schema_or_rna_gap": 74,
+      "equal_counts_with_fallback_attribution_caveat": 3
+    },
+    "classification_method": [
+      "Classify complete rows with exact captured development ownership or provider inheritance as existing. Provider inheritance requires identical positive full and neither counts in both merged user and add-on roles, with zero exact reference Blue Hole ownership.",
+      "Classify complete, unambiguous rows with equal positive stock and full merged user counts as base-equal.",
+      "Classify remaining complete rows as reference-delta when stock and full merged user counts differ and an exact stock-to-full link records a change beyond reordering.",
+      "Classify other rows as unresolved, including RNA schema gaps, rows absent in both merged user layers, and equal-count rows with uncertain fallback attribution. Preserve provider inheritance through schema gaps.",
+      "Static source overlap records declared scope, event and property correspondence separately from captured ownership. Blender may canonicalize a requested scope.",
+      "Use the accepted ledger row ID to look up the exact binding and baseline ambiguities. A comparison link identifies an exact row on one side of a comparison delta."
+    ],
+    "runtime_dispositions": {
+      "inherit": "Use the stock or provider binding in its original layer.",
+      "preserve-existing-declaration": "Retain the current category action pending scoped verification.",
+      "review-full-side-candidate": "Consider the reference-side binding only after reviewing scope, collisions and capability. Explicit source linkage identifies reviewed declarations.",
+      "stock-side-change": "Keep the old event as an observed stock-side difference. Suppression and replacement require separate authority and native evidence.",
+      "unresolved": "Keep the row open for stronger evidence."
+    },
+    "order": {
+      "comparison": "stock user vs full user",
+      "snapshot_sha256": {
+        "stock": "0e8967948c1ab02fbf38f5b724a85a7f9cf9e7fd5b2df12759f49551bc091b14",
+        "full": "98b255aa0f7427a2c5d8a457fcd984f8b1bdf4af688853c1e10084caeefba78e",
+        "industry": "f7660b7e9ed039d877af99b9b98d95b0b6282025fcb62b5ed6ede06c61c5e98c",
+        "neither": "89a341377a2f70acf37a50152efdacfce049da13f96a1a544ae69ff3d38656f7"
+      },
+      "relative_rank_change_ids": [
+        "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+        "01c5ae35e67b48d5a39c30d26ea2c050b8ba85c5af62eb138ea300880f8be1e2",
+        "02bb104818deb52ab214e9578c196936bfdc0b31df54420fbdcfa2886b71288b",
+        "0c12248d8163b9b22ab732546e0744aa58344e93c2ecc19374392b580cf122db",
+        "0e5a4d539d0de4e85811c703c5b04c88860e9e9b414a1f6dda1e3eb65d848953",
+        "14a9687b1f961f3f3ee2d9a57e9ef3859642a899a43cbbbcbc844ad861fcb7a6",
+        "152f75849707586cf7f5694004fd316d99a45f6f270ec9947c72f3570800900e",
+        "18322217077a7976830772f13ff4fc3ea0ef321dc7e82a7551fc06f1c85431f3",
+        "1adf899a2cf22d8e0cee4ae00d66beaea20ab4c6e4e56c3f247ca5e8571d1b28",
+        "23cd8f7ac5f9910db252738ca8ee02382a0350db71b01636925511f8d7be3d49",
+        "261a4b04141bd060a89a3caed42106f052cd465e9cd24a74f436ae984f93e28e",
+        "28042cf691083c563562ef89ceb579d5b0e9c7cbc94199826171b0813d3efb2d",
+        "2f6db356811c5e2a3115dda43b7926530bb3e7670e5104f3bef95936538d7643",
+        "33f93dbaccf141398be4fa805640d7722d8e89ce5424cb79bd33e06ddd784028",
+        "34a36cf6f2c2de4a99f83429174fa05030037318b3dd5585562404146d0a4f54",
+        "3a96e1f25a6d52129061fd37bf8e8a727f303f89218f9c8ad1f9da5dff21e183",
+        "3b08c9be940934a6a6fdb3a7b4ff632cd7b8427441560b81a21a98b0f0f7d8e7",
+        "3f2d8613f40b8c22d8dda87c36651b6ba32879f7a97dec93dac3d0dc7cac6f14",
+        "424be72fc535a0d76e2cf686ce00ab3d84d58354ad202cd05b3aad3a4255f4d1",
+        "486ad6f8b5dfc22bb4b2306290d89c3f8b529d3023deab65aaf79357d3340842",
+        "4971ace476ba10900afc10706935bb02d9d3ee44e55b21412f05df67332838f1",
+        "498468e585473bfbf200b637ffb5d39d71fcd4666377509fc48a970602ff393f",
+        "4a676a56a3a09757fc705ef0144b97d2491de8c61d9723c573298607d3758178",
+        "50c534e6778c2832fdf2a033f6e576a25fa0cfbcead532b0f0c9bd191473f6d7",
+        "587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328",
+        "5b61be3e8997f6e7e6a352038d19bb68b7360bd9ef5942e11bb07fa5a0816f3c",
+        "5c9fe0d0d8db7fd4a99e325d9b7753965517d655547e2813ea23be864d6f246b",
+        "64f249e3c14257eee7c220e7371ab8ffb0deed574259330a09eec25595541756",
+        "6a3838f7bb816a960596d9a8e4489de870ab79ccda3e83edff1d1389597415af",
+        "6dfbc058bbe7937d14a7c83a060c98dcd8da228b431990645daf1d19e46248f2",
+        "709d826178d6f2b5a7566500018c4298fbd51a5af2bafc237f7b41d9055c3b80",
+        "7388e3ec8691ef2ff5502a348d16460e31822da0cd859087865f6bf3d518433f",
+        "77147e7c7276d171f59046977998fc9850f0ff67a75b3c5518db0de20ade524d",
+        "79ac9cb96f221877f6e0565b7cd1afd659c693cb46b096db1f018f1d6ca7e10a",
+        "7b41e0411ac5e8705788e10f88dc0312eacc2fff39c3d74e7ff27e8a15840d26",
+        "7d665bf1b3d4106df16cc1d7b8303060b92fba68342b45bf02e99cbddd345b11",
+        "8125a8cf145cccd632390bcb7c7513441a30aee28e3b171359347c78f16a624c",
+        "847a15f93362b707995b6eaefe62d6e79b099467459140a3b5780de7d1a90c15",
+        "8b488c1f7a61bd5665aecc81c0b2aadf5ab2ee9588da49de95daf5adac48a364",
+        "9120f655a59f4742bb1f8c8a55122a2dad03f40c2bc841fa20605e9300dfdf37",
+        "94f907c34f672d129abf44f74fb73455de88122ff4330663c02d8a3f52fbd080",
+        "968ff2562097d0fd107465a5c9829862adf22281971947970489eff4cd34c279",
+        "99d10852e4ae1620d7a71703f912c1c0d4365a90dcf9a0812d94abbe3c06925b",
+        "9e6f3d7d6fc91a5bcd65249529ba89936f8babd674aad57cfd8c3a164a5d67dc",
+        "ab785ce01b2a02cd87ae7423c89b18df23b2e85c176bce87b293474ed4c49f44",
+        "b10f7d84e35d30074ff442f7ad653448604355cdc265dce584ba2650bf9c4219",
+        "bb40bafe57ec830743d3a8601000a433142b7f308478bbf869d3f4cee1d34184",
+        "c41af964ad2a0e54b98e6aa7b5a7739a5531fa4c663e6e1a86a5d3a9e180e2ff",
+        "d3ed36a243f3a6c4736c4076eb9560e60a69b7545892bfd88bd3d8cabb83a589",
+        "d462593ce687d34567f4ffc308c70f102700efcfecd70fd5e871394805b877cf",
+        "db414087cb51657aa429b3639d01476ba8ef7abdad0c5b253b9ec663e103506a",
+        "de5f51966f5f386f38ad0bb88f970fd0c6c330ef8f502890cb54ec70a53c1673",
+        "e09ea814f56217ede4c1c55b3600832bf69a7028a0a6874407ae8793222d8650",
+        "e3b8a4253e841595349e733abf4423133c17cf1372148e633c25373062820e79",
+        "eb202e0e754176379d92b464f940f2e20a510bac8f429d24664c6e1e4c9a3a29",
+        "ebd8d59afbaa86f9964abd8c4c882b24cec360b24e8545cbd397ac627588a5c6",
+        "ecda539f2b3ae3e66e0d08f03f280733baeb46db3f3ad9132149577e0bae3ec2",
+        "ed479dbdbd86b77e7b928ed504d77b32b1a10227e0a1e372a159f88e992fd848",
+        "f78125b550b46f109c71f404af5daf6ab6d3449613f57174c10412a4fd018369",
+        "fa11c005434a198b610110dc3abfc37e40bfec0cdbf9439f82019f37f206f863",
+        "fa17ff42edd60a6eeb473920bb31bfcec33c87d82f7d7fab5fa13c533ae833bd",
+        "ff0315a8bb8a22170f528d61a2c585d3c7b332262febe01f8c208db73de7d8b7",
+        "ffc31b82a6e59f8c0502cfa0087337d3446158d9c18cd4b1fce2c9ff0432c587"
+      ],
+      "absolute_offset_only_ids": [
+        "0a14fc97479a9cfa47e8d5c3cc5e0dc45e38b5159b448de8d4ad69276d072a57",
+        "1438bdee98945e84ae03323b97fa92badfd59a28ebc67a36b0d7d788eff30040",
+        "15a5474db21216bc80537165393d98bf77c9b9df6cbdf2b8a29250d91593fc95",
+        "20a778bacb1bab231307885415a02c55caec04af5bacfce5259129f1587c5253",
+        "217814088ddc59f061d76781351204ce0c4543c4574a7aad9c40383a841435bb",
+        "27748ed74fc5234ccaa6ae13c086a8236ae57cf2be022ef1c82c414f56bbdf7e",
+        "2849e3b158c3abccbaebcbf6740aa7f5787717a253fde5b3f0f4d2cb2fb8915f",
+        "2a2afd973a69a961eae2661202b667c73eae31556ab7bbeec502f746bbf181c0",
+        "34e2ec30718807f32f216ef92abb6d5b071940118a403768395c98fb3fb75e4e",
+        "3c5fb156b70628deb93921cae2b9f262e4177eb84a575df7ec66ebd234b57bb0",
+        "3fb754e57e480b06bfcc526c5d6e1a93c9e44a35848b2d92e34134a976a9794c",
+        "41cd86261befc8adb6cd6bfe7fa576b00a8e03a28279bbd33b4e1750309ae453",
+        "4971f064f85b13ef3a6e8bd7de0c13c76d01f889b3b211cf0b670ed168c348e4",
+        "49c28f30d38717ed7a738e7aa5ec5834b67a1220dae5da4e55595e60d3f58bfa",
+        "4b0c8da074f3ff7dc621d06d6359b064c6db0ee2a45ef69d906d5f87ba040e89",
+        "56bb1a0f20d94e8f4f11da29eeba03bec9045fc5a11366d17957f713ed44beb0",
+        "57c005c769641aabefe4018009ce4f28b5a3de7393d381120b9ee247d1557bd9",
+        "5c0f392c6fab15b76715803a1140fe68cb3e76436a8e20e63ae5eb8e02561b69",
+        "61668d8175ef0d44e48b8da1119ea421205097653d2f402bf66a3a2bc43b0c54",
+        "6370c5543922b3a1f7a651404ddaf43a545d73bf6047f2fd4efa7bccd773063e",
+        "662fb33a15fbbdd454b1bde1b98e5abf25890ff3f9aad07b1c9f5ec48311226a",
+        "664d090cd07c169a17d8bc81f4729884ab9887c8c19eff028f3836e316092183",
+        "679e17a9f115950b503d6d1b84b7416eb89ab37b7a0d95bdffc1a13908638918",
+        "68e57b3717a64fec2acf7549b7d7a1ac2b14222df372b8beb9f9f918c1c07c98",
+        "6bf73daebc655d5e3260dcd37b421c591bcba548fa0fb0137ceeb7e2e4e8a2b0",
+        "6f5743aa914e89c9c5e6b57e87cd6c744f045749cdbd0edf7bbb147400ab8a17",
+        "70dbd5f28c27418a9dce1edfe821bb4aebb491bb2bb4c8dd0912793a6dbacbfc",
+        "77395864d9a8727403764615d731f69899d0f129ed3a5be921d6fa14a8bc1112",
+        "78de08e75a78811bb6c19cf2b20ad46031bed774b48adc6bf2af6f344068bc36",
+        "7b913b2df831316df313d675bf88c3e8c2cb6b212a6dd302deec9388b17e4ac9",
+        "7c4caaff2dc21fe5e069b168f8a017e53e2e5f7a11d4af90d94b27b73cd6fde0",
+        "7ca75a3d39af9f5c8ec81e55d7f82145486a2ae2ce6fd8af2a6737ea3e85d822",
+        "7e3b056b46aa9c55e16a324b965c2d9e2c743edb7ac3fc6af685cd6fdc4d53f0",
+        "837669c6a221c7623f2a413f046c8ba24f17b367b4b972a8f309fcde0a57f790",
+        "844a856c635df8e3d4cb04d22dea525fb264c34140a04d4eae1fb02661bd29ca",
+        "88434152cd2896ad4d92618e6ac1147e8eb309dce1a33a4b0ae5690bdf41d7bd",
+        "8e63bd8c5a80188fd743f982ec18a0af16e2dad91cd5181618d2c839e176606e",
+        "8f278cc94e86f4f4faa769cd0f8e428fd0dea656bfb75e9dfa6caf39aa5e7203",
+        "9aff6e03c48147f3d447220d821d8cd37529a252ea173b2345be882400c12cea",
+        "9b7ef3c6528e9a8c740bcc23f467de81cdc3e3e4d8f6430fd8ba334b1c26d82c",
+        "a6c6fcca6b968d27852255d97c20b095f6be6c96bc9375e5392685f2fe0bf9e0",
+        "a7ec93364df103d03cf79d12fe12ab80e00b36aaf01be88d8cf06e6b254e631d",
+        "a8383d53b96b21497a3dbf47422818eb0275276d2e810736039033c58742c3e7",
+        "ac286b2f8e05bbcac77dbeabd64e3d2ebec12f0171ee9172693f54ba59561c44",
+        "b6d77a42931aa54a382ee40d400c662a28fd2b6ad51602849ab391c56174b5e4",
+        "b8a8836f74da81e9916cd5e1430b61403382acb2f6e968bd973794d631638e97",
+        "b9cddfc86ba373b86e05d635ac6b260c5e34a6d80b6b851fc19eaa51f28c5efd",
+        "be4a68c0452dcf5886cd4a4de5660a962f3ec5edab52cdc69023d4084ef83ac6",
+        "bf25c77daac80f96863a24d0f5ab27c38c6a70ffe2390bf25f1c26848f40a4c9",
+        "c2ea2ee17c7463c593c570c5375a5b4f3d58a0304be3f24574bf3081de17e866",
+        "c4ac867348c617e6f2ee7f39ab20bd595ce11fd5266a4349d429ca5f5f7c9132",
+        "c6beb0cd9595afb38052d253094d20f900dfa8df091594a23781f8f8baa41621",
+        "c764b8050e6bc05be91d3dc6562636e3ccc9d3ad86baf3580ce7d58ef991c779",
+        "cb87a0dd4e9e0ccbd48cf7f52205dda7c83e8fbbc989a12efb3d27995e01f2b2",
+        "ccb3ad858cbe4bb6b6c056687fbfc2cef7e25db120c7109c21bcbc3b9facefb1",
+        "d15444463253e9322d6ec25b95c20e13c20b5f1782d4b4eb23dd9691b7b54cb8",
+        "d4a490d96f7b8dce3b2fd34997f4df9eed7ce9dc17d786efd61e9b1de414d053",
+        "d54bb19726e4dad0ff5d6ba316f08ce694400c9d324c788cbb169e2cb996080f",
+        "d7088f06f76735c44fd5129ff23c67d6606e6fb19292ec15bb2da70c44bb8db6",
+        "db7525a4390e280bf4c1f2334c2cecfde89f34a61ef913990cab0ab8463d2567",
+        "dc70fe7c990ffa7982f4b8863265de8ea58e32ce2d1d3b0ec4f752986bf7fb35",
+        "dc7faa1760da5a5d88fc7142e4c7c29b2a8ef39cd2bc0fa8ea80afc8fa48bc3a",
+        "e2615ae36c573cf8b2ad842e568e349157cdc3e19cf94b22d428b91e93f896f1",
+        "e6d83d45f1836c9eecf4366b312327db7e2157a9b962eb4a6931f9ca70077dd6",
+        "e9d5eec8451c43f3125efee87e34f13027995ebcff1c216ac7141f459c14a28d",
+        "ec4a09787c059214bc2e0567d97b42203b9242ec66f1728ea114de730c1d3938",
+        "ec5d0cae13cf99c95e454d725dd3a1f4141e85754b9a92a03c6f09ce9863d93d",
+        "efab89fcbf8bbbb00faf366e3cae2d052bca099a1bb28ab8530e3699feaf0869",
+        "f0d65e5f98fd2759f34671d48ec8570fb18450d10322f96d90bfcff8da3b8915",
+        "f490d0f32a85f4ad997cb82180d2d151f7d1f98eb2f9522bb29e2f7c4137667e",
+        "f4d446dadb4bef35fce38458ab410b7af4cf75cb1374137b5a800f2757d70672",
+        "f65ca7c079ec7c2d6336a2cdf0a6881eac8c719b62d3f7717fd7d4711e2343ff",
+        "f7b711b617a5285e0ee7c1cf1071e88f607a215abc4a95be739ff5fbc2529e6b",
+        "fbf075704abbe542fcc196ff757b1743e92440685557f0a417ad08da23473a84"
+      ],
+      "owner03_active_literal_overlap_inversions": 0,
+      "interpretation": "Relative rank compares shared occurrences in the same exact scope. Dispatch still depends on native map and handler precedence.",
+      "inherited_precision_example": {
+        "row_id": "000259f5b47d975e344d2139174c8859226c03e17a671d8775274f0a0873a9ea",
+        "absolute_order_by_capture": {
+          "stock": 53,
+          "full": 40,
+          "industry": 52,
+          "neither": 53
+        }
+      }
+    },
+    "industry_comparator": {
+      "capture": "industry-4.5.1",
+      "input_probe_limit": "Industry case predates startup-popup dismissal; initial negative/control results are inconclusive"
+    }
+  },
+  "reviewed_declarations": {
+    "selection_circle": {
+      "source": "actions/actions/keymaps/selection/selection_circle.py",
+      "get_actions": "get_selection_circle_actions",
+      "preference": "enable_selection_circle",
+      "actions": {
+        "SELECTION_3D_VIEW_CIRCLE_ADD": [
+          "65179ade6ef40a7e2c328d1e13e5631d5bfcf4abe9a50300c4a2b9b6b7324995"
+        ],
+        "SELECTION_3D_VIEW_CIRCLE_SUBTRACT": [
+          "5a02611f57e1d97cef92a9be7c758c0aa856622ea423d17c4e77aad95acae33a"
+        ],
+        "SELECTION_UV_CIRCLE_ADD": [
+          "e516e0f4b047efd00bbe11076cb482c83b0419a0d3022ae2a46bfa4c15e5ed87"
+        ],
+        "SELECTION_UV_CIRCLE_SUBTRACT": [
+          "f128c452103b86698cd1165bf7360adbae5aaf916c49214787809bb2dae64141"
+        ]
+      },
+      "native_probe_evidence": {
+        "owned_addon_run_id": "handler_probe-1794545957790082000",
+        "readonly_reference_run_id": "reference-evidence-1794546022214537000",
+        "dispatch_cases": [
+          "handler_circle_object_add", "handler_circle_object_subtract",
+          "handler_circle_uv_add", "handler_circle_uv_subtract"
+        ],
+        "observation": "Owned probe and copied reference matched selection counts in each case: Object 0 to 2 and 1 to 0, UV 0 to 4 and 64 to 60.",
+        "production_verification": {
+          "run_id": "circle_production-1794546638102450000",
+          "source_sha256": "bf2a3c9150631ab1898edf042353b362ab7bef434159f223a3a6f40dae98d093",
+          "scope": "Four Object/UV gesture effects and Object add with Circle disabled and reenabled. Scoped foreign source and unrelated categories were preserved."
+        }
+      }
+    },
+    "selection_all_none": {
+      "source": "actions/actions/keymaps/selection/selection_all_none.py",
+      "get_actions": "get_selection_all_none_actions",
+      "preference": "enable_selection_all_none",
+      "native_evidence": {
+        "run_id": "selection-1794542407253275000",
+        "dispatch_cases": [
+          "uv_select_all_ctrl", "uv_deselect_all_ctrl", "uv_select_all_cmd", "uv_deselect_all_cmd"
+        ],
+        "isolation_case": "selection_all_none_toggle_isolation"
+      },
+      "actions": {
+        "SELECTION_UV_SELECT_ALL": [
+          "18f7a532a4022c38749eed86f917b8c341de08618c84541affbe0b92690dea37",
+          "0e2e39eb0d50831c6f87106840dae8f823c7ec0db0ec91bab997385ec725ae8e"
+        ],
+        "SELECTION_UV_DESELECT_ALL": [
+          "f92a635f5fc477b89c7bd3e0a02908aa33d920f3e1a5ce72f91c5b9064d917e8",
+          "fc77c97bf954e20548f91caf8abf9f03afb7dea9fa1da443c7b49c0f506d00df"
+        ]
+      }
+    },
+    "navigation_view_framing": {
+      "source": "actions/actions/keymaps/navigation/view_framing.py",
+      "get_actions": "get_navigation_view_framing_actions",
+      "preference": "enable_navigation_view_framing",
+      "actions": {
+        "NAVIGATION_3D_VIEW_FRAME_SELECTED": [
+          "5ddc9654fc9d8dc2f2ed7afd21032b52ee06ffa1b290ead75cc30d662e3dbb21",
+          "d23d99c09a2c29942fa23f85fa4311b4206251b27ccd29ebec216ff005919c49",
+          "4b508edb846741603ea365f625946e1426b96f1968cf52efdf310edf209917ae"
+        ],
+        "NAVIGATION_3D_VIEW_FRAME_SELECTED_ALL_REGIONS": [
+          "c59a83b7bb1c2d1ed5f6637e43cfaafb20c8a7c2c27445750d30963d4791a0c6"
+        ],
+        "NAVIGATION_3D_VIEW_FRAME_ALL": [
+          "38a81ee57f77e42a3019c75be83916f829ca1a40e1838fe08632014de9eadf6c",
+          "4b75006949b2232e6d9677b856b9eb0af1a758a60bdc140cd3ad01269f35b427",
+          "f1b001e7a3d02ade59e105c82d3cc1ea1e8d191afada7b23d83181524ed0b680"
+        ],
+        "NAVIGATION_IMAGE_FRAME_SELECTED": [
+          "cfd89dd2f73dbd8a84092727005b9cd5bb3e95a6d51ba6a268a78865a4519fe7",
+          "76e9b72f268687d8f88fb0b4b3765eaf5db36622e8768c0b2086de816406cb49",
+          "818cab8bfca455cedfe75472338037544fc905a974173d30ee77baa11441f155"
+        ],
+        "NAVIGATION_IMAGE_FRAME_ALL": [
+          "4d5203eeb62fedbfff7308eddf532619e2d2cb242006d1fde883e00675af6037",
+          "08eb0ffb2a0d810ff836fb8c6b86b29e60bbd8ffd3854d30e2a5891425c47e47",
+          "b1c4e65516a1edfaeb88ae928fb789f032cd476e211672702f1b8b7d9f740874"
+        ]
+      }
+    }
+  },
+  "reviewed_existing_declarations": {
+    "selection_tool_switch": {
+      "source": "actions/actions/keymaps/selection/selection_tool_switch.py",
+      "preference": "enable_selection_tool_switch",
+      "event_correction": {
+        "field": "value",
+        "before": "CLICK",
+        "after": "PRESS"
+      },
+      "original_click_rows": {
+        "SELECTION_TOOL_SWITCH_OBJECT": "4ce73660bd5e5feaf6aecc5c0b4f8c66c04a1d37160bf2fefa77f994b5b66847",
+        "SELECTION_TOOL_SWITCH_CURVE": "afea988899759f3bdb3dcbec9a601d5640a6bc5228e5e2134681602e5216686d",
+        "SELECTION_TOOL_SWITCH_CURVES": "a847856e0080bde4861c4799aeaf55ada36bc2793b81fa0e162e2c50492fd020",
+        "SELECTION_TOOL_SWITCH_MESH": "050dc9e850be2cb9663c7d9f3cf4c65e976988b1e8c92cff1c16a14317a9a9ce"
+      },
+      "native_press_probe": {
+        "fixture": "native.json",
+        "run_id": "q_probe_modes-1794542592596535000",
+        "observation": "Temporary PRESS bindings invoked the existing wrappers in all 20 mode and provider lifecycle cases. Object and Mesh used provider tools when enabled and available. Curve and Curves used builtin.select_box."
+      },
+      "native_production_evidence": {
+        "fixture": "native.json",
+        "run_id": "q_modes-1794542781399568000",
+        "source_sha256": "96108080b43383cbc67b3bfcca17efe7092a9988cf0a2484ff713a0a45113587",
+        "observation": "All 20 cases invoked the expected wrapper and activated the expected tool using production PRESS bindings."
+      },
+      "native_box_selection_evidence": {
+        "run_id": "q_tools-1794543526567898000",
+        "earlier_attempt_run_id": "q_tools-1794542682653282000",
+        "observation": "Native box drags selected one item with each built-in and provider tool in Object and Mesh. Direct wrapper invocation activated each tool before the drag."
+      }
+    },
+    "selection_more_less_uv_brackets": {
+      "source": "actions/actions/keymaps/selection/selection_more_less.py",
+      "intent_source": {
+        "path": "overlays/deluxe/docs/Blue Hole Keymaps.md",
+        "lines": [174, 175]
+      },
+      "native_evidence": {
+        "run_id": "selection-1794542407253275000",
+        "dispatch_cases": ["more_less_uv_RIGHT_BRACKET", "more_less_uv_LEFT_BRACKET"]
+      },
+      "bindings": {
+        "SELECTION_UV_SELECT_MORE": {
+          "row_id": "8eb6e5854ee0f7d1373566729a5b84cb5a9df29927f63e89edd363a395539aa3",
+          "binding_index": 2
+        },
+        "SELECTION_UV_SELECT_LESS": {
+          "row_id": "8b319baccba2e5a7bac8671297fb7fd0ef7abef232d553f6f91bc56e5d383f52",
+          "binding_index": 2
+        }
+      }
+    },
+    "transform_tools_gizmo": {
+      "source": "actions/actions/keymaps/transform/transform_tools_gizmo.py",
+      "correction": "Use the EMPTY mode-map scope for the 30 existing Gizmo tool switches.",
+      "pre_correction_native_evidence": {
+        "batch": "01",
+        "capture_sha256": "1d5433b25ef80f59c30650aa24bfebc530f3e52b8e06c730cff4d412967cb5d2",
+        "observation": "Gizmo registrations in VIEW_3D and IMAGE_EDITOR mode maps were absent from merged user maps. Default and merged user mode maps used EMPTY."
+      },
+      "post_correction_native_evidence": {
+        "fixture": "native.json",
+        "run_id": "transform-1794542483357451000",
+        "context": "Object Mode",
+        "dispatch_cases": ["transform_W_shift", "transform_E_shift", "transform_R_shift"]
+      },
+      "accepted_full_user_rows": {
+        "TRANSFORM_TOOL_CURVES_MOVE": "b4a63c8ec232616638ac3f01c4152134ad26a948e8aee3f0b8b852fd930acba5",
+        "TRANSFORM_TOOL_CURVES_ROTATE": "437a340d0d868ed229af863e4340bde5df2df54ff517a36be24349aefc55014a",
+        "TRANSFORM_TOOL_CURVES_SCALE": "681642ef205e4a22a45c6195f1637d9a015b26c494ac8d8f6caa4fcc81bd7db3",
+        "TRANSFORM_TOOL_UV_EDITOR_MOVE": "975850d195a3828a2ca6ca627b778db9a57250786c523efafe77879419c99812",
+        "TRANSFORM_TOOL_UV_EDITOR_ROTATE": "718492977f8637d623151a2e602bd75ccc664fd9e86aef6756f5ee3b3cd998d0",
+        "TRANSFORM_TOOL_UV_EDITOR_SCALE": "7d57decd8377458e2781127098eb3214dd9b8e1285480f109cbf7d127aea9447"
+      }
+    }
+  },
+  "ordinary_source_drafts": {
+    "status": "native-dispatch-pending",
+    "scope": "21 ordinary candidate declarations prepared for targeted stock, copied reference, and owned-addon proof.",
+    "groups": {
+      "navigation_view_framing": {
+        "actions": {
+          "NAVIGATION_3D_VIEW_LOCAL_VIEW": {
+            "0": "62d31f078d497b73967dd785c682a5a6840c9d4c81ddd82e1b43208fd6714e15"
+          }
+        },
+        "source": "actions/actions/keymaps/navigation/view_framing.py",
+        "source_sha256": "cd73184503c77077cba0740fe45aade2c281fdcbc06d0265156fe556a0eecb1e",
+        "preference": "enable_navigation_view_framing"
+      },
+      "navigation_viewport_axis": {
+        "actions": {
+          "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BACK": {
+            "0": "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219",
+            "1": "3ee7001bf2f7f96dae4711948f76694b1c3ceb57aef1db6f96d9c2949b6b8b99"
+          },
+          "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BOTTOM": {
+            "0": "ac571b681410e5ce9d989bed48844639b1711b4fbc3493c1d7480ed47c0b363e",
+            "1": "73b312d55cdc6a757ca15ccaa51cdd75ecf21fe184ddad45db575af78c6fcf97"
+          },
+          "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_LEFT": {
+            "0": "aa588d20ab030355215e945cdf7ea42dd7e386dfdefb93728ffdbbfb7ba4e6d8",
+            "1": "c0d9e2aa23b51664bb6a7f52439f47fe4ca359575c1da6fcb2bd33afa7dd0d3a"
+          }
+        },
+        "source": "actions/actions/keymaps/navigation/viewport_axis.py",
+        "source_sha256": "7daea590c729125bf617f1f9cc6a510c5878191f0254772a2fff8d7ffb3fef2f",
+        "preference": "enable_navigation_viewport_axis"
+      },
+      "navigation_viewport_movement": {
+        "actions": {
+          "NAVIGATION_3D_VIEW_ZOOM_IN": {
+            "0": "291b254de1dbbd4fa32d997de0e25aa91eea9e2306902ea8e09ef3ca3580c549"
+          },
+          "NAVIGATION_3D_VIEW_ZOOM_OUT": {
+            "0": "1498e141d9619244e98c6eaae90422084cc4c9f90c27406fa4f33c1b936e729b"
+          }
+        },
+        "source": "actions/actions/keymaps/navigation/viewport_movement.py",
+        "source_sha256": "b7f9f2b3862f256e72c741dadf8f7c541fbf67027ed10d6f5384cdb02cb106fe",
+        "preference": "enable_navigation_viewport_movement"
+      },
+      "selection_more_less": {
+        "actions": {
+          "SELECTION_3D_VIEW_OBJECT_SELECT_LESS": {
+            "0": "c668cd6405ddd1e2b7c17a066eeea197ea8063eac81bc238742430ad3a8eb973"
+          },
+          "SELECTION_UV_SELECT_LESS": {
+            "3": "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
+          },
+          "SELECTION_UV_SELECT_MORE": {
+            "3": "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a"
+          }
+        },
+        "source": "actions/actions/keymaps/selection/selection_more_less.py",
+        "source_sha256": "0193ccc9d191ee9764cb1f4d2eb597a17e1ca589e755527e3b3ec1a4240e9da8",
+        "preference": "enable_selection_more_less"
+      },
+      "selection_tool_switch": {
+        "actions": {
+          "SELECTION_TOOL_SWITCH_IMAGE": {
+            "0": "75c4bbefab8e3cc7a898801350b900eae9aceea836329b236df37a0c14952850"
+          },
+          "SELECTION_TOOL_SWITCH_IMAGE_PAINT": {
+            "0": "a15ff41f58e3a58fe77ab5d970e06f238a62dbb08e41283277d47c86e2c3a489"
+          },
+          "SELECTION_TOOL_SWITCH_VERTEX_PAINT": {
+            "0": "e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111"
+          },
+          "SELECTION_TOOL_SWITCH_WEIGHT_PAINT": {
+            "0": "d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c"
+          }
+        },
+        "source": "actions/actions/keymaps/selection/selection_tool_switch.py",
+        "source_sha256": "53894b38e1c6d85e9502fe17070827e66f16b9e0e11f77af5560acfda8f6daff",
+        "preference": "enable_selection_tool_switch"
+      },
+      "transform_tools_gizmo": {
+        "actions": {
+          "TRANSFORM_TOOL_IMAGE_TRANSFORM": {
+            "0": "318ab4227e9699b1b4279142e4c99a612fec5ebf27e2f6a663adb07e6c88a02d",
+            "1": "ba40873fbf25c357c6c711911eaa483711dba3a101390e753d9e7d2eabcce1a6",
+            "2": "ff57544c10325e3984fef99805970ba7d3fa9d4bc93e6aa1e388e7f21b22e749"
+          },
+          "TRANSFORM_TOOL_UV_EDITOR_TRANSFORM": {
+            "0": "06f22b2be115a9adbc05174de8e78048c60c241aa07f6a6ff0e357df503ab717"
+          }
+        },
+        "source": "actions/actions/keymaps/transform/transform_tools_gizmo.py",
+        "source_sha256": "9fdc0215edfa462e9e1034dc8a41067adf2bd8c4210738b834fdf0d6a6061d83",
+        "preference": "enable_transform_tools_gizmo"
+      },
+      "transform_tools_modal": {
+        "actions": {
+          "TRANSFORM_TRANSLATE_UV_CURSOR": {
+            "0": "ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1"
+          }
+        },
+        "source": "actions/actions/keymaps/transform/transform_tools_modal.py",
+        "source_sha256": "c96ecb1a43a89d4ae43d97f80b979378e90acbb09323a22377c8e24579a19f66",
+        "preference": "enable_transform_tools_modal"
+      }
+    }
+  },
+  "authorized_transfers": {
+    "04": {
+      "authorized_by": "root coordinator",
+      "source_chat": "01a1d1f1-9859-7a11-b53d-0777e15aac0c",
+      "reason": "UV-specific handler/tool reconciliation",
+      "groups": {
+        "uv_q_boundary": [
+          "2cc296fd06d5bf974968ac07da759dec261c268a1dd598c61175b5b4f11e7f65"
+        ],
+        "other_uv_tweak_fallback": [
+          "31d610f08818ec7acff104b540013dcb8083d522e1494e45293aed9f43e9c0a8",
+          "797016483738b7c44213ce8949adee9466a5c1482832f8d34b928657015665f9"
+        ],
+        "uv_loop_linked": [
+          "4be43c65802782650d9b12591136efbc6aa3bd962b6c0b77b96e059c2fac8c40",
+          "51527e5a764271307189138a0a1e1fd1f39358faa5c180ec70af846b49c3eebd",
+          "5fccd93d8aaf46c90ef18b42dc08a3e5d9babfb4263350b867b8c2dcf76b39fd",
+          "760e8d5e05afd1ab0afb175e64f56c724eb05227a9d7d83f9e451672077ae8ea",
+          "aba49cd61706f407686fbb1a1d8add0f45a29d2e6c863a4e1c95543ff36ce6d3"
+        ]
+      },
+      "retained_by_03": {
+        "declaration_groups": ["selection_more_less_uv_brackets", "selection_all_none"],
+        "transform_boundary": {
+          "W": "a9dc6ac09d9444be9a00e38676d4b30769d5505508485f3083b4749db4a90e01",
+          "G": "a617d6ba7bffe5931c516dd6f7be58620c8bc146f29634ef62a12c2935a891da",
+          "Shift-W": "975850d195a3828a2ca6ca627b778db9a57250786c523efafe77879419c99812"
+        }
+      }
+    }
+  },
+  "native_verification": {
+    "status": "partial-native-evidence",
+    "fixture": "native.json",
+    "ordinary_axis_dispatch": {
+      "production_run_id": "ordinary_production-1794545820737107000",
+      "reference_run_id": "reference-evidence-1794545881196202000",
+      "reference_status": "partial: first Ctrl-F1 had no effect and the strict foreign-map cleanup check failed"
+    },
+    "uv_g_prior_rotation": {
+      "factory_run_id": "uv_g_control-1794546314362688000",
+      "reference_run_id": "reference-evidence-1794546712329758000",
+      "scope": "After a successful prior 90-degree Rotate, factory G translated on drag and copied-reference G immediately repeated Rotate. The fixture-owned F23 control was removed before G."
+    },
+    "editor_handler_controls": {
+      "guarded_probe_run_id": "editor_probe-1794546248543363000",
+      "reference_run_id": "reference-evidence-1794546783689968000",
+      "reference_status": "All eight effects observed with positive Window, editor and unmodified wheel controls. Strict cleanup failed on foreign property readability changes.",
+      "earlier_reference_non_effects": "Input delivery was unverified.",
+      "outstanding": ["outside-context poll and pass-through", "saved user edit and reopen"]
+    },
+    "selection_wheel_controls": {
+      "run_id": "selection_failures-1794543558832094000",
+      "observed_shortcut_modes": ["mesh", "curve"],
+      "unchanged_selection_after_shortcut": ["dopesheet", "graph", "node", "sequencer"],
+      "fixture_errors": ["mask"]
+    },
+    "transform_dispatch": {
+      "run_id": "transform-1794542483357451000",
+      "object_mode_cases": [
+        "transform_W", "transform_E", "transform_R", "transform_W_gizmo_active",
+        "object_context_menu_with_active_move_gizmo"
+      ],
+      "mesh_edit_mode_case": "mesh_face_select_with_active_move_gizmo"
+    }
+  }
+}

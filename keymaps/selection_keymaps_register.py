@@ -19,6 +19,8 @@ from .keymap_action_utils import ensure_action_keymaps
 from ..actions.operator_action import unregister_registered_keymaps
 from ..actions.actions.keymaps.selection.selection_more_less import get_selection_more_less_actions
 from ..actions.actions.keymaps.selection.selection_tool_switch import get_selection_tool_switch_actions
+from ..actions.actions.keymaps.selection.selection_all_none import get_selection_all_none_actions
+from ..actions.actions.keymaps.selection.selection_circle import get_selection_circle_actions
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -52,6 +54,12 @@ def get_enabled_selection_actions():
 
     if prefs().keymap.selection.enable_selection_tool_switch:
         actions.extend(get_selection_tool_switch_actions())
+
+    if prefs().keymap.selection.enable_selection_all_none:
+        actions.extend(get_selection_all_none_actions())
+
+    if prefs().keymap.selection.enable_selection_circle:
+        actions.extend(get_selection_circle_actions())
 
     return actions
 

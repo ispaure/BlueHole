@@ -39,8 +39,17 @@ def _selection_tool_switch_bindings(
             space_type=space_type,
             region_type=region_type,
             key='Q',
-            value='CLICK',
+            value='PRESS',
         ),
+    )
+
+
+def _box_select_tool_action(keymap_name: str, space_type: str = 'EMPTY') -> OperatorAction:
+    return OperatorAction(
+        operator='wm.tool_set_by_id',
+        text='Select Box Tool',
+        props={'name': 'builtin.select_box', 'cycle': True},
+        keymap_bindings=_selection_tool_switch_bindings(keymap_name, space_type),
     )
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,6 +81,18 @@ SELECTION_TOOL_SWITCH_MESH = OperatorAction(
 
 )
 
+# 75c4bbefab8e3cc7a898801350b900eae9aceea836329b236df37a0c14952850
+SELECTION_TOOL_SWITCH_IMAGE = _box_select_tool_action('Image', 'IMAGE_EDITOR')
+
+# a15ff41f58e3a58fe77ab5d970e06f238a62dbb08e41283277d47c86e2c3a489
+SELECTION_TOOL_SWITCH_IMAGE_PAINT = _box_select_tool_action('Image Paint')
+
+# e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111
+SELECTION_TOOL_SWITCH_VERTEX_PAINT = _box_select_tool_action('Vertex Paint')
+
+# d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c
+SELECTION_TOOL_SWITCH_WEIGHT_PAINT = _box_select_tool_action('Weight Paint')
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ACTION LIST
 
@@ -80,6 +101,10 @@ SELECTION_TOOL_SWITCH_ACTIONS: list[OperatorAction] = [
     SELECTION_TOOL_SWITCH_CURVE,
     SELECTION_TOOL_SWITCH_CURVES,
     SELECTION_TOOL_SWITCH_MESH,
+    SELECTION_TOOL_SWITCH_IMAGE,
+    SELECTION_TOOL_SWITCH_IMAGE_PAINT,
+    SELECTION_TOOL_SWITCH_VERTEX_PAINT,
+    SELECTION_TOOL_SWITCH_WEIGHT_PAINT,
 ]
 
 

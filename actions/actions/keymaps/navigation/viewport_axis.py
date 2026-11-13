@@ -189,6 +189,42 @@ NAVIGATION_3D_VIEW_AXIS_FRONT = OperatorAction(
     keymap_bindings=_shift_alt_front_view_bindings('3D View', space_type='VIEW_3D')
 )
 
+NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BACK = OperatorAction(
+    operator='view3d.view_axis',
+    text='View Axis (Absolute Back View)',
+    props={'type': 'BACK', 'relative': False, 'align_active': False},
+    keymap_bindings=(
+        # 2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='F1', ctrl=True),
+        # 3ee7001bf2f7f96dae4711948f76694b1c3ceb57aef1db6f96d9c2949b6b8b99
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='F1', oskey=True),
+    ),
+)
+
+NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_LEFT = OperatorAction(
+    operator='view3d.view_axis',
+    text='View Axis (Absolute Left View)',
+    props={'type': 'LEFT', 'relative': False, 'align_active': False},
+    keymap_bindings=(
+        # aa588d20ab030355215e945cdf7ea42dd7e386dfdefb93728ffdbbfb7ba4e6d8
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='F2', ctrl=True),
+        # c0d9e2aa23b51664bb6a7f52439f47fe4ca359575c1da6fcb2bd33afa7dd0d3a
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='F2', oskey=True),
+    ),
+)
+
+NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BOTTOM = OperatorAction(
+    operator='view3d.view_axis',
+    text='View Axis (Absolute Bottom View)',
+    props={'type': 'BOTTOM', 'relative': False, 'align_active': False},
+    keymap_bindings=(
+        # ac571b681410e5ce9d989bed48844639b1711b4fbc3493c1d7480ed47c0b363e
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='F3', ctrl=True),
+        # 73b312d55cdc6a757ca15ccaa51cdd75ecf21fe184ddad45db575af78c6fcf97
+        KeymapBinding(keymap_name='3D View', space_type='VIEW_3D', key='F3', oskey=True),
+    ),
+)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ACTION LIST
 
@@ -198,6 +234,9 @@ NAVIGATION_VIEWPORT_AXIS_ACTIONS: list[OperatorAction] = [
     NAVIGATION_3D_VIEW_AXIS_LEFT,
     NAVIGATION_3D_VIEW_AXIS_RIGHT,
     NAVIGATION_3D_VIEW_AXIS_FRONT,
+    NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BACK,
+    NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_LEFT,
+    NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BOTTOM,
 ]
 
 

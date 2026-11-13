@@ -16,12 +16,16 @@ __status__ = 'Production'
 # IMPORTS
 
 from .selection_more_less import SELECTION_MORE_LESS_ACTIONS
+from .selection_all_none import SELECTION_ALL_NONE_ACTIONS
+from .selection_circle import SELECTION_CIRCLE_ACTIONS
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ACTION GROUPS
 
 _SELECTION_ACTIONS = (
     *SELECTION_MORE_LESS_ACTIONS,
+    *SELECTION_ALL_NONE_ACTIONS,
+    *SELECTION_CIRCLE_ACTIONS,
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
