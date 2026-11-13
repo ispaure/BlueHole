@@ -106,3 +106,19 @@ the right-press Tweak fallback in the applicable tool state. The copied
 reference's earlier strict preservation failure and its inconclusive Box
 direct-control result remain in the 03 receipt. The original catalog pass used
 portable checks. The native follow-up above covers the UV Cursor gesture.
+
+### Object and Mesh native follow-up
+
+In Blender 4.5.1 LTS (`b0a72b245dcf`), middle mouse in the active Mesh
+Bevel tool started native Bevel. Moving and releasing increased the cube's
+vertex count from 8 to 24 and ended the modal operation. Disabling and
+re-enabling Mesh Tool Shortcuts removed and restored its binding.
+
+The Mode Switching section removed and restored the Deluxe `1` binding
+in Object Non-modal, but pressing `1` in Object Mode left the cube in
+Object Mode. Disabling only the stock Object Mode `object.hide_collection`
+binding for `1` in the disposable profile let the Deluxe binding enter
+vertex Edit Mode. The test restored the stock binding before shutdown.
+Keep this cross-keymap precedence issue open under Brief 04. The replay
+covered `1` and recorded its results in
+`test-results/deluxe-keymaps-category04/native-followup/readback.json`.
