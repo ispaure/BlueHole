@@ -104,7 +104,8 @@ def context_label(scope):
     name = scope['name']
     space = scope.get('space_type', 'EMPTY')
     region = scope.get('region_type', 'WINDOW')
-    show_space = space != 'EMPTY' and not (space == 'VIEW_3D' and '3D View' in name)
+    show_space = (space != 'EMPTY' and title(space).casefold() != name.casefold()
+                  and not (space == 'VIEW_3D' and '3D View' in name))
     return ' · '.join([name, *([title(space)] if show_space else []),
                        *([title(region)] if region != 'WINDOW' else []),
                        *(['Modal'] if scope.get('is_modal') else [])])
@@ -130,9 +131,7 @@ class Editor:
         self.category = 'navigation' if 'navigation' in self.catalog['categories'] else ''
         self.section = ''
         self.assignment = ''
-        self.assignment_open = True
         self.command = ''
-        self.command_open = True
         self.command_category = ''
         self.command_section = ''
         self.page = 0

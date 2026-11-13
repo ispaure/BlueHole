@@ -16,6 +16,7 @@ from .deluxe_editor_model import Editor, SOURCE_LABELS, context_label, display_v
 
 _editor = None
 _dialog_choices = {}
+_context_choices = []
 WM_PROPERTY = 'bh_deluxe_editor'
 ERRORS = (ValueError, KeyError, IndexError, OSError, RuntimeError, ReferenceError)
 HIDDEN = {'HIDDEN', 'SKIP_SAVE'}
@@ -163,6 +164,17 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
     action: StringProperty(options=HIDDEN)
     target: StringProperty(options=HIDDEN)
 
+    @classmethod
+    def description(cls, _context, props):
+        if props.action == 'page':
+            return 'Go to page ' + str(int(props.target) + 1)
+        if props.action == 'assignment' and _editor is not None:
+            row = _editor.catalog['assignments'].get(props.target)
+            if row:
+                event = shortcut(_editor.catalog['events'][row['event']])
+                return f"{event} · {context_label(row['scope'])}"
+        return cls.bl_label
+
     def invoke(self, context, event):
         if self.action in {'reset', 'reload', 'delete_section', 'remove_assignment'}:
             return context.window_manager.invoke_confirm(self, event)
@@ -195,8 +207,8 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
                 current.command_section = section
                 current.command_category = current.catalog['sections'][section]['category']
                 current.command = assignment.get('command', '')
-                current.command_open = True
                 view.search = command_name(current, current.command) if assignment else ''
+                current.page = 0
 
             return self.run(context, show)
         return super().execute(context)
@@ -216,9 +228,7 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.category, current.section, current.assignment = target, '', ''
             current.page = 0
         elif action in {'assignment', 'command'}:
-            opened = getattr(current, action) != target or not getattr(current, action + '_open')
             setattr(current, action, target)
-            setattr(current, action + '_open', opened)
         elif action == 'section':
             setattr(current, action, target)
             current.assignment = ''
@@ -281,6 +291,67 @@ def choices(rows):
     return [(id_, label, description, index) for index, (id_, label, description) in enumerate(rows, 1)]
 
 
+def scope_key(scope):
+    return scope['name'], scope.get('space_type', 'EMPTY'), scope.get('region_type', 'WINDOW')
+
+
+def assignment_scopes(current, keyconfigs):
+    """Include existing Deluxe contexts and the current preset's ordinary keymaps."""
+    scopes = {}
+    for catalog in (current.catalog, current.defaults):
+        for row in catalog['assignments'].values():
+            scope = row['scope']
+            scopes.setdefault(scope_key(scope), scope)
+    for config in (keyconfigs.active, keyconfigs.default):
+        if config is None:
+            continue
+        for map_ in config.keymaps:
+            try:
+                scope = runtime.capture_scope(map_)
+            except runtime._Pending:
+                continue
+            if not scope.is_modal and not scope.is_tool and ' Tool:' not in scope.name:
+                descriptor = dict(name=scope.name, space_type=scope.space_type, region_type=scope.region_type)
+                scopes.setdefault(scope_key(descriptor), descriptor)
+    return sorted(scopes.values(), key=lambda scope: context_label(scope).casefold())
+
+
+class BH_OT_deluxe_context(EditorOperator, bpy.types.Operator):
+    bl_idname = 'wm.bh_deluxe_context'
+    bl_label = 'Keymap Context'
+    bl_description = 'Search for the Blender keymap where this assignment should run'
+    bl_property = 'scope'
+
+    assignment: StringProperty(options=HIDDEN)
+    scope: EnumProperty(items=lambda _self, _context: _context_choices, options=TRANSIENT)
+
+    def invoke(self, context, _event):
+        global _context_choices
+        try:
+            current = editor()
+            current.require_editable_assignment(self.assignment)
+            scopes = assignment_scopes(current, context.window_manager.keyconfigs)
+        except ERRORS as error:
+            self.report({'ERROR'}, str(error))
+            return {'CANCELLED'}
+        # Blender creates a new operator from the search result's RNA properties.
+        _context_choices = choices((json.dumps(scope), context_label(scope), '') for scope in scopes)
+        context.window_manager.invoke_search_popup(self)
+        return {'INTERFACE'}
+
+    def stage(self, current):
+        current.require_editable_assignment(self.assignment)
+        row = current.catalog['assignments'][self.assignment]
+        if self.scope:
+            scope = json.loads(self.scope)
+            if scope_key(row['scope']) != scope_key(scope):
+                shipped = current.defaults['assignments'].get(self.assignment)
+                if shipped and scope_key(shipped['scope']) == scope_key(scope):
+                    scope = shipped['scope']
+                current.draft.update('assignments', self.assignment, scope=scope)
+                current.changed()
+
+
 class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
     bl_idname = 'wm.bh_deluxe_mapping'
     bl_label = 'Assignment Settings'
@@ -300,11 +371,8 @@ class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
             require(row is not None, 'The assignment changed. Select it again.')
             current.require_editable_assignment(self.assignment)
         metadata = current.preview()['commands']
-        self._scopes = {}
-        for item in (*current.defaults['assignments'].values(), *catalog['assignments'].values()):
-            scope = item['scope']
-            if scope not in self._scopes.values():
-                self._scopes[str(len(self._scopes))] = scope
+        self._scopes = {str(index): scope for index, scope in
+                        enumerate(assignment_scopes(current, context.window_manager.keyconfigs))}
         self._choices = {
             'section': choices((id_, f"{catalog['categories'][section['category']]['label']} / {section['label']}", '')
                                for id_, section in catalog['sections'].items() if not section.get('required')),
@@ -313,8 +381,7 @@ class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
                                       key=lambda item: item[1].casefold())),
             'event': choices(sorted(((id_, shortcut(event), f"{len(current.draft.uses('events', id_))} assignments")
                                       for id_, event in catalog['events'].items()), key=lambda item: item[1].casefold())),
-            'scope': choices((id_, context_label(scope), '') for id_, scope in
-                             sorted(self._scopes.items(), key=lambda item: context_label(item[1]).casefold())),
+            'scope': choices((id_, context_label(scope), '') for id_, scope in self._scopes.items()),
         }
         if not all(self._choices.values()):
             self.report({'ERROR'}, 'An assignment needs a section, command, shortcut and keymap')
@@ -325,7 +392,7 @@ class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
                         else self._choices['section'][0][0])
         self.command = row['command'] if row else self._choices['command'][0][0]
         self.event_id = row['event'] if row else self._choices['event'][0][0]
-        self.scope_id = (next(id_ for id_, scope in self._scopes.items() if scope == row['scope'])
+        self.scope_id = (next(id_ for id_, scope in self._scopes.items() if scope_key(scope) == scope_key(row['scope']))
                          if row else self._choices['scope'][0][0])
         self._draft = current.draft
         self._initial = row
@@ -345,6 +412,8 @@ class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
             current.require_editable_assignment(self.assignment)
             require(current.catalog['assignments'][self.assignment] == self._initial,
                     'The assignment changed. Reopen assignment settings.')
+            if scope_key(scope) == scope_key(self._initial['scope']):
+                scope = self._initial['scope']
             current.draft.update('assignments', self.assignment, section=self.section,
                                  command=self.command, event=self.event_id, scope=scope)
         else:
@@ -833,7 +902,7 @@ class BH_OT_deluxe_stage_binding(EditorOperator, bpy.types.Operator):
 
 classes = (
     BH_PG_deluxe_value, BH_PG_deluxe_editor, BH_OT_deluxe_edit, BH_OT_deluxe_inline_edit,
-    BH_OT_deluxe_section, BH_OT_deluxe_mapping,
+    BH_OT_deluxe_section, BH_OT_deluxe_mapping, BH_OT_deluxe_context,
     BH_OT_deluxe_shortcut, BH_OT_deluxe_capture, BH_OT_deluxe_field,
     BH_OT_deluxe_binding_picker, BH_OT_deluxe_stage_binding,
 )
@@ -849,6 +918,7 @@ def unregister():
     global _editor
     _editor = None
     _dialog_choices.clear()
+    _context_choices.clear()
     _inline_enums.clear()
     delattr(bpy.types.WindowManager, WM_PROPERTY)
     for cls in reversed(classes):

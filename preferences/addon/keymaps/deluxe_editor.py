@@ -10,6 +10,7 @@ from .deluxe_editor_model import (SOURCE_LABELS, STATUS_LABELS, context_label, d
 from ....keymaps.deluxe_schema import same_value
 
 PAGE_SIZE = 8
+DETAIL_PANE_MIN_WIDTH = 480
 
 
 def find(text, query):
@@ -23,12 +24,23 @@ def paginate(layout, current, rows):
         bar = layout.row(align=True)
         prev = bar.row(align=True)
         prev.enabled = page > 0
-        ops.operator_button(prev, 'page', 'Previous', str(page - 1), icon='TRIA_LEFT')
-        bar.label(text=f'{page + 1} / {last + 1}')
+        ops.operator_button(prev, 'page', '', str(max(0, page - 1)), icon='TRIA_LEFT')
+        number = bar.row(align=True)
+        number.alignment = 'CENTER'
+        number.label(text=f'{page + 1} / {last + 1}')
         forward = bar.row(align=True)
         forward.enabled = page < last
-        ops.operator_button(forward, 'page', 'Next', str(page + 1), icon='TRIA_RIGHT')
+        ops.operator_button(forward, 'page', '', str(min(last, page + 1)), icon='TRIA_RIGHT')
     return rows[page * PAGE_SIZE:(page + 1) * PAGE_SIZE]
+
+
+def detail_columns(layout, side_by_side):
+    if side_by_side:
+        split = layout.split(factor=0.38)
+        return split.column(align=True), split.column()
+    listing = layout.column(align=True)
+    layout.separator()
+    return listing, layout.column()
 
 
 class BH_MT_deluxe_categories(bpy.types.Menu):
@@ -181,7 +193,7 @@ def sections_view(layout, current, preview):
                     items.prop(owner, name)
 
 
-def assignments(layout, current, preview, query, *, search_keys=False):
+def assignments(layout, current, preview, query, *, side_by_side, search_keys=False):
     group_controls(layout, current, preview)
     catalog = current.catalog
     section = catalog['sections'].get(current.section)
@@ -212,35 +224,20 @@ def assignments(layout, current, preview, query, *, search_keys=False):
             matches = find(' '.join((ops.command_name(current, row['command']), operator, event,
                                      scope, owner, catalog['sections'][row['section']]['label'])), query)
         if matches:
-            found.append((id_, command, event, scope, owner))
-    if not found:
+            found.append((id_, command, event, scope))
+    if found:
+        listing, detail = detail_columns(layout, side_by_side)
+        shown = paginate(listing, current, found)
+        if current.assignment not in {item[0] for item in shown}:
+            current.assignment = shown[0][0]
+        for id_, command, event, scope in shown:
+            item = listing.column(align=True)
+            ops.operator_button(item, 'assignment', command, id_, depress=id_ == current.assignment)
+            item.label(text=f'{event}  ·  {scope}')
+        inspector(detail.box().column(align=True), current, preview, current.assignment)
+    else:
+        current.assignment = ''
         layout.label(text='No matching assignments' if query else 'No assignments in this section')
-    shown = paginate(layout, current, found)
-    if current.assignment not in {item[0] for item in shown}:
-        current.assignment = shown[0][0] if shown else ''
-    for id_, command, event, scope, owner in shown:
-        expanded = id_ == current.assignment and current.assignment_open
-        item = layout.box() if expanded else layout.column(align=True)
-        header = item.split(factor=0.45, align=True)
-        title_row = header.row(align=True)
-        ops.operator_button(title_row, 'assignment', '', id_, emboss=False,
-                            icon='TRIA_DOWN' if expanded else 'TRIA_RIGHT')
-        assignment = catalog['assignments'][id_]
-        toggle(title_row, 'assignments', id_, assignment, required=not preview['assignments'][id_]['editable'])
-        ops.operator_button(title_row, 'assignment', command, id_, emboss=False)
-        details = header.split(factor=0.45, align=True)
-        if expanded:
-            details.label(text=title(catalog['events'][assignment['event']].get('map_type', 'KEYBOARD')))
-        else:
-            capture = details.row(align=True)
-            capture.enabled = preview['assignments'][id_]['editable']
-            capture.operator(ops.BH_OT_deluxe_capture.bl_idname, text=event).assignment = id_
-        details.label(text=f'{scope} · {owner}')
-        if expanded:
-            item.separator(factor=0.5)
-            body = item.row()
-            body.separator(factor=1.0)
-            inspector(body.column(align=True), current, preview, id_)
     if section:
         rules(layout, current, preview)
 
@@ -251,8 +248,11 @@ def inspector(layout, current, preview, id_):
     state = preview['assignments'][id_]
     event = current.catalog['events'][row['event']]
     identity = layout.row()
+    identity.label(text=meta['label'])
+    identity.label(text=meta['owner'])
     command = current.catalog['commands'][row['command']]
-    identity.label(text=command.get('operator', meta['label']))
+    identity = layout.row()
+    identity.label(text=command.get('operator', ''))
     if id_ not in current.defaults['assignments']:
         identity.label(text='Custom assignment')
     elif same_value(row, current.defaults['assignments'][id_]) and all(
@@ -267,9 +267,15 @@ def inspector(layout, current, preview, id_):
     location = layout.row(align=True)
     ops.operator_button(location, 'show_assignments', path, row['section'], icon='FILE_FOLDER', emboss=False)
     toggle(location, 'sections', row['section'], section, required=section.get('required', False))
-    ops.operator_button(location, 'show_command', 'View Command', id_, icon='FORWARD', emboss=False)
     if not preview['sections'][row['section']]:
-        location.label(text='Section inactive', icon='INFO')
+        layout.label(text='Section inactive', icon='INFO')
+    scope_row = layout.split(factor=0.34, align=True)
+    scope_row.label(text='Keymap Context')
+    scope = context_label(row['scope'])
+    if state['editable']:
+        scope_row.operator(ops.BH_OT_deluxe_context.bl_idname, text=scope, icon='VIEWZOOM').assignment = id_
+    else:
+        scope_row.label(text=scope, icon='LOCKED')
     if not state['eligible'] or not state['active']:
         layout.label(text='Inactive', icon='INFO')
     if meta['availability'] != 'available':
@@ -284,10 +290,12 @@ def inspector(layout, current, preview, id_):
         layout.label(text='Overlaps Blender: ' + ', '.join(preview['inherited_conflicts'][id_]), icon='INFO')
     if not state['editable']:
         layout.label(text='Required shortcut', icon='LOCKED')
+        ops.operator_button(layout, 'show_command', 'View Command', id_, icon='FORWARD', emboss=False)
         return
     layout.separator(factor=0.5)
     shortcut_controls(layout, id_, event)
     actions = layout.row(align=True)
+    toggle(actions, 'assignments', id_, row)
     actions.operator(ops.BH_OT_deluxe_shortcut.bl_idname, text='Advanced Shortcut', emboss=False).assignment = id_
     actions.operator(ops.BH_OT_deluxe_mapping.bl_idname, text='Assignment Settings', emboss=False).assignment = id_
     ops.operator_button(actions, 'remove_assignment', '', id_, icon='TRASH', emboss=False)
@@ -308,6 +316,7 @@ def inspector(layout, current, preview, id_):
     if command.get('properties'):
         layout.separator(factor=0.5)
     command_fields(layout, current, row['command'], assignment=id_)
+    ops.operator_button(layout, 'show_command', 'View Command', id_, icon='FORWARD', emboss=False)
 
 
 def shortcut_controls(layout, assignment, event):
@@ -325,7 +334,8 @@ def shortcut_controls(layout, assignment, event):
         cell = line.row(align=True)
         cell.enabled = key != 'repeat' or event.get('value', 'PRESS') in {'PRESS', 'ANY'}
         cell.prop(control, prop, text=label)
-    mods = layout.row(align=True)
+    modifier_row = layout.split(factor=0.77, align=True)
+    mods = modifier_row.row(align=True)
     any_mod = ops.inline_value(view, 'any', 'boolean', event.get('any', False), assignment=assignment)
     mods.prop(any_mod, 'boolean', text='Any', toggle=True)
     controls = mods.row(align=True)
@@ -338,7 +348,7 @@ def shortcut_controls(layout, assignment, event):
         button.assignment, button.field = assignment, key
     modifier = ops.inline_value(view, 'key_modifier', 'option', event.get('key_modifier', 'NONE'),
                                 assignment=assignment, items=options['key_modifier'])
-    mods.prop(modifier, 'option', text='')
+    modifier_row.prop(modifier, 'option', text='')
     if event.get('value') == 'CLICK_DRAG':
         control = ops.inline_value(view, 'direction', 'option', event.get('direction', 'ANY'),
                                    assignment=assignment, items=options['direction'])
@@ -397,7 +407,7 @@ def command_fields(layout, current, id_, assignment=''):
         layout.label(text='No editable settings for this command', icon='INFO')
 
 
-def commands(layout, current, preview, query):
+def commands(layout, current, preview, query, *, side_by_side):
     categories = current.catalog['categories']
     if current.command_category not in categories:
         current.command_category, current.command_section = '', ''
@@ -423,28 +433,27 @@ def commands(layout, current, preview, query):
         if find(f"{name} {meta['owner']} {command.get('operator', '')}", query):
             found.append((id_, name, meta))
     found.sort(key=lambda item: (item[1].casefold(), item[0]))
-    shown = paginate(layout, current, found)
-    if current.command not in {item[0] for item in shown}:
-        current.command = shown[0][0] if shown else ''
-    if not shown:
+    if not found:
+        current.command = ''
         layout.label(text='No matching commands')
+        return
+    listing, detail = detail_columns(layout, side_by_side)
+    shown = paginate(listing, current, found)
+    if current.command not in {item[0] for item in shown}:
+        current.command = shown[0][0]
     for id_, name, meta in shown:
-        expanded = id_ == current.command and current.command_open
-        item = layout.box() if expanded else layout.column(align=True)
-        header = item.split(factor=0.7)
-        row = header.row(align=True)
-        ops.operator_button(row, 'command', '', id_, emboss=False,
-                            icon='TRIA_DOWN' if expanded else 'TRIA_RIGHT')
-        ops.operator_button(row, 'command', name, id_, emboss=False)
-        header.label(text=STATUS_LABELS.get(meta['availability'], meta['owner']))
-        if expanded:
-            item.separator(factor=0.5)
-            body = item.row()
-            body.separator(factor=1.0)
-            command_details(body.column(align=True), current, id_)
+        item = listing.column(align=True)
+        ops.operator_button(item, 'command', name, id_, depress=id_ == current.command)
+        item.label(text=STATUS_LABELS.get(meta['availability'], meta['owner']))
+    command_details(detail.box().column(align=True), current, preview['commands'][current.command], current.command)
 
 
-def command_details(layout, current, id_):
+def command_details(layout, current, meta, id_):
+    header = layout.row()
+    header.label(text=ops.command_name(current, id_))
+    header.label(text=meta['owner'])
+    if meta['availability'] != 'available':
+        layout.label(text=STATUS_LABELS[meta['availability']], icon='INFO')
     uses = current.draft.uses('commands', id_)
     sections = dict.fromkeys(current.catalog['assignments'][aid]['section'] for aid in uses)
     if uses:
@@ -511,12 +520,14 @@ def draw(context, layout):
         layout.label(text=str(error), icon='ERROR')
     else:
         query = view.search.strip()
+        side_by_side = bool(context.region and
+                            context.region.width >= DETAIL_PANE_MIN_WIDTH * context.preferences.system.ui_scale)
         if view.tab == 'SECTIONS':
             sections_view(layout, current, preview)
         elif view.tab == 'ASSIGNMENTS':
-            assignments(layout, current, preview, query, search_keys=view.search_mode == 'KEY')
+            assignments(layout, current, preview, query, side_by_side=side_by_side, search_keys=view.search_mode == 'KEY')
         else:
-            commands(layout, current, preview, query)
+            commands(layout, current, preview, query, side_by_side=side_by_side)
         if view.tab != 'SECTIONS' and current.dirty and preview['conflicts']:
             layout.label(text=f"{len(preview['conflicts'])} conflicting Deluxe input groups", icon='ERROR')
 

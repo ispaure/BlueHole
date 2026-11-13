@@ -3,23 +3,28 @@
 Open **Preferences → Add-ons → Blue Hole → Addon Settings → Keymaps** after
 configuring Deluxe on the Blender preset. **Sections** is the default view.
 Use its category and section checkboxes to stage which shortcut groups are
-enabled, then click **Apply Changes**. Assignments show the command,
-shortcut, keymap context and source. Search spans all sections. The category
-and section menus browse one section at a time when search is empty.
+enabled, then click **Apply Changes**. Assignments and Commands put their list
+beside the selected item's settings in wide windows. In narrow windows the
+settings appear below the list. Assignment search spans all sections. The
+category and section menus browse one section at a time when search is empty.
 
-- Expand a row with its arrow to see its section and edit it in place. The
-  section link opens its assignments and the checkbox stages its enabled
+- Select an assignment to see its shortcut, keymap context, command source
+  and section. The section link opens its assignments and the checkbox stages its enabled
   state. **View Commands** and **View Assignments** switch between views for
   that section. Select **Key-Binding** in Assignments to type a shortcut such
   as `Shift F10` or `Ctrl Shift A`. Use **Name** to search by command name,
   operator ID, or keymap.
-- Click an assignment's shortcut to capture a new key for that assignment.
+- Click the key in the detail pane to capture a new key for that assignment.
   Expand **Linked assignments** to see the contexts affected by **Capture for
-  All**. Escape cancels capture. The expanded row places the key, event phase,
+  All**. Escape cancels capture. The pane places the key, event phase,
   and keyboard repeat above the modifier buttons. **Advanced Shortcut** offers
   the full event settings and shared editing.
-- **Assignment Settings** lets you move the assignment or choose an existing
-  command, shortcut and keymap. To add a mapping, add a section from the menu
+- Click **Keymap Context** and type a Blender keymap name to change where the
+  selected assignment runs. Choosing a result stages the change for that
+  assignment. If a shortcut is needed in several contexts, create an
+  assignment for each context and reuse the same shortcut and command.
+  **Assignment Settings** also lets you move an assignment to another section
+  or choose an existing command, shortcut and keymap. To add a mapping, add a section from the menu
   beside the section selector or select an existing one,
   choose **Add Assignment**, and select those three entries. **New Shortcut**
   adds an input to the library for reuse in Assignment Settings.
