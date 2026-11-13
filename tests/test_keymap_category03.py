@@ -325,6 +325,26 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
 
 
 class Category03ModalProbeTests(unittest.TestCase):
+    def test_subtraction_control_accepts_finished_passthrough_only_with_effect(self):
+        from blender_keymap_category03_handlers import ObjectSubtractCases
+        fixture = ObjectSubtractCases.__new__(ObjectSubtractCases)
+        for result, selected, accepted in (
+                (['FINISHED'], False, True),
+                (['FINISHED', 'PASS_THROUGH'], False, True),
+                (['FINISHED', 'PASS_THROUGH'], True, False),
+                (['PASS_THROUGH'], False, False),
+                (['CANCELLED'], False, False),
+                (['FINISHED', 'RUNNING_MODAL'], False, False),
+                (['FINISHED', 'INTERFACE'], False, False)):
+            with self.subTest(result=result, selected=selected):
+                fixture.result = {'direct_control': {'result': result}}
+                fixture.snapshot = lambda phase: {'target_selected': selected}
+                if accepted:
+                    fixture.verify_direct_control()
+                else:
+                    with self.assertRaises(AssertionError):
+                        fixture.verify_direct_control()
+
     def fixture(self):
         from blender_keymap_category03_modal import ModalSwitchCases
         from blender_keymap_category03_modal_probe import ModalAliasProbeCases
@@ -1496,6 +1516,33 @@ class Category03NativeReceiptTests(unittest.TestCase):
         self.assertTrue(run['modal_capture_readiness']['matched_context_and_counts'])
         self.assertTrue(run['watcher_stopped'])
         self.assertEqual(run['cleanup']['owned'], 0)
+
+    def test_focused_subtraction_retains_matching_effects_and_fixture_errors(self):
+        factory = self.runs['subtract_probe-1794566659165110000']
+        reference = self.reference_runs['reference-evidence-1794566535713559000']
+        self.assertEqual(factory['handler_fixture_sha256'], reference['handler_fixture_sha256'])
+        self.assertEqual(factory['native_status'], 'error')
+        data = reference['observations']
+        self.assertEqual(data['status'], 'error')
+        for run in (factory, data):
+            case, = run['dispatch']
+            self.assertTrue(case['input_delivery']['delivered'])
+            self.assertTrue(case['native_subtraction_observed'])
+            self.assertEqual(case['direct_control']['point'], case['projected_point'])
+            self.assertEqual(case['direct_control']['result'], ['FINISHED', 'PASS_THROUGH'])
+            self.assertTrue(case['direct_control']['positive_subtraction'])
+            phases = {phase['phase']: phase['snapshot'] for phase in case['phases']}
+            self.assertEqual([phases[label]['target_selected'] for label in
+                              ('before_press', 'after_press', 'after_release', 'direct_reset', 'after_direct')],
+                             [True, True, False, True, False])
+        self.assertTrue(factory['subtract_proof']['exact_source_and_merged_preservation'])
+        self.assertFalse(data['subtract_proof']['exact_source_and_merged_preservation'])
+        self.assertEqual(factory['subtract_proof']['exact_candidate_counts'],
+                         {'default': 0, 'active': 0, 'addon': 1, 'user': 1})
+        self.assertEqual(data['subtract_proof']['exact_candidate_counts'],
+                         {'default': 0, 'active': 1, 'addon': 0, 'user': 1})
+        self.assertTrue(factory['watcher_stopped'])
+        self.assertEqual(factory['cleanup']['owned'], 0)
 
     def test_shared_production_persistence_restores_editor_circle_framing_and_arrow_edits(self):
         pairs = (

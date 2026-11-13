@@ -590,7 +590,10 @@ class ObjectSubtractCases(HandlerCases):
         after = self.snapshot('after_direct')
         control = self.result['direct_control']
         control['positive_subtraction'] = not after['target_selected']
-        assert control['result'] == ['FINISHED'] and control['positive_subtraction']
+        result = set(control['result'])
+        assert ('FINISHED' in result
+                and not result.intersection({'CANCELLED', 'RUNNING_MODAL', 'INTERFACE'})
+                and control['positive_subtraction'])
 
     def cleanup(self):
         if self.initial_maps is None:

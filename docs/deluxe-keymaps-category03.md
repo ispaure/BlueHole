@@ -204,14 +204,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Fifty-eight category checks currently pass. They cover exact assigned IDs and
+Sixty category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 57 factory attempts and seventeen copied-reference attempts. A completed
+retains 58 factory attempts and eighteen copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -574,7 +574,7 @@ projects the same point for native input and direct control, requires F23 delive
 records press/release and full native candidates, resets selection before the
 minimal direct call, and rejects FINISHED without actual deselection. It retains
 strict source/merged cleanup. The focused factory `subtract_probe`/`subtract_observe` and copied-reference
-`subtract` launcher routes are prepared but not natively executed;
+`subtract` launcher routes ran as batch30 below; the corrected return predicate is offscreen;
 Circle/navigation/shortest-path behavior is not rerun or accepted by this work.
 
 
@@ -609,3 +609,34 @@ source represents these as add-only diffs. A narrow model reproduces batch29's
 rebinding and distinguishes add-only removal. User-map RNA admission, identity
 through rebuilds, exact edited cleanup, saved ownership and immediate-save/fresh
 reopen remain unproved. No alternative production path is implemented.
+
+
+Batch30 compared one copied-reference subtraction child
+`reference-evidence-1794566535713559000` (20.01s) and one exact factory probe
+`subtract_probe-1794566659165110000` (12.5539s), both at frozen `5320daf`.
+Each isolated target stayed selected after PRESS and became unselected on RELEASE.
+The F23 callback and direct call shared projected point (2055,1229). After an
+independent selected-state reset, the direct call also deselected the target.
+Both returned FINISHED with PASS_THROUGH. The frozen fixture incorrectly required
+FINISHED alone, so both historical native status errors remain retained. The
+predicate is corrected offscreen and tested to reject no effect, cancellation
+and unfinished results; the positive reference/factory observations need no rerun.
+
+Factory full source/merged preservation passed, and unregister ended with zero
+owned/pending/tracked resources and a stopped watcher. Reference strict comparison
+failed separately: 194 source read_issues changes (193 active, one addon), 148
+merged read_issues changes, and user UV Editor318→272 from 45 removed
+`uv.toolkit_center_cursor_and_frame_all` rows plus one `uv.toolkit_distribute`.
+All other fields and surviving relative order stayed exact. The foreign loss
+cause remains unknown. Both PIDs and all temporary roots were verified absent,
+protected inputs and43 frozen hashes matched, and the slot was released.
+
+Batch30 captured inherited stock Ctrl-LEFTMOUSE/CLICK row109 with center=True,
+object=True and deselect=False, but did not exercise stock-only behavior in the
+matched isolated scene. The earlier handler probe already had candidate items
+and lacked its direct control/isolated target, so it cannot fill that gap.
+The narrow production reservation is one ordinary editable view3d.select
+Ctrl-LEFTMOUSE/CLICK declaration under a new independent Subtract Selection group.
+An actual-production off/on/off check must measure inherited stock behavior,
+independent group toggling and exact preservation. No new production declaration,
+shared runtime capability or candidate-accounting acceptance is claimed yet.

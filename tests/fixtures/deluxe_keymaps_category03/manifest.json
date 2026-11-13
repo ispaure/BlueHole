@@ -2075,5 +2075,54 @@
       "runtime_production_changes": false
     },
     "cleanup": "All native owned/pending/tracked resources0, watcher stopped; owned PID and roots absent;41 frozen hashes and protected inputs exact"
+  },
+  "object_subtract_comparison": {
+    "factory_run": "subtract_probe-1794566659165110000",
+    "reference_run": "reference-evidence-1794566535713559000",
+    "executed_checkpoint": "5320daf",
+    "interpretation": {
+      "status": "matched native Ctrl-click deselection and same-point direct controls; historical fixture errors and strict reference failure retained",
+      "selected_phases": [
+        true,
+        true,
+        false,
+        true,
+        false
+      ],
+      "phase_order": [
+        "before_press",
+        "after_press",
+        "after_release",
+        "direct_reset",
+        "after_direct"
+      ],
+      "point": [
+        2055,
+        1229
+      ],
+      "direct_result": [
+        "FINISHED",
+        "PASS_THROUGH"
+      ],
+      "fixture_error": "Frozen helper wrongly required a singleton FINISHED result; corrected offscreen to accept FINISHED membership with actual effect while rejecting cancelled/unfinished results. No successful native rerun is claimed.",
+      "factory_strict_preservation": true,
+      "reference_strict_preservation": false,
+      "reference_source_readability_changes": 194,
+      "reference_merged_readability_changes": 148,
+      "reference_user_uv_count": [
+        318,
+        272
+      ],
+      "reference_removed_targets": {
+        "uv.toolkit_center_cursor_and_frame_all": 45,
+        "uv.toolkit_distribute": 1
+      },
+      "reference_other_fields_and_surviving_order": "Exact; no source property-value changes or cause of merged foreign loss inferred",
+      "qualified_stock_only_behavior_baseline": false,
+      "causality": "Exact candidate admitted and desired native effect observed; no exclusive attribution to candidate over inherited stock row109 without a matched group-off control",
+      "production_reservation": "object-subtract-production-reservation.json",
+      "production_implemented": false,
+      "candidate_accounting_changed": false
+    }
   }
 }
