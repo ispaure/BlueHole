@@ -151,10 +151,13 @@ The global switch disables standard categories while Pipeline retains its
 obligatory bindings and Pie follows its independent switch. Startup waits for
 preferences and actual keyconfigs. Failure after partial category registration
 drains ownership. Unload cancels the watcher and pending initialization even when
-initial registration never completed.
+initial registration never completed. If operator properties become unreadable
+during unload, as can happen inside Read Preferences, a short cleanup timer
+rechecks those rows after Blender can read their properties again.
 
 Use `handle.diagnostics`, `runtime_diagnostics()`, `runtime_stats()` and
-`retained_edits()` for inspection. `pending_cleanup()` reports failed removals.
+`retained_edits()` for inspection. `pending_cleanup()` reports failed removals
+and rows waiting for a readable snapshot (`owned_snapshot_unavailable`).
 Exact ownership survives rollback, withdrawal or release failures; that request
 cannot create another item until cleanup resolves. A valid pending cleanup row
 also blocks other owners or new request IDs from claiming its full scope/event.
@@ -193,6 +196,11 @@ cleanup logs its presence. Such a row remains visible in the native source and
 merged maps and may outlive add-on unload; this is an explicit preservation
 limitation, not a claim of zero remaining rows. The native test removes its own
 intentional edited fixture row by exact reference after verifying the transfer.
+When a previously captured source row becomes unreadable during release, cleanup
+waits until it can check the same native member and compare its complete
+snapshot. An unchanged row can be removed, a changed row is retained, and a
+missing member drops the old cleanup record. A row still unreadable after
+bounded unload retries remains pending for a later runtime registration.
 
 ## Validation and remaining gates
 

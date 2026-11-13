@@ -1203,6 +1203,40 @@ class RuntimeKeymapTests(unittest.TestCase):
         self.assertEqual(list(addon.keymap_items), [foreign])
         again.release()
 
+    def test_release_rechecks_temporarily_unreadable_owned_rows(self):
+        for recovery in ('unchanged', 'edited', 'replaced'):
+            with self.subTest(recovery=recovery):
+                addon = self.addon()
+                handle = self.utils.register_feature('owner', assignments=(self.assignment(),))
+                item = handle.owned_pairs[0][1]
+                properties = item.properties
+                item.properties = None
+                self.assertIn(('replacement', 'owned_snapshot_unavailable'), handle.release())
+                self.assertTrue(self.utils.retry_unreadable_cleanup(1))
+                self.assertEqual(self.utils.retained_edits(), ())
+                self.assertEqual(self.utils.pending_cleanup()[0]['reason'], 'owned_snapshot_unavailable')
+                item.properties = properties
+                if recovery == 'edited':
+                    item.type = 'F19'
+                elif recovery == 'replaced':
+                    replacement = item.clone()
+                    replacement._pointer = item.as_pointer()
+                    addon.keymap_items.remove(item)
+                    addon.keymap_items.append_fixture(replacement)
+                self.assertFalse(self.utils.retry_unreadable_cleanup(1))
+                self.assertEqual(self.utils.pending_cleanup(), ())
+                if recovery == 'edited':
+                    self.assertEqual(list(addon.keymap_items), [item])
+                    self.assertEqual(len(self.utils.retained_edits()), 1)
+                    addon.keymap_items.remove(item)
+                elif recovery == 'replaced':
+                    self.assertEqual(list(addon.keymap_items), [replacement])
+                    addon.keymap_items.remove(replacement)
+                else:
+                    self.assertEqual(list(addon.keymap_items), [])
+                self.assertEqual(self.utils.retained_edits(), ())
+                self.runtime.configs.addon.keymaps.remove(addon)
+
     def test_pending_cleanup_blocks_new_same_event_request_until_exact_removal(self):
         for second_owner in ('owner-b', 'owner-a'):
             with self.subTest(second_owner=second_owner):
@@ -1661,6 +1695,44 @@ class LifecycleIntegrationTests(unittest.TestCase):
         self.orchestrator.unregister()
         self.assertEqual(self.addon_names(), [])
         self.assertEqual(self.timers, {})
+
+    def test_unload_retries_unreadable_bindings_without_restarting_watcher(self):
+        self.orchestrator.register()
+        addon = self.runtime.configs.addon.keymaps.get('3D View')
+        item = addon.keymap_items[0]
+        properties = item.properties
+        item.properties = None
+        self.orchestrator.unregister()
+        cleanup = self.orchestrator._retry_unload_cleanup
+        self.assertEqual(set(self.timers), {cleanup})
+        self.assertEqual(list(addon.keymap_items), [item])
+        self.assertEqual(cleanup(), self.orchestrator.WATCH_INTERVAL)
+        item.properties = properties
+        self.assertIsNone(cleanup())
+        del self.timers[cleanup]  # Blender retires callbacks that return None.
+        self.assertEqual(list(addon.keymap_items), [])
+        self.assertEqual(self.core.runtime_stats()['tracked_resources'], 0)
+
+    def test_unload_leaves_persistently_unreadable_binding_pending(self):
+        self.orchestrator.register()
+        addon = self.runtime.configs.addon.keymaps.get('3D View')
+        item = addon.keymap_items[0]
+        properties = item.properties
+        item.properties = None
+        self.orchestrator.unregister()
+        cleanup = self.orchestrator._retry_unload_cleanup
+        for _ in range(self.orchestrator.UNLOAD_CLEANUP_ATTEMPTS - 1):
+            self.assertEqual(cleanup(), self.orchestrator.WATCH_INTERVAL)
+        self.assertIsNone(cleanup())
+        del self.timers[cleanup]
+        self.assertEqual(list(addon.keymap_items), [item])
+        self.assertEqual(self.core.retained_edits(), ())
+        self.assertEqual(self.core.pending_cleanup()[0]['reason'], 'owned_snapshot_unavailable')
+        item.properties = properties
+        self.orchestrator.register()
+        self.assertFalse(item._alive)
+        self.assertEqual(len(self.addon_names()), 10)
+        self.assertEqual(self.core.pending_cleanup(), ())
 
     def test_legacy_profile_blocks_saved_runtime_switches_until_review(self):
         settings = self.runtime.bpy.context.preferences.keymap

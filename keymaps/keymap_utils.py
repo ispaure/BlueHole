@@ -265,6 +265,7 @@ _CREATED_MAPS = {}
 _RETAINED_EDITED = {}
 _PAIR_ALIASES = {}
 _PENDING_CLEANUP = {}
+_CLEANUP_RETRY_REASONS = frozenset(('owned_remove_failed', 'owned_snapshot_unavailable'))
 _PROVIDER_REF_IDS = {}
 _RECONCILE_CURSOR = 0
 _COUNTS = {'checked': 0, 'created': 0, 'removed': 0, 'reinsertions': 0}
@@ -553,8 +554,8 @@ def _remove_owned(owned):
             _retain_edited(owned)
             return 'user_edited_owned_item_retained'
     except _Pending:
-        _retain_edited(owned)
-        return 'unreadable_owned_item_retained'
+        _queue_cleanup(owned, 'owned_snapshot_unavailable')
+        return 'owned_snapshot_unavailable'
     try:
         _remove_native_item(map_, item)
         _COUNTS['removed'] += 1
@@ -594,32 +595,37 @@ def _cleanup_one(owned):
 def _retry_cleanup_key(key):
     records = _PENDING_CLEANUP.get(key, ())
     remaining = []
-    results = []
-    for owned, reason in records:
+    for owned, _ in records:
         outcome = _cleanup_one(owned)
-        results.append(outcome)
-        if outcome == 'owned_remove_failed':
-            remaining.append((owned, reason))
+        if outcome in _CLEANUP_RETRY_REASONS:
+            remaining.append((owned, outcome))
         else:
             handle = _FEATURES.get(key[0])
             if handle is not None and handle._owned.get(key[1]) is owned:
                 handle._owned.pop(key[1], None)
+    _PENDING_CLEANUP.pop(key, None)
     if remaining:
         _PENDING_CLEANUP[key] = remaining
-    else:
-        _PENDING_CLEANUP.pop(key, None)
-    return tuple(results)
 
 
-def _retry_cleanup(limit=None):
+def _retry_cleanup(limit=None, *, reason=None):
     diagnostics = []
-    keys = tuple(_PENDING_CLEANUP)
+    keys = tuple(key for key, records in _PENDING_CLEANUP.items()
+                 if reason is None or any(why == reason for _, why in records))
     for key in keys[:limit]:
-        outcomes = _retry_cleanup_key(key)
+        _retry_cleanup_key(key)
+        pending = _PENDING_CLEANUP.get(key)
         diagnostics.append(KeymapDiagnostic(key[0], key[1],
-                                            'pending' if key in _PENDING_CLEANUP else 'released',
-                                            'owned_remove_failed' if key in _PENDING_CLEANUP else 'cleanup_complete'))
+                                            'pending' if pending else 'released',
+                                            pending[0][1] if pending else 'cleanup_complete'))
     return tuple(diagnostics)
+
+
+def retry_unreadable_cleanup(budget):
+    """Retry released bindings during preference reload without registering anything."""
+    _retry_cleanup(limit=budget, reason='owned_snapshot_unavailable')
+    return any(reason == 'owned_snapshot_unavailable'
+               for records in _PENDING_CLEANUP.values() for _, reason in records)
 
 
 def pending_cleanup():
@@ -1107,7 +1113,7 @@ class FeatureHandle:
                 _retry_cleanup_key(cleanup_key)
                 if cleanup_key in _PENDING_CLEANUP:
                     diagnostics.append(_diagnostic(self, request, 'pending',
-                                                   'owned_remove_failed'))
+                                                   _PENDING_CLEANUP[cleanup_key][0][1]))
                 else:
                     diagnostics.append(_diagnostic(self, request, 'released',
                                                    'cleanup_complete'))
@@ -1159,7 +1165,7 @@ class FeatureHandle:
                         current_snapshot = _snapshot(live_item, _scope(live_map).is_modal)
                     except _Pending:
                         diagnostics.append(_diagnostic(self, request, 'pending',
-                                                       'unreadable_owned_item_retained'))
+                                                       'owned_snapshot_unavailable'))
                         preflight_failed = True
                         continue
                     if current_snapshot != prior.snapshot:
@@ -1180,11 +1186,11 @@ class FeatureHandle:
                         if issue.reason == 'merged_priority_unproved':
                             self._blocked[key] = _proof_generation(proof)
                         removal = _remove_owned(prior)
-                        if removal != 'owned_remove_failed':
+                        if removal not in _CLEANUP_RETRY_REASONS:
                             self._owned.pop(key, None)
                         else:
                             diagnostics.append(_diagnostic(self, request, 'pending',
-                                                           'owned_remove_failed'))
+                                                           removal))
                             preflight_failed = True
                             continue
                         diagnostics.append(_diagnostic(self, request, issue.status, issue.reason, issue.role, issue.capability))
@@ -1212,9 +1218,9 @@ class FeatureHandle:
                         attempts = self._overtakes.get(key, 0) + 1
                         self._overtakes[key] = attempts
                         removal = _remove_owned(prior)
-                        if removal == 'owned_remove_failed':
+                        if removal in _CLEANUP_RETRY_REASONS:
                             diagnostics.append(_diagnostic(self, request, 'pending',
-                                                           'owned_remove_failed'))
+                                                           removal))
                             preflight_failed = True
                             continue
                         self._owned.pop(key, None)
@@ -1406,8 +1412,8 @@ def runtime_diagnostics():
     """Immutable diagnostic snapshot for lifecycle and native receipts."""
     return (tuple(diagnostic for handle in tuple(_FEATURES.values())
                   for diagnostic in handle.diagnostics) +
-            tuple(KeymapDiagnostic(owner_id, request_id, 'pending', 'owned_remove_failed')
-                  for (owner_id, request_id) in _PENDING_CLEANUP))
+            tuple(KeymapDiagnostic(owner_id, request_id, 'pending', records[0][1])
+                  for (owner_id, request_id), records in _PENDING_CLEANUP.items()))
 
 
 def release_all():
@@ -1445,7 +1451,7 @@ def release_owned_pairs(pairs):
         owned = handle._owned.get(request_id)
         if owned is not None:
             outcome = _remove_owned(owned)
-            if outcome != 'owned_remove_failed':
+            if outcome not in _CLEANUP_RETRY_REASONS:
                 handle._owned.pop(request_id, None)
             removed.append((handle.owner_id, request_id, outcome))
         else:

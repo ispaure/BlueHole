@@ -80,10 +80,12 @@ _profile_store = None
 _legacy_profile = False
 _last_error = None
 _wait_interval = 0.25
+_unload_cleanup_attempts = 0
 WATCH_INTERVAL = 0.25
 MAX_WAIT_INTERVAL = 2.0
 WATCH_REQUEST_BUDGET = 16
 WATCH_TIME_BUDGET = 0.004
+UNLOAD_CLEANUP_ATTEMPTS = 4
 watcher_stats = {'ticks': 0, 'max_seconds': 0.0, 'last_seconds': 0.0,
                  'category_refreshes': 0, 'errors': 0}
 
@@ -195,7 +197,7 @@ def _clear_categories():
     pending = keymap_utils.pending_cleanup()
     if pending:
         log(Severity.WARNING, TOOL_NAME,
-            f'{len(pending)} owned keymap item(s) still await native removal; '
+            f'{len(pending)} owned keymap item(s) still await cleanup; '
             'ownership is retained for the next cleanup attempt.')
     for category, error in errors:
         log(Severity.WARNING, TOOL_NAME, f'{category} cleanup reported {error}.')
@@ -276,20 +278,38 @@ def register():
     except Exception:
         _enabled = False
         raise
+    if bpy.app.timers.is_registered(_retry_unload_cleanup):
+        bpy.app.timers.unregister(_retry_unload_cleanup)
     if not bpy.app.timers.is_registered(_watch_keymaps):
         bpy.app.timers.register(_watch_keymaps, first_interval=WATCH_INTERVAL, persistent=True)
     log(Severity.INFO, TOOL_NAME, f'Registered {total} owned keymaps.')
     return total
 
 
+def _retry_unload_cleanup():
+    global _unload_cleanup_attempts
+    if _enabled:
+        return None
+    _unload_cleanup_attempts -= 1
+    remaining = keymap_utils.retry_unreadable_cleanup(WATCH_REQUEST_BUDGET)
+    if remaining and _unload_cleanup_attempts:
+        return WATCH_INTERVAL
+    return None
+
+
 def unregister():
-    global _enabled, _preference_state, _last_error, _profile_store
+    global _enabled, _preference_state, _last_error, _profile_store, _unload_cleanup_attempts
     _enabled = False
     if bpy.app.timers.is_registered(_watch_keymaps):
         bpy.app.timers.unregister(_watch_keymaps)
     try:
         _clear_categories()
     finally:
+        # Read Preferences may unload us before Blender restores operator RNA.
+        if any(row['reason'] == 'owned_snapshot_unavailable' for row in keymap_utils.pending_cleanup()):
+            if not bpy.app.timers.is_registered(_retry_unload_cleanup):
+                _unload_cleanup_attempts = UNLOAD_CLEANUP_ATTEMPTS
+                bpy.app.timers.register(_retry_unload_cleanup, first_interval=WATCH_INTERVAL)
         _preference_state = None
         _last_error = None
         if _profile_store is not None:
