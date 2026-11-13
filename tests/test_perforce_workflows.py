@@ -1,11 +1,13 @@
 """Blue Hole source-control callbacks keep saves permissive, outside Blender."""
 import importlib
+import json
 import os
 from pathlib import Path
 import sys
 import types
 import unittest
-from unittest.mock import Mock, patch
+from tempfile import TemporaryDirectory
+from unittest.mock import Mock, call, patch
 
 
 class BlueHoleWorkflowTests(unittest.TestCase):
@@ -152,6 +154,54 @@ class BlueHoleWorkflowTests(unittest.TestCase):
                     self.assertIs(group.export_proc(send=False), not abort)
                 self.assertEqual(item.export_proc.call_count, 0 if abort else 1)
                 self.assertEqual(self.bpy.context.view_layer.objects.active, 'original')
+
+    def test_gltf_prepares_tracked_buffer_and_adds_only_referenced_new_buffer(self):
+        class Group(self.groups.ContainerGroup):
+            def set_containers_from_selection(self, silent_if_empty):
+                pass
+
+            def set_containers_from_scene(self, silent_if_empty):
+                pass
+
+        def export(path, *, buffered):
+            document = {}
+            if buffered:
+                path.with_suffix('.bin').write_bytes(b'buffer')
+                document['buffers'] = [{'uri': path.stem.replace(' ', '%20') + '.bin', 'byteLength': 6}]
+            path.write_text(json.dumps(document))
+            return True
+
+        with TemporaryDirectory() as tmp:
+            tracked, new, empty, glb, cancelled = [Path(tmp, name) for name in (
+                'tracked.gltf', 'new mesh.gltf', 'empty.gltf', 'scene.glb', 'cancelled.gltf')]
+            empty.with_suffix('.bin').write_bytes(b'stale')
+            cancelled.with_suffix('.bin').write_bytes(b'buffer')
+            cancelled.write_text('{"buffers":[{"uri":"cancelled.bin","byteLength":6}]}')
+            group = Group(types.SimpleNamespace(engine='godot'))
+            group.container_lst = [types.SimpleNamespace(path=path, export_proc=Mock(
+                side_effect=lambda path=path: export(path, buffered=path in (tracked, new))))
+                for path in (tracked, new, empty, glb)]
+            group.container_lst.append(types.SimpleNamespace(path=cancelled, export_proc=Mock(return_value=False)))
+            self.bpy.context = types.SimpleNamespace(
+                view_layer=types.SimpleNamespace(objects=types.SimpleNamespace(active='original')))
+            self.settings.source_control_error_aborts_exp = True
+            with patch.object(self.groups, 'P4FileGroup') as group_factory, patch.object(
+                    self.groups, 'P4Info'), patch.object(self.groups, 'exec_p4_arguments') as p4, patch.object(
+                    self.groups, 'log'):
+                status, checkout = Mock(), Mock()
+                group_factory.side_effect = [status, checkout]
+                status.get_p4_file_lst.return_value = [
+                    types.SimpleNamespace(status=self.groups.P4FileStatus.LATEST_REVISION),
+                    *[types.SimpleNamespace(status=self.groups.P4FileStatus.NOT_ADDED)] * 3,
+                ]
+                p4.return_value.success = True
+                self.assertTrue(group.export_proc(send=False))
+                status.update_fields_client_n_depot.assert_called_once_with()
+                self.assertEqual(checkout.append_p4_file_to_group_from_client_file.call_args_list,
+                                 [call(str(path)) for path in (tracked, new, empty, glb, cancelled,
+                                                               tracked.with_suffix('.bin'))])
+                p4.assert_called_once_with(['add', '-t', 'binary', str(new.with_suffix('.bin'))])
+            self.assertEqual(empty.with_suffix('.bin').read_bytes(), b'stale')
 
     def test_rename_stops_before_local_fallback_after_checkout_or_move_failure(self):
         for checkout_ok in (False, True):

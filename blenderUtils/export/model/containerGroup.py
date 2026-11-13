@@ -18,7 +18,10 @@ __status__ = 'Production'
 # IMPORTS
 
 from abc import ABC, abstractmethod
+import json
+from pathlib import Path
 from typing import *
+from urllib.parse import unquote
 
 import bpy
 
@@ -27,7 +30,8 @@ from ....unrealUtils import sendUnreal
 from ..exportSettings import *
 from ....Lib.commonUtils.runtime.diagnostics import *
 from ....preferences.prefs import *
-from ....Lib.commonUtils.integrations.wrappers.perforce import P4FileGroup
+from ....Lib.commonUtils.integrations.wrappers.perforce import P4FileGroup, P4FileStatus, P4Info
+from ....Lib.commonUtils.integrations.wrappers.perforce.p4_utils import exec_p4_arguments
 from .container import Container
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,10 +76,13 @@ class ContainerGroup(ABC):
             validated_container_lst.append(container)
 
         # Source Control
-        if validated_container_lst and not bypass_sc:
-            sc_result = self.__export_source_control_proc(validated_container_lst)
+        source_control = prefs().sourcecontrol
+        gltfs_with_untracked_buffers: set[Path] = set()
+        if (validated_container_lst and not bypass_sc and source_control.source_control_enable
+                and source_control.source_control_solution == 'perforce'):
+            sc_result, gltfs_with_untracked_buffers = self.__prepare_perforce_export(validated_container_lst)
             if not sc_result:
-                if prefs().sourcecontrol.source_control_error_aborts_exp:
+                if source_control.source_control_error_aborts_exp:
                     msg = 'There were errors checking out file(s), aborting export!'
                     log(Severity.ERROR, self.CONTAINERS_NAME, msg)
                     return False
@@ -93,6 +100,18 @@ class ContainerGroup(ABC):
                 success: bool = container.export_proc()
                 if not success:
                     continue
+
+                if container.path in gltfs_with_untracked_buffers:
+                    try:
+                        buffer = self.__exported_buffer(container.path)
+                        if buffer is not None:
+                            if not exec_p4_arguments(['add', '-t', 'binary', str(buffer)]).success:
+                                raise RuntimeError(f'Perforce could not open {buffer.name} for add.')
+                            gltfs_with_untracked_buffers.remove(container.path)
+                    except (OSError, ValueError, RuntimeError) as error:
+                        log(Severity.ERROR, self.CONTAINERS_NAME, f'glTF buffer: {error}')
+                        if source_control.source_control_error_aborts_exp:
+                            return False
 
                 # Post-export validation hook.
                 if not self.__run_post_export_override(container):
@@ -266,19 +285,45 @@ class ContainerGroup(ABC):
                     f'must be a StringProperty, but its Blender RNA type is "{prop.type}".'
                 )
 
-    def __export_source_control_proc(self, container_lst: List[Container]):
-        """
-        Handle source control steps required before export for the provided containers.
-        """
-        if not prefs().sourcecontrol.source_control_enable:
-            return True
+    def __prepare_perforce_export(self, containers: list[Container]) -> tuple[bool, set[Path]]:
+        paths = dict.fromkeys(container.path for container in containers)
+        gltfs = [path for path in paths if path.suffix.lower() == '.gltf']
+        gltfs_with_untracked_buffers = set()
+        if gltfs:
+            # Resolve the configured workspace before querying possible buffers.
+            if not P4Info().is_server_accessible():
+                return False, set()
+            companions = P4FileGroup()
+            for path in gltfs:
+                companions.append_p4_file_to_group_from_client_file(str(path.with_suffix('.bin')))
+            if not companions.update_fields_client_n_depot():
+                return False, set()
+            for path, file in zip(gltfs, companions.get_p4_file_lst(), strict=True):
+                if file.status == P4FileStatus.NOT_ADDED:
+                    gltfs_with_untracked_buffers.add(path)
+                else:
+                    paths[path.with_suffix('.bin')] = None
 
-        match prefs().sourcecontrol.source_control_solution:
-            case 'perforce':
-                p4_file_grp_cls = P4FileGroup()
-                for container in container_lst:
-                    p4_file_grp_cls.append_p4_file_to_group_from_client_file(str(container.path))
-                return p4_file_grp_cls.open_for_edit()
+        batch = P4FileGroup()
+        for path in paths:
+            batch.append_p4_file_to_group_from_client_file(str(path))
+        if not batch.open_for_edit():
+            return False, set()
+        return True, gltfs_with_untracked_buffers
 
-            case _:
-                return True  # For now other solutions do not require manual work.
+    @staticmethod
+    def __exported_buffer(gltf_path: Path) -> Path | None:
+        # Bufferless exports can leave a same-named .bin from an earlier export.
+        # Only the manifest identifies the companion for this export.
+        buffer = gltf_path.with_suffix('.bin')
+        try:
+            with gltf_path.open(encoding='utf-8') as stream:
+                document = json.load(stream)
+            for entry in document.get('buffers', ()):
+                if unquote(entry.get('uri', '')) == buffer.name:
+                    if buffer.stat().st_size == entry['byteLength'] > 0:
+                        return buffer
+                    raise ValueError(f'{buffer.name} does not match the exported glTF buffer length.')
+        except (AttributeError, TypeError, KeyError) as error:
+            raise ValueError(f'Could not read the exported buffers in {gltf_path.name}.') from error
+        return None
