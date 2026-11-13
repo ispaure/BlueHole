@@ -413,15 +413,16 @@ cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
 
 Required native work includes a positive cursor-effect control, Image framing/pan/zoom, the axis reference readiness
 check, remaining ordinary clusters,
-and focused middle-mouse/subtract and modal/tool probes. G behavior and production persistence are accepted; composed UV/global
+and focused middle-mouse and modal/tool probes. G behavior and production persistence are accepted; composed UV/global
 parity remains. Existing proofs need no broader
 rerun unless affected source changes.
 
-Of 140 active full-side delta candidates, 35 have implemented declarations:
+Of 140 active full-side delta candidates, 36 have implemented declarations:
 thirteen framing, six UV selection additions, four Circle inputs and twelve
-ordinary declarations accepted through explicit mechanism reuse. Exactly eight UV-specific Q,
+ordinary declarations accepted through explicit mechanism reuse, plus Object
+Subtract Selection accepted after batch31. Exactly eight UV-specific Q,
 loop/linked and Tweak fallback rows were explicitly transferred to 04. The
-remaining 97 stay with 03: 10 ordinary candidates (nine declarations still draft), 70 currently
+remaining 96 stay with 03: 10 ordinary candidates (nine declarations still draft), 69 currently
 unsupported or unproved handler/modal/tool/replacement cases, 13 observations of
 active-role absence, and four conflicting bindings. Active-role absence alone
 does not prove unavailability. Each has row-specific next steps in the refreshed
@@ -456,9 +457,9 @@ saved preference inputs and their manifests were removed after verified readers.
 The corrected File Browser/Preview control cluster also passed using owned
 scrollable content and visible-region coordinates.
 
-The ignored mechanism plan partitions all 97 remaining IDs into ordinary
+The current mechanism partition contains 96 remaining IDs: ordinary
 declarations (10), modal events (33), middle-mouse tool dispatch (19), selection
-replacement/fallback (22), navigation timing/context (5), release confirmation
+replacement/fallback (21), navigation timing/context (5), release confirmation
 (4), and conflicting reference intentions (4). Registration/persistence proof
 can be reused where source, selector and context warrant it. Twelve ordinary rows
 were explicitly approved for reuse. Ctrl-F1 retains its spot check. The two UV
@@ -640,8 +641,8 @@ Ctrl-LEFTMOUSE/CLICK declaration under a new independent Subtract Selection grou
 The approved source draft now registers that declaration through the existing
 ordinary action machinery, with its own Subtract Selection toggle and editable
 tab. Stock bindings and existing preferences remain unchanged. No shared runtime
-capability is added, and candidate accounting remains 35 implemented, eight
-transferred and 97 remaining until native production acceptance.
+capability is added. At the source-draft checkpoint, accounting remained
+35 implemented, eight transferred and 97 remaining pending native acceptance.
 
 The prepared `subtract_production` fixture runs six matched trials: selected and
 unselected targets with the group off, on, then off again. Each trial resets the
@@ -658,6 +659,30 @@ All 62 category tests pass. Offscreen scheduling validates six trials and 72
 fixture steps. Existing focused modes explicitly leave the new group off unless
 their fixture enables it; inspection still covers the default production catalog.
 Ordinary editable persistence reuses the accepted mechanism; this checkpoint
-does not claim a new native save/reopen run. One bounded factory production
-child is prepared and awaits exact allocation. Historical native receipts remain
-58 factory and 18 reference attempts, including the retained batch30 errors.
+does not claim a new native save/reopen run.
+
+Batch31 `subtract_production-1794568237865868000` completed in 50.5662 seconds
+at `f6498ac`. All six independently reset trials passed. Before enabling the
+group, Ctrl-click kept a selected target selected and selected an unselected
+target. With the group enabled, it deselected the selected target and left the
+unselected target unselected. Disabling the group restored both observed stock
+outcomes. Every trial verified input delivery at (2055,1229), a separately reset
+positive direct control and exact source/merged preservation. Direct controls
+returned FINISHED with PASS_THROUGH and produced actual deselection.
+
+Both actual production installs used the same legacy:Selection owner and
+`0:3D View:LEFTMOUSE:CLICK` request, with exact complete native binding admission.
+Both releases and final cleanup passed foreign preservation; the existing two
+live-proven Pipeline source generations were compared separately. Native
+unregister ended with zero owned/pending/tracked resources and a stopped watcher.
+The child PID and every owned temporary root were absent, and all44 frozen source
+hashes and protected inputs matched. The slot was released; no other child ran.
+
+This matched off/on/off comparison establishes the production group's effect
+in the tested Object-mode scene. It does not trace every internal handler or
+establish other modes/editors. The coordinator accepted this exact row with
+ordinary lifecycle reuse: accounting is now 36 implemented/eight transferred/96
+remaining. Native evidence now retains
+59 factory and18 reference attempts, with historical failures unchanged.
+All63 category tests pass, including a retained-evidence check of the six-case
+matrix, production ownership, exact preservation and native cleanup.

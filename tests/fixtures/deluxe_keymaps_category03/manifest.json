@@ -1620,9 +1620,9 @@
     }
   },
   "candidate_accounting": {
-    "implemented": 35,
+    "implemented": 36,
     "transferred_04": 8,
-    "remaining_03": 97
+    "remaining_03": 96
   },
   "ordinary_wheel_comparison": {
     "status": "synthetic dispatch unverified in both configurations; direct operators work",
@@ -2126,7 +2126,7 @@
     }
   },
   "object_subtract_route": {
-    "status": "approved source draft; actual production native acceptance pending",
+    "status": "accepted exact Object-mode production row",
     "row_id": "8674bcb4d856346f287980fd961ade31095f1165d1f6e25725e4c06b81f582f3",
     "binding": {
       "active": true,
@@ -2179,7 +2179,7 @@
     "registration": "existing ordinary ensure_action_keymaps / legacy:Selection",
     "stock_changes": false,
     "runtime_capability_changes": false,
-    "candidate_accounting_changed": false,
+    "candidate_accounting_changed": true,
     "native_mode": "subtract_production",
     "native_trial_sequence": [
       {
@@ -2214,6 +2214,260 @@
       }
     ],
     "persistence": "Reuse accepted ordinary declaration/editor/persistence mechanism; unchanged registration and edit identity. No additional save/reopen child proposed.",
-    "pending_acceptance": "Six same-point stock/on/off selected and unselected trials; exact actual ownership/admission; independent direct controls; two installs/releases; strict foreign preservation."
+    "native_result": {
+      "run": "subtract_production-1794568237865868000",
+      "checkpoint": "f6498ac9813dd3175c3058e4822623d85d7c5143",
+      "seconds": 50.5662,
+      "native_status": "complete",
+      "matrix": [
+        {
+          "case": "production_subtract_stock_before_selected",
+          "group_enabled": false,
+          "initial_selected": true,
+          "before_press": true,
+          "after_press": true,
+          "after_release": true,
+          "direct_reset": true,
+          "after_direct": false,
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "input_delivery": true,
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "production_subtract_stock_before_unselected",
+          "group_enabled": false,
+          "initial_selected": false,
+          "before_press": false,
+          "after_press": false,
+          "after_release": true,
+          "direct_reset": true,
+          "after_direct": false,
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "input_delivery": true,
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "production_subtract_enabled_selected",
+          "group_enabled": true,
+          "initial_selected": true,
+          "before_press": true,
+          "after_press": true,
+          "after_release": false,
+          "direct_reset": true,
+          "after_direct": false,
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "input_delivery": true,
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "production_subtract_enabled_unselected",
+          "group_enabled": true,
+          "initial_selected": false,
+          "before_press": false,
+          "after_press": false,
+          "after_release": false,
+          "direct_reset": true,
+          "after_direct": false,
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "input_delivery": true,
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "production_subtract_stock_after_selected",
+          "group_enabled": false,
+          "initial_selected": true,
+          "before_press": true,
+          "after_press": true,
+          "after_release": true,
+          "direct_reset": true,
+          "after_direct": false,
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "input_delivery": true,
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "production_subtract_stock_after_unselected",
+          "group_enabled": false,
+          "initial_selected": false,
+          "before_press": false,
+          "after_press": false,
+          "after_release": true,
+          "direct_reset": true,
+          "after_direct": false,
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "input_delivery": true,
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_trial_preservation": true
+        }
+      ],
+      "installs": [
+        {
+          "owner_id": "legacy:Selection:4f029d4d6ea4ec7051a9a8df2c88bceb1ebb968a5114e539efae2d270b18e81d",
+          "request_id": "0:3D View:LEFTMOUSE:CLICK",
+          "source_row": {
+            "target": "view3d.select",
+            "event": {
+              "type": "LEFTMOUSE",
+              "value": "CLICK",
+              "any": false,
+              "shift": 0,
+              "ctrl": 1,
+              "alt": 0,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "MOUSE"
+            },
+            "active": true,
+            "properties": {
+              "extend": false,
+              "deselect": true,
+              "toggle": false,
+              "deselect_all": false,
+              "select_passthrough": false,
+              "center": false,
+              "enumerate": false,
+              "object": false,
+              "location": [
+                0,
+                0
+              ]
+            },
+            "read_issues": {},
+            "is_user_defined": false,
+            "is_user_modified": false,
+            "blender_id": 1
+          },
+          "runtime_owned_valid": true,
+          "registered_pair_matches": 1
+        },
+        {
+          "owner_id": "legacy:Selection:4f029d4d6ea4ec7051a9a8df2c88bceb1ebb968a5114e539efae2d270b18e81d",
+          "request_id": "0:3D View:LEFTMOUSE:CLICK",
+          "source_row": {
+            "target": "view3d.select",
+            "event": {
+              "type": "LEFTMOUSE",
+              "value": "CLICK",
+              "any": false,
+              "shift": 0,
+              "ctrl": 1,
+              "alt": 0,
+              "oskey": 0,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "MOUSE"
+            },
+            "active": true,
+            "properties": {
+              "extend": false,
+              "deselect": true,
+              "toggle": false,
+              "deselect_all": false,
+              "select_passthrough": false,
+              "center": false,
+              "enumerate": false,
+              "object": false,
+              "location": [
+                0,
+                0
+              ]
+            },
+            "read_issues": {},
+            "is_user_defined": false,
+            "is_user_modified": false,
+            "blender_id": 1
+          },
+          "runtime_owned_valid": true,
+          "registered_pair_matches": 1
+        }
+      ],
+      "release_count": 3,
+      "release_preservation": [
+        true,
+        true,
+        true
+      ],
+      "cleanup_errors": [],
+      "native_cleanup": {
+        "checked": 224,
+        "created": 1439,
+        "removed": 1439,
+        "reinsertions": 0,
+        "features": 0,
+        "owned": 0,
+        "retained_edited": 0,
+        "pending_cleanup": 0,
+        "tracked_resources": 0
+      },
+      "watcher_stopped": true,
+      "owned_pid_absent": true,
+      "remaining_resources": [],
+      "protected_inputs_unchanged": true,
+      "all44_frozen_sources_exact": true,
+      "released_at_utc": "2026-11-13T11:11:51.743066+00:00",
+      "attribution": "Matched off/on/off behavior establishes the scoped production group effect: stock selects/keeps selected, enabled deselects/keeps unselected, stock behavior returns after disable. This does not trace every internal handler dispatch or establish other modes/editors."
+    },
+    "declaration": {
+      "group": "selection_subtract",
+      "action": "SELECTION_OBJECT_SUBTRACT",
+      "binding_index": 0
+    },
+    "acceptance": {
+      "approved_by": "01a1d36b-dbd5-7933-9457-8e055db2b96d",
+      "row_id": "8674bcb4d856346f287980fd961ade31095f1165d1f6e25725e4c06b81f582f3",
+      "production_run": "subtract_production-1794568237865868000",
+      "production_checkpoint": "f6498ac9813dd3175c3058e4822623d85d7c5143",
+      "dispatch_status": "verified_in_exact_context",
+      "accepted_context": "Object mode VIEW_3D/WINDOW; selected/unselected off/on/off at identical projected target point",
+      "ordinary_lifecycle_reused": true,
+      "new_persistence_run": false,
+      "limits": "Scoped group effect, not every internal handler invocation or other modes/editors; historical reference strict failure retained."
+    }
   }
 }
