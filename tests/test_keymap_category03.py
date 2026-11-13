@@ -12,6 +12,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from runtime_keymap_fakes import FakeItems, FakeRuntime, row
+from keymap_native_evidence import unpack_native
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -321,7 +322,7 @@ class Category03NativeReceiptTests(unittest.TestCase):
     def setUpClass(cls):
         cls.manifest = read_json(CATEGORY / 'manifest.json')
         cls.verification = cls.manifest['native_verification']
-        cls.native = read_json(CATEGORY / cls.verification['fixture'])
+        cls.native = unpack_native(read_json(CATEGORY / cls.verification['fixture']))
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
 
@@ -772,6 +773,83 @@ class Category03NativeReceiptTests(unittest.TestCase):
                              {'window': 1, 'editor': 1})
             self.assertEqual(case['input_delivery']['unmodified_wheel']['status'],
                              'observed_view_change')
+
+    def test_uv_repeat_candidate_dispatch_and_exact_release(self):
+        run = self.runs['uv_g_probe-1794549192779191000']
+        self.assertEqual(run['native_status'], 'complete')
+        proof = run['uv_repeat_probe']
+        self.assertEqual(len(proof['installations']), 2)
+        self.assertEqual(len(proof['releases']), 2)
+        for installation in proof['installations']:
+            self.assertEqual(installation['owned_count'], 1)
+            assignment = installation['assignment']
+            self.assertEqual(assignment['target']['idname'], 'screen.repeat_last')
+            self.assertEqual(assignment['scope']['name'], 'UV Editor')
+            self.assertEqual(assignment['scope']['space_type'], 'EMPTY')
+            self.assertEqual(assignment['scope']['region_type'], 'WINDOW')
+            self.assertEqual(assignment['event']['type'], 'G')
+            self.assertEqual(assignment['event']['value'], 'PRESS')
+            self.assertTrue(assignment['event']['repeat'])
+        for release in proof['releases']:
+            self.assertTrue(release['strict_preservation'])
+            self.assertTrue(release['owned_candidate_absent'])
+            self.assertEqual(release['source_and_foreign_merged_after'],
+                             proof['source_and_foreign_merged_before'])
+        cases = run['dispatch']
+        self.assertEqual([case['expectation'] for case in cases],
+                         ['empty_history', 'single_repeat', 'single_repeat', 'translate',
+                          'move_tool', 'translate', 'single_repeat'])
+        self.assertEqual(cases[0]['history_before_input'], [])
+        self.assertFalse(cases[0]['repeat_poll_before_input'])
+        self.assertEqual(cases[0]['history_after_input'], ['TRANSFORM_OT_translate'])
+        for case in cases:
+            if case['expectation'] == 'single_repeat':
+                expected = case['prior_rotation_control']['control_after']['selected_positions']
+                self.assertTrue(case['repeat_poll_before_input'])
+                for phase in ('after_key', 'during', 'after'):
+                    actual = case[phase]['selected_positions']
+                    self.assertEqual(len(actual), len(expected))
+                    for old, new in zip(expected, actual, strict=True):
+                        self.assertEqual(old[:2], new[:2])
+                        for x, y in zip(old[2:], new[2:], strict=True):
+                            self.assertAlmostEqual(x, y, places=6)
+            elif case['expectation'] == 'move_tool':
+                self.assertEqual(case['after']['tool'], 'builtin.move')
+                self.assertEqual(case['after']['selected_positions'], case['before']['selected_positions'])
+            else:
+                before = case['before']['selected_positions']
+                after = case['after']['selected_positions']
+                self.assertEqual(case['after_key']['selected_positions'], before)
+                deltas = [tuple(round(y-x, 6) for x, y in zip(old[2:], new[2:]))
+                          for old, new in zip(before, after, strict=True)]
+                self.assertEqual(len(set(deltas)), 1)
+                self.assertNotEqual(deltas[0], (0, 0))
+
+    def test_uv_repeat_failed_save_retains_only_aggregate_map_difference(self):
+        run = self.runs['uv_g_save-1794549373328440000']
+        self.assertEqual(run['native_status'], 'error')
+        self.assertIn('strict_preservation', run['error'])
+        proof = run['uv_repeat_probe']
+        self.assertTrue(proof['saved_edit']['immediate_save'])
+        self.assertFalse(proof['saved_edit']['active'])
+        self.assertEqual(proof['saved_edit']['event'], 'F20/PRESS')
+        release, = proof['releases']
+        self.assertTrue(release['owned_candidate_absent'])
+        self.assertFalse(release['strict_preservation'])
+        before, after = proof['source_and_foreign_merged_before'], release['source_and_foreign_merged_after']
+        for role in ('default', 'active', 'addon'):
+            self.assertEqual(before[role], after[role])
+        changes = 0
+        for old, new in zip(before['user'], after['user'], strict=True):
+            self.assertEqual({k: v for k, v in old.items() if k != 'is_user_modified'},
+                             {k: v for k, v in new.items() if k != 'is_user_modified'})
+            if old['is_user_modified'] != new['is_user_modified']:
+                changes += 1
+                self.assertEqual(old['scope']['name'], 'UV Editor')
+                self.assertEqual(len(old['items']), 105)
+                self.assertFalse(old['is_user_modified'])
+                self.assertTrue(new['is_user_modified'])
+        self.assertEqual(changes, 1)
 
 
 class Category03RegistrationTests(Category03Evidence, unittest.TestCase):

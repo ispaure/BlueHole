@@ -10,6 +10,10 @@ and `blender_keymap_category03_editors.py`
 fixtures prepare bounded reference/owned probes; they require the coordinated
 native input slot through the category driver. Native category verification is
 in progress; see the [category receipt](../docs/deluxe-keymaps-category03.md).
+`keymap_native_evidence.unpack_native()` expands the receipt's shared snapshots
+and verifies their hashes and the complete document hash. Full sanitized run
+receipts remain under ignored `test-results` with their hashes recorded in the
+checked-in receipt; packing removes duplication without dropping evidence fields.
 
 ## Deluxe runtime keymaps
 

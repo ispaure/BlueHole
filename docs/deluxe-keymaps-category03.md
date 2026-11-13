@@ -144,15 +144,20 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Twenty-seven category checks currently pass. They cover exact assigned IDs and
+Twenty-nine category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 28 factory attempts and twelve copied-reference attempts. A completed
+retains 30 factory attempts and twelve copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
+Repeated complete keymap/item snapshots are stored once by SHA-256 in this
+receipt. `tests/keymap_native_evidence.py` expands them and verifies every
+snapshot plus the complete expanded document before tests inspect it. No evidence
+fields are dropped. Full sanitized per-run receipts and their hashes also remain
+under ignored `test-results/deluxe-keymaps-category03/sanitized-native/`.
 
 ### Proven bounded behavior
 
@@ -236,8 +241,23 @@ could not distinguish repeat from fresh translation. Production G remains
 unchanged. Ownership is settled: 03 owns the exact local UV Translate selector and
 UV precedence, 05 owns Screen Repeat Last, 04 verifies UV composition and 06
 integrated parity. One isolated UV Editor G/PRESS → Repeat Last assignment through
-the existing runtime is authorized for preparation; native allocation and proof
-of histories, fallback, toggles and save/reopen remain required.
+the existing runtime passed seven native cases: known Rotate and Translate repeat
+exactly once immediately, subsequent motion does not start a new transform, empty
+history fails Repeat Last poll and falls through to Translate, W/Shift-W remain
+effective, and remove/reinstall restores the expected G behavior. Both releases
+preserved all captured source and foreign merged fields/order/readability.
+
+The subsequent immediate-save run edited only the owned merged G row to inactive
+F20, saved it, and removed the owned source. Strict snapshot equality failed
+solely because the merged UV map's aggregate `is_user_modified` changed from false
+to true. All 105 foreign UV rows, their item-level flags/values/order/readability,
+and default/active/addon maps matched. The failed receipt is retained, reopen was
+skipped, and the saved binary was removed. A prepared follow-up separates that
+aggregate marker from exact foreign-row/source comparisons, proves the intended
+owned source and user override, and binds a fresh-reader expectation to the saved
+preference hash. Brief 02 establishes native saved-diff restoration but does not
+explicitly test this aggregate marker. Production G remains unchanged until the
+scoped persistence proof and production check pass.
 
 Earlier G controls lacked repeat history, used stale BMesh data, had no rotation
 effect, or ended in a crash. Those attempts remain inconclusive. The latest
