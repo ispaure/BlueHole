@@ -119,6 +119,10 @@ class ProfileStore:
     def snapshot(self):
         return deepcopy(self._catalog)
 
+    def section_enabled(self, section):
+        """Whether the applied profile and current preferences enable a section."""
+        return self._allowed() and self.resolver.section_enabled(self._catalog, self._preferences(), section)
+
     def begin(self):
         require(not self._closed, 'Deluxe profile editor has been unloaded')
         return Draft(self, (self._generation, self._revision), self._catalog)

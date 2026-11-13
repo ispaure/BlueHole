@@ -325,17 +325,21 @@ class Resolver:
             field = _field(prop) if prop is not None else {'editable': False}
             require(field['editable'] and _valid_field(field, value), f'Invalid {name} value in {id_}')
 
+    @staticmethod
+    def section_enabled(catalog, preferences, section_id):
+        section = catalog['sections'].get(section_id)
+        if section is None:
+            return False
+        category = catalog['categories'][section['category']]
+        return section.get('required', False) or (
+            bool(preferences.keymap.enable_keymaps)
+            and category.get('enabled', True) and section.get('enabled', True)
+            and _switch(preferences, category.get('switch'))
+            and _switch(preferences, section.get('switch')))
+
     def plan(self, catalog, preferences):
-        enabled = bool(preferences.keymap.enable_keymaps)
         sections = catalog['sections']
-        categories = catalog['categories']
-        state = {}
-        for id_, section in sections.items():
-            category = categories[section['category']]
-            state[id_] = section.get('required', False) or (
-                enabled and category.get('enabled', True) and section.get('enabled', True)
-                and _switch(preferences, category.get('switch'))
-                and _switch(preferences, section.get('switch')))
+        state = {id_: self.section_enabled(catalog, preferences, id_) for id_ in sections}
         groups = {}
         commands = catalog['commands']
         for id_, row in sorted(catalog['assignments'].items(), key=lambda entry: entry[1]['order']):

@@ -160,6 +160,14 @@ def deluxe_profile():
     return _profile_store
 
 
+def deluxe_section_enabled(section):
+    """Report the applied section state when the Deluxe profile is available."""
+    try:
+        return deluxe_profile().section_enabled(section)
+    except ValueError:
+        return False
+
+
 def _install_profile(candidate, previous):
     """Apply through the same registrar and reject newly failed native work."""
     global _preference_state

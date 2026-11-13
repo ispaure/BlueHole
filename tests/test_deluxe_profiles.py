@@ -242,6 +242,22 @@ class ProfileTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Missing command'):
             self.store.validate(draft)
 
+    def test_section_state_uses_the_applied_profile_and_current_preferences(self):
+        draft = self.store.begin()
+        draft.update('sections', 'framing', enabled=False)
+        self.assertFalse(self.store.preview(draft)['sections']['framing'])
+        self.assertTrue(self.store.section_enabled('framing'))
+        self.store.apply(draft)
+        self.assertFalse(self.store.section_enabled('framing'))
+
+        draft = self.store.begin()
+        draft.update('sections', 'framing', enabled=True)
+        self.store.apply(draft)
+        self.assertTrue(self.store.section_enabled('framing'))
+        self.settings.keymap.enable_keymaps = False
+        self.assertFalse(self.store.section_enabled('framing'))
+        self.assertFalse(self.store.section_enabled('unknown'))
+
     def test_edit_metadata_and_enum_validation_use_rna(self):
         enum_items = [SimpleNamespace(identifier=name) for name in ('DESELECT', 'SELECT', 'TOGGLE')]
         action = SimpleNamespace(name='Action', type='ENUM', is_enum_flag=False, is_readonly=False,

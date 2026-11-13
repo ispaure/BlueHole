@@ -81,6 +81,12 @@ def draw(preference, context, layout):
             text='Requires Selection keymaps and Selection Tool Switch to be enabled.',
             icon='ERROR'
         )
+    elif preference.keymap.deluxe_configured:
+        from ....keymaps.keymaps_register import deluxe_section_enabled
+
+        selection_keymaps_ready = deluxe_section_enabled('selection.tool_switch')
+        if not selection_keymaps_ready:
+            box.label(text='Selection → Tool switch is inactive in the applied Deluxe profile.', icon='INFO')
 
     row = box.row()
     row.enabled = selection_keymaps_ready

@@ -81,6 +81,12 @@ def draw(preference, context, layout):
             text='Requires Transform keymaps and Transform Tools (Modal) to be enabled.',
             icon='ERROR'
         )
+    elif preference.keymap.deluxe_configured:
+        from ....keymaps.keymaps_register import deluxe_section_enabled
+
+        transform_keymaps_ready = deluxe_section_enabled('transform.tools_modal')
+        if not transform_keymaps_ready:
+            box.label(text='Transform → Modal tools is inactive in the applied Deluxe profile.', icon='INFO')
 
     row = box.row()
     row.enabled = transform_keymaps_ready
