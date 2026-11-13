@@ -13,8 +13,11 @@ and section menus browse one section at a time when search is empty.
   command, shortcut and keymap. To add a mapping, add or select a section,
   choose **Add Assignment**, and select those three entries. **New Shortcut**
   adds an input to the library for reuse in Assignment Settings.
-- The **Commands** tab shows configured variants and their assignment uses.
-  Edit a field there to change all uses. The assignment inspector also offers
+- The **Commands** tab has its own category and section filters based on where
+  each command is used. **All Categories** includes unused commands. The
+  selected command shows configured settings and additional Blender settings
+  discovered from the operator. Edit a field there to change all uses, or
+  choose **Use Blender default** to remove its explicit value. The assignment inspector also offers
   **This assignment only** in the field dialog, which clones the command.
   Boolean, integer, float, string, enum, enum-flag and fixed numeric array
   controls follow the resolver's RNA metadata. Flag and array controls edit

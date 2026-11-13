@@ -51,8 +51,9 @@ def _operator_rna(idname):
 
 def _field(prop):
     kind = prop.type
-    if kind not in {'BOOLEAN', 'INT', 'FLOAT', 'ENUM', 'STRING'}:
-        return {'type': kind, 'editable': False}
+    if (kind not in {'BOOLEAN', 'INT', 'FLOAT', 'ENUM', 'STRING'}
+            or getattr(prop, 'is_hidden', False) or getattr(prop, 'is_skip_save', False)):
+        return {'label': prop.name, 'type': kind, 'editable': False}
     array = getattr(prop, 'is_array', False)
     flags = kind == 'ENUM' and prop.is_enum_flag
     if array:
@@ -230,7 +231,7 @@ class Resolver:
                                    for row in defaults['assignments'].values()}
         self.scopes = {scope_descriptor(row['scope']) for row in defaults['assignments'].values()}
 
-    def describe_command(self, command):
+    def describe_command(self, command, *, include_unset=False):
         if 'modal_value' in command:
             return {'label': command['modal_value'], 'owner': 'Blender', 'dependency': None,
                     'availability': 'available', 'editable': False, 'fields': {}}
@@ -241,11 +242,20 @@ class Resolver:
         locked = idname in ROUTING_OPERATORS or provider is not None or '.bh_' in idname
         editable = rna is not None and not locked
         fields = {}
+        properties = command['properties']
         if rna is not None:
-            for name, value in command['properties'].items():
+            names = dict.fromkeys(properties)
+            if include_unset and editable:
+                names.update(dict.fromkeys(name for name in rna.properties.keys() if name != 'rna_type'))
+            for name in names:
                 prop = rna.properties.get(name)
+                if name not in properties and (prop is None or getattr(prop, 'is_hidden', False)
+                                               or getattr(prop, 'is_skip_save', False)):
+                    continue
                 field = _field(prop) if prop is not None else {'editable': False, 'type': 'UNKNOWN'}
+                value = properties.get(name, field.get('default'))
                 field['editable'] = editable and field['editable'] and _valid_field(field, value)
+                field['explicit'] = name in properties
                 fields[name] = field
         if rna is None:
             fields = {name: {'editable': False, 'type': 'UNAVAILABLE'} for name in command['properties']}
@@ -301,14 +311,13 @@ class Resolver:
             return
         require(idname not in ROUTING_OPERATORS and '.bh_' not in idname and not row.get('provider'),
                 f'Command {id_} is code-managed')
-        allowed_fields = {key for variant in variants for key in variant['properties']}
+        rna = _operator_rna(idname)
         for name, value in row['properties'].items():
-            require(name in allowed_fields, f'Unknown editable field {name} in {id_}')
             if any(name in variant['properties'] and same_value(value, variant['properties'][name])
                    for variant in variants):
                 continue
-            rna = _operator_rna(idname)
             prop = rna.properties.get(name) if rna is not None else None
+            require(prop is not None and name != 'rna_type', f'Unknown editable field {name} in {id_}')
             field = _field(prop) if prop is not None else {'editable': False}
             require(field['editable'] and _valid_field(field, value), f'Invalid {name} value in {id_}')
 

@@ -99,8 +99,11 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             def show(current):
                 view = state(context)
                 view.tab = 'COMMANDS'
-                view.search = command_name(current, current.catalog['assignments'][self.target]['command'])
-                current.command = current.catalog['assignments'][self.target]['command']
+                assignment = current.catalog['assignments'][self.target]
+                current.command_section = assignment['section']
+                current.command_category = current.catalog['sections'][assignment['section']]['category']
+                current.command = assignment['command']
+                view.search = command_name(current, current.command)
 
             return self.run(context, show)
         return super().execute(context)
@@ -118,6 +121,12 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.changed('Shipped defaults staged')
         elif action == 'category':
             current.category, current.section, current.assignment = target, '', ''
+            current.page = 0
+        elif action == 'command_category':
+            current.command_category, current.command_section = target, ''
+            current.page = 0
+        elif action == 'command_section':
+            current.command_section = target
             current.page = 0
         elif action in {'section', 'assignment', 'command'}:
             setattr(current, action, target)
@@ -419,14 +428,15 @@ class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):
     string: StringProperty(options=TRANSIENT)
     option: EnumProperty(items=lambda self, _: enum_items(self, 'values'), options=TRANSIENT)
     enabled: BoolProperty(name='Flag enabled', options=TRANSIENT)
+    use_default: BoolProperty(name='Use Blender default', options=TRANSIENT)
 
     def invoke(self, context, _event):
         current = editor()
         row = current.catalog['commands'][self.command]
-        self._meta = current.preview()['commands'][self.command]['fields'][self.field]
+        self._meta = current.store.resolver.describe_command(row, include_unset=True)['fields'][self.field]
         if not self._meta['editable']:
             return {'CANCELLED'}
-        self._value = row['properties'][self.field]
+        self._value = row['properties'].get(self.field, self._meta['default'])
         self._draft = current.draft
         self._choices = {'values': choices((value, title(value), '') for value in self._meta['values'])}
         bind_choices(self, self._choices)
@@ -478,14 +488,22 @@ class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):
             if ids:
                 draw_uses(self.layout, current, 'commands', ids[0])
         self.layout.label(text='Blender default: ' + display_value(self._meta['default']))
+        if self._meta['explicit']:
+            self.layout.prop(self, 'use_default')
+        controls = self.layout.column()
+        controls.enabled = not self.use_default
         if self._meta['shape'] or self._meta['flags']:
-            self.layout.prop(self, 'component', text='Flag' if self._meta['flags'] else 'Component')
+            controls.prop(self, 'component', text='Flag' if self._meta['flags'] else 'Component')
             self.select_component(_context)
         name = 'enabled' if self._meta['flags'] else self._property
-        self.layout.prop(self, name, text=self._meta['label'])
+        controls.prop(self, name, text=self._meta['label'])
 
     def stage(self, current):
         require(current.draft is self._draft, 'The draft changed. Reopen the command setting.')
+        assignment = self.assignment if self.single else ''
+        if self.use_default:
+            current.edit_command(self.command, self.field, None, assignment, unset=True)
+            return
         if self._meta['flags']:
             flags = set(self._value)
             if self.enabled:
@@ -503,7 +521,7 @@ class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):
             value = updated
         else:
             value = getattr(self, self._property)
-        current.edit_command(self.command, self.field, value, self.assignment if self.single else '')
+        current.edit_command(self.command, self.field, value, assignment)
 
 
 def operator_button(layout, action, text='', target='', **kwargs):

@@ -66,6 +66,34 @@ class EditorTests(unittest.TestCase):
         self.assertEqual(editor.preview()['commands']['provider-fit']['availability'], 'waiting_for_provider')
         self.assertFalse(editor.preview()['assignments']['uv-provider-fit']['eligible'])
 
+    def test_command_filters_follow_assignment_sections(self):
+        editor = self.editor
+        self.assertIn('select-none', editor.command_ids())
+        editor.command_category = 'navigation'
+        self.assertEqual(editor.command_ids(), {'frame-selected', 'frame-all-regions'})
+        editor.command_section = 'overview'
+        self.assertEqual(editor.command_ids(), {'frame-all-regions'})
+
+    def test_unset_rna_setting_can_be_overridden_then_returned_to_default(self):
+        setting = SimpleNamespace(name='New setting', type='INT', is_readonly=False,
+                                  default=2, hard_min=1, hard_max=5)
+        self.h.runtime.bpy.ops = SimpleNamespace(view3d=SimpleNamespace(
+            view_selected=SimpleNamespace(get_rna_type=lambda: SimpleNamespace(
+                name='Frame Selected', properties={'segments': setting}))))
+        editor = self.editor
+        command = editor.catalog['commands']['frame-selected']
+        fields = editor.store.resolver.describe_command(command, include_unset=True)['fields']
+        self.assertEqual(fields['segments']['default'], 2)
+        self.assertFalse(fields['segments']['explicit'])
+        self.assertTrue(fields['segments']['editable'])
+        with self.assertRaisesRegex(ValueError, 'Invalid segments'):
+            editor.edit_command('frame-selected', 'segments', 6)
+        editor.edit_command('frame-selected', 'segments', 3)
+        editor.apply()
+        self.assertEqual(editor.catalog['commands']['frame-selected']['properties']['segments'], 3)
+        editor.edit_command('frame-selected', 'segments', None, unset=True)
+        self.assertNotIn('segments', editor.catalog['commands']['frame-selected']['properties'])
+
     def test_two_similar_bindings_are_distinct_in_staged_rules(self):
         editor = self.editor
         source = self.h.runtime.map('default', 'Object Mode', space='EMPTY', tool=False)

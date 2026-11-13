@@ -1,5 +1,6 @@
 """Draft operations and display values for the Deluxe Preferences editor."""
 
+from struct import pack, unpack
 from time import monotonic
 from uuid import uuid4
 
@@ -89,6 +90,8 @@ class Editor:
         self.section = ''
         self.assignment = ''
         self.command = ''
+        self.command_category = ''
+        self.command_section = ''
         self.page = 0
         self.message = ''
         self.dirty = False
@@ -178,12 +181,39 @@ class Editor:
         self.draft.put('events', event_id, event)
         self.changed()
 
-    def edit_command(self, command_id, field, value, assignment=''):
+    def command_ids(self):
+        """Filter reusable commands by assignment or rule usage."""
+        if not self.command_category:
+            return self.catalog['commands'].keys()
+        sections = set(self.sections(self.command_category))
+        if self.command_section:
+            sections.intersection_update({self.command_section})
+        return {
+            row[key] for table, key in (('assignments', 'command'), ('suppressions', 'replacement'))
+            for row in self.catalog[table].values() if row['section'] in sections and key in row
+        }
+
+    def edit_command(self, command_id, field, value, assignment='', *, unset=False):
         original = self.catalog['commands'][command_id]
-        metadata = self.store.resolver.describe_command(original)['fields'].get(field, {})
+        metadata = self.store.resolver.describe_command(original, include_unset=True)['fields'].get(field, {})
         require(metadata.get('editable'), 'This command field is read-only')
-        updated = {**original, 'properties': {**original['properties'], field: value}}
+        properties = dict(original['properties'])
+        if unset:
+            properties.pop(field, None)
+        else:
+            properties[field] = value
+        if same_value(properties, original['properties']):
+            return
+        updated = {**original, 'properties': properties}
         self.store.resolver.validate_command(updated, command_id)
+        if not unset and metadata['type'] == 'FLOAT':
+            # RNA stores floats as float32. Persist the value Blender will read back.
+            def native_float(part):
+                if isinstance(part, list):
+                    return [native_float(item) for item in part]
+                return unpack('f', pack('f', part))[0]
+
+            properties[field] = native_float(value)
         if assignment:
             self.require_editable_assignment(assignment)
             require(self.catalog['assignments'][assignment]['command'] == command_id,

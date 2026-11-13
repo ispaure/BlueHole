@@ -50,6 +50,29 @@ class BH_MT_deluxe_sections(bpy.types.Menu):
                                 icon='CHECKMARK' if id_ == current.section else 'NONE')
 
 
+class BH_MT_deluxe_command_categories(bpy.types.Menu):
+    bl_label = 'Command Category'
+
+    def draw(self, _context):
+        current = ops.editor()
+        ops.operator_button(self.layout, 'command_category', 'All Categories')
+        for id_, row in current.catalog['categories'].items():
+            ops.operator_button(self.layout, 'command_category', row['label'], id_,
+                                icon='CHECKMARK' if id_ == current.command_category else 'NONE')
+
+
+class BH_MT_deluxe_command_sections(bpy.types.Menu):
+    bl_label = 'Command Section'
+
+    def draw(self, _context):
+        current = ops.editor()
+        ops.operator_button(self.layout, 'command_section', 'All Sections')
+        for id_ in current.sections(current.command_category):
+            row = current.catalog['sections'][id_]
+            ops.operator_button(self.layout, 'command_section', row['label'], id_,
+                                icon='CHECKMARK' if id_ == current.command_section else 'NONE')
+
+
 def toggle(layout, table, id_, row, *, required=False):
     button = layout.row(align=True)
     button.enabled = not required
@@ -211,31 +234,58 @@ def inspector(layout, current, preview, id_):
 
 
 def command_fields(layout, current, preview, id_, assignment=''):
-    meta = preview['commands'][id_]
-    properties = current.catalog['commands'][id_].get('properties', {})
-    if not properties:
-        return
-    for name, value in properties.items():
-        field = meta['fields'].get(name, {})
-        row = layout.row(align=True)
-        label = f"{field.get('label', title(name))}: {display_value(value)}"
-        if field.get('editable'):
-            op = row.operator(ops.BH_OT_deluxe_field.bl_idname, text=label, icon='GREASEPENCIL')
-            op.command, op.field, op.assignment = id_, name, assignment
-        else:
-            row.label(text=label, icon='LOCKED')
-    if properties and not meta['editable']:
-        layout.label(text='Command settings are managed by Blender, Blue Hole, or its add-on')
+    command = current.catalog['commands'][id_]
+    meta = (preview['commands'][id_] if assignment else
+            current.store.resolver.describe_command(command, include_unset=True))
+    properties = command.get('properties', {})
+    fields = meta['fields']
+    for explicit, heading in ((True, 'Configured Settings'), (False, 'Additional Blender Settings')):
+        names = [name for name in fields if (name in properties) == explicit]
+        if not names:
+            continue
+        group = layout.column(align=True)
+        if not assignment:
+            group.label(text=heading)
+        for name in names:
+            field = fields[name]
+            value = properties.get(name, field.get('default'))
+            label = field.get('label', title(name))
+            if value is not None:
+                label += ': ' + display_value(value)
+            if not explicit and value is not None:
+                label += ' (default)'
+            if field.get('editable'):
+                op = group.operator(ops.BH_OT_deluxe_field.bl_idname, text=label, icon='GREASEPENCIL')
+                op.command, op.field, op.assignment = id_, name, assignment
+            else:
+                group.label(text=label, icon='LOCKED')
+    if not meta['editable'] and not assignment:
+        layout.label(text='No editable settings for this command', icon='INFO')
 
 
 def commands(layout, current, preview, query):
+    categories = current.catalog['categories']
+    if current.command_category not in categories:
+        current.command_category, current.command_section = '', ''
+    if current.command_section not in current.sections(current.command_category):
+        current.command_section = ''
+    row = layout.row(align=True)
+    category = categories.get(current.command_category, {})
+    section = current.catalog['sections'].get(current.command_section, {})
+    row.menu(BH_MT_deluxe_command_categories.__name__,
+             text=category.get('label', 'All Categories'), icon='DOWNARROW_HLT')
+    section_menu = row.row(align=True)
+    section_menu.enabled = bool(current.command_category)
+    section_menu.menu(BH_MT_deluxe_command_sections.__name__,
+                      text=section.get('label', 'All Sections'), icon='DOWNARROW_HLT')
     found = []
-    for id_, meta in preview['commands'].items():
+    for id_ in current.command_ids():
+        meta = preview['commands'][id_]
         name = ops.command_name(current, id_)
         command = current.catalog['commands'][id_]
         if find(f"{name} {meta['owner']} {command.get('operator', '')}", query):
             found.append((id_, name, meta))
-    found.sort(key=lambda item: item[1].casefold())
+    found.sort(key=lambda item: (item[1].casefold(), item[0]))
     shown = paginate(layout, current, found)
     if current.command not in {item[0] for item in shown}:
         current.command = shown[0][0] if shown else ''
@@ -335,7 +385,8 @@ def transaction_controls(layout, current):
         layout.label(text=messages.get(current.store.load_issue, 'Profile recovery required'), icon='ERROR')
 
 
-classes = (BH_MT_deluxe_categories, BH_MT_deluxe_sections)
+classes = (BH_MT_deluxe_categories, BH_MT_deluxe_sections,
+           BH_MT_deluxe_command_categories, BH_MT_deluxe_command_sections)
 
 
 def register():

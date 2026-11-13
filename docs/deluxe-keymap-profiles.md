@@ -17,6 +17,9 @@ code-managed. Commands with different property values retain distinct IDs.
 Menu, tool and context routes, Blue Hole operator behavior, and provider-managed
 fields are read-only. The resolver exposes Blender RNA labels, types, defaults,
 allowed enum identifiers, flags, array dimensions and limits for editable fields.
+Call `store.resolver.describe_command(command, include_unset=True)` to include
+settings available from the known operator's live RNA. Values inherited from
+Blender stay absent from the profile until explicitly set.
 
 ## Editor API
 
