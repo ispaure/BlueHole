@@ -11,7 +11,6 @@ from ....keymaps.deluxe_schema import same_value
 
 PAGE_SIZE = 8
 DETAIL_PANE_MIN_WIDTH = 480
-ASSIGNMENT_SOURCE_SPLIT = 0.62
 
 
 def find(text, query):
@@ -202,8 +201,7 @@ def assignments(layout, current, preview, query, *, side_by_side, search_keys=Fa
         row = layout.row(align=True)
         row.operator(ops.BH_OT_deluxe_mapping.bl_idname, text='Add Assignment', icon='ADD')
         row.operator(ops.BH_OT_deluxe_shortcut.bl_idname, text='New Shortcut', icon='EVENT_A')
-        row.operator(ops.BH_OT_deluxe_binding_picker.bl_idname,
-                     text='Disable Existing Shortcut', icon='X').section = current.section
+        row.operator(ops.BH_OT_deluxe_binding_picker.bl_idname, icon='VIEWZOOM').section = current.section
     found = []
     matches_key = None
     if query and search_keys:
@@ -231,24 +229,12 @@ def assignments(layout, current, preview, query, *, side_by_side, search_keys=Fa
         shown = paginate(listing, current, found)
         if current.assignment not in {item[0] for item in shown}:
             current.assignment = shown[0][0]
-        if side_by_side:
-            heading = listing.split(factor=ASSIGNMENT_SOURCE_SPLIT, align=True)
-            heading.label(text='Assignment')
-            heading.label(text='Source')
         for id_, command, event, scope, meta in shown:
             item = listing.column(align=True)
-            header = item.split(factor=ASSIGNMENT_SOURCE_SPLIT, align=True) if side_by_side else item
-            ops.operator_button(header, 'assignment', command, id_, depress=id_ == current.assignment)
-            summary = f'{event}  ·  {scope}'
-            owner = meta['owner']
-            waiting = meta['availability'] == 'waiting_for_provider'
-            if side_by_side:
-                header.label(text=owner, icon='ERROR' if waiting else 'NONE')
-            else:
-                summary = f'{owner}  ·  {summary}'
-            item.label(text=summary)
-            if waiting:
-                item.label(text=STATUS_LABELS['waiting_for_provider'], icon='ERROR' if not side_by_side else 'NONE')
+            ops.operator_button(item, 'assignment', command, id_, depress=id_ == current.assignment)
+            item.label(text=f'{event}  ·  {scope}')
+            if meta['availability'] == 'waiting_for_provider':
+                item.label(text=f"Waiting for {meta['dependency']}", icon='ERROR')
         inspector(detail.box().column(align=True), current, preview, current.assignment)
     else:
         current.assignment = ''
@@ -264,7 +250,6 @@ def inspector(layout, current, preview, id_):
     event = current.catalog['events'][row['event']]
     identity = layout.row()
     identity.label(text=meta['label'])
-    identity.label(text=meta['owner'])
     command = current.catalog['commands'][row['command']]
     identity = layout.row()
     identity.label(text=command.get('operator', ''))
@@ -293,7 +278,11 @@ def inspector(layout, current, preview, id_):
         scope_row.label(text=scope, icon='LOCKED')
     if not state['eligible'] or not state['active']:
         layout.label(text='Inactive', icon='INFO')
-    if meta['availability'] != 'available':
+    if meta['availability'] == 'waiting_for_provider':
+        layout.label(text=f"Waiting for {meta['dependency']}", icon='ERROR')
+    elif meta['dependency']:
+        layout.label(text=f"Requires {meta['dependency']}", icon='INFO')
+    elif meta['availability'] != 'available':
         layout.label(text=STATUS_LABELS[meta['availability']], icon='ERROR')
     elif state['eligible'] and state['active'] and not state['registered'] and id_ in current.saved['assignments']:
         layout.label(text='Waiting for runtime registration' if current.dirty
@@ -313,7 +302,7 @@ def inspector(layout, current, preview, id_):
     toggle(actions, 'assignments', id_, row)
     actions.operator(ops.BH_OT_deluxe_shortcut.bl_idname, text='Advanced Shortcut', emboss=False).assignment = id_
     actions.operator(ops.BH_OT_deluxe_mapping.bl_idname, text='Assignment Settings', emboss=False).assignment = id_
-    ops.operator_button(actions, 'remove_assignment', '', id_, icon='TRASH', emboss=False)
+    actions.operator(ops.BH_OT_deluxe_remove_assignment.bl_idname, text='', icon='TRASH', emboss=False).assignment = id_
     if len(linked) > 1:
         view = ops.state(bpy.context)
         shared = layout.row(align=True)

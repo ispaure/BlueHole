@@ -277,10 +277,13 @@ class Resolver:
         if rna is None:
             fields = {name: {'editable': False, 'type': 'UNAVAILABLE'} for name in command['properties']}
         label = (rna.name if rna is not None else idname) or idname
+        owner = provider or ('Blue Hole' if '.bh_' in idname else 'Blender')
         if idname in {'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel'}:
             name = command['properties']['name']
             label = getattr(getattr(bpy.types, name, None), 'bl_label', None) or name
-        return {'label': label, 'owner': provider or ('Blue Hole' if '.bh_' in idname else 'Blender'),
+            if name.startswith('BLUEHOLE_'):
+                owner = 'Blue Hole'
+        return {'label': label, 'owner': owner,
                 'dependency': provider, 'availability': ('available' if rna is not None
                                                            else 'waiting_for_provider' if provider
                                                            else 'unavailable'),

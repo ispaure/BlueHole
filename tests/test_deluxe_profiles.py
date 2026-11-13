@@ -152,6 +152,17 @@ class ProfileTests(unittest.TestCase):
             self.assertEqual(meta['owner'], provider)
             self.assertEqual(meta['availability'], 'waiting_for_provider')
 
+    def test_command_owner_follows_blue_hole_menu_target(self):
+        catalog = read(DEFAULTS)
+        resolver = self.resolver.Resolver(catalog)
+        commands = catalog['commands']
+        self.runtime.bpy.types = SimpleNamespace()
+        menu = next(row for row in commands.values()
+                    if row['properties'].get('name') == 'BLUEHOLE_MT_pie_UV_cursor')
+        self.assertEqual(resolver.describe_command(menu)['owner'], 'Blue Hole')
+        self.assertEqual(resolver.describe_command(commands['view3d-view-selected-aa07ccdbfcd2'])['owner'],
+                         'Blender')
+
     def test_round_trip_shared_edit_clone_and_group_crud(self):
         draft = self.store.begin()
         self.assertEqual(draft.uses('events', 'frame'), ('view-frame', 'image-frame'))

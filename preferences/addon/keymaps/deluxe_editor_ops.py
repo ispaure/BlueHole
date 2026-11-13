@@ -22,6 +22,27 @@ ERRORS = (ValueError, KeyError, IndexError, OSError, RuntimeError, ReferenceErro
 HIDDEN = {'HIDDEN', 'SKIP_SAVE'}
 TRANSIENT = {'SKIP_SAVE'}
 
+EDIT_DESCRIPTIONS = {
+    'apply': 'Save the draft to the Blue Hole keymap catalog and update the active keymaps',
+    'discard': 'Discard staged edits and return to the last applied profile',
+    'reload': 'Reload the keymap catalog from disk and discard staged edits',
+    'reset': 'Stage the catalog loaded when the editor opened',
+    'category': 'Browse assignments in this category',
+    'section': 'Browse assignments in this section',
+    'assignment': 'Show the shortcut and settings for this assignment',
+    'command': 'Show this command’s settings and the sections that use it',
+    'show_command': 'Open the command used by this assignment',
+    'show_section_commands': 'Show commands used in this section',
+    'show_assignments': 'Open the Assignments tab for this section',
+    'delete_section': 'Remove this empty section from the draft. Apply Changes saves the removal',
+    'remove_rule': 'Remove this existing-shortcut rule from the draft. Apply Changes saves the removal',
+}
+TOGGLE_TARGETS = {'categories': 'category', 'sections': 'section',
+                  'assignments': 'assignment', 'suppressions': 'rule'}
+MODIFIER_STATES = [('0', 'Off', 'Require this modifier to be released'),
+                   ('1', 'On', 'Require this modifier to be held'),
+                   ('-1', 'Either', 'Match whether or not this modifier is held')]
+
 
 def editor():
     global _editor
@@ -96,11 +117,13 @@ class BH_PG_deluxe_value(bpy.types.PropertyGroup):
     assignment: StringProperty(options=HIDDEN)
     field: StringProperty(options=HIDDEN)
     choices_key: StringProperty(options=HIDDEN)
-    boolean: BoolProperty(update=inline_update('boolean'), options=TRANSIENT)
-    integer: IntProperty(update=inline_update('integer'), options=TRANSIENT)
-    number: FloatProperty(update=inline_update('number'), precision=6, options=TRANSIENT)
-    string: StringProperty(update=inline_update('string'), options=TRANSIENT)
-    option: EnumProperty(items=inline_options, update=inline_update('option'), options=TRANSIENT)
+    boolean: BoolProperty(description='Stage a change to this setting', update=inline_update('boolean'), options=TRANSIENT)
+    integer: IntProperty(description='Stage a value for the shared command', update=inline_update('integer'), options=TRANSIENT)
+    number: FloatProperty(description='Stage a value for the shared command', update=inline_update('number'),
+                          precision=6, options=TRANSIENT)
+    string: StringProperty(description='Stage a value for the shared command', update=inline_update('string'), options=TRANSIENT)
+    option: EnumProperty(description='Stage a choice for this setting', items=inline_options,
+                         update=inline_update('option'), options=TRANSIENT)
 
 
 class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
@@ -119,14 +142,20 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
     search_mode: EnumProperty(items=[('NAME', 'Name', 'Search for a command or keymap name'),
                                     ('KEY', 'Key-Binding', 'Type a shortcut, such as Shift F10')],
                               options=TRANSIENT, update=switch_tab)
-    search: StringProperty(name='Search', options=TRANSIENT, update=reset_page)
-    show_shared_uses: BoolProperty(name='Show linked assignments', options=TRANSIENT)
-    show_extra_fields: BoolProperty(name='Show additional Blender settings', options=TRANSIENT)
-    live_search: StringProperty(name='Search current bindings', options=TRANSIENT,
+    search: StringProperty(name='Search', description='Filter the current list using the selected search mode',
+                           options=TRANSIENT, update=reset_page)
+    show_shared_uses: BoolProperty(name='Show linked assignments',
+                                   description='Show where this shortcut is shared and the option to change it for all linked assignments',
+                                   options=TRANSIENT)
+    show_extra_fields: BoolProperty(name='Show additional Blender settings',
+                                    description='Show command settings that currently use Blender’s defaults', options=TRANSIENT)
+    live_search: StringProperty(name='Search current bindings',
+                                description='Filter existing bindings by command, shortcut or keymap name', options=TRANSIENT,
                                 update=lambda self, _context: setattr(self, 'live_page', 0))
-    live_source: EnumProperty(name='Source', items=[(key, label, '') for key, label in SOURCE_LABELS.items()],
+    live_source: EnumProperty(name='Source', description='Choose which Blender keyconfig to browse',
+                              items=[(key, label, '') for key, label in SOURCE_LABELS.items()],
                               options=TRANSIENT, update=lambda self, _context: setattr(self, 'live_page', 0))
-    live_page: IntProperty(min=0, options=TRANSIENT)
+    live_page: IntProperty(description='Choose the page of matching bindings, starting at zero', min=0, options=TRANSIENT)
     values: CollectionProperty(type=BH_PG_deluxe_value, options=TRANSIENT)
 
 
@@ -166,17 +195,31 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
 
     @classmethod
     def description(cls, _context, props):
-        if props.action == 'page':
-            return 'Go to page ' + str(int(props.target) + 1)
-        if props.action == 'assignment' and _editor is not None:
+        action, target = props.action, props.target
+        if action == 'page' and target.isdecimal():
+            return f'Go to page {int(target) + 1}'
+        if action == 'order':
+            direction = 'up' if target == '-1' else 'down'
+            return f'Move this section {direction} in its category'
+        if action in ('command_category', 'command_section'):
+            group = 'category' if action == 'command_category' else 'section'
+            return f'Filter commands by this {group}' if target else f'Clear the command {group} filter'
+        if action in TOGGLE_TARGETS:
+            label = TOGGLE_TARGETS[action]
+            row = _editor.catalog[action].get(target) if _editor is not None else None
+            if row is None:
+                return f'Toggle this {label} in the draft'
+            verb = 'Disable' if row.get('enabled', True) else 'Enable'
+            return f'{verb} this {label} in the draft'
+        if action == 'assignment' and _editor is not None:
             row = _editor.catalog['assignments'].get(props.target)
             if row:
                 event = shortcut(_editor.catalog['events'][row['event']])
-                return f"{event} · {context_label(row['scope'])}"
-        return cls.bl_label
+                return f"Show assignment details for {event} in {context_label(row['scope'])}"
+        return EDIT_DESCRIPTIONS.get(action, cls.bl_label)
 
     def invoke(self, context, event):
-        if self.action in {'reset', 'reload', 'delete_section', 'remove_assignment'}:
+        if self.action in {'reset', 'reload', 'delete_section'}:
             return context.window_manager.invoke_confirm(self, event)
         return self.execute(context)
 
@@ -223,7 +266,7 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.reload()
         elif action == 'reset':
             current.draft.reset()
-            current.changed('Shipped defaults staged')
+            current.changed('Initial catalog staged')
         elif action == 'category':
             current.category, current.section, current.assignment = target, '', ''
             current.page = 0
@@ -237,7 +280,7 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.page = int(target)
         elif action == 'order':
             current.reorder_section(int(target))
-        elif action in {'categories', 'sections', 'assignments', 'suppressions'}:
+        elif action in TOGGLE_TARGETS:
             if action == 'assignments':
                 current.require_editable_assignment(target)
             row = current.catalog[action][target]
@@ -255,11 +298,24 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
         elif action == 'remove_rule':
             current.draft.delete('suppressions', target)
             current.changed()
-        elif action == 'remove_assignment':
-            current.require_editable_assignment(target)
-            current.draft.delete('assignments', target)
-            current.assignment = ''
-            current.changed()
+
+
+class BH_OT_deluxe_remove_assignment(EditorOperator, bpy.types.Operator):
+    bl_idname = 'wm.bh_deluxe_remove_assignment'
+    bl_label = 'Remove Assignment'
+    bl_description = ('Remove this assignment from the draft and keep its command and linked assignments. '
+                      'Apply Changes saves the removal')
+
+    assignment: StringProperty(options=HIDDEN)
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
+
+    def stage(self, current):
+        current.require_editable_assignment(self.assignment)
+        current.draft.delete('assignments', self.assignment)
+        current.assignment = ''
+        current.changed()
 
 
 class BH_OT_deluxe_section(EditorOperator, bpy.types.Operator):
@@ -268,6 +324,10 @@ class BH_OT_deluxe_section(EditorOperator, bpy.types.Operator):
 
     section: StringProperty(options=HIDDEN)
     name: StringProperty(name='Section name', maxlen=48, options=TRANSIENT)
+
+    @classmethod
+    def description(cls, _context, props):
+        return 'Rename this section in the draft' if props.section else 'Add a section to the selected category'
 
     def invoke(self, context, _event):
         self.name = editor().catalog['sections'][self.section]['label'] if self.section else ''
@@ -363,6 +423,12 @@ class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
     event_id: EnumProperty(name='Shortcut', items=lambda self, _: enum_items(self, 'event'), options=TRANSIENT)
     scope_id: EnumProperty(name='Keymap', items=lambda self, _: enum_items(self, 'scope'), options=TRANSIENT)
 
+    @classmethod
+    def description(cls, _context, props):
+        if props.assignment:
+            return 'Change this assignment’s section, command, shortcut or Blender keymap'
+        return 'Create an assignment from an existing shortcut, a command and a Blender keymap'
+
     def invoke(self, context, _event):
         current = editor()
         catalog = current.catalog
@@ -441,13 +507,26 @@ class BH_OT_deluxe_shortcut(EditorOperator, bpy.types.Operator):
 
     assignment: StringProperty(options=HIDDEN)
     choice_key: StringProperty(options=HIDDEN)
-    shared: BoolProperty(name='Edit all linked assignments', default=False, options=TRANSIENT)
-    key: EnumProperty(name='Key', items=lambda self, _: enum_items(self, 'key'), options=TRANSIENT)
-    phase: EnumProperty(name='Phase', items=lambda self, _: enum_items(self, 'phase'), options=TRANSIENT)
-    direction: EnumProperty(name='Direction', items=lambda self, _: enum_items(self, 'direction'), options=TRANSIENT)
-    key_modifier: EnumProperty(name='Key modifier', items=lambda self, _: enum_items(self, 'modifier'), options=TRANSIENT)
-    repeat: BoolProperty(name='Repeat', options=TRANSIENT)
-    any_modifier: BoolProperty(name='Any modifier', options=TRANSIENT)
+    shared: BoolProperty(name='Edit all linked assignments',
+                         description='Update every assignment that shares this shortcut, including disabled assignments',
+                         options=TRANSIENT)
+    key: EnumProperty(name='Key', description='Choose the key or input button that triggers the shortcut',
+                      items=lambda self, _: enum_items(self, 'key'), options=TRANSIENT)
+    phase: EnumProperty(name='Phase', description='Choose when the input triggers the shortcut',
+                        items=lambda self, _: enum_items(self, 'phase'), options=TRANSIENT)
+    direction: EnumProperty(name='Direction', description='Choose which drag direction triggers the shortcut',
+                            items=lambda self, _: enum_items(self, 'direction'), options=TRANSIENT)
+    key_modifier: EnumProperty(name='Key modifier', description='Choose an additional key to hold',
+                               items=lambda self, _: enum_items(self, 'modifier'), options=TRANSIENT)
+    repeat: BoolProperty(name='Repeat', description='Allow a held key to trigger the shortcut repeatedly', options=TRANSIENT)
+    any_modifier: BoolProperty(name='Any modifier', description='Match the input regardless of which modifiers are held',
+                               options=TRANSIENT)
+
+    @classmethod
+    def description(cls, _context, props):
+        if props.assignment:
+            return 'Edit the key, trigger, direction and modifiers for this shortcut'
+        return 'Create a reusable shortcut for the draft. Add an assignment to make it run a command'
 
     def invoke(self, context, _event):
         current = editor()
@@ -502,7 +581,7 @@ class BH_OT_deluxe_shortcut(EditorOperator, bpy.types.Operator):
 for _modifier in ('shift', 'ctrl', 'alt', 'oskey', 'hyper'):
     BH_OT_deluxe_shortcut.__annotations__[_modifier] = EnumProperty(
         name={'ctrl': 'Ctrl', 'oskey': 'OS Key'}.get(_modifier, _modifier.title()),
-        items=[('0', 'Off', ''), ('1', 'On', ''), ('-1', 'Either', '')], options=TRANSIENT)
+        items=MODIFIER_STATES, options=TRANSIENT)
 
 
 def stage_input(current, assignment, event, shared):
@@ -537,7 +616,9 @@ class BH_OT_deluxe_inline_edit(EditorOperator, bpy.types.Operator):
 
     @classmethod
     def description(cls, _context, props):
-        return 'Use Blender default' if props.command else 'Cycle modifier: off, on, either'
+        if props.command:
+            return 'Use Blender’s default for this setting across all assignments that share the command'
+        return 'Cycle this modifier through Off, On and Either for this assignment'
 
     def stage(self, current):
         if self.command:
@@ -565,6 +646,12 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
 
     assignment: StringProperty(options=HIDDEN)
     shared: BoolProperty(options=HIDDEN)
+
+    @classmethod
+    def description(cls, _context, props):
+        if props.shared:
+            return 'Capture a key or mouse button for all linked assignments, including disabled ones'
+        return 'Capture a key or mouse button for this assignment only'
 
     def invoke(self, context, _event):
         current = editor()
@@ -615,20 +702,22 @@ class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):
     choice_key: StringProperty(options=HIDDEN)
     field: StringProperty(options=HIDDEN)
     assignment: StringProperty(options=HIDDEN)
-    single: BoolProperty(name='This assignment only', options=TRANSIENT)
+    single: BoolProperty(name='This assignment only',
+                         description='Give this assignment a separate command with its own settings', options=TRANSIENT)
     boolean: BoolProperty(options=TRANSIENT)
     integer: IntProperty(options=TRANSIENT)
     number: FloatProperty(options=TRANSIENT, precision=6)
     string: StringProperty(options=TRANSIENT)
     option: EnumProperty(items=lambda self, _: enum_items(self, 'values'), options=TRANSIENT)
     enabled: BoolProperty(name='Flag enabled', options=TRANSIENT)
-    use_default: BoolProperty(name='Use Blender default', options=TRANSIENT)
+    use_default: BoolProperty(name='Use Blender default', description='Remove the explicitly configured value',
+                              options=TRANSIENT)
 
     @classmethod
     def description(cls, _context, props):
         if props.assignment:
             return 'Edit this setting, with the option to make a separate command for this assignment'
-        return cls.bl_label
+        return 'Edit this setting for every assignment that uses this command'
 
     def invoke(self, context, _event):
         current = editor()
@@ -768,10 +857,16 @@ def known_replacement(candidate):
 
 class BH_OT_deluxe_binding_picker(bpy.types.Operator):
     bl_idname = 'wm.bh_deluxe_binding_picker'
-    bl_label = 'Disable Existing Shortcut'
+    bl_label = 'Find Existing Shortcut'
 
     section: StringProperty(options=HIDDEN)
     rule: StringProperty(options=HIDDEN)
+
+    @classmethod
+    def description(cls, _context, props):
+        if props.rule:
+            return 'Choose a different existing binding for this rule'
+        return 'Find an existing binding to review and stage a rule. Only supported replacements affect the active keymap'
 
     def invoke(self, context, _event):
         view = state(context)
@@ -826,6 +921,7 @@ class BH_OT_deluxe_binding_picker(bpy.types.Operator):
 class BH_OT_deluxe_stage_binding(EditorOperator, bpy.types.Operator):
     bl_idname = 'wm.bh_deluxe_stage_binding'
     bl_label = 'Review Existing Shortcut'
+    bl_description = 'Inspect the binding and review whether a supported replacement is available'
 
     section: StringProperty(options=HIDDEN)
     rule: StringProperty(options=HIDDEN)
@@ -901,7 +997,7 @@ class BH_OT_deluxe_stage_binding(EditorOperator, bpy.types.Operator):
 
 
 classes = (
-    BH_PG_deluxe_value, BH_PG_deluxe_editor, BH_OT_deluxe_edit, BH_OT_deluxe_inline_edit,
+    BH_PG_deluxe_value, BH_PG_deluxe_editor, BH_OT_deluxe_edit, BH_OT_deluxe_remove_assignment, BH_OT_deluxe_inline_edit,
     BH_OT_deluxe_section, BH_OT_deluxe_mapping, BH_OT_deluxe_context,
     BH_OT_deluxe_shortcut, BH_OT_deluxe_capture, BH_OT_deluxe_field,
     BH_OT_deluxe_binding_picker, BH_OT_deluxe_stage_binding,
