@@ -1101,6 +1101,80 @@ class Category03NativeReceiptTests(unittest.TestCase):
             self.assertFalse(case['selection_changed'])
             self.assertTrue(case['view_changed'])
 
+    def test_uv_ordinary_receipt_retains_dispatch_mismatch_and_cursor_fixture_error(self):
+        production = self.runs['ordinary_production-1794557329510485000']
+        reference = next(run for run in self.native['reference_runs']
+                         if run['id'] == 'reference-evidence-1794557393495550000')
+        self.assertEqual(set(self.manifest['blocking_dispatch_reconciliation']), {
+            case['ledger_id'] for case in production['dispatch'][:2]})
+        for item in self.manifest['blocking_dispatch_reconciliation'].values():
+            self.assertEqual(item['status'], 'implemented-dispatch-mismatch')
+        for cases, expected in ((production['dispatch'], (4, 4)),
+                                (reference['observations']['dispatch'], (9, 1))):
+            self.assertEqual(len(cases), 3)
+            for case, count in zip(cases[:2], expected):
+                self.assertTrue(case['input_delivery']['delivered'])
+                self.assertEqual(case['before']['editor_ui_type'], 'UV')
+                self.assertEqual(case['before']['context_mode'], 'EDIT_MESH')
+                self.assertEqual(len(case['before']['selected_uv']), 4)
+                self.assertEqual(len(case['after']['selected_uv']), count)
+                self.assertEqual(case['exact_rows_before_probe']['user'], 1)
+                self.assertTrue(case['direct_control']['poll'])
+                direct_count = 9 if case['tested_key'] == 'UP_ARROW' else 1
+                self.assertEqual(len(case['direct_control']['after']['selected_uv']), direct_count)
+            cursor = cases[2]
+            self.assertEqual(cursor['before']['cursor'], cursor['after']['cursor'])
+            self.assertEqual(cursor['error']['phase'], 'direct_fixture_control')
+            self.assertEqual(cursor['error']['type'], 'TypeError')
+            self.assertIn('expected a set, not a list', cursor['error']['message'])
+        self.assertEqual(reference['observations']['status'], 'error')
+        self.assertFalse(reference['observations']['ordinary_proof']['foreign_source_fields_and_order_unchanged'])
+
+    def test_uv_arrow_probe_proves_frames_winner_and_scoped_precedence(self):
+        run = self.runs['uv_arrow_probe-1794558496042342000']
+        proof = run['uv_arrow_precedence']
+        self.assertEqual(run['native_status'], 'complete')
+        self.assertEqual(proof['status'], 'complete')
+        self.assertEqual(len(proof['cases']), 13)
+        self.assertEqual(len(proof['installs']), 2)
+        self.assertEqual(len(proof['releases']), 2)
+        self.assertTrue(proof['fixture_cleanup_complete'])
+        self.assertTrue(run['ordinary_proof']['foreign_source_fields_and_order_unchanged'])
+        self.assertTrue(run['watcher_stopped'])
+        self.assertEqual(run['cleanup']['owned'], 0)
+        for endpoint in proof['releases']:
+            self.assertTrue(endpoint['exact_sources_and_merged_equal'])
+            self.assertEqual(endpoint['maps'], proof['baseline_maps'])
+        for case in proof['cases']:
+            self.assertTrue(case['passed'])
+            self.assertTrue(case['input_delivery']['delivered'])
+            self.assertEqual(case['before']['frame_current'], 5)
+            if case['expected'] == 'uv_selection':
+                self.assertEqual(case['after']['frame_current'], 5)
+                self.assertNotEqual(case['before']['selected_uv'], case['after']['selected_uv'])
+            else:
+                self.assertIn(case['after']['frame_current'], (1, 10))
+                self.assertEqual(case['callbacks'], [])
+                if case['kind'] == 'uv':
+                    self.assertEqual(case['before']['selected_uv'], case['after']['selected_uv'])
+                else:
+                    self.assertFalse(case['guard_poll'])
+
+    def test_uv_arrow_partial_production_retains_control_order_failure(self):
+        run = self.runs['uv_arrow_production-1794559318047548000']
+        proof = run['uv_arrow_precedence']
+        self.assertEqual(run['native_status'], 'error')
+        self.assertEqual(len(run['dispatch']), 10)
+        self.assertTrue(all(case['passed'] for case in run['dispatch']))
+        self.assertFalse(proof['releases'][0]['accepted_preservation'])
+        final = proof['final_without_control']
+        self.assertTrue(final['source_comparison']['accepted_sources_equal'])
+        self.assertTrue(final['strict_foreign_merged_equal'])
+        self.assertIn('cleanup_error', run)
+        self.assertNotIn('watcher_stopped', run)
+        self.assertTrue(all(owner['owner_id'].startswith('legacy:Selection:')
+                            for owner in proof['installs'][0]['actual_owners']))
+
     def test_shared_production_persistence_restores_editor_circle_and_framing_edits(self):
         pairs = (
             ('editor_save-1794555923466868000', 'editor_reopen-1794556023841045000', {'editor_more'}),
@@ -1645,7 +1719,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             (context('SEQUENCE_EDITOR'), ('sequencer.select_more', 'sequencer.select_less')),
         ]
         for ctx, targets in accepted:
-            for cls, target in zip(module.classes, targets, strict=True):
+            for cls, target in zip(module.classes[:2], targets, strict=True):
                 with self.subTest(context=ctx.area.type, operator=cls.bl_idname):
                     for operator in operators.values():
                         operator.reset_mock()
@@ -1677,6 +1751,35 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         for operator in operators.values():
             operator.assert_not_called()
             operator.poll.assert_not_called()
+
+    def test_uv_arrow_guards_preserve_other_contexts_and_underlying_poll(self):
+        self.stub('.operators', path='operators')
+        self.runtime.bpy.types.Operator = type('Operator', (), {})
+        more, less = Mock(return_value={'FINISHED'}), Mock(return_value={'FINISHED'})
+        more.poll, less.poll = Mock(return_value=True), Mock(return_value=True)
+        self.runtime.bpy.ops = types.SimpleNamespace(uv=types.SimpleNamespace(select_more=more, select_less=less))
+        module = self.load('operators.selection_more_less_ops')
+        accepted = types.SimpleNamespace(area=types.SimpleNamespace(type='IMAGE_EDITOR', ui_type='UV'),
+                                         region=types.SimpleNamespace(type='WINDOW'))
+        for cls, operator in zip(module.classes[2:], (more, less), strict=True):
+            self.assertTrue(cls.poll(accepted))
+            self.assertEqual(cls().execute(accepted), {'FINISHED'})
+            operator.assert_called_once_with('EXEC_DEFAULT')
+            operator.reset_mock()
+            operator.poll.return_value = False
+            self.assertFalse(cls.poll(accepted))
+            self.assertEqual(cls().execute(accepted), {'PASS_THROUGH'})
+            operator.assert_not_called()
+            operator.poll.return_value = True
+        for area_type, ui_type, region in (('VIEW_3D', 'VIEW_3D', 'WINDOW'),
+                                           ('IMAGE_EDITOR', 'IMAGE_EDITOR', 'WINDOW'),
+                                           ('IMAGE_EDITOR', 'UV', 'HEADER'),
+                                           ('DOPESHEET_EDITOR', 'DOPESHEET', 'WINDOW')):
+            ctx = types.SimpleNamespace(area=types.SimpleNamespace(type=area_type, ui_type=ui_type),
+                                        region=types.SimpleNamespace(type=region))
+            for cls in module.classes[2:]:
+                self.assertFalse(cls.poll(ctx))
+                self.assertEqual(cls().execute(ctx), {'PASS_THROUGH'})
 
     def load_transform_register(self):
         self.stub('.operators', path='operators')
@@ -1797,6 +1900,26 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             column=layout.column.return_value, feature_owner=prefs,
             feature_prop_name='enable_transform_action_shortcuts', actions=[action])
 
+    def test_direct_fixture_enum_flags_match_accepted_runtime_conversion(self):
+        from blender_keymap_category03_ordinary import native_control_properties
+        flag = types.SimpleNamespace(
+            identifier='snap_elements', type='ENUM', is_enum_flag=True,
+            enum_items=[types.SimpleNamespace(identifier=value) for value in ('', 'INCREMENT', 'VERTEX')])
+        scalar = types.SimpleNamespace(identifier='action', type='ENUM', is_enum_flag=False)
+        schema = types.SimpleNamespace(properties=[flag, scalar])
+        operator = types.SimpleNamespace(get_rna_type=lambda: schema)
+        properties = {'snap_elements': ['INCREMENT'], 'action': 'SELECT', 'value': [0.125, 0.0625, 0.0]}
+        converted = native_control_properties(operator, properties)
+        native = types.SimpleNamespace(properties=types.SimpleNamespace(bl_rna=schema))
+        self.keymap_utils._set_property(native, 'snap_elements', ('INCREMENT',))
+        self.assertEqual(converted['snap_elements'], native.properties.snap_elements)
+        self.assertEqual(converted['action'], 'SELECT')
+        self.assertEqual(converted['value'], properties['value'])
+        self.assertEqual(properties['snap_elements'], ['INCREMENT'])
+        for flags in (['UNKNOWN'], ['INCREMENT', 'INCREMENT'], ['VERTEX', 'INCREMENT'], 'INCREMENT'):
+            with self.assertRaises(ValueError):
+                native_control_properties(operator, {'snap_elements': flags})
+
     def test_shared_persistence_selectors_match_exact_production_declarations(self):
         from blender_keymap_category03_persistence import PersistenceCases
         self.load_selection_register()
@@ -1804,12 +1927,12 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         more_less = self.load('actions.actions.keymaps.selection.selection_more_less')
         actions = [*self.framing_actions(), *circle.get_selection_circle_actions(),
                    *more_less.get_selection_more_less_actions()]
-        for editor_only in (False, True):
+        for editor_only, uv_arrow_only in ((False, False), (True, False), (False, True)):
             helper = PersistenceCases(
                 bpy=None, configs=None, runtime=None, categories=None, preferences=None,
                 fixture=None, root=ROOT, record=None, receipt={}, set_groups=None,
-                production_paths=(), package='fixture', editor_only=editor_only)
-            self.assertEqual(len(helper.specs), 1 if editor_only else 2)
+                production_paths=(), package='fixture', editor_only=editor_only, uv_arrow_only=uv_arrow_only)
+            self.assertEqual(len(helper.specs), 1 if editor_only or uv_arrow_only else 2)
             for spec in helper.specs:
                 matches = [(action, binding) for action in actions
                            if action.get_idname() == spec['target']
@@ -1902,6 +2025,13 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
                                     self.assertNotIn('declaration', review)
                                 self.assertNotIn('authorized_transfer', review)
                                 binding = self.ledger[row_id]['binding']
+                                if row_id in self.manifest.get('handler_adaptations', {}):
+                                    adaptation = self.manifest['handler_adaptations'][row_id]
+                                    self.assertEqual(adaptation['reference_binding'], binding)
+                                    binding = adaptation['runtime_binding']
+                                    self.assertEqual(binding['event'], adaptation['reference_binding']['event'])
+                                    self.assertEqual(binding['scope']['name'], 'Frames')
+                                    self.assertIn(binding['target'], ('wm.bh_uv_select_more', 'wm.bh_uv_select_less'))
                                 pair = pairs[offsets[id(action)] + int(index)]
                                 self.assert_registered_binding(pair, binding)
                                 expected = binding['properties']

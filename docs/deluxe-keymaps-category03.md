@@ -112,10 +112,33 @@ Existing subfeature toggles control these drafts.
 The seven axis/Local View production inputs produced their expected effects.
 The first copied-reference run observed six matching effects, an unchanged first
 Ctrl-F1 case, and a strict property-readability comparison failure. Those limits
-remain explicit. Ctrl-F1 and the two UV arrow aliases receive spot checks in a
-related scheduled batch or integrated owner06 work; no dedicated lifecycle rerun
-is required. The arrow aliases reuse proven command/context behavior without
-their own dispatch observation.
+remain explicit. Ctrl-F1 retains a related scheduled or integrated owner06 spot
+check; no dedicated lifecycle rerun is required. The two UV arrow declarations
+remain implemented but now have **blocking dispatch mismatches**: the actual
+pre-adaptation production inputs left four UV corners selected, while copied-reference Up grew
+four to nine and Down shrank four to one. Direct controls worked on both setups.
+The accepted baseline has stock Frames Up/Down keyframe-jump rows that are absent
+from the reference active map. A 13-observation isolated probe proved those
+Frames rows win: arrows jumped from frame 5 to 10/1 without changing UV selection,
+while the brackets changed selection and left frame 5 unchanged. Two UV-only
+owned Frames guards then produced the intended UV effects and preserved inherited
+keyframe jumps in the 3D View. Both removals restored exact source/merged maps;
+reinstall restored UV selection. Collection order alone was not used to infer
+the winner.
+
+The approved production adaptation replaces the two ineffective local arrow
+declarations with one editable Frames binding per arrow, targeting fixed UV-only
+guards in the existing selection operator module. The existing More/Less feature
+controls them; wheel/bracket declarations, View2D guard scopes and stock/global
+rows are unchanged. The first actual production run passed ten effects, including
+both arrows, both brackets and inherited outside-UV jumps under real Selection
+identities. Its first release failed because the fixture-owned F23 input control
+changed order relative to rebuilt owned Pipeline rows. Removing only that control
+restored exact foreign identity/source/merged preservation. Cleanup then stopped
+at a fixture completeness assertion, although the child exited and host cleanup
+passed. Save/reopen was skipped. The revised fixture removes F23 at every matched
+endpoint and completes addon shutdown before surfacing cleanup errors; the full
+actual toggle sequence and representative saved-edit pair remain pending.
 
 | Existing group | Draft inputs |
 | --- | --- |
@@ -149,6 +172,14 @@ check separately failed on 192 property-readability changes, with row IDs/order
 and all other fields unchanged. Protected inputs and host resource cleanup passed.
 Other ordinary clusters remain pending.
 
+The same UV pair observed no Ctrl-Shift-middle cursor movement in either setup.
+Its direct control failed because JSON enum-flag lists were passed to RNA without
+conversion to sets. The corrected fixture validates native enum-flag schema and
+members using the accepted runtime rules, and captures press, initial motion,
+second motion and release snapshots. These fixture changes are not yet natively
+verified. The reference UV run also retained a strict 192-row readability
+comparison failure; its arrow effects and that failure are reported separately.
+
 ## Verification and boundaries
 
 Run the portable category checks with:
@@ -157,14 +188,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Forty-two category checks currently pass. They cover exact assigned IDs and
+Forty-seven category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 47 factory attempts and thirteen copied-reference attempts. A completed
+retains 50 factory attempts and fourteen copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -364,7 +395,8 @@ confinement and disposable minimum-version adaptation. Original app/profile and
 provider sources remain read-only. Process, source hash, protected-input and
 cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
 
-Required native work includes Image framing/pan/zoom, the axis reference readiness
+Required native work includes the two implemented UV arrow dispatch blockers,
+the corrected cursor control, Image framing/pan/zoom, the axis reference readiness
 check, remaining ordinary clusters,
 and focused middle-mouse/subtract and modal/tool probes. G behavior and production persistence are accepted; composed UV/global
 parity remains. Existing proofs need no broader
@@ -378,7 +410,8 @@ remaining 100 stay with 03: 13 ordinary candidates (12 declarations still draft)
 unsupported or unproved handler/modal/tool/replacement cases, 13 observations of
 active-role absence, and four conflicting bindings. Active-role absence alone
 does not prove unavailability. Each has row-specific next steps in the refreshed
-reconciliation proposal. These counts describe disposition, not native parity.
+reconciliation proposal. The two implemented UV arrow rows additionally remain
+blocking dispatch reconciliation items. These counts describe disposition, not native parity.
 The original 01 ledger is unchanged. Generic UV More/Less, All/None and the W/G
 boundary remain with 03; Mesh loop and context-menu declarations retain their
 other owners while this brief tests relevant interactions.
@@ -412,7 +445,8 @@ declarations (13), modal events (33), middle-mouse tool dispatch (19), selection
 replacement/fallback (22), navigation timing/context (5), release confirmation
 (4), and conflicting reference intentions (4). Registration/persistence proof
 can be reused where source, selector and context warrant it. Nine ordinary rows
-were explicitly approved for reuse, with the three remaining spot checks retained.
+were explicitly approved for reuse. Ctrl-F1 retains its spot check; the two UV
+arrow checks exposed dispatch mismatches and now require a fix.
 A source-bound single-step launcher retains the exact wheel comparison and shared
 lifecycle/control commands. Another native allocation is required for further
 families; the inconclusive wheel pair will not be repeated unchanged.

@@ -180,8 +180,6 @@ SELECTION_UV_SELECT_MORE = OperatorAction(
         *_select_more_bindings('UV Editor'),
         # 8eb6e5854ee0f7d1373566729a5b84cb5a9df29927f63e89edd363a395539aa3
         KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='RIGHT_BRACKET', repeat=True),
-        # 89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a
-        KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='UP_ARROW', repeat=True),
     ),
 )
 
@@ -191,8 +189,26 @@ SELECTION_UV_SELECT_LESS = OperatorAction(
         *_select_less_bindings('UV Editor'),
         # 8b319baccba2e5a7bac8671297fb7fd0ef7abef232d553f6f91bc56e5d383f52
         KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='LEFT_BRACKET', repeat=True),
+    ),
+)
+
+# Frames handles arrows before the UV keymap. Fixed UV-only guards preserve the
+# inherited keyframe jumps outside UV and keep one editable binding per arrow.
+SELECTION_UV_ARROW_SELECT_MORE = OperatorAction(
+    operator='wm.bh_uv_select_more',
+    text='Grow UV Selection',
+    keymap_bindings=(
+        # 89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a
+        KeymapBinding(keymap_name='Frames', space_type='EMPTY', key='UP_ARROW', repeat=True),
+    ),
+)
+
+SELECTION_UV_ARROW_SELECT_LESS = OperatorAction(
+    operator='wm.bh_uv_select_less',
+    text='Shrink UV Selection',
+    keymap_bindings=(
         # a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839
-        KeymapBinding(keymap_name='UV Editor', space_type='EMPTY', key='DOWN_ARROW', repeat=True),
+        KeymapBinding(keymap_name='Frames', space_type='EMPTY', key='DOWN_ARROW', repeat=True),
     ),
 )
 
@@ -301,6 +317,8 @@ SELECTION_MORE_LESS_ACTIONS: list[OperatorAction] = [
 
     SELECTION_UV_SELECT_MORE,
     SELECTION_UV_SELECT_LESS,
+    SELECTION_UV_ARROW_SELECT_MORE,
+    SELECTION_UV_ARROW_SELECT_LESS,
 
     SELECTION_MASK_SELECT_MORE,
     SELECTION_MASK_SELECT_LESS,

@@ -56,7 +56,51 @@ class WM_OT_BH_editor_select_less(bpy.types.Operator):
         return _execute(context, False)
 
 
-classes = (WM_OT_BH_editor_select_more, WM_OT_BH_editor_select_less)
+def _uv_selection_operator(context, more):
+    area, region = context.area, context.region
+    if (area is None or area.type != 'IMAGE_EDITOR' or area.ui_type != 'UV'
+            or region is None or region.type != 'WINDOW'):
+        return None
+    return bpy.ops.uv.select_more if more else bpy.ops.uv.select_less
+
+
+def _execute_uv(context, more):
+    operator = _uv_selection_operator(context, more)
+    if operator is None or not operator.poll():
+        return {'PASS_THROUGH'}
+    return operator('EXEC_DEFAULT')
+
+
+class WM_OT_BH_uv_select_more(bpy.types.Operator):
+    bl_idname = 'wm.bh_uv_select_more'
+    bl_label = 'Grow UV Selection'
+    bl_description = 'Grow UV selection while preserving arrow behavior outside the UV editor'
+
+    @classmethod
+    def poll(cls, context):
+        operator = _uv_selection_operator(context, True)
+        return bool(operator is not None and operator.poll())
+
+    def execute(self, context):
+        return _execute_uv(context, True)
+
+
+class WM_OT_BH_uv_select_less(bpy.types.Operator):
+    bl_idname = 'wm.bh_uv_select_less'
+    bl_label = 'Shrink UV Selection'
+    bl_description = 'Shrink UV selection while preserving arrow behavior outside the UV editor'
+
+    @classmethod
+    def poll(cls, context):
+        operator = _uv_selection_operator(context, False)
+        return bool(operator is not None and operator.poll())
+
+    def execute(self, context):
+        return _execute_uv(context, False)
+
+
+classes = (WM_OT_BH_editor_select_more, WM_OT_BH_editor_select_less,
+           WM_OT_BH_uv_select_more, WM_OT_BH_uv_select_less)
 
 
 def register():

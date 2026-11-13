@@ -105,10 +105,10 @@ def _run_session(args, root):
     environment.update(PYTHONDONTWRITEBYTECODE='1', PYTHONNOUSERSITE='1',
                        PYTHONUNBUFFERED='1', DELUXE_CATEGORY_ROOT=str(root),
                        DELUXE_CATEGORY_MODE=args.mode, DELUXE_CATEGORY_REPO=str(REPO))
-    if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
+    if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production'):
         environment['DELUXE_CATEGORY_ORDINARY_CLUSTER'] = getattr(args, 'ordinary_cluster', 'axis')
         environment['DELUXE_CATEGORY_INVERT_ZOOM'] = str(getattr(args, 'invert_zoom', None))
-    if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen'):
+    if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_save', 'uv_arrow_reopen'):
         environment['DELUXE_CATEGORY_EDITOR_CLUSTER'] = getattr(args, 'editor_cluster', 'selection')
         environment['DELUXE_CATEGORY_EDITOR_INPUT_CONTROLS'] = '1' if getattr(args, 'editor_input_controls', False) else '0'
         environment['DELUXE_CATEGORY_EDITOR_PRIME_READINESS'] = '1' if getattr(args, 'editor_prime_readiness', False) else '0'
@@ -142,12 +142,12 @@ def _run_session(args, root):
     shutil.copyfile(Path(__file__).resolve(), executed)
     if args.mode in ('handler_observe', 'handler_probe', 'circle_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_handlers.py', root / 'handler-fixture.py')
-    if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
+    if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_ordinary.py', root / 'ordinary-fixture.py')
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
-    if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen'):
+    if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_editors.py', root / 'editor-fixture.py')
-    if args.mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen'):
+    if args.mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_save', 'uv_arrow_reopen'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_persistence.py', root / 'persistence-fixture.py')
     policy = root / 'confinement.sb'
     policy.write_text('(version 1)\n(allow default)\n(deny network*)\n(deny file-write*)\n'
@@ -274,7 +274,7 @@ def native_main(root, mode):
         (root / 'native.json').write_text(json.dumps(receipt, indent=2) + '\n')
         print('CATEGORY03 ' + label, flush=True)
 
-    if mode in ('reopen', 'uv_g_reopen', 'uv_g_production_reopen', 'editor_reopen'):
+    if mode in ('reopen', 'uv_g_reopen', 'uv_g_production_reopen', 'editor_reopen', 'uv_arrow_reopen'):
         shutil.copyfile(root / 'incoming/userpref.blend', root / 'config/userpref.blend')
         bpy.ops.wm.read_userpref()
         bpy.context.preferences.use_preferences_save = False
@@ -1789,6 +1789,38 @@ def native_main(root, mode):
         steps.append(circle_on)
         fixture.case('production_circle_reenabled_object_add', mods={'shift': True}, circle=True)
         steps.append(fixture.cleanup)
+    elif mode in ('uv_arrow_probe', 'uv_arrow_production'):
+        production = None
+        if mode == 'uv_arrow_production':
+            editor_helper = load_file('category03_editor_comparison', root / 'editor-fixture.py')
+            operators = sys.modules[PACKAGE + '.operators.selection_more_less_ops']
+
+            def arrow_production_setup():
+                for name in ('enable_selection_more_less', 'enable_selection_all_none',
+                             'enable_selection_circle', 'enable_selection_tool_switch'):
+                    setattr(prefs.keymap.selection, name, False)
+                set_groups(False, True, False)
+
+            def arrow_production_toggle(enabled):
+                prefs.keymap.selection.enable_selection_more_less = enabled
+                kmreg.refresh()
+                configs.update()
+
+            steps.append(arrow_production_setup)
+            production = {
+                'classes': (operators.WM_OT_BH_uv_select_more, operators.WM_OT_BH_uv_select_less),
+                'toggle': arrow_production_toggle,
+                'registered_pairs': lambda: kmreg.selection_keymaps_register.registered_selection_keymaps,
+                'source_provenance': pipeline_source_provenance,
+                'compare_sources': editor_helper.EditorCases.compare_sources,
+            }
+        else:
+            steps.append(lambda: set_groups(True, True, True))
+        helper = load_file('category03_ordinary_fixture', root / 'ordinary-fixture.py')
+        ordinary = helper.OrdinaryCases(
+            steps, receipt, record, window, area, exporter,
+            cluster='uv_edit', ledger_path=root / 'ordinary-ledger.jsonl')
+        state['ordinary_fixture'] = helper.UVArrowPrecedenceCases(ordinary, rt, production=production).append()
     elif mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
         steps.append(lambda: set_groups(mode == 'ordinary_production', mode == 'ordinary_production', mode == 'ordinary_production'))
         helper = load_file('category03_ordinary_fixture', root / 'ordinary-fixture.py')
@@ -1933,7 +1965,7 @@ def native_main(root, mode):
         image_case('RIGHTMOUSE', {'alt': True}, (90, 40))
         for key in ('F', 'A', 'WHEELUPMOUSE', 'WHEELRIGHTMOUSE', 'WHEELDOWNMOUSE', 'WHEELLEFTMOUSE'):
             image_case(key, {'shift': True, 'alt': True} if key.startswith('WHEEL') else {})
-    elif mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen'):
+    elif mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_save', 'uv_arrow_reopen'):
         editor_helper = load_file('category03_editor_fixture', root / 'editor-fixture.py')
         persistence_helper = load_file('category03_persistence_fixture', root / 'persistence-fixture.py')
         fixture = editor_helper.EditorCases(steps, receipt, record, window, area, exporter,
@@ -1944,11 +1976,13 @@ def native_main(root, mode):
             bpy=bpy, configs=configs, runtime=rt, categories=kmreg, preferences=prefs,
             fixture=fixture, root=root, record=record, receipt=receipt, set_groups=set_groups,
             production_paths=PRODUCTION_PATHS, package=PACKAGE,
-            editor_only=mode.startswith('editor_'), reopen=mode in ('reopen', 'editor_reopen')).append(steps)
+            editor_only=mode.startswith('editor_'), uv_arrow_only=mode.startswith('uv_arrow_'),
+            reopen=mode in ('reopen', 'editor_reopen', 'uv_arrow_reopen')).append(steps)
     else:
         raise ValueError('Native case not implemented: ' + mode)
 
     def cleanup():
+        ordinary_cleanup_error = None
         if 'g_control_binding' in state:
             keymap, item = state.pop('g_control_binding')
             keymap.keymap_items.remove(item)
@@ -1957,7 +1991,11 @@ def native_main(root, mode):
         if 'editor_fixture' in state:
             state['editor_fixture'].cleanup()
         if 'ordinary_fixture' in state:
-            state['ordinary_fixture'].cleanup()
+            try:
+                state['ordinary_fixture'].cleanup()
+            except Exception:
+                ordinary_cleanup_error = traceback.format_exc()
+                receipt['ordinary_fixture_cleanup_error'] = ordinary_cleanup_error
         if 'handler_fixture' in state:
             state['handler_fixture'].cleanup()
         release_walk_probe()
@@ -1979,6 +2017,8 @@ def native_main(root, mode):
         receipt['watcher_stopped'] = not bpy.app.timers.is_registered(kmreg._watch_keymaps)
         assert not receipt['cleanup']['owned'] and not receipt['cleanup']['pending_cleanup']
         assert receipt['watcher_stopped']
+        if ordinary_cleanup_error:
+            raise AssertionError('Ordinary fixture cleanup failed; addon shutdown completed')
 
     iterator = iter(steps)
 
@@ -2011,8 +2051,9 @@ def cli():
     parser.add_argument('--blender', type=Path, required=True)
     parser.add_argument('--profile-source', type=Path, help='Read-only protected input hashes; not loaded in factory cases')
     parser.add_argument('--provider-source', type=Path)
-    parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
-                                         'transform', 'image', 'persistence', 'reopen', 'editor_save', 'editor_reopen'), required=True)
+    parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'uv_arrow_probe', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
+                                         'transform', 'image', 'persistence', 'reopen', 'editor_save', 'editor_reopen',
+                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')
     parser.add_argument('--editor-matched-endpoints', action='store_true')

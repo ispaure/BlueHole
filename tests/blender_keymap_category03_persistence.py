@@ -11,16 +11,21 @@ import shutil
 class PersistenceCases:
     def __init__(self, *, bpy, configs, runtime, categories, preferences, fixture,
                  root, record, receipt, set_groups, production_paths, package,
-                 editor_only=False, reopen=False):
+                 editor_only=False, uv_arrow_only=False, reopen=False):
         self.bpy, self.configs, self.rt = bpy, configs, runtime
         self.kmreg, self.prefs, self.fixture = categories, preferences, fixture
         self.root, self.record, self.receipt = Path(root), record, receipt
         self.set_groups, self.production_paths, self.package = set_groups, production_paths, package
         self.reopen, self.editor_only = reopen, editor_only
-        self.scenario = 'editor' if editor_only else 'circle_framing'
+        self.selection_only = editor_only or uv_arrow_only
+        self.scenario = 'uv_arrow' if uv_arrow_only else ('editor' if editor_only else 'circle_framing')
         self.state = {'scenario': self.scenario, 'fresh_process': reopen, 'restorations': []}
         self.receipt['production_persistence'] = self.state
-        self.specs = ([{'name': 'editor_more', 'category': 'Selection',
+        self.specs = ([{'name': 'uv_arrow_more', 'category': 'Selection',
+                       'scope': 'Frames', 'space': 'EMPTY', 'target': 'wm.bh_uv_select_more',
+                       'key': 'UP_ARROW', 'shift': False, 'edited_key': 'F17',
+                       'edited_active': False}] if uv_arrow_only else [
+                      {'name': 'editor_more', 'category': 'Selection',
                        'scope': 'View2D', 'space': 'EMPTY', 'target': 'wm.bh_editor_select_more',
                        'key': 'WHEELUPMOUSE', 'shift': True, 'edited_key': 'F18',
                        'edited_active': False}] if editor_only else [
@@ -51,9 +56,9 @@ class PersistenceCases:
         for name in ('enable_selection_more_less', 'enable_selection_all_none',
                      'enable_selection_circle', 'enable_selection_tool_switch'):
             setattr(sel, name, False)
-        self.set_groups(not self.editor_only, True, False)
+        self.set_groups(not self.selection_only, True, False)
         modules = (self.kmreg.selection_keymaps_register, self.kmreg.navigation_keymaps_register)
-        getters = ('get_selection_more_less_actions',) if self.editor_only else (
+        getters = ('get_selection_more_less_actions',) if self.selection_only else (
             'get_selection_circle_actions', 'get_navigation_view_framing_actions')
         self.fixture.extra_source_names = {
             binding.keymap_name for module in modules for getter in getters
@@ -71,7 +76,7 @@ class PersistenceCases:
         self.record('production_persistence_setup')
 
     def toggle(self, enabled):
-        if self.editor_only:
+        if self.selection_only:
             self.prefs.keymap.selection.enable_selection_more_less = enabled
         else:
             self.prefs.keymap.navigation.enable_navigation_view_framing = enabled

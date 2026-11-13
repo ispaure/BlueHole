@@ -551,18 +551,19 @@
           "SELECTION_3D_VIEW_OBJECT_SELECT_LESS": {
             "0": "c668cd6405ddd1e2b7c17a066eeea197ea8063eac81bc238742430ad3a8eb973"
           },
-          "SELECTION_UV_SELECT_LESS": {
-            "3": "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
+          "SELECTION_UV_ARROW_SELECT_MORE": {
+            "0": "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a"
           },
-          "SELECTION_UV_SELECT_MORE": {
-            "3": "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a"
+          "SELECTION_UV_ARROW_SELECT_LESS": {
+            "0": "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
           }
         },
         "source": "actions/actions/keymaps/selection/selection_more_less.py",
-        "source_sha256": "e66f92232986827bcb4e699fbdbf14eef1a8ae6f4314530626864031377cd362",
+        "source_sha256": "6243684d09b82e8cedc02f4ce3635e1f3df0af214af7c2ed2a90588196c44b5f",
         "preference": "enable_selection_more_less",
         "historical_source_sha256": [
-          "0193ccc9d191ee9764cb1f4d2eb597a17e1ca589e755527e3b3ec1a4240e9da8"
+          "0193ccc9d191ee9764cb1f4d2eb597a17e1ca589e755527e3b3ec1a4240e9da8",
+          "e66f92232986827bcb4e699fbdbf14eef1a8ae6f4314530626864031377cd362"
         ]
       },
       "selection_tool_switch": {
@@ -836,7 +837,7 @@
   "prepared_persistence": {
     "status": "both actual production pairs passed in 4.5.1; saved inputs removed after fresh readers",
     "helper": "tests/blender_keymap_category03_persistence.py",
-    "helper_sha256": "a65f63b918f7bf3564a3434d047d6e9e582393305ebf764a063e7a834419932e",
+    "helper_sha256": "23f7c787949fe8abb59aaea0ea41612eecb3f41b1cb47f57502cac710d0dc581",
     "modes": {
       "editor": [
         "editor_save",
@@ -871,7 +872,7 @@
     }
   },
   "accepted_mechanism_reuse": {
-    "status": "implemented with approved mechanism reuse",
+    "status": "implemented with approved mechanism reuse; two UV aliases now have blocking dispatch mismatches",
     "approved_by": "Brief coordinator Sol High",
     "source_chat": "01a1d36b-dbd5-7933-9457-8e055db2b96d",
     "binding_count": 9,
@@ -913,13 +914,13 @@
       },
       "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a": {
         "group": "selection_more_less",
-        "action": "SELECTION_UV_SELECT_MORE",
-        "binding_index": 3
+        "action": "SELECTION_UV_ARROW_SELECT_MORE",
+        "binding_index": 0
       },
       "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839": {
         "group": "selection_more_less",
-        "action": "SELECTION_UV_SELECT_LESS",
-        "binding_index": 3
+        "action": "SELECTION_UV_ARROW_SELECT_LESS",
+        "binding_index": 0
       }
     },
     "evidence": {
@@ -928,17 +929,40 @@
       "production_axis_effects": 7,
       "matching_reference_axis_inputs": 6,
       "inconclusive_reference_input": "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219",
-      "uv_aliases_without_own_dispatch": [
-        "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a",
-        "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
-      ],
-      "uv_command_context_witness": "selection-1794542407253275000"
+      "uv_command_context_witness": "selection-1794542407253275000",
+      "uv_alias_dispatch_mismatch": {
+        "rows": [
+          "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a",
+          "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
+        ],
+        "production_run": "ordinary_production-1794557329510485000",
+        "reference_run": "reference-evidence-1794557393495550000",
+        "production_selected_uv_after": [
+          4,
+          4
+        ],
+        "reference_selected_uv_after": [
+          9,
+          1
+        ],
+        "both_direct_controls_after": [
+          9,
+          1
+        ],
+        "native_Window_controls": "delivered in UV IMAGE_EDITOR/WINDOW, EDIT_MESH",
+        "interpretation": "implemented declarations, observed dispatch mismatch; blocking reconciliation until fixed",
+        "candidate_inherited_selectors": [
+          "34d2f9ada5856fe81d97c8cf38ca8f02c30624669e704641dbfc259709f4d1b1",
+          "9809f50232defd4f4e71f504ef4fa98049439335ad7b130a0ebe4746ca850345"
+        ],
+        "inherited_owner": "05",
+        "order_evidence": "test-results/deluxe-keymaps-category03/uv-arrow-handler-order.json",
+        "reference_error": "strict preservation failed on 192 read_issues changes; other fields/IDs/order unchanged; accepted per-row effects remain separately scoped"
+      }
     },
     "spot_checks": {
       "rows": [
-        "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219",
-        "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a",
-        "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
+        "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219"
       ],
       "route": "include in an already scheduled related axis/UV batch or integrated owner06 checks; no dedicated lifecycle rerun"
     }
@@ -965,5 +989,221 @@
     "reference_preservation": "strict comparison failed on read_issues of 192 rows; IDs/order and other fields unchanged; retained as failed",
     "host_cleanup": "both children exited, owned roots removed and protected input hashes unchanged",
     "next": "preserve selectors; physical wheel/trackpad witness through integrated 06 if required; do not repeat identical synthetic pair"
+  },
+  "blocking_dispatch_reconciliation": {
+    "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a": {
+      "status": "implemented-dispatch-mismatch",
+      "production_run": "ordinary_production-1794557329510485000",
+      "reference_run": "reference-evidence-1794557393495550000",
+      "production_selected_uv_after": [
+        4,
+        4
+      ],
+      "reference_selected_uv_after": [
+        9,
+        1
+      ],
+      "both_direct_controls_after": [
+        9,
+        1
+      ],
+      "native_Window_controls": "delivered in UV IMAGE_EDITOR/WINDOW, EDIT_MESH",
+      "interpretation": "implemented declarations, observed dispatch mismatch; blocking reconciliation until fixed",
+      "candidate_inherited_selectors": [
+        "34d2f9ada5856fe81d97c8cf38ca8f02c30624669e704641dbfc259709f4d1b1",
+        "9809f50232defd4f4e71f504ef4fa98049439335ad7b130a0ebe4746ca850345"
+      ],
+      "inherited_owner": "05",
+      "order_evidence": "test-results/deluxe-keymaps-category03/uv-arrow-handler-order.json",
+      "reference_error": "strict preservation failed on 192 read_issues changes; other fields/IDs/order unchanged; accepted per-row effects remain separately scoped",
+      "production_correction_prepared": {
+        "group": "selection_more_less",
+        "action": "SELECTION_UV_ARROW_SELECT_MORE",
+        "binding_index": 0
+      }
+    },
+    "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839": {
+      "status": "implemented-dispatch-mismatch",
+      "production_run": "ordinary_production-1794557329510485000",
+      "reference_run": "reference-evidence-1794557393495550000",
+      "production_selected_uv_after": [
+        4,
+        4
+      ],
+      "reference_selected_uv_after": [
+        9,
+        1
+      ],
+      "both_direct_controls_after": [
+        9,
+        1
+      ],
+      "native_Window_controls": "delivered in UV IMAGE_EDITOR/WINDOW, EDIT_MESH",
+      "interpretation": "implemented declarations, observed dispatch mismatch; blocking reconciliation until fixed",
+      "candidate_inherited_selectors": [
+        "34d2f9ada5856fe81d97c8cf38ca8f02c30624669e704641dbfc259709f4d1b1",
+        "9809f50232defd4f4e71f504ef4fa98049439335ad7b130a0ebe4746ca850345"
+      ],
+      "inherited_owner": "05",
+      "order_evidence": "test-results/deluxe-keymaps-category03/uv-arrow-handler-order.json",
+      "reference_error": "strict preservation failed on 192 read_issues changes; other fields/IDs/order unchanged; accepted per-row effects remain separately scoped",
+      "production_correction_prepared": {
+        "group": "selection_more_less",
+        "action": "SELECTION_UV_ARROW_SELECT_LESS",
+        "binding_index": 0
+      }
+    }
+  },
+  "uv_cursor_dispatch": {
+    "row_id": "ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1",
+    "production_run": "ordinary_production-1794557329510485000",
+    "reference_run": "reference-evidence-1794557393495550000",
+    "status": "unverified: no gesture effect on either setup, direct enum-flag conversion failed",
+    "fixture_repair": "schema-gated enum-flag arguments match accepted runtime conversion; press/motion/release snapshots added, native unrun"
+  },
+  "handler_adaptations": {
+    "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a": {
+      "reference_binding": {
+        "active": true,
+        "event": {
+          "alt": 0,
+          "any": false,
+          "ctrl": 0,
+          "direction": "ANY",
+          "hyper": 0,
+          "key_modifier": "NONE",
+          "map_type": "KEYBOARD",
+          "oskey": 0,
+          "repeat": true,
+          "shift": 0,
+          "type": "UP_ARROW",
+          "value": "PRESS"
+        },
+        "properties": {},
+        "read_issues": {},
+        "scope": {
+          "is_modal": false,
+          "is_tool": null,
+          "name": "UV Editor",
+          "region_type": "WINDOW",
+          "space_type": "EMPTY"
+        },
+        "target": "uv.select_more"
+      },
+      "runtime_binding": {
+        "active": true,
+        "event": {
+          "alt": 0,
+          "any": false,
+          "ctrl": 0,
+          "direction": "ANY",
+          "hyper": 0,
+          "key_modifier": "NONE",
+          "map_type": "KEYBOARD",
+          "oskey": 0,
+          "repeat": true,
+          "shift": 0,
+          "type": "UP_ARROW",
+          "value": "PRESS"
+        },
+        "properties": {},
+        "read_issues": {},
+        "scope": {
+          "is_modal": false,
+          "is_tool": null,
+          "name": "Frames",
+          "region_type": "WINDOW",
+          "space_type": "EMPTY"
+        },
+        "target": "wm.bh_uv_select_more"
+      },
+      "guard_context": "UV IMAGE_EDITOR/WINDOW and underlying operator poll; declines elsewhere",
+      "native_probe": "uv_arrow_probe-1794558496042342000",
+      "production_status": "prepared; actual identity/toggle/persistence proof pending",
+      "approved_by": "Brief coordinator Sol High"
+    },
+    "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839": {
+      "reference_binding": {
+        "active": true,
+        "event": {
+          "alt": 0,
+          "any": false,
+          "ctrl": 0,
+          "direction": "ANY",
+          "hyper": 0,
+          "key_modifier": "NONE",
+          "map_type": "KEYBOARD",
+          "oskey": 0,
+          "repeat": true,
+          "shift": 0,
+          "type": "DOWN_ARROW",
+          "value": "PRESS"
+        },
+        "properties": {},
+        "read_issues": {},
+        "scope": {
+          "is_modal": false,
+          "is_tool": null,
+          "name": "UV Editor",
+          "region_type": "WINDOW",
+          "space_type": "EMPTY"
+        },
+        "target": "uv.select_less"
+      },
+      "runtime_binding": {
+        "active": true,
+        "event": {
+          "alt": 0,
+          "any": false,
+          "ctrl": 0,
+          "direction": "ANY",
+          "hyper": 0,
+          "key_modifier": "NONE",
+          "map_type": "KEYBOARD",
+          "oskey": 0,
+          "repeat": true,
+          "shift": 0,
+          "type": "DOWN_ARROW",
+          "value": "PRESS"
+        },
+        "properties": {},
+        "read_issues": {},
+        "scope": {
+          "is_modal": false,
+          "is_tool": null,
+          "name": "Frames",
+          "region_type": "WINDOW",
+          "space_type": "EMPTY"
+        },
+        "target": "wm.bh_uv_select_less"
+      },
+      "guard_context": "UV IMAGE_EDITOR/WINDOW and underlying operator poll; declines elsewhere",
+      "native_probe": "uv_arrow_probe-1794558496042342000",
+      "production_status": "prepared; actual identity/toggle/persistence proof pending",
+      "approved_by": "Brief coordinator Sol High"
+    }
+  },
+  "uv_arrow_route": {
+    "status": "ten actual production effects passed; fixture endpoint correction and full toggle/persistence acceptance pending",
+    "sources": [
+      "operators/selection_more_less_ops.py",
+      "actions/actions/keymaps/selection/selection_more_less.py"
+    ],
+    "source_sha256": {
+      "operators/selection_more_less_ops.py": "b11bdcaa068ca16c497e0ae749b61b696d726d30e6f92ab40c30b4a29dd9b2dc",
+      "actions/actions/keymaps/selection/selection_more_less.py": "6243684d09b82e8cedc02f4ce3635e1f3df0af214af7c2ed2a90588196c44b5f"
+    },
+    "probe_run": "uv_arrow_probe-1794558496042342000",
+    "preference": "enable_selection_more_less",
+    "editable_bindings_per_arrow": 1,
+    "modes": [
+      "uv_arrow_production",
+      "uv_arrow_save",
+      "uv_arrow_reopen"
+    ],
+    "representative_edit": "UP_ARROW -> F17 inactive, repeat-enabled; save before watcher and fresh reopen",
+    "stock_global_rows": "unchanged; owner05 handoff recorded by coordinator",
+    "partial_production_run": "uv_arrow_production-1794559318047548000",
+    "partial_production_limit": "F23 fixture control order shifted relative to recreated Pipeline rows; removing F23 restored exact foreign preservation; cleanup completeness assertion stopped addon unregister; host cleanup passed; save/reopen skipped"
   }
 }

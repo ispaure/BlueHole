@@ -7,6 +7,7 @@ be staged as disposable add-on probes; the reference path observes existing maps
 import json
 import math
 from pathlib import Path
+import sys
 
 
 CLUSTERS = {
@@ -56,6 +57,26 @@ TOOL_STARTS = {
 }
 
 
+def native_control_properties(operator, properties):
+    """Apply the runtime's reviewed enum-flag rules to direct RNA arguments."""
+    converted = properties.copy()
+    for prop in operator.get_rna_type().properties:
+        name = prop.identifier
+        if name not in converted or prop.type != 'ENUM' or getattr(prop, 'is_enum_flag', False) is not True:
+            continue
+        identifiers = tuple(item.identifier for item in prop.enum_items)
+        if not identifiers or any(type(identifier) is not str for identifier in identifiers):
+            raise ValueError('unreadable_property_schema')
+        allowed = frozenset(identifier for identifier in identifiers if identifier)
+        value = converted[name]
+        if (not allowed or type(value) not in (list, tuple)
+                or any(type(flag) is not str or flag not in allowed for flag in value)
+                or tuple(value) != tuple(sorted(set(value)))):
+            raise ValueError('unreadable_property_schema')
+        converted[name] = set(value)
+    return converted
+
+
 class OrdinaryCases:
     def __init__(self, steps, receipt, record, window, area, exporter, *,
                  probe=False, cluster='axis', invert_zoom=None, ledger_path=None):
@@ -80,7 +101,7 @@ class OrdinaryCases:
                     found[row['row_id']] = row['binding']
         self.bindings = {row_id: found[row_id] for row_id in ids}
         self.scope_names = {row['scope']['name'] for row in self.bindings.values()}
-        self.scope_names.update(('Window', 'Screen', '3D View', 'Image', 'UV Editor'))
+        self.scope_names.update(('Window', 'Screen', 'Frames', 'View2D', '3D View', 'Image', 'UV Editor'))
         self.foreign = {}
         self.owned = None
         self.saved_inversion = None
@@ -422,6 +443,7 @@ class OrdinaryCases:
             result = {
                 'editor': self.area.type, 'editor_ui_type': self.area.ui_type,
                 'context_mode': ctx.mode, 'active_tool': self.active_tool(),
+                'frame_current': ctx.scene.frame_current,
                 'operator_history': [operator.bl_idname for operator in ctx.window_manager.operators],
                 'modal_operators_observable': hasattr(self.window, 'modal_operators'),
                 'modal_operators': [operator.bl_idname for operator in
@@ -468,8 +490,12 @@ class OrdinaryCases:
             properties.update(mx=region.width // 2, my=region.height // 2)
         with self.context():
             poll = operator.poll()
-            result = sorted(operator('EXEC_DEFAULT', **properties)) if poll else []
+            native_properties = native_control_properties(operator, properties) if poll else {}
+            result = sorted(operator('EXEC_DEFAULT', **native_properties)) if poll else []
         return {'poll': poll, 'result': result, 'properties': properties,
+                'native_enum_flag_arguments': {
+                    name: sorted(value) for name, value in native_properties.items()
+                    if type(value) is set},
                 'method': 'direct operator fixture control'}
 
     def conflicting_rows(self, binding):
@@ -587,6 +613,11 @@ class OrdinaryCases:
             if state.get('input_delivered'):
                 attempt('input_drag', lambda: self.event('MOUSEMOVE', 'NOTHING', dx=dx, dy=dy, **mods))
 
+        def observe_phase(phase):
+            if state.get('input_delivered'):
+                attempt('input_phase_observation', lambda: result.setdefault('input_phases', []).append({
+                    'phase': phase, 'snapshot': self.snapshot()}))
+
         def end_drag():
             if not state.pop('pressed', False):
                 return
@@ -644,7 +675,10 @@ class OrdinaryCases:
 
         self.steps.extend((prepare, observe_maps, prime_input, begin))
         if is_drag:
-            self.steps.extend((lambda: drag(8, 4), lambda: drag(70, 32), end_drag))
+            self.steps.extend((lambda: observe_phase('after_press'),
+                               lambda: drag(8, 4), lambda: observe_phase('after_initial_motion'),
+                               lambda: drag(70, 32), lambda: observe_phase('after_second_motion'),
+                               end_drag, lambda: observe_phase('after_release')))
         self.steps.extend((observe, reset, fixture_control, finish))
 
     def append(self):
@@ -652,4 +686,346 @@ class OrdinaryCases:
         for row_id, binding in self.bindings.items():
             self.case(row_id, binding)
         self.steps.append(self.cleanup)
+        return self
+
+
+class UVArrowPrecedenceCases:
+    """One isolated Frames assignment experiment; inherited rows are read-only."""
+
+    def __init__(self, ordinary, runtime, *, production=None):
+        self.fixture, self.runtime = ordinary, runtime
+        self.bpy, self.configs = ordinary.bpy, ordinary.configs
+        self.steps, self.receipt, self.record = ordinary.steps, ordinary.receipt, ordinary.record
+        self.classes, self.callbacks = [], []
+        self.handle = None
+        self.production = production
+        self.installed = False
+        self.previous_profile = None
+        self.profiling = False
+        self.owner = 'category03:uv-arrow-frames-probe'
+        self.proof = {'status': 'prepared', 'owner': self.owner, 'production': production is not None,
+                      'source_policy': 'ordinary owned assignments only; inherited rows read-only',
+                      'cases': [], 'installs': [], 'releases': []}
+        self.receipt['uv_arrow_precedence'] = self.proof
+
+    def setup(self, kind):
+        self.fixture.setup_image('UV Editor') if kind == 'uv' else self.fixture.setup_object('3D View')
+        with self.fixture.context():
+            obj, scene = self.bpy.context.object, self.bpy.context.scene
+            for frame, value in ((1, 0.0), (10, 1.0)):
+                scene.frame_set(frame)
+                obj.location.x = value
+                assert obj.keyframe_insert(data_path='location', index=0, frame=frame)
+            scene.frame_set(5)
+        return obj.name
+
+    def maps(self):
+        return {role: [self.fixture.capture(keymap) for keymap in getattr(self.configs, role).keymaps
+                       if keymap.name in self.fixture.scope_names]
+                for role in ('default', 'active', 'addon', 'user')}
+
+    def guard_class(self, direction):
+        bpy, callbacks = self.bpy, self.callbacks
+        target = 'uv.select_' + direction
+
+        class WM_OT_category03_uv_guard(bpy.types.Operator):
+            bl_idname = 'wm.category03_uv_' + direction + '_guard'
+            bl_label = 'Category 03 UV ' + direction + ' priority probe'
+
+            @classmethod
+            def poll(cls, context):
+                return bool(context.area and context.area.type == 'IMAGE_EDITOR'
+                            and context.area.ui_type == 'UV'
+                            and context.region and context.region.type == 'WINDOW'
+                            and getattr(bpy.ops.uv, 'select_' + direction).poll())
+
+            def execute(self, context):
+                if not type(self).poll(context):
+                    return {'PASS_THROUGH'}
+                result = getattr(bpy.ops.uv, 'select_' + direction)('EXEC_DEFAULT')
+                callbacks.append({'target': target, 'area': context.area.type,
+                                  'ui_type': context.area.ui_type, 'region': context.region.type,
+                                  'mode': context.mode, 'result': sorted(result)})
+                return result
+
+        WM_OT_category03_uv_guard.__name__ = 'WM_OT_category03_uv_' + direction + '_guard'
+        return WM_OT_category03_uv_guard
+
+    def start(self):
+        if self.production:
+            self.classes.extend(self.production['classes'])
+            self.initial_maps = self.maps()
+            self.initial_owners = self.production['source_provenance'](self.initial_maps)
+            self.proof['initial_maps_without_control'] = self.initial_maps
+            self.proof['initial_owned_generations'] = self.initial_owners
+        else:
+            for direction in ('more', 'less'):
+                cls = self.guard_class(direction)
+                self.bpy.utils.register_class(cls)
+                self.classes.append(cls)
+        self.fixture.start()
+        if self.production:
+            self.fixture.release_input_control()
+        self.baseline = self.maps()
+        if self.production:
+            self.baseline_owners = self.production['source_provenance'](self.baseline)
+            self.proof['baseline_owned_generations'] = self.baseline_owners
+        self.proof.update(status='running', baseline_maps=self.baseline,
+                          order_limit='Captured map/item order is not handler priority; frame/UV effects prove the winner')
+        self.record('uv_arrow_probe_ready')
+
+    def install(self):
+        rt = self.runtime
+        assert self.handle is None
+        if self.production:
+            self.production['toggle'](True)
+            self.installed = True
+            pairs = self.production['registered_pairs']()
+            proof = {'source_rows': [], 'merged_rows': [], 'registered_pair_matches': [],
+                     'actual_owners': [], 'owned_pair_count': 0}
+            self.proof['installs'].append(proof)
+            wanted = {cls.bl_idname for cls in self.classes}
+            for owner_id, handle in rt._FEATURES.items():
+                if not owner_id.startswith('legacy:Selection:'):
+                    continue
+                for request_id, owned in handle._owned.items():
+                    if owned.item.idname not in wanted:
+                        continue
+                    assert rt._valid_owned(owned)
+                    assert sum(rt._same(km, owned.map) and rt._same(item, owned.item)
+                               for km, item in pairs) == 1
+                    assert (owned.map.name, owned.map.space_type, owned.map.region_type) == ('Frames', 'EMPTY', 'WINDOW')
+                    source = next(row for row in self.fixture.capture(owned.map)['items']
+                                  if row['blender_id'] == owned.item.id)
+                    merged = [row for km in self.configs.user.keymaps if km.name == 'Frames'
+                              for row in self.fixture.capture(km)['items']
+                              if row['target'] == owned.item.idname]
+                    assert len(merged) == 1
+                    assert source['active'] and source['event']['repeat']
+                    assert {k: v for k, v in source.items() if k != 'blender_id'} == {
+                        k: v for k, v in merged[0].items() if k != 'blender_id'}
+                    proof['source_rows'].append(source)
+                    proof['merged_rows'].append(merged[0])
+                    proof['registered_pair_matches'].append(1)
+                    proof['actual_owners'].append({'owner_id': owner_id, 'request_id': request_id})
+            proof['owned_pair_count'] = len(proof['source_rows'])
+            assert proof['owned_pair_count'] == 2
+            assert {row['event']['type'] for row in proof['source_rows']} == {'UP_ARROW', 'DOWN_ARROW'}
+            self.record('uv_arrow_production_enabled')
+            return
+        assignments = tuple(rt.KeymapAssignment(
+            request_id=direction, scope=rt.KeymapScope('Frames'),
+            event=rt.KeymapEvent(key, repeat=True),
+            target=rt.KeymapTarget(idname=cls.bl_idname))
+            for direction, key, cls in zip(('more', 'less'), ('UP_ARROW', 'DOWN_ARROW'), self.classes))
+        self.handle = rt.register_feature(self.owner, assignments=assignments)
+        self.installed = True
+        self.configs.update()
+        proof = {'source_rows': [], 'merged_rows': [], 'registered_pair_matches': [],
+                 'owned_pair_count': len(self.handle.owned_pairs)}
+        self.proof['installs'].append(proof)
+        assert proof['owned_pair_count'] == 2
+        for request in assignments:
+            owned = self.handle._owned[request.request_id]
+            assert rt._valid_owned(owned)
+            pair_matches = sum(rt._same(km, owned.map) and rt._same(item, owned.item)
+                               for km, item in self.handle.owned_pairs)
+            assert pair_matches == 1
+            source = self.fixture.capture(owned.map)
+            row = next(row for row in source['items'] if row['blender_id'] == owned.item.id)
+            proof['source_rows'].append(row)
+            assert row['active'] and row['target'] == request.target.idname
+            assert row['event']['type'] == request.event.type and row['event']['repeat']
+            matches = [row for km in self.configs.user.keymaps
+                       if km.name == 'Frames' and km.space_type == 'EMPTY' and km.region_type == 'WINDOW'
+                       for row in self.fixture.capture(km)['items'] if row['target'] == request.target.idname]
+            assert len(matches) == 1
+            merged = matches[0]
+            proof['merged_rows'].append(merged)
+            assert {k: v for k, v in merged.items() if k != 'blender_id'} == {
+                k: v for k, v in row.items() if k != 'blender_id'}
+            proof['registered_pair_matches'].append(pair_matches)
+        self.record('uv_arrow_probe_installed')
+
+    def release(self):
+        if self.production and self.installed:
+            self.production['toggle'](False)
+        if self.handle is not None:
+            self.handle.release()
+            self.handle = None
+            self.configs.update()
+        self.installed = False
+        assert not any(row.idname in {cls.bl_idname for cls in self.classes}
+                       for role in ('addon', 'user') for km in getattr(self.configs, role).keymaps
+                       for row in km.keymap_items)
+
+    def release_endpoint(self):
+        if self.production:
+            self.fixture.release_input_control()
+        current = self.maps()
+        proof = {'maps': current, 'exact_sources_and_merged_equal': current == self.baseline}
+        if self.production:
+            source_roles = ('default', 'active', 'addon')
+            before = {role: self.baseline[role] for role in source_roles}
+            after = {role: current[role] for role in source_roles}
+            owners = self.production['source_provenance'](current)
+            comparison = self.production['compare_sources'](before, after, self.baseline_owners, owners)
+            proof.update(source_comparison=comparison, owned_source_generations=owners,
+                         strict_foreign_merged_equal=current['user'] == self.baseline['user'])
+            proof['accepted_preservation'] = (comparison['accepted_sources_equal']
+                                               and proof['strict_foreign_merged_equal'])
+        else:
+            proof['accepted_preservation'] = proof['exact_sources_and_merged_equal']
+        self.proof['releases'].append(proof)
+        self.record('uv_arrow_probe_released')
+        assert proof['accepted_preservation']
+
+    def start_profile(self):
+        if not self.production:
+            return
+        codes = {cls.execute.__code__: 'uv.select_' + direction
+                 for cls, direction in zip(self.classes, ('more', 'less'))}
+        self.previous_profile = sys.getprofile()
+
+        def profile(frame, event, result):
+            if event == 'return' and frame.f_code in codes:
+                context = frame.f_locals['context']
+                self.callbacks.append({'target': codes[frame.f_code], 'area': context.area.type,
+                                       'ui_type': context.area.ui_type, 'region': context.region.type,
+                                       'mode': context.mode, 'result': sorted(result)})
+
+        sys.setprofile(profile)
+        self.profiling = True
+
+    def stop_profile(self):
+        if self.profiling:
+            sys.setprofile(self.previous_profile)
+            self.profiling = False
+
+    def case(self, label, key, kind, expected, direction):
+        result = {'case': label, 'key': key, 'kind': kind, 'expected': expected}
+        state = {}
+
+        def prepare():
+            result['keyframed_object'] = self.setup(kind)
+            if self.production and self.fixture.input_control is None:
+                self.fixture.install_input_control()
+            state['control_start'] = len(self.fixture.input_callbacks)
+            state['callback_start'] = len(self.callbacks)
+
+        def prime():
+            self.fixture.event('MOUSEMOVE', 'NOTHING')
+            self.fixture.event('F23')
+            self.fixture.event('F23', 'RELEASE')
+
+        def begin():
+            callbacks = self.fixture.input_callbacks[state['control_start']:]
+            expected_context = {'area': self.fixture.area.type, 'region': 'WINDOW'}
+            delivered = expected_context in callbacks
+            result['input_delivery'] = {'callbacks': callbacks, 'expected': expected_context,
+                                        'delivered': delivered}
+            if not delivered:
+                result.update(passed=False, status='window_control_missing')
+                self.proof['cases'].append(result)
+                self.receipt['dispatch'].append(result)
+                self.record(label)
+            assert delivered
+            result['before'] = self.fixture.snapshot()
+            result['live_maps_before_input'] = self.maps()
+            with self.fixture.context():
+                result['guard_poll'] = self.classes[0 if direction == 'more' else 1].poll(self.bpy.context)
+                result['stock_jump_poll'] = self.bpy.ops.screen.keyframe_jump.poll()
+            self.start_profile()
+            self.fixture.event('MOUSEMOVE', 'NOTHING')
+            self.fixture.event(key)
+            self.fixture.event(key, 'RELEASE')
+
+        def observe():
+            self.stop_profile()
+            result['after'] = self.fixture.snapshot()
+            result['callbacks'] = self.callbacks[state['callback_start']:]
+            before, after = result['before'], result['after']
+            if expected == 'uv_selection':
+                result['passed'] = (len(before['selected_uv']) == 4
+                                    and len(after['selected_uv']) == (9 if direction == 'more' else 1)
+                                    and after['frame_current'] == 5)
+                if self.installed and key in ('UP_ARROW', 'DOWN_ARROW'):
+                    result['passed'] &= len(result['callbacks']) == 1
+                else:
+                    result['passed'] &= not result['callbacks']
+            else:
+                result['passed'] = (after['frame_current'] == (10 if direction == 'more' else 1)
+                                    and not result['callbacks'])
+                if kind == 'uv':
+                    result['passed'] &= before['selected_uv'] == after['selected_uv']
+                else:
+                    result['passed'] &= not result['guard_poll']
+            result['passed'] &= before['frame_current'] == 5
+            self.proof['cases'].append(result)
+            self.receipt['dispatch'].append(result)
+            self.record(label)
+            assert result['passed'], label
+
+        self.steps.extend((prepare, prime, begin, observe))
+
+    def cleanup(self):
+        self.stop_profile()
+        finished = False
+        try:
+            self.release()
+            if self.production:
+                self.fixture.release_input_control()
+                if not hasattr(self, 'initial_maps'):
+                    return
+                current = self.maps()
+                roles = ('default', 'active', 'addon')
+                owners = self.production['source_provenance'](current)
+                comparison = self.production['compare_sources'](
+                    {role: self.initial_maps[role] for role in roles},
+                    {role: current[role] for role in roles}, self.initial_owners, owners)
+                merged_equal = current['user'] == self.initial_maps['user']
+                self.proof['final_without_control'] = {
+                    'maps': current, 'owned_source_generations': owners,
+                    'source_comparison': comparison, 'strict_foreign_merged_equal': merged_equal}
+                self.proof['control_released'] = True
+                assert comparison['accepted_sources_equal'] and merged_equal
+            else:
+                self.fixture.cleanup()
+            finished = True
+        finally:
+            if not self.production:
+                for cls in reversed(self.classes):
+                    self.bpy.utils.unregister_class(cls)
+            self.classes.clear()
+            self.proof['fixture_cleanup_complete'] = finished
+            if (finished and len(self.proof['cases']) == 13 and all(case['passed'] for case in self.proof['cases'])
+                    and len(self.proof['releases']) == 2
+                    and all(item['accepted_preservation'] for item in self.proof['releases'])):
+                self.proof['status'] = 'complete'
+
+    def append(self):
+        self.steps.extend((lambda: self.setup('uv'),
+                           lambda: self.fixture.event('F24'),
+                           lambda: self.fixture.event('F24', 'RELEASE'), self.start))
+        for direction, key in (('more', 'UP_ARROW'), ('less', 'DOWN_ARROW')):
+            self.case('baseline_uv_' + direction, key, 'uv', 'keyframe_jump', direction)
+        if not self.production:
+            for direction, key in (('more', 'RIGHT_BRACKET'), ('less', 'LEFT_BRACKET')):
+                self.case('baseline_bracket_' + direction, key, 'uv', 'uv_selection', direction)
+        for direction, key in (('more', 'UP_ARROW'), ('less', 'DOWN_ARROW')):
+            self.case('baseline_3d_' + direction, key, 'object', 'keyframe_jump', direction)
+        self.steps.append(self.install)
+        for direction, key in (('more', 'UP_ARROW'), ('less', 'DOWN_ARROW')):
+            self.case('owned_uv_' + direction, key, 'uv', 'uv_selection', direction)
+        if self.production:
+            for direction, key in (('more', 'RIGHT_BRACKET'), ('less', 'LEFT_BRACKET')):
+                self.case('owned_bracket_' + direction, key, 'uv', 'uv_selection', direction)
+        for direction, key in (('more', 'UP_ARROW'), ('less', 'DOWN_ARROW')):
+            self.case('owned_3d_' + direction, key, 'object', 'keyframe_jump', direction)
+        self.steps.extend((self.release, lambda: self.setup('uv'), self.release_endpoint))
+        for direction, key in (('more', 'UP_ARROW'), ('less', 'DOWN_ARROW')):
+            self.case('released_uv_' + direction, key, 'uv', 'keyframe_jump', direction)
+        self.steps.append(self.install)
+        self.case('reinstalled_uv_more', 'UP_ARROW', 'uv', 'uv_selection', 'more')
+        self.steps.extend((self.release, lambda: self.setup('uv'), self.release_endpoint))
         return self
