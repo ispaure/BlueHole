@@ -69,6 +69,10 @@ preferences, and copied resource trees are excluded from Git and packages.
 
 ## Isolation and capture procedure
 
+The legacy files used in this capture are retained in Git history. The 04
+and 05 catalog tests use extracts of the relevant explicit preset fields
+keyed by ledger row ID.
+
 The reference app and its shared portable profile are called `<reference app>`
 and `<reference profile>` throughout the evidence. Resolve them privately. The
 app itself was executed read-only; no app copy or original preference write was

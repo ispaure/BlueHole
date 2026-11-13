@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from runtime_keymap_fakes import FakeItems, FakeProperties, FakeRuntime, row
-from test_keymap_category04 import BASELINE, FIXTURES, ROOT, preset_properties, read_jsonl
+from test_keymap_category04 import BASELINE, FIXTURES, ROOT, read_jsonl
 
 
 class Category05CatalogTest(unittest.TestCase):
@@ -104,7 +104,8 @@ class Category05CatalogTest(unittest.TestCase):
             'other': load('actions.actions.keymaps.other_actions').OTHER_ACTIONS,
             'pie': registers['pie'].get_enabled_pie_actions(),
         }
-        preset = preset_properties()
+        preset_fields = json.loads((FIXTURES / 'deluxe_keymaps_category05/preset-explicit-fields.json').read_text())
+        self.assertEqual(preset_fields.keys(), {id_ for id_, entry in catalog.items() if entry[-1] == 'preset'})
         keys_by_category = defaultdict(list)
         emitted = {}
         expected = defaultdict(list)
@@ -148,17 +149,7 @@ class Category05CatalogTest(unittest.TestCase):
                     properties = action.get_props()
                     effective = {k: canonical(v) for k, v in ref['properties'].items()}
                     if source == 'preset':
-                        preset_key = (scope.name, scope.space_type, scope.region_type,
-                                      ref['target'], event.type, event.value)
-                        self.assertTrue(any(
-                            properties.keys() == candidate.keys()
-                            and all(preset_event.get(field, default) == getattr(event, field)
-                                    for field, default in (
-                                        ('any', False), ('shift', False), ('ctrl', False),
-                                        ('alt', False), ('oskey', False), ('repeat', False),
-                                        ('direction', 'ANY'), ('key_modifier', 'NONE')))
-                            for preset_event, candidate in preset[preset_key]
-                        ), id_)
+                        self.assertIn(set(properties), [set(fields) for fields in preset_fields[id_]], id_)
                         self.assertLessEqual(properties.items(), effective.items(), id_)
                     elif source == 'defaults':
                         self.assertFalse(properties, id_)

@@ -1,6 +1,5 @@
 """Bulk reconciliation of the Object, Mesh and UV catalog."""
 
-import ast
 from collections import Counter, defaultdict
 from dataclasses import asdict
 import importlib
@@ -24,22 +23,6 @@ REGISTRATION_ORDER = ('mesh', 'object', 'uv')
 
 def read_jsonl(path):
     return [json.loads(line) for line in path.read_text().splitlines()]
-
-
-def preset_properties():
-    """Read the protected preset data without loading it as a keyconfig."""
-    path = ROOT / 'overlays/deluxe/payload/keyconfig/BH_Keymaps.py'
-    data = next(node.value for node in ast.parse(path.read_text()).body
-                if isinstance(node, ast.Assign)
-                and any(isinstance(target, ast.Name) and target.id == 'keyconfig_data'
-                        for target in node.targets))
-    by_command = defaultdict(list)
-    for name, scope, contents in ast.literal_eval(data):
-        for target, event, details in contents['items']:
-            key = (name, scope.get('space_type', 'EMPTY'), scope.get('region_type', 'WINDOW'),
-                   target, event['type'], event['value'])
-            by_command[key].append((event, dict((details or {}).get('properties', ()))))
-    return by_command
 
 
 def property_value(value):
@@ -119,7 +102,9 @@ class Category04CatalogTest(unittest.TestCase):
         groups = {}
         expected = defaultdict(list)
         catalog = {}
-        preset = preset_properties()
+        preset = json.loads((FIXTURES / 'deluxe_keymaps_category04/preset-explicit-properties.json').read_text())
+        self.assertEqual(preset.keys(), {id_ for id_, entry in declarations.items()
+                                        if entry['properties_source'] == 'reference preset explicit'})
         for category in CATEGORIES:
             module = load(f'actions.actions.keymaps.{category}')
             register = registers[category] = load(f'keymaps.{category}_keymaps_register')
@@ -160,16 +145,8 @@ class Category04CatalogTest(unittest.TestCase):
                     effective = {}
                     self.assertEqual(properties, effective, id_)
                 elif entry['properties_source'] == 'reference preset explicit':
-                    key = (scope.name, scope.space_type, scope.region_type,
-                           ref['target'], event.type, event.value)
-                    matches = [props for input_, props in preset[key]
-                               if all(input_.get(field, default) == getattr(event, field)
-                                      for field, default in (
-                                          ('any', False), ('shift', False), ('ctrl', False),
-                                          ('alt', False), ('oskey', False), ('repeat', False),
-                                          ('direction', 'ANY'), ('key_modifier', 'NONE')))]
                     self.assertIn(properties, [{k: property_value(v) for k, v in m.items()}
-                                               for m in matches], id_)
+                                               for m in preset[id_]], id_)
                     self.assertLessEqual(properties.items(), effective.items(), id_)
                 else:
                     self.assertEqual(properties, effective, id_)

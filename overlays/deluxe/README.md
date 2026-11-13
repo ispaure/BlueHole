@@ -9,7 +9,11 @@ its existing Keymaps and Pie Menus opt-ins.
 Use **Addon Settings > Keymaps**, **Pie Menus**, and **Third-Party Add-ons** in
 Blue Hole preferences to change features. **Disable Deluxe Keymaps** removes
 the runtime catalog and its pie shortcuts and keeps your feature choices for
-the next enable. Save Preferences to keep your choices across sessions.
+the next enable. Blender saves the Blue Hole activation and feature switches
+on normal exit if **Auto-Save Preferences** is enabled. Otherwise choose
+**Save Preferences** in Blender to keep the choice across sessions. The
+shortcut editor's **Apply Changes** saves assignment edits to a separate
+Deluxe JSON profile.
 The standard Blue Hole Save As shortcut is part of Blue Hole's pipeline while
 the add-on is enabled. Disable Blue Hole to restore the stock Save As shortcut.
 
@@ -58,5 +62,5 @@ export workflows still need native parity checks. The detailed exceptions are
 recorded in the [Navigation, Selection and Transform](../../docs/deluxe-keymaps-category03.md),
 [Object, Mesh and UV](../../docs/deluxe-keymaps-category04.md), and
 [Sculpt, Pipeline, Other and Pie](../../docs/deluxe-keymaps-category05.md)
-receipts. The old preset and preference snapshot remain reference inputs in
-the source checkout. The installable ZIP contains the runtime catalog.
+receipts. The original preset and preference snapshot are available in Git
+history. The source checkout and installable ZIP use the runtime catalog.

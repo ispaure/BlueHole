@@ -67,8 +67,7 @@ def digest(value):
 
 
 def protected_hashes(profile=None):
-    paths = {'packaged_preset': REPO / 'overlays/deluxe/payload/keyconfig/BH_Keymaps.py',
-             'packaged_preferences': REPO / 'overlays/deluxe/payload/userpref.blend'}
+    paths = {'deluxe_catalog': REPO / 'keymaps/deluxe-defaults.json'}
     if profile:
         paths.update(reference_preset=profile / 'scripts/presets/keyconfig/BH_Keymaps.py',
                      reference_preferences=profile / 'config/userpref.blend')

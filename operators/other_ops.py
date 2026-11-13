@@ -38,6 +38,12 @@ def _keymap_error(operator, context, error, message):
     return {'CANCELLED'}
 
 
+def _report_keymap_preference(operator, context, message):
+    if not context.preferences.use_preferences_save:
+        message += ' Use Save Preferences to keep this choice after restarting Blender.'
+    operator.report({'INFO'}, message)
+
+
 class WM_OT_URLOpen(bpy.types.Operator):
     """Open a website in the web-browser"""
     bl_idname = "wm.bh_open_url"
@@ -86,6 +92,7 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
             message = str(error) if isinstance(error, (ValueError, applyDeluxePrefs.ActivationError)) else (
                 'Blender could not apply Deluxe keymaps. See the Blue Hole log and try again.')
             return _keymap_error(self, context, error, message)
+        _report_keymap_preference(self, context, 'Deluxe keymaps enabled.')
         return {'FINISHED'}
 
 
@@ -97,6 +104,7 @@ class WM_OT_Disable_Deluxe_Keymaps(bpy.types.Operator):
 
     def execute(self, context):
         applyDeluxePrefs.disable_deluxe_keymaps(context, prefs().prefs)
+        _report_keymap_preference(self, context, 'Deluxe keymaps disabled.')
         return {'FINISHED'}
 
 
