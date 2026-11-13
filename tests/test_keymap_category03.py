@@ -334,6 +334,230 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
         self.assertNotIn('declaration', self.rows[row_id])
 
 
+class Category03ImageToolFixtureTests(unittest.TestCase):
+    def fixture(self):
+        from blender_keymap_category03_ordinary import OrdinaryCases
+        configs = types.SimpleNamespace(**{role: types.SimpleNamespace(keymaps=[])
+                                          for role in ('default', 'active', 'addon', 'user')})
+        bpy = types.SimpleNamespace(context=types.SimpleNamespace(
+            window_manager=types.SimpleNamespace(keyconfigs=configs)))
+        with patch.dict(sys.modules, {'bpy': bpy}):
+            fixture = OrdinaryCases([], {'dispatch': []}, Mock(), None,
+                                    types.SimpleNamespace(type='IMAGE_EDITOR'), None,
+                                    cluster='image_tools', ledger_path=BASELINE / 'reconciliation-ledger.jsonl')
+        return fixture
+
+    def test_image_tool_subset_contains_only_four_exact_rows_in_two_contexts(self):
+        from blender_keymap_category03_ordinary import OrdinaryCases, CLUSTERS
+        fixture = self.fixture()
+        self.assertEqual([binding['event']['type'] for binding in fixture.bindings.values()], list('QWER'))
+        self.assertEqual({binding['scope']['name'] for binding in fixture.bindings.values()}, {'Image'})
+        self.assertEqual(len({row_id for ids in CLUSTERS.values() for row_id in ids}), 22)
+        # Build the real closures to catch subset/family routing failures.
+        fixture.append()
+        self.assertEqual(len(fixture.steps), 66)
+        fixture.steps, fixture.case = [], Mock()
+        fixture.append()
+        self.assertEqual([(call.args[1]['event']['type'], call.args[2]['image_mode'])
+                          for call in fixture.case.call_args_list],
+                         [(key, mode) for key in 'QWER' for mode in ('VIEW', 'UV')])
+        with patch.dict(sys.modules, {'bpy': fixture.bpy}), self.assertRaises(ValueError):
+            OrdinaryCases([], {}, Mock(), None, None, None, cluster='image_tools', probe=True,
+                          ledger_path=BASELINE / 'reconciliation-ledger.jsonl')
+
+    def test_image_tool_control_uses_actual_context_without_rewriting_the_binding(self):
+        fixture = self.fixture()
+        binding = next(iter(fixture.bindings.values()))
+        original = copy.deepcopy(binding)
+        operator = Mock(return_value={'FINISHED'})
+        operator.poll.return_value = True
+        operator.get_rna_type.return_value = types.SimpleNamespace(properties=[])
+        fixture.bpy.ops = types.SimpleNamespace(wm=types.SimpleNamespace(tool_set_by_id=operator))
+        fixture.context = nullcontext
+        control = fixture.direct_control(binding)
+        operator.assert_called_once_with('EXEC_DEFAULT', **{**binding['properties'], 'space_type': 'IMAGE_EDITOR'})
+        self.assertEqual(binding, original)
+        self.assertEqual(control['captured_binding_properties']['space_type'], 'EMPTY')
+        self.assertEqual(control['space_type_policy'], 'explicit actual IMAGE_EDITOR context')
+        fixture.area.type = 'VIEW_3D'
+        with self.assertRaises(AssertionError):
+            fixture.direct_control(binding)
+        self.assertEqual(operator.call_count, 1)
+
+    def test_tool_property_state_does_not_confuse_defaults_explicit_values_or_unknowns(self):
+        from blender_keymap_category03_ordinary import tool_property_state
+        properties = types.SimpleNamespace(space_type='EMPTY', name='builtin.select_box',
+                                           cycle=False, as_fallback=False)
+        def is_set(name):
+            if name == 'as_fallback':
+                raise ReferenceError('unavailable')
+            return name in ('cycle', 'name')
+        properties.is_property_set = is_set
+        result = tool_property_state(properties)
+        self.assertEqual(result['values']['space_type'], 'EMPTY')
+        self.assertIs(result['is_property_set']['space_type'], False)
+        self.assertIs(result['is_property_set']['cycle'], True)
+        self.assertIsNone(result['is_property_set']['as_fallback'])
+        self.assertEqual(result['read_issues'], {'as_fallback.is_property_set': 'ReferenceError'})
+
+    def test_image_tool_map_evidence_keeps_identity_order_and_inactive_competitors(self):
+        fixture = self.fixture()
+        binding = next(iter(fixture.bindings.values()))
+        candidate = {**copy.deepcopy(binding), 'blender_id': 7}
+        other = {**copy.deepcopy(candidate), 'blender_id': 9, 'active': False}
+        other['properties']['cycle'] = False
+        native = [types.SimpleNamespace(id=row['blender_id'], as_pointer=lambda i=i: 100 + i,
+                                        properties=types.SimpleNamespace(**row['properties'],
+                                            is_property_set=lambda name: name in ('name', 'cycle')))
+                  for i, row in enumerate((other, candidate))]
+        km = types.SimpleNamespace(name='Image', as_pointer=lambda: 42, keymap_items=native)
+        fixture.capture = Mock(return_value={'scope': binding['scope'], 'items': [other, candidate]})
+        for role in ('default', 'active', 'addon', 'user'):
+            getattr(fixture.configs, role).keymaps = [km]
+        evidence = fixture.tool_row_evidence(binding)
+        for role in evidence:
+            self.assertEqual([x['row']['blender_id'] for x in evidence[role]], [9, 7])
+            self.assertEqual([x['item_index'] for x in evidence[role]], [0, 1])
+            self.assertEqual([x['item_pointer'] for x in evidence[role]], [100, 101])
+            self.assertEqual([x['exact_binding'] for x in evidence[role]], [False, True])
+            self.assertIs(evidence[role][1]['operator_properties']['is_property_set']['space_type'], False)
+            self.assertEqual(evidence[role][0]['row'], other)
+
+    def test_tool_dispatch_observer_separates_two_inputs_and_restores_previous_profiler(self):
+        from blender_keymap_category03_ordinary import ToolDispatchTrace
+        class Operator:
+            properties = types.SimpleNamespace(space_type='EMPTY', name='builtin.select_box',
+                                               cycle=True, as_fallback=False,
+                                               is_property_set=lambda name: name in ('name', 'cycle'))
+            def execute(self, context):
+                space_type = context.space_data.type
+                return {'FINISHED'}
+        context = types.SimpleNamespace(area=types.SimpleNamespace(type='IMAGE_EDITOR', ui_type='UV'),
+                                        region=types.SimpleNamespace(type='WINDOW'), mode='EDIT_MESH',
+                                        space_data=types.SimpleNamespace(type='IMAGE_EDITOR'))
+        output, previous_events = [], []
+        previous = sys.getprofile()
+        sentinel = lambda frame, event, arg: previous_events.append(event)
+        trace = ToolDispatchTrace(Operator.execute.__code__, output)
+        try:
+            sys.setprofile(sentinel)
+            Operator().execute(context)  # Setup is outside the observation interval.
+            trace.start()
+            Operator().execute(context)
+            trace.phase = 'second_input'
+            Operator().execute(context)
+            trace.stop()
+            self.assertIs(sys.getprofile(), sentinel)
+            Operator().execute(context)  # Direct control is also excluded.
+        finally:
+            if trace.running:
+                trace.stop()
+            sys.setprofile(previous)
+        self.assertTrue(previous_events)
+        self.assertEqual([row['phase'] for row in output], ['first_input', 'second_input'])
+        self.assertEqual([row['resolved_space_type'] for row in output], ['IMAGE_EDITOR'] * 2)
+        self.assertTrue(all(row['result'] == ['FINISHED'] for row in output))
+        self.assertTrue(all(row['properties']['is_property_set']['space_type'] is False for row in output))
+
+    def test_positive_tool_control_requires_an_observable_change_in_the_same_context(self):
+        from blender_keymap_category03_ordinary import positive_tool_control
+        fixture = self.fixture()
+        binding = next(iter(fixture.bindings.values()))
+        before = {'active_tool': 'builtin.select', 'editor': 'IMAGE_EDITOR', 'editor_ui_type': 'UV',
+                  'context_mode': 'EDIT_MESH', 'image_mode': 'UV', 'modal_operators': []}
+        after = {**before, 'active_tool': binding['properties']['name']}
+        control = {'poll': True, 'result': ['FINISHED']}
+        self.assertTrue(positive_tool_control(control, before, after, binding))
+        for change in ({'active_tool': 'builtin.select'}, {'context_mode': 'OBJECT'},
+                       {'editor_ui_type': 'IMAGE_EDITOR'}, {'modal_operators': ['TRANSFORM_OT_translate']}):
+            self.assertFalse(positive_tool_control(control, before, {**after, **change}, binding))
+        self.assertFalse(positive_tool_control(control, after, after, binding))
+        self.assertFalse(positive_tool_control({'poll': True, 'result': ['CANCELLED']}, before, after, binding))
+
+    def test_image_q_case_keeps_second_press_divergence_separate_from_direct_control(self):
+        fixture = self.fixture()
+        row_id, binding = next(iter(fixture.bindings.items()))
+        active = {'tool': 'builtin.select'}
+        context = types.SimpleNamespace(area=types.SimpleNamespace(type='IMAGE_EDITOR', ui_type='UV'),
+                                        region=types.SimpleNamespace(type='WINDOW'), mode='EDIT_MESH',
+                                        space_data=types.SimpleNamespace(type='IMAGE_EDITOR'))
+        class Operator:
+            properties = types.SimpleNamespace(**binding['properties'],
+                                               is_property_set=lambda name: name in ('name', 'cycle'))
+            def execute(self, context):
+                space_type = context.space_data.type
+                active['tool'] = ('builtin.select_circle' if active['tool'] == 'builtin.select_box'
+                                  else 'builtin.select_box')
+                return {'FINISHED'}
+        module = types.ModuleType('bl_operators.wm')
+        module.WM_OT_tool_set_by_id = Operator
+        def setup(*args):
+            active['tool'] = 'builtin.select'
+            return [{'requested': 'builtin.select', 'result': ['FINISHED'], 'active_tool': 'builtin.select'}]
+        def event(key, value='PRESS', **kwargs):
+            if key == 'F23' and value == 'PRESS':
+                fixture.input_callbacks.append({'area': 'IMAGE_EDITOR', 'region': 'WINDOW'})
+            if key == 'Q' and value == 'PRESS':
+                Operator().execute(context)
+        def direct(binding):
+            result = Operator().execute(context)
+            return {'poll': True, 'result': sorted(result)}
+        fixture.setup, fixture.event, fixture.direct_control = setup, event, direct
+        fixture.active_tool = lambda: active['tool']
+        fixture.snapshot = lambda: {'active_tool': active['tool'], 'editor': 'IMAGE_EDITOR',
+            'editor_ui_type': 'UV', 'context_mode': 'EDIT_MESH', 'image_mode': 'UV', 'modal_operators': []}
+        fixture.exact_count = Mock(return_value=1)
+        fixture.conflicting_rows = Mock(return_value=[])
+        fixture.tool_row_evidence = Mock(return_value={'user': ['full-row-evidence']})
+        fixture.case(row_id, binding, {'name': 'image_uv', 'image_mode': 'UV'})
+        previous = sys.getprofile()
+        try:
+            with patch.dict(sys.modules, {'bl_operators.wm': module}):
+                for step in fixture.steps:
+                    step()
+        finally:
+            fixture.stop_tool_trace()
+        self.assertIs(sys.getprofile(), previous)
+        result, = fixture.receipt['dispatch']
+        self.assertNotIn('error', result)
+        self.assertEqual(result['after']['active_tool'], 'builtin.select_box')
+        self.assertEqual(result['after_second_input']['active_tool'], 'builtin.select_circle')
+        self.assertEqual([call['phase'] for call in result['tool_dispatch']], ['first_input', 'second_input'])
+        self.assertEqual(result['direct_control']['after']['active_tool'], 'builtin.select_box')
+        self.assertTrue(result['direct_control']['positive_tool_effect'])
+        self.assertEqual(fixture.tool_row_evidence.call_count, 2)
+
+    def test_image_tool_cleanup_still_releases_rows_after_observer_failure(self):
+        fixture = self.fixture()
+        fixture.proof = {}
+        fixture.tool_trace = types.SimpleNamespace(stop=Mock(side_effect=RuntimeError('observer failure')))
+        fixture.release, fixture.release_input_control = Mock(), Mock()
+        with self.assertRaises(RuntimeError):
+            fixture.cleanup()
+        fixture.release.assert_called_once()
+        fixture.release_input_control.assert_called_once()
+
+    def test_image_tool_cleanup_retains_strict_merged_changes(self):
+        fixture = self.fixture()
+        fixture.proof = {'owned_created': 0, 'owned_released': 0}
+        source = types.SimpleNamespace(name='Image', as_pointer=lambda: 1)
+        merged = types.SimpleNamespace(name='Image', as_pointer=lambda: 2)
+        fixture.configs.addon.keymaps = [source]
+        fixture.configs.user.keymaps = [merged]
+        captures = {1: {'scope': {'name': 'Image'}, 'items': []},
+                    2: {'scope': {'name': 'Image'}, 'items': []}}
+        fixture.capture = lambda km: copy.deepcopy(captures[km.as_pointer()])
+        fixture.foreign = fixture.fingerprint_foreign()
+        self.assertIn(('user', 2), fixture.foreign)
+        captures[2]['items'].append({'blender_id': 9})
+        fixture.release, fixture.release_input_control = Mock(), Mock()
+        with self.assertRaises(AssertionError):
+            fixture.cleanup()
+        self.assertFalse(fixture.proof['strict_source_and_merged_preservation'])
+        self.assertTrue(fixture.proof['tool_dispatch_observer_released'])
+        self.assertEqual(fixture.proof['foreign_source_changes']['changed_in_place'][0]['role'], 'user')
+
+
 class Category03ModalProbeTests(unittest.TestCase):
     def test_uv_extend_shared_schedule_keeps_three_event_paths_separate(self):
         from blender_keymap_category03_handlers import UVExtendCases

@@ -204,7 +204,7 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Eighty-nine category checks currently pass. They cover exact assigned IDs and
+Ninety-eight category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
@@ -911,3 +911,36 @@ The lossless receipt preserves all63 prior factory and20 reference records and
 now contains64 factory/20 reference attempts. All89 category tests pass. The next
 work is the exact four-row Image Q/W/E/R shared test-control repair; no production
 or runtime change or additional native allocation follows from this acceptance.
+
+
+The shared Image tool control repair is now prepared as the exact `image_tools`
+subset of the unchanged22-row ordinary pool. It schedules Q/W/E/R separately in
+VIEW and UV: eight cases, two simulated native key presses and one independently reset
+direct control per case,66 shared fixture steps. The existing production and
+copied-reference launchers accept the subset. It refuses disposable candidate
+insertion and leaves all production declarations/runtime behavior unchanged.
+Image Paint Q, UV T, masked paint Q and UV PRESS are excluded.
+
+Before each input, complete overlapping default/active/add-on/merged rows retain
+native identities, order, effective properties and separate `is_property_set`
+values for space_type/name/cycle/as_fallback; unreadable state remains unknown.
+The direct control explicitly supplies its actual IMAGE_EDITOR space, recording
+both the original captured EMPTY and the control arguments. Positive control
+requires a distinct starting tool, FINISHED and the requested active tool in the
+same editor/mode with no modal operator. Missing effects remain inconclusive.
+A read-only Python observer wraps only the first/second native input interval
+and captures actual wm.tool_set_by_id arguments, property-set states, resolved
+space and results. Full overlapping rows are captured again before the second
+press. Direct/setup calls are excluded and the previous profiler is restored.
+This can distinguish Q cycle calls without claiming that Python dispatch identifies
+a particular native keymap item by itself.
+
+The subset also compares full captured merged maps as well as source maps after
+removing its F23 control; all strict failures remain errors. Cleanup still
+attempts owned-row release if observer shutdown fails. All98 category tests pass,
+including an executed fake Q case retaining a second-press Circle outcome while
+the separately reset direct control selects Box, unknown explicit-set state,
+observer restoration and strict merged failures. The proposed native comparison
+is one factory production child and one copied-reference child, each capped75
+seconds and run sequentially only under an exact grant. No native child has run
+for this repair, no additional mapping is accepted, and accounting stays38/eight/94.

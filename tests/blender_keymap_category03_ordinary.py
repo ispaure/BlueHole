@@ -46,6 +46,12 @@ CLUSTERS = {
 }
 CLUSTER_SUBSETS = {
     'uv_cursor': ('uv_edit', ('ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1',)),
+    'image_tools': ('tools', (
+        '75c4bbefab8e3cc7a898801350b900eae9aceea836329b236df37a0c14952850',
+        '318ab4227e9699b1b4279142e4c99a612fec5ebf27e2f6a663adb07e6c88a02d',
+        'ba40873fbf25c357c6c711911eaa483711dba3a101390e753d9e7d2eabcce1a6',
+        'ff57544c10325e3984fef99805970ba7d3fa9d4bc93e6aa1e388e7f21b22e749',
+    )),
 }
 CLUSTER_GROUPS = {'tools_selection': ('tools', 'selection')}
 OBSERVATION_CLUSTERS = {
@@ -65,6 +71,83 @@ TOOL_STARTS = {
     'Weight Paint': ('builtin_brush.Draw', 'builtin.brush', 'builtin.annotate'),
     'UV Editor': ('builtin.select_box', 'builtin.select'),
 }
+TOOL_PROPERTIES = ('space_type', 'name', 'cycle', 'as_fallback')
+
+
+def tool_property_state(properties):
+    """Retain explicit-set state separately from effective RNA defaults."""
+    values, explicit, issues = {}, {}, {}
+    for name in TOOL_PROPERTIES:
+        try:
+            values[name] = getattr(properties, name)
+        except CASE_ERRORS as error:
+            values[name] = None
+            issues[name + '.value'] = type(error).__name__
+        try:
+            value = properties.is_property_set(name)
+            if type(value) is not bool:
+                raise ValueError('Non-boolean property-set state')
+            explicit[name] = value
+        except CASE_ERRORS as error:
+            explicit[name] = None
+            issues[name + '.is_property_set'] = type(error).__name__
+    return {'values': values, 'is_property_set': explicit, 'read_issues': issues}
+
+
+class ToolDispatchTrace:
+    """Observe only the pinned Python tool operator during native key input."""
+
+    def __init__(self, execute_code, output):
+        self.execute_code, self.output = execute_code, output
+        self.phase = 'first_input'
+        self.pending = {}
+        self.callback = self.observe
+        self.previous = None
+        self.running = False
+
+    def start(self):
+        assert not self.running
+        self.previous = sys.getprofile()
+        self.running = True
+        sys.setprofile(self.callback)
+
+    def stop(self):
+        if self.running:
+            assert sys.getprofile() is self.callback, 'Tool observer was replaced during input'
+            sys.setprofile(self.previous)
+            self.running = False
+
+    def observe(self, frame, event, arg):
+        if self.previous is not None:
+            self.previous(frame, event, arg)
+        if frame.f_code is not self.execute_code:
+            return
+        if event == 'call':
+            op, context = frame.f_locals['self'], frame.f_locals['context']
+            row = {'phase': self.phase, 'operator': 'wm.tool_set_by_id',
+                   'properties': tool_property_state(op.properties),
+                   'area': getattr(context.area, 'type', None),
+                   'ui_type': getattr(context.area, 'ui_type', None),
+                   'region': getattr(context.region, 'type', None),
+                   'context_mode': context.mode,
+                   'context_space_type': getattr(context.space_data, 'type', None)}
+            self.output.append(row)
+            self.pending[id(frame)] = row
+        elif event == 'return':
+            row = self.pending.pop(id(frame), None)
+            if row is not None:
+                row['resolved_space_type'] = frame.f_locals.get('space_type')
+                row['result'] = sorted(arg) if isinstance(arg, set) else None
+
+
+def positive_tool_control(control, before, after, binding):
+    expected = binding['properties']['name']
+    return (control['poll'] and control['result'] == ['FINISHED']
+            and before['active_tool'] is not None and before['active_tool'] != expected
+            and after['active_tool'] == expected
+            and before['editor'] == after['editor'] == 'IMAGE_EDITOR'
+            and all(before[key] == after[key] for key in ('editor_ui_type', 'context_mode', 'image_mode'))
+            and not after['modal_operators'])
 
 
 def native_control_properties(operator, properties):
@@ -97,6 +180,8 @@ class OrdinaryCases:
         self.window, self.area, self.exporter = window, area, exporter
         self.configs = bpy.context.window_manager.keyconfigs
         self.probe, self.cluster, self.invert_zoom = probe, cluster, invert_zoom
+        if cluster == 'image_tools' and probe:
+            raise ValueError('Image tool repair observes existing production/reference rows only')
         if invert_zoom is not None and cluster != 'wheel_zoom':
             raise ValueError('invert_zoom applies only to wheel_zoom')
         if cluster in CLUSTER_SUBSETS:
@@ -128,6 +213,7 @@ class OrdinaryCases:
         self.input_callbacks = []
         self.input_control = None
         self.input_control_class = None
+        self.tool_trace = None
 
     def region(self):
         return next(region for region in self.area.regions if region.type == 'WINDOW')
@@ -148,7 +234,8 @@ class OrdinaryCases:
 
     def fingerprint_foreign(self):
         maps = {}
-        for role in ('default', 'active', 'addon'):
+        roles = ('default', 'active', 'addon', 'user') if self.cluster == 'image_tools' else ('default', 'active', 'addon')
+        for role in roles:
             for keymap in getattr(self.configs, role).keymaps:
                 if keymap.name in self.scope_names:
                     maps[role, keymap.as_pointer()] = self.capture(keymap)
@@ -270,16 +357,22 @@ class OrdinaryCases:
         if self.proof is None:
             return
         try:
-            self.release()
+            self.stop_tool_trace()
         finally:
-            self.release_input_control()
-            if self.saved_inversion is not None:
-                inputs = self.bpy.context.preferences.inputs
-                inputs.invert_mouse_zoom = self.saved_inversion
-                self.saved_inversion = None
-                self.proof['inversion_restored'] = True
+            try:
+                self.release()
+            finally:
+                self.release_input_control()
+                if self.saved_inversion is not None:
+                    inputs = self.bpy.context.preferences.inputs
+                    inputs.invert_mouse_zoom = self.saved_inversion
+                    self.saved_inversion = None
+                    self.proof['inversion_restored'] = True
         current = self.fingerprint_foreign()
         self.proof['foreign_source_fields_and_order_unchanged'] = current == self.foreign
+        if self.cluster == 'image_tools':
+            self.proof['strict_source_and_merged_preservation'] = current == self.foreign
+            self.proof['tool_dispatch_observer_released'] = self.tool_trace is None
         if current != self.foreign:
             self.proof['foreign_source_changes'] = self.describe_foreign_changes(
                 self.foreign, current,
@@ -522,15 +615,66 @@ class OrdinaryCases:
         elif binding['target'] == 'view3d.zoom':
             region = self.region()
             properties.update(mx=region.width // 2, my=region.height // 2)
+        if self.cluster == 'image_tools':
+            assert binding['target'] == 'wm.tool_set_by_id' and self.area.type == 'IMAGE_EDITOR'
+            # Captured EMPTY is an effective default, not proof that it was set.
+            # The positive control deliberately uses its actual editor context.
+            properties['space_type'] = self.area.type
         with self.context():
             poll = operator.poll()
             native_properties = native_control_properties(operator, properties) if poll else {}
             result = sorted(operator('EXEC_DEFAULT', **native_properties)) if poll else []
-        return {'poll': poll, 'result': result, 'properties': properties,
+        control = {'poll': poll, 'result': result, 'properties': properties,
                 'native_enum_flag_arguments': {
                     name: sorted(value) for name, value in native_properties.items()
                     if type(value) is set},
                 'method': 'direct operator fixture control'}
+        if self.cluster == 'image_tools':
+            control.update(space_type_policy='explicit actual IMAGE_EDITOR context',
+                           captured_binding_properties=binding['properties'].copy(),
+                           binding_or_property_set_state_modified=False)
+        return control
+
+    def tool_row_evidence(self, binding):
+        """Keep complete overlapping rows and native identity in every layer."""
+        evidence = {}
+        event = binding['event']
+        for role in ('default', 'active', 'addon', 'user'):
+            evidence[role] = []
+            for keymap in getattr(self.configs, role).keymaps:
+                if keymap.name not in self.scope_names:
+                    continue
+                captured = self.capture(keymap)
+                native = {item.id: item for item in keymap.keymap_items}
+                for index, row in enumerate(captured['items']):
+                    actual = row['event']
+                    if (actual.get('type') != event['type']
+                            or not (actual.get('any') or all(actual.get(mod) in
+                                    (event[mod], -1) for mod in MODIFIERS))):
+                        continue
+                    item = native[row['blender_id']]
+                    evidence[role].append({
+                        'scope': captured['scope'], 'map_pointer': keymap.as_pointer(),
+                        'item_pointer': item.as_pointer(), 'item_index': index, 'row': row,
+                        'exact_binding': captured['scope'] == binding['scope'] and self.item_matches(row, binding),
+                        'operator_properties': tool_property_state(item.properties)
+                            if row['target'] == 'wm.tool_set_by_id' else None,
+                    })
+        return evidence
+
+    def start_tool_trace(self, result):
+        if self.cluster != 'image_tools':
+            return
+        from bl_operators.wm import WM_OT_tool_set_by_id
+        assert self.tool_trace is None
+        result['tool_dispatch'] = []
+        self.tool_trace = ToolDispatchTrace(WM_OT_tool_set_by_id.execute.__code__, result['tool_dispatch'])
+        self.tool_trace.start()
+
+    def stop_tool_trace(self):
+        if self.tool_trace is not None:
+            self.tool_trace.stop()
+            self.tool_trace = None
 
     def conflicting_rows(self, binding):
         event = binding['event']
@@ -564,7 +708,9 @@ class OrdinaryCases:
         if variant:
             result['context_variant'] = variant
             result['case'] += '_' + variant['name']
-            result['family'] = next(family for family in CLUSTER_GROUPS[self.cluster]
+            families = ((CLUSTER_SUBSETS[self.cluster][0],) if self.cluster in CLUSTER_SUBSETS
+                        else CLUSTER_GROUPS[self.cluster])
+            result['family'] = next(family for family in families
                                     if row_id in CLUSTERS[family])
 
         def attempt(phase, operation):
@@ -596,6 +742,8 @@ class OrdinaryCases:
                             and attempt['active_tool'] == attempt['requested'] == active
                             and active != binding['properties']['name']
                             for attempt in result['tool_setup'])
+                    if self.cluster == 'image_tools' and not result['start_control_valid']:
+                        raise ValueError('Image tool fixture lacks a verified distinct starting tool')
             attempt('fixture_setup', work)
 
         def observe_maps():
@@ -605,6 +753,8 @@ class OrdinaryCases:
                     for role in ('default', 'active', 'addon', 'user')
                 }
                 result['merged_event_candidates'] = self.conflicting_rows(binding)
+                if self.cluster == 'image_tools':
+                    result['tool_rows_before_input'] = self.tool_row_evidence(binding)
             attempt('map_observation', work)
             if not self.probe:
                 return
@@ -658,6 +808,7 @@ class OrdinaryCases:
                     if not ready:
                         raise ValueError('Combined family fixture did not reach its declared context')
                 self.event('MOUSEMOVE', 'NOTHING')
+                self.start_tool_trace(result)
                 self.event(key, **mods)
                 state['pressed'] = True
                 if not is_drag and 'WHEEL' not in key:
@@ -699,11 +850,15 @@ class OrdinaryCases:
                 result['after'] = self.snapshot()
                 result['input_status'] = 'observed'
                 if is_tool:
+                    if self.tool_trace is not None:
+                        result['tool_rows_before_second_input'] = self.tool_row_evidence(binding)
+                        self.tool_trace.phase = 'second_input'
                     self.event(key, **mods)
                     self.event(key, 'RELEASE', **mods)
             attempt('input_observation', work)
 
         def reset():
+            self.stop_tool_trace()
             def work():
                 if is_tool:
                     result['after_second_input'] = self.snapshot()
@@ -725,6 +880,10 @@ class OrdinaryCases:
                 if 'direct_control' in result:
                     attempt('direct_fixture_observation',
                             lambda: result['direct_control'].update(after=self.snapshot()))
+                    if self.cluster == 'image_tools' and 'after' in result['direct_control']:
+                        control = result['direct_control']
+                        control['positive_tool_effect'] = positive_tool_control(
+                            control, result['direct_control_before'], control['after'], binding)
             finally:
                 owned = self.owned is not None and self.owned[1] is not None
                 self.release()
@@ -748,7 +907,7 @@ class OrdinaryCases:
     def append(self):
         self.steps.append(self.start)
         for row_id, binding in self.bindings.items():
-            if self.cluster == 'tools_selection':
+            if self.cluster in ('tools_selection', 'image_tools'):
                 scope = binding['scope']['name']
                 if scope == 'Image':
                     variants = ({'name': 'image_view', 'image_mode': 'VIEW'},
