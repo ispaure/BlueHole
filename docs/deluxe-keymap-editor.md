@@ -84,10 +84,10 @@ Sculpt and the UV Editor each have their own assignments under **Pie → Menus**
 Ctrl+Shift+Alt+right-click also has mode-specific routes, including the Mesh
 UV Special pie and Object Mode Import/Export.
 
-In Blender 5.2.2, the built-in Object Mode and Mesh keymaps open Add on
-Shift+A press. Those mode keymaps take precedence over the 3D View Shift+A
-drag assignment, so the Add pie can appear as assigned in Preferences while
-the standard Add menu opens in the viewport.
+In Object Mode and Edit Mesh, tap Shift+A for the mode's Add menu. Hold
+Shift+A and move the mouse to open the Deluxe Add pie. While the default
+Shift+A drag assignment is enabled, Deluxe opens the stock Add menus on
+release. Disabling or rebinding the pie restores their press behavior.
 
 ## Add-on shortcuts
 

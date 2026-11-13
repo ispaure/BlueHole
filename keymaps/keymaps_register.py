@@ -186,6 +186,8 @@ def _install_profile(candidate, previous):
 
 
 def _clear_categories():
+    if _profile_store is not None:
+        _profile_store.restore_stock_add()
     errors = []
     for module in (pie_keymaps_register, *reversed(keymap_module_lst)):
         try:

@@ -18,6 +18,12 @@ from .deluxe_resolver import Resolver, capture_candidate, profile_assignment_id,
 from .deluxe_schema import (ProfileError, TABLES, identifier, merge_profile, profile_overlay,
                             require, same_value, selector_descriptor, validate_catalog)
 
+ADD_PIE_EVENT = runtime.KeymapEvent('A', value='CLICK_DRAG', shift=True)
+ADD_PIE_TARGET = runtime.KeymapTarget('wm.call_menu_pie', {'name': 'BLUEHOLE_MT_pie_add'})
+ADD_PIE_SCOPE = runtime.KeymapScope('3D View', 'VIEW_3D')
+STOCK_ADD_EVENT = runtime.KeymapEvent('A', shift=True)
+STOCK_ADD_MENUS = (('Object Mode', 'VIEW3D_MT_add'), ('Mesh', 'VIEW3D_MT_mesh_add'))
+
 
 class Draft:
     """A detached working copy tied to one store revision."""
@@ -124,6 +130,7 @@ class ProfileStore:
         self._install = install
         self._allowed = allowed
         self._closed = False
+        self._stock_add_rows = []
         self._generation = 0
         self._revision = self._disk_revision()
         self.load_issue = None
@@ -145,6 +152,55 @@ class ProfileStore:
 
     def close(self):
         self._closed = True
+
+    def _defer_stock_add(self):
+        """Let Blender distinguish Shift+A tap from drag before opening Add."""
+        source = runtime._config('default')
+        if not runtime._same(source, runtime._config('active')):
+            return
+        rows = []
+        for name, menu in STOCK_ADD_MENUS:
+            scope = resolve_scope(runtime.KeymapScope(name), source)
+            if scope.is_tool:
+                continue
+            target = runtime.KeymapTarget('wm.call_menu', {'name': menu})
+            selector = runtime.KeymapSelector(scope, STOCK_ADD_EVENT, target)
+            try:
+                _, source_map, item = runtime._exact_source(selector)
+                runtime._preflight_merged_source(selector)
+                merged = runtime._one_map(runtime._config('user'), scope)
+                user_item = merged.keymap_items.from_id(item.id)
+                if (user_item is None or user_item.is_user_modified or user_item.is_user_defined
+                        or runtime._snapshot(user_item, False) != (STOCK_ADD_EVENT, target, True)):
+                    continue
+            except runtime._Pending:
+                # A custom binding or a different Blender keymap takes precedence.
+                continue
+            rows.append((source_map, item, item.id, target))
+        try:
+            # Edit the in-memory default source so Blender saves no user keymap delta.
+            for row in rows:
+                self._stock_add_rows.append(row)
+                row[1].value = 'RELEASE'
+            if rows:
+                runtime._update_merged()
+        except Exception:
+            self.restore_stock_add()
+            raise
+
+    def restore_stock_add(self):
+        if not self._stock_add_rows:
+            return
+        source = runtime._config('default')
+        expected = replace(STOCK_ADD_EVENT, value='RELEASE')
+        for source_map, item, item_id, target in self._stock_add_rows:
+            if (runtime._contains(source.keymaps, source_map)
+                    and runtime._contains(source_map.keymap_items, item)
+                    and item.id == item_id
+                    and runtime._snapshot(item, False) == (expected, target, True)):
+                item.value = 'PRESS'
+        runtime._update_merged()
+        self._stock_add_rows.clear()
 
     def _disk_revision(self):
         try:
@@ -427,12 +483,18 @@ class ProfileStore:
             catalog = self._catalog
         sections, groups = self._plan(catalog)
         total = 0
+        add_pie_registered = False
         for owner, requests in groups.items():
             config = runtime.get_addon_keyconfig()
             requests = tuple(replace(request, scope=resolve_scope(request.scope, config))
                              for request in requests)
             handle = runtime.register_feature(owner, assignments=requests)
             total += len(handle.owned_pairs)
+            applied = {row.request_id for row in handle.diagnostics if row.status == 'applied'}
+            add_pie_registered |= any(
+                request.request_id in applied and request.active and request.event == ADD_PIE_EVENT
+                and replace(request.scope, is_tool=None) == ADD_PIE_SCOPE and request.scope.is_tool is not True
+                and request.target == ADD_PIE_TARGET for request in requests)
         for id_, row in catalog['suppressions'].items():
             if not (sections[row['section']] and row.get('enabled', True)):
                 continue
@@ -440,4 +502,6 @@ class ProfileStore:
             if request is not None:
                 handle = runtime.register_feature('profile:deluxe-' + id_, overrides=(request,))
                 total += len(handle.owned_pairs)
+        if add_pie_registered:
+            self._defer_stock_add()
         return total
