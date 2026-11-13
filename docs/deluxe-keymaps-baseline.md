@@ -10,8 +10,11 @@ The ledger ID is **`deluxe-baseline-2026-11-12-v1`**. It records observed bindin
 candidates and controlled differences. It is not a claim that every candidate
 dispatches in every editor, tool, mode, or operator-poll context. Brief 06 owns
 the broader native parity checks; brief 02 must preserve the uncertainty recorded
-here when choosing its override contract. The coordinator owns acceptance and
-dispatch of the next brief.
+here when choosing its override contract. The coordinator accepted brief 01 at
+`0d4b9043530b13dbb501ab78f6b17c576044f1e5` as the baseline deliverable and
+prerequisite for 02. Acceptance covers the captured environment and recorded
+uncertainty; the migration/parity verification gates below remain in force.
+The coordinator owns dispatch of the next brief.
 
 ## Evidence and reproduction
 

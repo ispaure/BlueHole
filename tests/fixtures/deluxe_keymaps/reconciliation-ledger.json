@@ -1,5 +1,5 @@
 {
-  "acceptance": "open; see capture-manifest gaps",
+  "acceptance": "Coordinator-accepted baseline at 0d4b9043530b13dbb501ab78f6b17c576044f1e5; prerequisite for 02. Acceptance covers the captured environment and recorded uncertainty, not full shortcut parity. Migration/parity verification gates remain: 14 absent configured modules, 171 unresolved operator candidates, 12 restored modified-flag rows, Q/menu precedence, and broader editor/tool/modal contexts.",
   "entries_file": "reconciliation-ledger.jsonl",
   "id": "deluxe-baseline-2026-11-12-v1",
   "owners": {
