@@ -36,6 +36,9 @@ EDIT_DESCRIPTIONS = {
     'show_assignments': 'Open the Assignments tab for this section',
     'delete_section': 'Remove this empty section from the draft. Apply Changes saves the removal',
     'remove_rule': 'Remove this existing-shortcut rule from the draft. Apply Changes saves the removal',
+    'linked_shortcut': 'Show or hide the sections that share this shortcut',
+    'linked_section': 'Show or hide linked assignments in this section',
+    'feature_category': 'Show the shortcut groups in this category',
 }
 TOGGLE_TARGETS = {'categories': 'category', 'sections': 'section',
                   'assignments': 'assignment', 'suppressions': 'rule'}
@@ -144,9 +147,6 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
                               options=TRANSIENT, update=switch_tab)
     search: StringProperty(name='Search', description='Filter the current list using the selected search mode',
                            options=TRANSIENT, update=reset_page)
-    show_shared_uses: BoolProperty(name='Show linked assignments',
-                                   description='Show where this shortcut is shared and the option to change it for all linked assignments',
-                                   options=TRANSIENT)
     show_extra_fields: BoolProperty(name='Show additional Blender settings',
                                     description='Show command settings that currently use Blender’s defaults', options=TRANSIENT)
     live_search: StringProperty(name='Search current bindings',
@@ -272,6 +272,13 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.page = 0
         elif action in {'assignment', 'command'}:
             setattr(current, action, target)
+        elif action == 'linked_shortcut':
+            current.expanded_shortcut = '' if current.expanded_shortcut == target else target
+            current.expanded_linked_section = ''
+        elif action == 'linked_section':
+            current.expanded_linked_section = '' if current.expanded_linked_section == target else target
+        elif action == 'feature_category':
+            current.feature_category = target
         elif action == 'section':
             setattr(current, action, target)
             current.assignment = ''
@@ -507,9 +514,6 @@ class BH_OT_deluxe_shortcut(EditorOperator, bpy.types.Operator):
 
     assignment: StringProperty(options=HIDDEN)
     choice_key: StringProperty(options=HIDDEN)
-    shared: BoolProperty(name='Edit all linked assignments',
-                         description='Update every assignment that shares this shortcut, including disabled assignments',
-                         options=TRANSIENT)
     key: EnumProperty(name='Key', description='Choose the key or input button that triggers the shortcut',
                       items=lambda self, _: enum_items(self, 'key'), options=TRANSIENT)
     phase: EnumProperty(name='Phase', description='Choose when the input triggers the shortcut',
@@ -525,7 +529,7 @@ class BH_OT_deluxe_shortcut(EditorOperator, bpy.types.Operator):
     @classmethod
     def description(cls, _context, props):
         if props.assignment:
-            return 'Edit the key, trigger, direction and modifiers for this shortcut'
+            return 'Edit the key, trigger, direction and modifiers for this assignment only'
         return 'Create a reusable shortcut for the draft. Add an assignment to make it run a command'
 
     def invoke(self, context, _event):
@@ -554,10 +558,6 @@ class BH_OT_deluxe_shortcut(EditorOperator, bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self, width=475, confirm_text='Stage Shortcut')
 
     def draw(self, _context):
-        current = editor()
-        if self.assignment:
-            draw_uses(self.layout, current, 'events', self.assignment, self.shared)
-            self.layout.prop(self, 'shared')
         for key in ('key', 'phase', 'direction', 'key_modifier'):
             self.layout.prop(self, key)
         row = self.layout.row(align=True)
@@ -575,7 +575,7 @@ class BH_OT_deluxe_shortcut(EditorOperator, bpy.types.Operator):
         event.update({key: int(getattr(self, key)) for key in ('shift', 'ctrl', 'alt', 'oskey', 'hyper')})
         if self.any_modifier:
             event.update({key: -1 for key in ('shift', 'ctrl', 'alt', 'oskey', 'hyper')})
-        stage_input(current, self.assignment, event, self.shared)
+        stage_input(current, self.assignment, event, False)
 
 
 for _modifier in ('shift', 'ctrl', 'alt', 'oskey', 'hyper'):
@@ -653,11 +653,50 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
             return 'Capture a key or mouse button for all linked assignments, including disabled ones'
         return 'Capture a key or mouse button for this assignment only'
 
-    def invoke(self, context, _event):
-        current = editor()
-        if self.assignment:
+    def invoke(self, context, event):
+        if not self.shared:
+            return self.execute(context)
+        try:
+            current = editor()
+            event_id = current.catalog['assignments'][self.assignment]['event']
+            linked = current.draft.uses('events', event_id)
+            require(len(linked) > 1, 'This shortcut is no longer shared')
+            preview = current.preview()
+            for id_ in linked:
+                current.require_editable_assignment(id_)
+        except ERRORS as error:
+            self.report({'ERROR'}, str(error))
+            return {'CANCELLED'}
+        inactive = sum(not (preview['assignments'][id_]['eligible'] and preview['assignments'][id_]['active'])
+                       for id_ in linked)
+        message = f'Capture a new shortcut for all {len(linked)} linked assignments.'
+        if inactive:
+            noun = 'assignment is' if inactive == 1 else 'assignments are'
+            message += f' {inactive} {noun} currently inactive and will also change.'
+        self._confirmed = current.draft, event_id, current.catalog['events'][event_id], linked
+        return context.window_manager.invoke_confirm(
+            self, event, title='Change Shared Shortcut', message=message,
+            confirm_text=f'Change All {len(linked)}')
+
+    def execute(self, context):
+        try:
+            current = editor()
             current.require_editable_assignment(self.assignment)
+            event_id = current.catalog['assignments'][self.assignment]['event']
+            event_data = current.catalog['events'][event_id]
+            linked = current.draft.uses('events', event_id)
+            if self.shared:
+                require(getattr(self, '_confirmed', None) == (current.draft, event_id, event_data, linked),
+                        'Confirm the linked assignments before changing the shortcut')
+                for id_ in linked:
+                    current.require_editable_assignment(id_)
+        except ERRORS as error:
+            self.report({'ERROR'}, str(error))
+            return {'CANCELLED'}
         self._draft = current.draft
+        self._event_id = event_id
+        self._event_data = event_data
+        self._linked = linked
         self._area = context.area
         current.message = 'Press a key or mouse button. Esc cancels.'
         if self._area:
@@ -691,7 +730,18 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
             'type': event.type, 'map_type': map_type(event.type), 'shift': event.shift,
             'ctrl': event.ctrl, 'alt': event.alt, 'oskey': event.oskey,
         }
-        return self.run(context, lambda current: stage_input(current, self.assignment, captured, self.shared))
+
+        def stage_capture(current):
+            row = current.catalog['assignments'].get(self.assignment)
+            require(row and row['event'] == self._event_id
+                    and current.catalog['events'][self._event_id] == self._event_data,
+                    'The shortcut changed. Capture it again.')
+            if self.shared:
+                require(current.draft.uses('events', self._event_id) == self._linked,
+                        'The linked assignments changed. Capture the shortcut again.')
+            stage_input(current, self.assignment, captured, self.shared)
+
+        return self.run(context, stage_capture)
 
 
 class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):

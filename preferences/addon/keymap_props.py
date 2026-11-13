@@ -121,8 +121,11 @@ def draw(preference, context, layout):
     if preference.keymap.deluxe_configured:
         from .keymaps import deluxe_editor
 
-        column_keymap.operator('wm.bh_reset_deluxe_keymaps', text='Reset Feature Switches')
-        column_keymap.prop(context.preferences.inputs, 'invert_mouse_zoom')
+        settings = column_keymap.box()
+        settings.label(text='Deluxe Settings')
+        settings.prop(context.preferences.inputs, 'invert_mouse_zoom')
+        settings.operator('wm.bh_reset_deluxe_keymaps', text='Reset Feature Switches')
+        column_keymap.separator()
         deluxe_editor.draw(context, column_keymap)
         return
 

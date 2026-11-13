@@ -1,5 +1,6 @@
 """Draft operations and display values for the Deluxe Preferences editor."""
 
+from collections import Counter
 from struct import pack, unpack
 from time import monotonic
 from uuid import uuid4
@@ -129,8 +130,11 @@ class Editor:
         self.saved = store.snapshot()
         self.catalog = self.draft.snapshot()
         self.category = 'navigation' if 'navigation' in self.catalog['categories'] else ''
+        self.feature_category = self.category
         self.section = ''
         self.assignment = ''
+        self.expanded_shortcut = ''
+        self.expanded_linked_section = ''
         self.command = ''
         self.command_category = ''
         self.command_section = ''
@@ -209,6 +213,31 @@ class Editor:
     def require_editable_assignment(self, id_):
         row = self.catalog['assignments'][id_]
         require(not self.catalog['sections'][row['section']].get('required'), 'This shortcut is required')
+
+    def linked_sections(self, linked):
+        assignments = self.catalog['assignments']
+        totals = Counter(row['section'] for row in assignments.values())
+        groups = {}
+        for id_ in sorted(linked, key=lambda id_: assignments[id_]['order']):
+            groups.setdefault(assignments[id_]['section'], []).append(id_)
+        return [(section, ids, totals[section])
+                for section, ids in sorted(groups.items(), key=lambda pair: -len(pair[1]))]
+
+    def assignment_status(self, preview, id_):
+        row = self.catalog['assignments'][id_]
+        state = preview['assignments'][id_]
+        if not row.get('enabled', True):
+            return 'Disabled', 'CHECKBOX_DEHLT'
+        if not preview['sections'][row['section']]:
+            return 'Section inactive', 'PAUSE'
+        if not state['active']:
+            return 'Inactive', 'PAUSE'
+        command = preview['commands'][row['command']]
+        if command['availability'] == 'waiting_for_provider':
+            return f"Waiting for {command['dependency']}", 'INFO'
+        if command['availability'] != 'available':
+            return 'Command unavailable', 'ERROR'
+        return 'Enabled', 'CHECKMARK'
 
     def stage_event(self, assignment, event, *, shared):
         self.require_editable_assignment(assignment)

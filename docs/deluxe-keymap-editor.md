@@ -2,8 +2,10 @@
 
 Open **Preferences → Add-ons → Blue Hole → Addon Settings → Keymaps** after
 configuring Deluxe on the Blender preset. **Sections** is the default view.
-Use its category and section checkboxes to stage which shortcut groups are
-enabled, then click **Apply Changes**. Assignments and Commands put their list
+Choose a category tab, then use the category and section checkboxes to stage
+which shortcut groups are enabled. Sections show when a saved feature switch
+makes a group inactive or an enabled shortcut needs an add-on. Click **Apply
+Changes** to save. Assignments and Commands put their list
 beside the selected item's settings in wide windows. In narrow windows the
 settings appear below the list. Assignment search spans all sections. The
 category and section menus browse one section at a time when search is empty.
@@ -15,8 +17,9 @@ and backup failures show the next step in Blender and log the failure. If the
 runtime cannot rebuild the shortcuts, activation restores the prior preference
 choices.
 
-- The Assignments list shows each command's source, such as Blender, Blue Hole
-  or a named add-on. Select an assignment to see its settings and section.
+- Select an assignment to see its shortcut, section and command settings.
+  **View Command** shows the command's source, such as Blender, Blue Hole or
+  a named add-on.
   The section link opens its assignments and the checkbox stages its enabled
   state. **View Commands** and **View Assignments** switch between views for
   that section. Select **Key-Binding** in Assignments to type a shortcut such
@@ -29,10 +32,11 @@ choices.
   assignment. **Enter Object Mode** keeps the collection shortcut available
   when the object is already in Object Mode.
 - Click the key in the detail pane to capture a new key for that assignment.
-  Expand **Linked assignments** to see the contexts affected by **Capture for
-  All**. Escape cancels capture. The pane places the key, event phase,
-  and keyboard repeat above the modifier buttons. **Advanced Shortcut** offers
-  the full event settings and shared editing.
+  Expand **Shared Shortcut** to see the linked assignments grouped by
+  section, with each assignment's context and enabled state. **Change All**
+  asks for confirmation before capturing a shortcut for the whole group,
+  including inactive assignments. Escape cancels capture. **Advanced
+  Shortcut** opens the full event settings for the selected assignment.
 - Click **Keymap Context** and type a Blender keymap name to change where the
   selected assignment runs. Choosing a result stages the change for that
   assignment. If a shortcut is needed in several contexts, create an
@@ -71,6 +75,19 @@ choices.
   successful reload. **Save Recovered Profile** publishes recovered settings
   after reviewing them. **Reset Feature Switches** acts on the separate Blender
   preference switches.
+
+## Viewport pie shortcuts
+
+Ctrl+right-click opens the action pie for the current mode, and
+Shift+right-click opens its tool pie. Object Mode, Edit Mesh, Edit Curve,
+Sculpt and the UV Editor each have their own assignments under **Pie → Menus**.
+Ctrl+Shift+Alt+right-click also has mode-specific routes, including the Mesh
+UV Special pie and Object Mode Import/Export.
+
+In Blender 5.2.2, the built-in Object Mode and Mesh keymaps open Add on
+Shift+A press. Those mode keymaps take precedence over the 3D View Shift+A
+drag assignment, so the Add pie can appear as assigned in Preferences while
+the standard Add menu opens in the viewport.
 
 ## Add-on shortcuts
 
