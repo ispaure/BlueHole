@@ -66,7 +66,8 @@ class EditorTests(unittest.TestCase):
 
     def test_command_metadata_and_single_assignment_clone(self):
         def rna():
-            field = SimpleNamespace(name='All Regions', type='BOOLEAN', is_readonly=False, default=False)
+            field = SimpleNamespace(name='All Regions', type='BOOLEAN', is_readonly=False,
+                                    is_skip_save=True, default=False)
             return SimpleNamespace(name='Frame Selected', properties={'use_all_regions': field})
 
         self.h.runtime.bpy.ops = SimpleNamespace(view3d=SimpleNamespace(
@@ -90,13 +91,15 @@ class EditorTests(unittest.TestCase):
 
     def test_unset_rna_setting_can_be_overridden_then_returned_to_default(self):
         setting = SimpleNamespace(name='New setting', type='INT', is_readonly=False,
-                                  default=2, hard_min=1, hard_max=5)
+                                  is_skip_save=True, default=2, hard_min=1, hard_max=5)
+        hidden = SimpleNamespace(name='Hidden setting', type='BOOLEAN', is_hidden=True)
         self.h.runtime.bpy.ops = SimpleNamespace(view3d=SimpleNamespace(
             view_selected=SimpleNamespace(get_rna_type=lambda: SimpleNamespace(
-                name='Frame Selected', properties={'segments': setting}))))
+                name='Frame Selected', properties={'segments': setting, 'hidden': hidden}))))
         editor = self.editor
         command = editor.catalog['commands']['frame-selected']
         fields = editor.store.resolver.describe_command(command, include_unset=True)['fields']
+        self.assertNotIn('hidden', fields)
         self.assertEqual(fields['segments']['default'], 2)
         self.assertFalse(fields['segments']['explicit'])
         self.assertTrue(fields['segments']['editable'])

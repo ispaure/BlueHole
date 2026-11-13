@@ -87,8 +87,13 @@ the command source separately. Search by source to find direct add-on commands.
 
 The **Third-Party Add-ons** controls reflect whether their Deluxe sections
 are enabled. The availability checks read registered Blender operators.
-Provider-enabled Zen UV and autoConstraints dispatch, and Blender 5.2.2,
-still need verification.
+Provider-enabled Zen UV and autoConstraints dispatch still need verification.
+
+A disposable Logistics preset on Blender 5.2.2 verified the Sections,
+Assignments and Commands views, shared and single-assignment capture,
+typed key search, keymap context changes, inline command settings, and
+the supported Select All replacement in the binding picker. Apply,
+Discard, Reload Profile and a cold relaunch were also verified.
 
 The [profile API contract](deluxe-keymap-profiles.md) describes persistence,
 validation and recovery. The existing Blender Keymap preferences retain

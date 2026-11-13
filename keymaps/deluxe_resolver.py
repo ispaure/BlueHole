@@ -62,8 +62,10 @@ def _operator_rna(idname):
 
 def _field(prop):
     kind = prop.type
+    # SKIP_SAVE controls Blender's last-used operator values. Keymaps
+    # supply their own explicit values on each invocation.
     if (kind not in {'BOOLEAN', 'INT', 'FLOAT', 'ENUM', 'STRING'}
-            or getattr(prop, 'is_hidden', False) or getattr(prop, 'is_skip_save', False)):
+            or getattr(prop, 'is_hidden', False)):
         return {'label': prop.name, 'type': kind, 'editable': False}
     array = getattr(prop, 'is_array', False)
     flags = kind == 'ENUM' and prop.is_enum_flag
@@ -264,8 +266,7 @@ class Resolver:
                 names.update(dict.fromkeys(name for name in rna.properties.keys() if name != 'rna_type'))
             for name in names:
                 prop = rna.properties.get(name)
-                if name not in properties and (prop is None or getattr(prop, 'is_hidden', False)
-                                               or getattr(prop, 'is_skip_save', False)):
+                if name not in properties and (prop is None or getattr(prop, 'is_hidden', False)):
                     continue
                 field = _field(prop) if prop is not None else {'editable': False, 'type': 'UNKNOWN'}
                 value = properties.get(name, field.get('default'))
