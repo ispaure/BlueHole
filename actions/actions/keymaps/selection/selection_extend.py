@@ -1,4 +1,4 @@
-"""Ordinary additive selection by object center."""
+"""Ordinary additive object-center and UV selection."""
 
 from ....operator_action import KeymapBinding, OperatorAction
 
@@ -14,7 +14,18 @@ SELECTION_OBJECT_EXTEND_BY_CENTER = OperatorAction(
     ),
 )
 
-SELECTION_EXTEND_ACTIONS = [SELECTION_OBJECT_EXTEND_BY_CENTER]
+SELECTION_UV_EXTEND = OperatorAction(
+    operator='uv.select',
+    text='Extend UV Selection',
+    props={'extend': True},
+    keymap_bindings=(
+        # 0e8d690a0470457363cd15ff3448c54325c24261cae1dc525ebff9c3dd459f1d
+        KeymapBinding(keymap_name='UV Editor', space_type='EMPTY',
+                      key='LEFTMOUSE', value='CLICK', shift=True),
+    ),
+)
+
+SELECTION_EXTEND_ACTIONS = [SELECTION_OBJECT_EXTEND_BY_CENTER, SELECTION_UV_EXTEND]
 
 
 def get_selection_extend_actions():

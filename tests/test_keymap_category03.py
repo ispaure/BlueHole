@@ -573,6 +573,46 @@ class Category03ModalProbeTests(unittest.TestCase):
             fixture.candidate_maps(False)
         self.assertEqual(fixture.result['exact_candidate_counts']['addon'][row_id], 1)
 
+    def test_uv_extend_production_reuses_group_with_two_states_and_no_probe(self):
+        from blender_keymap_category03_handlers import UVExtendCases, UVExtendProductionCases
+        ledger = {row['row_id']: row for row in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        binding = ledger[UVExtendCases.CELLS[0][0]]['binding']
+        configs = types.SimpleNamespace(**{role: types.SimpleNamespace(keymaps=[])
+                                          for role in ('default', 'active', 'addon', 'user')})
+        fake_bpy = types.SimpleNamespace(context=types.SimpleNamespace(
+            window_manager=types.SimpleNamespace(keyconfigs=configs)))
+        with patch.dict(sys.modules, {'bpy': fake_bpy}):
+            steps, receipt = [], {'dispatch': []}
+            fixture = UVExtendProductionCases(steps, receipt, Mock(), None, None, None, None, {}, binding=binding)
+            for method in ('prepare', 'production_baseline', 'toggle', 'start', 'begin_cell', 'prepare_cell',
+                           'install_candidate', 'begin_trial', 'press_input', 'release_input', 'finish_trial',
+                           'release_cell', 'release_controls', 'cleanup'):
+                setattr(fixture, method, Mock())
+            fixture.append()
+            self.assertEqual(len(steps), 20)
+            for step in steps:
+                step()
+            self.assertEqual([call.args for call in fixture.toggle.call_args_list], [(True,), (False,)])
+            self.assertEqual([call.args for call in fixture.begin_trial.call_args_list], [(True, False), (False, False)])
+            fixture.install_candidate.assert_not_called()
+            fixture.release_controls.assert_called_once()
+            self.assertFalse(fixture.WITNESS_HEAD)
+            self.assertTrue(UVExtendCases.WITNESS_HEAD)
+            self.assertTrue(receipt['uv_extend_production']['production'])
+            self.assertFalse(receipt['uv_extend_production']['direct_candidate_injection'])
+
+    def test_uv_extend_production_control_failure_still_attempts_group_release(self):
+        from blender_keymap_category03_handlers import UVExtendProductionCases, ObjectSubtractProductionCases
+        fixture = UVExtendProductionCases.__new__(UVExtendProductionCases)
+        fixture.closed, fixture.proof = False, {}
+        fixture.release_controls = Mock(side_effect=AssertionError('strict control preservation'))
+        with patch.object(ObjectSubtractProductionCases, 'cleanup') as release:
+            with self.assertRaises(AssertionError):
+                fixture.cleanup()
+            release.assert_called_once_with(fixture)
+        self.assertFalse(fixture.closed)
+        self.assertIn('strict control preservation', fixture.proof['combined_cleanup_errors'][0])
+
     def test_extend_production_reuses_two_states_without_probe_injection(self):
         from blender_keymap_category03_handlers import ObjectExtendProductionCases, ObjectExtendTrial
         ledger = {r['row_id']: r for r in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
@@ -846,6 +886,44 @@ class Category03NativeReceiptTests(unittest.TestCase):
         cls.native = unpack_native(read_json(CATEGORY / cls.verification['fixture']))
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
+
+    def test_uv_extend_reference_effects_match_but_final_strict_failure_remains(self):
+        run = self.reference_runs['reference-evidence-1794573067246147000']
+        native = run['observations']
+        self.assertEqual(native['status'], 'error')
+        proof = native['uv_extend_proof']
+        cell, = proof['cells']
+        self.assertTrue(cell['reference_additive_effects'])
+        self.assertTrue(cell['exact_cell_preservation'])
+        self.assertFalse(proof['exact_source_and_merged_preservation'])
+        self.assertFalse(proof['cleanup_errors'])
+        for trial, initial in zip(cell['trials'], (True, False)):
+            phases = {p['phase']: p['snapshot'] for p in trial['phases']}
+            self.assertEqual(phases['after_press']['target_selected'], initial)
+            self.assertTrue(phases['after_release']['target_selected'])
+            self.assertTrue(phases['after_release']['bystander_selected'])
+            self.assertTrue(trial['exact_map_event_witnessed'])
+            self.assertTrue(trial['expected_selection_observed'])
+            self.assertEqual(trial['projected_point'], [1978, 1126])
+        before, after = proof['maps_before_without_controls'], proof['maps_after_without_control']
+        changes = Counter()
+        removed = []
+        for role in before:
+            self.assertEqual([m['scope'] for m in before[role]], [m['scope'] for m in after[role]])
+            for left, right in zip(before[role], after[role]):
+                old = {r['blender_id']: r for r in left['items']}
+                new = {r['blender_id']: r for r in right['items']}
+                self.assertLessEqual(new.keys(), old.keys())
+                removed.extend((role, left['scope']['name'], old[i]['target']) for i in old.keys() - new.keys())
+                for i in old.keys() & new.keys():
+                    fields = {key for key in old[i] if old[i][key] != new[i][key]}
+                    self.assertLessEqual(fields, {'read_issues'})
+                    changes[role] += bool(fields)
+        self.assertEqual(changes, {'default': 0, 'active': 226, 'addon': 1, 'user': 173})
+        self.assertEqual(Counter(removed), {('user', 'UV Editor', 'uv.toolkit_center_cursor_and_frame_all'): 45,
+                                           ('user', 'UV Editor', 'uv.toolkit_distribute'): 1})
+        self.assertTrue(run['protected_unchanged'])
+        self.assertFalse(run['cleanup']['remaining_resources'])
 
     def test_uv_extend_corrected_click_matches_addition_with_verified_stock_reuse(self):
         run = self.runs['uv_extend_probe-1794572360320071000']
@@ -2237,6 +2315,8 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             'mesh.select_less': {'use_face_step': True},
             'object.select_hierarchy': {'direction': 'PARENT', 'extend': True},
             'uv.select_all': {'action': 'TOGGLE'},
+            'uv.select': {'deselect': False, 'deselect_all': False, 'extend': False,
+                          'location': [0.0, 0.0], 'select_passthrough': False, 'toggle': False},
             'uv.select_circle': {'mode': 'SET', 'radius': 25, 'wait_for_input': False,
                                  'x': 0, 'y': 0},
             'view3d.select_circle': {'mode': 'SET', 'radius': 25, 'wait_for_input': True,
@@ -2393,43 +2473,55 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         prefs.enable_selection_extend = False
         self.preferences.keymap.selection = prefs
         self.preferences.keymap.enable_keymaps = True
-        action, = module.get_selection_extend_actions()
-        self.assertIn(action, selection.get_all_selection_actions())
+        actions = module.get_selection_extend_actions()
+        self.assertEqual(len(actions), 2)
+        self.assertTrue(all(action in selection.get_all_selection_actions() for action in actions))
         expected = self.ledger['fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d']['binding']
         stock_binding = self.ledger['4b0804a9a14135505b4bb747a327063796dab714ec18c2422dc44470567d396f']['binding']
         stock_item = row('view3d.select', key='LEFTMOUSE', value='CLICK', shift=True, oskey=True,
                          prop_values=stock_binding['properties'])
         stock = self.runtime.map('default', '3D View', space='VIEW_3D')
         stock.keymap_items.append_fixture(stock_item)
+        uv_expected = self.ledger['0e8d690a0470457363cd15ff3448c54325c24261cae1dc525ebff9c3dd459f1d']['binding']
+        uv_stock_binding = self.ledger['3f963e7c3ca365432c5a880e7e9c92b41b84f5f3670617f4fc367c62aac2da39']['binding']
+        uv_stock = self.runtime.map('default', 'UV Editor')
+        uv_stock_item = row('uv.select', key='LEFTMOUSE', value='CLICK', shift=True,
+                            prop_values=uv_stock_binding['properties'])
+        uv_stock.keymap_items.append_fixture(uv_stock_item)
         self.assertEqual(register.get_enabled_selection_actions(), subtract.get_selection_subtract_actions())
         self.assertEqual(register.register(), 1)
         prefs.enable_selection_extend = True
-        self.assertEqual(register.register(), 2)
-        self.assert_registered_binding(register.registered_selection_keymaps[-1], expected)
-        self.assertEqual(dict(register.registered_selection_keymaps[-1][1].properties), expected['properties'])
+        self.assertEqual(register.register(), 3)
+        for pair, binding in zip(register.registered_selection_keymaps[-2:], (expected, uv_expected)):
+            self.assert_registered_binding(pair, binding)
+            self.assertEqual(dict(pair[1].properties), binding['properties'])
         owners = [h for h in self.keymap_utils._FEATURES.values()
                   if any(dict(r.target.properties).get('extend') is True for r in h.assignments)]
-        self.assertEqual(len(owners), 1)
-        self.assertTrue(owners[0].owner_id.startswith('legacy:Selection:'))
-        self.assertEqual(owners[0].assignments[0].request_id, '0:3D View:LEFTMOUSE:CLICK')
+        self.assertEqual(len(owners), 2)
+        self.assertTrue(all(owner.owner_id.startswith('legacy:Selection:') for owner in owners))
+        self.assertEqual({owner.assignments[0].request_id for owner in owners},
+                         {'0:3D View:LEFTMOUSE:CLICK', '0:UV Editor:LEFTMOUSE:CLICK'})
         prefs.enable_selection_extend = False
         self.assertEqual(register.register(), 1)
         prefs.enable_selection_extend = True
-        self.assertEqual(register.register(), 2)
+        self.assertEqual(register.register(), 3)
         prefs.active_selection_keymap_tab = 'EXTEND'
         layout = Mock()
         ui.draw(self.preferences, self.runtime.bpy.context, layout)
         self.draw_feature.assert_called_once_with(column=layout.column.return_value,
-            feature_owner=prefs, feature_prop_name='enable_selection_extend', actions=[action])
+            feature_owner=prefs, feature_prop_name='enable_selection_extend', actions=actions)
         prefs.enable_selection_keymaps = False
         self.assertEqual(register.register(), 0)
         prefs.enable_selection_keymaps = True
-        self.assertEqual(register.register(), 2)
+        self.assertEqual(register.register(), 3)
         self.preferences.keymap.enable_keymaps = False
         self.assertEqual(register.register(), 0)
         self.assertEqual(list(stock.keymap_items), [stock_item])
         self.assertTrue(stock_item.active)
         self.assertEqual(dict(stock_item.properties), stock_binding['properties'])
+        self.assertEqual(list(uv_stock.keymap_items), [uv_stock_item])
+        self.assertTrue(uv_stock_item.active)
+        self.assertEqual(dict(uv_stock_item.properties), uv_stock_binding['properties'])
 
     def test_subtract_group_is_editable_independent_and_preserves_stock(self):
         register = self.load_selection_register()

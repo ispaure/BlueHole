@@ -692,7 +692,7 @@ class ObjectSubtractProductionCases:
             if not owner_id.startswith('legacy:Selection:'):
                 continue
             for request_id, owned in handle._owned.items():
-                if owned.item.idname != 'view3d.select':
+                if owned.item.idname != self.inspector.binding['target']:
                     continue
                 source = self.inspector.capture(owned.map)
                 row = next(row for row in source['items'] if row['blender_id'] == owned.item.id)
@@ -1021,6 +1021,8 @@ class UVExtendCases(ObjectSubtractCases):
     LABEL_PREFIX = 'uv_extend'
     UV_POSITIONS = ((.2, .2), (.8, .2), (.8, .8), (.2, .8))
     REFERENCE = False
+    PRODUCTION = False
+    WITNESS_HEAD = True
 
     def __init__(self, *args, bindings, stock_click_controls=None, **kwargs):
         super().__init__(*args, binding=bindings[self.CELLS[0][0]], **kwargs)
@@ -1043,7 +1045,7 @@ class UVExtendCases(ObjectSubtractCases):
         self.cell_allocations = []
         self.proof = {'test_only_driver': True, 'production_capability_enabled': False,
                       'ledger_ids': list(bindings), 'probe': self.probe,
-                      'reference': self.REFERENCE, 'cells': [],
+                      'reference': self.REFERENCE, 'production': self.PRODUCTION, 'cells': [],
                       'lifecycle': 'Reuse accepted ordinary lifecycle; no save/reopen or product toggle suite'}
         if stock_click_controls:
             self.proof['stock_click_reuse'] = stock_click_controls
@@ -1213,7 +1215,7 @@ class UVExtendCases(ObjectSubtractCases):
         # This owned item only logs and passes through; it cannot make selection
         # succeed. Its merged order ahead of competing rows is checked below.
         self.add_item(self.binding['scope'], self.control_class.bl_idname,
-                      {**event, 'head': True}, {})
+                      {**event, 'head': self.WITNESS_HEAD}, {})
         self.cell_allocations.append(self.allocations[-1])
         self.configs.update()
 
@@ -1244,7 +1246,7 @@ class UVExtendCases(ObjectSubtractCases):
         for role, rows in counts.items():
             for ledger_id, count in rows.items():
                 expected = (role in ('active', 'user') if self.REFERENCE else
-                            probe and role in ('addon', 'user'))
+                            (probe or self.PRODUCTION) and role in ('addon', 'user'))
                 assert count == int(expected and ledger_id == self.cell['ledger_id'])
         user_map, = relevant['user']
         witness = [i for i, item in enumerate(user_map['items'])
@@ -1261,9 +1263,11 @@ class UVExtendCases(ObjectSubtractCases):
         self.initial_selected = selected
         self.reset_selection(selected)
         self.result = {'case': 'uv_extend_' + self.cell['ledger_id'][:8] +
-                       ('_reference' if self.REFERENCE else '_probe' if probe else '_stock') +
+                       ('_production' if self.PRODUCTION else '_reference' if self.REFERENCE else
+                        '_probe' if probe else '_stock') +
                        ('_selected' if selected else '_unselected'),
-                       'ledger_id': self.cell['ledger_id'], 'probe': probe, 'reference': self.REFERENCE,
+                       'ledger_id': self.cell['ledger_id'], 'probe': probe,
+                       'reference': self.REFERENCE, 'production': self.PRODUCTION,
                        'initial_selected': selected, 'phases': []}
         self.cell['trials'].append(self.result)
         self.receipt['dispatch'].append(self.result)
@@ -1314,7 +1318,8 @@ class UVExtendCases(ObjectSubtractCases):
             self.input_callbacks.count(expected) == 1 and
             self.result['callbacks_after_press'].count(expected) == int(self.cell['event'] == 'PRESS'))
         self.result['expected_selection_observed'] = (
-            after['target_selected'] == (True if self.result['probe'] or self.REFERENCE else not self.initial_selected)
+            after['target_selected'] == (True if self.result['probe'] or self.REFERENCE or self.PRODUCTION
+                                        else not self.initial_selected)
             and after['bystander_selected'] and sorted(after['selected']) ==
             ([[0, 0], [0, 2]] if after['target_selected'] else [[0, 2]]))
         before = self.result['phases'][0]['snapshot']
@@ -1352,6 +1357,9 @@ class UVExtendCases(ObjectSubtractCases):
         self.cell['reference_additive_effects'] = (self.REFERENCE and len(trials) == 2 and all(
             row['exact_map_event_witnessed'] and row['expected_selection_observed']
             and row['geometry_and_tool_unchanged'] for row in trials))
+        self.cell['production_additive_effects'] = (self.PRODUCTION and len(trials) == 2 and all(
+            row['exact_map_event_witnessed'] and row['expected_selection_observed']
+            and row['geometry_and_tool_unchanged'] for row in trials))
         self.cell['production_accepted'] = False
         self.record('uv_extend_cell_released')
         assert self.cell['exact_cell_preservation'], 'UV cell source/merged maps changed'
@@ -1378,6 +1386,74 @@ class UVExtendReferenceCases(UVExtendCases):
 
     CELLS = UVExtendCases.CELLS[:1]
     REFERENCE = True
+
+
+class UVExtendProductionCases(UVExtendCases):
+    """Two UV states through the actual Extend group; existing lifecycle reused."""
+
+    CELLS = UVExtendCases.CELLS[:1]
+    PRODUCTION = True
+    # The actual candidate already exists. Appending only the owned witness
+    # makes it precede that candidate after Blender's prepend merge.
+    WITNESS_HEAD = False
+    candidate_count = ObjectSubtractProductionCases.candidate_count
+    toggle = ObjectSubtractProductionCases.toggle
+    preservation = ObjectSubtractProductionCases.preservation
+
+    def __init__(self, *args, binding):
+        steps, receipt, record, window, area, exporter, runtime, production = args
+        super().__init__(steps, receipt, record, window, area, exporter,
+                         bindings={self.CELLS[0][0]: binding})
+        self.inspector = self
+        self.runtime, self.production = runtime, production
+        self.baseline, self.enabled, self.closed = None, False, False
+        self.fixtures = []
+        self.label_prefix = 'uv_extend_production'
+        self.proof.pop('production_capability_enabled')
+        self.proof.update(direct_candidate_injection=False, shared_runtime_capability_changes=False,
+                          installs=[], releases=[],
+                          scope='Actual Extend group; UV vertex/Select Box CLICK context')
+        receipt.pop('uv_extend_proof')
+        receipt['uv_extend_production'] = self.proof
+
+    def production_baseline(self):
+        ObjectSubtractProductionCases.start(self)
+        assert self.candidate_count('addon') == self.candidate_count('user') == 0
+
+    def release_cell(self):
+        super().release_cell()
+        assert self.cell['production_additive_effects'], 'Actual UV Extend must add and preserve selection'
+
+    def release_controls(self):
+        UVExtendCases.cleanup(self)
+
+    def cleanup(self):
+        if self.closed:
+            return
+        errors = []
+        try:
+            self.release_controls()
+        except Exception as exc:
+            errors.append('controls: ' + type(exc).__name__ + ': ' + str(exc))
+        try:
+            ObjectSubtractProductionCases.cleanup(self)
+        except Exception as exc:
+            errors.append('production: ' + type(exc).__name__ + ': ' + str(exc))
+        self.proof['combined_cleanup_errors'] = errors
+        if errors:
+            self.closed = False
+            raise AssertionError('UV production cleanup failed: ' + '; '.join(errors))
+
+    def append(self):
+        self.steps.extend((self.prepare, lambda: None, self.production_baseline,
+                           lambda: self.toggle(True), self.start,
+                           lambda: self.begin_cell(*self.CELLS[0]), lambda: None, self.prepare_cell))
+        for selected in (True, False):
+            self.steps.extend((lambda selected=selected: self.begin_trial(selected, False),
+                               self.press_input, self.release_input, self.finish_trial))
+        self.steps.extend((self.release_cell, self.release_controls,
+                           lambda: self.toggle(False), self.cleanup))
+        return self
 
 
 class ObjectExtendProductionCases(ObjectSubtractProductionCases):

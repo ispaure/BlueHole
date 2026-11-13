@@ -3517,5 +3517,90 @@
       "new_persistence_run": false,
       "limits": "Scoped production group effect; copied-reference strict trial failures retained despite positive effects/final equality; no other-mode/handler-trace claim."
     }
+  },
+  "uv_extend_route": {
+    "status": "Conditional ordinary mapping applied after matching reference effects and verified owned cleanup; native production check pending",
+    "row_id": "0e8d690a0470457363cd15ff3448c54325c24261cae1dc525ebff9c3dd459f1d",
+    "binding": {
+      "active": true,
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 0,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "properties": {
+        "deselect": false,
+        "deselect_all": false,
+        "extend": true,
+        "location": [
+          0.0,
+          0.0
+        ],
+        "select_passthrough": false,
+        "toggle": false
+      },
+      "read_issues": {},
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "UV Editor",
+        "region_type": "WINDOW",
+        "space_type": "EMPTY"
+      },
+      "target": "uv.select"
+    },
+    "source_sha256": {
+      "actions/actions/keymaps/selection/selection_extend.py": "603f09049c9014b946b0514ad528415d67ded43be9b47587a06e607ae8345749",
+      "actions/actions/keymaps/selection/__init__.py": "c4b5ea4d78f724756b369158c7e24d7e3ad6750cc9cb55f315efe22d04c262e4",
+      "keymaps/selection_keymaps_register.py": "beb3362213266240cb0ff52ec02f7bd78babc58c24b43386f60dc9a84abd9ca0",
+      "preferences/addon/keymaps/keymap_props_selection.py": "89278cb185e56f11687e90bb3e8924ec4e625c2cefb6c70686b4e6b8b644921c"
+    },
+    "action": "SELECTION_UV_EXTEND",
+    "declaration": {
+      "group": "selection_extend",
+      "action": "SELECTION_UV_EXTEND",
+      "binding_index": 0
+    },
+    "preference": "existing enable_selection_extend",
+    "tab": "existing EXTEND",
+    "registration": "Existing Selection ordinary registration and public action catalog; no new group",
+    "expected_portable_identity": {
+      "owner_id": "legacy:Selection:de1a2030dc8d4baa0792cff32127ec7f6c081ec3d3dfa7bf5e7764c26a191a80",
+      "request_id": "0:UV Editor:LEFTMOUSE:CLICK"
+    },
+    "native_mode": "uv_extend_production",
+    "production_fixture": "UVExtendProductionCases",
+    "planned_fixture_steps": 20,
+    "planned_native_cases": 2,
+    "planned_installs": 1,
+    "planned_group_releases": 1,
+    "planned_preservation_comparisons": 2,
+    "direct_candidate_injection": false,
+    "stock_controls_reused": "batch35 two stock CLICK observations, validated for same context/geometry/point in batch36",
+    "factory_probe_reused": "batch36 ordinary CLICK two additive states; PRESS outcomes remain separate/unresolved",
+    "reference_controls_reused": {
+      "run": "reference-evidence-1794573067246147000",
+      "positive_effects": true,
+      "strict_cell_preservation": true,
+      "strict_final_preservation": false,
+      "source_read_issues": 227,
+      "merged_read_issues": 173,
+      "foreign_UV_rows_removed": 46,
+      "cause": "unestablished",
+      "owned_cleanup_verified": true
+    },
+    "lifecycle_plan": "Actual owner/request/full binding and registered pair; toggle shared Extend once on/off with other preferences unchanged. F23/witness absent at toggle endpoints. Reuse accepted ordinary editable persistence/group lifecycle; no stock/reference/save-reopen replay.",
+    "stock_changes": false,
+    "runtime_capability_changes": false,
+    "candidate_accounting_changed": false
   }
 }

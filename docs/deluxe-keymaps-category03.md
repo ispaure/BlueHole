@@ -204,14 +204,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Eighty-five category checks currently pass. They cover exact assigned IDs and
+Eighty-eight category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 58 factory attempts and eighteen copied-reference attempts. A completed
+retains63 factory attempts and20 copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -849,3 +849,43 @@ explicit-default `space_type=EMPTY` control error must be repaired once, with
 actual property-set-state captured, while preserving the existing Q second-press
 divergence. This offscreen group proposal adds no native allocation or product
 change. All85 category tests pass.
+
+Batch37 `reference-evidence-1794573067246147000` ran the two ordinary CLICK
+reference states at `f73559f` in23.15 seconds. Both matched the additive effect:
+selected stayed selected, unselected became selected on RELEASE, and the
+bystander/geometry/tool remained unchanged. Exact CLICK witnesses, Shift+F23 at
+point[1978,1126], active/user candidate admission with no add-on candidate and the
+independently reset direct ADD control passed. The cell comparison also passed.
+
+The final comparison retained native status error:227 source read_issues changes
+(226 active, one add-on),173 merged read_issues changes, and merged UV Editor
+318→272 with46 foreign rows removed (45 uv.toolkit_center_cursor_and_frame_all,
+one uv.toolkit_distribute). Other fields and surviving relative order matched;
+the cause is unestablished. These strict failures are not normalized or erased.
+Owned control rows were absent after cleanup, control class unregister completed,
+and no owned cleanup/diagnostic-retention errors remained. PID27237 and all
+temporary roots were absent, protected files and45 frozen inputs unchanged, and
+batch37 was released. The lossless receipt now contains63 factory/20 reference
+attempts, with all63 prior factory/19 reference records unchanged.
+
+Both matching effects and verified owned cleanup satisfy the coordinator's
+explicit conditional source authorization. The exact prepared patch now adds
+SELECTION_UV_EXTEND to the existing Extend group, using uv.select with extend=True
+and Shift+LEFTMOUSE CLICK in UV Editor. No new preference/tab, stock mutation,
+tool PRESS binding or shared runtime capability was added. The original Object
+Extend action retains its identity; its historical executed source hashes stay
+unchanged. The new UV action's portable owner is
+`legacy:Selection:de1a2030dc8d4baa0792cff32127ec7f6c081ec3d3dfa7bf5e7764c26a191a80`,
+request `0:UV Editor:LEFTMOUSE:CLICK`. Native production identity is still pending.
+
+The minimal actual-production fixture has20 steps/two enabled UV states, one
+real group install/release and final preservation comparison, with independent
+preferences and complete binding/owned-pair checks. Its temporary witness is
+appended after the already registered source so Blender's prepend merge puts
+the witness ahead; the actual candidate is never directly inserted or reordered
+by the fixture. Controls are absent at toggle endpoints. Existing ordinary
+editable persistence and batch35/36 stock/probe controls are reused; there is no
+reference, stock, second install or save/reopen replay. No new native allocation
+is assumed. All88 category tests pass, including both editable Extend actions,
+exact stock preservation, production scheduling/cleanup and retained reference
+strict failure. Accounting remains37/eight/95 pending production acceptance.
