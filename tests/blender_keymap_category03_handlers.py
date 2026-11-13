@@ -1021,10 +1021,18 @@ class UVExtendCases(ObjectSubtractCases):
     LABEL_PREFIX = 'uv_extend'
     UV_POSITIONS = ((.2, .2), (.8, .2), (.8, .8), (.2, .8))
 
-    def __init__(self, *args, bindings, **kwargs):
+    def __init__(self, *args, bindings, stock_click_controls=None, **kwargs):
         super().__init__(*args, binding=bindings[self.CELLS[0][0]], **kwargs)
         assert set(bindings) == {cell[0] for cell in self.CELLS}
         self.bindings = bindings
+        self.stock_click_controls = stock_click_controls
+        if stock_click_controls:
+            assert self.probe and stock_click_controls['binding'] == bindings[self.CELLS[0][0]]
+            assert stock_click_controls['ledger_id'] == self.CELLS[0][0]
+            assert [(row['probe'], row['initial_selected']) for row in stock_click_controls['trials']] == [
+                (False, True), (False, False)]
+            assert all(row['exact_map_event_witnessed'] and row['expected_selection_observed']
+                       and row['geometry_and_tool_unchanged'] for row in stock_click_controls['trials'])
         self.scope_names.update(row['scope']['name'] for row in bindings.values())
         self.scope_names.update(km.name for role in ('default', 'active', 'addon', 'user')
                                 for km in getattr(self.configs, role).keymaps
@@ -1034,6 +1042,8 @@ class UVExtendCases(ObjectSubtractCases):
         self.proof = {'test_only_driver': True, 'production_capability_enabled': False,
                       'ledger_ids': list(bindings), 'probe': self.probe, 'cells': [],
                       'lifecycle': 'Reuse accepted ordinary lifecycle; no save/reopen or product toggle suite'}
+        if stock_click_controls:
+            self.proof['stock_click_reuse'] = stock_click_controls
         self.receipt['uv_extend_proof'] = self.proof
 
     def prepare(self):
@@ -1148,6 +1158,8 @@ class UVExtendCases(ObjectSubtractCases):
         assert self.binding['event']['value'] == event
         self.cell = {'ledger_id': ledger_id, 'tool_requested': tool,
                      'event': event, 'tool_map_field': tool_map_field, 'trials': []}
+        self.cell['reused_stock_trials'] = (self.stock_click_controls['trials']
+            if self.stock_click_controls and ledger_id == self.CELLS[0][0] else [])
         self.proof['cells'].append(self.cell)
         self.result = None
         with self.context():
@@ -1185,6 +1197,11 @@ class UVExtendCases(ObjectSubtractCases):
         control['after'] = self.snapshot('after_direct')
         self.assert_positive_control(control, before, control['after'])
         control['positive_addition'] = True
+        if self.cell['reused_stock_trials']:
+            previous = self.stock_click_controls
+            assert self.cell['tool_readback'] == previous['tool_readback']
+            assert before['uv_positions'] == previous['direct_control']['before']['uv_positions']
+            assert control['location_uv'] == previous['direct_control']['location_uv']
         self.configs.update()
         self.cell['maps_before_witness'] = self.maps()
         event = {name: self.binding['event'][name] for name in
@@ -1201,7 +1218,11 @@ class UVExtendCases(ObjectSubtractCases):
         event = {name: self.binding['event'][name] for name in
                  ('type', 'value', 'any', 'shift', 'ctrl', 'alt', 'oskey',
                   'key_modifier', 'repeat', 'direction')}
-        self.add_item(self.binding['scope'], self.binding['target'], event, self.binding['properties'])
+        # wm_keymap_addon_add copies each source item to the merged list head.
+        # Candidate-before-witness in this disposable source yields the witness
+        # before the candidate in the merged map. Verify actual order below.
+        self.add_item(self.binding['scope'], self.binding['target'],
+                      {**event, 'head': True}, self.binding['properties'])
         self.cell_allocations.append(self.allocations[-1])
         self.configs.update()
 
@@ -1211,21 +1232,25 @@ class UVExtendCases(ObjectSubtractCases):
             all(row[field] == binding[field] for field in ('target', 'event', 'active', 'properties', 'read_issues'))
             for km in maps if km['scope'] == binding['scope'] for row in km['items'])
             for ledger_id, binding in self.bindings.items()} for role, maps in captured.items()}
+        relevant = {role: [km for km in maps if km['scope'] == self.binding['scope']]
+                    for role, maps in captured.items()}
+        # Retain the actual admission state before every assertion, including
+        # unexpected counts, missing maps and a witness behind the candidate.
+        self.result.update(exact_candidate_counts=counts, native_maps=relevant)
+        self.record(self.result['case'] + '_admission_maps')
         for role, rows in counts.items():
             for ledger_id, count in rows.items():
                 assert count == int(probe and role in ('addon', 'user') and ledger_id == self.cell['ledger_id'])
-        relevant = {role: [km for km in maps if km['scope'] == self.binding['scope']]
-                    for role, maps in captured.items()}
         user_map, = relevant['user']
         witness = [i for i, item in enumerate(user_map['items'])
                    if item['target'] == self.control_class.bl_idname]
-        assert len(witness) == 1
         competing = [i for i, item in enumerate(user_map['items'])
                      if item['active'] and item['event'] == self.binding['event']
                      and item['target'] != self.control_class.bl_idname]
+        self.result['witness_order'] = {'indices': witness, 'competing_indices': competing}
+        self.record(self.result['case'] + '_admission_order')
+        assert len(witness) == 1
         assert competing and all(witness[0] < index for index in competing), 'Witness is not ahead of competing rows'
-        self.result.update(exact_candidate_counts=counts, native_maps=relevant,
-                           witness_order={'index': witness[0], 'competing_indices': competing})
 
     def begin_trial(self, selected, probe):
         self.initial_selected = selected
@@ -1241,6 +1266,8 @@ class UVExtendCases(ObjectSubtractCases):
         x, y = self.values['point']
         assert 0 <= x < self.region().width and 0 <= y < self.region().height
         self.result['projected_point'] = list(self.values['point'])
+        if self.cell['reused_stock_trials']:
+            assert self.result['projected_point'] == self.stock_click_controls['projected_point']
         if 'projected_point' in self.cell:
             assert self.result['projected_point'] == self.cell['projected_point'], 'UV target projection changed within cell'
         else:
@@ -1314,7 +1341,7 @@ class UVExtendCases(ObjectSubtractCases):
         self.configs.update()
         self.cell['maps_after_witness'] = self.maps()
         self.cell['exact_cell_preservation'] = self.cell['maps_after_witness'] == self.cell['maps_before_witness']
-        trials = self.cell['trials']
+        trials = self.cell['reused_stock_trials'] + self.cell['trials']
         self.cell['matched_stock_probe_effects'] = self.probe and self.matched_effects(trials)
         self.cell['production_accepted'] = False
         self.record('uv_extend_cell_released')
@@ -1324,7 +1351,9 @@ class UVExtendCases(ObjectSubtractCases):
         self.steps.extend((self.prepare, lambda: None, self.start))
         for cell in self.CELLS:
             self.steps.extend((lambda cell=cell: self.begin_cell(*cell), lambda: None, self.prepare_cell))
-            for probe in ((False, True) if self.probe else (False,)):
+            stages = ((True,) if self.stock_click_controls and cell[0] == self.CELLS[0][0]
+                      else (False, True) if self.probe else (False,))
+            for probe in stages:
                 if probe:
                     self.steps.append(self.install_candidate)
                 for selected in (True, False):

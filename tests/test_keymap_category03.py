@@ -346,11 +346,16 @@ class Category03ModalProbeTests(unittest.TestCase):
                                           for role in ('default', 'active', 'addon', 'user')})
         fake_bpy = types.SimpleNamespace(context=types.SimpleNamespace(
             window_manager=types.SimpleNamespace(keyconfigs=configs)))
-        for probe, count in ((False, 40), (True, 67)):
+        controls = {'ledger_id': UVExtendCases.CELLS[0][0],
+                    'binding': bindings[UVExtendCases.CELLS[0][0]],
+                    'trials': [{'probe': False, 'initial_selected': selected,
+                                'exact_map_event_witnessed': True, 'expected_selection_observed': True,
+                                'geometry_and_tool_unchanged': True} for selected in (True, False)]}
+        for probe, count, reuse in ((False, 40, None), (True, 67, None), (True, 59, controls)):
             with self.subTest(probe=probe), patch.dict(sys.modules, {'bpy': fake_bpy}):
                 steps, receipt = [], {'dispatch': []}
                 fixture = UVExtendCases(steps, receipt, Mock(), None, None, None,
-                                        bindings=bindings, probe=probe)
+                                        bindings=bindings, probe=probe, stock_click_controls=reuse)
                 methods = ('prepare', 'start', 'begin_cell', 'prepare_cell', 'install_candidate',
                            'begin_trial', 'press_input', 'release_input', 'finish_trial',
                            'release_cell', 'cleanup')
@@ -364,7 +369,10 @@ class Category03ModalProbeTests(unittest.TestCase):
                 expected = [(True, False), (False, False)]
                 if probe:
                     expected += [(True, True), (False, True)]
-                self.assertEqual([call.args for call in fixture.begin_trial.call_args_list], expected * 3)
+                expected = expected * 3
+                if reuse:
+                    expected = expected[2:]
+                self.assertEqual([call.args for call in fixture.begin_trial.call_args_list], expected)
                 fixture.prepare.assert_called_once()
                 fixture.cleanup.assert_called_once()
                 self.assertEqual(fixture.install_candidate.call_count, 3 if probe else 0)
@@ -389,7 +397,7 @@ class Category03ModalProbeTests(unittest.TestCase):
     def test_uv_extend_direct_control_uses_uv_location_instead_of_projected_pixels(self):
         from blender_keymap_category03_handlers import UVExtendCases
         fixture = UVExtendCases.__new__(UVExtendCases)
-        fixture.cell = {'tool_requested': 'builtin.select_box', 'tool_map_field': None}
+        fixture.cell = {'tool_requested': 'builtin.select_box', 'tool_map_field': None, 'reused_stock_trials': []}
         fixture.tool_state = Mock(return_value={'idname': 'builtin.select_box'})
         ledger = {row['row_id']: row for row in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
         fixture.binding = ledger[UVExtendCases.CELLS[0][0]]['binding']
@@ -459,13 +467,63 @@ class Category03ModalProbeTests(unittest.TestCase):
         self.assertEqual(km.keymap_items, [foreign])
         self.assertEqual(fixture.allocations, [allocation])
         fixture.cell_allocations, fixture.created_maps = [], []
-        fixture.cell = {'trials': [], 'maps_before_witness': {'foreign': 'original'}}
+        fixture.cell = {'trials': [], 'reused_stock_trials': [], 'maps_before_witness': {'foreign': 'original'}}
         fixture.maps = Mock(return_value={'foreign': 'changed'})
         fixture.configs, fixture.record, fixture.probe = Mock(), Mock(), True
         with self.assertRaises(AssertionError):
             fixture.release_cell()
         self.assertFalse(fixture.cell['exact_cell_preservation'])
         self.assertFalse(fixture.cell['production_accepted'])
+
+    def test_uv_extend_retains_failed_candidate_positions_before_asserting(self):
+        from blender_keymap_category03_handlers import UVExtendCases
+        ledger = {row['row_id']: row for row in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        fixture = UVExtendCases.__new__(UVExtendCases)
+        fixture.bindings = {cell[0]: ledger[cell[0]]['binding'] for cell in UVExtendCases.CELLS}
+        fixture.binding = fixture.bindings[UVExtendCases.CELLS[0][0]]
+        fixture.cell = {'ledger_id': UVExtendCases.CELLS[0][0]}
+        fixture.control_class = types.SimpleNamespace(bl_idname='wm.uv_test_witness')
+        candidate = copy.deepcopy(fixture.binding)
+        witness = {**candidate, 'target': fixture.control_class.bl_idname, 'properties': {}}
+        stock = copy.deepcopy(candidate)
+        stock['properties'].update(extend=False, toggle=True)
+        for wrong_order in (True, False):
+            fixture.result, fixture.record = {'case': 'order_test'}, Mock()
+            source = {'scope': candidate['scope'], 'items': [candidate, witness]}
+            merged = {'scope': candidate['scope'], 'items':
+                      [candidate, witness, stock] if wrong_order else [witness, candidate, stock]}
+            fixture.maps = Mock(return_value={'default': [], 'active': [], 'addon': [source], 'user': [merged]})
+            if wrong_order:
+                with self.assertRaises(AssertionError):
+                    fixture.candidate_maps(True)
+            else:
+                fixture.candidate_maps(True)
+            self.assertEqual(fixture.result['native_maps']['user'], [merged])
+            self.assertEqual(fixture.result['witness_order']['indices'], [1 if wrong_order else 0])
+            self.assertEqual(fixture.result['exact_candidate_counts']['user'][fixture.cell['ledger_id']], 1)
+            self.assertEqual(fixture.record.call_args_list[-1].args, ('order_test_admission_order',))
+
+    def test_uv_extend_candidate_source_order_accounts_for_prepend_merge(self):
+        from blender_keymap_category03_handlers import UVExtendCases
+        fixture = UVExtendCases.__new__(UVExtendCases)
+        ledger = {row['row_id']: row for row in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        fixture.binding = ledger[UVExtendCases.CELLS[0][0]]['binding']
+        source = ['witness']
+        fixture.allocations, fixture.cell_allocations = [], []
+        fixture.configs = Mock()
+        def add_item(scope, target, event, properties):
+            self.assertEqual(scope, fixture.binding['scope'])
+            self.assertEqual(properties, fixture.binding['properties'])
+            source.insert(0 if event.get('head') else len(source), 'candidate')
+            fixture.allocations.append(object())
+        fixture.add_item = add_item
+        fixture.install_candidate()
+        # Pinned wm_keymap_addon_add uses BLI_addhead for every source item.
+        merged = ['stock']
+        for item in source:
+            merged.insert(0, item)
+        self.assertEqual(merged, ['witness', 'candidate', 'stock'])
+        self.assertEqual(fixture.cell_allocations, fixture.allocations)
 
     def test_extend_production_reuses_two_states_without_probe_injection(self):
         from blender_keymap_category03_handlers import ObjectExtendProductionCases, ObjectExtendTrial
@@ -740,6 +798,35 @@ class Category03NativeReceiptTests(unittest.TestCase):
         cls.native = unpack_native(read_json(CATEGORY / cls.verification['fixture']))
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
+
+    def test_uv_extend_stock_click_controls_and_pre_input_failure_are_retained(self):
+        run = self.runs['uv_extend_probe-1794571757033229000']
+        self.assertEqual(run['native_status'], 'error')
+        self.assertIn('Witness is not ahead of competing rows', run['error'])
+        proof = run['uv_extend_proof']
+        cell, = proof['cells']
+        self.assertTrue(cell['direct_control']['positive_addition'])
+        self.assertEqual(cell['direct_control']['result'], ['FINISHED', 'PASS_THROUGH'])
+        self.assertEqual(len(cell['trials']), 3)
+        for trial, initial in zip(cell['trials'][:2], (True, False)):
+            phases = {p['phase']: p['snapshot'] for p in trial['phases']}
+            self.assertFalse(trial['probe'])
+            self.assertTrue(trial['exact_map_event_witnessed'])
+            self.assertTrue(trial['expected_selection_observed'])
+            self.assertEqual(phases['after_press']['target_selected'], initial)
+            self.assertEqual(phases['after_release']['target_selected'], not initial)
+            self.assertTrue(phases['after_release']['bystander_selected'])
+        candidate = cell['trials'][2]
+        self.assertTrue(candidate['probe'])
+        self.assertEqual([p['phase'] for p in candidate['phases']], ['before_press'])
+        self.assertNotIn('native_maps', candidate)
+        self.assertNotIn('witness_order', candidate)
+        self.assertTrue(proof['exact_source_and_merged_preservation'])
+        self.assertFalse(proof['cleanup_errors'])
+        self.assertTrue(run['watcher_stopped'])
+        self.assertFalse(run['cleanup']['owned'])
+        self.assertFalse(run['remaining_owned_resources'])
+        self.assertTrue(run['protected_unchanged'])
 
     def test_extend_actual_production_identity_effects_and_releases(self):
         route = self.manifest['object_extend_route']

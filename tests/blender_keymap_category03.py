@@ -146,6 +146,9 @@ def _run_session(args, root):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_handlers.py', root / 'handler-fixture.py')
     if args.mode in ('extend_observe', 'extend_probe', 'extend_production', 'uv_extend_observe', 'uv_extend_probe'):
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
+    if args.mode == 'uv_extend_probe':
+        shutil.copyfile(REPO / 'test-results/deluxe-keymaps-category03/uv-selection-stock-click-controls.json',
+                        root / 'uv-extend-stock-controls.json')
     if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production', 'modal_observe', 'modal_alias_probe'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_ordinary.py', root / 'ordinary-fixture.py')
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
@@ -1832,8 +1835,13 @@ def native_main(root, mode):
         ledger = {row['row_id']: row for row in map(
             json.loads, (root / 'ordinary-ledger.jsonl').read_text().splitlines())}
         bindings = {cell[0]: ledger[cell[0]]['binding'] for cell in handler.UVExtendCases.CELLS}
+        stock_controls = None
+        if mode == 'uv_extend_probe':
+            stock_controls = json.loads((root / 'uv-extend-stock-controls.json').read_text())
+            stock_controls['input_sha256'] = sha(root / 'uv-extend-stock-controls.json')
         state['ordinary_fixture'] = handler.UVExtendCases(
             steps, receipt, record, window, area, exporter, bindings=bindings,
+            stock_click_controls=stock_controls,
             probe=mode == 'uv_extend_probe').append()
     elif mode in ('extend_observe', 'extend_probe'):
         steps.append(lambda: set_groups(False, False, False))

@@ -204,7 +204,7 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Sixty category checks currently pass. They cover exact assigned IDs and
+Eighty-one category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
@@ -766,3 +766,38 @@ stock/reference controls. Accounting is now37 implemented/eight transferred/95
 remaining; the retained batch33 strict errors remain unchanged.
 All72 category tests pass. The lossless receipt contains61 factory/19 reference
 attempts; all60 prior factory/19 reference records remain unchanged.
+
+Batch35 `uv_extend_probe-1794571757033229000` retained a fixture error after
+15.4821 seconds at `7e61950`. The shared quad's direct UV-coordinate ADD control
+selected the unselected target and retained the selected bystander. Both stock
+UV Editor Shift+LEFTMOUSE CLICK states completed: selected became unselected;
+unselected became selected. Neither changed on PRESS, both changed on RELEASE,
+and the exact CLICK pass-through witness ran once per observation. Geometry,
+tool and bystander remained unchanged; Shift+F23 confirmed point[1978,1126].
+
+After candidate insertion, the witness-order assertion failed before sending
+the candidate mouse PRESS. No candidate gesture or tool/fallback PRESS trial
+ran. The failing code stored counts/maps/order only after that assertion, so the
+failed state's precise merged positions were not retained. This is a diagnostic
+limit, not evidence of a product selection defect. The two stock observations
+remain usable independently of the overall native error.
+
+Final captured source and merged snapshots matched exactly. Fixture cleanup
+reported no errors; native owned/pending/tracked resources were zero and the
+watcher stopped. PID25137 and all temporary roots were absent, protected inputs
+and all45 executed source hashes matched, and the allocation was released.
+The lossless receipt now contains62 factory/19 reference attempts; all61 prior
+factory/19 reference records remain unchanged. Accounting stays37/eight/95.
+
+The corrected test-only fixture records counts and full map snapshots before
+admission checks, then records actual witness/competitor indices before checking
+order. Pinned Blender4.5.1 `wm_keymap.cc`, `wm_keymap_addon_add`, prepends each
+source item to the merged map. Inserting the owned candidate before the owned
+witness in the disposable source therefore places the witness first after that
+merge; actual readback must still pass. No stock row or product behavior changes.
+The two completed stock CLICK controls are hash-bound and reused only with the
+same exact binding, tool, UV geometry/location and projected point. A fresh
+proposal has59 steps and ten new observations, retaining separate primary and
+fallback PRESS baselines. No identical retry or new allocation is assumed.
+All81 category tests pass, including failure-position retention, reversed-merge
+ordering, the reduced schedule, native stock effects and strict cleanup.
