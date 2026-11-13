@@ -20,7 +20,8 @@ and section menus browse one section at a time when search is empty.
   choose **Add Assignment**, and select those three entries. **New Shortcut**
   adds an input to the library for reuse in Assignment Settings.
 - The **Commands** tab has its own category and section filters based on where
-  each command is used. **All Categories** includes unused commands. The
+  each command is used. Picking a category or section clears the text search.
+  **All Categories** includes unused commands. The
   selected command shows configured settings and additional Blender settings
   discovered from the operator. Edit a field inline to change all uses. Use
   the **×** beside a configured value to restore Blender's default. The

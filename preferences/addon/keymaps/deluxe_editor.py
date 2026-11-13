@@ -209,6 +209,7 @@ def inspector(layout, current, preview, id_):
         head.label(text='Deluxe default')
     else:
         head.label(text='Customized')
+    layout.label(text=f"Command source: {meta['owner']}")
     section = current.catalog['sections'][row['section']]
     category = current.catalog['categories'][section['category']]
     path = f"{category['label']} / {section['label']}"
@@ -377,7 +378,9 @@ def command_details(layout, current, id_):
         category = current.catalog['categories'][section['category']]
         label = f"{category['label']} / {section['label']}"
         ops.operator_button(layout, 'show_assignments', label, section_id, icon='FORWARD')
-    if not uses:
+    if uses:
+        layout.label(text=f'Used by {len(uses)} assignment{"s" if len(uses) != 1 else ""}')
+    else:
         layout.label(text='No assignment uses this command')
     command_fields(layout, current, id_)
 

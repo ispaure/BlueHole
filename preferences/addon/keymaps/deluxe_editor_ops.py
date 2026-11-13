@@ -107,8 +107,12 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
         if _editor is not None:
             _editor.page = 0
 
+    def switch_tab(self, context):
+        self.search = ''
+        self.reset_page(context)
+
     tab: EnumProperty(items=[('ASSIGNMENTS', 'Assignments', ''), ('COMMANDS', 'Commands', '')],
-                      options=TRANSIENT, update=reset_page)
+                      options=TRANSIENT, update=switch_tab)
     search: StringProperty(name='Search', options=TRANSIENT, update=reset_page)
     live_search: StringProperty(name='Search current bindings', options=TRANSIENT,
                                 update=lambda self, _context: setattr(self, 'live_page', 0))
@@ -167,9 +171,17 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
                 current.assignment, current.page = '', 0
 
             return self.run(context, show_assignments)
-        if self.action in {'show_command', 'show_section_commands'}:
+        if self.action in {'show_command', 'show_section_commands', 'command_category', 'command_section'}:
             def show(current):
                 view = state(context)
+                if self.action in {'command_category', 'command_section'}:
+                    if self.action == 'command_category':
+                        current.command_category, current.command_section = self.target, ''
+                    else:
+                        current.command_section = self.target
+                    view.search = ''
+                    current.page = 0
+                    return
                 view.tab = 'COMMANDS'
                 assignment = current.catalog['assignments'].get(self.target, {})
                 section = assignment.get('section', self.target)
@@ -195,12 +207,6 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.changed('Shipped defaults staged')
         elif action == 'category':
             current.category, current.section, current.assignment = target, '', ''
-            current.page = 0
-        elif action == 'command_category':
-            current.command_category, current.command_section = target, ''
-            current.page = 0
-        elif action == 'command_section':
-            current.command_section = target
             current.page = 0
         elif action in {'assignment', 'command'}:
             opened = getattr(current, action) != target or not getattr(current, action + '_open')
