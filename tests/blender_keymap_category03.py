@@ -109,6 +109,7 @@ def _run_session(args, root):
         environment['DELUXE_CATEGORY_EDITOR_CLUSTER'] = getattr(args, 'editor_cluster', 'selection')
         environment['DELUXE_CATEGORY_EDITOR_INPUT_CONTROLS'] = '1' if getattr(args, 'editor_input_controls', False) else '0'
         environment['DELUXE_CATEGORY_EDITOR_PRIME_READINESS'] = '1' if getattr(args, 'editor_prime_readiness', False) else '0'
+        environment['DELUXE_CATEGORY_EDITOR_MATCHED_ENDPOINTS'] = '1' if getattr(args, 'editor_matched_endpoints', False) else '0'
     for name in RESOURCE_NAMES:
         folder = root / name.lower()
         folder.mkdir()
@@ -1718,7 +1719,8 @@ def native_main(root, mode):
             steps, receipt, record, window, area, exporter, probe=mode == 'editor_probe',
             cluster=os.environ.get('DELUXE_CATEGORY_EDITOR_CLUSTER', 'selection'),
             input_controls=os.environ.get('DELUXE_CATEGORY_EDITOR_INPUT_CONTROLS') == '1',
-            prime_readiness=os.environ.get('DELUXE_CATEGORY_EDITOR_PRIME_READINESS') == '1').append()
+            prime_readiness=os.environ.get('DELUXE_CATEGORY_EDITOR_PRIME_READINESS') == '1',
+            matched_endpoints=os.environ.get('DELUXE_CATEGORY_EDITOR_MATCHED_ENDPOINTS') == '1').append()
     elif mode == 'selection':
         steps.append(lambda: set_groups(False, True, False))
         for kind in ('object', 'mesh', 'curve', 'curves', 'lattice', 'armature', 'uv',
@@ -1829,6 +1831,7 @@ def cli():
                                          'transform', 'image', 'persistence', 'reopen'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')
+    parser.add_argument('--editor-matched-endpoints', action='store_true')
     parser.add_argument('--editor-cluster', choices=('selection', 'passthrough'), default='selection')
     parser.add_argument('--ordinary-cluster', choices=('axis', 'wheel_zoom', 'uv_edit', 'tools', 'selection'), default='axis')
     parser.add_argument('--invert-zoom', action=argparse.BooleanOptionalAction, default=None)

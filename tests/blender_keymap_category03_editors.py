@@ -46,7 +46,8 @@ PASSTHROUGH = ('image', 'nla', 'file_browser', 'timeline', 'sequencer_preview', 
 
 class EditorCases:
     def __init__(self, steps, receipt, record, window, area, exporter, *,
-                 probe=False, cluster='selection', input_controls=False, prime_readiness=False):
+                 probe=False, cluster='selection', input_controls=False, prime_readiness=False,
+                 matched_endpoints=False):
         import bpy
 
         if cluster not in ('selection', 'passthrough'):
@@ -58,6 +59,9 @@ class EditorCases:
         self.probe, self.cluster = probe, cluster
         self.input_controls = input_controls
         self.prime_readiness = prime_readiness
+        self.matched_endpoints = matched_endpoints
+        self.endpoint_label = None
+        self.matched_baseline = None
         self.readiness = None
         self.control_class = None
         self.control_items, self.control_maps, self.control_callbacks = [], [], []
@@ -138,6 +142,10 @@ class EditorCases:
     def merged_rows(self):
         return [self.capture(keymap) for keymap in self.configs.user.keymaps
                 if keymap.name in ('View2D', *EDITOR_SCOPES.values())]
+
+    def foreign_merged_maps(self):
+        names = {'Window', 'View2D', 'Image', 'NLA Editor', 'File Browser', *EDITOR_SCOPES.values()}
+        return [self.capture(keymap) for keymap in self.configs.user.keymaps if keymap.name in names]
 
     @staticmethod
     def exact_descriptor(direction):
@@ -259,9 +267,76 @@ class EditorCases:
 
     def capture_primed_source(self):
         self.readiness['first_primed_source'] = self.source_maps()
+        if self.endpoint_label:
+            self.readiness['first_primed_merged'] = self.foreign_merged_maps()
+
+    def begin_matched_endpoint(self, label):
+        """Use the same context and readiness lifecycle before and after ownership."""
+        self.endpoint_label = label
+        self.setup('dopesheet', 'UP')
+        self.configs.update()
+        self.begin_readiness()
+        self.readiness['label'] = label
+        self.readiness['context'] = {'area': self.area.type,
+                                    'mode': self.area.spaces.active.mode,
+                                    'region': self.region().type}
+        endpoints = self.receipt.setdefault('editor_matched_endpoints', {
+            'comparison': 'exact source and foreign merged snapshots; full read_issues retained',
+            'endpoints': [],
+        })
+        endpoints['endpoints'].append(self.readiness)
+
+    def finish_matched_endpoint(self):
+        sources, merged = self.source_maps(), self.foreign_merged_maps()
+        value = self.readiness
+        value['source'] = sources
+        value['foreign_merged'] = merged
+        value['unknown_properties'] = self.property_read_issues(sources)
+        value['stable_sources'] = sources == value['first_primed_source']
+        value['stable_merged'] = merged == value['first_primed_merged']
+        assert value['stable_sources'] and value['stable_merged'], 'Matched endpoint did not stabilize'
+        relevant = {target for targets in TARGETS.values() for target, _ in targets.values()}
+        relevant.update(('view2d.scroll_up', 'view2d.scroll_down'))
+        source_rows = [row for maps in sources.values() for keymap in maps for row in keymap['items']]
+        value['missing_relevant_targets'] = sorted(relevant - {row['target'] for row in source_rows})
+        assert not value['missing_relevant_targets'], 'Relevant source selector is missing'
+        value['relevant_target_unknowns'] = [row for row in source_rows
+                                           if row['target'] in relevant and row['read_issues']]
+        assert not value['relevant_target_unknowns'], 'Relevant selector property read failed'
+        # Explicit, inherited sentinel rows are checked independently of the
+        # fixture operators and the selected eight target declarations.
+        sentinel_targets = {'Dopesheet': 'action.select_all', 'Graph Editor': 'graph.select_all',
+                            'Node Editor': 'node.select_all', 'Sequencer': 'sequencer.select_all'}
+        sentinels = []
+        for name, target in sentinel_targets.items():
+            matches = [row for keymap in sources['default'] if keymap['scope']['name'] == name
+                       for row in keymap['items'] if row['target'] == target
+                       and row['event']['type'] == 'A' and row['event']['value'] == 'PRESS'
+                       and not any(row['event'][flag] for flag in ('shift', 'ctrl', 'alt', 'oskey', 'any'))]
+            assert len(matches) == 1 and not matches[0]['read_issues'], (name, matches)
+            sentinels.append({'map': name, 'row': matches[0]})
+        value['readable_foreign_sentinels'] = sentinels
+        if self.matched_baseline is None:
+            self.matched_baseline = {'context': value['context'], 'source': sources, 'merged': merged}
+            value['is_baseline'] = True
+        else:
+            value['context_matches'] = value['context'] == self.matched_baseline['context']
+            value['strict_sources_equal'] = sources == self.matched_baseline['source']
+            value['strict_foreign_merged_equal'] = merged == self.matched_baseline['merged']
+            self.record('editor_matched_endpoint_compared')
+            assert value['context_matches']
+            assert value['strict_sources_equal'], 'Matched-context source comparison failed'
+            assert value['strict_foreign_merged_equal'], 'Matched-context foreign merged comparison failed'
+        self.endpoint_label = None
+        self.record('editor_matched_endpoint_complete')
+
+    def append_matched_endpoint(self, label):
+        self.steps.extend((lambda: self.begin_matched_endpoint(label), self.deliver_readiness,
+                           self.finish_readiness, self.capture_primed_source,
+                           self.finish_matched_endpoint))
 
     def input_control_receipt(self):
-        if self.state is None:
+        if self.state is None or self.endpoint_label:
             return self.readiness
         return self.state['input_controls']
 
@@ -424,7 +499,8 @@ class EditorCases:
             'foreign_source_fields_and_order_unchanged': source_after == self.source_before,
             'merged_probe_rows_absent': merged_probe_rows_absent,
         })
-        assert source_after == self.source_before
+        if not self.matched_endpoints:
+            assert source_after == self.source_before
         assert merged_probe_rows_absent
         self.record('editor_handler_released')
 
@@ -739,7 +815,9 @@ class EditorCases:
         self.steps.extend((press, observe, finish))
 
     def append(self):
-        if self.prime_readiness:
+        if self.matched_endpoints:
+            self.append_matched_endpoint('before_owned_probe' if self.probe else 'before_no_probe')
+        elif self.prime_readiness:
             self.steps.extend((self.begin_readiness, self.deliver_readiness,
                                self.finish_readiness, self.capture_primed_source))
         self.steps.append(self.start)
@@ -748,6 +826,8 @@ class EditorCases:
             for kind in kinds:
                 for direction in DIRECTIONS:
                     self.case(kind, direction, 'readonly', direct=self.cluster == 'selection')
+            if self.matched_endpoints:
+                self.append_matched_endpoint('after_no_probe')
         else:
             for kind in kinds:
                 self.case(kind, 'UP', 'before_install', direct=False)
@@ -756,9 +836,13 @@ class EditorCases:
                 for direction in DIRECTIONS:
                     self.case(kind, direction, 'installed', direct=self.cluster == 'selection')
             self.steps.append(self.release)
+            if self.matched_endpoints:
+                self.append_matched_endpoint('after_first_release')
             self.case(kinds[0], 'UP', 'after_release', direct=False)
             self.steps.append(self.install)
             self.case(kinds[0], 'UP', 'reinstalled', direct=False)
             self.steps.append(self.release)
+            if self.matched_endpoints:
+                self.append_matched_endpoint('after_second_release')
         self.steps.append(self.cleanup)
         return self
