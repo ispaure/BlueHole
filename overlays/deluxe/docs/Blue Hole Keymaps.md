@@ -1,7 +1,7 @@
-These tables cover common artist shortcuts from the
-[bundled Deluxe profile](../../../keymaps/deluxe-defaults.json) for Blender
-5.2.2. Rows marked **Blender** come from the built-in Blender preset. The
-**Add-on** column shows dependencies and optional integrations. For the
+These tables cover the [bundled Deluxe profile](../../../keymaps/deluxe-defaults.json)
+for Blender 5.2.2 and shortcuts from the Reference Blender 4.5.1 setup.
+Rows marked **Blender** come from the built-in Blender preset. The **Add-on**
+column shows dependencies and optional integrations. For the
 full list and your saved changes, open **Addon Settings > Keymaps > Assignments**
 in Blue Hole preferences. The **Sections** tab controls which shortcut groups
 are enabled. See the [Deluxe guide](../README.md) for setup.
@@ -22,6 +22,7 @@ are enabled. See the [Deluxe guide](../README.md) for setup.
 - [UV EDITOR](#uv-editor)
 - [🎨 SCULPTING MODE](#-sculpting-mode)
 - [Add-on shortcuts](#add-on-shortcuts)
+- [Reference reference shortcuts](#reference-reference-shortcuts)
 - [Additional information](#additional-information)
 
 # 💾 **SYSTEM**
@@ -59,6 +60,7 @@ are enabled. See the [Deluxe guide](../README.md) for setup.
 | Clear Parent | Alt + P | | Blender, Object Mode | |
 | Extend Selection to Parent | Shift + Wheel Up | Shift + Wheel Right | Object Mode | |
 | Extend Selection to Child | Shift + Wheel Down | Shift + Wheel Left | Object Mode | |
+| Walk Up / Down the Outliner | Alt + Wheel Up / Down | Alt + Wheel Right / Left | Add Shift to extend the selection | |
 
 ## Show / Hide
 
@@ -83,6 +85,7 @@ are enabled. See the [Deluxe guide](../README.md) for setup.
 | Frame Selection in All Views | Shift + F | | | |
 | Frame All | A | Shift + Alt + Wheel Down/Left | A also has inherited selection bindings in some modes | |
 | Align to Front Relative to the Current View | Shift + Alt + MMB Click | | | |
+| Align to an Axis Relative to the Current View | Shift + Alt + LMB Drag | | Drag toward the desired axis | |
 | Back / Left / Bottom View | Ctrl + F1 / F2 / F3 | Cmd + F1 / F2 / F3 | Apply the modifier to each function key | |
 | View Pie | V | | | |
 
@@ -90,7 +93,7 @@ are enabled. See the [Deluxe guide](../README.md) for setup.
 
 | **Action** | **Keymap 1** | **Keymap 2** | **Note/Status** | **Add-on** |
 | --- | --- | --- | --- | --- |
-| Pan | Alt + MMB Drag | Alt + LMB Drag | Image, Clip and View2D maps | |
+| Pan | Alt + MMB Drag | Alt + LMB Drag | Image, Clip and View2D maps. Blender also provides MMB Drag | |
 | Zoom | Alt + RMB Drag | Alt + Wheel Up/Down | Wheel variant is in View2D maps | |
 | Frame Selection | F | Shift + Alt + Wheel Up/Right | Image/UV map. F also frames selection in editors such as the Graph Editor and Dopesheet | |
 | Frame All | A | Shift + Alt + Wheel Down/Left | Image/UV map | |
@@ -121,6 +124,7 @@ Use the number row above the letters in the 3D View.
 | Face Select | 3 | | Enters Mesh Edit Mode from Object Mode | |
 | Pose Mode | 3 | | With an armature active | |
 | Object Mode | 4 | | Returns from Edit Mode | |
+| Toggle Object / Edit Mode | Tab | | Blender, with the pointer in the 3D View | |
 | Sculpt / Vertex Paint / Weight Paint / Texture Paint | 5 / 6 / 7 / 8 | | With a compatible active object | |
 
 ## Click and Box
@@ -218,6 +222,8 @@ For lasso selection, choose **Select Lasso** from Blender's toolbar. Its default
 | Activate Box Select | Q | | The UV Editor assigns Box on key release | |
 | Place and Move UV Cursor | MMB Drag | | With the UV Cursor tool active | |
 | Snap UV Cursor to Selection | Ctrl + Shift + Wheel Up | Ctrl + Shift + Wheel Right | | |
+| Move UV Cursor to Upper-Left of UV Area | Ctrl + Shift + Wheel Left | | UV Editor, in Mesh Edit Mode | Zen UV (required) |
+| Fit UV Islands to Active Trim | Ctrl + Shift + Alt + MMB | | Select the UV islands and set an active trim | Zen UV (required) |
 | UV Tool Pie | Shift + RMB | | | |
 | UV Action Pie | Ctrl + RMB | | | |
 | UV Cursor Pie | Ctrl + Shift + RMB | | | |
@@ -248,17 +254,44 @@ controls. **Keymaps > Assignments** shows each shortcut's source and status.
 | autoConstraints | W / E / R in supported 3D modes | Each shortcut uses the corresponding autoConstraints operator when the integration is enabled and that operator is available | Blender Move, Rotate or Scale |
 | Interactive Tools | Alt + D in Mesh Edit Mode | Smart Delete runs when the provider operator is available | Blender's existing Alt+D binding remains available |
 | Group Pro | Ctrl + J in Object Mode | Uses the Group Pro Join override when its operator is available | Blender Join |
+| Zen UV | Ctrl + Shift + Wheel Left and Ctrl + Shift + Alt + MMB in the UV Editor | Moves the UV cursor or fits selected islands to the active trim | The provider's operator is required for each action |
 | Blender FBX | Ctrl + Shift + E | Uses the exporter bundled with Blender when its operator is available | A missing exporter leaves this shortcut inactive |
 
-The Reference reference also customized shortcuts from Hard Ops, Boxcutter,
-MACHIN3tools, MESHmachine, and Pie Menu Editor. Their installed keymaps and
-saved edits can still affect the same keys. For example, the reference bound
-Hard Ops Mirror to Alt+X and assigned Pie Menu Editor actions to right-mouse
-gestures in some editors. Those reference edits are outside the bundled
-Deluxe defaults. The Reference Group Pro Paste override on Ctrl+V is also
-outside the bundled profile. Its provider binding and Blender's Paste Buffer
-can share that shortcut. See the [Object and Mesh audit](../../../docs/deluxe-keymaps-category04.md#exact-exceptions)
-and the [remaining reference exceptions](../../../docs/deluxe-keymaps-category05.md#exact-exceptions-and-03-composition).
+# Reference reference shortcuts
+
+These mappings come from the shared Reference 4.5.1 keyconfig, saved
+preferences, and installed add-ons. To use them in 5.2.2, the matching keymap
+settings and any listed add-ons need to be present in that profile.
+
+| **Action** | **Keymap 1** | **Keymap 2** | **Note/Status** | **Add-on** |
+| --- | --- | --- | --- | --- |
+| Toggle Quad View | Ctrl + Tab | | In the 3D View. The bundled 5.2.2 setup inherits Blender's Ctrl + Alt + Q | |
+| Toggle Viewport Region / Asset Library | Ctrl + Space | | In the 3D View. The region depends on the pointer position and MACHIN3tools settings | MACHIN3tools (required) |
+| Quick Favorites | Q twice | | Double-press Q in the reference keyconfig | |
+| Duplicate Object | Ctrl + D | | With an object selected in the Outliner | |
+| Create Collection from Selection | Ctrl + G | | In Object Mode | |
+| Add Selection to the Active Object's Collection | Ctrl + Shift + G | | In Object Mode | |
+| Remove Selected Objects from a Collection | Ctrl + Alt + G | | In Object Mode | |
+| Group Pro Pie | C + Drag | | In the 3D View. Press C and drag | Group Pro (required) |
+| Paste Groups | Ctrl + V | | In the 3D View. Group Pro Paste and Blender Paste Buffer can share this key | Group Pro (required) |
+| Hard Ops Mirror Gizmo | Alt + X | | In the 3D View | Hard Ops (required) |
+| Select Object Hierarchy / Collection Contents | Shift + LMB Double-Click | LMB Double-Click | In the Outliner. Use the first on an object and the second on a collection | |
+| Invert Box Selection | Ctrl + Shift + LMB Drag | | With the X-Ray Box tool active in the 3D View | X-Ray Selection Tools (required) |
+| Add with Lasso | Ctrl + Shift + Alt + LMB Drag | | In the UV Editor with the Box Select tool active | |
+| Constrain a Transform to an Axis | MMB Drag | | Start the transform, then drag in the desired direction | |
+| Constrain a Transform to the YZ / XZ / XY Plane | Wheel Up / Wheel Down / Alt + Wheel Down | | During a transform | |
+| Precision during Transform | Hold Shift | | During a transform | |
+| Toggle autoConstraints | Shift + Alt + X | | In the 3D View | autoConstraints (required) |
+| Increase / Decrease Proportional Radius | Tab + Wheel Up / Down | `]` / `[` | During a proportional transform | |
+| Adjust Sculpt Brush Radius | Shift + Space | | In Sculpt Mode. Move the mouse to adjust the radius | |
+| Move UV Cursor to Upper-Left of UV Area | Ctrl + Shift + Wheel Down | | Additional Reference shortcut in the UV Editor | Zen UV (required) |
+| Toggle UV Island Isolation | S | | Zen UV runs on key press. The reference also assigns Hide Unselected on click | Zen UV (required for isolation) |
+| Toggle UV Checker | Alt + T | | Window shortcut in the reference profile | Zen UV (required) |
+| Zen UV Pie | Alt + U | | Image and UV Editor | Zen UV (required) |
+
+The [Object and Mesh audit](../../../docs/deluxe-keymaps-category04.md#exact-exceptions)
+and the [remaining reference exceptions](../../../docs/deluxe-keymaps-category05.md#exact-exceptions-and-03-composition)
+record overlapping bindings and other Reference customizations.
 
 # Additional information
 
@@ -266,7 +299,7 @@ and the [remaining reference exceptions](../../../docs/deluxe-keymaps-category05
 
 - **Object and mesh mode.** `1`, `2` and `3` choose Vertex, Edge and Face Select on a mesh. `3` still enters Pose Mode on an armature. `4` is the dedicated Deluxe shortcut for returning to Object Mode.
 - **Selection and visibility.** `Ctrl + A` and `Ctrl + Shift + A` are Deluxe All/None shortcuts in UV. Object and Mesh Edit use Blender's `A` and `Alt + A` where the mode handles them. Isolation uses `Shift + I`. Blender's viewport X-Ray toggle is `Alt + Z`.
-- **Legacy gestures.** The old box-invert, modified lasso, 3D loop/ring double-click, and transform wheel-plane shortcuts have no equivalent Deluxe assignment in the bundled catalog. Blender's selection tools and axis keys cover those workflows. The viewport axis drag rows are bundled, and earlier native comparisons did not establish the expected directional drag behavior.
+- **Loop and ring selection.** The captured Mesh map uses a single click for edge loops and rings. The UV Editor has separate double-click loop bindings.
 
 The reference migration also left some exact conflicts and legacy modal or
 macro routes deferred. See the [Deluxe guide](../README.md#shortcut-coverage)

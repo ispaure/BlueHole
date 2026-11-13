@@ -103,8 +103,16 @@ The [X-Ray Selection Tools 4.10.2 update](https://extensions.blender.org/add-ons
 loaded in a separate 5.2.2 preset. Q activated X-Ray Box in Object and Mesh
 and returned to Blender Box Select after the integration was switched off.
 [Zen UV 5.4](https://zenmastersteam.github.io/Zen-UV/latest/) lists support for
-Blender 5.2 LTS. Verify both UV shortcuts with a compatible package before
-adding them back to the artist guide.
+Blender 5.2 LTS. The shared add-on library and the Blender installations
+checked contain Zen UV 5.0.3.0. Verification of both shortcuts with a
+compatible package remains open. The artist guide lists the mappings and
+their add-on requirements.
+
+Both Zen UV gestures were also replayed in a disposable copy of the Reference
+4.5.1 profile. Ctrl+Shift+Wheel Left and the reference-only Wheel Down variant
+both moved the UV cursor to (0, 1).
+Ctrl+Shift+Alt+MMB fitted the selected UVs inside the active trim. The
+Reference keyconfig and preference file hashes matched before and after.
 
 A disposable Logistics preset on Blender 5.2.2 verified the Sections,
 Assignments and Commands views, shared and single-assignment capture,
