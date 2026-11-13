@@ -105,13 +105,16 @@ fresh process remain pending.
 
 Twenty-one additional bindings are drafted in existing category modules and
 verified against exact accepted scopes, events, targets and declared properties.
-Their native acceptance remains pending; the manifest keeps them separate from
-the twenty-three implemented candidates (including Circle) and historical native receipts.
+Nine are now accepted by coordinator-approved exact-context mechanism reuse,
+bringing the implemented candidate count to 32. Twelve declarations remain draft.
 Existing subfeature toggles control these drafts.
 The seven axis/Local View production inputs produced their expected effects.
 The first copied-reference run observed six matching effects, an unchanged first
-Ctrl-F1 case, and a strict property-readability comparison failure. A focused
-reference readiness check remains required before treating that cluster as complete.
+Ctrl-F1 case, and a strict property-readability comparison failure. Those limits
+remain explicit. Ctrl-F1 and the two UV arrow aliases receive spot checks in a
+related scheduled batch or integrated owner06 work; no dedicated lifecycle rerun
+is required. The arrow aliases reuse proven command/context behavior without
+their own dispatch observation.
 
 | Existing group | Draft inputs |
 | --- | --- |
@@ -133,7 +136,9 @@ The ordinary fixture separates stock observation, one exact owned probe at a
 time, and production-source observation. Five bounded clusters cover all 22
 IDs. The seven-handler fixture separately compares middle click, drag and
 second-press drag, circle entry versus actual brush selection, Object subtract
-and Mesh/UV shortest-path controls. Both preserve foreign source fields/order;
+and Mesh/UV shortest-path controls. The ordinary fixture now adds a native F23 Window delivery control before each
+shortcut and skips unverified input; it retains direct operator effect controls.
+Both fixtures preserve foreign source fields/order;
 the axis and handler subsets have run, while other clusters remain pending.
 
 ## Verification and boundaries
@@ -144,14 +149,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Thirty-eight category checks currently pass. They cover exact assigned IDs and
+Forty-one category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 39 factory attempts and twelve copied-reference attempts. A completed
+retains 41 factory attempts and twelve copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -316,8 +321,11 @@ toggle and existing controls. Actual production dispatch now passes nine native 
 `legacy:Transform` identity: the repeat/fallback cases, W/Shift-W with Actions
 on and off, two installs and two exact releases. Source and foreign merged
 snapshots match, and unrelated Transform declarations remain unchanged.
-Production immediate-save/fresh-reopen is prepared but remains unrun, because
-this identity differs from the isolated probe owner.
+Production immediate save and fresh reopen now pass under that actual identity
+as well. The inactive F20 repeat-enabled user override survived both processes
+and four releases/reinstalls, with exact original source and foreign data proof.
+The hash-bound preference file and expectation manifest were removed after the
+reader. Composed owner04/05/06 parity remains open.
 
 Earlier G controls lacked repeat history, used stale BMesh data, had no rotation
 effect, or ended in a crash. Those attempts remain inconclusive. The latest
@@ -345,14 +353,15 @@ cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
 Required native work includes File Browser/Sequencer Preview input controls and
 editor persistence, Circle/Framing saved edits across a fresh process, Image
 framing/pan/zoom, the axis reference readiness check, remaining ordinary clusters,
-and focused middle-mouse/subtract and modal/tool probes. G awaits production immediate-save and
-fresh-reopen acceptance. Existing proofs need no broader
+and focused middle-mouse/subtract and modal/tool probes. G behavior and production persistence are accepted; composed UV/global
+parity remains. Existing proofs need no broader
 rerun unless affected source changes.
 
-Of 140 active full-side delta candidates, twenty-three have implemented declarations:
-thirteen framing, six UV selection additions and four Circle inputs. Exactly eight UV-specific Q,
+Of 140 active full-side delta candidates, 32 have implemented declarations:
+thirteen framing, six UV selection additions, four Circle inputs and nine
+ordinary declarations accepted through explicit mechanism reuse. Exactly eight UV-specific Q,
 loop/linked and Tweak fallback rows were explicitly transferred to 04. The
-remaining 109 stay with 03: 22 ordinary candidates (21 now drafted), 70 currently
+remaining 100 stay with 03: 13 ordinary candidates (12 declarations still draft), 70 currently
 unsupported or unproved handler/modal/tool/replacement cases, 13 observations of
 active-role absence, and four conflicting bindings. Active-role absence alone
 does not prove unavailability. Each has row-specific next steps in the refreshed
@@ -370,3 +379,22 @@ capability checks. Industry lineage neither makes a candidate inherited under
 Blender nor supplies a reason to defer a confirmed customization. The shared
 runtime change remains limited to the approved property normalization repair;
 accepted 01/02 fixtures are unchanged. Required gaps keep brief 03 open.
+
+### Prepared shared work
+
+`tests/blender_keymap_category03_persistence.py` prepares the editor and combined
+Circle/Framing save/reopen pairs using actual category toggles, exact runtime
+ownership, immediate save, merged-item reacquisition and source-bound input
+manifests. Complete matched snapshots retain every foreign row; only a proven
+owned saved edit can explain its map-level modified flag. These new pairs have
+not been run natively. The remaining File Browser/Preview control cluster uses
+owned scrollable content and visible-region coordinates; it is also unrun.
+
+The ignored mechanism plan partitions all 100 remaining IDs into ordinary
+declarations (13), modal events (33), middle-mouse tool dispatch (19), selection
+replacement/fallback (22), navigation timing/context (5), release confirmation
+(4), and conflicting reference intentions (4). Registration/persistence proof
+can be reused where source, selector and context warrant it. Nine ordinary rows
+were explicitly approved for reuse, with the three remaining spot checks retained.
+A source-bound single-step launcher prepares a compact wheel-zoom factory/
+reference pair and the shared lifecycle/control checks without starting them.

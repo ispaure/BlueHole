@@ -85,6 +85,9 @@ class OrdinaryCases:
         self.owned = None
         self.saved_inversion = None
         self.proof = None
+        self.input_callbacks = []
+        self.input_control = None
+        self.input_control_class = None
 
     def region(self):
         return next(region for region in self.area.regions if region.type == 'WINDOW')
@@ -166,7 +169,49 @@ class OrdinaryCases:
                 inputs.invert_mouse_zoom = self.invert_zoom
             self.proof['invert_mouse_zoom'] = inputs.invert_mouse_zoom
             self.proof['input_limit'] = 'Synthetic event delivery; hardware event generation is unverified'
+        self.install_input_control()
         self.record('ordinary_ready')
+
+    def install_input_control(self):
+        bpy, callbacks = self.bpy, self.input_callbacks
+        assert not any(item.type == 'F23' for km in self.configs.user.keymaps for item in km.keymap_items)
+
+        class WM_OT_category03_ordinary_control(bpy.types.Operator):
+            bl_idname = 'wm.category03_ordinary_control'
+            bl_label = 'Category 03 ordinary input control'
+
+            def execute(self, context):
+                callbacks.append({'area': context.area.type if context.area else None,
+                                  'region': context.region.type if context.region else None})
+                return {'FINISHED'}
+
+        bpy.utils.register_class(WM_OT_category03_ordinary_control)
+        self.input_control_class = WM_OT_category03_ordinary_control
+        before = {km.as_pointer() for km in self.configs.addon.keymaps}
+        keymap = self.configs.addon.keymaps.new(name='Window', space_type='EMPTY', region_type='WINDOW')
+        self.input_control = keymap, None, keymap.as_pointer() not in before
+        item = keymap.keymap_items.new(WM_OT_category03_ordinary_control.bl_idname, 'F23', 'PRESS')
+        self.input_control = keymap, item, self.input_control[2]
+        self.configs.update()
+        matches = [item for km in self.configs.user.keymaps if km.name == 'Window'
+                   for item in km.keymap_items if item.idname == WM_OT_category03_ordinary_control.bl_idname]
+        self.proof['input_control'] = {'key': 'F23', 'addon_id': item.id, 'merged_occurrences': len(matches)}
+        assert len(matches) == 1
+
+    def release_input_control(self):
+        if self.input_control is not None:
+            keymap, item, created = self.input_control
+            if item is not None:
+                keymap.keymap_items.remove(item)
+            if created and not len(keymap.keymap_items):
+                self.configs.addon.keymaps.remove(keymap)
+            self.input_control = None
+        if self.input_control_class is not None:
+            self.bpy.utils.unregister_class(self.input_control_class)
+            self.input_control_class = None
+        self.configs.update()
+        if self.proof and 'input_control' in self.proof:
+            self.proof['input_control']['released'] = True
 
     def release(self):
         if self.owned is None:
@@ -187,6 +232,7 @@ class OrdinaryCases:
         try:
             self.release()
         finally:
+            self.release_input_control()
             if self.saved_inversion is not None:
                 inputs = self.bpy.context.preferences.inputs
                 inputs.invert_mouse_zoom = self.saved_inversion
@@ -511,6 +557,15 @@ class OrdinaryCases:
 
         def begin():
             def work():
+                callbacks = self.input_callbacks[state['control_index']:]
+                delivered = {'area': self.area.type, 'region': 'WINDOW'} in callbacks
+                result['input_delivery'] = {'callbacks': callbacks,
+                                            'expected_area': self.area.type,
+                                            'expected_region': 'WINDOW', 'delivered': delivered}
+                state['input_delivered'] = delivered
+                if not delivered:
+                    result['input_status'] = 'window_control_missing'
+                    return
                 result['before'] = self.snapshot()
                 self.event('MOUSEMOVE', 'NOTHING')
                 self.event(key, **mods)
@@ -520,8 +575,17 @@ class OrdinaryCases:
                     state['pressed'] = False
             attempt('input_press', work)
 
+        def prime_input():
+            state['control_index'] = len(self.input_callbacks)
+            def work():
+                self.event('MOUSEMOVE', 'NOTHING')
+                self.event('F23')
+                self.event('F23', 'RELEASE')
+            attempt('native_input_control', work)
+
         def drag(dx, dy):
-            attempt('input_drag', lambda: self.event('MOUSEMOVE', 'NOTHING', dx=dx, dy=dy, **mods))
+            if state.get('input_delivered'):
+                attempt('input_drag', lambda: self.event('MOUSEMOVE', 'NOTHING', dx=dx, dy=dy, **mods))
 
         def end_drag():
             if not state.pop('pressed', False):
@@ -534,6 +598,8 @@ class OrdinaryCases:
                 result['release_error'] = type(error).__name__
 
         def observe():
+            if not state.get('input_delivered'):
+                return
             def work():
                 result['after'] = self.snapshot()
                 result['input_status'] = 'observed'
@@ -576,7 +642,7 @@ class OrdinaryCases:
                 self.receipt['dispatch'].append(result)
                 self.record(result['case'])
 
-        self.steps.extend((prepare, observe_maps, begin))
+        self.steps.extend((prepare, observe_maps, prime_input, begin))
         if is_drag:
             self.steps.extend((lambda: drag(8, 4), lambda: drag(70, 32), end_drag))
         self.steps.extend((observe, reset, fixture_control, finish))

@@ -46,6 +46,7 @@ CONTROL_KEYS = {'window': 'F21', 'editor': 'F22'}
 ERRORS = (AttributeError, KeyError, ReferenceError, RuntimeError, StopIteration,
           TypeError, ValueError)
 PASSTHROUGH = ('image', 'nla', 'file_browser', 'timeline', 'sequencer_preview', 'node_without_tree')
+REMAINING_PASSTHROUGH = ('file_browser', 'sequencer_preview')
 
 
 class EditorCases:
@@ -54,7 +55,7 @@ class EditorCases:
                  matched_endpoints=False):
         import bpy
 
-        if cluster not in ('selection', 'passthrough'):
+        if cluster not in ('selection', 'passthrough', 'remaining'):
             raise ValueError('Unknown editor proof cluster')
         if input_controls and probe:
             raise ValueError('Input controls require reference or production observation')
@@ -69,6 +70,9 @@ class EditorCases:
         self.before_shortcut = None
         self.after_shortcut = None
         self.owned_source_provenance = None
+        self.extra_source_names = set()
+        self.verified_merged_edits = []
+        self.file_browser_directory = None
         self.readiness = None
         self.control_class = None
         self.control_items, self.control_maps, self.control_callbacks = [], [], []
@@ -80,8 +84,11 @@ class EditorCases:
         self.fixture_strips = []
         self.state = None
 
-    def region(self):
-        return next(region for region in self.area.regions if region.type == 'WINDOW')
+    def region(self, *, visible=False):
+        kind = ('PREVIEW' if self.area.type == 'SEQUENCE_EDITOR'
+                and self.area.spaces.active.view_type == 'PREVIEW' else 'WINDOW')
+        return next(region for region in self.area.regions if region.type == kind
+                    and (not visible or (region.width > 1 and region.height > 1)))
 
     def context(self):
         return self.bpy.context.temp_override(window=self.window, area=self.area, region=self.region())
@@ -139,7 +146,7 @@ class EditorCases:
 
     def source_maps(self):
         names = {'Window', 'View2D', 'Image', 'NLA Editor', 'File Browser',
-                 *EDITOR_SCOPES.values()}
+                 *EDITOR_SCOPES.values(), *self.extra_source_names}
         return {
             role: [self.capture(keymap) for keymap in getattr(self.configs, role).keymaps
                    if keymap.name in names]
@@ -151,7 +158,8 @@ class EditorCases:
                 if keymap.name in ('View2D', *EDITOR_SCOPES.values())]
 
     def foreign_merged_maps(self):
-        names = {'Window', 'View2D', 'Image', 'NLA Editor', 'File Browser', *EDITOR_SCOPES.values()}
+        names = {'Window', 'View2D', 'Image', 'NLA Editor', 'File Browser',
+                 *EDITOR_SCOPES.values(), *self.extra_source_names}
         return [self.capture(keymap) for keymap in self.configs.user.keymaps if keymap.name in names]
 
     @staticmethod
@@ -377,13 +385,27 @@ class EditorCases:
             value['context_matches'] = value['context'] == self.matched_baseline['context']
             value['strict_sources_equal'] = sources == self.matched_baseline['source']
             value['strict_foreign_merged_equal'] = merged == self.matched_baseline['merged']
+            expected_merged = copy.deepcopy(self.matched_baseline['merged'])
+            markers = []
+            for proof in self.verified_merged_edits:
+                assert proof['owner_id'].startswith(('legacy:Selection:', 'legacy:Navigation:'))
+                assert proof['request_id'] and proof['runtime_owned_valid'] and proof['registered_pair_matches']
+                assert proof['row']['is_user_modified'] and proof['map_is_user_modified']
+                maps = [km for km in expected_merged if km['scope'] == proof['scope']]
+                assert len(maps) == 1
+                markers.append({'scope': proof['scope'], 'before': maps[0]['is_user_modified'],
+                                'expected_after': True, 'owner_id': proof['owner_id'],
+                                'request_id': proof['request_id'], 'verified_edited_row': proof['row']})
+                maps[0]['is_user_modified'] = True
+            value['expected_owned_map_edit_markers'] = markers
+            value['strict_foreign_merged_preservation'] = merged == expected_merged
             value['source_comparison'] = self.compare_sources(
                 self.matched_baseline['source'], sources,
                 self.matched_baseline['owned_sources'], value['owned_source_generations'])
             self.record('editor_matched_endpoint_compared')
             assert value['context_matches']
             assert value['source_comparison']['accepted_sources_equal'], 'Matched-context source comparison failed'
-            assert value['strict_foreign_merged_equal'], 'Matched-context foreign merged comparison failed'
+            assert value['strict_foreign_merged_preservation'], 'Matched-context foreign merged comparison failed'
         self.endpoint_label = None
         self.record('editor_matched_endpoint_complete')
 
@@ -672,14 +694,14 @@ class EditorCases:
         return lambda: []
 
     def view(self):
-        region = self.region()
+        region = self.region(visible=True)
         points = ((0, 0), (region.width // 2, region.height // 2),
                   (region.width - 1, region.height - 1))
         return [[value if math.isfinite(value) else None
                  for value in region.view2d.region_to_view(x, y)] for x, y in points]
 
     def point(self):
-        region = self.region()
+        region = self.region(visible=True)
         return region.x + region.width // 2, region.y + region.height // 2
 
     def event(self, key, value, *, point=None, **modifiers):
@@ -708,6 +730,23 @@ class EditorCases:
         def prepare():
             attempt('fixture_setup', lambda: values.update(read=self.setup(kind, direction)))
 
+        def prepare_delivery():
+            if kind != 'file_browser' or self.file_browser_directory is None:
+                return
+
+            def work():
+                params = self.area.spaces.active.params
+                assert params is not None
+                assert 'LIST_VERTICAL' in params.bl_rna.properties['display_type'].enum_items.keys()
+                params.display_type = 'LIST_VERTICAL'
+                params.directory = (str(self.file_browser_directory) + '/').encode()
+                row['owned_file_browser_content'] = {
+                    'directory': str(self.file_browser_directory),
+                    'entries': len(tuple(self.file_browser_directory.iterdir())),
+                    'display_type': params.display_type,
+                }
+            attempt('scrollable_fixture_setup', work)
+
         def control_setup():
             if 'read' not in values:
                 return
@@ -716,6 +755,7 @@ class EditorCases:
                 row['input_controls'] = self.install_input_controls(kind)
                 values['control_callback_index'] = len(self.control_callbacks)
                 values['input_point'] = self.point()
+                values['input_region'] = self.region(visible=True).type
                 self.event('MOUSEMOVE', 'NOTHING', point=values['input_point'])
             attempt('native_input_control_setup', work)
 
@@ -739,11 +779,12 @@ class EditorCases:
                 expected_area = CONTROL_SPACES[kind]
                 counts = {
                     label: sum(event['label'] == label and event['area'] == expected_area
-                               and event['region'] == 'WINDOW' for event in events)
+                               and event['region'] == values['input_region'] for event in events)
                     for label in CONTROL_KEYS
                 }
                 row['input_delivery'] = {
                     'coordinates': values['input_point'], 'callbacks': events,
+                    'expected_region': values['input_region'],
                     'counts_in_expected_window_region': counts,
                     'window_delivered': counts['window'] > 0,
                     'editor_delivered': counts['editor'] > 0,
@@ -752,7 +793,8 @@ class EditorCases:
                     row['wheel_observation'] = 'window_control_missing'
                     return
                 wheel = {
-                    'key': 'WHEELUPMOUSE', 'modifiers': {},
+                    'key': ('WHEELDOWNMOUSE' if kind == 'file_browser' and self.file_browser_directory
+                            else 'WHEELUPMOUSE'), 'modifiers': {},
                     'view_before': self.view(), 'selection_before': values['read'](),
                 }
                 row['input_delivery']['unmodified_wheel'] = wheel
@@ -878,7 +920,7 @@ class EditorCases:
             self.steps.extend((direct_setup, direct_execute))
         self.steps.append(prepare)
         if self.input_controls:
-            self.steps.extend((control_setup, controls, control_wheel, observe_control_wheel))
+            self.steps.extend((prepare_delivery, control_setup, controls, control_wheel, observe_control_wheel))
         self.steps.extend((press, observe, finish))
 
     def append(self):
@@ -888,7 +930,8 @@ class EditorCases:
             self.steps.extend((self.begin_readiness, self.deliver_readiness,
                                self.finish_readiness, self.capture_primed_source))
         self.steps.append(self.start)
-        kinds = tuple(TARGETS) if self.cluster == 'selection' else PASSTHROUGH
+        kinds = (tuple(TARGETS) if self.cluster == 'selection' else
+                 REMAINING_PASSTHROUGH if self.cluster == 'remaining' else PASSTHROUGH)
         if not self.probe:
             for kind in kinds:
                 for direction in DIRECTIONS:

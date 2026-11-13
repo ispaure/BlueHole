@@ -241,6 +241,12 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
             reviewed_rows[row_id] = {
                 'group': UV_BRACKETS, 'action': action, 'binding_index': binding['binding_index'],
             }
+        reuse = self.manifest['accepted_mechanism_reuse']
+        self.assertEqual(reuse['binding_count'], 9)
+        self.assertFalse(set(reviewed_rows) & set(reuse['bindings']))
+        reviewed_rows.update(reuse['bindings'])
+        self.assertEqual(self.manifest['candidate_accounting'], {
+            'implemented': 32, 'transferred_04': 8, 'remaining_03': 100})
         self.assertEqual({
             row_id: review['declaration']
             for row_id, review in self.rows.items() if 'declaration' in review
@@ -911,6 +917,31 @@ class Category03NativeReceiptTests(unittest.TestCase):
         empty = run['dispatch'][0]
         self.assertEqual(empty['history_before_input'], [])
         self.assertFalse(empty['repeat_poll_before_input'])
+
+    def test_uv_repeat_production_saved_edit_and_fresh_reopen(self):
+        writer = self.runs['uv_g_production_save-1794554158037432000']
+        reader = self.runs['uv_g_production_reopen-1794554208354408000']
+        manifest = writer['uv_repeat_probe']['saved_edit']['saved_manifest']
+        self.assertEqual(reader['uv_repeat_probe']['verified_incoming_manifest'], manifest)
+        self.assertTrue(manifest['production_identity'])
+        self.assertTrue(writer['uv_repeat_probe']['saved_edit']['immediate_save'])
+        self.assertTrue(writer['uv_repeat_probe']['saved_edit']['owned_source_unchanged'])
+        for run in (writer, reader):
+            self.assertEqual(run['native_status'], 'complete')
+            proof = run['uv_repeat_probe']
+            self.assertEqual(proof['owner'], manifest['owner'])
+            self.assertTrue(proof['owner'].startswith('legacy:Transform:'))
+            actual = proof['saved_edit_restored']
+            self.assertEqual((actual['event'], actual['active'], actual['repeat']), ('F20', False, True))
+            self.assertTrue(actual['is_user_modified'])
+            self.assertEqual(actual['fresh_process'], run is reader)
+            self.assertEqual(len(proof['releases']), 2)
+            for release in proof['releases']:
+                self.assertTrue(release['strict_preservation'])
+                self.assertTrue(release['source_maps_exact'])
+                self.assertTrue(release['owned_candidate_absent'])
+                self.assertTrue(release['other_transform_declarations_preserved_after_actions_off'])
+                self.assertEqual(release['retained_source_edit_count'], 0)
 
     def test_matched_editor_guard_preserves_exact_endpoints_and_unknowns(self):
         run = self.runs['editor_probe-1794550412457976000']
@@ -1720,9 +1751,48 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             column=layout.column.return_value, feature_owner=prefs,
             feature_prop_name='enable_transform_action_shortcuts', actions=[action])
 
+    def test_shared_persistence_selectors_match_exact_production_declarations(self):
+        from blender_keymap_category03_persistence import PersistenceCases
+        self.load_selection_register()
+        circle = self.load('actions.actions.keymaps.selection.selection_circle')
+        more_less = self.load('actions.actions.keymaps.selection.selection_more_less')
+        actions = [*self.framing_actions(), *circle.get_selection_circle_actions(),
+                   *more_less.get_selection_more_less_actions()]
+        for editor_only in (False, True):
+            helper = PersistenceCases(
+                bpy=None, configs=None, runtime=None, categories=None, preferences=None,
+                fixture=None, root=ROOT, record=None, receipt={}, set_groups=None,
+                production_paths=(), package='fixture', editor_only=editor_only)
+            self.assertEqual(len(helper.specs), 1 if editor_only else 2)
+            for spec in helper.specs:
+                matches = [(action, binding) for action in actions
+                           if action.get_idname() == spec['target']
+                           for binding in action.keymap_bindings
+                           if (binding.keymap_name, binding.space_type, binding.region_type,
+                               binding.key, binding.shift) ==
+                           (spec['scope'], spec['space'], 'WINDOW', spec['key'], spec['shift'])
+                           and not any((binding.ctrl, binding.alt, binding.oskey, binding.any))]
+                self.assertEqual(len(matches), 1, spec['name'])
+                if spec['name'] == 'circle':
+                    self.assertEqual(matches[0][0].get_props()['radius'], 25)
+                    self.assertEqual(spec['edited_radius'], 31)
+
+    def test_native_preview_input_uses_visible_region_and_rejects_hidden_coordinates(self):
+        from blender_keymap_category03_editors import EditorCases
+        hidden = types.SimpleNamespace(type='WINDOW', x=0, y=0, width=0, height=0)
+        preview = types.SimpleNamespace(type='PREVIEW', x=10, y=20, width=800, height=600)
+        fixture = EditorCases.__new__(EditorCases)
+        fixture.area = types.SimpleNamespace(type='SEQUENCE_EDITOR', regions=[hidden, preview],
+                                            spaces=types.SimpleNamespace(active=types.SimpleNamespace(view_type='PREVIEW')))
+        self.assertEqual(fixture.point(), (410, 320))
+        self.assertIs(fixture.region(visible=True), preview)
+        preview.width = 0
+        with self.assertRaises(StopIteration):
+            fixture.point()
+
     def test_ordinary_drafts_emit_the_21_reviewed_bindings_under_existing_controls(self):
         draft = self.manifest['ordinary_source_drafts']
-        self.assertEqual(draft['status'], 'native-dispatch-pending')
+        self.assertEqual(draft['status'], 'partial-mechanism-accepted')
         selection = self.load_selection_register()
         transform = self.load_transform_register()
         categories = {
@@ -1779,7 +1849,11 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
                                 review = self.rows[row_id]
                                 self.assertEqual(review['runtime_disposition'],
                                                  'review-full-side-candidate')
-                                self.assertNotIn('declaration', review)
+                                if row_id in draft['accepted_row_ids']:
+                                    self.assertEqual(review['declaration'],
+                                                     self.manifest['accepted_mechanism_reuse']['bindings'][row_id])
+                                else:
+                                    self.assertNotIn('declaration', review)
                                 self.assertNotIn('authorized_transfer', review)
                                 binding = self.ledger[row_id]['binding']
                                 pair = pairs[offsets[id(action)] + int(index)]

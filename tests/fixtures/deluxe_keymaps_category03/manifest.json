@@ -501,8 +501,8 @@
     }
   },
   "ordinary_source_drafts": {
-    "status": "native-dispatch-pending",
-    "scope": "21 ordinary candidate declarations prepared for targeted stock, copied reference, and owned-addon proof.",
+    "status": "partial-mechanism-accepted",
+    "scope": "21 ordinary declarations: nine accepted by approved exact-context mechanism reuse; twelve remain draft; one additional candidate still lacks an authorized declaration.",
     "groups": {
       "navigation_view_framing": {
         "actions": {
@@ -612,7 +612,18 @@
           "c96ecb1a43a89d4ae43d97f80b979378e90acbb09323a22377c8e24579a19f66"
         ]
       }
-    }
+    },
+    "accepted_row_ids": [
+      "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219",
+      "3ee7001bf2f7f96dae4711948f76694b1c3ceb57aef1db6f96d9c2949b6b8b99",
+      "aa588d20ab030355215e945cdf7ea42dd7e386dfdefb93728ffdbbfb7ba4e6d8",
+      "c0d9e2aa23b51664bb6a7f52439f47fe4ca359575c1da6fcb2bd33afa7dd0d3a",
+      "ac571b681410e5ce9d989bed48844639b1711b4fbc3493c1d7480ed47c0b363e",
+      "73b312d55cdc6a757ca15ccaa51cdd75ecf21fe184ddad45db575af78c6fcf97",
+      "62d31f078d497b73967dd785c682a5a6840c9d4c81ddd82e1b43208fd6714e15",
+      "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a",
+      "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
+    ]
   },
   "authorized_transfers": {
     "04": {
@@ -770,7 +781,7 @@
     }
   },
   "uv_repeat_route": {
-    "status": "production behavior/toggle/preservation proved; production persistence pending",
+    "status": "production behavior, toggle, immediate-save and fresh-reopen proved in 4.5.1; composition pending",
     "source": "actions/actions/keymaps/transform/transform_tools_modal.py",
     "source_sha256": {
       "actions/actions/keymaps/transform/transform_tools_modal.py": "8f94c479a500bf1e481ea8f6aaf44438999fd56b81e1617ee1e3bd07d92d4d73",
@@ -802,9 +813,106 @@
     ],
     "identity": "Actual legacy:Transform adapter identity; production path differs from category03:uv-repeat-probe",
     "remaining": [
-      "actual production owned immediate-save and hash-bound fresh reopen",
-      "owner04 composition and owner06 integrated parity"
+      "owner04 UV composition, owner05 global Screen consistency and owner06 integrated parity"
     ],
-    "production_behavior_run": "uv_g_production-1794553968267516000"
+    "production_behavior_run": "uv_g_production-1794553968267516000",
+    "production_writer": "uv_g_production_save-1794554158037432000",
+    "production_reader": "uv_g_production_reopen-1794554208354408000"
+  },
+  "prepared_persistence": {
+    "status": "source-bound fixtures prepared; native unrun",
+    "helper": "tests/blender_keymap_category03_persistence.py",
+    "helper_sha256": "a65f63b918f7bf3564a3434d047d6e9e582393305ebf764a063e7a834419932e",
+    "modes": {
+      "editor": [
+        "editor_save",
+        "editor_reopen"
+      ],
+      "circle_and_framing": [
+        "persistence",
+        "reopen"
+      ]
+    },
+    "source_and_foreign_proof": "Same-context complete source/foreign snapshots, live Pipeline generation provenance, exact edited owned source/identity and separately recorded map marker",
+    "saved_inputs": "userpref.blend plus category-persistence-expected.json, bound to actual staged production and all executed fixture hashes",
+    "remaining_controls": "editor_production --editor-cluster remaining; visible Preview input and owned 256-directory File Browser list, native unrun"
+  },
+  "accepted_mechanism_reuse": {
+    "status": "implemented with approved mechanism reuse",
+    "approved_by": "Brief coordinator Sol High",
+    "source_chat": "01a1d36b-dbd5-7933-9457-8e055db2b96d",
+    "binding_count": 9,
+    "bindings": {
+      "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219": {
+        "group": "navigation_viewport_axis",
+        "action": "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BACK",
+        "binding_index": 0
+      },
+      "3ee7001bf2f7f96dae4711948f76694b1c3ceb57aef1db6f96d9c2949b6b8b99": {
+        "group": "navigation_viewport_axis",
+        "action": "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BACK",
+        "binding_index": 1
+      },
+      "aa588d20ab030355215e945cdf7ea42dd7e386dfdefb93728ffdbbfb7ba4e6d8": {
+        "group": "navigation_viewport_axis",
+        "action": "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_LEFT",
+        "binding_index": 0
+      },
+      "c0d9e2aa23b51664bb6a7f52439f47fe4ca359575c1da6fcb2bd33afa7dd0d3a": {
+        "group": "navigation_viewport_axis",
+        "action": "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_LEFT",
+        "binding_index": 1
+      },
+      "ac571b681410e5ce9d989bed48844639b1711b4fbc3493c1d7480ed47c0b363e": {
+        "group": "navigation_viewport_axis",
+        "action": "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BOTTOM",
+        "binding_index": 0
+      },
+      "73b312d55cdc6a757ca15ccaa51cdd75ecf21fe184ddad45db575af78c6fcf97": {
+        "group": "navigation_viewport_axis",
+        "action": "NAVIGATION_3D_VIEW_AXIS_ABSOLUTE_BOTTOM",
+        "binding_index": 1
+      },
+      "62d31f078d497b73967dd785c682a5a6840c9d4c81ddd82e1b43208fd6714e15": {
+        "group": "navigation_view_framing",
+        "action": "NAVIGATION_3D_VIEW_LOCAL_VIEW",
+        "binding_index": 0
+      },
+      "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a": {
+        "group": "selection_more_less",
+        "action": "SELECTION_UV_SELECT_MORE",
+        "binding_index": 3
+      },
+      "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839": {
+        "group": "selection_more_less",
+        "action": "SELECTION_UV_SELECT_LESS",
+        "binding_index": 3
+      }
+    },
+    "evidence": {
+      "production_axis_run": "ordinary_production-1794545820737107000",
+      "reference_axis_run": "reference-evidence-1794545881196202000",
+      "production_axis_effects": 7,
+      "matching_reference_axis_inputs": 6,
+      "inconclusive_reference_input": "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219",
+      "uv_aliases_without_own_dispatch": [
+        "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a",
+        "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
+      ],
+      "uv_command_context_witness": "selection-1794542407253275000"
+    },
+    "spot_checks": {
+      "rows": [
+        "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219",
+        "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a",
+        "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
+      ],
+      "route": "include in an already scheduled related axis/UV batch or integrated owner06 checks; no dedicated lifecycle rerun"
+    }
+  },
+  "candidate_accounting": {
+    "implemented": 32,
+    "transferred_04": 8,
+    "remaining_03": 100
   }
 }

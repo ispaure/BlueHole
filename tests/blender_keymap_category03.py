@@ -108,7 +108,7 @@ def _run_session(args, root):
     if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
         environment['DELUXE_CATEGORY_ORDINARY_CLUSTER'] = getattr(args, 'ordinary_cluster', 'axis')
         environment['DELUXE_CATEGORY_INVERT_ZOOM'] = str(getattr(args, 'invert_zoom', None))
-    if args.mode in ('editor_observe', 'editor_probe', 'editor_production'):
+    if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen'):
         environment['DELUXE_CATEGORY_EDITOR_CLUSTER'] = getattr(args, 'editor_cluster', 'selection')
         environment['DELUXE_CATEGORY_EDITOR_INPUT_CONTROLS'] = '1' if getattr(args, 'editor_input_controls', False) else '0'
         environment['DELUXE_CATEGORY_EDITOR_PRIME_READINESS'] = '1' if getattr(args, 'editor_prime_readiness', False) else '0'
@@ -145,8 +145,10 @@ def _run_session(args, root):
     if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_ordinary.py', root / 'ordinary-fixture.py')
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
-    if args.mode in ('editor_observe', 'editor_probe', 'editor_production'):
+    if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_editors.py', root / 'editor-fixture.py')
+    if args.mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen'):
+        shutil.copyfile(REPO / 'tests/blender_keymap_category03_persistence.py', root / 'persistence-fixture.py')
     policy = root / 'confinement.sb'
     policy.write_text('(version 1)\n(allow default)\n(deny network*)\n(deny file-write*)\n'
                       '(allow file-write* (subpath ' + json.dumps(str(root)) + '))\n'
@@ -183,6 +185,8 @@ def _run_session(args, root):
             result['ordinary_ledger_sha256'] = sha(root / 'ordinary-ledger.jsonl')
         if (root / 'editor-fixture.py').exists():
             result['editor_fixture_sha256'] = sha(root / 'editor-fixture.py')
+        if (root / 'persistence-fixture.py').exists():
+            result['persistence_fixture_sha256'] = sha(root / 'persistence-fixture.py')
         result['private_launch_log_sha256'] = sha(root / 'private-launch.log')
         # Bind PID/exit/log even if parsing the native receipt itself fails.
         (root / 'process.json').write_text(json.dumps(result, indent=2) + '\n')
@@ -270,7 +274,7 @@ def native_main(root, mode):
         (root / 'native.json').write_text(json.dumps(receipt, indent=2) + '\n')
         print('CATEGORY03 ' + label, flush=True)
 
-    if mode in ('reopen', 'uv_g_reopen', 'uv_g_production_reopen'):
+    if mode in ('reopen', 'uv_g_reopen', 'uv_g_production_reopen', 'editor_reopen'):
         shutil.copyfile(root / 'incoming/userpref.blend', root / 'config/userpref.blend')
         bpy.ops.wm.read_userpref()
         bpy.context.preferences.use_preferences_save = False
@@ -337,6 +341,40 @@ def native_main(root, mode):
         prefs.keymap.transform.enable_transform_keymaps = transform
         kmreg.refresh()
         configs.update()
+
+    def pipeline_source_provenance(sources):
+        # Prove both exact unrelated source identities from the live
+        # ownership ledger and the category's registered native pairs.
+        registered = kmreg.pipeline_keymaps_register.registered_pipeline_keymaps
+        result = []
+        for owner_id, handle in rt._FEATURES.items():
+            if not owner_id.startswith('legacy:Pipeline:'):
+                continue
+            for request_id, owned in handle._owned.items():
+                if owned.item.idname != 'wm.bh_save_as_mainfile':
+                    continue
+                valid = rt._valid_owned(owned)
+                pair_matches = sum(rt._same(km, owned.map) and rt._same(item, owned.item)
+                                   for km, item in registered)
+                assert valid and pair_matches == 1
+                assert rt._same(owned.config, configs.addon)
+                scope = asdict(rt.capture_scope(owned.map))
+                matches = [(i, j, row) for i, keymap in enumerate(sources['addon'])
+                           if keymap['scope'] == scope
+                           for j, row in enumerate(keymap['items'])
+                           if row['blender_id'] == owned.item.id]
+                assert len(matches) == 1
+                index, position, row = matches[0]
+                request = next(r for r in handle.assignments if r.request_id == request_id)
+                assert request.target.idname == 'wm.bh_save_as_mainfile'
+                result.append({'owner_id': owner_id, 'request_id': request_id,
+                               'runtime_owned_valid': valid, 'registered_pair_matches': True,
+                               'native_map_pointer': owned.map.as_pointer(),
+                               'native_item_pointer': owned.item.as_pointer(),
+                               'map_index': index, 'row_index': position,
+                               'scope': scope, 'row': row, 'request': asdict(request)})
+        assert len(result) == 2
+        return sorted(result, key=lambda proof: (proof['map_index'], proof['row_index']))
 
     def owned_rows():
         result = {}
@@ -1456,74 +1494,6 @@ def native_main(root, mode):
         }
         record('uv_repeat_saved_edit_restored')
 
-    def framing_user_item(key):
-        matches = [(km, item) for km in configs.user.keymaps if km.name == '3D View'
-                   and km.space_type == 'VIEW_3D' for item in km.keymap_items
-                   if item.idname == 'view3d.view_selected' and item.type == key
-                   and not item.shift and not item.ctrl and not item.alt and not item.oskey
-                   and item.properties.use_all_regions is False]
-        assert len(matches) == 1, (key, len(matches))
-        return matches[0][1]
-
-    def circle_user_item(key):
-        matches = [item for km in configs.user.keymaps
-                   if km.name == '3D View Generic' and km.space_type == 'VIEW_3D'
-                   for item in km.keymap_items
-                   if item.idname == 'view3d.select_circle' and item.type == key
-                   and item.shift and not item.ctrl and not item.alt and not item.oskey
-                   and item.properties.mode == 'ADD' and item.properties.wait_for_input]
-        assert len(matches) == 1, (key, len(matches))
-        return matches[0]
-
-    def persistence_write():
-        prefs.keymap.selection.enable_selection_circle = True
-        set_groups(True, True, False)
-        item = framing_user_item('F')
-        item.type = 'F19'
-        circle = circle_user_item('MIDDLEMOUSE')
-        circle.type = 'F20'
-        circle.properties.radius = 31
-        # Save in this same callback before any watcher/reconciliation tick.
-        bpy.ops.wm.save_userpref()
-        saved = root / 'saved-cases'
-        saved.mkdir()
-        shutil.copyfile(root / 'config/userpref.blend', saved / 'userpref.blend')
-        prefs.keymap.navigation.enable_navigation_view_framing = False
-        prefs.keymap.selection.enable_selection_circle = False
-        kmreg.refresh()
-        configs.update()
-        assert not any(i.type == 'F19' and i.idname == 'view3d.view_selected'
-                       for km in configs.user.keymaps if km.name == '3D View' for i in km.keymap_items)
-        assert not any(i.type == 'F20' and i.idname == 'view3d.select_circle'
-                       for km in configs.user.keymaps if km.name == '3D View Generic' for i in km.keymap_items)
-        prefs.keymap.navigation.enable_navigation_view_framing = True
-        prefs.keymap.selection.enable_selection_circle = True
-        kmreg.refresh()
-        configs.update()
-        restored = framing_user_item('F19')
-        assert restored.is_user_modified
-        restored_circle = circle_user_item('F20')
-        assert restored_circle.is_user_modified and restored_circle.properties.radius == 31
-        receipt['persistence'] = {'immediate_save': True, 'edited_event': 'F19',
-                                  'circle_edited_event': 'Shift-F20', 'circle_edited_radius': 31,
-                                  'dormant_while_disabled': True, 'restored_on_enable': True,
-                                  'edited_layer': 'merged user, never an inherited source row'}
-        record('framing_and_circle_user_edits_saved_and_reenabled')
-
-    def persistence_read():
-        set_groups(True, True, False)
-        item = framing_user_item('F19')
-        assert item.is_user_modified and item.active
-        circle = circle_user_item('F20')
-        assert circle.is_user_modified and circle.active and circle.properties.radius == 31
-        receipt['persistence'] = {'fresh_reopen': True, 'type': item.type,
-                                  'active': item.active, 'is_user_modified': item.is_user_modified,
-                                  'circle_type': circle.type, 'circle_shift': bool(circle.shift),
-                                  'circle_radius': circle.properties.radius,
-                                  'circle_active': circle.active,
-                                  'circle_is_user_modified': circle.is_user_modified}
-        record('framing_and_circle_user_edits_fresh_reopen')
-
     def provider_enable():
         if not os.environ.get('DELUXE_CATEGORY_PROVIDER'):
             record('xray_provider_unavailable')
@@ -1833,39 +1803,6 @@ def native_main(root, mode):
         fixture = helper.EditorCases(steps, receipt, record, window, area, exporter,
                                      cluster=cluster, matched_endpoints=True, input_controls=True)
         state['editor_fixture'] = fixture
-        def pipeline_source_provenance(sources):
-            # Prove both exact unrelated source identities from the live
-            # ownership ledger and the category's registered native pairs.
-            registered = kmreg.pipeline_keymaps_register.registered_pipeline_keymaps
-            result = []
-            for owner_id, handle in rt._FEATURES.items():
-                if not owner_id.startswith('legacy:Pipeline:'):
-                    continue
-                for request_id, owned in handle._owned.items():
-                    if owned.item.idname != 'wm.bh_save_as_mainfile':
-                        continue
-                    valid = rt._valid_owned(owned)
-                    pair_matches = sum(rt._same(km, owned.map) and rt._same(item, owned.item)
-                                       for km, item in registered)
-                    assert valid and pair_matches == 1
-                    assert rt._same(owned.config, configs.addon)
-                    scope = asdict(rt.capture_scope(owned.map))
-                    matches = [(i, j, row) for i, keymap in enumerate(sources['addon'])
-                               if keymap['scope'] == scope
-                               for j, row in enumerate(keymap['items'])
-                               if row['blender_id'] == owned.item.id]
-                    assert len(matches) == 1
-                    index, position, row = matches[0]
-                    request = next(r for r in handle.assignments if r.request_id == request_id)
-                    assert request.target.idname == 'wm.bh_save_as_mainfile'
-                    result.append({'owner_id': owner_id, 'request_id': request_id,
-                                   'runtime_owned_valid': valid, 'registered_pair_matches': True,
-                                   'native_map_pointer': owned.map.as_pointer(),
-                                   'native_item_pointer': owned.item.as_pointer(),
-                                   'map_index': index, 'row_index': position,
-                                   'scope': scope, 'row': row, 'request': asdict(request)})
-            assert len(result) == 2
-            return sorted(result, key=lambda proof: (proof['map_index'], proof['row_index']))
         fixture.owned_source_provenance = pipeline_source_provenance
         def production_editor_setup():
             prefs.keymap.selection.enable_selection_more_less = False
@@ -1873,6 +1810,12 @@ def native_main(root, mode):
             prefs.keymap.selection.enable_selection_circle = False
             prefs.keymap.selection.enable_selection_tool_switch = False
             set_groups(False, True, False)
+            if cluster == 'remaining':
+                directory = root / 'datafiles/category03-file-browser'
+                directory.mkdir()
+                for index in range(256):
+                    (directory / f'Fixture_{index:03}').mkdir()
+                fixture.file_browser_directory = directory
             module = next(module for module in addon.operators_register.OPERATOR_MODULES
                           if module.__name__.endswith('.selection_more_less_ops'))
             codes = {module.WM_OT_BH_editor_select_more.execute.__code__: 'UP',
@@ -1901,7 +1844,8 @@ def native_main(root, mode):
             fixture.state['production_operators'] = ['wm.bh_editor_select_more', 'wm.bh_editor_select_less']
             fixture.state['callback_observation'] = 'read-only profile during shortcut dispatch; disabled before snapshots'
         steps.append(production_editor_metadata)
-        kinds = tuple(helper.TARGETS) if cluster == 'selection' else helper.PASSTHROUGH
+        kinds = (tuple(helper.TARGETS) if cluster == 'selection' else
+                 helper.REMAINING_PASSTHROUGH if cluster == 'remaining' else helper.PASSTHROUGH)
         for kind in kinds:
             fixture.case(kind, 'UP', 'before_install', direct=False)
         def production_editor_on():
@@ -1989,10 +1933,18 @@ def native_main(root, mode):
         image_case('RIGHTMOUSE', {'alt': True}, (90, 40))
         for key in ('F', 'A', 'WHEELUPMOUSE', 'WHEELRIGHTMOUSE', 'WHEELDOWNMOUSE', 'WHEELLEFTMOUSE'):
             image_case(key, {'shift': True, 'alt': True} if key.startswith('WHEEL') else {})
-    elif mode == 'persistence':
-        steps.append(persistence_write)
-    elif mode == 'reopen':
-        steps.append(persistence_read)
+    elif mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen'):
+        editor_helper = load_file('category03_editor_fixture', root / 'editor-fixture.py')
+        persistence_helper = load_file('category03_persistence_fixture', root / 'persistence-fixture.py')
+        fixture = editor_helper.EditorCases(steps, receipt, record, window, area, exporter,
+                                             matched_endpoints=True)
+        fixture.owned_source_provenance = pipeline_source_provenance
+        state['editor_fixture'] = fixture
+        state['persistence_fixture'] = persistence_helper.PersistenceCases(
+            bpy=bpy, configs=configs, runtime=rt, categories=kmreg, preferences=prefs,
+            fixture=fixture, root=root, record=record, receipt=receipt, set_groups=set_groups,
+            production_paths=PRODUCTION_PATHS, package=PACKAGE,
+            editor_only=mode.startswith('editor_'), reopen=mode in ('reopen', 'editor_reopen')).append(steps)
     else:
         raise ValueError('Native case not implemented: ' + mode)
 
@@ -2060,11 +2012,11 @@ def cli():
     parser.add_argument('--profile-source', type=Path, help='Read-only protected input hashes; not loaded in factory cases')
     parser.add_argument('--provider-source', type=Path)
     parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
-                                         'transform', 'image', 'persistence', 'reopen'), required=True)
+                                         'transform', 'image', 'persistence', 'reopen', 'editor_save', 'editor_reopen'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')
     parser.add_argument('--editor-matched-endpoints', action='store_true')
-    parser.add_argument('--editor-cluster', choices=('selection', 'passthrough'), default='selection')
+    parser.add_argument('--editor-cluster', choices=('selection', 'passthrough', 'remaining'), default='selection')
     parser.add_argument('--ordinary-cluster', choices=('axis', 'wheel_zoom', 'uv_edit', 'tools', 'selection'), default='axis')
     parser.add_argument('--invert-zoom', action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument('--output', type=Path, default=REPO / 'test-results/deluxe-keymaps-category03')
