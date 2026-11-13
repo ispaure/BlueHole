@@ -615,15 +615,18 @@
       }
     },
     "accepted_row_ids": [
+      "06f22b2be115a9adbc05174de8e78048c60c241aa07f6a6ff0e357df503ab717",
       "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219",
       "3ee7001bf2f7f96dae4711948f76694b1c3ceb57aef1db6f96d9c2949b6b8b99",
-      "aa588d20ab030355215e945cdf7ea42dd7e386dfdefb93728ffdbbfb7ba4e6d8",
-      "c0d9e2aa23b51664bb6a7f52439f47fe4ca359575c1da6fcb2bd33afa7dd0d3a",
-      "ac571b681410e5ce9d989bed48844639b1711b4fbc3493c1d7480ed47c0b363e",
-      "73b312d55cdc6a757ca15ccaa51cdd75ecf21fe184ddad45db575af78c6fcf97",
       "62d31f078d497b73967dd785c682a5a6840c9d4c81ddd82e1b43208fd6714e15",
+      "73b312d55cdc6a757ca15ccaa51cdd75ecf21fe184ddad45db575af78c6fcf97",
       "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a",
-      "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839"
+      "a02eca7e5332335cd12650270686df12c738e997d7f8925495c37cba053fd839",
+      "aa588d20ab030355215e945cdf7ea42dd7e386dfdefb93728ffdbbfb7ba4e6d8",
+      "ac571b681410e5ce9d989bed48844639b1711b4fbc3493c1d7480ed47c0b363e",
+      "c0d9e2aa23b51664bb6a7f52439f47fe4ca359575c1da6fcb2bd33afa7dd0d3a",
+      "d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c",
+      "e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111"
     ]
   },
   "authorized_transfers": {
@@ -884,7 +887,7 @@
     "status": "implemented with approved mechanism reuse; two UV aliases now have blocking dispatch mismatches",
     "approved_by": "Brief coordinator Sol High",
     "source_chat": "01a1d36b-dbd5-7933-9457-8e055db2b96d",
-    "binding_count": 9,
+    "binding_count": 12,
     "bindings": {
       "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219": {
         "group": "navigation_viewport_axis",
@@ -930,6 +933,21 @@
         "group": "selection_more_less",
         "action": "SELECTION_UV_ARROW_SELECT_LESS",
         "binding_index": 0
+      },
+      "d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c": {
+        "group": "selection_tool_switch",
+        "action": "SELECTION_TOOL_SWITCH_WEIGHT_PAINT",
+        "binding_index": 0
+      },
+      "06f22b2be115a9adbc05174de8e78048c60c241aa07f6a6ff0e357df503ab717": {
+        "group": "transform_tools_gizmo",
+        "action": "TRANSFORM_TOOL_UV_EDITOR_TRANSFORM",
+        "binding_index": 0
+      },
+      "e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111": {
+        "group": "selection_tool_switch",
+        "action": "SELECTION_TOOL_SWITCH_VERTEX_PAINT",
+        "binding_index": 0
       }
     },
     "evidence": {
@@ -974,12 +992,637 @@
         "2ae7de8b565d9c03fc45535896de07dc97af7ebed6ce9357fa324e1ea8187219"
       ],
       "route": "include in an already scheduled related axis/UV batch or integrated owner06 checks; no dedicated lifecycle rerun"
+    },
+    "batch26_context_acceptance": {
+      "status": "accepted by coordinator at exact tested contexts; no rerun",
+      "source_checkpoint": "6f12688",
+      "behavior_runs": {
+        "production": "ordinary_production-1794561360052050000",
+        "reference": "reference-evidence-1794561456886365000"
+      },
+      "source_sha256": {
+        "actions/actions/keymaps/navigation/__init__.py": "bea86c0e302dd4333fd7047c841beaf988bd7d0f4ef5acbbd5afeaa42f678176",
+        "actions/actions/keymaps/navigation/viewport_movement.py": "b7f9f2b3862f256e72c741dadf8f7c541fbf67027ed10d6f5384cdb02cb106fe",
+        "actions/actions/keymaps/navigation/viewport_axis.py": "7daea590c729125bf617f1f9cc6a510c5878191f0254772a2fff8d7ffb3fef2f",
+        "actions/actions/keymaps/navigation/view_framing.py": "cd73184503c77077cba0740fe45aade2c281fdcbc06d0265156fe556a0eecb1e",
+        "actions/actions/keymaps/selection/selection_more_less.py": "6243684d09b82e8cedc02f4ce3635e1f3df0af214af7c2ed2a90588196c44b5f",
+        "actions/actions/keymaps/selection/selection_tool_switch.py": "53894b38e1c6d85e9502fe17070827e66f16b9e0e11f77af5560acfda8f6daff",
+        "actions/actions/keymaps/selection/selection_all_none.py": "e8008178d932507bda67125ea23328bdf23eaf97be8cdb646cbcee37858c1e06",
+        "actions/actions/keymaps/selection/selection_circle.py": "bf2a3c9150631ab1898edf042353b362ab7bef434159f223a3a6f40dae98d093",
+        "actions/actions/keymaps/selection/__init__.py": "81d1b17ceebe8561410259aef78d1a8320184a06cf246fbe21d0011b455bf833",
+        "actions/actions/keymaps/transform/transform_tools_modal.py": "8f94c479a500bf1e481ea8f6aaf44438999fd56b81e1617ee1e3bd07d92d4d73",
+        "actions/actions/keymaps/transform/transform_tools_gizmo.py": "9fdc0215edfa462e9e1034dc8a41067adf2bd8c4210738b834fdf0d6a6061d83",
+        "actions/actions/keymaps/transform/__init__.py": "6cdb22f83fa9f8531324c62aec8fc1fccd8d5367124a43804f5a7ffc0d8fd1cd",
+        "keymaps/navigation_keymaps_register.py": "755f9ae30b2875185226ba45369729e2451ab73df730e23aeb77bb9048ba1a95",
+        "keymaps/selection_keymaps_register.py": "2f1f18c4af5b4fea7bcd6052a3906ee12ddcb6ecdd33403842969f7044b9d8ac",
+        "keymaps/transform_keymaps_register.py": "469a42609f2a66096547f3b01601c855db5db1f9aa337509b0a81960c7f1c08f",
+        "preferences/addon/keymaps/keymap_props_navigation.py": "965ffe1d7a8cffd000c175a1d0659891dd43bba26bcbd7c2fe016e6591874683",
+        "preferences/addon/keymaps/keymap_props_selection.py": "8f2a6f7c5e1c7de03e88a647a4c9fff6e1ab432597d8e2362d7f0a45cc4b781d",
+        "preferences/addon/keymaps/keymap_props_transform.py": "0913737c3f052982199d60855a390580bcc7e3a741fa0428a98f7390f8f692a3",
+        "operators/box_xray_ops.py": "ca5f5d8ea2cc7538166c568528866d48dedb2c9ebbe33937acb2cff88c823a0a",
+        "operators/selection_more_less_ops.py": "b11bdcaa068ca16c497e0ae749b61b696d726d30e6f92ab40c30b4a29dd9b2dc",
+        "operators/operators_register.py": "0f35dc97d171ca049ef6e2ac69e9eb35f5b3dc9fa81cde712ef2e6390e24b9a1",
+        "keymaps/pipeline_keymaps_register.py": "5c5d65fb1cc02e4053aa4de64355602ba585c141dc53058334ed4b28a5ab693a",
+        "actions/actions/keymaps/pipeline/obligatory.py": "7661e368bf59eddf46b2b675b0b3964f772eb222ff4c54aca0e8cad2bda4138a",
+        "keymaps/keymap_utils.py": "0708e8ee57abb8591c456721c900f1864ece67f2900c7ad9ad8ad5fa3f410522",
+        "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+        "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+        "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+        "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+      },
+      "rows": {
+        "06f22b2be115a9adbc05174de8e78048c60c241aa07f6a6ff0e357df503ab717": {
+          "declaration": {
+            "action": "TRANSFORM_TOOL_UV_EDITOR_TRANSFORM",
+            "binding_index": 0,
+            "group": "transform_tools_gizmo",
+            "path": "actions/actions/keymaps/transform/transform_tools_gizmo.py"
+          },
+          "accepted_binding": {
+            "active": true,
+            "event": {
+              "alt": 0,
+              "any": false,
+              "ctrl": 0,
+              "direction": "ANY",
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "map_type": "KEYBOARD",
+              "oskey": 0,
+              "repeat": false,
+              "shift": 0,
+              "type": "T",
+              "value": "PRESS"
+            },
+            "properties": {
+              "as_fallback": false,
+              "cycle": true,
+              "name": "builtin.transform",
+              "space_type": "EMPTY"
+            },
+            "read_issues": {},
+            "scope": {
+              "is_modal": false,
+              "is_tool": null,
+              "name": "UV Editor",
+              "region_type": "WINDOW",
+              "space_type": "EMPTY"
+            },
+            "target": "wm.tool_set_by_id"
+          },
+          "positive_context": {
+            "name": "exact_scope"
+          },
+          "tool_sequence": [
+            "builtin.select_box",
+            "builtin.transform",
+            "builtin.transform"
+          ],
+          "all_observed_contexts": [
+            {
+              "row_id": "06f22b2be115a9adbc05174de8e78048c60c241aa07f6a6ff0e357df503ab717",
+              "context": {
+                "name": "exact_scope"
+              },
+              "production": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 0,
+                  "addon": 1,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.select_box",
+                  "builtin.transform",
+                  "builtin.transform"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_uv": [
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      0,
+                      3
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      0,
+                      3
+                    ]
+                  ]
+                ]
+              },
+              "reference": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 1,
+                  "addon": 0,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.select_box",
+                  "builtin.transform",
+                  "builtin.transform"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_uv": [
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      0,
+                      3
+                    ]
+                  ],
+                  [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      0,
+                      3
+                    ]
+                  ]
+                ]
+              }
+            }
+          ],
+          "scope": "Use native positive context exactly; unmasked/no-effect contexts do not prove unavailable behavior."
+        },
+        "e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111": {
+          "declaration": {
+            "action": "SELECTION_TOOL_SWITCH_VERTEX_PAINT",
+            "binding_index": 0,
+            "group": "selection_tool_switch",
+            "path": "actions/actions/keymaps/selection/selection_tool_switch.py"
+          },
+          "accepted_binding": {
+            "active": true,
+            "event": {
+              "alt": 0,
+              "any": false,
+              "ctrl": 0,
+              "direction": "ANY",
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "map_type": "KEYBOARD",
+              "oskey": 0,
+              "repeat": false,
+              "shift": 0,
+              "type": "Q",
+              "value": "PRESS"
+            },
+            "properties": {
+              "as_fallback": false,
+              "cycle": true,
+              "name": "builtin.select_box",
+              "space_type": "EMPTY"
+            },
+            "read_issues": {},
+            "scope": {
+              "is_modal": false,
+              "is_tool": null,
+              "name": "Vertex Paint",
+              "region_type": "WINDOW",
+              "space_type": "EMPTY"
+            },
+            "target": "wm.tool_set_by_id"
+          },
+          "positive_context": {
+            "name": "face_mask_on",
+            "paint_mask": true
+          },
+          "tool_sequence": [
+            "builtin.brush",
+            "builtin.select_box",
+            "builtin.select_circle"
+          ],
+          "all_observed_contexts": [
+            {
+              "row_id": "e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111",
+              "context": {
+                "name": "mask_off",
+                "paint_mask": false
+              },
+              "production": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 0,
+                  "addon": 1,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.brush",
+                  "builtin.brush",
+                  "builtin.brush"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_objects": [
+                  [
+                    "Category Ordinary Cube"
+                  ],
+                  [
+                    "Category Ordinary Cube"
+                  ]
+                ]
+              },
+              "reference": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 1,
+                  "addon": 0,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.brush",
+                  "builtin.brush",
+                  "builtin.brush"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_objects": [
+                  [
+                    "Category Ordinary Cube"
+                  ],
+                  [
+                    "Category Ordinary Cube"
+                  ]
+                ]
+              }
+            },
+            {
+              "row_id": "e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111",
+              "context": {
+                "name": "face_mask_on",
+                "paint_mask": true
+              },
+              "production": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 0,
+                  "addon": 1,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.brush",
+                  "builtin.select_box",
+                  "builtin.select_circle"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_objects": [
+                  [
+                    "Category Ordinary Cube"
+                  ],
+                  [
+                    "Category Ordinary Cube"
+                  ]
+                ]
+              },
+              "reference": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 1,
+                  "addon": 0,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.brush",
+                  "builtin.select_box",
+                  "builtin.select_circle"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_objects": [
+                  [
+                    "Category Ordinary Cube"
+                  ],
+                  [
+                    "Category Ordinary Cube"
+                  ]
+                ]
+              }
+            }
+          ],
+          "scope": "Use native positive context exactly; unmasked/no-effect contexts do not prove unavailable behavior."
+        },
+        "d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c": {
+          "declaration": {
+            "action": "SELECTION_TOOL_SWITCH_WEIGHT_PAINT",
+            "binding_index": 0,
+            "group": "selection_tool_switch",
+            "path": "actions/actions/keymaps/selection/selection_tool_switch.py"
+          },
+          "accepted_binding": {
+            "active": true,
+            "event": {
+              "alt": 0,
+              "any": false,
+              "ctrl": 0,
+              "direction": "ANY",
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "map_type": "KEYBOARD",
+              "oskey": 0,
+              "repeat": false,
+              "shift": 0,
+              "type": "Q",
+              "value": "PRESS"
+            },
+            "properties": {
+              "as_fallback": false,
+              "cycle": true,
+              "name": "builtin.select_box",
+              "space_type": "EMPTY"
+            },
+            "read_issues": {},
+            "scope": {
+              "is_modal": false,
+              "is_tool": null,
+              "name": "Weight Paint",
+              "region_type": "WINDOW",
+              "space_type": "EMPTY"
+            },
+            "target": "wm.tool_set_by_id"
+          },
+          "positive_context": {
+            "name": "face_mask_on",
+            "paint_mask": true
+          },
+          "tool_sequence": [
+            "builtin.brush",
+            "builtin.select_circle",
+            "builtin.select_lasso"
+          ],
+          "all_observed_contexts": [
+            {
+              "row_id": "d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c",
+              "context": {
+                "name": "mask_off",
+                "paint_mask": false
+              },
+              "production": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 0,
+                  "addon": 1,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.brush",
+                  "builtin.brush",
+                  "builtin.brush"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_objects": [
+                  [
+                    "Category Ordinary Cube"
+                  ],
+                  [
+                    "Category Ordinary Cube"
+                  ]
+                ]
+              },
+              "reference": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 1,
+                  "addon": 0,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.brush",
+                  "builtin.brush",
+                  "builtin.brush"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_objects": [
+                  [
+                    "Category Ordinary Cube"
+                  ],
+                  [
+                    "Category Ordinary Cube"
+                  ]
+                ]
+              }
+            },
+            {
+              "row_id": "d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c",
+              "context": {
+                "name": "face_mask_on",
+                "paint_mask": true
+              },
+              "production": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 0,
+                  "addon": 1,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.brush",
+                  "builtin.select_circle",
+                  "builtin.select_lasso"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_objects": [
+                  [
+                    "Category Ordinary Cube"
+                  ],
+                  [
+                    "Category Ordinary Cube"
+                  ]
+                ]
+              },
+              "reference": {
+                "start_control_valid": true,
+                "distinct_start_tool": true,
+                "exact_rows_before_probe": {
+                  "default": 0,
+                  "active": 1,
+                  "addon": 0,
+                  "user": 1
+                },
+                "tools": [
+                  "builtin.brush",
+                  "builtin.select_circle",
+                  "builtin.select_lasso"
+                ],
+                "modal_operators": [
+                  [],
+                  [],
+                  []
+                ],
+                "error": {
+                  "phase": "direct_fixture_control",
+                  "type": "RuntimeError"
+                },
+                "direct_control": {},
+                "selected_objects": [
+                  [
+                    "Category Ordinary Cube"
+                  ],
+                  [
+                    "Category Ordinary Cube"
+                  ]
+                ]
+              }
+            }
+          ],
+          "scope": "Use native positive context exactly; unmasked/no-effect contexts do not prove unavailable behavior."
+        }
+      },
+      "reuse_basis": "Exact ordinary adapter, native property forms, source/merged admission and independently verified actual context/start-tool/Window delivery. Existing actual production toggle/save/reopen mechanisms are accepted; these three rows introduce no new runtime capability.",
+      "limits": "All14 tool direct controls failed due fixture explicit EMPTY space semantics. Positive native input effects are separately observable and matched. Reference strict227-row visibility comparison failed, including two previously unreadable provider property sets. No foreign-value mutation or equality inferred.",
+      "excluded": "Image/UV Q second-press cycle divergence; six Image W/E/R observations; unmasked paint controls; Image Paint Q/Invert; Object ESC; cursor; modal token switching.",
+      "native_rerun": "None proposed for these three positive row/context observations; acceptance remains explicitly scoped to tested contexts and source hashes.",
+      "acceptance_scope": "UV T and face-mask Vertex/Weight Paint Q only; no generalized dispatch, preservation or availability claim",
+      "approved_by": "Brief coordinator Sol High"
     }
   },
   "candidate_accounting": {
-    "implemented": 32,
+    "implemented": 35,
     "transferred_04": 8,
-    "remaining_03": 100
+    "remaining_03": 97
   },
   "ordinary_wheel_comparison": {
     "status": "synthetic dispatch unverified in both configurations; direct operators work",
@@ -1275,7 +1918,7 @@
     }
   },
   "ordinary_tools_selection_comparison": {
-    "status": "partial native behavior; direct tool controls invalid; no new accepted candidates",
+    "status": "three exact positive row/context declarations accepted by coordinator; remaining contexts and direct control failures unresolved",
     "production_run": "ordinary_production-1794561360052050000",
     "reference_run": "reference-evidence-1794561456886365000",
     "observations_per_configuration": 16,
@@ -1300,6 +1943,11 @@
       "property_detail": "Weight Paint wm.pme_user_pie_menu_call IDs1/2 gained invoke_mode/keymap/pie_menu_name/slot readback; prior values unknown",
       "native_ids_order_and_other_fields_unchanged": true
     },
-    "remaining": "Record native property-set flags and prepare context-bound positive controls; reuse accepted lifecycle. No repeat pair or runtime expansion allocated."
+    "remaining": "Record native property-set flags and prepare context-bound positive controls; reuse accepted lifecycle. No repeat pair or runtime expansion allocated.",
+    "accepted_rows": [
+      "06f22b2be115a9adbc05174de8e78048c60c241aa07f6a6ff0e357df503ab717",
+      "d5bb12b4ca2bf2a3ad36a8cdbbfa98483b61ec2fe1f85e83699dfcd49bd6571c",
+      "e818d7f7e379627bc1cc8078ed75e4ae089ee3b87e4ab12e61c9c5de8d6d7111"
+    ]
   }
 }

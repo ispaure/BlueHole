@@ -48,6 +48,12 @@ CLUSTER_SUBSETS = {
     'uv_cursor': ('uv_edit', ('ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1',)),
 }
 CLUSTER_GROUPS = {'tools_selection': ('tools', 'selection')}
+OBSERVATION_CLUSTERS = {
+    'modal_switch': (
+        '299e9dbeb54d018fa47270d4aef02ecc9143a6bc0882df7d3dc0c836fa2df822',
+        '95d1e4739cb33e21cb88513fd041e4a20cd56a06dd022e945218fb4d65af778e',
+    ),
+}
 MODIFIERS = ('shift', 'ctrl', 'alt', 'oskey')
 ITEM_FIELDS = ('type', 'value', 'any', *MODIFIERS, 'key_modifier', 'repeat', 'direction')
 CASE_ERRORS = (AttributeError, KeyError, ReferenceError, RuntimeError, StopIteration,
@@ -99,6 +105,8 @@ class OrdinaryCases:
         elif cluster in CLUSTER_GROUPS:
             ids = tuple(row_id for family in CLUSTER_GROUPS[cluster] for row_id in CLUSTERS[family])
             assert len(ids) == len(set(ids))
+        elif cluster in OBSERVATION_CLUSTERS:
+            ids = OBSERVATION_CLUSTERS[cluster]
         else:
             ids = CLUSTERS[cluster]
         if ledger_path is None:

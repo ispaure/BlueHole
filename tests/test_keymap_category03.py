@@ -242,11 +242,11 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
                 'group': UV_BRACKETS, 'action': action, 'binding_index': binding['binding_index'],
             }
         reuse = self.manifest['accepted_mechanism_reuse']
-        self.assertEqual(reuse['binding_count'], 9)
+        self.assertEqual(reuse['binding_count'], 12)
         self.assertFalse(set(reviewed_rows) & set(reuse['bindings']))
         reviewed_rows.update(reuse['bindings'])
         self.assertEqual(self.manifest['candidate_accounting'], {
-            'implemented': 32, 'transferred_04': 8, 'remaining_03': 100})
+            'implemented': 35, 'transferred_04': 8, 'remaining_03': 97})
         self.assertEqual({
             row_id: review['declaration']
             for row_id, review in self.rows.items() if 'declaration' in review

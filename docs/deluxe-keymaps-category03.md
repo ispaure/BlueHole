@@ -106,8 +106,8 @@ save, feature toggles and a fresh process. The same pair preserved Framing F19.
 
 Twenty-one additional bindings are drafted in existing category modules and
 verified against exact accepted scopes, events, targets and declared properties.
-Nine are now accepted by coordinator-approved exact-context mechanism reuse,
-bringing the implemented candidate count to 32. Twelve declarations remain draft.
+Twelve are now accepted by coordinator-approved exact-context mechanism reuse,
+bringing the implemented candidate count to 35. Nine declarations remain draft.
 Existing subfeature toggles control these drafts.
 The seven axis/Local View production inputs produced their expected effects.
 The first copied-reference run observed six matching effects, an unchanged first
@@ -417,11 +417,11 @@ and focused middle-mouse/subtract and modal/tool probes. G behavior and producti
 parity remains. Existing proofs need no broader
 rerun unless affected source changes.
 
-Of 140 active full-side delta candidates, 32 have implemented declarations:
-thirteen framing, six UV selection additions, four Circle inputs and nine
+Of 140 active full-side delta candidates, 35 have implemented declarations:
+thirteen framing, six UV selection additions, four Circle inputs and twelve
 ordinary declarations accepted through explicit mechanism reuse. Exactly eight UV-specific Q,
 loop/linked and Tweak fallback rows were explicitly transferred to 04. The
-remaining 100 stay with 03: 13 ordinary candidates (12 declarations still draft), 70 currently
+remaining 97 stay with 03: 10 ordinary candidates (nine declarations still draft), 70 currently
 unsupported or unproved handler/modal/tool/replacement cases, 13 observations of
 active-role absence, and four conflicting bindings. Active-role absence alone
 does not prove unavailability. Each has row-specific next steps in the refreshed
@@ -456,11 +456,11 @@ saved preference inputs and their manifests were removed after verified readers.
 The corrected File Browser/Preview control cluster also passed using owned
 scrollable content and visible-region coordinates.
 
-The ignored mechanism plan partitions all 100 remaining IDs into ordinary
-declarations (13), modal events (33), middle-mouse tool dispatch (19), selection
+The ignored mechanism plan partitions all 97 remaining IDs into ordinary
+declarations (10), modal events (33), middle-mouse tool dispatch (19), selection
 replacement/fallback (22), navigation timing/context (5), release confirmation
 (4), and conflicting reference intentions (4). Registration/persistence proof
-can be reused where source, selector and context warrant it. Nine ordinary rows
+can be reused where source, selector and context warrant it. Twelve ordinary rows
 were explicitly approved for reuse. Ctrl-F1 retains its spot check. The two UV
 arrow checks exposed dispatch mismatches subsequently resolved by actual
 production behavior and representative persistence checks in batch24.
@@ -493,3 +493,19 @@ changed, and two Weight Paint provider rows exposed four additional properties.
 Native IDs, order and other fields were unchanged; newly readable values do not
 prove their previous values. Production native shutdown and both host cleanups
 passed, with protected input hashes exact and no copied resources remaining.
+
+The coordinator accepted the three exact UV T and masked Vertex/Weight Paint Q
+declarations at these tested contexts using the existing ordinary registration
+and toggle mechanisms. Their positive effects need no rerun. This acceptance
+retains the direct-control and strict reference failures and makes no generalized
+dispatch, preservation or availability claim. Image/UV Q cycling remains open.
+
+The next prepared witness is read-only Transform Modal Map E switching in a
+copied reference. `tests/blender_keymap_category03_modal.py` reuses the ordinary
+fixture's input and preservation controls. It requires a native Rotate movement
+and exact cancellation control, then observes a known Translate operation,
+first E, repeated E, confirmation and extra motion. Geometry snapshots must
+show the effects; a changed rotation alone does not identify Trackball. The
+24-step fixture retains both exact E token selectors and full source/merged maps,
+creates no modal items and enables no runtime capability. It is compiled and
+validated off desktop, with native execution still pending allocation.
