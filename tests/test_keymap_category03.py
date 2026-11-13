@@ -342,16 +342,57 @@ class Category03ModalProbeTests(unittest.TestCase):
         fake_bpy = types.SimpleNamespace(context=types.SimpleNamespace(
             window_manager=types.SimpleNamespace(keyconfigs=object())))
         with patch.dict(sys.modules, {'bpy': fake_bpy}):
-            for probe, count, step_count in ((True, 6, 68), (False, 2, 24)):
+            for probe, reference, count, step_count in (
+                    (True, False, 6, 68), (False, False, 2, 24), (False, True, 2, 24)):
                 steps, receipt = [], {'dispatch': []}
                 fixture = ObjectExtendCases(steps, receipt, lambda *a, **k: None,
-                                            None, None, None, binding, probe=probe).append()
+                                            None, None, None, binding, probe=probe,
+                                            reference=reference).append()
                 self.assertEqual(len(steps), step_count)
                 self.assertEqual(len(fixture.fixtures), count)
                 self.assertEqual([f.initial_selected for f in fixture.fixtures], [True, False] * (count // 2))
                 self.assertEqual([f.probe for f in fixture.fixtures],
                                  [False, False, True, True, False, False] if probe else [False, False])
                 self.assertTrue(all(f.binding == binding for f in fixture.fixtures))
+                self.assertTrue(all(f.defer_preservation_failure == reference for f in fixture.fixtures))
+
+    def test_extend_reference_defers_only_snapshot_failure_after_owned_cleanup(self):
+        from blender_keymap_category03_handlers import ObjectExtendTrial, ObjectSubtractCases
+        fixture = ObjectExtendTrial.__new__(ObjectExtendTrial)
+        for fault in (None, 'allocation', 'class', 'cleanup_error', 'not_reference', 'other_assertion'):
+            fixture.defer_preservation_failure = fault != 'not_reference'
+            fixture.allocations = [object()] if fault == 'allocation' else []
+            fixture.created_maps = []
+            fixture.control_class = object() if fault == 'class' else None
+            fixture.initial_maps = {'captured': True}
+            fixture.proof = {'cleanup_errors': ['failure'] if fault == 'cleanup_error' else [],
+                             'exact_source_and_merged_preservation': fault == 'other_assertion'}
+            with self.subTest(fault=fault), patch.object(
+                    ObjectSubtractCases, 'cleanup', side_effect=AssertionError('retained failure')):
+                if fault is None:
+                    fixture.cleanup()
+                    self.assertIsNone(fixture.initial_maps)
+                    self.assertTrue(fixture.proof['strict_preservation_failure_deferred'])
+                    self.assertFalse(fixture.proof['exact_source_and_merged_preservation'])
+                else:
+                    with self.assertRaises(AssertionError):
+                        fixture.cleanup()
+
+    def test_extend_reference_still_fails_after_a_deferred_strict_mismatch(self):
+        from blender_keymap_category03_handlers import ObjectExtendCases
+        fixture = ObjectExtendCases.__new__(ObjectExtendCases)
+        fixture.closed, fixture.fixtures = False, []
+        fixture.baseline = {'unchanged': True}
+        fixture.proof = {'trials': [{'preservation': {'exact_source_and_merged_preservation': False}}]}
+        fixture.inspector = types.SimpleNamespace(configs=types.SimpleNamespace(update=Mock()),
+                                                  maps=Mock(return_value=fixture.baseline))
+        fixture.record = Mock()
+        with self.assertRaises(AssertionError):
+            fixture.cleanup()
+        self.assertTrue(fixture.proof['exact_final_preservation'])
+        self.assertFalse(fixture.proof['strict_trial_preservation'])
+        self.assertTrue(fixture.closed)
+        fixture.cleanup()
 
     def test_extend_controls_require_active_state_and_positive_add_without_bystander_loss(self):
         from blender_keymap_category03_handlers import ObjectExtendTrial

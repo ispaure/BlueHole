@@ -795,6 +795,24 @@ class ObjectExtendTrial(ObjectSubtractCases):
     PROOF_KEY = 'extend_trial_proof'
     LABEL_PREFIX = 'focused_extend'
 
+    def __init__(self, *args, defer_preservation_failure=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.defer_preservation_failure = defer_preservation_failure
+
+    def cleanup(self):
+        try:
+            super().cleanup()
+        except AssertionError:
+            # A reference context can change foreign readability. Retain that
+            # strict failure, collect the other state, then fail the aggregate.
+            # Allocation/removal failures still stop immediately.
+            if (not self.defer_preservation_failure or self.allocations or self.created_maps
+                    or self.control_class is not None or self.proof.get('cleanup_errors')
+                    or self.proof.get('exact_source_and_merged_preservation') is not False):
+                raise
+            self.proof['strict_preservation_failure_deferred'] = True
+            self.initial_maps = None
+
     def prepare(self):
         super().prepare()
         bpy = self.bpy
@@ -888,17 +906,19 @@ class ObjectExtendTrial(ObjectSubtractCases):
 
 
 class ObjectExtendCases:
-    """Factory stock/probe/restored-stock comparison, never a production action."""
+    """Factory stock/probe comparison or two read-only reference observations."""
 
-    def __init__(self, steps, receipt, record, window, area, exporter, binding, *, probe=False):
+    def __init__(self, steps, receipt, record, window, area, exporter, binding, *, probe=False,
+                 reference=False):
         self.steps, self.receipt, self.record = steps, receipt, record
         self.arguments = (steps, receipt, record, window, area, exporter)
-        self.binding, self.probe = binding, probe
+        assert not (probe and reference)
+        self.binding, self.probe, self.reference = binding, probe, reference
         self.inspector = ObjectExtendTrial(*self.arguments, binding=binding)
         self.fixtures, self.baseline, self.closed = [], None, False
         self.proof = {'ledger_id': ObjectExtendTrial.LEDGER_ID,
                       'test_only_driver': True, 'production_capability_enabled': False,
-                      'probe': probe, 'trials': []}
+                      'probe': probe, 'reference': reference, 'trials': []}
         receipt['extend_proof'] = self.proof
 
     def start(self):
@@ -910,7 +930,8 @@ class ObjectExtendCases:
     def trial(self, stage, selected, probe):
         label = 'extend_' + stage + ('_selected_active' if selected else '_unselected')
         fixture = ObjectExtendTrial(*self.arguments, binding=self.binding, probe=probe,
-                                    initial_selected=selected, case_label=label)
+                                    initial_selected=selected, case_label=label,
+                                    defer_preservation_failure=self.reference)
         self.fixtures.append(fixture)
         fixture.append()
 
@@ -923,8 +944,9 @@ class ObjectExtendCases:
                 assert phases['after_release']['target_active']
                 assert phases['after_release']['bystander_selected']
             counts = fixture.proof['exact_candidate_counts']
-            assert counts['addon'] == counts['user'] == int(probe)
-            assert fixture.proof['exact_source_and_merged_preservation']
+            assert counts == {'default': 0, 'active': int(self.reference),
+                              'addon': int(probe), 'user': int(probe or self.reference)}
+            assert fixture.proof['exact_source_and_merged_preservation'] or self.reference
             self.proof['trials'].append({'case': label, 'stage': stage, 'probe': probe,
                                         'result': fixture.result, 'preservation': fixture.proof})
             self.record(label + '_verified')
@@ -941,6 +963,9 @@ class ObjectExtendCases:
             except Exception as exc:
                 errors.append(type(exc).__name__ + ': ' + str(exc))
         self.proof['cleanup_errors'] = errors
+        self.proof['strict_trial_preservation'] = all(
+            trial['preservation']['exact_source_and_merged_preservation']
+            for trial in self.proof['trials'])
         if len(self.proof['trials']) == 6:
             outcomes = []
             for trial in self.proof['trials']:
@@ -955,14 +980,16 @@ class ObjectExtendCases:
             self.proof['maps_after'] = current
             self.proof['exact_final_preservation'] = current == self.baseline
             self.record('extend_comparison_cleanup')
-            assert self.proof['exact_final_preservation']
         assert not errors
-        assert self.proof.get('stock_behavior_restored', True)
         self.closed = True
+        assert self.proof.get('exact_final_preservation', True)
+        assert self.proof['strict_trial_preservation']
+        assert self.proof.get('stock_behavior_restored', True)
 
     def append(self):
         self.steps.append(self.start)
-        stages = ('stock_before', 'probe', 'stock_after') if self.probe else ('stock_observe',)
+        stages = (('stock_before', 'probe', 'stock_after') if self.probe else
+                  ('reference',) if self.reference else ('stock_observe',))
         for stage in stages:
             for selected in (True, False):
                 self.trial(stage, selected, stage == 'probe')
