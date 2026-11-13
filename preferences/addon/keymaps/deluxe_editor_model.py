@@ -14,6 +14,13 @@ KEY_LABELS = {
     'WHEELLEFTMOUSE': 'Wheel Left', 'WHEELRIGHTMOUSE': 'Wheel Right',
     'RET': 'Enter', 'ESC': 'Esc', 'OSKEY': 'OS Key',
 }
+SEARCH_MODIFIERS = {key: key for key in (*MODIFIERS, 'any')}
+SEARCH_MODIFIERS.update(control='ctrl', option='alt', cmd='oskey', command='oskey',
+                        win='oskey', os='oskey')
+SEARCH_KEYS = {'lmb': 'LEFTMOUSE', 'mmb': 'MIDDLEMOUSE', 'rmb': 'RIGHTMOUSE',
+               '+': 'NUMPAD_PLUS', '-': 'NUMPAD_MINUS', '*': 'NUMPAD_ASTERIX',
+               '/': 'NUMPAD_SLASH', '.': 'NUMPAD_PERIOD', '`': 'ACCENT_GRAVE',
+               "'": 'QUOTE'}
 STATUS_LABELS = {
     'waiting_for_provider': 'Waiting for add-on',
     'unavailable': 'Unavailable',
@@ -36,6 +43,40 @@ def map_type(key):
     return 'KEYBOARD'
 
 
+def key_label(key):
+    return KEY_LABELS.get(key, title(key) if len(key) > 1 else key)
+
+
+def key_filter(query, event_labels):
+    """Match typed keys and requested modifiers, including held key modifiers."""
+    modifiers = set()
+    key_terms = []
+    words = query.casefold().split()
+    for word in words:
+        if word == '+' and len(words) > 1 and words[-1] != '+':
+            continue
+        for part in filter(None, word.split('+') if word != '+' else (word,)):
+            if part in SEARCH_MODIFIERS:
+                modifiers.add(SEARCH_MODIFIERS[part])
+            else:
+                key_terms.append(part)
+    matches = []
+    for term in key_terms:
+        exact = {key for key, label in event_labels.items()
+                 if term in (key.casefold(), label.casefold().replace(' ', '_'))}
+        if term in SEARCH_KEYS:
+            exact.add(SEARCH_KEYS[term])
+        matches.append(exact or {key for key, label in event_labels.items()
+                                 if term in key.casefold() or term in label.casefold()})
+
+    def accepts(event):
+        keys = {event['type'], event.get('key_modifier', 'NONE')} - {'NONE'}
+        return (all(event.get(modifier) == 1 for modifier in modifiers)
+                and all(keys & choices for choices in matches))
+
+    return accepts
+
+
 def shortcut(event):
     names = []
     if event.get('any'):
@@ -47,7 +88,7 @@ def shortcut(event):
             if value:
                 names.append(label + (' (any)' if value == -1 else ''))
     key = event['type']
-    names.append(KEY_LABELS.get(key, title(key) if len(key) > 1 else key))
+    names.append(key_label(key))
     if event.get('key_modifier', 'NONE') != 'NONE':
         names.insert(0, KEY_LABELS.get(event['key_modifier'], title(event['key_modifier'])))
     value = event.get('value', 'PRESS')

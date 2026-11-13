@@ -111,9 +111,16 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
         self.search = ''
         self.reset_page(context)
 
-    tab: EnumProperty(items=[('ASSIGNMENTS', 'Assignments', ''), ('COMMANDS', 'Commands', '')],
+    tab: EnumProperty(items=[('SECTIONS', 'Sections', 'Enable or disable shortcut groups'),
+                            ('ASSIGNMENTS', 'Assignments', 'Edit individual shortcuts'),
+                            ('COMMANDS', 'Commands', 'Edit command settings')],
                       options=TRANSIENT, update=switch_tab)
+    search_mode: EnumProperty(items=[('NAME', 'Name', 'Search for a command or keymap name'),
+                                    ('KEY', 'Key-Binding', 'Type a shortcut, such as Shift F10')],
+                              options=TRANSIENT, update=switch_tab)
     search: StringProperty(name='Search', options=TRANSIENT, update=reset_page)
+    show_shared_uses: BoolProperty(name='Show linked assignments', options=TRANSIENT)
+    show_extra_fields: BoolProperty(name='Show additional Blender settings', options=TRANSIENT)
     live_search: StringProperty(name='Search current bindings', options=TRANSIENT,
                                 update=lambda self, _context: setattr(self, 'live_page', 0))
     live_source: EnumProperty(name='Source', items=[(key, label, '') for key, label in SOURCE_LABELS.items()],
@@ -489,7 +496,6 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
 
     assignment: StringProperty(options=HIDDEN)
     shared: BoolProperty(options=HIDDEN)
-    search: BoolProperty(options=HIDDEN)
 
     def invoke(self, context, _event):
         current = editor()
@@ -529,11 +535,6 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
             'type': event.type, 'map_type': map_type(event.type), 'shift': event.shift,
             'ctrl': event.ctrl, 'alt': event.alt, 'oskey': event.oskey,
         }
-        if self.search:
-            state(context).search = 'Key: ' + shortcut(captured)
-            _editor.message = ''
-            redraw(context)
-            return {'FINISHED'}
         return self.run(context, lambda current: stage_input(current, self.assignment, captured, self.shared))
 
 

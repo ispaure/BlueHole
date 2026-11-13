@@ -32,6 +32,20 @@ class EditorTests(unittest.TestCase):
         self.assertFalse(editor.dirty)
         self.assertEqual(editor.catalog, self.h.defaults)
 
+    def test_typed_key_search_matches_modifiers_and_key_names(self):
+        labels = {'F10': 'F10', 'F11': 'F11', 'RIGHTMOUSE': 'Right Mouse',
+                  'NUMPAD_PLUS': 'Numpad +', 'A': 'A'}
+        search = self.editor_module.key_filter
+        for query in ('shift F10', 'Shift+F10', 'Shift + F10'):
+            matches = search(query, labels)
+            self.assertTrue(matches({'type': 'F10', 'shift': 1, 'ctrl': True}))
+            self.assertFalse(matches({'type': 'F10'}))
+            self.assertFalse(matches({'type': 'F11', 'shift': True}))
+        self.assertTrue(search('cmd RMB', labels)({'type': 'RIGHTMOUSE', 'oskey': True}))
+        self.assertTrue(search('Shift +', labels)({'type': 'NUMPAD_PLUS', 'shift': True}))
+        self.assertTrue(search('A', labels)({'type': 'F10', 'key_modifier': 'A'}))
+        self.assertFalse(search('unknown-key', labels)({'type': 'F10'}))
+
     def test_section_mapping_move_and_persist(self):
         editor = self.editor
         editor.edit_section('Artist tools')

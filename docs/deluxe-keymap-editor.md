@@ -1,29 +1,34 @@
 # Edit Deluxe keymaps in Blender
 
 Open **Preferences → Add-ons → Blue Hole → Addon Settings → Keymaps** after
-configuring Deluxe on the Blender preset. Assignments show the command,
+configuring Deluxe on the Blender preset. **Sections** is the default view.
+Use its category and section checkboxes to stage which shortcut groups are
+enabled, then click **Apply Changes**. Assignments show the command,
 shortcut, keymap context and source. Search spans all sections. The category
 and section menus browse one section at a time when search is empty.
 
 - Expand a row with its arrow to see its section and edit it in place. The
   section link opens its assignments and the checkbox stages its enabled
   state. **View Commands** and **View Assignments** switch between views for
-  that section. **Find by Key** captures a shortcut for search without editing
-  a binding. The search box also accepts a command name or operator ID.
-- Select an assignment and use **Capture for This Assignment** to give it its
-  own shortcut. **Capture for All** changes the shared shortcut across the
-  listed contexts. Escape cancels capture. The expanded row offers inline
-  capture, event phase, repeat, and modifier controls for the current assignment.
-  **Edit Shortcut** also offers the full event settings and shared editing.
+  that section. Select **Key-Binding** in Assignments to type a shortcut such
+  as `Shift F10` or `Ctrl Shift A`. Use **Name** to search by command name,
+  operator ID, or keymap.
+- Click an assignment's shortcut to capture a new key for that assignment.
+  Expand **Linked assignments** to see the contexts affected by **Capture for
+  All**. Escape cancels capture. The expanded row places the key, event phase,
+  and keyboard repeat above the modifier buttons. **Advanced Shortcut** offers
+  the full event settings and shared editing.
 - **Assignment Settings** lets you move the assignment or choose an existing
-  command, shortcut and keymap. To add a mapping, add or select a section,
+  command, shortcut and keymap. To add a mapping, add a section from the menu
+  beside the section selector or select an existing one,
   choose **Add Assignment**, and select those three entries. **New Shortcut**
   adds an input to the library for reuse in Assignment Settings.
 - The **Commands** tab has its own category and section filters based on where
   each command is used. Picking a category or section clears the text search.
   **All Categories** includes unused commands. The
-  selected command shows configured settings and additional Blender settings
-  discovered from the operator. Edit a field inline to change all uses. Use
+  selected command shows configured settings. Expand **Additional Blender
+  Settings** to see the remaining fields discovered from the operator.
+  Edit a field inline to change all uses. Use
   the **×** beside a configured value to restore Blender's default. The
   duplicate icon in an assignment's command settings opens the field dialog
   with a **This assignment only** option, which clones the command.
@@ -38,7 +43,8 @@ and section menus browse one section at a time when search is empty.
   Generic suppression targets can be staged and reviewed with an unsupported
   status. Use **Pick Again** when a rule's target changes or becomes ambiguous.
 - **Apply Changes** writes the profile and applies it through the runtime.
-  **Discard** drops staged edits. **Reset Draft** stages the shipped catalog.
+  **Discard** drops staged edits. **Reset Draft** and **Reload Profile** are
+  in the **Profile** menu. Reset stages the shipped catalog.
   **Reload Profile** reads the current file and drops the draft after a
   successful reload. **Save Recovered Profile** publishes recovered settings
   after reviewing them. **Reset Feature Switches** acts on the separate Blender
