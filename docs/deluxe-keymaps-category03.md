@@ -711,3 +711,36 @@ watcher. The PID and every owned temporary root were absent; all44 frozen source
 hashes and protected inputs matched. Slot released, with no other child.
 This establishes the scoped factory probe effect, not copied-reference behavior,
 production registration or other-mode parity. Accounting remains36/eight/96.
+
+Batch33 `reference-evidence-1794569668793426000` ran the two inherited reference
+states at `c3f7036` in 25.941 seconds. Selected-active stayed selected; unselected
+became selected and active; the bystander remained selected. Both exact
+Cmd+Shift/point controls and independently reset direct add controls passed.
+Complete binding admission was default0/active1/addon0/user1. These observations
+match the accepted factory probe.
+
+Both per-trial strict comparisons failed and the native status remains error.
+Each trial changed 194 source and 148 merged read_issues fields. User UV Editor
+lost 46 foreign rows in the first trial (45 uv.toolkit_center_cursor_and_frame_all
+and one uv.toolkit_distribute), then regained those rows in the second. Other
+fields and surviving relative order matched; final complete captured maps were
+exact. This does not erase transient strict failures or establish their cause.
+Both trials released their owned controls, and host cleanup verified the PID and
+all copied roots absent. Protected inputs and44 frozen hashes matched; slot
+released. All60 prior factory/18 reference records remain unchanged; evidence now
+contains60 factory/19 reference attempts.
+
+The matching reference outcomes fulfilled the approved condition for one
+ordinary production declaration: Extend Selection by Center, with
+center=True/extend=True/toggle=True and the exact Cmd+Shift CLICK event. The
+existing Selection feature pattern provides an independent toggle and editable
+EXTEND tab. Stock flags, UV/tool declarations and shared runtime are unchanged.
+Accounting remains36/eight/96 pending actual production acceptance.
+
+The minimal prepared production check reuses accepted stock/reference controls:
+two enabled selected-active/unselected trials, actual registered owner/request
+identity, two installs/releases, independent preferences and exact foreign
+preservation. Its28 fixture steps add no candidate directly. Existing ordinary
+editable persistence is reused; no additional save/reopen or reference child is
+proposed. All71 category tests pass, including reference-error retention, exact
+editable group registration and the minimal production schedule/effect checks.

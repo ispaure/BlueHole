@@ -328,6 +328,34 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
 
 
 class Category03ModalProbeTests(unittest.TestCase):
+    def test_extend_production_reuses_two_states_without_probe_injection(self):
+        from blender_keymap_category03_handlers import ObjectExtendProductionCases, ObjectExtendTrial
+        ledger = {r['row_id']: r for r in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        binding = ledger[ObjectExtendTrial.LEDGER_ID]['binding']
+        fake_bpy = types.SimpleNamespace(context=types.SimpleNamespace(
+            window_manager=types.SimpleNamespace(keyconfigs=object())))
+        with patch.dict(sys.modules, {'bpy': fake_bpy}):
+            steps, receipt = [], {'dispatch': []}
+            fixture = ObjectExtendProductionCases(steps, receipt, lambda *a, **k: None,
+                None, None, None, None, {}, binding=binding).append()
+        self.assertEqual(len(steps), 28)
+        self.assertEqual([f.initial_selected for f in fixture.fixtures], [True, False])
+        self.assertTrue(all(not f.probe and not f.defer_preservation_failure for f in fixture.fixtures))
+        self.assertFalse(receipt['extend_production']['direct_candidate_injection'])
+        for initial in (True, False):
+            before = {'target_selected': initial, 'target_active': initial,
+                      'bystander_selected': True, 'bystander_visible': True}
+            after = {'target_selected': True, 'target_active': True, 'bystander_selected': True}
+            result = {'phases': [{'phase': 'before_press', 'snapshot': before},
+                                 {'phase': 'after_release', 'snapshot': after}],
+                      'direct_control': {'positive_addition': True}}
+            fixture.assert_trial_effect(result, initial, True)
+            for field in after:
+                with self.subTest(initial=initial, field=field), self.assertRaises(AssertionError):
+                    changed = copy.deepcopy(result)
+                    changed['phases'][1]['snapshot'][field] = False
+                    fixture.assert_trial_effect(changed, initial, True)
+
     def test_extend_probe_uses_exact_selector_six_states_and_owned_modifiers(self):
         from blender_keymap_category03_handlers import (
             BINDINGS, ObjectExtendCases, ObjectExtendTrial, ObjectSubtractCases)
@@ -573,6 +601,35 @@ class Category03NativeReceiptTests(unittest.TestCase):
         cls.native = unpack_native(read_json(CATEGORY / cls.verification['fixture']))
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
+
+    def test_extend_reference_matches_effects_but_retains_strict_trial_failures(self):
+        run = self.reference_runs['reference-evidence-1794569668793426000']
+        native = run['observations']
+        self.assertEqual(native['status'], 'error')
+        proof = native['extend_proof']
+        self.assertTrue(proof['reference'])
+        self.assertEqual(len(proof['trials']), 2)
+        for trial, selected in zip(proof['trials'], (True, False)):
+            result = trial['result']
+            phases = {p['phase']: p['snapshot'] for p in result['phases']}
+            self.assertEqual(phases['before_press']['target_selected'], selected)
+            self.assertEqual(phases['before_press']['target_active'], selected)
+            after = phases['after_release']
+            self.assertTrue(after['target_selected'] and after['target_active'] and after['bystander_selected'])
+            self.assertTrue(result['input_delivery']['delivered'])
+            self.assertTrue(result['direct_control']['positive_addition'])
+            self.assertEqual(result['direct_control']['point'], result['projected_point'])
+            preservation = trial['preservation']
+            self.assertEqual(preservation['exact_candidate_counts'], {
+                'default': 0, 'active': 1, 'addon': 0, 'user': 1})
+            self.assertFalse(preservation['exact_source_and_merged_preservation'])
+            self.assertTrue(preservation['strict_preservation_failure_deferred'])
+            self.assertEqual(preservation['cleanup_errors'], [])
+        self.assertFalse(proof['strict_trial_preservation'])
+        self.assertTrue(proof['exact_final_preservation'])
+        self.assertEqual(proof['maps_before'], proof['maps_after'])
+        self.assertEqual(run['cleanup']['remaining_resources'], [])
+        self.assertEqual(run['cleanup']['retention_errors'], [])
 
     def test_extend_probe_changes_selected_active_without_losing_bystander(self):
         evidence = self.manifest['selection_extend_probe']
@@ -1963,6 +2020,59 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.addCleanup(register.unregister)
         return register
 
+    def test_extend_group_is_editable_independent_and_preserves_stock(self):
+        register = self.load_selection_register()
+        module = self.load('actions.actions.keymaps.selection.selection_extend')
+        selection = self.load('actions.actions.keymaps.selection')
+        subtract = self.load('actions.actions.keymaps.selection.selection_subtract')
+        self.stub('.blenderUtils.operatorUtils', op_exists=lambda _idname: True)
+        ui = self.load('preferences.addon.keymaps.keymap_props_selection')
+        prefs = types.SimpleNamespace(**{name: definition['default']
+            for name, definition in ui.SelectionKeymapPG.__annotations__.items()})
+        self.assertTrue(prefs.enable_selection_extend)
+        prefs.enable_selection_more_less = prefs.enable_selection_tool_switch = False
+        prefs.enable_selection_all_none = prefs.enable_selection_circle = False
+        prefs.enable_selection_extend = False
+        self.preferences.keymap.selection = prefs
+        self.preferences.keymap.enable_keymaps = True
+        action, = module.get_selection_extend_actions()
+        self.assertIn(action, selection.get_all_selection_actions())
+        expected = self.ledger['fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d']['binding']
+        stock_binding = self.ledger['4b0804a9a14135505b4bb747a327063796dab714ec18c2422dc44470567d396f']['binding']
+        stock_item = row('view3d.select', key='LEFTMOUSE', value='CLICK', shift=True, oskey=True,
+                         prop_values=stock_binding['properties'])
+        stock = self.runtime.map('default', '3D View', space='VIEW_3D')
+        stock.keymap_items.append_fixture(stock_item)
+        self.assertEqual(register.get_enabled_selection_actions(), subtract.get_selection_subtract_actions())
+        self.assertEqual(register.register(), 1)
+        prefs.enable_selection_extend = True
+        self.assertEqual(register.register(), 2)
+        self.assert_registered_binding(register.registered_selection_keymaps[-1], expected)
+        self.assertEqual(dict(register.registered_selection_keymaps[-1][1].properties), expected['properties'])
+        owners = [h for h in self.keymap_utils._FEATURES.values()
+                  if any(dict(r.target.properties).get('extend') is True for r in h.assignments)]
+        self.assertEqual(len(owners), 1)
+        self.assertTrue(owners[0].owner_id.startswith('legacy:Selection:'))
+        self.assertEqual(owners[0].assignments[0].request_id, '0:3D View:LEFTMOUSE:CLICK')
+        prefs.enable_selection_extend = False
+        self.assertEqual(register.register(), 1)
+        prefs.enable_selection_extend = True
+        self.assertEqual(register.register(), 2)
+        prefs.active_selection_keymap_tab = 'EXTEND'
+        layout = Mock()
+        ui.draw(self.preferences, self.runtime.bpy.context, layout)
+        self.draw_feature.assert_called_once_with(column=layout.column.return_value,
+            feature_owner=prefs, feature_prop_name='enable_selection_extend', actions=[action])
+        prefs.enable_selection_keymaps = False
+        self.assertEqual(register.register(), 0)
+        prefs.enable_selection_keymaps = True
+        self.assertEqual(register.register(), 2)
+        self.preferences.keymap.enable_keymaps = False
+        self.assertEqual(register.register(), 0)
+        self.assertEqual(list(stock.keymap_items), [stock_item])
+        self.assertTrue(stock_item.active)
+        self.assertEqual(dict(stock_item.properties), stock_binding['properties'])
+
     def test_subtract_group_is_editable_independent_and_preserves_stock(self):
         register = self.load_selection_register()
         module = self.load('actions.actions.keymaps.selection.selection_subtract')
@@ -1974,6 +2084,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         prefs = types.SimpleNamespace(**{name: definition['default']
                                         for name, definition in definitions.items()})
         self.assertTrue(prefs.enable_selection_subtract)
+        prefs.enable_selection_extend = False
         prefs.enable_selection_more_less = prefs.enable_selection_tool_switch = False
         prefs.enable_selection_all_none = prefs.enable_selection_subtract = False
         self.preferences.keymap.selection = prefs
@@ -2028,7 +2139,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             enable_selection_keymaps=True,
             enable_selection_all_none=False,
             enable_selection_circle=False,
-            enable_selection_subtract=False,
+            enable_selection_subtract=False, enable_selection_extend=False,
             enable_selection_more_less=False,
             enable_selection_tool_switch=True,
         )
@@ -2085,6 +2196,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
                                   definitions['active_selection_keymap_tab']['items']})
         selection_prefs.enable_selection_circle = False
         selection_prefs.enable_selection_subtract = False
+        selection_prefs.enable_selection_extend = False
         self.assertEqual(register.register(), 0)
 
         actions = [getattr(all_none, symbol) for symbol in feature['actions']]
@@ -2154,7 +2266,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
             enable_selection_keymaps=True,
             enable_selection_all_none=False,
             enable_selection_circle=False,
-            enable_selection_subtract=False,
+            enable_selection_subtract=False, enable_selection_extend=False,
             enable_selection_more_less=True,
             enable_selection_tool_switch=False,
         )
@@ -2227,6 +2339,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.assertIn('CIRCLE', {entry[0] for entry in
                                 definitions['active_selection_keymap_tab']['items']})
         selection_prefs.enable_selection_subtract = False
+        selection_prefs.enable_selection_extend = False
         self.assertEqual(register.register(), 0)
 
         actions = [getattr(circle, symbol) for symbol in feature['actions']]
@@ -2275,7 +2388,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
         self.preferences.keymap.enable_keymaps = True
         self.preferences.keymap.selection = types.SimpleNamespace(
             enable_selection_keymaps=True, enable_selection_all_none=False,
-            enable_selection_circle=False, enable_selection_subtract=False,
+            enable_selection_circle=False, enable_selection_subtract=False, enable_selection_extend=False,
             enable_selection_more_less=True,
             enable_selection_tool_switch=False)
         self.assertEqual(register.register(), 59)
@@ -2581,7 +2694,7 @@ class Category03RegistrationTests(Category03Evidence, unittest.TestCase):
                           types.SimpleNamespace(enable_selection_keymaps=True,
                                                 enable_selection_all_none=False,
                                                 enable_selection_circle=False,
-                                                enable_selection_subtract=False),
+                                                enable_selection_subtract=False, enable_selection_extend=False),
                           self.load('actions.actions.keymaps.selection').get_all_selection_actions()),
             'transform': (transform, transform.get_enabled_transform_actions,
                           types.SimpleNamespace(enable_transform_keymaps=True,

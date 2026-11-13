@@ -647,10 +647,13 @@ class ObjectSubtractCases(HandlerCases):
 class ObjectSubtractProductionCases:
     """Actual ordinary group, with matched stock/on/off selected-state trials."""
 
-    def __init__(self, steps, receipt, record, window, area, exporter, runtime, production):
+    def __init__(self, steps, receipt, record, window, area, exporter, runtime, production,
+                 *, trial_class=ObjectSubtractCases, binding=None,
+                 proof_key='subtract_production', case_prefix='production_subtract'):
         self.steps, self.receipt, self.record = steps, receipt, record
         self.arguments = (steps, receipt, record, window, area, exporter)
-        self.inspector = ObjectSubtractCases(*self.arguments)
+        self.trial_class, self.label_prefix, self.case_prefix = trial_class, proof_key, case_prefix
+        self.inspector = trial_class(*self.arguments, binding=binding)
         self.runtime, self.production = runtime, production
         self.configs = self.inspector.configs
         self.fixtures = []
@@ -660,7 +663,7 @@ class ObjectSubtractProductionCases:
         self.proof = {'test_only_driver': True, 'direct_candidate_injection': False,
                       'installs': [], 'releases': [], 'trials': [],
                       'scope': 'Actual Selection group; native effects scoped to Object mode'}
-        receipt['subtract_production'] = self.proof
+        receipt[proof_key] = self.proof
 
     def start(self):
         self.configs.update()
@@ -669,7 +672,7 @@ class ObjectSubtractProductionCases:
         self.baseline_preferences = self.production['other_preferences']()
         self.proof.update(baseline_maps=self.baseline, baseline_owned_generations=self.baseline_owners,
                           other_preferences=self.baseline_preferences)
-        self.record('subtract_production_ready')
+        self.record(self.label_prefix + '_ready')
 
     def candidate_count(self, role):
         binding = self.inspector.binding
@@ -709,9 +712,9 @@ class ObjectSubtractProductionCases:
             if self.proof['installs']:
                 assert matches[0]['owner_id'] == self.proof['installs'][0]['owner_id']
             self.proof['installs'].extend(matches)
-            self.record('subtract_production_enabled')
+            self.record(self.label_prefix + '_enabled')
         else:
-            self.preservation('subtract_production_disabled')
+            self.preservation(self.label_prefix + '_disabled')
 
     def preservation(self, label):
         self.configs.update()
@@ -731,8 +734,9 @@ class ObjectSubtractProductionCases:
         assert proof['accepted_preservation']
 
     def trial(self, stage, enabled, selected):
-        label = 'production_subtract_' + stage + ('_selected' if selected else '_unselected')
-        fixture = ObjectSubtractCases(*self.arguments, initial_selected=selected, case_label=label)
+        label = self.case_prefix + '_' + stage + ('_selected' if selected else '_unselected')
+        fixture = self.trial_class(*self.arguments, initial_selected=selected, case_label=label,
+                                   binding=self.inspector.binding)
         self.fixtures.append(fixture)
         fixture.append()
 
@@ -770,7 +774,7 @@ class ObjectSubtractProductionCases:
                 if self.enabled:
                     self.toggle(False)
                 else:
-                    self.preservation('subtract_production_final_preservation')
+                    self.preservation(self.label_prefix + '_final_preservation')
         finally:
             self.proof['cleanup_errors'] = errors
         assert not errors
@@ -994,4 +998,33 @@ class ObjectExtendCases:
             for selected in (True, False):
                 self.trial(stage, selected, stage == 'probe')
         self.steps.append(self.cleanup)
+        return self
+
+
+class ObjectExtendProductionCases(ObjectSubtractProductionCases):
+    """Two actual-production states, reusing accepted stock/reference controls."""
+
+    def __init__(self, *args, binding):
+        super().__init__(*args, trial_class=ObjectExtendTrial, binding=binding,
+                         proof_key='extend_production', case_prefix='production_extend')
+
+    def start(self):
+        super().start()
+        assert self.candidate_count('addon') == self.candidate_count('user') == 0
+
+    @staticmethod
+    def assert_trial_effect(result, initial_selected, enabled):
+        phases = {p['phase']: p['snapshot'] for p in result['phases']}
+        ObjectExtendTrial.assert_initial_state(phases['before_press'], initial_selected)
+        assert result['direct_control']['positive_addition']
+        if enabled:
+            after = phases['after_release']
+            assert after['target_selected'] and after['target_active'] and after['bystander_selected']
+
+    def append(self):
+        self.steps.extend((self.start, lambda: self.toggle(True)))
+        for selected in (True, False):
+            self.trial('enabled', True, selected)
+        self.steps.extend((lambda: self.toggle(False), lambda: self.toggle(True),
+                           lambda: self.toggle(False), self.cleanup))
         return self

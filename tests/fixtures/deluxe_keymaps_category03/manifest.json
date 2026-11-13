@@ -2961,5 +2961,270 @@
       }
     },
     "candidate_accounting_changed": false
+  },
+  "selection_extend_reference": {
+    "batch": 33,
+    "checkpoint": "c3f7036babb79f7e00a2fb5ded706ec261eee18d",
+    "run": "reference-evidence-1794569668793426000",
+    "pid": 22054,
+    "seconds": 25.941,
+    "native_status": "error",
+    "matrix": [
+      {
+        "case": "extend_reference_selected_active",
+        "initial_selected": true,
+        "phases": {
+          "before_press": {
+            "target_selected": true,
+            "target_active": true,
+            "bystander_selected": true
+          },
+          "after_press": {
+            "target_selected": true,
+            "target_active": true,
+            "bystander_selected": true
+          },
+          "after_release": {
+            "target_selected": true,
+            "target_active": true,
+            "bystander_selected": true
+          },
+          "direct_reset": {
+            "target_selected": false,
+            "target_active": false,
+            "bystander_selected": true
+          },
+          "after_direct": {
+            "target_selected": true,
+            "target_active": true,
+            "bystander_selected": true
+          }
+        },
+        "input_delivery": {
+          "callbacks": [
+            {
+              "area": "VIEW_3D",
+              "region": "WINDOW",
+              "point": [
+                2055,
+                1229
+              ],
+              "modifiers": {
+                "shift": true,
+                "oskey": true,
+                "ctrl": false,
+                "alt": false
+              }
+            }
+          ],
+          "delivered": true
+        },
+        "point": [
+          2055,
+          1229
+        ],
+        "direct_result": [
+          "FINISHED",
+          "PASS_THROUGH"
+        ],
+        "positive_addition": true,
+        "exact_candidate_counts": {
+          "default": 0,
+          "active": 1,
+          "addon": 0,
+          "user": 1
+        },
+        "strict_trial_preservation": false,
+        "strict_failure_deferred": true,
+        "cleanup_errors": []
+      },
+      {
+        "case": "extend_reference_unselected",
+        "initial_selected": false,
+        "phases": {
+          "before_press": {
+            "target_selected": false,
+            "target_active": false,
+            "bystander_selected": true
+          },
+          "after_press": {
+            "target_selected": false,
+            "target_active": false,
+            "bystander_selected": true
+          },
+          "after_release": {
+            "target_selected": true,
+            "target_active": true,
+            "bystander_selected": true
+          },
+          "direct_reset": {
+            "target_selected": false,
+            "target_active": false,
+            "bystander_selected": true
+          },
+          "after_direct": {
+            "target_selected": true,
+            "target_active": true,
+            "bystander_selected": true
+          }
+        },
+        "input_delivery": {
+          "callbacks": [
+            {
+              "area": "VIEW_3D",
+              "region": "WINDOW",
+              "point": [
+                2055,
+                1229
+              ],
+              "modifiers": {
+                "shift": true,
+                "oskey": true,
+                "ctrl": false,
+                "alt": false
+              }
+            }
+          ],
+          "delivered": true
+        },
+        "point": [
+          2055,
+          1229
+        ],
+        "direct_result": [
+          "FINISHED",
+          "PASS_THROUGH"
+        ],
+        "positive_addition": true,
+        "exact_candidate_counts": {
+          "default": 0,
+          "active": 1,
+          "addon": 0,
+          "user": 1
+        },
+        "strict_trial_preservation": false,
+        "strict_failure_deferred": true,
+        "cleanup_errors": []
+      }
+    ],
+    "both_native_outcomes_match_factory_probe": true,
+    "strict_trial_preservation": false,
+    "strict_final_preservation": true,
+    "cleanup_errors": [],
+    "owned_pid_absent": true,
+    "remaining_resources": [],
+    "retention_errors": [],
+    "protected_inputs_unchanged": true,
+    "all44_frozen_sources_exact": true,
+    "released_at_utc": "2026-11-13T11:35:30.298713+00:00",
+    "conditional_production_gate_passed": true,
+    "interpretation": "Both reference states match factory probe. Each trial has194 source/148 merged read_issues differences; merged UV Editor loses46 rows in first trial and regains them in second, with surviving relative order and other fields unchanged. Final maps exact; transient strict failures and native error retained, cause not inferred.",
+    "accounting": {
+      "implemented": 36,
+      "transferred_04": 8,
+      "remaining_03": 96
+    },
+    "preservation_classification": [
+      {
+        "case": "extend_reference_selected_active",
+        "source_readability_changes": 194,
+        "merged_readability_changes": 148,
+        "other_changed_fields": [],
+        "uv_counts": [
+          318,
+          272
+        ],
+        "removed_targets": {
+          "uv.toolkit_center_cursor_and_frame_all": 45,
+          "uv.toolkit_distribute": 1
+        },
+        "added_targets": {},
+        "common_relative_order_equal": true
+      },
+      {
+        "case": "extend_reference_unselected",
+        "source_readability_changes": 194,
+        "merged_readability_changes": 148,
+        "other_changed_fields": [],
+        "uv_counts": [
+          272,
+          318
+        ],
+        "removed_targets": {},
+        "added_targets": {
+          "uv.toolkit_center_cursor_and_frame_all": 45,
+          "uv.toolkit_distribute": 1
+        },
+        "common_relative_order_equal": true
+      }
+    ]
+  },
+  "object_extend_route": {
+    "status": "Approved ordinary source draft after matching reference; actual production check pending",
+    "row_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+    "binding": {
+      "active": true,
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 1,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "properties": {
+        "center": true,
+        "deselect": false,
+        "deselect_all": false,
+        "enumerate": false,
+        "extend": true,
+        "location": [
+          0,
+          0
+        ],
+        "object": false,
+        "select_passthrough": false,
+        "toggle": true
+      },
+      "read_issues": {},
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    "source_sha256": {
+      "actions/actions/keymaps/selection/selection_extend.py": "de8300c844387a78b8ddd8d8aa9508adce3b3100c9d4ddce531fdad54fba5ef2",
+      "actions/actions/keymaps/selection/__init__.py": "c4b5ea4d78f724756b369158c7e24d7e3ad6750cc9cb55f315efe22d04c262e4",
+      "keymaps/selection_keymaps_register.py": "beb3362213266240cb0ff52ec02f7bd78babc58c24b43386f60dc9a84abd9ca0",
+      "preferences/addon/keymaps/keymap_props_selection.py": "89278cb185e56f11687e90bb3e8924ec4e625c2cefb6c70686b4e6b8b644921c"
+    },
+    "action": "SELECTION_OBJECT_EXTEND_BY_CENTER",
+    "preference": "enable_selection_extend",
+    "tab": "EXTEND",
+    "registration": "existing ordinary ensure_action_keymaps / legacy:Selection",
+    "native_mode": "extend_production",
+    "production_fixture": "ObjectExtendProductionCases",
+    "planned_fixture_steps": 28,
+    "planned_native_cases": [
+      "enabled selected-and-active target",
+      "enabled unselected target"
+    ],
+    "stock_controls_reused": "batch32 factory stock/probe/restored-stock observations",
+    "reference_controls_reused": "reference-evidence-1794569668793426000",
+    "lifecycle_plan": "Actual preference enables only Extend Selection; two enabled geometry/control trials, release, second install/release; exact owned identity, independent preferences, full captured foreign preservation with only two live-proven Pipeline source generations compared separately.",
+    "persistence": "Reuse ordinary editable identity/persistence mechanism; no save/reopen child proposed",
+    "stock_changes": false,
+    "runtime_capability_changes": false,
+    "candidate_accounting_changed": false
   }
 }

@@ -22,6 +22,7 @@ from ..actions.actions.keymaps.selection.selection_tool_switch import get_select
 from ..actions.actions.keymaps.selection.selection_all_none import get_selection_all_none_actions
 from ..actions.actions.keymaps.selection.selection_circle import get_selection_circle_actions
 from ..actions.actions.keymaps.selection.selection_subtract import get_selection_subtract_actions
+from ..actions.actions.keymaps.selection.selection_extend import get_selection_extend_actions
 from ..preferences.prefs import prefs
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -64,6 +65,9 @@ def get_enabled_selection_actions():
 
     if prefs().keymap.selection.enable_selection_subtract:
         actions.extend(get_selection_subtract_actions())
+
+    if prefs().keymap.selection.enable_selection_extend:
+        actions.extend(get_selection_extend_actions())
 
     return actions
 

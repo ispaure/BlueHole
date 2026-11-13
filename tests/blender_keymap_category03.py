@@ -31,6 +31,7 @@ PRODUCTION_PATHS = (
     'actions/actions/keymaps/selection/selection_all_none.py',
     'actions/actions/keymaps/selection/selection_circle.py',
     'actions/actions/keymaps/selection/selection_subtract.py',
+    'actions/actions/keymaps/selection/selection_extend.py',
     'actions/actions/keymaps/selection/__init__.py',
     'actions/actions/keymaps/transform/transform_tools_modal.py',
     'actions/actions/keymaps/transform/transform_tools_gizmo.py',
@@ -141,9 +142,9 @@ def _run_session(args, root):
         shutil.copytree(args.incoming, root / 'incoming')
     executed = root / 'executed-native-test.py'
     shutil.copyfile(Path(__file__).resolve(), executed)
-    if args.mode in ('handler_observe', 'handler_probe', 'circle_production', 'subtract_observe', 'subtract_probe', 'subtract_production', 'extend_observe', 'extend_probe'):
+    if args.mode in ('handler_observe', 'handler_probe', 'circle_production', 'subtract_observe', 'subtract_probe', 'subtract_production', 'extend_observe', 'extend_probe', 'extend_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_handlers.py', root / 'handler-fixture.py')
-    if args.mode in ('extend_observe', 'extend_probe'):
+    if args.mode in ('extend_observe', 'extend_probe', 'extend_production'):
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
     if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production', 'modal_observe', 'modal_alias_probe'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_ordinary.py', root / 'ordinary-fixture.py')
@@ -152,7 +153,7 @@ def _run_session(args, root):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_modal.py', root / 'modal-fixture.py')
     if args.mode == 'modal_alias_probe':
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_modal_probe.py', root / 'modal-probe-fixture.py')
-    if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'subtract_production'):
+    if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'subtract_production', 'extend_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_editors.py', root / 'editor-fixture.py')
     if args.mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_save', 'uv_arrow_reopen'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_persistence.py', root / 'persistence-fixture.py')
@@ -339,6 +340,7 @@ def native_main(root, mode):
             # Focused fixtures opt into this group explicitly; older cases
             # retain their existing selection declarations.
             prefs.keymap.selection.enable_selection_subtract = False
+            prefs.keymap.selection.enable_selection_extend = False
         if mode.startswith('uv_g_'):
             prefs.keymap.transform.enable_transform_action_shortcuts = False
         prefs.keymap.enable_keymaps = True
@@ -1760,7 +1762,8 @@ def native_main(root, mode):
                 steps.append(uv_repeat_release)
     elif mode == 'subtract_production':
         other_selection = ('enable_selection_more_less', 'enable_selection_tool_switch',
-                           'enable_selection_all_none', 'enable_selection_circle')
+                           'enable_selection_all_none', 'enable_selection_circle',
+                           'enable_selection_extend')
 
         def subtract_setup():
             for name in (*other_selection, 'enable_selection_subtract'):
@@ -1789,6 +1792,40 @@ def native_main(root, mode):
                 'source_provenance': pipeline_source_provenance,
                 'compare_sources': comparison.EditorCases.compare_sources,
             }).append()
+    elif mode == 'extend_production':
+        other_selection = ('enable_selection_more_less', 'enable_selection_tool_switch',
+                           'enable_selection_all_none', 'enable_selection_circle',
+                           'enable_selection_subtract')
+
+        def extend_setup():
+            for name in (*other_selection, 'enable_selection_extend'):
+                setattr(prefs.keymap.selection, name, False)
+            set_groups(False, True, False)
+
+        def extend_toggle(enabled):
+            prefs.keymap.selection.enable_selection_extend = enabled
+            kmreg.refresh()
+            configs.update()
+
+        def extend_other_preferences():
+            return {'global': prefs.keymap.enable_keymaps,
+                    'selection': prefs.keymap.selection.enable_selection_keymaps,
+                    'navigation': prefs.keymap.navigation.enable_navigation_keymaps,
+                    'transform': prefs.keymap.transform.enable_transform_keymaps,
+                    **{name: getattr(prefs.keymap.selection, name) for name in other_selection}}
+
+        steps.append(extend_setup)
+        handler = load_file('category03_extend_fixture', root / 'handler-fixture.py')
+        comparison = load_file('category03_extend_comparison', root / 'editor-fixture.py')
+        ledger = {row['row_id']: row for row in map(
+            json.loads, (root / 'ordinary-ledger.jsonl').read_text().splitlines())}
+        state['ordinary_fixture'] = handler.ObjectExtendProductionCases(
+            steps, receipt, record, window, area, exporter, rt, {
+                'toggle': extend_toggle, 'other_preferences': extend_other_preferences,
+                'registered_pairs': lambda: kmreg.selection_keymaps_register.registered_selection_keymaps,
+                'source_provenance': pipeline_source_provenance,
+                'compare_sources': comparison.EditorCases.compare_sources,
+            }, binding=ledger[handler.ObjectExtendTrial.LEDGER_ID]['binding']).append()
     elif mode in ('extend_observe', 'extend_probe'):
         steps.append(lambda: set_groups(False, False, False))
         handler = load_file('category03_extend_fixture', root / 'handler-fixture.py')
@@ -2163,7 +2200,7 @@ def cli():
     parser.add_argument('--provider-source', type=Path)
     parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'uv_arrow_probe', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
                                          'transform', 'image', 'persistence', 'reopen', 'editor_save', 'editor_reopen',
-                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe', 'modal_alias_probe', 'subtract_observe', 'subtract_probe', 'subtract_production', 'extend_observe', 'extend_probe'), required=True)
+                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe', 'modal_alias_probe', 'subtract_observe', 'subtract_probe', 'subtract_production', 'extend_observe', 'extend_probe', 'extend_production'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')
     parser.add_argument('--editor-matched-endpoints', action='store_true')

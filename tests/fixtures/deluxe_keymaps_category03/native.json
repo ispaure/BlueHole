@@ -342782,32 +342782,7 @@
                       "$snapshot": "a37e403db45e39f61ccf991338fb2ff730e570e5aa337844c1866a97d2383529"
                     },
                     {
-                      "target": "wm.tool_set_by_id",
-                      "event": {
-                        "type": "U",
-                        "value": "PRESS",
-                        "any": false,
-                        "shift": 0,
-                        "ctrl": 0,
-                        "alt": 0,
-                        "oskey": 0,
-                        "hyper": 0,
-                        "key_modifier": "NONE",
-                        "direction": "ANY",
-                        "repeat": true,
-                        "map_type": "KEYBOARD"
-                      },
-                      "active": true,
-                      "properties": {
-                        "name": "zenuv.uv_tool",
-                        "cycle": false,
-                        "as_fallback": false,
-                        "space_type": "EMPTY"
-                      },
-                      "read_issues": {},
-                      "is_user_defined": true,
-                      "is_user_modified": true,
-                      "blender_id": -59
+                      "$snapshot": "97991502a46d20ed0c29ae23f86aa188527c639011310e9958766ff769e0178b"
                     }
                   ]
                 },
@@ -343031,402 +343006,7 @@
                 "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
               },
               {
-                "scope": {
-                  "name": "Mesh",
-                  "space_type": "EMPTY",
-                  "region_type": "WINDOW",
-                  "is_modal": false,
-                  "is_tool": null
-                },
-                "is_user_modified": false,
-                "is_tool_source": "unavailable",
-                "tool_name_hint": false,
-                "items": [
-                  {
-                    "$snapshot": "9bd7fddde4b8838496766360b1498a53d36aaeb8c7596d7441d04b5ff2f4d04f"
-                  },
-                  {
-                    "$snapshot": "46ccabcc515bfdf8f294b1d38657bc6661db9d85095cf7896550634ec48753dd"
-                  },
-                  {
-                    "$snapshot": "5412bd56ca91d81f88d9f392cc77900e81296febeff3d2ae35c4dca311edf5d7"
-                  },
-                  {
-                    "$snapshot": "924ce990c20379bc511ddbd8087da7bba478f376c8b94f79e43edd5bf79cbc95"
-                  },
-                  {
-                    "$snapshot": "1a4a8b559fd16a4d9df7df577b67883876448bbd43e7b366527c9a01fad1809d"
-                  },
-                  {
-                    "$snapshot": "faf58f8367a3dba56c089eb9bfbcad5923a67ef53d02b8f0143e9afc54f6e391"
-                  },
-                  {
-                    "$snapshot": "4a5c94fe37c8fedc3f179c78a631118115c4164033d89919d11a82302035e2ba"
-                  },
-                  {
-                    "$snapshot": "39a028238daa93a3428c1105176eba028e067336f7021ee69050fcc10eb47232"
-                  },
-                  {
-                    "$snapshot": "19b7d126d2cbfb02bdf6ebc7ed58b25063de3c5efaa47061fccf7f0b143fcda4"
-                  },
-                  {
-                    "$snapshot": "f75fb8a4c779c342a0fb0bfe11394e4e758555c782b128442434758f582c816a"
-                  },
-                  {
-                    "$snapshot": "23361bfd50d7a5b346cb4eebefa6fcddaf57d7c0375dc2b2cb81bf37642ff4ad"
-                  },
-                  {
-                    "$snapshot": "c2f6310396ddef57634fa7f5fbaf334a04a2b46dba2c02de73026f3ded988854"
-                  },
-                  {
-                    "$snapshot": "7ffc566ae975dce351ad686438194d548cf7febde8c73af60dd4228e0f41d9f9"
-                  },
-                  {
-                    "$snapshot": "cba4371b0d241ec1e7bd9f5141fde6f0380f1306cf17479b8a0b36af39b8924c"
-                  },
-                  {
-                    "$snapshot": "0af95f1adca8a1e746c5562451e4aa5ceedb1c562dd224a899a7835a697e2215"
-                  },
-                  {
-                    "$snapshot": "a628748afbe255f1e17a49ad6dc99748cbcdcca5b2b9f277c99df680005c2c4c"
-                  },
-                  {
-                    "$snapshot": "3d38207af64143f7a7b396d36a1e3695d29715961bf4ecabf8fb879c30164eba"
-                  },
-                  {
-                    "$snapshot": "26711c045b6babec2ed1e09e51e49fb7e9b66fe2fc0f9f3b206139504c2c19d6"
-                  },
-                  {
-                    "$snapshot": "cbdabd8316c215331f7a6fd039a97f9fc4e6454f881c1327d208b91bc6a2ece5"
-                  },
-                  {
-                    "$snapshot": "f05884654d60aa127d6d56851a910d6c51b39c0cf7c350ddacc296d8774bdef5"
-                  },
-                  {
-                    "$snapshot": "251dd0af35b908cd9b0c9c2c8a3420a92d3e78a459106e65b6af86b0d108319f"
-                  },
-                  {
-                    "$snapshot": "9b04fe7bbd19c5e7afecbcabdf76b436c4f6638263ff0d4f08d21258f91236b7"
-                  },
-                  {
-                    "$snapshot": "2bc0776288fd030d678b791a7c145f532344d016d6c0733a0342fbe4d64cb1db"
-                  },
-                  {
-                    "$snapshot": "a916a145570478431f942268073bd334b39421de36ed119d902748b09a65ce3f"
-                  },
-                  {
-                    "$snapshot": "d18724f8bfc7e842c5fd5c12b0c38c8a45257cbb0db0e3207bce3b8b8a5a209c"
-                  },
-                  {
-                    "$snapshot": "eba0fd3c22162cb8547a8f62100f250cd4ff02ca89a8f5f04ea39129ef7999d7"
-                  },
-                  {
-                    "$snapshot": "059b2302060dd91adc5487bf14b78a8aa18aa2a48c194faa66954df833555c76"
-                  },
-                  {
-                    "$snapshot": "2a2d090ec79ee6f00e78b79cb5ae16131fdb4472decf08d4ac366a2d7c2988be"
-                  },
-                  {
-                    "$snapshot": "4097660167c7ee7a4bd78c1e0af6a16b8a2a497633f5702c1e118763b34e3df6"
-                  },
-                  {
-                    "$snapshot": "6b393c878a68d4bcdf2d158f03e48793deb446616e982f400c368aee6cc1692c"
-                  },
-                  {
-                    "$snapshot": "2047205be1c1ba95df440714e5db504ddbbc353e4e7b238b2668adbfb2571275"
-                  },
-                  {
-                    "$snapshot": "1d47eab636146a3f9145ba0e6975cbf89a816b9f66575ef27f8f51c459d79384"
-                  },
-                  {
-                    "$snapshot": "2022bc965257738668fc2059ba6cf9b7e4a365082062e7ec72c4ff371b28afef"
-                  },
-                  {
-                    "$snapshot": "19ea0c26885cc98b7597222a762fc1e974702643cc8c31e1bf99271b7702ca4b"
-                  },
-                  {
-                    "$snapshot": "572e1f720aac06f2481e36186bff2a5891068d2b013bc638ef4deb7c58ebbea9"
-                  },
-                  {
-                    "$snapshot": "23b2ae7e00fa4625769307aa7d662cebdffbe7a9d420bb005a48a4419e299487"
-                  },
-                  {
-                    "$snapshot": "5db676756c7efc390cd7d606f64c124c35081a3331f2f0866171a059386ee54f"
-                  },
-                  {
-                    "$snapshot": "d3f5f8bbed3cd2d43214092188058ccac7eb22ef75cf0a94dd428b38db2b7851"
-                  },
-                  {
-                    "$snapshot": "60f223c6e68314709fdea77eb54fc38c887e946ef8d126c7cebc32f430e9ee84"
-                  },
-                  {
-                    "$snapshot": "99d4c0cf185f5de8a5ab7826af807b32bbd8e8f92190da8e2539814758ef4f35"
-                  },
-                  {
-                    "$snapshot": "d3262e57c982d71100f885e3d2788544cae5a2b1c697749bb927ce0a3fd84feb"
-                  },
-                  {
-                    "$snapshot": "c8526519ff39d5770dd9f450e0f013798bef8314a0170076f41336fa16490470"
-                  },
-                  {
-                    "$snapshot": "061942499d504d0812c65a76fdcee90507e530daa81afd484d76cc8700034ae9"
-                  },
-                  {
-                    "$snapshot": "f30b68f969f9682eca2cae837c119ded9749343944f0e90c251c1176c5fbb413"
-                  },
-                  {
-                    "$snapshot": "1f1315592bbfeda7d7d08d31698c21a12862532eac89282a432e7dfc63f5da9b"
-                  },
-                  {
-                    "$snapshot": "4573396e161c9e373b428376c09e3463182e7e4980540b85ffbb52d9fbedae39"
-                  },
-                  {
-                    "$snapshot": "f4f0989f11845596d4df65645505c03dc2d2c4a49b4a3942d9edb744b46b1ce7"
-                  },
-                  {
-                    "$snapshot": "7e350a2c7b58078aa44ba8361b2476a48aa8bc75c3ef3e3c6fdc571b75a1d80c"
-                  },
-                  {
-                    "$snapshot": "6db7cf7fac7496edd54514b77a5a06c8acb2e40d67c63bd04eaa9c8e610cac46"
-                  },
-                  {
-                    "$snapshot": "88bbc349c6079c77f95696492cd42a899129abd66cfd490fd8230430df21b5b0"
-                  },
-                  {
-                    "$snapshot": "092f9f609348fe854db9a43c982f085af095d9c4d85e59a6965c3cc290f77f6f"
-                  },
-                  {
-                    "$snapshot": "71e1d1648bc432faee582057f198b946a0a861fff48b12bbcb7262c9847ec40f"
-                  },
-                  {
-                    "$snapshot": "4f050cd267dad4dab9113a3c2becdce4bd79cd6cc9dd423a118b4251c194e9a4"
-                  },
-                  {
-                    "$snapshot": "e615958d44aa1771f228574ad53a35fcb00fefc98ca1cd63b8a1e3b941b10d6b"
-                  },
-                  {
-                    "$snapshot": "64ae6232f90668fcad8cac40dae3f083612c8f9929f1f7bb44c56171b210e9c2"
-                  },
-                  {
-                    "$snapshot": "9ab189fc9dd4f67ff761bca141317f393b4c3045d0991faf049965a893e090c1"
-                  },
-                  {
-                    "$snapshot": "323e6c9f4798a8bcabd0f8dac310dcebaba21422e2a9e16e7633a78cd9b5e4ef"
-                  },
-                  {
-                    "$snapshot": "8775749c4f8527e02eb7a9b3354d1efdfe3296ac642c30bb6c5239f8afe49118"
-                  },
-                  {
-                    "$snapshot": "d264ca41937f93a543c9389dab675db4b51e276b726fd990a462cb6d37af23be"
-                  },
-                  {
-                    "$snapshot": "430035db6346071646a5ab14982821681d1fba83de75a9672dc3daf00b34bbb0"
-                  },
-                  {
-                    "$snapshot": "af7ead8686313243a14729501ee56f1a5a35cb71aedc66df3bbd5cc3a8484070"
-                  },
-                  {
-                    "$snapshot": "8eb14e89e9beb0825ce4fb2136e3a9ef74fd635676c81e90b5e61b8dce3ef8d5"
-                  },
-                  {
-                    "$snapshot": "8d9baa2ee8adc63ba4ba15f5b8e4d93626b9c4d92f61953f2e65844db299850c"
-                  },
-                  {
-                    "$snapshot": "3f104f4a1359c7cae1abba6e722b61837696b36af0a7fbac73b31c25b8a74916"
-                  },
-                  {
-                    "$snapshot": "f0ba27e3ab0e303baa20cee5d40438ba4cfbb18fcc5a71a8a78ac00df8fdd5ef"
-                  },
-                  {
-                    "$snapshot": "f51a876aaf827776c3b093735d7b5646b25688b7fd1f3909324f276d9a1fbd11"
-                  },
-                  {
-                    "$snapshot": "7b63e855de61bfd89d35b992ebaf6e08bafad90eaecdd6eb8397b6f7d7b926ef"
-                  },
-                  {
-                    "$snapshot": "a532b09009f559dc5ad7c6b2ea753071ef3bc459c0bf2343d23d0416f7c2ef59"
-                  },
-                  {
-                    "$snapshot": "30fb7581ef187728a6a962dbcd2580eb99c44c11fef3483ca43b7ba0f86fe95e"
-                  },
-                  {
-                    "$snapshot": "9667969f7e2b9a19d2918dbece35796d3f3ca85c24bec49c47bb76cbae6021d4"
-                  },
-                  {
-                    "$snapshot": "8ad17f071f125793e793940210f40b9f8c13dd6c216e972911df644b97108626"
-                  },
-                  {
-                    "$snapshot": "bb37cc0128a0387008c2455cc20814db06c346828a9c13b2067d874627177ae1"
-                  },
-                  {
-                    "$snapshot": "1f9b4de13badab8c54c75092be78228f087b0136d6abe0b9da62571963b85bd5"
-                  },
-                  {
-                    "$snapshot": "c523e9b1b066f27b6e89f74718016c30fff0557bb16e386296b142c98c91a34e"
-                  },
-                  {
-                    "$snapshot": "7df905ac6ba368e60c426da4e91402ab4138312908c1de0588f3592369e342d4"
-                  },
-                  {
-                    "$snapshot": "18e9e7d0d1161c1270fd861f84f1d230d818b8da76c462d423f8e7fe8c225dbb"
-                  },
-                  {
-                    "$snapshot": "ee39424106771218d931e6866e9f7fb6897d6d12ada31b075d2aab8ad4d73d6a"
-                  },
-                  {
-                    "$snapshot": "affbc2f35843fadb28f12356562280e75abdd95e7eaa2e9739d2e1480188d945"
-                  },
-                  {
-                    "$snapshot": "38b995abe7acf4b48c33a41c775a9c9e3e1258c2d4752b02f9eb43ca5534daf3"
-                  },
-                  {
-                    "$snapshot": "a41c8e40b1df0bb772b0b02f3ef5ff055397134361822fb9edf1d36188f91063"
-                  },
-                  {
-                    "$snapshot": "9ede28d08916765e2b24d893d195850fb8cc49f06c28df936edf3cf688a4899e"
-                  },
-                  {
-                    "$snapshot": "c452b530ce89a647eda56032234b7da9aae2c9d2638f3d9b669a0fb6745b3a8d"
-                  },
-                  {
-                    "$snapshot": "fc509d5dbdf849131f20b45398bc9a472997f3cec711994fbbc24cc383f0be50"
-                  },
-                  {
-                    "$snapshot": "1415868a2c0bf576ced4ffb5e425d0a78df2a8367eeb368619182969308bda88"
-                  },
-                  {
-                    "$snapshot": "3f0960a81996d18cc8e3e11fcf945795c1331f42b205122b6093e0a1c2a7abf8"
-                  },
-                  {
-                    "$snapshot": "cd8a29fb7ee8877e2b4101b8c27b14cab98d70c787676fa990f306bc34135877"
-                  },
-                  {
-                    "$snapshot": "79a74158ffe939b8f8c67d2023cd2a18c4d110b13812a6c7d516fe205d1925b6"
-                  },
-                  {
-                    "$snapshot": "90084819dad31e21a81afb96b37986997ea5e54c836cd9146f6f55d9ac5a52d9"
-                  },
-                  {
-                    "$snapshot": "23812beaca438f150f068d4053bdfcd3524af022f698a672a927693551557085"
-                  },
-                  {
-                    "$snapshot": "820ddb10374da1fd4241bd70312c742b6d72fb76a89bb82fa94e31c9fff1416a"
-                  },
-                  {
-                    "$snapshot": "d87fadbc1bfe3ee082c6c2205ec27fd38559f1400ad2bb00b08484c3c3cba793"
-                  },
-                  {
-                    "$snapshot": "864419e36e85199d5ad93352cb086188385349e50532d91dcd988270e0b09da5"
-                  },
-                  {
-                    "$snapshot": "358b330a3fadca36c268ce24007f5f1b044717eb60f12dd09034d430ad9dc7bf"
-                  },
-                  {
-                    "$snapshot": "5321b27430bdcffeb3fd9f4a7bb612b225eb6abf9244ff621065a5270b5b0bb4"
-                  },
-                  {
-                    "$snapshot": "1bce519c7dd003218915f86456133ba62273073d818220e9c4c5e7b8cfb4f6ce"
-                  },
-                  {
-                    "$snapshot": "5856e0de3e39f5890e01fe806899a4d9fb151b7f0494cf753b9c907050aa729d"
-                  },
-                  {
-                    "$snapshot": "f5cf84974136ac0b2cc5808a09e3149dfb1f7e1b6e7285507e6364b3da8a1d2a"
-                  },
-                  {
-                    "$snapshot": "c066f4641ba7a83e333d3ee9fc85ea0621035c7df44b586fa01a7cc35ea6e28f"
-                  },
-                  {
-                    "$snapshot": "80d4d9e19be80b63ea4b037925920bdeefd68c66b0be00d9bc7b31e61a427029"
-                  },
-                  {
-                    "$snapshot": "f812ce412dec40e534bd20002440abc57882788c37303f1756057478fe8cf70a"
-                  },
-                  {
-                    "$snapshot": "de0fc1a3a5841c74e1f5a52f47a7600ef1105682fc0e0dea190393929e13f2cb"
-                  },
-                  {
-                    "$snapshot": "eae6f01074195a471bb414ed106a29502fc997b764f8bab3e33f90ead1310f3c"
-                  },
-                  {
-                    "$snapshot": "2284ca52e0c3fcdb4b26bd601b75b9600f00729f6e2f7ba252da5d68ac15b211"
-                  },
-                  {
-                    "$snapshot": "30b00b082a9d78edddcc2c392e9dc00a29f6b93546606c68ec452238127501aa"
-                  },
-                  {
-                    "$snapshot": "23cd7a265f883aaa824e8866e867a6ab71aac14230465611d6932f569b9ccc21"
-                  },
-                  {
-                    "$snapshot": "7cc3f1fa66232a380a72e1465a3cf9bce964cf36cb8d466b39d5b4baa58761c2"
-                  },
-                  {
-                    "$snapshot": "81d05fde45990dd057162838cb7a43258243455d80fdc2bb5286379add8d864a"
-                  },
-                  {
-                    "$snapshot": "2246f09e6ad1454d1d03b648cfc514041bddb2f5a6d61985d7c6f4676e3d7ff8"
-                  },
-                  {
-                    "$snapshot": "9c780133466caed75ff255e0669a4f6eae9ecb5bea72d21bce80c834dfc3fe6b"
-                  },
-                  {
-                    "$snapshot": "abfa7fe2856ecff3fad113928d7bde3ff7e5539ca81460a57713169e0e0c96a2"
-                  },
-                  {
-                    "$snapshot": "1fe62ad0a2a9c8279b7f550cacca361aa9e63d63f229225d66989fff8450f5ca"
-                  },
-                  {
-                    "$snapshot": "c38935d18b18a2199e0189e345e3e0992c7c1ba5903c827a906a97a373507afb"
-                  },
-                  {
-                    "$snapshot": "f5f7e009b4f9adbc2a1b978a1d0a14e40bc598716a4c45b58b35a0074025d049"
-                  },
-                  {
-                    "$snapshot": "09f1d734b1571cc2d878098ff1144d6051df901d1c849d79afc6078fde00a29c"
-                  },
-                  {
-                    "$snapshot": "7a1dcfec19dd34970523ef375aec7e2d95b9fc87cd4590146358d91d6757baf8"
-                  },
-                  {
-                    "$snapshot": "8290bc9fd4904c9106cba4b10fa62543789fc416e2f95bbf56600e3871214038"
-                  },
-                  {
-                    "$snapshot": "1762582fb36fb25ed4273f77a97abad6b8828ae5a1e59447540fb03bd57640df"
-                  },
-                  {
-                    "$snapshot": "cd78c1706bd5e86dd4c2da80be0d0ac65138ddaa9c202dc07db53af5281b836b"
-                  },
-                  {
-                    "$snapshot": "a4857e3305777896e8cae14dc57d14b37733123232384735340f410ca5858508"
-                  },
-                  {
-                    "$snapshot": "9aef2dfc5cba9a9b5bf29ae995844bf10a08873a3bd5b2502aa6681f85986a92"
-                  },
-                  {
-                    "$snapshot": "85fc5a2c9126eaeccf933078e888e79c88fa5f6973a4d5fd829370f9a0449a2f"
-                  },
-                  {
-                    "$snapshot": "604d8dc53194f7b89b7d8a610cc8580a1c77d9d79920b9d4dbcee0b2e01c1ccc"
-                  },
-                  {
-                    "$snapshot": "32429bb056917c0e8345cf6a01625e5b5261571b651813784360b92141b3443c"
-                  },
-                  {
-                    "$snapshot": "5cf697429862898d4c35387b2999c6c6ce2976207a3286861e586b9564e4830b"
-                  },
-                  {
-                    "$snapshot": "b7746f01143b7c50e1c4d767ed54ffe18e9b797f61e1d2b4f6a08e12ef494386"
-                  },
-                  {
-                    "$snapshot": "344989f724f28fd6d12f4a379d0ea47df7a9ac2f0d16baff2885cad49869507e"
-                  },
-                  {
-                    "$snapshot": "902ae97c83c407d75611c6caeb305a3addf3d8e93ce8ad84df3eaabe88401245"
-                  },
-                  {
-                    "$snapshot": "9f0383e6f5507f2678009302cce73efbd592d3968bdebf5cf739657f90859ee0"
-                  }
-                ]
+                "$snapshot": "7c4cd997e1e2ac407d916de48ce5dfee00741aef3c55f2b03943f9d9bc2661d9"
               },
               {
                 "$snapshot": "a7a35c380d5bef9b45025c0f7ba6b507a7a1f7883762f3d9a3749e633a1d553a"
@@ -343481,363 +343061,7 @@
                 "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
               },
               {
-                "scope": {
-                  "name": "Mesh",
-                  "space_type": "EMPTY",
-                  "region_type": "WINDOW",
-                  "is_modal": false,
-                  "is_tool": null
-                },
-                "is_user_modified": true,
-                "is_tool_source": "unavailable",
-                "tool_name_hint": false,
-                "items": [
-                  {
-                    "$snapshot": "0674dda3b8bbac8ca15564487533c4700644930eeeb765dfb6b76fca13023e59"
-                  },
-                  {
-                    "$snapshot": "98f8e49e61e02c52d451f833bdccb4166f3ca9f4479b313cf56caf62a3055a24"
-                  },
-                  {
-                    "$snapshot": "b5841cc5408d0d7651f3a46fd2b83fce623e654ea204f78ee22b05fd2c769509"
-                  },
-                  {
-                    "$snapshot": "8d07c37b23a1e2142d0830abd7a2055cc71b84d271723a100ce517b76ed8b245"
-                  },
-                  {
-                    "$snapshot": "bc278ab29e49b4c2578540f644f27e9c154fdb343dbf5b6c81936476d59795b3"
-                  },
-                  {
-                    "$snapshot": "52603e562b38377726a0d90e4a09952c3db0e7249c8135c1b54d0e6d0c98f15a"
-                  },
-                  {
-                    "$snapshot": "14cde5696c0c696ecc49df649c809b1b3b965c0baea2b429c782dbc6e932a0ef"
-                  },
-                  {
-                    "$snapshot": "6c4d7d38871aedbe17b8f4134157be1adb41b91cc7e16b518ca0f719014a87a5"
-                  },
-                  {
-                    "$snapshot": "50b7efd4ad3ce164c9a7f802d83802697f71fe6f9097cb82149101f7a4ba665a"
-                  },
-                  {
-                    "$snapshot": "fccb3b63e2540e88ba1d11987a0426495648891815261d7dd744870773934c92"
-                  },
-                  {
-                    "$snapshot": "367d6e6055092d405f5e69622a5589cec5ae32695116b84e141741cf32cb4d48"
-                  },
-                  {
-                    "$snapshot": "e07a7a5030a7ebefde43c95a8e50c83d224b921dbbe2dcd6a63856f53c2d02d2"
-                  },
-                  {
-                    "$snapshot": "caad220c8e59fe80cf3569896614f2dd541a92225e96b5a11a20b976b5ba5b1a"
-                  },
-                  {
-                    "$snapshot": "362dc807df42e5b6b68230bfef31688c893c88a6122e22a99991dc91cb3f6075"
-                  },
-                  {
-                    "$snapshot": "784a2f280fdc581374dac50d707d07fbf4e4ff1c70b877b8af6cc1860cfe27d1"
-                  },
-                  {
-                    "$snapshot": "3c0f70385b9ce0b6d112fc2c8f6dc0bb73010a7fc0b9458f75905fecb57a06d5"
-                  },
-                  {
-                    "$snapshot": "201f1f10bf7aea59dc82667ea6ea4ddab5f33de8899b415b9552ed1765b1aab4"
-                  },
-                  {
-                    "$snapshot": "a8ec50094a4217b2c6278f8c6797bbad89b5630d7deb6c6f96e0b2b44656e022"
-                  },
-                  {
-                    "$snapshot": "ecd0653b2d4b224b7d96cfe12a689a696e019e345154dabccf58452fea8d6931"
-                  },
-                  {
-                    "$snapshot": "f81d52643a5f46c8110ee0d9f99731cad5a667e554dc5b70a5bc00da10f99b2a"
-                  },
-                  {
-                    "$snapshot": "4eefe7d5b80e216019c608d3bcd6a3cbd65d10ade44360bbe77a21e4d984cc2b"
-                  },
-                  {
-                    "$snapshot": "cc51eb55293e0c3e354c7e5ecbc4a5113da7c613f99aaf92e8684180b06fb0d6"
-                  },
-                  {
-                    "$snapshot": "694c02d984c111cb0109cca418430456d4cb14c50830e1192122bd4c7e5b2cd5"
-                  },
-                  {
-                    "$snapshot": "7aa3fc565b7e09d8dd8e5a10d73bd98affe4f56e362a91091bdc101b6a501a76"
-                  },
-                  {
-                    "$snapshot": "059b2302060dd91adc5487bf14b78a8aa18aa2a48c194faa66954df833555c76"
-                  },
-                  {
-                    "$snapshot": "6b393c878a68d4bcdf2d158f03e48793deb446616e982f400c368aee6cc1692c"
-                  },
-                  {
-                    "$snapshot": "d6681302edc820459be0bdd48b5219479eeffb4aacfc2a1adfaf78728508dff5"
-                  },
-                  {
-                    "$snapshot": "ed6eb7f7e7bf9b2ab58caba0a1dcc95a8385494bd0c6e6b129afda9cb0ce3146"
-                  },
-                  {
-                    "$snapshot": "a9c723d3fe7c0fcb8aca501132b89b879a49a1ed7ee4ee66e85dd9d0e9210df1"
-                  },
-                  {
-                    "$snapshot": "bdebb55d3af1048ca01c7527ec341992509b03a0a5d7f255292dd2c1abd5344b"
-                  },
-                  {
-                    "$snapshot": "cffc94a0ed98cbda2e5199d348b5bc683cb110be3933f307b7157ad8951385fe"
-                  },
-                  {
-                    "$snapshot": "eb1e5054c76ae6271e16416d70c7577dcbc9313133ee1039b25ae7eca966ed50"
-                  },
-                  {
-                    "$snapshot": "500ace928151456f92a4611e4063d9be340bd80854965974e5f78b572577980a"
-                  },
-                  {
-                    "$snapshot": "79be18b4b046dbb8f6842695ad1c7a2af5530e70919793d0f4dd7a87df677a65"
-                  },
-                  {
-                    "$snapshot": "a1d7ae6380d1d7952f596612a0cf33e5d9266eac5a51e77468fef36e626604df"
-                  },
-                  {
-                    "$snapshot": "2d38e4015771f1477d0802ff8cfa20a1418e84d3efd319d308a5094d7807b6bc"
-                  },
-                  {
-                    "$snapshot": "69adaf1abbfe01d164e40e28f49c5eb9f2be5b312aa07e97c77b8a8b33aa0064"
-                  },
-                  {
-                    "$snapshot": "e848c1b958d1634057200b42764f37d81e69ac45e3e3c5ca4cb524a828af438c"
-                  },
-                  {
-                    "$snapshot": "bf06789ed3d8ed0053cbb28872f4cd73b48f044ad7d9a20f7f1c01a4cf6ed401"
-                  },
-                  {
-                    "$snapshot": "9242d636cc57f367291b4b0db8f0a9b44143073d7b62d48b6cf1ac7f9a8f203b"
-                  },
-                  {
-                    "$snapshot": "05bcd3d1b1b7535cd65252d0a14ae71f77a029dd66447739fa90b11ab8d4f5bb"
-                  },
-                  {
-                    "$snapshot": "5e7a525130c3a59057063a33520fef2d8aed7e1ad7e1ec0cb186c1708c1ce566"
-                  },
-                  {
-                    "$snapshot": "327622e470c4ed7d732fd2af2ab1f582984a31feb2204c00b73db5ec5c9b37fb"
-                  },
-                  {
-                    "$snapshot": "97297faef43f7361192fe806794b96e15524d9db6416c8571cbbf2a017cfc8b2"
-                  },
-                  {
-                    "$snapshot": "a73632a2db9060fe92755d6ab0e3cb5987f251e1faae83a1cc2ca674de359502"
-                  },
-                  {
-                    "$snapshot": "4b7b6255b9e354d508b05c50c047f69a5c8552e8f5f9e46413391f9e7b38808d"
-                  },
-                  {
-                    "$snapshot": "2855f64bc0e08314ab95847dc2c50b1b3d7c42e9d13a1b3dc239de351a283d7a"
-                  },
-                  {
-                    "$snapshot": "940460be583e8ff20e2223dcbf864708334285d3ea9c663bf6484b8318ec85ec"
-                  },
-                  {
-                    "$snapshot": "fe1c6f095af599d33bc32f323d6d686bfa3918ab397e06b89c1e347aa3193e94"
-                  },
-                  {
-                    "$snapshot": "19b061372f69e24ec8c58cea4284464c69e20b8efcaae5f654ac1b6cd631bd6d"
-                  },
-                  {
-                    "$snapshot": "a21d88da4a314f86463a3eb0c275341171c5a550e8bd0f2c9a032de5d89a4c43"
-                  },
-                  {
-                    "$snapshot": "a559937b9d22182a28423e349c100f579411efa01fa7ba35dfa9cc411d9d01d4"
-                  },
-                  {
-                    "$snapshot": "de1997c83751aed52951dd981e35ba05b6305bd57cd66dfce2c6e0e66c512929"
-                  },
-                  {
-                    "$snapshot": "f29fc77b1536b2c754186953a59c6000f60263f6079b55f4893ee7741274d787"
-                  },
-                  {
-                    "$snapshot": "8af1ffa356b880c4dae5bc4309e508bb0ba0aaaa510bbf92f8cbef9b79be60e0"
-                  },
-                  {
-                    "$snapshot": "18fa83a6fe91d9a91cfcb97c45e8489b1b78dfdfb6793700dd195e85e5be1e94"
-                  },
-                  {
-                    "$snapshot": "9667969f7e2b9a19d2918dbece35796d3f3ca85c24bec49c47bb76cbae6021d4"
-                  },
-                  {
-                    "$snapshot": "276780ea63e5ee6c5da86b8b8007eadcc72b354cb2d89f73a8bb08e05fc037bc"
-                  },
-                  {
-                    "$snapshot": "63f37b4a727fde9c73b321a3be8c7fa0018b57ddac80732ead25a326431992c7"
-                  },
-                  {
-                    "$snapshot": "0d9a2943919793eb8138d2b455b4a1ffaad031b1d566e9d680c9c9ca4297f679"
-                  },
-                  {
-                    "$snapshot": "69fdfd165129244e2696761589e1544bbfbbf5e158e7ac015cb545125ed88ed0"
-                  },
-                  {
-                    "$snapshot": "d22d0ba189ae4d4436af8b8cc183593a1ae126af6bccb5520fe4d43cc35c8c00"
-                  },
-                  {
-                    "$snapshot": "063d83f8e68e35c378109e1852c3e345d5f7d41ee1f7430440ea2352988df7a1"
-                  },
-                  {
-                    "$snapshot": "073226a0e36caf43fed085c81dbcfd866efca9a9a2a3e56127d16fb23807d3dc"
-                  },
-                  {
-                    "$snapshot": "2610dbe8e983e3c028e6e7d68ece6f25f7ec2e2b25d001418af9e39419134dd3"
-                  },
-                  {
-                    "$snapshot": "5deeda44f3c723b9a1183bd76d4e9835f71f6bf41f578fdd6299fe7e242549e5"
-                  },
-                  {
-                    "$snapshot": "a7f253cd5834cfcd28b6923d1561cd2344188418acc7a6b14f844ddadf4ac0a4"
-                  },
-                  {
-                    "$snapshot": "00fe1df63a6186b467efaace30c0df0c5606f9d7c8c945cee7ecb1b4dbc476de"
-                  },
-                  {
-                    "$snapshot": "cbfdd109fa346bbfdddefe4269181de5972f8c31cf96b1cad4329dd2c58a23ac"
-                  },
-                  {
-                    "$snapshot": "775bfc87194068693feda63cb251ac7c71a91d2d62a2147e6ac1159fe3060a39"
-                  },
-                  {
-                    "$snapshot": "6e1e31525b50704e311b74af8ec6cd33c93a7c64954ebb3d1c3c8b706594d70d"
-                  },
-                  {
-                    "$snapshot": "97b3ae816607715f8826953d0dbeeab6a84377f5f35b1939f8f6aa03e0099c33"
-                  },
-                  {
-                    "$snapshot": "eb35276a68e11896455ca9c9fef35321eac9e23b35c38d1e4c4140a2d0b1c2ed"
-                  },
-                  {
-                    "$snapshot": "949386bcb711c432856c1dd502f09e7fcb812d558a2bf902a9f676c8fadfa5cd"
-                  },
-                  {
-                    "$snapshot": "6947e4f36dce1320c39ff1c2250693de42b6a6303d5e02bc689f9d1bc939aa4b"
-                  },
-                  {
-                    "$snapshot": "ec6cf354993a34d83a7cf5fa9db0fb760eb0983d8c0efbaebffb4c70f9ed2f66"
-                  },
-                  {
-                    "$snapshot": "173275f120d207f2174a745f1cb054cd70020d91fe7374cbba3371c338adf191"
-                  },
-                  {
-                    "$snapshot": "a962c396579384d09ed3dd86f404420f628df79c6678d994ef58cb387bf6f5de"
-                  },
-                  {
-                    "$snapshot": "9e4fabc953c454ec640d1fe6631e1e9e121efbc390f407684e3bb9d5307dd9d3"
-                  },
-                  {
-                    "$snapshot": "846acda0470bc85d6bde3596f1a93597d6fa7edd7067b768fd1c36f1cddb3523"
-                  },
-                  {
-                    "$snapshot": "54b1b59f9ff5b1366bd5c82e33ffefed67535a3c9ae281f51edbd73a3cecb12d"
-                  },
-                  {
-                    "$snapshot": "b7ad2c8c3009606b12936ed5f9bb90baf96256f6b56dd5a0a34639181de1b782"
-                  },
-                  {
-                    "$snapshot": "c644e1b9f3ded7003e680e62ef2acae5cfaaa7fb89eee644739edb66fb1bf498"
-                  },
-                  {
-                    "$snapshot": "053dcfedd800e48b16cba8d8331d8a7af2ecae2481c916fbb819eba38646fd26"
-                  },
-                  {
-                    "$snapshot": "d0d2e813f1e6fd7456e606ebcaf34d888bff3ae5c5074dc614f464b0f33f7411"
-                  },
-                  {
-                    "$snapshot": "1d4ed43e1a3655a0358f0c1bcd16216737fff21e776d95c0bd25443b57c4e478"
-                  },
-                  {
-                    "$snapshot": "d72bf9ab713451759f5a49d7e5d3c17d31201426b8d614af89657f1b09e30978"
-                  },
-                  {
-                    "$snapshot": "71735f9db306e9494a7f613494cd5c115c07542771610cc904e35dea9846a091"
-                  },
-                  {
-                    "$snapshot": "0c7140352d332753552a0cb324bd66cc5e5e76029c375183580379c68704df26"
-                  },
-                  {
-                    "$snapshot": "026c1effdb0029d4a63c05af2cf0c37c6376260688e40397ea462a639cf416d1"
-                  },
-                  {
-                    "$snapshot": "d3dac952d5ecda753a02a62c7bc14c538f80d534452257bf7d8ed76e39360d47"
-                  },
-                  {
-                    "$snapshot": "d8a121e8b4a3b150c10bfd073b6309a41afb8182d197f7802868e39010c798cb"
-                  },
-                  {
-                    "$snapshot": "b2793da68a9644f406ec7e6e869b5c2b2cdac5729dce0f899ed85d83b9c4e1a3"
-                  },
-                  {
-                    "$snapshot": "137bfd62905982bcebe7e43320062ebb0283b1653c3f1087adfb2bbd8779118f"
-                  },
-                  {
-                    "$snapshot": "bafd6e9a6721b9b1ca682402d8a08e1ad38ef63a42d4b41181b950ba064c2b4f"
-                  },
-                  {
-                    "$snapshot": "c9017b3c21f1a0d775ee5a581c747b8b4c80ee326825fa6b973b5318becda462"
-                  },
-                  {
-                    "$snapshot": "e46ca013660098abd57df884e093d387f335237f30f89a19751fdeac184b762a"
-                  },
-                  {
-                    "$snapshot": "799edaed670fe9f27f759c620427344181ea8d78454beefc53c84fdc9aae53e8"
-                  },
-                  {
-                    "$snapshot": "68b3fd0ab82b972fe1d97b64fbab14eb9f05646655ad54f62cc81e4e34d84738"
-                  },
-                  {
-                    "$snapshot": "e338d08c17a040398e8265774d0b13502e4b601cde8219e251fcd87894772485"
-                  },
-                  {
-                    "$snapshot": "8de92ce1b87b9dbde4a0ea0b33375d4da7bf1b112d00c882379bfbad6bc409c5"
-                  },
-                  {
-                    "$snapshot": "1ead6e7478a896e0a4d58c1c4d08de44a334a4bbffc89bb15dd6bf3b313ed0c3"
-                  },
-                  {
-                    "$snapshot": "8251dad1299f6335a16480c94faaac147e096ef5a2e81bf408ea2a77fd516581"
-                  },
-                  {
-                    "$snapshot": "ec4bb4f9a0b2e569a43191837dcc697c74d67f85d7c124c41285a8752bdef97c"
-                  },
-                  {
-                    "$snapshot": "a4b5af9c3393c71914340c75dda29ee3d548366384535b5191957b439b86147a"
-                  },
-                  {
-                    "$snapshot": "61e9977f08e4c3b571769d0f8467739e4d4c39521bc72b30b22e411f633a614b"
-                  },
-                  {
-                    "$snapshot": "a155536e50215239f1e205daacc198b277330a00661f21540f62d885f641a912"
-                  },
-                  {
-                    "$snapshot": "96a8ca9343c1a2556ff2f3dd40e6db746dc063ed070d7d57873686c3252ed492"
-                  },
-                  {
-                    "$snapshot": "85e5a9603ce19fd21bb96bc94aa6d1e4ef6d45a39b56d6d9065879584ec43463"
-                  },
-                  {
-                    "$snapshot": "acb66d31532a87b3509f3a5b99fdf5a77a435dcd39b67f88982c30fa64fd0d2d"
-                  },
-                  {
-                    "$snapshot": "bdc07f7b958760aefe6bbf8fe1361c861602b1054efbf68ef27c45aa43a61f47"
-                  },
-                  {
-                    "$snapshot": "1e739d349568ad8d5a82672a46d20e75525497555b06e1d29de84bd6a3940dd9"
-                  },
-                  {
-                    "$snapshot": "23100a24ec20a3de009fe54e45ade15e9c248b3a0bbef62986c3c273738e9aa5"
-                  },
-                  {
-                    "$snapshot": "ad30ebac67965eaad9abcbbaa282003ca9b42b251993f4e23e8298aa187180c3"
-                  },
-                  {
-                    "$snapshot": "5c56456f37009085bd3e265f272c65237ff5376d31147a342a78b880a03f0ac5"
-                  }
-                ]
+                "$snapshot": "c28cbaa51a7812bd6a8b7c76eebe617719b5c487d54eeff8ac4b3eaec65f3297"
               },
               {
                 "$snapshot": "ebe9ff68642a823bc94f8edbfdde0453e7d6d695af715a3bccd4fb42f78829a4"
@@ -343915,6 +343139,2430 @@
       "launcher_sha256": "1b0a08c2900e446742db850a090043049dd7e52b7b2e02e31fc21be48f8abfa6",
       "handler_fixture_sha256": "d814d51ae38ec3a40b6116040672587522ee5fdfbaa16831463983ffa5a3fc73",
       "private_launch_log_sha256": "32cee383ae12868783e8a40292a027c602c75fc54e623c8d0ee4edd4ab425b36",
+      "crash_retained_files": [],
+      "retention_errors": []
+    },
+    {
+      "id": "reference-evidence-1794569668793426000",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 25.941,
+      "protected_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_unchanged": true,
+      "driver_sha256": "d430dcc2004b98d0948f0a172d4b1d5c0b21fc08a3f558c35cdd2e06ebc67d4a",
+      "probe_sha256": "99d25a14f2bcc4dc42bfa9b1c0ebdf9d1de228da37ef9bbd6f47c1fdd1d1cbc8",
+      "private_process_receipt_sha256": "105346ddb117fb14af80efc75d05b56e9a01d95c6688d4aa19afa6fbdec9742a",
+      "observations": {
+        "status": "error",
+        "mode": "reference-affected",
+        "dispatch": [
+          {
+            "case": "extend_reference_selected_active",
+            "ledger_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+            "initial_selected": true,
+            "phases": [
+              {
+                "phase": "before_press",
+                "snapshot": {
+                  "history": [],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander",
+                    "Category Handler Cube"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": true,
+                  "active_object": "Category Handler Cube",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": true,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              },
+              {
+                "phase": "after_press",
+                "snapshot": {
+                  "history": [],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander",
+                    "Category Handler Cube"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": true,
+                  "active_object": "Category Handler Cube",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": true,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              },
+              {
+                "phase": "after_release",
+                "snapshot": {
+                  "history": [
+                    "VIEW3D_OT_select"
+                  ],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander",
+                    "Category Handler Cube"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": true,
+                  "active_object": "Category Handler Cube",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": true,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              },
+              {
+                "phase": "direct_reset",
+                "snapshot": {
+                  "history": [
+                    "VIEW3D_OT_select"
+                  ],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": false,
+                  "active_object": "Category Extend Bystander",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": false,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              },
+              {
+                "phase": "after_direct",
+                "snapshot": {
+                  "history": [
+                    "VIEW3D_OT_select"
+                  ],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander",
+                    "Category Handler Cube"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": true,
+                  "active_object": "Category Handler Cube",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": true,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              }
+            ],
+            "target_object": "Category Handler Cube",
+            "projected_point": [
+              2055,
+              1229
+            ],
+            "input_delivery": {
+              "callbacks": [
+                {
+                  "area": "VIEW_3D",
+                  "region": "WINDOW",
+                  "point": [
+                    2055,
+                    1229
+                  ],
+                  "modifiers": {
+                    "shift": true,
+                    "oskey": true,
+                    "ctrl": false,
+                    "alt": false
+                  }
+                }
+              ],
+              "delivered": true
+            },
+            "native_candidates": {
+              "default": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+                },
+                {
+                  "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "active": [
+                {
+                  "$snapshot": "77ad9576356daa80080b992beadb80e4c26c4adeabd25078485266c169b5def9"
+                },
+                {
+                  "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+                },
+                {
+                  "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                },
+                {
+                  "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+                },
+                {
+                  "$snapshot": "e05db4bf999e00294d899fa1ecaf60c11f224500c1896ea240153152d069de1a"
+                },
+                {
+                  "$snapshot": "fea513928dd01ed858a6b25a1a8334b44b89c4a9b64da23315c3b99ebbee262a"
+                },
+                {
+                  "$snapshot": "fccfee145fdc60e4be42d0cc9f8dc77907cd09cd39e79b0b3f318080639fbdc2"
+                },
+                {
+                  "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+                },
+                {
+                  "$snapshot": "21ee2ee12f7c9adef84020b0ea5743869717657c543c6deae0247383f5923813"
+                }
+              ],
+              "addon": [
+                {
+                  "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+                },
+                {
+                  "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+                },
+                {
+                  "$snapshot": "2116d9bd16cee7a1a414844e75ff775d4391d74e081d46d34b4aed771677957c"
+                },
+                {
+                  "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+                },
+                {
+                  "$snapshot": "612a36a7f6c67c675c511fabf9f0cdca13121f6d934bad67f053ea57b8e8b9d1"
+                },
+                {
+                  "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+                },
+                {
+                  "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+                }
+              ],
+              "user": [
+                {
+                  "$snapshot": "b36d5067bffb91b72a03ca2fa8ea089d0b0d37bedd97aac0ff5c4cf4e0228d7a"
+                },
+                {
+                  "$snapshot": "6c71bb8f50e8c80c2be8764a7a3e30e2bf8c52eb860b2275e28147ff39366af5"
+                },
+                {
+                  "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+                },
+                {
+                  "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                },
+                {
+                  "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+                },
+                {
+                  "$snapshot": "2bdae3cf27ced059c59568eefd237569a09319de65a297254ccd2a319307e395"
+                },
+                {
+                  "$snapshot": "8b62d142abf15a2d4f27cd3570f0cc61b11445002f6e15faea899e9fc68ba83a"
+                },
+                {
+                  "$snapshot": "94210b01ace5146b0a5fba2398289572a0ec684d29a99594173a604bd3c78589"
+                },
+                {
+                  "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+                }
+              ]
+            },
+            "native_target_selected": true,
+            "direct_control": {
+              "poll": true,
+              "point": [
+                2055,
+                1229
+              ],
+              "properties": {
+                "center": true,
+                "extend": true
+              },
+              "method": "independently reset same-origin add control; not dispatch evidence",
+              "result": [
+                "FINISHED",
+                "PASS_THROUGH"
+              ],
+              "positive_addition": true
+            }
+          },
+          {
+            "case": "extend_reference_unselected",
+            "ledger_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+            "initial_selected": false,
+            "phases": [
+              {
+                "phase": "before_press",
+                "snapshot": {
+                  "history": [],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": false,
+                  "active_object": "Category Extend Bystander",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": false,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              },
+              {
+                "phase": "after_press",
+                "snapshot": {
+                  "history": [],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": false,
+                  "active_object": "Category Extend Bystander",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": false,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              },
+              {
+                "phase": "after_release",
+                "snapshot": {
+                  "history": [
+                    "VIEW3D_OT_select"
+                  ],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander",
+                    "Category Handler Cube"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": true,
+                  "active_object": "Category Handler Cube",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": true,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              },
+              {
+                "phase": "direct_reset",
+                "snapshot": {
+                  "history": [
+                    "VIEW3D_OT_select"
+                  ],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": false,
+                  "active_object": "Category Extend Bystander",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": false,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              },
+              {
+                "phase": "after_direct",
+                "snapshot": {
+                  "history": [
+                    "VIEW3D_OT_select"
+                  ],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "selected": [
+                    "Category Extend Bystander",
+                    "Category Handler Cube"
+                  ],
+                  "view": {
+                    "location": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "rotation": [
+                      1.0,
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "distance": 10.0
+                  },
+                  "target_active": true,
+                  "active_object": "Category Handler Cube",
+                  "bystander_selected": true,
+                  "bystander_visible": true,
+                  "target_selected": true,
+                  "target_visible": true,
+                  "mode": "OBJECT",
+                  "area": "VIEW_3D",
+                  "region": "WINDOW"
+                }
+              }
+            ],
+            "target_object": "Category Handler Cube",
+            "projected_point": [
+              2055,
+              1229
+            ],
+            "input_delivery": {
+              "callbacks": [
+                {
+                  "area": "VIEW_3D",
+                  "region": "WINDOW",
+                  "point": [
+                    2055,
+                    1229
+                  ],
+                  "modifiers": {
+                    "shift": true,
+                    "oskey": true,
+                    "ctrl": false,
+                    "alt": false
+                  }
+                }
+              ],
+              "delivered": true
+            },
+            "native_candidates": {
+              "default": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+                },
+                {
+                  "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "active": [
+                {
+                  "$snapshot": "05b25a6039402211a718f32883ba00c9ccc0d079e0fd3d62b1728d830ce7d729"
+                },
+                {
+                  "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+                },
+                {
+                  "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                },
+                {
+                  "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+                },
+                {
+                  "$snapshot": "7c4cd997e1e2ac407d916de48ce5dfee00741aef3c55f2b03943f9d9bc2661d9"
+                },
+                {
+                  "$snapshot": "a7a35c380d5bef9b45025c0f7ba6b507a7a1f7883762f3d9a3749e633a1d553a"
+                },
+                {
+                  "$snapshot": "81ba38d04d9c2509baa3aa03c402b7f11c14501ccabcbf5e8c61165c93d9cc12"
+                },
+                {
+                  "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+                },
+                {
+                  "$snapshot": "437891873c7833a028247ee5934f1d642d4f5a60e23b7f323d5a2d9d839cc809"
+                }
+              ],
+              "addon": [
+                {
+                  "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+                },
+                {
+                  "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+                },
+                {
+                  "$snapshot": "b4c4d363e20752668f1548d0f28ae49576117c31a8b711a49a141978ba7847f6"
+                },
+                {
+                  "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+                },
+                {
+                  "$snapshot": "8951dda0253afd2318941b48d193548556b74064ee15274698fcc1a63644be2c"
+                },
+                {
+                  "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+                },
+                {
+                  "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+                }
+              ],
+              "user": [
+                {
+                  "$snapshot": "96baa009266a22f1659f2dffbd028fc7c477f8637872980f2140b7afc7bd3a8a"
+                },
+                {
+                  "$snapshot": "c2ab02323c5fe28138ed04d6acf85507c0dbe659aec10fcffa8f528d026f4ad7"
+                },
+                {
+                  "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+                },
+                {
+                  "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                },
+                {
+                  "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+                },
+                {
+                  "$snapshot": "c28cbaa51a7812bd6a8b7c76eebe617719b5c487d54eeff8ac4b3eaec65f3297"
+                },
+                {
+                  "$snapshot": "ebe9ff68642a823bc94f8edbfdde0453e7d6d695af715a3bccd4fb42f78829a4"
+                },
+                {
+                  "$snapshot": "feae80d1f1c98e40264f4b9ad7baa9cffb26bfb28fa1231350d3f27e108ace4a"
+                },
+                {
+                  "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+                }
+              ]
+            },
+            "native_target_selected": true,
+            "direct_control": {
+              "poll": true,
+              "point": [
+                2055,
+                1229
+              ],
+              "properties": {
+                "center": true,
+                "extend": true
+              },
+              "method": "independently reset same-origin add control; not dispatch evidence",
+              "result": [
+                "FINISHED",
+                "PASS_THROUGH"
+              ],
+              "positive_addition": true
+            }
+          }
+        ],
+        "case_set": "extend",
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf"
+        },
+        "active_keyconfig": "BH_Keymaps",
+        "original_invert_mouse_zoom": true,
+        "extend_proof": {
+          "ledger_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+          "test_only_driver": true,
+          "production_capability_enabled": false,
+          "probe": false,
+          "reference": true,
+          "trials": [
+            {
+              "case": "extend_reference_selected_active",
+              "stage": "reference",
+              "probe": false,
+              "result": {
+                "case": "extend_reference_selected_active",
+                "ledger_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+                "initial_selected": true,
+                "phases": [
+                  {
+                    "phase": "before_press",
+                    "snapshot": {
+                      "history": [],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander",
+                        "Category Handler Cube"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": true,
+                      "active_object": "Category Handler Cube",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": true,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  },
+                  {
+                    "phase": "after_press",
+                    "snapshot": {
+                      "history": [],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander",
+                        "Category Handler Cube"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": true,
+                      "active_object": "Category Handler Cube",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": true,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  },
+                  {
+                    "phase": "after_release",
+                    "snapshot": {
+                      "history": [
+                        "VIEW3D_OT_select"
+                      ],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander",
+                        "Category Handler Cube"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": true,
+                      "active_object": "Category Handler Cube",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": true,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  },
+                  {
+                    "phase": "direct_reset",
+                    "snapshot": {
+                      "history": [
+                        "VIEW3D_OT_select"
+                      ],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": false,
+                      "active_object": "Category Extend Bystander",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": false,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  },
+                  {
+                    "phase": "after_direct",
+                    "snapshot": {
+                      "history": [
+                        "VIEW3D_OT_select"
+                      ],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander",
+                        "Category Handler Cube"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": true,
+                      "active_object": "Category Handler Cube",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": true,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  }
+                ],
+                "target_object": "Category Handler Cube",
+                "projected_point": [
+                  2055,
+                  1229
+                ],
+                "input_delivery": {
+                  "callbacks": [
+                    {
+                      "area": "VIEW_3D",
+                      "region": "WINDOW",
+                      "point": [
+                        2055,
+                        1229
+                      ],
+                      "modifiers": {
+                        "shift": true,
+                        "oskey": true,
+                        "ctrl": false,
+                        "alt": false
+                      }
+                    }
+                  ],
+                  "delivered": true
+                },
+                "native_candidates": {
+                  "default": [
+                    {
+                      "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                    },
+                    {
+                      "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                    },
+                    {
+                      "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                    },
+                    {
+                      "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                    },
+                    {
+                      "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+                    },
+                    {
+                      "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+                    },
+                    {
+                      "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                    },
+                    {
+                      "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                    },
+                    {
+                      "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                    }
+                  ],
+                  "active": [
+                    {
+                      "$snapshot": "77ad9576356daa80080b992beadb80e4c26c4adeabd25078485266c169b5def9"
+                    },
+                    {
+                      "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+                    },
+                    {
+                      "$snapshot": "e05db4bf999e00294d899fa1ecaf60c11f224500c1896ea240153152d069de1a"
+                    },
+                    {
+                      "$snapshot": "fea513928dd01ed858a6b25a1a8334b44b89c4a9b64da23315c3b99ebbee262a"
+                    },
+                    {
+                      "$snapshot": "fccfee145fdc60e4be42d0cc9f8dc77907cd09cd39e79b0b3f318080639fbdc2"
+                    },
+                    {
+                      "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+                    },
+                    {
+                      "$snapshot": "21ee2ee12f7c9adef84020b0ea5743869717657c543c6deae0247383f5923813"
+                    }
+                  ],
+                  "addon": [
+                    {
+                      "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+                    },
+                    {
+                      "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+                    },
+                    {
+                      "$snapshot": "2116d9bd16cee7a1a414844e75ff775d4391d74e081d46d34b4aed771677957c"
+                    },
+                    {
+                      "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+                    },
+                    {
+                      "$snapshot": "612a36a7f6c67c675c511fabf9f0cdca13121f6d934bad67f053ea57b8e8b9d1"
+                    },
+                    {
+                      "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+                    },
+                    {
+                      "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+                    }
+                  ],
+                  "user": [
+                    {
+                      "$snapshot": "b36d5067bffb91b72a03ca2fa8ea089d0b0d37bedd97aac0ff5c4cf4e0228d7a"
+                    },
+                    {
+                      "$snapshot": "6c71bb8f50e8c80c2be8764a7a3e30e2bf8c52eb860b2275e28147ff39366af5"
+                    },
+                    {
+                      "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+                    },
+                    {
+                      "$snapshot": "2bdae3cf27ced059c59568eefd237569a09319de65a297254ccd2a319307e395"
+                    },
+                    {
+                      "$snapshot": "8b62d142abf15a2d4f27cd3570f0cc61b11445002f6e15faea899e9fc68ba83a"
+                    },
+                    {
+                      "$snapshot": "94210b01ace5146b0a5fba2398289572a0ec684d29a99594173a604bd3c78589"
+                    },
+                    {
+                      "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+                    }
+                  ]
+                },
+                "native_target_selected": true,
+                "direct_control": {
+                  "poll": true,
+                  "point": [
+                    2055,
+                    1229
+                  ],
+                  "properties": {
+                    "center": true,
+                    "extend": true
+                  },
+                  "method": "independently reset same-origin add control; not dispatch evidence",
+                  "result": [
+                    "FINISHED",
+                    "PASS_THROUGH"
+                  ],
+                  "positive_addition": true
+                }
+              },
+              "preservation": {
+                "ledger_ids": [
+                  "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d"
+                ],
+                "production_capability_enabled": false,
+                "probe": false,
+                "maps_before_without_control": {
+                  "default": [
+                    {
+                      "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                    },
+                    {
+                      "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                    },
+                    {
+                      "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                    },
+                    {
+                      "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                    },
+                    {
+                      "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+                    },
+                    {
+                      "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+                    },
+                    {
+                      "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                    },
+                    {
+                      "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                    },
+                    {
+                      "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                    }
+                  ],
+                  "active": [
+                    {
+                      "$snapshot": "77ad9576356daa80080b992beadb80e4c26c4adeabd25078485266c169b5def9"
+                    },
+                    {
+                      "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+                    },
+                    {
+                      "$snapshot": "e05db4bf999e00294d899fa1ecaf60c11f224500c1896ea240153152d069de1a"
+                    },
+                    {
+                      "$snapshot": "fea513928dd01ed858a6b25a1a8334b44b89c4a9b64da23315c3b99ebbee262a"
+                    },
+                    {
+                      "$snapshot": "fccfee145fdc60e4be42d0cc9f8dc77907cd09cd39e79b0b3f318080639fbdc2"
+                    },
+                    {
+                      "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+                    },
+                    {
+                      "$snapshot": "21ee2ee12f7c9adef84020b0ea5743869717657c543c6deae0247383f5923813"
+                    }
+                  ],
+                  "addon": [
+                    {
+                      "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+                    },
+                    {
+                      "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+                    },
+                    {
+                      "$snapshot": "2116d9bd16cee7a1a414844e75ff775d4391d74e081d46d34b4aed771677957c"
+                    },
+                    {
+                      "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+                    },
+                    {
+                      "$snapshot": "05e4935e6241423914840146b156735293b0e252b7f763b47c6372ea2c25ee82"
+                    },
+                    {
+                      "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+                    },
+                    {
+                      "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+                    }
+                  ],
+                  "user": [
+                    {
+                      "$snapshot": "873d483e5736cd768a1503b5881538af6a85597770d371adf46f3f04f2d254df"
+                    },
+                    {
+                      "$snapshot": "6c71bb8f50e8c80c2be8764a7a3e30e2bf8c52eb860b2275e28147ff39366af5"
+                    },
+                    {
+                      "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+                    },
+                    {
+                      "$snapshot": "2bdae3cf27ced059c59568eefd237569a09319de65a297254ccd2a319307e395"
+                    },
+                    {
+                      "$snapshot": "8b62d142abf15a2d4f27cd3570f0cc61b11445002f6e15faea899e9fc68ba83a"
+                    },
+                    {
+                      "$snapshot": "94210b01ace5146b0a5fba2398289572a0ec684d29a99594173a604bd3c78589"
+                    },
+                    {
+                      "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+                    }
+                  ]
+                },
+                "exact_candidate_counts": {
+                  "default": 0,
+                  "active": 1,
+                  "addon": 0,
+                  "user": 1
+                },
+                "maps_after_without_control": {
+                  "default": [
+                    {
+                      "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                    },
+                    {
+                      "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                    },
+                    {
+                      "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                    },
+                    {
+                      "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                    },
+                    {
+                      "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+                    },
+                    {
+                      "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+                    },
+                    {
+                      "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                    },
+                    {
+                      "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                    },
+                    {
+                      "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                    }
+                  ],
+                  "active": [
+                    {
+                      "$snapshot": "05b25a6039402211a718f32883ba00c9ccc0d079e0fd3d62b1728d830ce7d729"
+                    },
+                    {
+                      "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+                    },
+                    {
+                      "$snapshot": "7c4cd997e1e2ac407d916de48ce5dfee00741aef3c55f2b03943f9d9bc2661d9"
+                    },
+                    {
+                      "$snapshot": "a7a35c380d5bef9b45025c0f7ba6b507a7a1f7883762f3d9a3749e633a1d553a"
+                    },
+                    {
+                      "$snapshot": "81ba38d04d9c2509baa3aa03c402b7f11c14501ccabcbf5e8c61165c93d9cc12"
+                    },
+                    {
+                      "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+                    },
+                    {
+                      "$snapshot": "437891873c7833a028247ee5934f1d642d4f5a60e23b7f323d5a2d9d839cc809"
+                    }
+                  ],
+                  "addon": [
+                    {
+                      "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+                    },
+                    {
+                      "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+                    },
+                    {
+                      "$snapshot": "b4c4d363e20752668f1548d0f28ae49576117c31a8b711a49a141978ba7847f6"
+                    },
+                    {
+                      "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+                    },
+                    {
+                      "$snapshot": "05e4935e6241423914840146b156735293b0e252b7f763b47c6372ea2c25ee82"
+                    },
+                    {
+                      "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+                    },
+                    {
+                      "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+                    }
+                  ],
+                  "user": [
+                    {
+                      "$snapshot": "44906e50c5eec70ea8dc02aaed1cfc7acf3737648bed1f9afaa721381ff60abc"
+                    },
+                    {
+                      "$snapshot": "c2ab02323c5fe28138ed04d6acf85507c0dbe659aec10fcffa8f528d026f4ad7"
+                    },
+                    {
+                      "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+                    },
+                    {
+                      "$snapshot": "c28cbaa51a7812bd6a8b7c76eebe617719b5c487d54eeff8ac4b3eaec65f3297"
+                    },
+                    {
+                      "$snapshot": "ebe9ff68642a823bc94f8edbfdde0453e7d6d695af715a3bccd4fb42f78829a4"
+                    },
+                    {
+                      "$snapshot": "feae80d1f1c98e40264f4b9ad7baa9cffb26bfb28fa1231350d3f27e108ace4a"
+                    },
+                    {
+                      "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+                    }
+                  ]
+                },
+                "cleanup_errors": [],
+                "exact_source_and_merged_preservation": false,
+                "strict_preservation_failure_deferred": true
+              }
+            },
+            {
+              "case": "extend_reference_unselected",
+              "stage": "reference",
+              "probe": false,
+              "result": {
+                "case": "extend_reference_unselected",
+                "ledger_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+                "initial_selected": false,
+                "phases": [
+                  {
+                    "phase": "before_press",
+                    "snapshot": {
+                      "history": [],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": false,
+                      "active_object": "Category Extend Bystander",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": false,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  },
+                  {
+                    "phase": "after_press",
+                    "snapshot": {
+                      "history": [],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": false,
+                      "active_object": "Category Extend Bystander",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": false,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  },
+                  {
+                    "phase": "after_release",
+                    "snapshot": {
+                      "history": [
+                        "VIEW3D_OT_select"
+                      ],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander",
+                        "Category Handler Cube"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": true,
+                      "active_object": "Category Handler Cube",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": true,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  },
+                  {
+                    "phase": "direct_reset",
+                    "snapshot": {
+                      "history": [
+                        "VIEW3D_OT_select"
+                      ],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": false,
+                      "active_object": "Category Extend Bystander",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": false,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  },
+                  {
+                    "phase": "after_direct",
+                    "snapshot": {
+                      "history": [
+                        "VIEW3D_OT_select"
+                      ],
+                      "modal_operators_observable": true,
+                      "modal_operators": [],
+                      "selected": [
+                        "Category Extend Bystander",
+                        "Category Handler Cube"
+                      ],
+                      "view": {
+                        "location": [
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "rotation": [
+                          1.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ],
+                        "distance": 10.0
+                      },
+                      "target_active": true,
+                      "active_object": "Category Handler Cube",
+                      "bystander_selected": true,
+                      "bystander_visible": true,
+                      "target_selected": true,
+                      "target_visible": true,
+                      "mode": "OBJECT",
+                      "area": "VIEW_3D",
+                      "region": "WINDOW"
+                    }
+                  }
+                ],
+                "target_object": "Category Handler Cube",
+                "projected_point": [
+                  2055,
+                  1229
+                ],
+                "input_delivery": {
+                  "callbacks": [
+                    {
+                      "area": "VIEW_3D",
+                      "region": "WINDOW",
+                      "point": [
+                        2055,
+                        1229
+                      ],
+                      "modifiers": {
+                        "shift": true,
+                        "oskey": true,
+                        "ctrl": false,
+                        "alt": false
+                      }
+                    }
+                  ],
+                  "delivered": true
+                },
+                "native_candidates": {
+                  "default": [
+                    {
+                      "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                    },
+                    {
+                      "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                    },
+                    {
+                      "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                    },
+                    {
+                      "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                    },
+                    {
+                      "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+                    },
+                    {
+                      "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+                    },
+                    {
+                      "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                    },
+                    {
+                      "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                    },
+                    {
+                      "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                    }
+                  ],
+                  "active": [
+                    {
+                      "$snapshot": "05b25a6039402211a718f32883ba00c9ccc0d079e0fd3d62b1728d830ce7d729"
+                    },
+                    {
+                      "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+                    },
+                    {
+                      "$snapshot": "7c4cd997e1e2ac407d916de48ce5dfee00741aef3c55f2b03943f9d9bc2661d9"
+                    },
+                    {
+                      "$snapshot": "a7a35c380d5bef9b45025c0f7ba6b507a7a1f7883762f3d9a3749e633a1d553a"
+                    },
+                    {
+                      "$snapshot": "81ba38d04d9c2509baa3aa03c402b7f11c14501ccabcbf5e8c61165c93d9cc12"
+                    },
+                    {
+                      "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+                    },
+                    {
+                      "$snapshot": "437891873c7833a028247ee5934f1d642d4f5a60e23b7f323d5a2d9d839cc809"
+                    }
+                  ],
+                  "addon": [
+                    {
+                      "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+                    },
+                    {
+                      "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+                    },
+                    {
+                      "$snapshot": "b4c4d363e20752668f1548d0f28ae49576117c31a8b711a49a141978ba7847f6"
+                    },
+                    {
+                      "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+                    },
+                    {
+                      "$snapshot": "8951dda0253afd2318941b48d193548556b74064ee15274698fcc1a63644be2c"
+                    },
+                    {
+                      "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+                    },
+                    {
+                      "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+                    }
+                  ],
+                  "user": [
+                    {
+                      "$snapshot": "96baa009266a22f1659f2dffbd028fc7c477f8637872980f2140b7afc7bd3a8a"
+                    },
+                    {
+                      "$snapshot": "c2ab02323c5fe28138ed04d6acf85507c0dbe659aec10fcffa8f528d026f4ad7"
+                    },
+                    {
+                      "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+                    },
+                    {
+                      "$snapshot": "c28cbaa51a7812bd6a8b7c76eebe617719b5c487d54eeff8ac4b3eaec65f3297"
+                    },
+                    {
+                      "$snapshot": "ebe9ff68642a823bc94f8edbfdde0453e7d6d695af715a3bccd4fb42f78829a4"
+                    },
+                    {
+                      "$snapshot": "feae80d1f1c98e40264f4b9ad7baa9cffb26bfb28fa1231350d3f27e108ace4a"
+                    },
+                    {
+                      "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+                    }
+                  ]
+                },
+                "native_target_selected": true,
+                "direct_control": {
+                  "poll": true,
+                  "point": [
+                    2055,
+                    1229
+                  ],
+                  "properties": {
+                    "center": true,
+                    "extend": true
+                  },
+                  "method": "independently reset same-origin add control; not dispatch evidence",
+                  "result": [
+                    "FINISHED",
+                    "PASS_THROUGH"
+                  ],
+                  "positive_addition": true
+                }
+              },
+              "preservation": {
+                "ledger_ids": [
+                  "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d"
+                ],
+                "production_capability_enabled": false,
+                "probe": false,
+                "maps_before_without_control": {
+                  "default": [
+                    {
+                      "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                    },
+                    {
+                      "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                    },
+                    {
+                      "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                    },
+                    {
+                      "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                    },
+                    {
+                      "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+                    },
+                    {
+                      "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+                    },
+                    {
+                      "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                    },
+                    {
+                      "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                    },
+                    {
+                      "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                    }
+                  ],
+                  "active": [
+                    {
+                      "$snapshot": "05b25a6039402211a718f32883ba00c9ccc0d079e0fd3d62b1728d830ce7d729"
+                    },
+                    {
+                      "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+                    },
+                    {
+                      "$snapshot": "7c4cd997e1e2ac407d916de48ce5dfee00741aef3c55f2b03943f9d9bc2661d9"
+                    },
+                    {
+                      "$snapshot": "a7a35c380d5bef9b45025c0f7ba6b507a7a1f7883762f3d9a3749e633a1d553a"
+                    },
+                    {
+                      "$snapshot": "81ba38d04d9c2509baa3aa03c402b7f11c14501ccabcbf5e8c61165c93d9cc12"
+                    },
+                    {
+                      "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+                    },
+                    {
+                      "$snapshot": "437891873c7833a028247ee5934f1d642d4f5a60e23b7f323d5a2d9d839cc809"
+                    }
+                  ],
+                  "addon": [
+                    {
+                      "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+                    },
+                    {
+                      "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+                    },
+                    {
+                      "$snapshot": "b4c4d363e20752668f1548d0f28ae49576117c31a8b711a49a141978ba7847f6"
+                    },
+                    {
+                      "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+                    },
+                    {
+                      "$snapshot": "05e4935e6241423914840146b156735293b0e252b7f763b47c6372ea2c25ee82"
+                    },
+                    {
+                      "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+                    },
+                    {
+                      "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+                    }
+                  ],
+                  "user": [
+                    {
+                      "$snapshot": "44906e50c5eec70ea8dc02aaed1cfc7acf3737648bed1f9afaa721381ff60abc"
+                    },
+                    {
+                      "$snapshot": "c2ab02323c5fe28138ed04d6acf85507c0dbe659aec10fcffa8f528d026f4ad7"
+                    },
+                    {
+                      "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+                    },
+                    {
+                      "$snapshot": "c28cbaa51a7812bd6a8b7c76eebe617719b5c487d54eeff8ac4b3eaec65f3297"
+                    },
+                    {
+                      "$snapshot": "ebe9ff68642a823bc94f8edbfdde0453e7d6d695af715a3bccd4fb42f78829a4"
+                    },
+                    {
+                      "$snapshot": "feae80d1f1c98e40264f4b9ad7baa9cffb26bfb28fa1231350d3f27e108ace4a"
+                    },
+                    {
+                      "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+                    }
+                  ]
+                },
+                "exact_candidate_counts": {
+                  "default": 0,
+                  "active": 1,
+                  "addon": 0,
+                  "user": 1
+                },
+                "maps_after_without_control": {
+                  "default": [
+                    {
+                      "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                    },
+                    {
+                      "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                    },
+                    {
+                      "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                    },
+                    {
+                      "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                    },
+                    {
+                      "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+                    },
+                    {
+                      "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+                    },
+                    {
+                      "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                    },
+                    {
+                      "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                    },
+                    {
+                      "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                    }
+                  ],
+                  "active": [
+                    {
+                      "$snapshot": "77ad9576356daa80080b992beadb80e4c26c4adeabd25078485266c169b5def9"
+                    },
+                    {
+                      "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+                    },
+                    {
+                      "$snapshot": "e05db4bf999e00294d899fa1ecaf60c11f224500c1896ea240153152d069de1a"
+                    },
+                    {
+                      "$snapshot": "fea513928dd01ed858a6b25a1a8334b44b89c4a9b64da23315c3b99ebbee262a"
+                    },
+                    {
+                      "$snapshot": "fccfee145fdc60e4be42d0cc9f8dc77907cd09cd39e79b0b3f318080639fbdc2"
+                    },
+                    {
+                      "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+                    },
+                    {
+                      "$snapshot": "21ee2ee12f7c9adef84020b0ea5743869717657c543c6deae0247383f5923813"
+                    }
+                  ],
+                  "addon": [
+                    {
+                      "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+                    },
+                    {
+                      "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+                    },
+                    {
+                      "$snapshot": "2116d9bd16cee7a1a414844e75ff775d4391d74e081d46d34b4aed771677957c"
+                    },
+                    {
+                      "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+                    },
+                    {
+                      "$snapshot": "05e4935e6241423914840146b156735293b0e252b7f763b47c6372ea2c25ee82"
+                    },
+                    {
+                      "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+                    },
+                    {
+                      "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+                    }
+                  ],
+                  "user": [
+                    {
+                      "$snapshot": "873d483e5736cd768a1503b5881538af6a85597770d371adf46f3f04f2d254df"
+                    },
+                    {
+                      "$snapshot": "6c71bb8f50e8c80c2be8764a7a3e30e2bf8c52eb860b2275e28147ff39366af5"
+                    },
+                    {
+                      "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+                    },
+                    {
+                      "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+                    },
+                    {
+                      "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+                    },
+                    {
+                      "$snapshot": "2bdae3cf27ced059c59568eefd237569a09319de65a297254ccd2a319307e395"
+                    },
+                    {
+                      "$snapshot": "8b62d142abf15a2d4f27cd3570f0cc61b11445002f6e15faea899e9fc68ba83a"
+                    },
+                    {
+                      "$snapshot": "94210b01ace5146b0a5fba2398289572a0ec684d29a99594173a604bd3c78589"
+                    },
+                    {
+                      "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+                    }
+                  ]
+                },
+                "cleanup_errors": [],
+                "exact_source_and_merged_preservation": false,
+                "strict_preservation_failure_deferred": true
+              }
+            }
+          ],
+          "maps_before": {
+            "default": [
+              {
+                "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+              },
+              {
+                "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ],
+            "active": [
+              {
+                "$snapshot": "77ad9576356daa80080b992beadb80e4c26c4adeabd25078485266c169b5def9"
+              },
+              {
+                "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+              },
+              {
+                "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+              },
+              {
+                "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+              },
+              {
+                "$snapshot": "e05db4bf999e00294d899fa1ecaf60c11f224500c1896ea240153152d069de1a"
+              },
+              {
+                "$snapshot": "fea513928dd01ed858a6b25a1a8334b44b89c4a9b64da23315c3b99ebbee262a"
+              },
+              {
+                "$snapshot": "fccfee145fdc60e4be42d0cc9f8dc77907cd09cd39e79b0b3f318080639fbdc2"
+              },
+              {
+                "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+              },
+              {
+                "$snapshot": "21ee2ee12f7c9adef84020b0ea5743869717657c543c6deae0247383f5923813"
+              }
+            ],
+            "addon": [
+              {
+                "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+              },
+              {
+                "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+              },
+              {
+                "$snapshot": "2116d9bd16cee7a1a414844e75ff775d4391d74e081d46d34b4aed771677957c"
+              },
+              {
+                "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+              },
+              {
+                "$snapshot": "05e4935e6241423914840146b156735293b0e252b7f763b47c6372ea2c25ee82"
+              },
+              {
+                "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+              },
+              {
+                "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+              }
+            ],
+            "user": [
+              {
+                "$snapshot": "873d483e5736cd768a1503b5881538af6a85597770d371adf46f3f04f2d254df"
+              },
+              {
+                "$snapshot": "6c71bb8f50e8c80c2be8764a7a3e30e2bf8c52eb860b2275e28147ff39366af5"
+              },
+              {
+                "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+              },
+              {
+                "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+              },
+              {
+                "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+              },
+              {
+                "$snapshot": "2bdae3cf27ced059c59568eefd237569a09319de65a297254ccd2a319307e395"
+              },
+              {
+                "$snapshot": "8b62d142abf15a2d4f27cd3570f0cc61b11445002f6e15faea899e9fc68ba83a"
+              },
+              {
+                "$snapshot": "94210b01ace5146b0a5fba2398289572a0ec684d29a99594173a604bd3c78589"
+              },
+              {
+                "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+              }
+            ]
+          },
+          "cleanup_errors": [],
+          "strict_trial_preservation": false,
+          "maps_after": {
+            "default": [
+              {
+                "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+              },
+              {
+                "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ],
+            "active": [
+              {
+                "$snapshot": "77ad9576356daa80080b992beadb80e4c26c4adeabd25078485266c169b5def9"
+              },
+              {
+                "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+              },
+              {
+                "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+              },
+              {
+                "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+              },
+              {
+                "$snapshot": "e05db4bf999e00294d899fa1ecaf60c11f224500c1896ea240153152d069de1a"
+              },
+              {
+                "$snapshot": "fea513928dd01ed858a6b25a1a8334b44b89c4a9b64da23315c3b99ebbee262a"
+              },
+              {
+                "$snapshot": "fccfee145fdc60e4be42d0cc9f8dc77907cd09cd39e79b0b3f318080639fbdc2"
+              },
+              {
+                "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+              },
+              {
+                "$snapshot": "21ee2ee12f7c9adef84020b0ea5743869717657c543c6deae0247383f5923813"
+              }
+            ],
+            "addon": [
+              {
+                "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+              },
+              {
+                "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+              },
+              {
+                "$snapshot": "2116d9bd16cee7a1a414844e75ff775d4391d74e081d46d34b4aed771677957c"
+              },
+              {
+                "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+              },
+              {
+                "$snapshot": "05e4935e6241423914840146b156735293b0e252b7f763b47c6372ea2c25ee82"
+              },
+              {
+                "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+              },
+              {
+                "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+              }
+            ],
+            "user": [
+              {
+                "$snapshot": "873d483e5736cd768a1503b5881538af6a85597770d371adf46f3f04f2d254df"
+              },
+              {
+                "$snapshot": "6c71bb8f50e8c80c2be8764a7a3e30e2bf8c52eb860b2275e28147ff39366af5"
+              },
+              {
+                "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+              },
+              {
+                "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+              },
+              {
+                "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+              },
+              {
+                "$snapshot": "2bdae3cf27ced059c59568eefd237569a09319de65a297254ccd2a319307e395"
+              },
+              {
+                "$snapshot": "8b62d142abf15a2d4f27cd3570f0cc61b11445002f6e15faea899e9fc68ba83a"
+              },
+              {
+                "$snapshot": "94210b01ace5146b0a5fba2398289572a0ec684d29a99594173a604bd3c78589"
+              },
+              {
+                "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+              }
+            ]
+          },
+          "exact_final_preservation": true
+        },
+        "extend_trial_proof": {
+          "ledger_ids": [
+            "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d"
+          ],
+          "production_capability_enabled": false,
+          "probe": false,
+          "maps_before_without_control": {
+            "default": [
+              {
+                "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+              },
+              {
+                "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ],
+            "active": [
+              {
+                "$snapshot": "05b25a6039402211a718f32883ba00c9ccc0d079e0fd3d62b1728d830ce7d729"
+              },
+              {
+                "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+              },
+              {
+                "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+              },
+              {
+                "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+              },
+              {
+                "$snapshot": "7c4cd997e1e2ac407d916de48ce5dfee00741aef3c55f2b03943f9d9bc2661d9"
+              },
+              {
+                "$snapshot": "a7a35c380d5bef9b45025c0f7ba6b507a7a1f7883762f3d9a3749e633a1d553a"
+              },
+              {
+                "$snapshot": "81ba38d04d9c2509baa3aa03c402b7f11c14501ccabcbf5e8c61165c93d9cc12"
+              },
+              {
+                "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+              },
+              {
+                "$snapshot": "437891873c7833a028247ee5934f1d642d4f5a60e23b7f323d5a2d9d839cc809"
+              }
+            ],
+            "addon": [
+              {
+                "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+              },
+              {
+                "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+              },
+              {
+                "$snapshot": "b4c4d363e20752668f1548d0f28ae49576117c31a8b711a49a141978ba7847f6"
+              },
+              {
+                "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+              },
+              {
+                "$snapshot": "05e4935e6241423914840146b156735293b0e252b7f763b47c6372ea2c25ee82"
+              },
+              {
+                "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+              },
+              {
+                "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+              }
+            ],
+            "user": [
+              {
+                "$snapshot": "44906e50c5eec70ea8dc02aaed1cfc7acf3737648bed1f9afaa721381ff60abc"
+              },
+              {
+                "$snapshot": "c2ab02323c5fe28138ed04d6acf85507c0dbe659aec10fcffa8f528d026f4ad7"
+              },
+              {
+                "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+              },
+              {
+                "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+              },
+              {
+                "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+              },
+              {
+                "$snapshot": "c28cbaa51a7812bd6a8b7c76eebe617719b5c487d54eeff8ac4b3eaec65f3297"
+              },
+              {
+                "$snapshot": "ebe9ff68642a823bc94f8edbfdde0453e7d6d695af715a3bccd4fb42f78829a4"
+              },
+              {
+                "$snapshot": "feae80d1f1c98e40264f4b9ad7baa9cffb26bfb28fa1231350d3f27e108ace4a"
+              },
+              {
+                "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+              }
+            ]
+          },
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 1,
+            "addon": 0,
+            "user": 1
+          },
+          "maps_after_without_control": {
+            "default": [
+              {
+                "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "c33ec1c741164a407fbb528cd6020dea5ed2a7476960aa190bdf319a3a27a43b"
+              },
+              {
+                "$snapshot": "bfa38b1311e6df244288bf33cfe3c9f85977b00888994c0a3b662ebea2664f24"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ],
+            "active": [
+              {
+                "$snapshot": "77ad9576356daa80080b992beadb80e4c26c4adeabd25078485266c169b5def9"
+              },
+              {
+                "$snapshot": "5fa4a31b12ded5731ea9a68f1c28402ab55425a43ab700a243a5f0a1e97a7e69"
+              },
+              {
+                "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+              },
+              {
+                "$snapshot": "d22ed6abb3483ca35e1359d9bcd314dc018b57c90bef39d630280a0a758a4b86"
+              },
+              {
+                "$snapshot": "e05db4bf999e00294d899fa1ecaf60c11f224500c1896ea240153152d069de1a"
+              },
+              {
+                "$snapshot": "fea513928dd01ed858a6b25a1a8334b44b89c4a9b64da23315c3b99ebbee262a"
+              },
+              {
+                "$snapshot": "fccfee145fdc60e4be42d0cc9f8dc77907cd09cd39e79b0b3f318080639fbdc2"
+              },
+              {
+                "$snapshot": "2b46d742fc4828e13b3f31088341b544a72031d2fc959eacef5e8ebf0a6aa943"
+              },
+              {
+                "$snapshot": "21ee2ee12f7c9adef84020b0ea5743869717657c543c6deae0247383f5923813"
+              }
+            ],
+            "addon": [
+              {
+                "$snapshot": "d72f6048c8dbcb614cc71bbe759a3c30342bccacea6289045200beef69c6e9e4"
+              },
+              {
+                "$snapshot": "3061cf65368f2aaf5345a48b5ea5150321000a936121cf9798677d0660bb49de"
+              },
+              {
+                "$snapshot": "2116d9bd16cee7a1a414844e75ff775d4391d74e081d46d34b4aed771677957c"
+              },
+              {
+                "$snapshot": "eb353bedd5e03a37c9c357b6570a236effa2712255b8741acc24b53d964ffa45"
+              },
+              {
+                "$snapshot": "05e4935e6241423914840146b156735293b0e252b7f763b47c6372ea2c25ee82"
+              },
+              {
+                "$snapshot": "74fb3239c5604fbbba45c0b1c1973ad2dab595f912ed5b417288c57c8f3ced4c"
+              },
+              {
+                "$snapshot": "69f59a2e66d09076f4790e1841498cb13a5b05177d1827e165eabcf1e52f43f3"
+              }
+            ],
+            "user": [
+              {
+                "$snapshot": "873d483e5736cd768a1503b5881538af6a85597770d371adf46f3f04f2d254df"
+              },
+              {
+                "$snapshot": "6c71bb8f50e8c80c2be8764a7a3e30e2bf8c52eb860b2275e28147ff39366af5"
+              },
+              {
+                "$snapshot": "536c297a6d35bafef9b7aa712d4d33977c51c7db5582187abc250c59b996a53f"
+              },
+              {
+                "$snapshot": "0362f1ce918c714b6404c8d8be5877766b26c2444b7fb77a3c2b64011772ffb1"
+              },
+              {
+                "$snapshot": "82ef3834fc569fedbed356aefa47d3684e1619de0f0379c97990c01069f4f6f8"
+              },
+              {
+                "$snapshot": "2bdae3cf27ced059c59568eefd237569a09319de65a297254ccd2a319307e395"
+              },
+              {
+                "$snapshot": "8b62d142abf15a2d4f27cd3570f0cc61b11445002f6e15faea899e9fc68ba83a"
+              },
+              {
+                "$snapshot": "94210b01ace5146b0a5fba2398289572a0ec684d29a99594173a604bd3c78589"
+              },
+              {
+                "$snapshot": "1b1efb4d5c8d2ec7e7f14e537212b1490d1749265eb9f9c85ae84861136a9ad8"
+              }
+            ]
+          },
+          "cleanup_errors": [],
+          "exact_source_and_merged_preservation": false,
+          "strict_preservation_failure_deferred": true
+        },
+        "error": "Traceback (most recent call last):\n  File \"<repo>/test-results/deluxe-keymaps-category03/reference-evidence-1794569668793426000/reference-input.py\", line 217, in tick\n    step();return 0.35\n    ^^^^^^\n  File \"<repo>/test-results/deluxe-keymaps-category03/reference-evidence-1794569668793426000/handler-fixture.py\", line 986, in cleanup\n    assert self.proof['strict_trial_preservation']\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+        "autosave_off": true,
+        "inversion_restored": true
+      },
+      "cleanup": {
+        "removed_resources": [
+          {
+            "session": "reference-affected-1794569668802380000",
+            "resource": "resources"
+          },
+          {
+            "session": "reference-affected-1794569668802380000",
+            "resource": "config"
+          },
+          {
+            "session": "reference-affected-1794569668802380000",
+            "resource": "scripts"
+          },
+          {
+            "session": "reference-affected-1794569668802380000",
+            "resource": "extensions"
+          },
+          {
+            "session": "reference-affected-1794569668802380000",
+            "resource": "datafiles"
+          },
+          {
+            "session": "reference-affected-1794569668802380000",
+            "resource": "tmp"
+          },
+          {
+            "session": "reference-affected-1794569668802380000",
+            "resource": "cache"
+          },
+          {
+            "session": "reference-affected-1794569668802380000",
+            "resource": "redirected"
+          }
+        ],
+        "crash_retained_files": [],
+        "processes": [
+          {
+            "session": "__pycache__"
+          },
+          {
+            "session": "reference-affected-1794569668802380000",
+            "pid": 22054,
+            "returncode": 0,
+            "receipt_sha256": "d13a415bfe5d210911e40677b7184ead6be2864b6edf2d60c8544ea469bf92a2",
+            "private_launch_log": "reference-affected-1794569668802380000/private-launch.log",
+            "private_launch_log_sha256": "921faa9dc2f419444848c61a8c2ca9008d46bdad9560c071f9b92fba654181a9"
+          }
+        ],
+        "retention_errors": [],
+        "remaining_resources": []
+      },
+      "pid": 22054,
+      "run_success": false,
+      "launcher_sha256": "1b0a08c2900e446742db850a090043049dd7e52b7b2e02e31fc21be48f8abfa6",
+      "handler_fixture_sha256": "61d57442c3b43e696b3b6ae48c74418c78350e404f98d6fa2a35a7eedcbff8da",
+      "ordinary_ledger_sha256": "a5a500da8d9ada01dc5cf8aa04111e9fd73864d933469ebfea4313ecebffb8e3",
+      "private_launch_log_sha256": "921faa9dc2f419444848c61a8c2ca9008d46bdad9560c071f9b92fba654181a9",
       "crash_retained_files": [],
       "retention_errors": []
     }
@@ -344340,6 +345988,11 @@
       "id": "reference-evidence-1794566535713559000",
       "path": "test-results/deluxe-keymaps-category03/sanitized-native/reference-evidence-1794566535713559000.json",
       "sha256": "10a9b897c27bed8b301e2c3282301ab0bbab1ac334f47933d32363c6a53d1b77"
+    },
+    {
+      "id": "reference-evidence-1794569668793426000",
+      "path": "test-results/deluxe-keymaps-category03/sanitized-native/reference-evidence-1794569668793426000.json",
+      "sha256": "3072d19f6d68f8a3231ec56c75d3494ce68a4ec67bb3c8637b7b7788034f4c40"
     }
   ],
   "historical_claims": {
@@ -533972,6 +535625,34 @@
         }
       ]
     },
+    "97991502a46d20ed0c29ae23f86aa188527c639011310e9958766ff769e0178b": {
+      "target": "wm.tool_set_by_id",
+      "event": {
+        "type": "U",
+        "value": "PRESS",
+        "any": false,
+        "shift": 0,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 0,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": true,
+        "map_type": "KEYBOARD"
+      },
+      "active": true,
+      "properties": {
+        "name": "zenuv.uv_tool",
+        "cycle": false,
+        "as_fallback": false,
+        "space_type": "EMPTY"
+      },
+      "read_issues": {},
+      "is_user_defined": true,
+      "is_user_modified": true,
+      "blender_id": -59
+    },
     "059b2302060dd91adc5487bf14b78a8aa18aa2a48c194faa66954df833555c76": {
       "target": "machin3.call_decal_pie",
       "event": {
@@ -534017,6 +535698,1208 @@
       "is_user_defined": false,
       "is_user_modified": false,
       "blender_id": 30
+    },
+    "7c4cd997e1e2ac407d916de48ce5dfee00741aef3c55f2b03943f9d9bc2661d9": {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": false,
+        "is_tool": null
+      },
+      "is_user_modified": false,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "9bd7fddde4b8838496766360b1498a53d36aaeb8c7596d7441d04b5ff2f4d04f"
+        },
+        {
+          "$snapshot": "46ccabcc515bfdf8f294b1d38657bc6661db9d85095cf7896550634ec48753dd"
+        },
+        {
+          "$snapshot": "5412bd56ca91d81f88d9f392cc77900e81296febeff3d2ae35c4dca311edf5d7"
+        },
+        {
+          "$snapshot": "924ce990c20379bc511ddbd8087da7bba478f376c8b94f79e43edd5bf79cbc95"
+        },
+        {
+          "$snapshot": "1a4a8b559fd16a4d9df7df577b67883876448bbd43e7b366527c9a01fad1809d"
+        },
+        {
+          "$snapshot": "faf58f8367a3dba56c089eb9bfbcad5923a67ef53d02b8f0143e9afc54f6e391"
+        },
+        {
+          "$snapshot": "4a5c94fe37c8fedc3f179c78a631118115c4164033d89919d11a82302035e2ba"
+        },
+        {
+          "$snapshot": "39a028238daa93a3428c1105176eba028e067336f7021ee69050fcc10eb47232"
+        },
+        {
+          "$snapshot": "19b7d126d2cbfb02bdf6ebc7ed58b25063de3c5efaa47061fccf7f0b143fcda4"
+        },
+        {
+          "$snapshot": "f75fb8a4c779c342a0fb0bfe11394e4e758555c782b128442434758f582c816a"
+        },
+        {
+          "$snapshot": "23361bfd50d7a5b346cb4eebefa6fcddaf57d7c0375dc2b2cb81bf37642ff4ad"
+        },
+        {
+          "$snapshot": "c2f6310396ddef57634fa7f5fbaf334a04a2b46dba2c02de73026f3ded988854"
+        },
+        {
+          "$snapshot": "7ffc566ae975dce351ad686438194d548cf7febde8c73af60dd4228e0f41d9f9"
+        },
+        {
+          "$snapshot": "cba4371b0d241ec1e7bd9f5141fde6f0380f1306cf17479b8a0b36af39b8924c"
+        },
+        {
+          "$snapshot": "0af95f1adca8a1e746c5562451e4aa5ceedb1c562dd224a899a7835a697e2215"
+        },
+        {
+          "$snapshot": "a628748afbe255f1e17a49ad6dc99748cbcdcca5b2b9f277c99df680005c2c4c"
+        },
+        {
+          "$snapshot": "3d38207af64143f7a7b396d36a1e3695d29715961bf4ecabf8fb879c30164eba"
+        },
+        {
+          "$snapshot": "26711c045b6babec2ed1e09e51e49fb7e9b66fe2fc0f9f3b206139504c2c19d6"
+        },
+        {
+          "$snapshot": "cbdabd8316c215331f7a6fd039a97f9fc4e6454f881c1327d208b91bc6a2ece5"
+        },
+        {
+          "$snapshot": "f05884654d60aa127d6d56851a910d6c51b39c0cf7c350ddacc296d8774bdef5"
+        },
+        {
+          "$snapshot": "251dd0af35b908cd9b0c9c2c8a3420a92d3e78a459106e65b6af86b0d108319f"
+        },
+        {
+          "$snapshot": "9b04fe7bbd19c5e7afecbcabdf76b436c4f6638263ff0d4f08d21258f91236b7"
+        },
+        {
+          "$snapshot": "2bc0776288fd030d678b791a7c145f532344d016d6c0733a0342fbe4d64cb1db"
+        },
+        {
+          "$snapshot": "a916a145570478431f942268073bd334b39421de36ed119d902748b09a65ce3f"
+        },
+        {
+          "$snapshot": "d18724f8bfc7e842c5fd5c12b0c38c8a45257cbb0db0e3207bce3b8b8a5a209c"
+        },
+        {
+          "$snapshot": "eba0fd3c22162cb8547a8f62100f250cd4ff02ca89a8f5f04ea39129ef7999d7"
+        },
+        {
+          "$snapshot": "059b2302060dd91adc5487bf14b78a8aa18aa2a48c194faa66954df833555c76"
+        },
+        {
+          "$snapshot": "2a2d090ec79ee6f00e78b79cb5ae16131fdb4472decf08d4ac366a2d7c2988be"
+        },
+        {
+          "$snapshot": "4097660167c7ee7a4bd78c1e0af6a16b8a2a497633f5702c1e118763b34e3df6"
+        },
+        {
+          "$snapshot": "6b393c878a68d4bcdf2d158f03e48793deb446616e982f400c368aee6cc1692c"
+        },
+        {
+          "$snapshot": "2047205be1c1ba95df440714e5db504ddbbc353e4e7b238b2668adbfb2571275"
+        },
+        {
+          "$snapshot": "1d47eab636146a3f9145ba0e6975cbf89a816b9f66575ef27f8f51c459d79384"
+        },
+        {
+          "$snapshot": "2022bc965257738668fc2059ba6cf9b7e4a365082062e7ec72c4ff371b28afef"
+        },
+        {
+          "$snapshot": "19ea0c26885cc98b7597222a762fc1e974702643cc8c31e1bf99271b7702ca4b"
+        },
+        {
+          "$snapshot": "572e1f720aac06f2481e36186bff2a5891068d2b013bc638ef4deb7c58ebbea9"
+        },
+        {
+          "$snapshot": "23b2ae7e00fa4625769307aa7d662cebdffbe7a9d420bb005a48a4419e299487"
+        },
+        {
+          "$snapshot": "5db676756c7efc390cd7d606f64c124c35081a3331f2f0866171a059386ee54f"
+        },
+        {
+          "$snapshot": "d3f5f8bbed3cd2d43214092188058ccac7eb22ef75cf0a94dd428b38db2b7851"
+        },
+        {
+          "$snapshot": "60f223c6e68314709fdea77eb54fc38c887e946ef8d126c7cebc32f430e9ee84"
+        },
+        {
+          "$snapshot": "99d4c0cf185f5de8a5ab7826af807b32bbd8e8f92190da8e2539814758ef4f35"
+        },
+        {
+          "$snapshot": "d3262e57c982d71100f885e3d2788544cae5a2b1c697749bb927ce0a3fd84feb"
+        },
+        {
+          "$snapshot": "c8526519ff39d5770dd9f450e0f013798bef8314a0170076f41336fa16490470"
+        },
+        {
+          "$snapshot": "061942499d504d0812c65a76fdcee90507e530daa81afd484d76cc8700034ae9"
+        },
+        {
+          "$snapshot": "f30b68f969f9682eca2cae837c119ded9749343944f0e90c251c1176c5fbb413"
+        },
+        {
+          "$snapshot": "1f1315592bbfeda7d7d08d31698c21a12862532eac89282a432e7dfc63f5da9b"
+        },
+        {
+          "$snapshot": "4573396e161c9e373b428376c09e3463182e7e4980540b85ffbb52d9fbedae39"
+        },
+        {
+          "$snapshot": "f4f0989f11845596d4df65645505c03dc2d2c4a49b4a3942d9edb744b46b1ce7"
+        },
+        {
+          "$snapshot": "7e350a2c7b58078aa44ba8361b2476a48aa8bc75c3ef3e3c6fdc571b75a1d80c"
+        },
+        {
+          "$snapshot": "6db7cf7fac7496edd54514b77a5a06c8acb2e40d67c63bd04eaa9c8e610cac46"
+        },
+        {
+          "$snapshot": "88bbc349c6079c77f95696492cd42a899129abd66cfd490fd8230430df21b5b0"
+        },
+        {
+          "$snapshot": "092f9f609348fe854db9a43c982f085af095d9c4d85e59a6965c3cc290f77f6f"
+        },
+        {
+          "$snapshot": "71e1d1648bc432faee582057f198b946a0a861fff48b12bbcb7262c9847ec40f"
+        },
+        {
+          "$snapshot": "4f050cd267dad4dab9113a3c2becdce4bd79cd6cc9dd423a118b4251c194e9a4"
+        },
+        {
+          "$snapshot": "e615958d44aa1771f228574ad53a35fcb00fefc98ca1cd63b8a1e3b941b10d6b"
+        },
+        {
+          "$snapshot": "64ae6232f90668fcad8cac40dae3f083612c8f9929f1f7bb44c56171b210e9c2"
+        },
+        {
+          "$snapshot": "9ab189fc9dd4f67ff761bca141317f393b4c3045d0991faf049965a893e090c1"
+        },
+        {
+          "$snapshot": "323e6c9f4798a8bcabd0f8dac310dcebaba21422e2a9e16e7633a78cd9b5e4ef"
+        },
+        {
+          "$snapshot": "8775749c4f8527e02eb7a9b3354d1efdfe3296ac642c30bb6c5239f8afe49118"
+        },
+        {
+          "$snapshot": "d264ca41937f93a543c9389dab675db4b51e276b726fd990a462cb6d37af23be"
+        },
+        {
+          "$snapshot": "430035db6346071646a5ab14982821681d1fba83de75a9672dc3daf00b34bbb0"
+        },
+        {
+          "$snapshot": "af7ead8686313243a14729501ee56f1a5a35cb71aedc66df3bbd5cc3a8484070"
+        },
+        {
+          "$snapshot": "8eb14e89e9beb0825ce4fb2136e3a9ef74fd635676c81e90b5e61b8dce3ef8d5"
+        },
+        {
+          "$snapshot": "8d9baa2ee8adc63ba4ba15f5b8e4d93626b9c4d92f61953f2e65844db299850c"
+        },
+        {
+          "$snapshot": "3f104f4a1359c7cae1abba6e722b61837696b36af0a7fbac73b31c25b8a74916"
+        },
+        {
+          "$snapshot": "f0ba27e3ab0e303baa20cee5d40438ba4cfbb18fcc5a71a8a78ac00df8fdd5ef"
+        },
+        {
+          "$snapshot": "f51a876aaf827776c3b093735d7b5646b25688b7fd1f3909324f276d9a1fbd11"
+        },
+        {
+          "$snapshot": "7b63e855de61bfd89d35b992ebaf6e08bafad90eaecdd6eb8397b6f7d7b926ef"
+        },
+        {
+          "$snapshot": "a532b09009f559dc5ad7c6b2ea753071ef3bc459c0bf2343d23d0416f7c2ef59"
+        },
+        {
+          "$snapshot": "30fb7581ef187728a6a962dbcd2580eb99c44c11fef3483ca43b7ba0f86fe95e"
+        },
+        {
+          "$snapshot": "9667969f7e2b9a19d2918dbece35796d3f3ca85c24bec49c47bb76cbae6021d4"
+        },
+        {
+          "$snapshot": "8ad17f071f125793e793940210f40b9f8c13dd6c216e972911df644b97108626"
+        },
+        {
+          "$snapshot": "bb37cc0128a0387008c2455cc20814db06c346828a9c13b2067d874627177ae1"
+        },
+        {
+          "$snapshot": "1f9b4de13badab8c54c75092be78228f087b0136d6abe0b9da62571963b85bd5"
+        },
+        {
+          "$snapshot": "c523e9b1b066f27b6e89f74718016c30fff0557bb16e386296b142c98c91a34e"
+        },
+        {
+          "$snapshot": "7df905ac6ba368e60c426da4e91402ab4138312908c1de0588f3592369e342d4"
+        },
+        {
+          "$snapshot": "18e9e7d0d1161c1270fd861f84f1d230d818b8da76c462d423f8e7fe8c225dbb"
+        },
+        {
+          "$snapshot": "ee39424106771218d931e6866e9f7fb6897d6d12ada31b075d2aab8ad4d73d6a"
+        },
+        {
+          "$snapshot": "affbc2f35843fadb28f12356562280e75abdd95e7eaa2e9739d2e1480188d945"
+        },
+        {
+          "$snapshot": "38b995abe7acf4b48c33a41c775a9c9e3e1258c2d4752b02f9eb43ca5534daf3"
+        },
+        {
+          "$snapshot": "a41c8e40b1df0bb772b0b02f3ef5ff055397134361822fb9edf1d36188f91063"
+        },
+        {
+          "$snapshot": "9ede28d08916765e2b24d893d195850fb8cc49f06c28df936edf3cf688a4899e"
+        },
+        {
+          "$snapshot": "c452b530ce89a647eda56032234b7da9aae2c9d2638f3d9b669a0fb6745b3a8d"
+        },
+        {
+          "$snapshot": "fc509d5dbdf849131f20b45398bc9a472997f3cec711994fbbc24cc383f0be50"
+        },
+        {
+          "$snapshot": "1415868a2c0bf576ced4ffb5e425d0a78df2a8367eeb368619182969308bda88"
+        },
+        {
+          "$snapshot": "3f0960a81996d18cc8e3e11fcf945795c1331f42b205122b6093e0a1c2a7abf8"
+        },
+        {
+          "$snapshot": "cd8a29fb7ee8877e2b4101b8c27b14cab98d70c787676fa990f306bc34135877"
+        },
+        {
+          "$snapshot": "79a74158ffe939b8f8c67d2023cd2a18c4d110b13812a6c7d516fe205d1925b6"
+        },
+        {
+          "$snapshot": "90084819dad31e21a81afb96b37986997ea5e54c836cd9146f6f55d9ac5a52d9"
+        },
+        {
+          "$snapshot": "23812beaca438f150f068d4053bdfcd3524af022f698a672a927693551557085"
+        },
+        {
+          "$snapshot": "820ddb10374da1fd4241bd70312c742b6d72fb76a89bb82fa94e31c9fff1416a"
+        },
+        {
+          "$snapshot": "d87fadbc1bfe3ee082c6c2205ec27fd38559f1400ad2bb00b08484c3c3cba793"
+        },
+        {
+          "$snapshot": "864419e36e85199d5ad93352cb086188385349e50532d91dcd988270e0b09da5"
+        },
+        {
+          "$snapshot": "358b330a3fadca36c268ce24007f5f1b044717eb60f12dd09034d430ad9dc7bf"
+        },
+        {
+          "$snapshot": "5321b27430bdcffeb3fd9f4a7bb612b225eb6abf9244ff621065a5270b5b0bb4"
+        },
+        {
+          "$snapshot": "1bce519c7dd003218915f86456133ba62273073d818220e9c4c5e7b8cfb4f6ce"
+        },
+        {
+          "$snapshot": "5856e0de3e39f5890e01fe806899a4d9fb151b7f0494cf753b9c907050aa729d"
+        },
+        {
+          "$snapshot": "f5cf84974136ac0b2cc5808a09e3149dfb1f7e1b6e7285507e6364b3da8a1d2a"
+        },
+        {
+          "$snapshot": "c066f4641ba7a83e333d3ee9fc85ea0621035c7df44b586fa01a7cc35ea6e28f"
+        },
+        {
+          "$snapshot": "80d4d9e19be80b63ea4b037925920bdeefd68c66b0be00d9bc7b31e61a427029"
+        },
+        {
+          "$snapshot": "f812ce412dec40e534bd20002440abc57882788c37303f1756057478fe8cf70a"
+        },
+        {
+          "$snapshot": "de0fc1a3a5841c74e1f5a52f47a7600ef1105682fc0e0dea190393929e13f2cb"
+        },
+        {
+          "$snapshot": "eae6f01074195a471bb414ed106a29502fc997b764f8bab3e33f90ead1310f3c"
+        },
+        {
+          "$snapshot": "2284ca52e0c3fcdb4b26bd601b75b9600f00729f6e2f7ba252da5d68ac15b211"
+        },
+        {
+          "$snapshot": "30b00b082a9d78edddcc2c392e9dc00a29f6b93546606c68ec452238127501aa"
+        },
+        {
+          "$snapshot": "23cd7a265f883aaa824e8866e867a6ab71aac14230465611d6932f569b9ccc21"
+        },
+        {
+          "$snapshot": "7cc3f1fa66232a380a72e1465a3cf9bce964cf36cb8d466b39d5b4baa58761c2"
+        },
+        {
+          "$snapshot": "81d05fde45990dd057162838cb7a43258243455d80fdc2bb5286379add8d864a"
+        },
+        {
+          "$snapshot": "2246f09e6ad1454d1d03b648cfc514041bddb2f5a6d61985d7c6f4676e3d7ff8"
+        },
+        {
+          "$snapshot": "9c780133466caed75ff255e0669a4f6eae9ecb5bea72d21bce80c834dfc3fe6b"
+        },
+        {
+          "$snapshot": "abfa7fe2856ecff3fad113928d7bde3ff7e5539ca81460a57713169e0e0c96a2"
+        },
+        {
+          "$snapshot": "1fe62ad0a2a9c8279b7f550cacca361aa9e63d63f229225d66989fff8450f5ca"
+        },
+        {
+          "$snapshot": "c38935d18b18a2199e0189e345e3e0992c7c1ba5903c827a906a97a373507afb"
+        },
+        {
+          "$snapshot": "f5f7e009b4f9adbc2a1b978a1d0a14e40bc598716a4c45b58b35a0074025d049"
+        },
+        {
+          "$snapshot": "09f1d734b1571cc2d878098ff1144d6051df901d1c849d79afc6078fde00a29c"
+        },
+        {
+          "$snapshot": "7a1dcfec19dd34970523ef375aec7e2d95b9fc87cd4590146358d91d6757baf8"
+        },
+        {
+          "$snapshot": "8290bc9fd4904c9106cba4b10fa62543789fc416e2f95bbf56600e3871214038"
+        },
+        {
+          "$snapshot": "1762582fb36fb25ed4273f77a97abad6b8828ae5a1e59447540fb03bd57640df"
+        },
+        {
+          "$snapshot": "cd78c1706bd5e86dd4c2da80be0d0ac65138ddaa9c202dc07db53af5281b836b"
+        },
+        {
+          "$snapshot": "a4857e3305777896e8cae14dc57d14b37733123232384735340f410ca5858508"
+        },
+        {
+          "$snapshot": "9aef2dfc5cba9a9b5bf29ae995844bf10a08873a3bd5b2502aa6681f85986a92"
+        },
+        {
+          "$snapshot": "85fc5a2c9126eaeccf933078e888e79c88fa5f6973a4d5fd829370f9a0449a2f"
+        },
+        {
+          "$snapshot": "604d8dc53194f7b89b7d8a610cc8580a1c77d9d79920b9d4dbcee0b2e01c1ccc"
+        },
+        {
+          "$snapshot": "32429bb056917c0e8345cf6a01625e5b5261571b651813784360b92141b3443c"
+        },
+        {
+          "$snapshot": "5cf697429862898d4c35387b2999c6c6ce2976207a3286861e586b9564e4830b"
+        },
+        {
+          "$snapshot": "b7746f01143b7c50e1c4d767ed54ffe18e9b797f61e1d2b4f6a08e12ef494386"
+        },
+        {
+          "$snapshot": "344989f724f28fd6d12f4a379d0ea47df7a9ac2f0d16baff2885cad49869507e"
+        },
+        {
+          "$snapshot": "902ae97c83c407d75611c6caeb305a3addf3d8e93ce8ad84df3eaabe88401245"
+        },
+        {
+          "$snapshot": "9f0383e6f5507f2678009302cce73efbd592d3968bdebf5cf739657f90859ee0"
+        }
+      ]
+    },
+    "c28cbaa51a7812bd6a8b7c76eebe617719b5c487d54eeff8ac4b3eaec65f3297": {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": false,
+        "is_tool": null
+      },
+      "is_user_modified": true,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "0674dda3b8bbac8ca15564487533c4700644930eeeb765dfb6b76fca13023e59"
+        },
+        {
+          "$snapshot": "98f8e49e61e02c52d451f833bdccb4166f3ca9f4479b313cf56caf62a3055a24"
+        },
+        {
+          "$snapshot": "b5841cc5408d0d7651f3a46fd2b83fce623e654ea204f78ee22b05fd2c769509"
+        },
+        {
+          "$snapshot": "8d07c37b23a1e2142d0830abd7a2055cc71b84d271723a100ce517b76ed8b245"
+        },
+        {
+          "$snapshot": "bc278ab29e49b4c2578540f644f27e9c154fdb343dbf5b6c81936476d59795b3"
+        },
+        {
+          "$snapshot": "52603e562b38377726a0d90e4a09952c3db0e7249c8135c1b54d0e6d0c98f15a"
+        },
+        {
+          "$snapshot": "14cde5696c0c696ecc49df649c809b1b3b965c0baea2b429c782dbc6e932a0ef"
+        },
+        {
+          "$snapshot": "6c4d7d38871aedbe17b8f4134157be1adb41b91cc7e16b518ca0f719014a87a5"
+        },
+        {
+          "$snapshot": "50b7efd4ad3ce164c9a7f802d83802697f71fe6f9097cb82149101f7a4ba665a"
+        },
+        {
+          "$snapshot": "fccb3b63e2540e88ba1d11987a0426495648891815261d7dd744870773934c92"
+        },
+        {
+          "$snapshot": "367d6e6055092d405f5e69622a5589cec5ae32695116b84e141741cf32cb4d48"
+        },
+        {
+          "$snapshot": "e07a7a5030a7ebefde43c95a8e50c83d224b921dbbe2dcd6a63856f53c2d02d2"
+        },
+        {
+          "$snapshot": "caad220c8e59fe80cf3569896614f2dd541a92225e96b5a11a20b976b5ba5b1a"
+        },
+        {
+          "$snapshot": "362dc807df42e5b6b68230bfef31688c893c88a6122e22a99991dc91cb3f6075"
+        },
+        {
+          "$snapshot": "784a2f280fdc581374dac50d707d07fbf4e4ff1c70b877b8af6cc1860cfe27d1"
+        },
+        {
+          "$snapshot": "3c0f70385b9ce0b6d112fc2c8f6dc0bb73010a7fc0b9458f75905fecb57a06d5"
+        },
+        {
+          "$snapshot": "201f1f10bf7aea59dc82667ea6ea4ddab5f33de8899b415b9552ed1765b1aab4"
+        },
+        {
+          "$snapshot": "a8ec50094a4217b2c6278f8c6797bbad89b5630d7deb6c6f96e0b2b44656e022"
+        },
+        {
+          "$snapshot": "ecd0653b2d4b224b7d96cfe12a689a696e019e345154dabccf58452fea8d6931"
+        },
+        {
+          "$snapshot": "f81d52643a5f46c8110ee0d9f99731cad5a667e554dc5b70a5bc00da10f99b2a"
+        },
+        {
+          "$snapshot": "4eefe7d5b80e216019c608d3bcd6a3cbd65d10ade44360bbe77a21e4d984cc2b"
+        },
+        {
+          "$snapshot": "cc51eb55293e0c3e354c7e5ecbc4a5113da7c613f99aaf92e8684180b06fb0d6"
+        },
+        {
+          "$snapshot": "694c02d984c111cb0109cca418430456d4cb14c50830e1192122bd4c7e5b2cd5"
+        },
+        {
+          "$snapshot": "7aa3fc565b7e09d8dd8e5a10d73bd98affe4f56e362a91091bdc101b6a501a76"
+        },
+        {
+          "$snapshot": "059b2302060dd91adc5487bf14b78a8aa18aa2a48c194faa66954df833555c76"
+        },
+        {
+          "$snapshot": "6b393c878a68d4bcdf2d158f03e48793deb446616e982f400c368aee6cc1692c"
+        },
+        {
+          "$snapshot": "d6681302edc820459be0bdd48b5219479eeffb4aacfc2a1adfaf78728508dff5"
+        },
+        {
+          "$snapshot": "ed6eb7f7e7bf9b2ab58caba0a1dcc95a8385494bd0c6e6b129afda9cb0ce3146"
+        },
+        {
+          "$snapshot": "a9c723d3fe7c0fcb8aca501132b89b879a49a1ed7ee4ee66e85dd9d0e9210df1"
+        },
+        {
+          "$snapshot": "bdebb55d3af1048ca01c7527ec341992509b03a0a5d7f255292dd2c1abd5344b"
+        },
+        {
+          "$snapshot": "cffc94a0ed98cbda2e5199d348b5bc683cb110be3933f307b7157ad8951385fe"
+        },
+        {
+          "$snapshot": "eb1e5054c76ae6271e16416d70c7577dcbc9313133ee1039b25ae7eca966ed50"
+        },
+        {
+          "$snapshot": "500ace928151456f92a4611e4063d9be340bd80854965974e5f78b572577980a"
+        },
+        {
+          "$snapshot": "79be18b4b046dbb8f6842695ad1c7a2af5530e70919793d0f4dd7a87df677a65"
+        },
+        {
+          "$snapshot": "a1d7ae6380d1d7952f596612a0cf33e5d9266eac5a51e77468fef36e626604df"
+        },
+        {
+          "$snapshot": "2d38e4015771f1477d0802ff8cfa20a1418e84d3efd319d308a5094d7807b6bc"
+        },
+        {
+          "$snapshot": "69adaf1abbfe01d164e40e28f49c5eb9f2be5b312aa07e97c77b8a8b33aa0064"
+        },
+        {
+          "$snapshot": "e848c1b958d1634057200b42764f37d81e69ac45e3e3c5ca4cb524a828af438c"
+        },
+        {
+          "$snapshot": "bf06789ed3d8ed0053cbb28872f4cd73b48f044ad7d9a20f7f1c01a4cf6ed401"
+        },
+        {
+          "$snapshot": "9242d636cc57f367291b4b0db8f0a9b44143073d7b62d48b6cf1ac7f9a8f203b"
+        },
+        {
+          "$snapshot": "05bcd3d1b1b7535cd65252d0a14ae71f77a029dd66447739fa90b11ab8d4f5bb"
+        },
+        {
+          "$snapshot": "5e7a525130c3a59057063a33520fef2d8aed7e1ad7e1ec0cb186c1708c1ce566"
+        },
+        {
+          "$snapshot": "327622e470c4ed7d732fd2af2ab1f582984a31feb2204c00b73db5ec5c9b37fb"
+        },
+        {
+          "$snapshot": "97297faef43f7361192fe806794b96e15524d9db6416c8571cbbf2a017cfc8b2"
+        },
+        {
+          "$snapshot": "a73632a2db9060fe92755d6ab0e3cb5987f251e1faae83a1cc2ca674de359502"
+        },
+        {
+          "$snapshot": "4b7b6255b9e354d508b05c50c047f69a5c8552e8f5f9e46413391f9e7b38808d"
+        },
+        {
+          "$snapshot": "2855f64bc0e08314ab95847dc2c50b1b3d7c42e9d13a1b3dc239de351a283d7a"
+        },
+        {
+          "$snapshot": "940460be583e8ff20e2223dcbf864708334285d3ea9c663bf6484b8318ec85ec"
+        },
+        {
+          "$snapshot": "fe1c6f095af599d33bc32f323d6d686bfa3918ab397e06b89c1e347aa3193e94"
+        },
+        {
+          "$snapshot": "19b061372f69e24ec8c58cea4284464c69e20b8efcaae5f654ac1b6cd631bd6d"
+        },
+        {
+          "$snapshot": "a21d88da4a314f86463a3eb0c275341171c5a550e8bd0f2c9a032de5d89a4c43"
+        },
+        {
+          "$snapshot": "a559937b9d22182a28423e349c100f579411efa01fa7ba35dfa9cc411d9d01d4"
+        },
+        {
+          "$snapshot": "de1997c83751aed52951dd981e35ba05b6305bd57cd66dfce2c6e0e66c512929"
+        },
+        {
+          "$snapshot": "f29fc77b1536b2c754186953a59c6000f60263f6079b55f4893ee7741274d787"
+        },
+        {
+          "$snapshot": "8af1ffa356b880c4dae5bc4309e508bb0ba0aaaa510bbf92f8cbef9b79be60e0"
+        },
+        {
+          "$snapshot": "18fa83a6fe91d9a91cfcb97c45e8489b1b78dfdfb6793700dd195e85e5be1e94"
+        },
+        {
+          "$snapshot": "9667969f7e2b9a19d2918dbece35796d3f3ca85c24bec49c47bb76cbae6021d4"
+        },
+        {
+          "$snapshot": "276780ea63e5ee6c5da86b8b8007eadcc72b354cb2d89f73a8bb08e05fc037bc"
+        },
+        {
+          "$snapshot": "63f37b4a727fde9c73b321a3be8c7fa0018b57ddac80732ead25a326431992c7"
+        },
+        {
+          "$snapshot": "0d9a2943919793eb8138d2b455b4a1ffaad031b1d566e9d680c9c9ca4297f679"
+        },
+        {
+          "$snapshot": "69fdfd165129244e2696761589e1544bbfbbf5e158e7ac015cb545125ed88ed0"
+        },
+        {
+          "$snapshot": "d22d0ba189ae4d4436af8b8cc183593a1ae126af6bccb5520fe4d43cc35c8c00"
+        },
+        {
+          "$snapshot": "063d83f8e68e35c378109e1852c3e345d5f7d41ee1f7430440ea2352988df7a1"
+        },
+        {
+          "$snapshot": "073226a0e36caf43fed085c81dbcfd866efca9a9a2a3e56127d16fb23807d3dc"
+        },
+        {
+          "$snapshot": "2610dbe8e983e3c028e6e7d68ece6f25f7ec2e2b25d001418af9e39419134dd3"
+        },
+        {
+          "$snapshot": "5deeda44f3c723b9a1183bd76d4e9835f71f6bf41f578fdd6299fe7e242549e5"
+        },
+        {
+          "$snapshot": "a7f253cd5834cfcd28b6923d1561cd2344188418acc7a6b14f844ddadf4ac0a4"
+        },
+        {
+          "$snapshot": "00fe1df63a6186b467efaace30c0df0c5606f9d7c8c945cee7ecb1b4dbc476de"
+        },
+        {
+          "$snapshot": "cbfdd109fa346bbfdddefe4269181de5972f8c31cf96b1cad4329dd2c58a23ac"
+        },
+        {
+          "$snapshot": "775bfc87194068693feda63cb251ac7c71a91d2d62a2147e6ac1159fe3060a39"
+        },
+        {
+          "$snapshot": "6e1e31525b50704e311b74af8ec6cd33c93a7c64954ebb3d1c3c8b706594d70d"
+        },
+        {
+          "$snapshot": "97b3ae816607715f8826953d0dbeeab6a84377f5f35b1939f8f6aa03e0099c33"
+        },
+        {
+          "$snapshot": "eb35276a68e11896455ca9c9fef35321eac9e23b35c38d1e4c4140a2d0b1c2ed"
+        },
+        {
+          "$snapshot": "949386bcb711c432856c1dd502f09e7fcb812d558a2bf902a9f676c8fadfa5cd"
+        },
+        {
+          "$snapshot": "6947e4f36dce1320c39ff1c2250693de42b6a6303d5e02bc689f9d1bc939aa4b"
+        },
+        {
+          "$snapshot": "ec6cf354993a34d83a7cf5fa9db0fb760eb0983d8c0efbaebffb4c70f9ed2f66"
+        },
+        {
+          "$snapshot": "173275f120d207f2174a745f1cb054cd70020d91fe7374cbba3371c338adf191"
+        },
+        {
+          "$snapshot": "a962c396579384d09ed3dd86f404420f628df79c6678d994ef58cb387bf6f5de"
+        },
+        {
+          "$snapshot": "9e4fabc953c454ec640d1fe6631e1e9e121efbc390f407684e3bb9d5307dd9d3"
+        },
+        {
+          "$snapshot": "846acda0470bc85d6bde3596f1a93597d6fa7edd7067b768fd1c36f1cddb3523"
+        },
+        {
+          "$snapshot": "54b1b59f9ff5b1366bd5c82e33ffefed67535a3c9ae281f51edbd73a3cecb12d"
+        },
+        {
+          "$snapshot": "b7ad2c8c3009606b12936ed5f9bb90baf96256f6b56dd5a0a34639181de1b782"
+        },
+        {
+          "$snapshot": "c644e1b9f3ded7003e680e62ef2acae5cfaaa7fb89eee644739edb66fb1bf498"
+        },
+        {
+          "$snapshot": "053dcfedd800e48b16cba8d8331d8a7af2ecae2481c916fbb819eba38646fd26"
+        },
+        {
+          "$snapshot": "d0d2e813f1e6fd7456e606ebcaf34d888bff3ae5c5074dc614f464b0f33f7411"
+        },
+        {
+          "$snapshot": "1d4ed43e1a3655a0358f0c1bcd16216737fff21e776d95c0bd25443b57c4e478"
+        },
+        {
+          "$snapshot": "d72bf9ab713451759f5a49d7e5d3c17d31201426b8d614af89657f1b09e30978"
+        },
+        {
+          "$snapshot": "71735f9db306e9494a7f613494cd5c115c07542771610cc904e35dea9846a091"
+        },
+        {
+          "$snapshot": "0c7140352d332753552a0cb324bd66cc5e5e76029c375183580379c68704df26"
+        },
+        {
+          "$snapshot": "026c1effdb0029d4a63c05af2cf0c37c6376260688e40397ea462a639cf416d1"
+        },
+        {
+          "$snapshot": "d3dac952d5ecda753a02a62c7bc14c538f80d534452257bf7d8ed76e39360d47"
+        },
+        {
+          "$snapshot": "d8a121e8b4a3b150c10bfd073b6309a41afb8182d197f7802868e39010c798cb"
+        },
+        {
+          "$snapshot": "b2793da68a9644f406ec7e6e869b5c2b2cdac5729dce0f899ed85d83b9c4e1a3"
+        },
+        {
+          "$snapshot": "137bfd62905982bcebe7e43320062ebb0283b1653c3f1087adfb2bbd8779118f"
+        },
+        {
+          "$snapshot": "bafd6e9a6721b9b1ca682402d8a08e1ad38ef63a42d4b41181b950ba064c2b4f"
+        },
+        {
+          "$snapshot": "c9017b3c21f1a0d775ee5a581c747b8b4c80ee326825fa6b973b5318becda462"
+        },
+        {
+          "$snapshot": "e46ca013660098abd57df884e093d387f335237f30f89a19751fdeac184b762a"
+        },
+        {
+          "$snapshot": "799edaed670fe9f27f759c620427344181ea8d78454beefc53c84fdc9aae53e8"
+        },
+        {
+          "$snapshot": "68b3fd0ab82b972fe1d97b64fbab14eb9f05646655ad54f62cc81e4e34d84738"
+        },
+        {
+          "$snapshot": "e338d08c17a040398e8265774d0b13502e4b601cde8219e251fcd87894772485"
+        },
+        {
+          "$snapshot": "8de92ce1b87b9dbde4a0ea0b33375d4da7bf1b112d00c882379bfbad6bc409c5"
+        },
+        {
+          "$snapshot": "1ead6e7478a896e0a4d58c1c4d08de44a334a4bbffc89bb15dd6bf3b313ed0c3"
+        },
+        {
+          "$snapshot": "8251dad1299f6335a16480c94faaac147e096ef5a2e81bf408ea2a77fd516581"
+        },
+        {
+          "$snapshot": "ec4bb4f9a0b2e569a43191837dcc697c74d67f85d7c124c41285a8752bdef97c"
+        },
+        {
+          "$snapshot": "a4b5af9c3393c71914340c75dda29ee3d548366384535b5191957b439b86147a"
+        },
+        {
+          "$snapshot": "61e9977f08e4c3b571769d0f8467739e4d4c39521bc72b30b22e411f633a614b"
+        },
+        {
+          "$snapshot": "a155536e50215239f1e205daacc198b277330a00661f21540f62d885f641a912"
+        },
+        {
+          "$snapshot": "96a8ca9343c1a2556ff2f3dd40e6db746dc063ed070d7d57873686c3252ed492"
+        },
+        {
+          "$snapshot": "85e5a9603ce19fd21bb96bc94aa6d1e4ef6d45a39b56d6d9065879584ec43463"
+        },
+        {
+          "$snapshot": "acb66d31532a87b3509f3a5b99fdf5a77a435dcd39b67f88982c30fa64fd0d2d"
+        },
+        {
+          "$snapshot": "bdc07f7b958760aefe6bbf8fe1361c861602b1054efbf68ef27c45aa43a61f47"
+        },
+        {
+          "$snapshot": "1e739d349568ad8d5a82672a46d20e75525497555b06e1d29de84bd6a3940dd9"
+        },
+        {
+          "$snapshot": "23100a24ec20a3de009fe54e45ade15e9c248b3a0bbef62986c3c273738e9aa5"
+        },
+        {
+          "$snapshot": "ad30ebac67965eaad9abcbbaa282003ca9b42b251993f4e23e8298aa187180c3"
+        },
+        {
+          "$snapshot": "5c56456f37009085bd3e265f272c65237ff5376d31147a342a78b880a03f0ac5"
+        }
+      ]
+    },
+    "612a36a7f6c67c675c511fabf9f0cdca13121f6d934bad67f053ea57b8e8b9d1": {
+      "scope": {
+        "name": "Window",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": false,
+        "is_tool": null
+      },
+      "is_user_modified": false,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "0a8b53a9b952f0c6e57bbbdf97477ff204a3005a15d16fdb25547b83307ae039"
+        },
+        {
+          "$snapshot": "61dfcf2442edbcf69cf0fafcf06147e2c0e1affa4398de094637285196ac6b2e"
+        },
+        {
+          "$snapshot": "34fb646260bdd2173e2a72301f08b855a0149949a2ac7d357c083c17eaf2b614"
+        },
+        {
+          "$snapshot": "32feb387a866f128c33d614503c8219e6fe3f57b66005f67164546b6288281d3"
+        },
+        {
+          "$snapshot": "5daea3bffc427078145256ed421ce6f72bc04852813f6ace964622c9afca84ed"
+        },
+        {
+          "$snapshot": "ab51347131436899a64301b0d695171009552c0f410a5fc51d027e4d37ad0ff0"
+        },
+        {
+          "$snapshot": "3d9a1f13c7d9ca8da7bd44c3fbb15876fe590d682d0bfe0a11e071a0b59792b3"
+        },
+        {
+          "$snapshot": "4d17bf320dbd216f934727e938ecb107d4f578a80ed2df1b79cd2aeca2bf5381"
+        },
+        {
+          "$snapshot": "60a0718dd496d773e45b6632d8dd74eecd305e30d6a3d37dca2685043b1fe02d"
+        },
+        {
+          "$snapshot": "9f38d9f92a0ad3fb1a418637565a7b443ddc266925446159cb774e86d9346ee4"
+        },
+        {
+          "$snapshot": "70fd1bcb8ee15746246f492e9438ae7f349c362b5a461ae694123ef154197b03"
+        },
+        {
+          "$snapshot": "0694cd72dcd4d44e8bf526f125de799c4eeb03527b1ba42280eb4b5267c1dda2"
+        },
+        {
+          "$snapshot": "224dd3f9faaeeade3b5a25d0a3670b9224bb3f882a956ec286e2133c9584e160"
+        }
+      ]
+    },
+    "113f10574562a2af405aaad6e3f1c846d36cd63caad6a828ec21fc12a90ee807": {
+      "target": "wm.category03_subtract_control",
+      "event": {
+        "type": "F23",
+        "value": "PRESS",
+        "any": false,
+        "shift": 1,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 1,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": false,
+        "map_type": "KEYBOARD"
+      },
+      "active": true,
+      "properties": {},
+      "read_issues": {},
+      "is_user_defined": false,
+      "is_user_modified": false,
+      "blender_id": 58
+    },
+    "b36d5067bffb91b72a03ca2fa8ea089d0b0d37bedd97aac0ff5c4cf4e0228d7a": {
+      "scope": {
+        "name": "Window",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": false,
+        "is_tool": null
+      },
+      "is_user_modified": true,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "113f10574562a2af405aaad6e3f1c846d36cd63caad6a828ec21fc12a90ee807"
+        },
+        {
+          "$snapshot": "4322406aea1c076f4b5436822bd5959cee9625e3200316ee793da0ce16aab4ae"
+        },
+        {
+          "$snapshot": "fb7727c6e78d1b18f577a51ed2774470d17ba5ebf0ec72cd876b2791aee8812f"
+        },
+        {
+          "$snapshot": "70aeea3abf5484f16b660ea7a73eee8748b5f7c202bb4f4b918a9298bbd2b0aa"
+        },
+        {
+          "$snapshot": "8760102e11e2b4c9fd8dc6a911b3b23243455737bc0a367a53a18fb752dbde2c"
+        },
+        {
+          "$snapshot": "8a54bea66f7bde8cb5d83424735a2aee01074fae23858e48cc2f28d14b2011c0"
+        },
+        {
+          "$snapshot": "cde77ab81db78da582674b5fb8cdbb1b481bc16eca78c60b05bec1f295f0b07a"
+        },
+        {
+          "$snapshot": "ab99b1d7eecde04b43a175349b07eee9c7618971423014ce6fab31b8816e2994"
+        },
+        {
+          "$snapshot": "1a6a559b4611b8fca6891efa423a5c80eb83eb8930e7cf43f53c381fb466a658"
+        },
+        {
+          "$snapshot": "39a1f0820c75981c652b0aeff6d640429b6bda908e0df651672e8121a36fc4f8"
+        },
+        {
+          "$snapshot": "8073cfd65c98f695b7a8813807b0572f5547959103e85e74c309f2775cffc2d2"
+        },
+        {
+          "$snapshot": "01577e4332c0818e36a27cf6fa96f0939777028684f45a2eed46d9fae75e55f8"
+        },
+        {
+          "$snapshot": "5de9a127892b5a3ae87d8b1ddce9da781822da029175bee3bc1cd0ddd6adeba3"
+        },
+        {
+          "$snapshot": "c70489459965b211175a385f777f02d130652f3ba06826b21e6348f737ce3277"
+        },
+        {
+          "$snapshot": "2646517b65c7d6cc801796af7501aad11c146289b23bec4109b893243a1ecae8"
+        },
+        {
+          "$snapshot": "c88aede96a236b11212439ae7d506f9f7a0acd670831c0ae0ec86bb81bf86b31"
+        },
+        {
+          "$snapshot": "8e23d9cdf65d8e46166d82c291078e17b3410c9fb4d128870efa0f2bc80adf24"
+        },
+        {
+          "$snapshot": "baf81911e6cbabf4460108e0cff34af64dd7aece06f589c782794d6efb37253b"
+        },
+        {
+          "$snapshot": "2def73299c8ae453f1331019167d34d22110fb334851942d6212bd386ee406b3"
+        },
+        {
+          "$snapshot": "869418b1a12cc375b416c6bbbd1e8086a038336eacb16cf5ea3e20e1c31e3419"
+        },
+        {
+          "$snapshot": "529fc35dfa4dd08dad087d7ca04f87fefcdc2ed4d02658398be18b3fb96fc04d"
+        },
+        {
+          "$snapshot": "62ab7afde345d311ca317ee1e66cdbafd768912f14d3eddd9301072629c0479d"
+        },
+        {
+          "$snapshot": "57e5f9527bad9a4642fdb317d7de61009bd81143c1db3dc1e83eccefa0b71264"
+        },
+        {
+          "$snapshot": "2fa6cf1e6a7826d9114f00f094affea336fbbdfc91ee5fc8e1850135f1446506"
+        },
+        {
+          "$snapshot": "87964302462a0f9eec6c986bb8293b53ad3e920f67aaa4e20978b455cd61931e"
+        },
+        {
+          "$snapshot": "0a7d6cacddefa709af9f60ccbfccdf05120089ea9254be86c0d13f80fc9f645f"
+        },
+        {
+          "$snapshot": "6287bb7be8aa756ad0fcc99af7fbda9bef9acc123916f66cf15e0e70ffe0b476"
+        },
+        {
+          "$snapshot": "4fe9b84fd16e2e6008fd289d28f5bf0c4f1af34bfae26a75b3353d1ab45475b9"
+        },
+        {
+          "$snapshot": "bede60519371674aafc7fd16437270c4ef4d51d70cb480840892fadb78fd7304"
+        },
+        {
+          "$snapshot": "252d90e8b73c7f9e54cf2dc33d5b5581645fee5b172d21681073340b5afb2249"
+        },
+        {
+          "$snapshot": "4a4d93d49ca704a61978988f9716026b47daac95e6a35229faae207d0d68ac8f"
+        },
+        {
+          "$snapshot": "ae425d49bd8a0cdf1e98ac6486e84c2aa8ecb11181343d097281546b5a73caa8"
+        },
+        {
+          "$snapshot": "2790e26b2f1b5bf6d7d5211c3582813709a45f519986e5cbc46e1140fb4b6e2f"
+        },
+        {
+          "$snapshot": "da2a3d682250fb3bf1a3c1881e1de32a228b50a461cdfc2b80e9c3c0ff272d88"
+        },
+        {
+          "$snapshot": "79f30d17cec50b4d641722543b997c067160793ed530ad817f38c612c30b5269"
+        },
+        {
+          "$snapshot": "d07f8d77a5bb28da3cf2ec2be287661b18342a781c942572ffd308002c33a83c"
+        },
+        {
+          "$snapshot": "50f1c7b342368dafe00cc38e1efabbb779464d0ac648e5aa36e00bcc2407ec1a"
+        },
+        {
+          "$snapshot": "8d16f3eb392d0a7819b7718cc9a2b1165f86115760f07fd7a133cfcaf4373733"
+        },
+        {
+          "$snapshot": "c783037fea720f5be0944925a90f3334a1bd4aa1d237829f59e25985ef8ea99a"
+        },
+        {
+          "$snapshot": "b3745cf7c967120554069d0b751ab1d7b123b2c7f22b05e74478613d7eb896d2"
+        },
+        {
+          "$snapshot": "4b3bb2776468531fbcf08564b76779785920d6ecd3af7d0ec8dacc09c92c4352"
+        },
+        {
+          "$snapshot": "98720523823d41472a1bf7707f676ed8be62114cc27961fb66c64966b0766285"
+        },
+        {
+          "$snapshot": "650abfa5fe7c52d83640670a0a3c3921c4fedfabab9b5f50752a13d2232e1b4b"
+        },
+        {
+          "$snapshot": "c66da2bd9b7468008503b8fccd8c08c071bb5783a1142012f446f8c42ade638b"
+        },
+        {
+          "$snapshot": "faa01a540cdee9eb0fcdc258e6597385cc4447ecabd93dfe92341562fbaffdbe"
+        },
+        {
+          "$snapshot": "6a2b4d966a259216090287a32ae06c2e3ba685837b9170e85c88a20ee65eb58d"
+        },
+        {
+          "$snapshot": "a37e403db45e39f61ccf991338fb2ff730e570e5aa337844c1866a97d2383529"
+        },
+        {
+          "$snapshot": "97991502a46d20ed0c29ae23f86aa188527c639011310e9958766ff769e0178b"
+        }
+      ]
+    },
+    "8951dda0253afd2318941b48d193548556b74064ee15274698fcc1a63644be2c": {
+      "scope": {
+        "name": "Window",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": false,
+        "is_tool": null
+      },
+      "is_user_modified": false,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "0a8b53a9b952f0c6e57bbbdf97477ff204a3005a15d16fdb25547b83307ae039"
+        },
+        {
+          "$snapshot": "61dfcf2442edbcf69cf0fafcf06147e2c0e1affa4398de094637285196ac6b2e"
+        },
+        {
+          "$snapshot": "34fb646260bdd2173e2a72301f08b855a0149949a2ac7d357c083c17eaf2b614"
+        },
+        {
+          "$snapshot": "32feb387a866f128c33d614503c8219e6fe3f57b66005f67164546b6288281d3"
+        },
+        {
+          "$snapshot": "5daea3bffc427078145256ed421ce6f72bc04852813f6ace964622c9afca84ed"
+        },
+        {
+          "$snapshot": "ab51347131436899a64301b0d695171009552c0f410a5fc51d027e4d37ad0ff0"
+        },
+        {
+          "$snapshot": "3d9a1f13c7d9ca8da7bd44c3fbb15876fe590d682d0bfe0a11e071a0b59792b3"
+        },
+        {
+          "$snapshot": "4d17bf320dbd216f934727e938ecb107d4f578a80ed2df1b79cd2aeca2bf5381"
+        },
+        {
+          "$snapshot": "60a0718dd496d773e45b6632d8dd74eecd305e30d6a3d37dca2685043b1fe02d"
+        },
+        {
+          "$snapshot": "9f38d9f92a0ad3fb1a418637565a7b443ddc266925446159cb774e86d9346ee4"
+        },
+        {
+          "$snapshot": "70fd1bcb8ee15746246f492e9438ae7f349c362b5a461ae694123ef154197b03"
+        },
+        {
+          "$snapshot": "0694cd72dcd4d44e8bf526f125de799c4eeb03527b1ba42280eb4b5267c1dda2"
+        },
+        {
+          "$snapshot": "aaaa454ab51d480a5f7269b89985d496f73e5d89448bdbcf995e41125a7f9c23"
+        }
+      ]
+    },
+    "96baa009266a22f1659f2dffbd028fc7c477f8637872980f2140b7afc7bd3a8a": {
+      "scope": {
+        "name": "Window",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": false,
+        "is_tool": null
+      },
+      "is_user_modified": true,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "113f10574562a2af405aaad6e3f1c846d36cd63caad6a828ec21fc12a90ee807"
+        },
+        {
+          "$snapshot": "4322406aea1c076f4b5436822bd5959cee9625e3200316ee793da0ce16aab4ae"
+        },
+        {
+          "$snapshot": "fb7727c6e78d1b18f577a51ed2774470d17ba5ebf0ec72cd876b2791aee8812f"
+        },
+        {
+          "$snapshot": "70aeea3abf5484f16b660ea7a73eee8748b5f7c202bb4f4b918a9298bbd2b0aa"
+        },
+        {
+          "$snapshot": "8760102e11e2b4c9fd8dc6a911b3b23243455737bc0a367a53a18fb752dbde2c"
+        },
+        {
+          "$snapshot": "8a54bea66f7bde8cb5d83424735a2aee01074fae23858e48cc2f28d14b2011c0"
+        },
+        {
+          "$snapshot": "cde77ab81db78da582674b5fb8cdbb1b481bc16eca78c60b05bec1f295f0b07a"
+        },
+        {
+          "$snapshot": "ab99b1d7eecde04b43a175349b07eee9c7618971423014ce6fab31b8816e2994"
+        },
+        {
+          "$snapshot": "1a6a559b4611b8fca6891efa423a5c80eb83eb8930e7cf43f53c381fb466a658"
+        },
+        {
+          "$snapshot": "39a1f0820c75981c652b0aeff6d640429b6bda908e0df651672e8121a36fc4f8"
+        },
+        {
+          "$snapshot": "8073cfd65c98f695b7a8813807b0572f5547959103e85e74c309f2775cffc2d2"
+        },
+        {
+          "$snapshot": "01577e4332c0818e36a27cf6fa96f0939777028684f45a2eed46d9fae75e55f8"
+        },
+        {
+          "$snapshot": "5de9a127892b5a3ae87d8b1ddce9da781822da029175bee3bc1cd0ddd6adeba3"
+        },
+        {
+          "$snapshot": "c70489459965b211175a385f777f02d130652f3ba06826b21e6348f737ce3277"
+        },
+        {
+          "$snapshot": "5ab99e834a834b24bde2057d34b721057deedd693fdd9c0cb5dacd6670bd435e"
+        },
+        {
+          "$snapshot": "c88aede96a236b11212439ae7d506f9f7a0acd670831c0ae0ec86bb81bf86b31"
+        },
+        {
+          "$snapshot": "8e23d9cdf65d8e46166d82c291078e17b3410c9fb4d128870efa0f2bc80adf24"
+        },
+        {
+          "$snapshot": "baf81911e6cbabf4460108e0cff34af64dd7aece06f589c782794d6efb37253b"
+        },
+        {
+          "$snapshot": "2def73299c8ae453f1331019167d34d22110fb334851942d6212bd386ee406b3"
+        },
+        {
+          "$snapshot": "869418b1a12cc375b416c6bbbd1e8086a038336eacb16cf5ea3e20e1c31e3419"
+        },
+        {
+          "$snapshot": "529fc35dfa4dd08dad087d7ca04f87fefcdc2ed4d02658398be18b3fb96fc04d"
+        },
+        {
+          "$snapshot": "62ab7afde345d311ca317ee1e66cdbafd768912f14d3eddd9301072629c0479d"
+        },
+        {
+          "$snapshot": "57e5f9527bad9a4642fdb317d7de61009bd81143c1db3dc1e83eccefa0b71264"
+        },
+        {
+          "$snapshot": "2fa6cf1e6a7826d9114f00f094affea336fbbdfc91ee5fc8e1850135f1446506"
+        },
+        {
+          "$snapshot": "87964302462a0f9eec6c986bb8293b53ad3e920f67aaa4e20978b455cd61931e"
+        },
+        {
+          "$snapshot": "0a7d6cacddefa709af9f60ccbfccdf05120089ea9254be86c0d13f80fc9f645f"
+        },
+        {
+          "$snapshot": "6287bb7be8aa756ad0fcc99af7fbda9bef9acc123916f66cf15e0e70ffe0b476"
+        },
+        {
+          "$snapshot": "4fe9b84fd16e2e6008fd289d28f5bf0c4f1af34bfae26a75b3353d1ab45475b9"
+        },
+        {
+          "$snapshot": "bede60519371674aafc7fd16437270c4ef4d51d70cb480840892fadb78fd7304"
+        },
+        {
+          "$snapshot": "252d90e8b73c7f9e54cf2dc33d5b5581645fee5b172d21681073340b5afb2249"
+        },
+        {
+          "$snapshot": "4a4d93d49ca704a61978988f9716026b47daac95e6a35229faae207d0d68ac8f"
+        },
+        {
+          "$snapshot": "ae425d49bd8a0cdf1e98ac6486e84c2aa8ecb11181343d097281546b5a73caa8"
+        },
+        {
+          "$snapshot": "2790e26b2f1b5bf6d7d5211c3582813709a45f519986e5cbc46e1140fb4b6e2f"
+        },
+        {
+          "$snapshot": "da2a3d682250fb3bf1a3c1881e1de32a228b50a461cdfc2b80e9c3c0ff272d88"
+        },
+        {
+          "$snapshot": "79f30d17cec50b4d641722543b997c067160793ed530ad817f38c612c30b5269"
+        },
+        {
+          "$snapshot": "d07f8d77a5bb28da3cf2ec2be287661b18342a781c942572ffd308002c33a83c"
+        },
+        {
+          "$snapshot": "50f1c7b342368dafe00cc38e1efabbb779464d0ac648e5aa36e00bcc2407ec1a"
+        },
+        {
+          "$snapshot": "8d16f3eb392d0a7819b7718cc9a2b1165f86115760f07fd7a133cfcaf4373733"
+        },
+        {
+          "$snapshot": "c783037fea720f5be0944925a90f3334a1bd4aa1d237829f59e25985ef8ea99a"
+        },
+        {
+          "$snapshot": "b3745cf7c967120554069d0b751ab1d7b123b2c7f22b05e74478613d7eb896d2"
+        },
+        {
+          "$snapshot": "4b3bb2776468531fbcf08564b76779785920d6ecd3af7d0ec8dacc09c92c4352"
+        },
+        {
+          "$snapshot": "98720523823d41472a1bf7707f676ed8be62114cc27961fb66c64966b0766285"
+        },
+        {
+          "$snapshot": "650abfa5fe7c52d83640670a0a3c3921c4fedfabab9b5f50752a13d2232e1b4b"
+        },
+        {
+          "$snapshot": "c66da2bd9b7468008503b8fccd8c08c071bb5783a1142012f446f8c42ade638b"
+        },
+        {
+          "$snapshot": "faa01a540cdee9eb0fcdc258e6597385cc4447ecabd93dfe92341562fbaffdbe"
+        },
+        {
+          "$snapshot": "712c12b9e4aab4cb58dd9b151719287cc9302e26879629193542c52d7e384287"
+        },
+        {
+          "$snapshot": "a37e403db45e39f61ccf991338fb2ff730e570e5aa337844c1866a97d2383529"
+        },
+        {
+          "$snapshot": "97991502a46d20ed0c29ae23f86aa188527c639011310e9958766ff769e0178b"
+        }
+      ]
     },
     "06f22b2be115a9adbc05174de8e78048c60c241aa07f6a6ff0e357df503ab717": {
       "active": true,
@@ -534115,5 +536998,5 @@
       "target": "wm.tool_set_by_id"
     }
   },
-  "expanded_sha256": "f2ce9ece665e7277ec6dabc556eee007a07bd0f5632f922bc68ae5f528b02129"
+  "expanded_sha256": "3541b9371c6e1e78ca485e1a99bdda1064f643a49bcf76602fddc3fcf3641eb3"
 }
