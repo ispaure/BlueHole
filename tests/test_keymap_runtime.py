@@ -11,7 +11,7 @@ import types
 import unittest
 from unittest.mock import patch
 
-from runtime_keymap_fakes import FakeRuntime, MergedMaps, row
+from runtime_keymap_fakes import FakeConfig, FakeRuntime, MergedMaps, ReusedIdWrapper, row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -415,6 +415,40 @@ class RuntimeKeymapTests(unittest.TestCase):
                 handle.release()
                 self.runtime.configs.default.keymaps.remove(source)
 
+    def test_modal_active_role_requires_default_alias_and_cleans_after_switch(self):
+        scope = self.scope(name='Transform Modal Map', space_type='EMPTY',
+                           is_modal=True)
+        event = self.native_modal_event()
+        request = self.override(selector=self.selector(scope=scope, event=event,
+                target=self.utils.KeymapTarget(modal_value='PRECISION'),
+                role='active'),
+            assignment=self.assignment(scope=scope, event=event,
+                target=self.utils.KeymapTarget(modal_value='CANCEL')),
+            capability='modal_head', context='transform_translate_precision_cancel')
+        default_map = self.runtime.map('default', 'Transform Modal Map',
+                                       space='EMPTY', modal=True, tool=False)
+        original = default_map.keymap_items.append_fixture(self.native_modal_row())
+        cancel = default_map.keymap_items.append_fixture(
+            self.native_modal_row('CANCEL', key='ESC'))
+        custom = FakeConfig('custom-active')
+        custom_map = custom.keymaps.new('Transform Modal Map', space_type='EMPTY',
+                                       modal=True, tool=False)
+        custom_original = custom_map.keymap_items.append_fixture(self.native_modal_row())
+        custom_cancel = custom_map.keymap_items.append_fixture(
+            self.native_modal_row('CANCEL', key='ESC'))
+        self.runtime.configs.active = custom
+        rejected = self.utils.register_feature('modal-custom', overrides=(request,))
+        self.assertEqual(list(custom_map.keymap_items), [custom_original, custom_cancel])
+        self.assertTrue(self.reasons(rejected))
+        rejected.release()
+        self.runtime.configs.active = self.runtime.configs.default
+        applied = self.utils.register_feature('modal-default', overrides=(request,))
+        self.assertEqual(len(default_map.keymap_items), 3)
+        self.runtime.configs.active = custom
+        applied.release()
+        self.assertEqual(list(default_map.keymap_items), [original, cancel])
+        self.assertEqual(list(custom_map.keymap_items), [custom_original, custom_cancel])
+
     def test_changed_source_selector_withdraws_owned_override(self):
         original = row(prop_values={'action': 'SELECT'})
         source = self.source(original)
@@ -431,6 +465,46 @@ class RuntimeKeymapTests(unittest.TestCase):
         self.assertIs(source.keymap_items[0], original)
         handle.release()
 
+    def test_merged_user_original_must_be_exact_unique_and_active_before_creation(self):
+        class ChangedMerged(MergedMaps):
+            def __init__(self, configs, change):
+                super().__init__(configs)
+                self.change = change
+
+            def __iter__(self):
+                for map_ in super().__iter__():
+                    if map_.name == '3D View':
+                        original = next(item for item in map_.keymap_items
+                                        if item.idname == 'object.select_all')
+                        if self.change == 'edited':
+                            original.type = 'F19'
+                            original.properties.action = 'DESELECT'
+                        elif self.change == 'duplicate':
+                            map_.keymap_items.rows.append(original.clone())
+                        else:
+                            original.active = False
+                    yield map_
+
+        for change in ('edited', 'duplicate', 'inactive'):
+            with self.subTest(merged_original=change):
+                source = self.source(row(prop_values={'action': 'SELECT'}))
+                addon = self.addon()
+                self.runtime.configs.user.keymaps = ChangedMerged(self.runtime.configs,
+                                                                    change)
+                handle = self.utils.register_feature('owner-' + change, overrides=(
+                    self.override(selector=self.selector(
+                        target=self.target(action='SELECT'))),))
+                self.assertEqual(addon.keymap_items.created, 0)
+                for _ in range(3):
+                    self.utils.reconcile(budget=1, time_budget=1)
+                self.assertEqual(addon.keymap_items.created, 0)
+                self.assertEqual(len(addon.keymap_items), 0)
+                self.assertEqual(len(source.keymap_items), 1)
+                self.assertTrue(self.reasons(handle))
+                handle.release()
+                self.runtime.configs.default.keymaps.remove(source)
+                self.runtime.configs.addon.keymaps.remove(addon)
+
     def test_config_replacement_does_not_delete_new_lookalike(self):
         self.source(row())
         addon = self.addon()
@@ -441,6 +515,28 @@ class RuntimeKeymapTests(unittest.TestCase):
         handle.release()
         self.assertEqual(len(replacement_map.keymap_items), 1)
         self.assertEqual(replacement_map.keymap_items[0].idname, 'bluehole.replacement')
+
+    def test_live_alias_wrapper_pointer_reuse_cannot_delete_foreign_item(self):
+        addon = self.addon()
+        addon.keymap_items.return_alias_wrappers = True
+        handle = self.utils.register_feature('owner-a', assignments=(self.assignment(),))
+        stored = handle.owned_pairs[0][1]
+        live = addon.keymap_items[0]
+        self.assertIsNot(stored, live)
+        self.assertEqual(stored.as_pointer(), live.as_pointer())
+        self.assertEqual(stored.id, live.id)
+        addon.keymap_items.remove(live)
+        foreign = row('bluehole.replacement')
+        foreign._pointer = stored.as_pointer()
+        self.assertNotEqual(foreign.id, stored.id)
+        addon.keymap_items.append_fixture(foreign)
+        created = addon.keymap_items.created
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(addon.keymap_items.created, created)
+        self.assertEqual(list(addon.keymap_items), [foreign])
+        handle.release()
+        self.utils.release_all()
+        self.assertEqual(list(addon.keymap_items), [foreign])
 
     def test_source_map_generation_change_revalidates_fresh_membership(self):
         source = self.source(row())
@@ -574,6 +670,93 @@ class RuntimeKeymapTests(unittest.TestCase):
         self.assertEqual(list(source.keymap_items), [unreadable, exact])
         handle.release()
 
+    def test_provider_lookalike_requires_enabled_module_pref_and_exact_reference(self):
+        scope = self.scope(name='3D View Generic')
+        event = self.event(type='TAB', alt=True)
+        provider_target = self.target('machin3.toggle_smooth',
+            toggle_subd_overlays=False,
+            toggle_korean_bevel_overlays=True, mode='SUBD')
+        addon = self.runtime.map('addon', '3D View Generic', tool=False)
+        provider = addon.keymap_items.append_fixture(row('machin3.toggle_smooth',
+            key='TAB', alt=True, prop_values=dict(provider_target.properties)))
+        request = self.override(selector=self.selector(scope=scope, event=event,
+            target=provider_target, role='addon'),
+            assignment=self.assignment(scope=scope, event=event),
+            context='machin3tools_object_toggle_smooth')
+        provider_module = types.ModuleType('MACHIN3tools')
+        provider_module.bl_info = {'version': (1, 13, 2, 'DeusEx')}
+        prefs = types.SimpleNamespace(activate_smooth=True)
+        addon_entry = types.SimpleNamespace(module='MACHIN3tools', preferences=prefs)
+        self.runtime.bpy.context.preferences = types.SimpleNamespace(
+            addons={'MACHIN3tools': addon_entry})
+        self.runtime.bpy.ops = types.SimpleNamespace(machin3=types.SimpleNamespace(
+            toggle_smooth=types.SimpleNamespace(get_rna_type=lambda: object())))
+        provider_module.keymaps = [(addon, provider)]
+        forged_reference = provider.clone()
+        forged_reference._pointer = provider.as_pointer()
+        self.assertNotEqual(forged_reference.id, provider.id)
+        with patch.dict(sys.modules, {'MACHIN3tools': provider_module}):
+            for name, enabled, addons, references, should_apply in (
+                    ('disabled', False, {'MACHIN3tools': addon_entry},
+                     [(addon, provider)], False),
+                    ('missing_prefs', True, {}, [(addon, provider)], False),
+                    ('lookalike_only', True, {'MACHIN3tools': addon_entry}, [], False),
+                    ('pointer_reused', True, {'MACHIN3tools': addon_entry},
+                     [(addon, forged_reference)], False),
+                    ('trusted', True, {'MACHIN3tools': addon_entry},
+                     [(addon, provider)], True)):
+                with self.subTest(case=name):
+                    provider_module.__addon_enabled__ = enabled
+                    provider_module.keymaps = references
+                    self.runtime.bpy.context.preferences.addons = addons
+                    handle = self.utils.register_feature('provider-' + name,
+                        overrides=(request,))
+                    self.assertEqual(len(addon.keymap_items), 2 if should_apply else 1)
+                    self.assertIs(addon.keymap_items[0], provider)
+                    if not should_apply:
+                        self.assertTrue(self.reasons(handle))
+                    handle.release()
+                    self.assertEqual(list(addon.keymap_items), [provider])
+
+    def test_provider_retained_wrapper_id_change_rejects_reused_address(self):
+        scope = self.scope(name='3D View Generic')
+        event = self.event(type='TAB', alt=True)
+        provider_target = self.target('machin3.toggle_smooth',
+            toggle_subd_overlays=False,
+            toggle_korean_bevel_overlays=True, mode='SUBD')
+        addon = self.runtime.map('addon', '3D View Generic', tool=False)
+        original = addon.keymap_items.append_fixture(row('machin3.toggle_smooth',
+            key='TAB', alt=True, prop_values=dict(provider_target.properties)))
+        retained_wrapper = ReusedIdWrapper(addon, original)
+        module = types.ModuleType('MACHIN3tools')
+        module.__addon_enabled__ = True
+        module.bl_info = {'version': (1, 13, 2, 'DeusEx')}
+        module.keymaps = [(addon, retained_wrapper)]
+        self.runtime.bpy.context.preferences = types.SimpleNamespace(addons={
+            'MACHIN3tools': types.SimpleNamespace(module='MACHIN3tools',
+                preferences=types.SimpleNamespace(activate_smooth=True))})
+        self.runtime.bpy.ops = types.SimpleNamespace(machin3=types.SimpleNamespace(
+            toggle_smooth=types.SimpleNamespace(get_rna_type=lambda: object())))
+        request = self.override(selector=self.selector(scope=scope, event=event,
+            target=provider_target, role='addon'),
+            assignment=self.assignment(scope=scope, event=event),
+            context='machin3tools_object_toggle_smooth')
+        with patch.dict(sys.modules, {'MACHIN3tools': module}):
+            handle = self.utils.register_feature('provider-owner', overrides=(request,))
+            self.assertEqual(len(addon.keymap_items), 2)
+            original_id = retained_wrapper.id
+            addon.keymap_items.remove(original)
+            foreign = row('machin3.toggle_smooth', key='TAB', alt=True,
+                          prop_values=dict(provider_target.properties))
+            foreign._pointer = retained_wrapper.as_pointer()
+            addon.keymap_items.append_fixture(foreign)
+            self.assertNotEqual(retained_wrapper.id, original_id)
+            handle.refresh()
+            self.assertEqual(list(addon.keymap_items), [foreign])
+            self.assertEqual(addon.keymap_items.created, 1)
+            self.assertIn('provider_reference_generation_changed', self.reasons(handle))
+            handle.release()
+
     def test_created_map_is_removed_after_release_and_creation_failure(self):
         source = self.runtime.map('default', tool=None)
         source.keymap_items.append_fixture(row())
@@ -680,6 +863,154 @@ class RuntimeKeymapTests(unittest.TestCase):
         self.assertIn('provider_priority_conflict', self.reasons(handle))
         handle.release()
         self.assertEqual([item.idname for item in addon.keymap_items], ['other.provider'])
+
+    def test_copied_legacy_pair_from_before_repriority_releases_current_item(self):
+        self.source(row())
+        provider = row('other.provider')
+        addon = self.addon(provider)
+        handle = self.utils.register_feature('legacy:Mesh:one', overrides=(self.override(),))
+        copied_pairs = list(handle.owned_pairs)
+        old_item = copied_pairs[0][1]
+        replacement_provider = provider.clone()
+        addon.keymap_items.remove(provider)
+        addon.keymap_items.append_fixture(replacement_provider)
+        handle.refresh()
+        self.assertFalse(old_item._alive)
+        with self.assertRaises(ReferenceError):
+            old_item.as_pointer()
+        foreign_lookalike = addon.keymap_items.append_fixture(row('bluehole.replacement', key='F18'))
+        self.utils.release_owned_pairs(copied_pairs)
+        self.assertEqual(copied_pairs, [])
+        self.assertEqual(list(addon.keymap_items), [replacement_provider, foreign_lookalike])
+        handle.refresh()
+        self.assertEqual(list(addon.keymap_items), [replacement_provider, foreign_lookalike])
+        handle.release()
+
+    def test_copied_legacy_pair_from_old_map_releases_recreated_item(self):
+        self.addon()
+        handle = self.utils.register_feature('legacy:Mesh:one', assignments=(self.assignment(),))
+        copied_pairs = list(handle.owned_pairs)
+        old_item = copied_pairs[0][1]
+        self.runtime.replace_config('addon')
+        new_map = self.addon(row('other.foreign', key='B'))
+        foreign = new_map.keymap_items[0]
+        handle.refresh()
+        self.assertFalse(old_item._alive)
+        self.assertEqual(len(new_map.keymap_items), 2)
+        self.utils.release_owned_pairs(copied_pairs)
+        self.assertEqual(list(new_map.keymap_items), [foreign])
+        handle.refresh()
+        self.assertEqual(list(new_map.keymap_items), [foreign])
+        handle.release()
+
+    def test_setter_failure_with_remove_failure_retains_cleanup_ownership(self):
+        self.source(row())
+        addon = self.addon(row('other.foreign', key='B'))
+        foreign = addon.keymap_items[0]
+        addon.keymap_items.new_prop_schema = {'mode': 0}
+        addon.keymap_items.new_prop_fail = 'mode'
+        addon.keymap_items.fail_next_remove = True
+        replacement = self.assignment(target=self.target('bluehole.replacement', mode=1))
+        handle = self.utils.register_feature('owner-a', overrides=(
+            self.override(assignment=replacement),))
+        self.assertEqual(len(addon.keymap_items), 2)
+        self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 1)
+        created = addon.keymap_items.created
+        addon.keymap_items.new_prop_fail = None
+        handle.refresh()
+        self.assertEqual(addon.keymap_items.created, created)
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 0)
+        self.assertEqual(list(addon.keymap_items), [foreign])
+        handle.release()
+
+    def test_release_remove_failure_blocks_same_owner_until_cleanup(self):
+        addon = self.addon(row('other.foreign', key='B'))
+        foreign = addon.keymap_items[0]
+        request = self.assignment()
+        handle = self.utils.register_feature('owner-a', assignments=(request,))
+        created = addon.keymap_items.created
+        addon.keymap_items.fail_next_remove = True
+        result = handle.release()
+        self.assertIn(('replacement', 'owned_remove_failed'), result)
+        self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 1)
+        again = self.utils.register_feature('owner-a', assignments=(request,))
+        self.assertEqual(addon.keymap_items.created, created)
+        self.utils.release_all()
+        self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 0)
+        self.assertEqual(list(addon.keymap_items), [foreign])
+        again.release()
+
+    def test_pending_cleanup_blocks_new_same_event_request_until_exact_removal(self):
+        for second_owner in ('owner-b', 'owner-a'):
+            with self.subTest(second_owner=second_owner):
+                addon = self.addon(row('other.foreign', key='B'))
+                foreign = addon.keymap_items[0]
+                first = self.utils.register_feature('owner-a',
+                    assignments=(self.assignment(),))
+                addon.keymap_items.remove_failures_remaining = 2
+                first.release()
+                self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 1)
+                second_request = self.assignment('other',
+                    target=self.target('bluehole.other'))
+                second = self.utils.register_feature(second_owner,
+                    assignments=(second_request,))
+                self.assertEqual(addon.keymap_items.created, 1)
+                self.assertEqual([item.idname for item in addon.keymap_items],
+                                 ['other.foreign', 'bluehole.replacement'])
+                self.assertIn('conflicting_assignment', self.reasons(second))
+                self.utils.reconcile(budget=1, time_budget=1)
+                self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 1)
+                self.assertEqual(addon.keymap_items.created, 1)
+                self.utils.reconcile(budget=1, time_budget=1)
+                self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 0)
+                second.refresh()
+                self.assertEqual([item.idname for item in addon.keymap_items],
+                                 ['other.foreign', 'bluehole.other'])
+                second.release()
+                self.assertEqual(list(addon.keymap_items), [foreign])
+                self.runtime.configs.addon.keymaps.remove(addon)
+
+    def test_repriority_remove_failure_does_not_duplicate_owned_item(self):
+        self.source(row())
+        provider = row('other.provider')
+        addon = self.addon(provider)
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        replacement_provider = provider.clone()
+        addon.keymap_items.remove(provider)
+        addon.keymap_items.append_fixture(replacement_provider)
+        addon.keymap_items.fail_next_remove = True
+        created = addon.keymap_items.created
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(addon.keymap_items.created, created)
+        self.assertEqual(sum(item.idname == 'bluehole.replacement'
+                             for item in addon.keymap_items), 1)
+        self.assertGreater(self.utils.runtime_stats()['pending_cleanup'], 0)
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.utils.release_all()
+        self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 0)
+        self.assertEqual(list(addon.keymap_items), [replacement_provider])
+
+    def test_repriority_cleanup_then_refresh_reapplies_request(self):
+        self.source(row())
+        provider = row('other.provider')
+        addon = self.addon(provider)
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        replacement_provider = provider.clone()
+        addon.keymap_items.remove(provider)
+        addon.keymap_items.append_fixture(replacement_provider)
+        addon.keymap_items.fail_next_remove = True
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 1)
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(self.utils.runtime_stats()['pending_cleanup'], 0)
+        handle.refresh()
+        self.assertEqual([item.idname for item in addon.keymap_items],
+                         ['other.provider', 'bluehole.replacement'])
+        self.assertEqual(self.merged_names()[0], 'bluehole.replacement')
+        self.assertNotIn('user_removed_owned_item', self.reasons(handle))
+        handle.release()
+        self.assertEqual(list(addon.keymap_items), [replacement_provider])
 
     def test_repeated_toggle_and_global_clear_are_idempotent(self):
         self.source(row())

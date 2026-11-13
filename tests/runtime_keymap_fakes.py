@@ -12,6 +12,7 @@ from types import SimpleNamespace
 
 
 _pointers = count(1000)
+_item_ids = count(1)
 EVENT_DEFAULTS = dict(type='A', value='PRESS', any=False, shift=False,
                       ctrl=False, alt=False, oskey=False, hyper=False,
                       key_modifier='NONE', direction='ANY', repeat=False,
@@ -26,6 +27,7 @@ class FakeItem:
                  prop_fail=None, active=True, modal_value='', **event):
         self._alive = True
         self._pointer = next(_pointers)
+        self.id = next(_item_ids)
         self.idname = idname
         self.prop_schema = prop_schema
         self.properties = FakeProperties(prop_values or {}, prop_schema, prop_fail)
@@ -60,6 +62,28 @@ class FakeItem:
             if name not in self.__dict__:
                 delattr(copy, name)
         return copy
+
+    def alias(self):
+        """Another live Python wrapper for the same native item identity."""
+        copy = self.clone()
+        copy._pointer = self._pointer
+        copy.id = self.id
+        return copy
+
+
+class ReusedIdWrapper:
+    """Retained RNA-like wrapper whose ID follows live memory at its address."""
+    def __init__(self, map_, item):
+        self.map = map_
+        self.pointer = item.as_pointer()
+
+    def as_pointer(self):
+        return self.pointer
+
+    @property
+    def id(self):
+        return next((item.id for item in self.map.keymap_items
+                     if item.as_pointer() == self.pointer), None)
 
 
 class FakeProperties(dict):
@@ -96,6 +120,9 @@ class FakeItems:
         self.new_prop_fail = None
         self.new_prop_schema = None
         self.new_missing_fields = set()
+        self.fail_next_remove = False
+        self.remove_failures_remaining = 0
+        self.return_alias_wrappers = False
 
     def __iter__(self):
         return iter(tuple(self.rows))
@@ -127,7 +154,7 @@ class FakeItems:
         if self.fail_after_create:
             self.fail_after_create = False
             raise RuntimeError('injected failure after native creation')
-        return item
+        return item.alias() if self.return_alias_wrappers else item
 
     def new_from_item(self, item, *, head=False):
         copy = item.clone()
@@ -136,10 +163,18 @@ class FakeItems:
         return copy
 
     def remove(self, item):
+        if self.fail_next_remove or self.remove_failures_remaining:
+            self.fail_next_remove = False
+            if self.remove_failures_remaining:
+                self.remove_failures_remaining -= 1
+            raise RuntimeError('injected native remove failure')
         for index, row in enumerate(self.rows):
-            if row is item:
+            if (row is item or (self.return_alias_wrappers and row._pointer == item._pointer
+                               and row.id == item.id)):
                 self.rows.pop(index)
-                item.invalidate()
+                row.invalidate()
+                if row is item:
+                    item.invalidate()
                 self.removed += 1
                 return
         raise ReferenceError('item is no longer a member of this map')

@@ -135,6 +135,11 @@ def _clear_categories():
         log(Severity.WARNING, TOOL_NAME,
             f'{len(retained)} directly edited source keymap item(s) retained as user data; '
             'inspect keymap runtime diagnostics before removing them.')
+    pending = keymap_utils.pending_cleanup()
+    if pending:
+        log(Severity.WARNING, TOOL_NAME,
+            f'{len(pending)} owned keymap item(s) still await native removal; '
+            'ownership is retained for the next cleanup attempt.')
     for category, error in errors:
         log(Severity.WARNING, TOOL_NAME, f'{category} cleanup reported {error}.')
 

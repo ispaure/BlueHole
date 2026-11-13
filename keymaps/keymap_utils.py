@@ -13,6 +13,7 @@ __status__ = 'Production'
 
 from dataclasses import dataclass, field
 import math
+import sys
 import time
 from collections.abc import Mapping
 
@@ -63,6 +64,11 @@ def _members(collection):
 
 def _contains(collection, obj):
     return any(_same(item, obj) for item in _members(collection))
+
+
+def _remove_native_item(map_, item):
+    """Single native removal leaf; fault probes may replace it temporarily."""
+    map_.keymap_items.remove(item)
 
 
 @dataclass(frozen=True)
@@ -183,6 +189,19 @@ class _Owned:
     detached: bool = False
     owner_id: str = ''
     request_id: str = ''
+    item_id: int | None = field(default=None, init=False)
+    config_pointer: tuple | None = field(default=None, init=False)
+    map_pointer: tuple | None = field(default=None, init=False)
+    item_pointer: tuple | None = field(default=None, init=False)
+
+    def __post_init__(self):
+        self.config_pointer = _pointer(self.config)
+        self.map_pointer = _pointer(self.map)
+        self.item_pointer = _pointer(self.item)
+        try:
+            self.item_id = self.item.id
+        except (AttributeError, ReferenceError, RuntimeError):
+            self.item_id = None
 
 
 class _Pending(Exception):
@@ -197,6 +216,9 @@ _FEATURES = {}
 _BOUND_CATEGORIES = {}
 _CREATED_MAPS = {}
 _RETAINED_EDITED = {}
+_PAIR_ALIASES = {}
+_PENDING_CLEANUP = {}
+_PROVIDER_REF_IDS = {}
 _RECONCILE_CURSOR = 0
 _COUNTS = {'checked': 0, 'created': 0, 'removed': 0, 'reinsertions': 0}
 
@@ -355,6 +377,30 @@ def _exact_source(selector):
     return config, map_, matches[0]
 
 
+def _preflight_merged_source(selector):
+    merged = _one_map(_config('user'), selector.scope)
+    candidates = []
+    for item in _members(merged.keymap_items):
+        if _event(item) != selector.event:
+            continue
+        try:
+            discriminator = item.propvalue if selector.scope.is_modal else item.idname
+        except (AttributeError, ReferenceError, RuntimeError, ValueError) as exc:
+            raise _Pending('unreadable_merged_target', role='user') from exc
+        wanted = selector.target.modal_value if selector.scope.is_modal else selector.target.idname
+        if discriminator != wanted:
+            continue
+        snapshot = _snapshot(item, selector.scope.is_modal)
+        if snapshot[:2] == (selector.event, selector.target):
+            candidates.append(snapshot)
+    if len(candidates) > 1:
+        raise _Pending('ambiguous_merged_source', 'unsupported', 'user')
+    if not candidates:
+        raise _Pending('merged_source_missing_or_edited', role='user')
+    if not candidates[0][2]:
+        raise _Pending('merged_source_inactive', role='user')
+
+
 def _diagnostic(handle, request, status, reason, role='', capability=''):
     if not capability and status in ('pending', 'unsupported'):
         capability = getattr(request, 'capability', '')
@@ -364,45 +410,143 @@ def _diagnostic(handle, request, status, reason, role='', capability=''):
                             role, getattr(request, 'context', ''), capability)
 
 
-def _valid_owned(owned):
+def _live_owned_members(owned):
+    if any(token is None for token in (owned.config_pointer, owned.map_pointer,
+                                       owned.item_pointer)):
+        return None
     try:
         configs = get_window_manager().keyconfigs
-        if not any(_same(getattr(configs, role, None), owned.config)
-                   for role in ('addon', 'default', 'active')):
-            return False
-        return (_contains(owned.config.keymaps, owned.map) and
-                _contains(owned.map.keymap_items, owned.item))
+        config = next((candidate for role in ('addon', 'default', 'active')
+                       if (candidate := getattr(configs, role, None)) is not None
+                       and _pointer(candidate) == owned.config_pointer), None)
+        if config is None:
+            return None
+        map_ = next((candidate for candidate in _members(config.keymaps)
+                     if _pointer(candidate) == owned.map_pointer), None)
+        if map_ is None:
+            return None
+        if owned.item_pointer is None:
+            return None
+        for item in _members(map_.keymap_items):
+            if _pointer(item) != owned.item_pointer:
+                continue
+            live_id = getattr(item, 'id', None)
+            if owned.item_id is None:
+                if hasattr(bpy, 'app'):
+                    return None
+            elif live_id != owned.item_id:
+                return None
+            return map_, item
+        return None
     except (AttributeError, ReferenceError, RuntimeError, TypeError):
-        return False
+        return None
+
+
+def _valid_owned(owned):
+    return _live_owned_members(owned) is not None
 
 
 def _remove_owned(owned):
-    if not _valid_owned(owned):
+    live = _live_owned_members(owned)
+    if live is None:
         return 'stale_owned_reference'
+    map_, item = live
     try:
-        if _snapshot(owned.item, _scope(owned.map).is_modal) != owned.snapshot:
+        if _snapshot(item, _scope(map_).is_modal) != owned.snapshot:
             _retain_edited(owned)
             return 'user_edited_owned_item_retained'
     except _Pending:
         _retain_edited(owned)
         return 'unreadable_owned_item_retained'
     try:
-        owned.map.keymap_items.remove(owned.item)
+        _remove_native_item(map_, item)
         _COUNTS['removed'] += 1
-        _remove_empty_map(owned.config, owned.map)
+        _remove_empty_map(owned.config, map_)
         try:
             _update_merged()
         except _Pending:
             return 'released_merged_update_failed'
         return 'released'
     except (AttributeError, ReferenceError, RuntimeError, ValueError):
-        return 'owned_remove_failed'
+        if _valid_owned(owned):
+            _queue_cleanup(owned)
+            return 'owned_remove_failed'
+        return 'released'
+
+
+def _cleanup_key(owned):
+    return owned.owner_id, owned.request_id
+
+
+def _queue_cleanup(owned, reason='owned_remove_failed'):
+    key = _cleanup_key(owned)
+    records = _PENDING_CLEANUP.setdefault(key, [])
+    if not any(record[0] is owned for record in records):
+        records.append((owned, reason))
+
+
+def _cleanup_one(owned):
+    if not _valid_owned(owned):
+        return 'stale_owned_reference'
+    if not owned.snapshot:
+        _retain_edited(owned)
+        return 'unreadable_owned_item_retained'
+    return _remove_owned(owned)
+
+
+def _retry_cleanup_key(key):
+    records = _PENDING_CLEANUP.get(key, ())
+    remaining = []
+    results = []
+    for owned, reason in records:
+        outcome = _cleanup_one(owned)
+        results.append(outcome)
+        if outcome == 'owned_remove_failed':
+            remaining.append((owned, reason))
+        else:
+            handle = _FEATURES.get(key[0])
+            if handle is not None and handle._owned.get(key[1]) is owned:
+                handle._owned.pop(key[1], None)
+    if remaining:
+        _PENDING_CLEANUP[key] = remaining
+    else:
+        _PENDING_CLEANUP.pop(key, None)
+    return tuple(results)
+
+
+def _retry_cleanup(limit=None):
+    diagnostics = []
+    keys = tuple(_PENDING_CLEANUP)
+    for key in keys[:limit]:
+        outcomes = _retry_cleanup_key(key)
+        diagnostics.append(KeymapDiagnostic(key[0], key[1],
+                                            'pending' if key in _PENDING_CLEANUP else 'released',
+                                            'owned_remove_failed' if key in _PENDING_CLEANUP else 'cleanup_complete'))
+    return tuple(diagnostics)
+
+
+def pending_cleanup():
+    return tuple({'owner_id': owner_id, 'request_id': request_id, 'reason': reason}
+                 for (owner_id, request_id), records in _PENDING_CLEANUP.items()
+                 for _, reason in records)
+
+
+def _remember_pair(handle, request_id, owned):
+    key = id(owned.map), id(owned.item)
+    _PAIR_ALIASES[key] = (owned.map, owned.item, handle, request_id)
+
+
+def _forget_handle_pairs(handle):
+    for key, alias in tuple(_PAIR_ALIASES.items()):
+        if alias[2] is handle:
+            _PAIR_ALIASES.pop(key, None)
 
 
 def _retain_edited(owned):
     owned.detached = True
-    _RETAINED_EDITED[(_pointer(owned.config), _pointer(owned.map), _pointer(owned.item))] = owned
-    _CREATED_MAPS.pop((_pointer(owned.config), _pointer(owned.map)), None)
+    _RETAINED_EDITED[(owned.config_pointer, owned.map_pointer, owned.item_pointer,
+                      owned.item_id)] = owned
+    _CREATED_MAPS.pop((owned.config_pointer, owned.map_pointer), None)
 
 
 def retained_edits():
@@ -423,7 +567,7 @@ def retained_edits():
     return tuple(rows)
 
 
-def _new_item(map_, target, event):
+def _new_item(config, map_, target, event, owner_id, request_id):
     kwargs = dict(type=event.type, value=event.value, any=event.any,
                   shift=event.shift, ctrl=event.ctrl, alt=event.alt,
                   oskey=event.oskey, key_modifier=event.key_modifier,
@@ -435,9 +579,11 @@ def _new_item(map_, target, event):
         item = map_.keymap_items.new(target.idname, **kwargs)
     except (TypeError, AttributeError, ValueError, RuntimeError) as exc:
         candidates = [item for item in _members(map_.keymap_items)
-                      if _pointer(item) not in before and getattr(item, 'idname', None) == target.idname]
+                      if _pointer(item) not in before]
         if len(candidates) == 1:
-            map_.keymap_items.remove(candidates[0])
+            partial = _Owned(config, map_, candidates[0], (), owner_id=owner_id,
+                             request_id=request_id)
+            _remove_raw(partial)
         raise _Pending('unsupported_creation_schema', 'unsupported') from exc
     return item
 
@@ -463,7 +609,7 @@ def _legacy_event_readback(actual, expected):
     return True
 
 
-def _create_assignment(request):
+def _create_assignment(request, owner_id):
     if request.scope.is_modal or request.target.modal_value:
         raise _Pending('unsupported_assignment_kind', 'unsupported')
     config = _config('addon')
@@ -489,12 +635,14 @@ def _create_assignment(request):
             _remove_empty_map(config, map_)
         raise _Pending('created_scope_mismatch', 'unsupported')
     try:
-        item = _new_item(map_, request.target, request.event)
+        item = _new_item(config, map_, request.target, request.event,
+                         owner_id, request.request_id)
     except Exception:
         if created_map:
             _remove_empty_map(config, map_)
         raise
-    owned = _Owned(config, map_, item, ())
+    owned = _Owned(config, map_, item, (), owner_id=owner_id,
+                   request_id=request.request_id)
     try:
         for key, value in request.target.properties:
             setattr(item.properties, key, value)
@@ -523,16 +671,28 @@ def _create_assignment(request):
 
 
 def _remove_raw(owned):
-    if _valid_owned(owned):
+    live = _live_owned_members(owned)
+    if live is None:
+        return 'stale_owned_reference'
+    map_, item = live
+    try:
+        _remove_native_item(map_, item)
+        _remove_empty_map(owned.config, map_)
         try:
-            owned.map.keymap_items.remove(owned.item)
-            _remove_empty_map(owned.config, owned.map)
+            _update_merged()
+        except _Pending:
+            return 'released_merged_update_failed'
+        return 'released'
+    except (AttributeError, ReferenceError, RuntimeError, ValueError):
+        if not _valid_owned(owned):
+            return 'released'
+        if not owned.snapshot:
             try:
-                _update_merged()
+                owned.snapshot = _snapshot(item, _scope(map_).is_modal)
             except _Pending:
-                pass
-        except (AttributeError, ReferenceError, RuntimeError, ValueError):
-            pass
+                owned.snapshot = ()
+        _queue_cleanup(owned)
+        return 'owned_remove_failed'
 
 
 def _remove_empty_map(config, map_):
@@ -546,6 +706,25 @@ def _remove_empty_map(config, map_):
             _CREATED_MAPS.pop(key, None)
     except (AttributeError, ReferenceError, RuntimeError, ValueError, TypeError):
         pass
+
+
+def _conflicting_owned_event(owner_id, scope, event):
+    for other in _FEATURES.values():
+        if other.owner_id == owner_id:
+            continue
+        for owned in other._owned.values():
+            live = _live_owned_members(owned)
+            if live is not None and owned.snapshot and owned.snapshot[2] and \
+                    _scope(live[0]) == scope and owned.snapshot[0] == event:
+                return True
+    for records in _PENDING_CLEANUP.values():
+        for owned, _ in records:
+            live = _live_owned_members(owned)
+            if live is None or _scope(live[0]) != scope:
+                continue
+            if not owned.snapshot or (owned.snapshot[2] and owned.snapshot[0] == event):
+                return True
+    return False
 
 
 def _preflight_override(request):
@@ -600,6 +779,8 @@ def _preflight_override(request):
             raise _Pending('unsupported_capability', 'unsupported', capability=request.capability)
         if selector.source_role not in ('default', 'active'):
             raise _Pending('unsupported_source_role', 'unsupported', selector.source_role)
+        if not _same(_config('active'), _config('default')):
+            raise _Pending('unproved_active_modal_config', 'unsupported', selector.source_role)
         modal_event = KeymapEvent('LEFT_SHIFT', value='ANY', any=True,
                                   shift=-1, ctrl=-1, alt=-1, oskey=-1, hyper=-1)
         if not (request.context == _MODAL_PROOF
@@ -612,7 +793,12 @@ def _preflight_override(request):
                 and selector.target == KeymapTarget(modal_value='PRECISION')
                 and request.replacement == KeymapTarget(modal_value='CANCEL')):
             raise _Pending('unproved_modal_context', 'unsupported', capability=request.capability)
+    _exact_source(selector)
+    _update_merged()
+    _preflight_merged_source(selector)
     source_config, source_map, source_item = _exact_source(selector)
+    if request.context == 'machin3tools_object_toggle_smooth':
+        _verify_machin3_provider(source_map, source_item)
     if request.capability == 'modal_head':
         observed_tokens = {getattr(item, 'propvalue', None)
                            for item in _members(source_map.keymap_items)}
@@ -629,14 +815,72 @@ def _proof_generation(proof):
             proof[3], proof[4])
 
 
+def _verify_machin3_provider(source_map, source_item):
+    module = sys.modules.get('MACHIN3tools')
+    if module is None or getattr(module, '__addon_enabled__', False) is not True:
+        _PROVIDER_REF_IDS.clear()
+        raise _Pending('provider_unavailable', role='addon')
+    if any(record[0] is not module for record in _PROVIDER_REF_IDS.values()):
+        _PROVIDER_REF_IDS.clear()
+    info = getattr(module, 'bl_info', None)
+    version = info.get('version', ()) if isinstance(info, dict) else ()
+    if not isinstance(version, (tuple, list)) or tuple(version[:3]) != (1, 13, 2):
+        raise _Pending('unproved_provider_version', 'unsupported', 'addon')
+    addons = getattr(getattr(bpy.context, 'preferences', None), 'addons', None)
+    if addons is None:
+        _PROVIDER_REF_IDS.clear()
+        raise _Pending('provider_unavailable', role='addon')
+    try:
+        entry = addons.get('MACHIN3tools') if hasattr(addons, 'get') else next(
+            (entry for entry in addons if getattr(entry, 'module', None) == 'MACHIN3tools'), None)
+        if entry is None or getattr(entry, 'module', None) != 'MACHIN3tools' or \
+                getattr(getattr(entry, 'preferences', None), 'activate_smooth', None) is not True:
+            _PROVIDER_REF_IDS.clear()
+            raise _Pending('provider_unavailable', role='addon')
+    except (AttributeError, ReferenceError, RuntimeError, TypeError) as exc:
+        raise _Pending('provider_unavailable', role='addon') from exc
+    try:
+        bpy.ops.machin3.toggle_smooth.get_rna_type()
+    except (AttributeError, ReferenceError, RuntimeError, TypeError, ValueError) as exc:
+        raise _Pending('provider_operator_unavailable', role='addon') from exc
+    source_id = getattr(source_item, 'id', None)
+    if source_id is None:
+        raise _Pending('provider_reference_unreadable', 'unsupported', 'addon')
+    try:
+        pairs = tuple(module.keymaps)
+        for key, record in tuple(_PROVIDER_REF_IDS.items()):
+            if not any(map_ is record[1] and item is record[2] for map_, item in pairs):
+                _PROVIDER_REF_IDS.pop(key, None)
+        trusted = False
+        for map_, item in pairs:
+            if not (_same(map_, source_map) and _same(item, source_item)):
+                continue
+            key = (id(module), id(map_), id(item))
+            record = _PROVIDER_REF_IDS.get(key)
+            item_id = getattr(item, 'id', None)
+            if record is not None and (record[0] is not module or record[1] is not map_
+                                       or record[2] is not item or record[3] != item_id):
+                raise _Pending('provider_reference_generation_changed', 'unsupported', 'addon')
+            if item_id != source_id:
+                continue
+            _PROVIDER_REF_IDS[key] = (module, map_, item, item_id)
+            trusted = True
+            break
+        if not trusted:
+            raise _Pending('provider_reference_missing', role='addon')
+    except (AttributeError, ReferenceError, RuntimeError, TypeError, ValueError) as exc:
+        raise _Pending('provider_reference_unreadable', 'unsupported', 'addon') from exc
+
+
 def _merged_order(request, owned, source_item):
     _update_merged()
-    if not _valid_owned(owned) or not _contains(owned.source_map.keymap_items, source_item):
+    own_live = _live_owned_members(owned)
+    if own_live is None or not _contains(owned.source_map.keymap_items, source_item):
         raise _Pending('source_generation_changed')
     merged_config = _config('user')
     merged_map = _one_map(merged_config, request.selector.scope)
     items = _members(merged_map.keymap_items)
-    own_snapshot = _snapshot(owned.item, request.selector.scope.is_modal)
+    own_snapshot = _snapshot(own_live[1], request.selector.scope.is_modal)
     source_snapshot = _snapshot(source_item, request.selector.scope.is_modal)
     owned_positions = []
     source_positions = []
@@ -661,7 +905,7 @@ def _merged_order(request, owned, source_item):
         raise _Pending('merged_priority_unproved', 'unsupported', 'user')
 
 
-def _create_override(request, proof):
+def _create_override(request, proof, owner_id):
     source_config, source_map, source_item, source_snapshot, source_index = proof
     if _snapshot(source_item, request.selector.scope.is_modal) != source_snapshot or not _contains(source_map.keymap_items, source_item):
         raise _Pending('source_generation_changed')
@@ -673,10 +917,13 @@ def _create_override(request, proof):
             candidates = [candidate for candidate in _members(source_map.keymap_items)
                           if _pointer(candidate) not in before]
             if len(candidates) == 1:
-                source_map.keymap_items.remove(candidates[0])
+                partial = _Owned(source_config, source_map, candidates[0], (),
+                                 owner_id=owner_id, request_id=request.request_id)
+                _remove_raw(partial)
             raise _Pending('modal_copy_unavailable', 'unsupported') from exc
         owned = _Owned(source_config, source_map, item, (), source_config, source_map,
-                       source_item, source_snapshot, source_index)
+                       source_item, source_snapshot, source_index,
+                       owner_id=owner_id, request_id=request.request_id)
         try:
             item.propvalue = request.replacement.modal_value
             _validate_created(owned, request.selector.event, request.replacement)
@@ -703,13 +950,15 @@ def _create_override(request, proof):
             _remove_empty_map(addon, addon_map)
         raise _Pending('created_scope_mismatch', 'unsupported')
     try:
-        item = _new_item(addon_map, request.replacement, request.selector.event)
+        item = _new_item(addon, addon_map, request.replacement, request.selector.event,
+                         owner_id, request.request_id)
     except Exception:
         if created_map:
             _remove_empty_map(addon, addon_map)
         raise
     owned = _Owned(addon, addon_map, item, (), source_config, source_map,
-                   source_item, source_snapshot, source_index)
+                   source_item, source_snapshot, source_index,
+                   owner_id=owner_id, request_id=request.request_id)
     try:
         for key, value in request.replacement.properties:
             setattr(item.properties, key, value)
@@ -756,6 +1005,17 @@ class FeatureHandle:
         seen_requests = set()
         for request in requests:
             key = request.request_id
+            cleanup_key = self.owner_id, key
+            if cleanup_key in _PENDING_CLEANUP:
+                _retry_cleanup_key(cleanup_key)
+                if cleanup_key in _PENDING_CLEANUP:
+                    diagnostics.append(_diagnostic(self, request, 'pending',
+                                                   'owned_remove_failed'))
+                else:
+                    diagnostics.append(_diagnostic(self, request, 'released',
+                                                   'cleanup_complete'))
+                preflight_failed = True
+                continue
             if not manual and time.monotonic() < self._retry_after.get(key, 0):
                 diagnostics.append(_diagnostic(self, request, 'pending', 'retry_backoff'))
                 preflight_failed = True
@@ -778,20 +1038,28 @@ class FeatureHandle:
                 if not _valid_owned(prior):
                     self._owned.pop(key, None)
                     try:
-                        current_config = any(_same(getattr(get_window_manager().keyconfigs, role, None), prior.config)
-                                             for role in ('addon', 'default', 'active'))
-                        current_map = current_config and _contains(prior.config.keymaps, prior.map)
+                        configs = get_window_manager().keyconfigs
+                        current_config = next((config for role in ('addon', 'default', 'active')
+                                               if (config := getattr(configs, role, None)) is not None
+                                               and _pointer(config) == prior.config_pointer), None)
+                        current_map = (next((map_ for map_ in _members(current_config.keymaps)
+                                             if _pointer(map_) == prior.map_pointer), None)
+                                       if current_config is not None else None)
                     except (AttributeError, ReferenceError, RuntimeError, TypeError):
-                        current_map = False
-                    if current_map and not _contains(prior.map.keymap_items, prior.item):
-                        _remove_empty_map(prior.config, prior.map)
+                        current_map = None
+                    if current_map is not None:
+                        _remove_empty_map(current_config, current_map)
                         self._cancelled.add(key)
                         diagnostics.append(_diagnostic(self, request, 'released', 'user_removed_owned_item'))
                         continue
                     prior = None
                 else:
                     try:
-                        current_snapshot = _snapshot(prior.item, _scope(prior.map).is_modal)
+                        live = _live_owned_members(prior)
+                        if live is None:
+                            raise _Pending('stale_owned_reference')
+                        live_map, live_item = live
+                        current_snapshot = _snapshot(live_item, _scope(live_map).is_modal)
                     except _Pending:
                         diagnostics.append(_diagnostic(self, request, 'pending',
                                                        'unreadable_owned_item_retained'))
@@ -814,8 +1082,14 @@ class FeatureHandle:
                     except _Pending as issue:
                         if issue.reason == 'merged_priority_unproved':
                             self._blocked[key] = _proof_generation(proof)
-                        _remove_owned(prior)
-                        self._owned.pop(key, None)
+                        removal = _remove_owned(prior)
+                        if removal != 'owned_remove_failed':
+                            self._owned.pop(key, None)
+                        else:
+                            diagnostics.append(_diagnostic(self, request, 'pending',
+                                                           'owned_remove_failed'))
+                            preflight_failed = True
+                            continue
                         diagnostics.append(_diagnostic(self, request, issue.status, issue.reason, issue.role, issue.capability))
                         preflight_failed = True
                         continue
@@ -840,10 +1114,15 @@ class FeatureHandle:
                             continue
                         attempts = self._overtakes.get(key, 0) + 1
                         self._overtakes[key] = attempts
-                        _remove_owned(prior)
+                        removal = _remove_owned(prior)
+                        if removal == 'owned_remove_failed':
+                            diagnostics.append(_diagnostic(self, request, 'pending',
+                                                           'owned_remove_failed'))
+                            preflight_failed = True
+                            continue
                         self._owned.pop(key, None)
                         try:
-                            replacement = _create_override(request, proof)
+                            replacement = _create_override(request, proof, self.owner_id)
                             replacement.overtakes = attempts
                             replacement.owner_id = self.owner_id
                             replacement.request_id = key
@@ -865,10 +1144,7 @@ class FeatureHandle:
                     continue
             try:
                 scope, event = _scope_event(request)
-                if any(other is not self and _valid_owned(owned)
-                       and owned.snapshot[2] and _scope(owned.map) == scope
-                       and owned.snapshot[0] == event
-                       for other in _FEATURES.values() for owned in other._owned.values()):
+                if _conflicting_owned_event(self.owner_id, scope, event):
                     raise _Pending('conflicting_assignment', 'unsupported')
                 if isinstance(request, KeymapOverride):
                     proof = _preflight_override(request)
@@ -893,7 +1169,8 @@ class FeatureHandle:
         created = []
         for request, proof in staged:
             try:
-                owned = _create_override(request, proof) if proof else _create_assignment(request)
+                owned = (_create_override(request, proof, self.owner_id) if proof
+                         else _create_assignment(request, self.owner_id))
                 owned.owner_id = self.owner_id
                 owned.request_id = request.request_id
                 self._owned[request.request_id] = owned
@@ -937,13 +1214,19 @@ class FeatureHandle:
         for request_id, owned in reversed(tuple(self._owned.items())):
             results.append((request_id, _remove_owned(owned)))
         self._owned.clear()
+        _forget_handle_pairs(self)
         if _FEATURES.get(self.owner_id) is self:
             del _FEATURES[self.owner_id]
         return tuple(results)
 
     @property
     def owned_pairs(self):
-        return [(owned.map, owned.item) for owned in self._owned.values() if _valid_owned(owned)]
+        pairs = []
+        for request_id, owned in self._owned.items():
+            if _valid_owned(owned):
+                _remember_pair(self, request_id, owned)
+                pairs.append((owned.map, owned.item))
+        return pairs
 
     @property
     def stats(self):
@@ -976,10 +1259,12 @@ def reconcile(budget=16, *, max_requests=None, time_budget=0.004):
     global _RECONCILE_CURSOR
     remaining = max(0, budget if max_requests is None else max_requests)
     deadline = time.monotonic() + max(0.0, time_budget)
-    result = []
+    cleanup_count = min(remaining, len(_PENDING_CLEANUP))
+    result = list(_retry_cleanup(limit=cleanup_count)) if cleanup_count else []
+    remaining -= cleanup_count
     handles = tuple(_FEATURES.values())
     if not handles:
-        return ()
+        return tuple(result)
     start = _RECONCILE_CURSOR % len(handles)
     visited = 0
     while visited < len(handles):
@@ -1003,22 +1288,35 @@ def reconcile(budget=16, *, max_requests=None, time_budget=0.004):
 
 
 def runtime_stats():
-    return {**_COUNTS, 'features': len(_FEATURES),
-            'owned': sum(len(handle._owned) for handle in _FEATURES.values()),
-            'retained_edited': len(retained_edits())}
+    owned = sum(len(handle._owned) for handle in _FEATURES.values())
+    retained = len(retained_edits())
+    pending = sum(len(records) for records in _PENDING_CLEANUP.values())
+    tracked = {id(item) for handle in _FEATURES.values() for item in handle._owned.values()}
+    tracked.update(id(item) for records in _PENDING_CLEANUP.values() for item, _ in records)
+    tracked.update(id(item) for item in _RETAINED_EDITED.values())
+    return {**_COUNTS, 'features': len(_FEATURES), 'owned': owned,
+            'retained_edited': retained, 'pending_cleanup': pending,
+            'tracked_resources': len(tracked)}
 
 
 def runtime_diagnostics():
     """Immutable diagnostic snapshot for lifecycle and native receipts."""
-    return tuple(diagnostic for handle in tuple(_FEATURES.values())
-                 for diagnostic in handle.diagnostics)
+    return (tuple(diagnostic for handle in tuple(_FEATURES.values())
+                  for diagnostic in handle.diagnostics) +
+            tuple(KeymapDiagnostic(owner_id, request_id, 'pending', 'owned_remove_failed')
+                  for (owner_id, request_id) in _PENDING_CLEANUP))
 
 
 def release_all():
     results = tuple((owner, handle.release()) for owner, handle in tuple(_FEATURES.items()))
+    _retry_cleanup(limit=16)
     for config, map_ in tuple(_CREATED_MAPS.values()):
         _remove_empty_map(config, map_)
-    _CREATED_MAPS.clear()
+    pending_maps = {(_pointer(owned.config), _pointer(owned.map))
+                    for records in _PENDING_CLEANUP.values() for owned, _ in records}
+    for key in tuple(_CREATED_MAPS):
+        if key not in pending_maps:
+            _CREATED_MAPS.pop(key, None)
     for category in tuple(_BOUND_CATEGORIES):
         sync_category_pairs(category)
     _BOUND_CATEGORIES.clear()
@@ -1034,21 +1332,28 @@ def release_owned_pairs(pairs):
             return
     removed = []
     for map_, item in reversed(tuple(pairs)):
-        for handle in tuple(_FEATURES.values()):
-            for request_id, owned in tuple(handle._owned.items()):
-                if _valid_owned(owned) and _same(owned.map, map_) and _same(owned.item, item):
-                    _remove_owned(owned)
-                    handle._owned.pop(request_id, None)
-                    handle._cancelled.add(request_id)
-                    removed.append((handle.owner_id, request_id))
+        alias = _PAIR_ALIASES.get((id(map_), id(item)))
+        if alias is None or alias[0] is not map_ or alias[1] is not item:
+            continue
+        handle, request_id = alias[2], alias[3]
+        if _FEATURES.get(handle.owner_id) is not handle:
+            continue
+        handle._cancelled.add(request_id)
+        owned = handle._owned.get(request_id)
+        if owned is not None:
+            outcome = _remove_owned(owned)
+            if outcome != 'owned_remove_failed':
+                handle._owned.pop(request_id, None)
+            removed.append((handle.owner_id, request_id, outcome))
+        else:
+            removed.append((handle.owner_id, request_id, 'cancelled_pending'))
     pairs.clear()
     return tuple(removed)
 
 
 def owned_pairs_for_map(map_):
-    return [(owned.map, owned.item) for handle in _FEATURES.values()
-            for owned in handle._owned.values()
-            if _same(owned.map, map_) and _valid_owned(owned)]
+    return [pair for handle in _FEATURES.values() for pair in handle.owned_pairs
+            if _same(pair[0], map_)]
 
 
 def bind_category_pairs(category, pairs):
