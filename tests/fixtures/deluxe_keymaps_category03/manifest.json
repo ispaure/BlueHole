@@ -1620,9 +1620,9 @@
     }
   },
   "candidate_accounting": {
-    "implemented": 36,
+    "implemented": 37,
     "transferred_04": 8,
-    "remaining_03": 96
+    "remaining_03": 95
   },
   "ordinary_wheel_comparison": {
     "status": "synthetic dispatch unverified in both configurations; direct operators work",
@@ -3160,7 +3160,7 @@
     ]
   },
   "object_extend_route": {
-    "status": "Approved ordinary source draft after matching reference; actual production check pending",
+    "status": "accepted exact Object-mode production row",
     "row_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
     "binding": {
       "active": true,
@@ -3225,6 +3225,297 @@
     "persistence": "Reuse ordinary editable identity/persistence mechanism; no save/reopen child proposed",
     "stock_changes": false,
     "runtime_capability_changes": false,
-    "candidate_accounting_changed": false
+    "candidate_accounting_changed": true,
+    "native_result": {
+      "batch": 34,
+      "checkpoint": "79c212349791d94471fe6df1bc6cfa34f0754ea0",
+      "run": "extend_production-1794570198118063000",
+      "pid": 23286,
+      "seconds": 21.7057,
+      "native_status": "complete",
+      "matrix": [
+        {
+          "case": "production_extend_enabled_selected",
+          "group_enabled": true,
+          "initial_selected": true,
+          "phases": {
+            "before_press": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "after_press": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "after_release": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "direct_reset": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_direct": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            }
+          },
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "positive_addition": true,
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW",
+                "point": [
+                  2055,
+                  1229
+                ],
+                "modifiers": {
+                  "shift": true,
+                  "oskey": true,
+                  "ctrl": false,
+                  "alt": false
+                }
+              }
+            ],
+            "delivered": true
+          },
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 0,
+            "addon": 1,
+            "user": 1
+          },
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "production_extend_enabled_unselected",
+          "group_enabled": true,
+          "initial_selected": false,
+          "phases": {
+            "before_press": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_press": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_release": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "direct_reset": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_direct": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            }
+          },
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "positive_addition": true,
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW",
+                "point": [
+                  2055,
+                  1229
+                ],
+                "modifiers": {
+                  "shift": true,
+                  "oskey": true,
+                  "ctrl": false,
+                  "alt": false
+                }
+              }
+            ],
+            "delivered": true
+          },
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 0,
+            "addon": 1,
+            "user": 1
+          },
+          "exact_trial_preservation": true
+        }
+      ],
+      "installs": [
+        {
+          "owner_id": "legacy:Selection:d3a8da7bddcf92899d543a7350b36d7479c5e761a0bcbde5da20b4e35c298943",
+          "request_id": "0:3D View:LEFTMOUSE:CLICK",
+          "source_row": {
+            "target": "view3d.select",
+            "event": {
+              "type": "LEFTMOUSE",
+              "value": "CLICK",
+              "any": false,
+              "shift": 1,
+              "ctrl": 0,
+              "alt": 0,
+              "oskey": 1,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "MOUSE"
+            },
+            "active": true,
+            "properties": {
+              "extend": true,
+              "deselect": false,
+              "toggle": true,
+              "deselect_all": false,
+              "select_passthrough": false,
+              "center": true,
+              "enumerate": false,
+              "object": false,
+              "location": [
+                0,
+                0
+              ]
+            },
+            "read_issues": {},
+            "is_user_defined": false,
+            "is_user_modified": false,
+            "blender_id": 1
+          },
+          "runtime_owned_valid": true,
+          "registered_pair_matches": 1
+        },
+        {
+          "owner_id": "legacy:Selection:d3a8da7bddcf92899d543a7350b36d7479c5e761a0bcbde5da20b4e35c298943",
+          "request_id": "0:3D View:LEFTMOUSE:CLICK",
+          "source_row": {
+            "target": "view3d.select",
+            "event": {
+              "type": "LEFTMOUSE",
+              "value": "CLICK",
+              "any": false,
+              "shift": 1,
+              "ctrl": 0,
+              "alt": 0,
+              "oskey": 1,
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "direction": "ANY",
+              "repeat": false,
+              "map_type": "MOUSE"
+            },
+            "active": true,
+            "properties": {
+              "extend": true,
+              "deselect": false,
+              "toggle": true,
+              "deselect_all": false,
+              "select_passthrough": false,
+              "center": true,
+              "enumerate": false,
+              "object": false,
+              "location": [
+                0,
+                0
+              ]
+            },
+            "read_issues": {},
+            "is_user_defined": false,
+            "is_user_modified": false,
+            "blender_id": 1
+          },
+          "runtime_owned_valid": true,
+          "registered_pair_matches": 1
+        }
+      ],
+      "release_count": 3,
+      "release_preservation": [
+        true,
+        true,
+        true
+      ],
+      "cleanup_errors": [],
+      "native_cleanup": {
+        "checked": 136,
+        "created": 1590,
+        "removed": 1590,
+        "reinsertions": 0,
+        "features": 0,
+        "owned": 0,
+        "retained_edited": 0,
+        "pending_cleanup": 0,
+        "tracked_resources": 0
+      },
+      "watcher_stopped": true,
+      "owned_pid_absent": true,
+      "remaining_resources": [],
+      "protected_inputs_unchanged": true,
+      "all45_frozen_sources_exact": true,
+      "released_at_utc": "2026-11-13T11:44:05.683866+00:00",
+      "attribution": "Actual ordinary Extend Selection group matches accepted factory probe/reference selected-active and unselected outcomes, preserves selected bystander and releases exactly. Stock behavior from batch32 reused. Scope Object mode VIEW_3D/WINDOW; no other mode/editor or handler-trace claim.",
+      "accounting": {
+        "implemented": 37,
+        "transferred_04": 8,
+        "remaining_03": 95
+      },
+      "acceptance": {
+        "approved_by": "01a1d36b-dbd5-7933-9457-8e055db2b96d",
+        "row_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+        "production_run": "extend_production-1794570198118063000",
+        "production_checkpoint": "79c212349791d94471fe6df1bc6cfa34f0754ea0",
+        "dispatch_status": "verified_in_exact_context",
+        "accepted_context": "Object mode VIEW_3D/WINDOW; selected-active and unselected targets with selected bystander",
+        "ordinary_lifecycle_reused": true,
+        "stock_comparison_run": "extend_probe-1794569119579631000",
+        "reference_run": "reference-evidence-1794569668793426000",
+        "new_persistence_run": false,
+        "limits": "Scoped production group effect; copied-reference strict trial failures retained despite positive effects/final equality; no other-mode/handler-trace claim."
+      }
+    },
+    "declaration": {
+      "group": "selection_extend",
+      "action": "SELECTION_OBJECT_EXTEND_BY_CENTER",
+      "binding_index": 0
+    },
+    "acceptance": {
+      "approved_by": "01a1d36b-dbd5-7933-9457-8e055db2b96d",
+      "row_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+      "production_run": "extend_production-1794570198118063000",
+      "production_checkpoint": "79c212349791d94471fe6df1bc6cfa34f0754ea0",
+      "dispatch_status": "verified_in_exact_context",
+      "accepted_context": "Object mode VIEW_3D/WINDOW; selected-active and unselected targets with selected bystander",
+      "ordinary_lifecycle_reused": true,
+      "stock_comparison_run": "extend_probe-1794569119579631000",
+      "reference_run": "reference-evidence-1794569668793426000",
+      "new_persistence_run": false,
+      "limits": "Scoped production group effect; copied-reference strict trial failures retained despite positive effects/final equality; no other-mode/handler-trace claim."
+    }
   }
 }

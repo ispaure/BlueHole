@@ -248,8 +248,11 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
         subtract = self.manifest['object_subtract_route']
         self.assertNotIn(subtract['row_id'], reviewed_rows)
         reviewed_rows[subtract['row_id']] = subtract['declaration']
+        extend = self.manifest['object_extend_route']
+        self.assertNotIn(extend['row_id'], reviewed_rows)
+        reviewed_rows[extend['row_id']] = extend['declaration']
         self.assertEqual(self.manifest['candidate_accounting'], {
-            'implemented': 36, 'transferred_04': 8, 'remaining_03': 96})
+            'implemented': 37, 'transferred_04': 8, 'remaining_03': 95})
         self.assertEqual({
             row_id: review['declaration']
             for row_id, review in self.rows.items() if 'declaration' in review
@@ -601,6 +604,44 @@ class Category03NativeReceiptTests(unittest.TestCase):
         cls.native = unpack_native(read_json(CATEGORY / cls.verification['fixture']))
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
+
+    def test_extend_actual_production_identity_effects_and_releases(self):
+        route = self.manifest['object_extend_route']
+        run = self.runs[route['native_result']['run']]
+        self.assertEqual(run['native_status'], 'complete')
+        for path, expected in route['source_sha256'].items():
+            self.assertEqual(run['source_sha256'][path], expected)
+        proof = run['extend_production']
+        self.assertFalse(proof['direct_candidate_injection'])
+        self.assertEqual(len(proof['trials']), 2)
+        for trial, selected in zip(proof['trials'], (True, False)):
+            self.assertTrue(trial['group_enabled'])
+            result = trial['result']
+            phases = {p['phase']: p['snapshot'] for p in result['phases']}
+            self.assertEqual(phases['before_press']['target_selected'], selected)
+            self.assertEqual(phases['before_press']['target_active'], selected)
+            after = phases['after_release']
+            self.assertTrue(after['target_selected'] and after['target_active'] and after['bystander_selected'])
+            self.assertTrue(result['input_delivery']['delivered'])
+            self.assertTrue(result['direct_control']['positive_addition'])
+            self.assertEqual(result['direct_control']['point'], result['projected_point'])
+            self.assertTrue(trial['preservation']['exact_source_and_merged_preservation'])
+            self.assertEqual(trial['preservation']['exact_candidate_counts'], {
+                'default': 0, 'active': 0, 'addon': 1, 'user': 1})
+        self.assertEqual(len(proof['installs']), 2)
+        self.assertEqual(len({x['owner_id'] for x in proof['installs']}), 1)
+        for install in proof['installs']:
+            self.assertTrue(install['owner_id'].startswith('legacy:Selection:'))
+            self.assertEqual(install['request_id'], '0:3D View:LEFTMOUSE:CLICK')
+            self.assertTrue(install['runtime_owned_valid'])
+            self.assertEqual(install['registered_pair_matches'], 1)
+        self.assertEqual(len(proof['releases']), 3)
+        self.assertTrue(all(x['accepted_preservation'] for x in proof['releases']))
+        self.assertEqual(proof['cleanup_errors'], [])
+        for key in ('owned', 'pending_cleanup', 'tracked_resources'):
+            self.assertEqual(run['cleanup'][key], 0)
+        self.assertTrue(run['watcher_stopped'])
+        self.assertEqual(run['remaining_owned_resources'], [])
 
     def test_extend_reference_matches_effects_but_retains_strict_trial_failures(self):
         run = self.reference_runs['reference-evidence-1794569668793426000']

@@ -417,12 +417,13 @@ and focused middle-mouse and modal/tool probes. G behavior and production persis
 parity remains. Existing proofs need no broader
 rerun unless affected source changes.
 
-Of 140 active full-side delta candidates, 36 have implemented declarations:
+Of 140 active full-side delta candidates, 37 have implemented declarations:
 thirteen framing, six UV selection additions, four Circle inputs and twelve
 ordinary declarations accepted through explicit mechanism reuse, plus Object
-Subtract Selection accepted after batch31. Exactly eight UV-specific Q,
+Subtract Selection accepted after batch31 and Extend Selection by Center after
+batch34. Exactly eight UV-specific Q,
 loop/linked and Tweak fallback rows were explicitly transferred to 04. The
-remaining 96 stay with 03: 10 ordinary candidates (nine declarations still draft), 69 currently
+remaining 95 stay with 03: 10 ordinary candidates (nine declarations still draft), 68 currently
 unsupported or unproved handler/modal/tool/replacement cases, 13 observations of
 active-role absence, and four conflicting bindings. Active-role absence alone
 does not prove unavailability. Each has row-specific next steps in the refreshed
@@ -457,9 +458,9 @@ saved preference inputs and their manifests were removed after verified readers.
 The corrected File Browser/Preview control cluster also passed using owned
 scrollable content and visible-region coordinates.
 
-The current mechanism partition contains 96 remaining IDs: ordinary
+The current mechanism partition contains 95 remaining IDs: ordinary
 declarations (10), modal events (33), middle-mouse tool dispatch (19), selection
-replacement/fallback (21), navigation timing/context (5), release confirmation
+replacement/fallback (20), navigation timing/context (5), release confirmation
 (4), and conflicting reference intentions (4). Registration/persistence proof
 can be reused where source, selector and context warrant it. Twelve ordinary rows
 were explicitly approved for reuse. Ctrl-F1 retains its spot check. The two UV
@@ -744,3 +745,24 @@ preservation. Its28 fixture steps add no candidate directly. Existing ordinary
 editable persistence is reused; no additional save/reopen or reference child is
 proposed. All71 category tests pass, including reference-error retention, exact
 editable group registration and the minimal production schedule/effect checks.
+
+Batch34 `extend_production-1794570198118063000` completed in 21.7057 seconds at
+`79c2123`. Both actual-production target states ended selected and active, with
+the bystander still selected. Exact modifier/point input delivery and both
+independently reset direct add controls passed. Complete addon/user admission
+matched the reference binding. The same actual legacy:Selection owner and
+`0:3D View:LEFTMOUSE:CLICK` request were verified across two installations.
+Both releases and final comparison passed, including exact foreign preservation
+and the existing separate comparison of two live-proven Pipeline generations.
+
+Native unregister ended with zero owned/pending/tracked resources and a stopped
+watcher. The PID and all temporary roots were absent, all45 frozen hashes and
+protected inputs matched, and the slot was released. No stock/reference/probe
+replay or other child ran. This establishes actual production behavior in the
+tested Object-mode scope using the accepted stock/reference controls; it does
+not claim other-mode parity or a new save/reopen test. The coordinator accepted
+the exact production row using existing ordinary lifecycle and accepted
+stock/reference controls. Accounting is now37 implemented/eight transferred/95
+remaining; the retained batch33 strict errors remain unchanged.
+All72 category tests pass. The lossless receipt contains61 factory/19 reference
+attempts; all60 prior factory/19 reference records remain unchanged.
