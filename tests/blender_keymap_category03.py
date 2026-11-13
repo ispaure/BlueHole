@@ -142,11 +142,13 @@ def _run_session(args, root):
     shutil.copyfile(Path(__file__).resolve(), executed)
     if args.mode in ('handler_observe', 'handler_probe', 'circle_production'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_handlers.py', root / 'handler-fixture.py')
-    if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production', 'modal_observe'):
+    if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production', 'modal_observe', 'modal_alias_probe'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_ordinary.py', root / 'ordinary-fixture.py')
         shutil.copyfile(REPO / 'tests/fixtures/deluxe_keymaps/reconciliation-ledger.jsonl', root / 'ordinary-ledger.jsonl')
-    if args.mode == 'modal_observe':
+    if args.mode in ('modal_observe', 'modal_alias_probe'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_modal.py', root / 'modal-fixture.py')
+    if args.mode == 'modal_alias_probe':
+        shutil.copyfile(REPO / 'tests/blender_keymap_category03_modal_probe.py', root / 'modal-probe-fixture.py')
     if args.mode in ('editor_observe', 'editor_probe', 'editor_production', 'persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_editors.py', root / 'editor-fixture.py')
     if args.mode in ('persistence', 'reopen', 'editor_save', 'editor_reopen', 'uv_arrow_save', 'uv_arrow_reopen'):
@@ -187,6 +189,8 @@ def _run_session(args, root):
             result['ordinary_ledger_sha256'] = sha(root / 'ordinary-ledger.jsonl')
         if (root / 'modal-fixture.py').exists():
             result['modal_fixture_sha256'] = sha(root / 'modal-fixture.py')
+        if (root / 'modal-probe-fixture.py').exists():
+            result['modal_probe_fixture_sha256'] = sha(root / 'modal-probe-fixture.py')
         if (root / 'editor-fixture.py').exists():
             result['editor_fixture_sha256'] = sha(root / 'editor-fixture.py')
         if (root / 'persistence-fixture.py').exists():
@@ -1825,7 +1829,7 @@ def native_main(root, mode):
             steps, receipt, record, window, area, exporter,
             cluster='uv_edit', ledger_path=root / 'ordinary-ledger.jsonl')
         state['ordinary_fixture'] = helper.UVArrowPrecedenceCases(ordinary, rt, production=production).append()
-    elif mode == 'modal_observe':
+    elif mode in ('modal_observe', 'modal_alias_probe'):
         steps.append(lambda: set_groups(False, False, False))
         helper = load_file('category03_ordinary_fixture', root / 'ordinary-fixture.py')
         modal = load_file('category03_modal_fixture', root / 'modal-fixture.py')
@@ -1861,7 +1865,12 @@ def native_main(root, mode):
 
         state['modal_readiness'] = modal_readiness
         steps.append(lambda: modal_readiness('before_capture'))
-        state['ordinary_fixture'] = modal.ModalSwitchCases(common).append()
+        if mode == 'modal_alias_probe':
+            probe = load_file('category03_modal_probe_fixture', root / 'modal-probe-fixture.py')
+            state['ordinary_fixture'] = probe.ModalAliasProbeCases(
+                common, modal.ModalSwitchCases, root / 'ordinary-ledger.jsonl').append()
+        else:
+            state['ordinary_fixture'] = modal.ModalSwitchCases(common).append()
     elif mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production'):
         steps.append(lambda: set_groups(mode == 'ordinary_production', mode == 'ordinary_production', mode == 'ordinary_production'))
         helper = load_file('category03_ordinary_fixture', root / 'ordinary-fixture.py')
@@ -2100,7 +2109,7 @@ def cli():
     parser.add_argument('--provider-source', type=Path)
     parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'uv_arrow_probe', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
                                          'transform', 'image', 'persistence', 'reopen', 'editor_save', 'editor_reopen',
-                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe'), required=True)
+                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe', 'modal_alias_probe'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')
     parser.add_argument('--editor-matched-endpoints', action='store_true')

@@ -204,7 +204,7 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Fifty-two category checks currently pass. They cover exact assigned IDs and
+Fifty-seven category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
@@ -546,3 +546,32 @@ aliases copied from observed R ROTATE/TRACKBALL templates in a disposable
 fixture, retaining original R behavior, exact ordering, partial-install rollback
 and owned user-edit handling. No production declaration or shared runtime was
 changed, and the other modal candidates remain unaccepted.
+
+
+The next disposable probe is implemented but has not run natively.
+`tests/blender_keymap_category03_modal_probe.py` admits only the exact native
+R/PRESS ROTATE/TRACKBALL templates. Both have repeat disabled; the exact E
+selectors require repeat enabled. It changes **both** fields on owned copies,
+creates TRACKBALL first and ROTATE second with head insertion, then validates
+complete source/merged E readback and ROTATE-before-TRACKBALL order. Original R
+and all foreign item fields/relative order remain strict. Complete map metadata
+is retained; every release requires full source/merged equality.
+
+The 79 scheduled steps reuse real movement, cancel, live operator identity,
+RET and extra-motion controls. They include deliberate first-copy rollback,
+E and R while installed, E and R after exact removal, a fresh pair generation,
+merged user edits to F18 with ROTATE inactive, and edited-pair removal. Portable
+fault tests cover failure after native allocation, a rejected repeat setter and
+an address reused by a different native ID. Current-process user-edit readback
+and cleanup do not establish saving, reopening, UI integration or edit restoration
+through feature toggles. `modal_alias_probe` is test-only; shared runtime and
+production declarations remain unchanged. Native readiness is frozen separately
+and requires a new allocation.
+
+A separate offscreen `ObjectSubtractCases` in the handler fixture schedules only
+ten steps for exact Ctrl-click Object subtraction. It isolates a visible target,
+projects the same point for native input and direct control, requires F23 delivery,
+records press/release and full native candidates, resets selection before the
+minimal direct call, and rejects FINISHED without actual deselection. It retains
+strict source/merged cleanup. It is not wired to a launch mode or natively executed;
+Circle/navigation/shortest-path behavior is not rerun or accepted by this work.

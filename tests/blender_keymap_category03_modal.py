@@ -64,9 +64,10 @@ class ModalSwitchCases:
         self.proof['maps_before_without_control'] = self.initial_maps
         self.record('modal_switch_ready')
 
-    def case(self, control):
-        result = {'case': 'modal_direct_rotate_control' if control else 'modal_translate_e_switch',
+    def case(self, control, *, switch_key='E', case_label=None):
+        result = {'case': case_label or ('modal_direct_rotate_control' if control else 'modal_translate_e_switch'),
                   'minimal_invocation': 'transform.rotate' if control else 'transform.translate',
+                  'switch_key': switch_key,
                   'phases': []}
         state = {}
 
@@ -139,9 +140,9 @@ class ModalSwitchCases:
         if control:
             self.steps.extend((lambda: self.press('ESC'), cancelled))
         else:
-            self.steps.extend((lambda: self.press('E'),
+            self.steps.extend((lambda: self.press(switch_key),
                                lambda: self.common.event('MOUSEMOVE', 'NOTHING', dx=120, dy=70),
-                               after_first_e, lambda: self.press('E'),
+                               after_first_e, lambda: self.press(switch_key),
                                lambda: self.common.event('MOUSEMOVE', 'NOTHING', dx=160, dy=-20),
                                after_second_e, lambda: self.press('RET'),
                                lambda: observe('after_confirm'),

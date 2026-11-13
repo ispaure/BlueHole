@@ -324,6 +324,124 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
         self.assertNotIn('declaration', self.rows[row_id])
 
 
+class Category03ModalProbeTests(unittest.TestCase):
+    def fixture(self):
+        from blender_keymap_category03_modal import ModalSwitchCases
+        from blender_keymap_category03_modal_probe import ModalAliasProbeCases
+        from runtime_keymap_fakes import FakeItem, FakeMap
+        ledger = {row['row_id']: row['binding'] for row in
+                  read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        common = types.SimpleNamespace(
+            steps=[], receipt={'dispatch': []}, record=Mock(), bpy=None,
+            bindings={key: ledger[key] for key in ModalAliasProbeCases.E_IDS},
+            configs=types.SimpleNamespace(update=Mock()))
+        probe = ModalAliasProbeCases(common, ModalSwitchCases,
+                                     BASELINE / 'reconciliation-ledger.jsonl')
+        km = FakeMap('Transform Modal Map', 'EMPTY', 'WINDOW', True)
+        templates = {token: km.keymap_items.append_fixture(
+            FakeItem(modal_value=token, **binding['event']))
+            for token, binding in probe.templates.items()}
+        probe.native_map, probe.map_pointer = km, km.as_pointer()
+        probe.modal_map = Mock(return_value=km)
+        probe.preflight = Mock(return_value=templates)
+        probe.validate_install = Mock()
+
+        def snapshots():
+            return [{'id': item.id, 'pointer': item.as_pointer(), 'token': item.propvalue,
+                     'event': {field: getattr(item, field) for field in probe.expected['ROTATE']['event']},
+                     'active': item.active, 'properties': dict(item.properties)}
+                    for item in km.keymap_items]
+
+        probe.witness.maps = snapshots
+        probe.baseline = snapshots()
+        return probe, templates
+
+    def test_modal_probe_copies_repeat_and_type_without_changing_R(self):
+        probe, templates = self.fixture()
+        for token in reversed(probe.TOKENS):
+            probe.copy(templates[token], token)
+        copies = probe.witness.maps()[:2]
+        self.assertEqual([row['token'] for row in copies], ['ROTATE', 'TRACKBALL'])
+        for row in copies:
+            self.assertEqual(row['event']['type'], 'E')
+            self.assertTrue(row['event']['repeat'])
+        self.assertEqual(probe.witness.maps()[2:], probe.baseline)
+        probe.remove_owned()
+        self.assertEqual(probe.witness.maps(), probe.baseline)
+
+    def test_modal_probe_readback_rejects_missing_repeat(self):
+        probe, _ = self.fixture()
+        for token, expected in probe.expected.items():
+            self.assertTrue(probe.binding_matches(expected, expected))
+            wrong = copy.deepcopy(expected)
+            wrong['event']['repeat'] = False
+            self.assertFalse(probe.binding_matches(wrong, expected))
+            self.assertFalse(probe.templates[token]['event']['repeat'])
+
+    def test_modal_probe_partial_install_rolls_back_exactly(self):
+        probe, _ = self.fixture()
+        probe.partial_install_control()
+        self.assertTrue(probe.proof['partial_install_rollback_passed'])
+        self.assertEqual(probe.owned, [])
+        self.assertEqual(probe.witness.maps(), probe.baseline)
+        self.assertEqual([row['token'] for row in probe.proof['generations']], ['TRACKBALL'])
+        probe.validate_install.assert_not_called()
+
+    def test_modal_probe_native_allocation_and_repeat_setter_failures_unwind(self):
+        from runtime_keymap_fakes import FakeItem
+
+        class RejectRepeatItem(FakeItem):
+            def __setattr__(self, name, value):
+                if name == 'repeat' and value is True:
+                    raise RuntimeError('injected repeat setter failure')
+                super().__setattr__(name, value)
+
+        for failure in ('after_native_allocation', 'repeat_setter'):
+            with self.subTest(failure=failure):
+                probe, _ = self.fixture()
+                items = probe.native_map.keymap_items
+                original = items.new_from_item
+
+                def create(*args, **kwargs):
+                    item = original(*args, **kwargs)
+                    if failure == 'after_native_allocation':
+                        raise RuntimeError('injected after native allocation')
+                    item.__class__ = RejectRepeatItem
+                    return item
+
+                with patch.object(items, 'new_from_item', side_effect=create):
+                    with self.assertRaises(RuntimeError):
+                        probe.install()
+                self.assertEqual(probe.owned, [])
+                self.assertEqual(probe.witness.maps(), probe.baseline)
+                self.assertTrue(probe.proof['checkpoints'][-1]['exact'])
+                probe.validate_install.assert_not_called()
+
+        probe, _ = self.fixture()
+        probe.validate_install.side_effect = AssertionError('injected merged readback failure')
+        with self.assertRaises(AssertionError):
+            probe.install()
+        self.assertEqual(len(probe.proof['generations']), 2)
+        self.assertEqual(probe.owned, [])
+        self.assertEqual(probe.witness.maps(), probe.baseline)
+
+    def test_modal_probe_refuses_reused_address_with_different_id(self):
+        from runtime_keymap_fakes import FakeItem
+        probe, templates = self.fixture()
+        probe.copy(templates['ROTATE'], 'ROTATE')
+        owned = probe.owned[0]
+        original = probe.live_owned(owned)
+        probe.native_map.keymap_items.remove(original)
+        foreign = FakeItem(modal_value='ROTATE', type='E', repeat=True)
+        foreign._pointer = owned['pointer']
+        probe.native_map.keymap_items.append_fixture(foreign)
+        with self.assertRaises(AssertionError):
+            probe.remove_owned()
+        self.assertIn(foreign, list(probe.native_map.keymap_items))
+        self.assertEqual(probe.owned, [owned])
+        self.assertTrue(probe.proof['removal_errors'])
+
+
 class Category03NativeReceiptTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -432,3 +432,198 @@ class HandlerCases:
         self.case('handler_ctrl_click_uv_shortest_path', 'uv', mods={'ctrl': True}, gesture='subtract', shortest=True)
         self.steps.append(self.cleanup)
         return self
+
+
+class ObjectSubtractCases(HandlerCases):
+    """Focused future fixture; no Circle, navigation or shortest-path replay."""
+
+    LEDGER_ID = '8674bcb4d856346f287980fd961ade31095f1165d1f6e25725e4c06b81f582f3'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.scope_names.update(('Window', 'Screen', 'Frames', 'View2D'))
+        self.binding = BINDINGS[self.LEDGER_ID]
+        self.allocations = []
+        self.created_maps = []
+        self.control_class = None
+        self.input_callbacks = []
+        self.initial_maps = None
+        self.result = {'case': 'focused_ctrl_click_object_subtract',
+                       'ledger_id': self.LEDGER_ID, 'phases': []}
+
+    def maps(self):
+        return {role: [self.capture(km) for km in getattr(self.configs, role).keymaps
+                       if km.name in self.scope_names]
+                for role in ('default', 'active', 'addon', 'user')}
+
+    def add_item(self, scope, target, event, properties):
+        matches = [km for km in self.configs.addon.keymaps
+                   if km.name == scope['name'] and km.space_type == scope['space_type']
+                   and km.region_type == scope['region_type'] and not km.is_modal]
+        assert len(matches) <= 1, 'Ambiguous add-on map'
+        if matches:
+            km = matches[0]
+        else:
+            km = self.configs.addon.keymaps.new(name=scope['name'],
+                                               space_type=scope['space_type'],
+                                               region_type=scope['region_type'])
+            self.created_maps.append(km)
+        item = km.keymap_items.new(target, **event)
+        # Journal before property setters, so a failed setter still unwinds.
+        self.allocations.append((km, item, item.as_pointer(), item.id))
+        for name, value in properties.items():
+            setattr(item.properties, name, value)
+        return item
+
+    def start(self):
+        self.configs.update()
+        self.initial_maps = self.maps()
+        self.receipt['subtract_proof'] = {
+            'ledger_ids': [self.LEDGER_ID], 'production_capability_enabled': False,
+            'probe': self.probe, 'maps_before_without_control': self.initial_maps,
+        }
+        self.receipt['dispatch'].append(self.result)
+        if self.probe:
+            event = {name: self.binding['event'][name] for name in
+                     ('type', 'value', 'any', 'shift', 'ctrl', 'alt', 'oskey',
+                      'key_modifier', 'repeat', 'direction')}
+            self.add_item(self.binding['scope'], self.binding['target'],
+                          event, self.binding['properties'])
+        assert not any(item.type == 'F23' for km in self.configs.user.keymaps
+                       for item in km.keymap_items)
+        callbacks, bpy = self.input_callbacks, self.bpy
+
+        class WM_OT_category03_subtract_control(bpy.types.Operator):
+            bl_idname = 'wm.category03_subtract_control'
+            bl_label = 'Category 03 subtraction input control'
+
+            def invoke(self, context, event):
+                callbacks.append({'area': context.area.type, 'region': context.region.type,
+                                  'point': [event.mouse_region_x, event.mouse_region_y]})
+                return {'FINISHED'}
+
+        bpy.utils.register_class(WM_OT_category03_subtract_control)
+        self.control_class = WM_OT_category03_subtract_control
+        self.add_item({'name': 'Window', 'space_type': 'EMPTY', 'region_type': 'WINDOW'},
+                      WM_OT_category03_subtract_control.bl_idname,
+                      {'type': 'F23', 'value': 'PRESS'}, {})
+        self.configs.update()
+        counts = {}
+        for role, maps in self.maps().items():
+            counts[role] = sum(all(row[field] == self.binding[field] for field in
+                                  ('target', 'event', 'active', 'properties', 'read_issues'))
+                               for km in maps if km['scope'] == self.binding['scope']
+                               for row in km['items'])
+        self.receipt['subtract_proof']['exact_candidate_counts'] = counts
+        self.record('focused_subtract_ready')
+        if self.probe:
+            assert counts['addon'] == counts['user'] == 1, 'Exact probe admission failed'
+
+    def snapshot(self, phase):
+        obj = self.bpy.data.objects[self.values['object_name']]
+        with self.context():
+            value = {**self.read(), 'target_selected': obj.select_get(),
+                     'target_visible': obj.visible_get(), 'mode': self.bpy.context.mode,
+                     'area': self.area.type, 'region': self.region().type}
+        self.result['phases'].append({'phase': phase, 'snapshot': value})
+        self.record('focused_subtract_' + phase)
+        return value
+
+    def prepare(self):
+        self.setup('object', subtract=True)
+        with self.context():
+            self.bpy.context.view_layer.update()
+        self.result['target_object'] = self.values['object_name']
+
+    def aim_target(self):
+        from bpy_extras.view3d_utils import location_3d_to_region_2d
+        obj = self.bpy.data.objects[self.values['object_name']]
+        point = location_3d_to_region_2d(self.region(), self.area.spaces.active.region_3d,
+                                        obj.matrix_world.translation)
+        assert point is not None, 'Target projection unavailable'
+        self.values['point'] = tuple(map(int, point))
+        x, y = self.values['point']
+        assert 0 <= x < self.region().width and 0 <= y < self.region().height
+        self.result['projected_point'] = list(self.values['point'])
+        self.event('MOUSEMOVE', 'NOTHING')
+        self.press('F23')
+
+    def before_input(self):
+        expected = {'area': 'VIEW_3D', 'region': 'WINDOW', 'point': self.result['projected_point']}
+        self.result['input_delivery'] = {'callbacks': list(self.input_callbacks),
+                                         'delivered': expected in self.input_callbacks}
+        assert self.result['input_delivery']['delivered']
+        before = self.snapshot('before_press')
+        assert before['target_visible'] and before['target_selected']
+        assert before['mode'] == 'OBJECT' and not before['modal_operators']
+        self.result['native_candidates'] = self.maps()
+
+    def release_input(self):
+        self.snapshot('after_press')
+        self.event('LEFTMOUSE', 'RELEASE', ctrl=True)
+
+    def reset_direct_control(self):
+        after = self.snapshot('after_release')
+        self.result['native_subtraction_observed'] = not after['target_selected']
+        assert not after['modal_operators'], 'Unexpected modal after Ctrl-click'
+        with self.context():
+            obj = self.bpy.data.objects[self.values['object_name']]
+            for candidate in self.bpy.context.scene.objects:
+                candidate.select_set(candidate == obj)
+            self.bpy.context.view_layer.objects.active = obj
+            self.bpy.context.view_layer.update()
+        before = self.snapshot('direct_reset')
+        assert before['target_visible'] and before['target_selected']
+
+    def direct_control(self):
+        with self.context():
+            operator = self.bpy.ops.view3d.select
+            control = {'poll': operator.poll(), 'point': list(self.values['point']),
+                       'properties': {'deselect': True},
+                       'method': 'minimal context-bound positive control; not dispatch evidence'}
+            self.result['direct_control'] = control
+            assert control['poll']
+            control['result'] = sorted(operator('EXEC_DEFAULT',
+                                                location=self.values['point'], deselect=True))
+
+    def verify_direct_control(self):
+        after = self.snapshot('after_direct')
+        control = self.result['direct_control']
+        control['positive_subtraction'] = not after['target_selected']
+        assert control['result'] == ['FINISHED'] and control['positive_subtraction']
+
+    def cleanup(self):
+        if self.initial_maps is None:
+            return
+        errors = []
+        while self.allocations:
+            km, item, pointer, native_id = self.allocations.pop()
+            try:
+                live = [candidate for candidate in km.keymap_items
+                        if candidate.as_pointer() == pointer and candidate.id == native_id]
+                assert len(live) == 1, 'Owned item generation missing or ambiguous'
+                km.keymap_items.remove(live[0])
+            except Exception as exc:
+                errors.append(type(exc).__name__ + ': ' + str(exc))
+        for km in self.created_maps:
+            if not len(km.keymap_items):
+                self.configs.addon.keymaps.remove(km)
+        self.created_maps.clear()
+        if self.control_class is not None:
+            self.bpy.utils.unregister_class(self.control_class)
+            self.control_class = None
+        self.configs.update()
+        after = self.maps()
+        proof = self.receipt['subtract_proof']
+        proof.update(maps_after_without_control=after, cleanup_errors=errors,
+                     exact_source_and_merged_preservation=after == self.initial_maps)
+        self.record('focused_subtract_cleanup')
+        assert not errors and proof['exact_source_and_merged_preservation']
+        self.initial_maps = None
+
+    def append(self):
+        self.steps.extend((self.start, self.prepare, self.aim_target, self.before_input,
+                           lambda: self.event('LEFTMOUSE', ctrl=True), self.release_input,
+                           self.reset_direct_control, self.direct_control,
+                           self.verify_direct_control, self.cleanup))
+        return self
