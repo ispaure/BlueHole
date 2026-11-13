@@ -140,7 +140,7 @@ def _run_session(args, root):
         shutil.copytree(args.incoming, root / 'incoming')
     executed = root / 'executed-native-test.py'
     shutil.copyfile(Path(__file__).resolve(), executed)
-    if args.mode in ('handler_observe', 'handler_probe', 'circle_production'):
+    if args.mode in ('handler_observe', 'handler_probe', 'circle_production', 'subtract_observe', 'subtract_probe'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_handlers.py', root / 'handler-fixture.py')
     if args.mode in ('ordinary_observe', 'ordinary_probe', 'ordinary_production', 'uv_arrow_probe', 'uv_arrow_production', 'modal_observe', 'modal_alias_probe'):
         shutil.copyfile(REPO / 'tests/blender_keymap_category03_ordinary.py', root / 'ordinary-fixture.py')
@@ -1751,6 +1751,13 @@ def native_main(root, mode):
                 steps.append(uv_repeat_install)
                 uv_transform_case('G', prior_rotation=True, expectation='single_repeat')
                 steps.append(uv_repeat_release)
+    elif mode in ('subtract_observe', 'subtract_probe'):
+        steps.append(lambda: set_groups(False, False, False))
+        handler = load_file('category03_subtract_fixture', root / 'handler-fixture.py')
+        # Use the guarded cleanup path so a strict fixture failure cannot skip
+        # addon unregister and watcher shutdown.
+        state['ordinary_fixture'] = handler.ObjectSubtractCases(
+            steps, receipt, record, window, area, exporter, probe=mode == 'subtract_probe').append()
     elif mode in ('handler_observe', 'handler_probe'):
         steps.append(lambda: set_groups(False, False, False))
         handler = load_file('category03_handler_fixture', root / 'handler-fixture.py')
@@ -2109,7 +2116,7 @@ def cli():
     parser.add_argument('--provider-source', type=Path)
     parser.add_argument('--mode', choices=('inspect', 'schema', 'navigation', 'q', 'q_modes', 'q_probe_modes', 'q_tools', 'walk_probe', 'uv_g_control', 'uv_g_probe', 'uv_g_save', 'uv_g_reopen', 'uv_g_production', 'uv_g_production_save', 'uv_g_production_reopen', 'uv_arrow_probe', 'handler_observe', 'handler_probe', 'circle_production', 'ordinary_observe', 'ordinary_probe', 'ordinary_production', 'editor_observe', 'editor_probe', 'editor_production', 'selection', 'selection_failures',
                                          'transform', 'image', 'persistence', 'reopen', 'editor_save', 'editor_reopen',
-                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe', 'modal_alias_probe'), required=True)
+                                         'uv_arrow_production', 'uv_arrow_save', 'uv_arrow_reopen', 'modal_observe', 'modal_alias_probe', 'subtract_observe', 'subtract_probe'), required=True)
     parser.add_argument('--editor-input-controls', action='store_true')
     parser.add_argument('--editor-prime-readiness', action='store_true')
     parser.add_argument('--editor-matched-endpoints', action='store_true')

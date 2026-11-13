@@ -204,14 +204,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Fifty-seven category checks currently pass. They cover exact assigned IDs and
+Fifty-eight category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 56 factory attempts and seventeen copied-reference attempts. A completed
+retains 57 factory attempts and seventeen copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -548,7 +548,7 @@ and owned user-edit handling. No production declaration or shared runtime was
 changed, and the other modal candidates remain unaccepted.
 
 
-The next disposable probe is implemented but has not run natively.
+The batch29 disposable probe tested the two native-template aliases.
 `tests/blender_keymap_category03_modal_probe.py` admits only the exact native
 R/PRESS ROTATE/TRACKBALL templates. Both have repeat disabled; the exact E
 selectors require repeat enabled. It changes **both** fields on owned copies,
@@ -565,13 +565,47 @@ fault tests cover failure after native allocation, a rejected repeat setter and
 an address reused by a different native ID. Current-process user-edit readback
 and cleanup do not establish saving, reopening, UI integration or edit restoration
 through feature toggles. `modal_alias_probe` is test-only; shared runtime and
-production declarations remain unchanged. Native readiness is frozen separately
-and requires a new allocation.
+production declarations remain unchanged. Its strict user-edit failure below blocks this source-copy path. No identical
+repeat or shared runtime/production implementation is authorized.
 
 A separate offscreen `ObjectSubtractCases` in the handler fixture schedules only
 ten steps for exact Ctrl-click Object subtraction. It isolates a visible target,
 projects the same point for native input and direct control, requires F23 delivery,
 records press/release and full native candidates, resets selection before the
 minimal direct call, and rejects FINISHED without actual deselection. It retains
-strict source/merged cleanup. It is not wired to a launch mode or natively executed;
+strict source/merged cleanup. The focused factory `subtract_probe`/`subtract_observe` and copied-reference
+`subtract` launcher routes are prepared but not natively executed;
 Circle/navigation/shortest-path behavior is not rerun or accepted by this work.
+
+
+Batch29 `modal_alias_probe-1794565828872658000` passed all five behavioral
+cases in 34.4586 seconds: direct Rotate/cancel, E switching with the pair,
+R with the pair, factory E after removal and R after removal. Exact emission
+included repeat=True and ROTATE-before-TRACKBALL ordering. The deliberate
+first-copy rollback and unedited-pair removal restored full snapshots exactly.
+
+After the fresh pair's merged user IDs 61/60 were edited to F18 (ROTATE inactive,
+TRACKBALL active), readback passed. Removing owned source copies then changed
+**merged stock R IDs 16/17** to F18/repeat=True; ROTATE also became inactive.
+Both rows and the user Transform Modal Map became user-modified. All 56 item
+IDs/order and map counts stayed unchanged; every other merged map and all
+default/active/addon snapshots stayed exact. Matching context/counts therefore
+did not establish preservation. This is a concrete production blocker, not an
+aggregate-marker exception. The overall native error and complete snapshots
+remain retained. No normalization, broad restore or identical repeat is allowed.
+
+Native unregister completed with zero owned/pending/tracked resources and the
+watcher stopped. The child and all temporary roots were verified absent, and
+protected inputs and 41 frozen source hashes stayed exact. Slot released. The
+independent focused subtraction fixture can progress; a materially different
+modal persistence path requires separate evidence and review.
+
+Offscreen review of the pinned Blender 4.5.1 `wm_keymap.cc` explains a mechanism
+consistent with this result: diff patching falls back from complete binding
+equality to operator/modal-result equality, then preserves the matched base ID.
+This is source analysis, not a captured native C call trace. The materially
+different candidate is a user-defined modal addition with a negative ID: the
+source represents these as add-only diffs. A narrow model reproduces batch29's
+rebinding and distinguishes add-only removal. User-map RNA admission, identity
+through rebuilds, exact edited cleanup, saved ownership and immediate-save/fresh
+reopen remain unproved. No alternative production path is implemented.

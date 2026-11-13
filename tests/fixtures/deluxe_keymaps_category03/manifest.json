@@ -1984,7 +1984,7 @@
     "transform_modal_map_exact_all_roles": true,
     "foreign_loss_cause": "unknown; no source-value mutation or equality inferred",
     "cleanup": "child exited, owned input released, exact copied roots removed, protected inputs unchanged",
-    "remaining": "Review exact two-alias disposable probe using native R templates; no production/runtime capability accepted"
+    "remaining": "Production source-copy modal aliases blocked by batch29 user-edit rebinding; evaluate a materially different path offscreen"
   },
   "modal_e_factory_comparison": {
     "factory_run": "modal_observe-1794564688446795000",
@@ -2026,5 +2026,54 @@
     "cleanup": "native owned/pending/tracked0, watcher stopped, PID and roots absent,40 frozen source hashes and protected inputs exact",
     "runtime_changed": false,
     "candidate_accounting_changed": false
+  },
+  "modal_e_alias_probe": {
+    "run": "modal_alias_probe-1794565828872658000",
+    "checkpoint": "d98db6c",
+    "result": {
+      "status": "blocked for production: edited aliases rebound to merged stock R after source-copy removal",
+      "clean_controls": "Exact E/repeat=True emission/order, Translate\u2192Rotate\u2192Trackball via E, inherited R while installed and after release, factory E fallback after release, positive Rotate/cancel, RET/extra motion and deliberate first-copy rollback passed",
+      "owned_edited_user_ids": {
+        "ROTATE": 61,
+        "TRACKBALL": 60
+      },
+      "affected_merged_stock_ids": {
+        "ROTATE": 16,
+        "TRACKBALL": 17
+      },
+      "after_edited_release": {
+        "ROTATE": {
+          "type": "F18",
+          "repeat": true,
+          "active": false,
+          "is_user_modified": true
+        },
+        "TRACKBALL": {
+          "type": "F18",
+          "repeat": true,
+          "active": true,
+          "is_user_modified": true
+        }
+      },
+      "source_roles_exact": [
+        "default",
+        "active",
+        "addon"
+      ],
+      "merged_map_count_and_item_order_unchanged": true,
+      "merged_transform_modal_item_count": [
+        56,
+        56
+      ],
+      "merged_map_is_user_modified": [
+        false,
+        true
+      ],
+      "matched_readiness": true,
+      "strict_preservation": false,
+      "no_identical_repeat": true,
+      "runtime_production_changes": false
+    },
+    "cleanup": "All native owned/pending/tracked resources0, watcher stopped; owned PID and roots absent;41 frozen hashes and protected inputs exact"
   }
 }

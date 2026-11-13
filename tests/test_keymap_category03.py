@@ -1451,6 +1451,52 @@ class Category03NativeReceiptTests(unittest.TestCase):
         self.assertEqual(proof['maps_before_without_control'], proof['maps_after_without_control'])
         self.assertTrue(factory['ordinary_proof']['input_control']['released'])
 
+    def test_modal_alias_probe_retains_user_edit_rebinding_to_stock_R(self):
+        run = self.runs['modal_alias_probe-1794565828872658000']
+        self.assertEqual(run['native_status'], 'error')
+        probe = run['modal_alias_probe']
+        self.assertTrue(probe['partial_install_rollback_passed'])
+        self.assertEqual([p['exact'] for p in probe['checkpoints']], [True, True, False])
+        self.assertEqual(len(probe['installations']), 2)
+        control, *cases = run['dispatch']
+        self.assertTrue(control['cancel_restored_geometry'])
+        for case in cases:
+            self.assertTrue(case['initial_positive_effect'])
+            self.assertTrue(case['expected_operator_sequence_verified'])
+            self.assertTrue(case['confirmation_stopped_motion'])
+        self.assertTrue(probe['user_edits']['complete_readback_passed'])
+        self.assertEqual({entry['native_id'] for entry in
+                          probe['user_edits']['edited_user_identities'].values()}, {60, 61})
+        proof = run['modal_switch_proof']
+        self.assertFalse(proof['exact_source_and_merged_preservation'])
+        for role in ('default', 'active', 'addon'):
+            self.assertEqual(proof['maps_before_without_control'][role],
+                             proof['maps_after_without_control'][role])
+        before = proof['maps_before_without_control']['user']
+        after = proof['maps_after_without_control']['user']
+        for old, new in zip(before, after):
+            if old['scope']['name'] != 'Transform Modal Map':
+                self.assertEqual(old, new)
+                continue
+            self.assertEqual(len(old['items']), 56)
+            self.assertEqual([row['blender_id'] for row in old['items']],
+                             [row['blender_id'] for row in new['items']])
+            changed = [(left, right) for left, right in zip(old['items'], new['items'])
+                       if left != right]
+            self.assertEqual([row['blender_id'] for row, _ in changed], [16, 17])
+            for left, right in changed:
+                self.assertEqual(left['event']['type'], 'R')
+                self.assertFalse(left['event']['repeat'])
+                self.assertEqual(right['event']['type'], 'F18')
+                self.assertTrue(right['event']['repeat'])
+                self.assertEqual(right['active'], right['target'] == 'TRACKBALL')
+                self.assertTrue(right['is_user_modified'])
+            self.assertFalse(old['is_user_modified'])
+            self.assertTrue(new['is_user_modified'])
+        self.assertTrue(run['modal_capture_readiness']['matched_context_and_counts'])
+        self.assertTrue(run['watcher_stopped'])
+        self.assertEqual(run['cleanup']['owned'], 0)
+
     def test_shared_production_persistence_restores_editor_circle_framing_and_arrow_edits(self):
         pairs = (
             ('editor_save-1794555923466868000', 'editor_reopen-1794556023841045000', {'editor_more'}),

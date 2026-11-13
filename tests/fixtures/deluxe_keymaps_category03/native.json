@@ -33,7 +33,7 @@
     "Composed UV arrow behavior: batch24 production/persistence accepted; owner05 retains global Frames and owner06 verifies integration",
     "UV cursor: batch25 exact input phases and corrected enum conversion passed, but gesture and nonzero direct FINISHED call both had no effect. Need a positive cursor-state/effect control; no parity/unavailability claim or identical rerun.",
     "Tools/selection batch26: UV T and masked paint Q have matching effects; Image/UV Q second press differs. Repair direct tool space_type explicit-default control and resolve exact selection context limits; retain227-row reference strict failure.",
-    "Modal E: reference Translate\u2192Rotate\u2192Trackball differs from factory Translate across both E presses. Factory matched readiness/strict maps passed; reference192 source readability,146 merged readability and UV318\u2192272 loss retained. Exact two-alias disposable capability probe needs review; no runtime/production acceptance."
+    "Modal E: batch29 test-only source copies pass clean behavior/rollback but user edits to alias IDs61/60 rebound onto stock merged R IDs16/17 after removal (F18/repeat=True; ROTATE inactive). Production path blocked; strict failure retained. No identical repeat, normalization or broad map restore. Evaluate a materially different persistence mechanism."
   ],
   "runs": [
     {
@@ -278985,6 +278985,4453 @@
       },
       "watcher_stopped": true,
       "remaining_owned_resources": []
+    },
+    {
+      "mode": "modal_alias_probe",
+      "pid": 16035,
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 34.4586,
+      "source_sha256": {
+        "actions/actions/keymaps/navigation/__init__.py": "bea86c0e302dd4333fd7047c841beaf988bd7d0f4ef5acbbd5afeaa42f678176",
+        "actions/actions/keymaps/navigation/viewport_movement.py": "b7f9f2b3862f256e72c741dadf8f7c541fbf67027ed10d6f5384cdb02cb106fe",
+        "actions/actions/keymaps/navigation/viewport_axis.py": "7daea590c729125bf617f1f9cc6a510c5878191f0254772a2fff8d7ffb3fef2f",
+        "actions/actions/keymaps/navigation/view_framing.py": "cd73184503c77077cba0740fe45aade2c281fdcbc06d0265156fe556a0eecb1e",
+        "actions/actions/keymaps/selection/selection_more_less.py": "6243684d09b82e8cedc02f4ce3635e1f3df0af214af7c2ed2a90588196c44b5f",
+        "actions/actions/keymaps/selection/selection_tool_switch.py": "53894b38e1c6d85e9502fe17070827e66f16b9e0e11f77af5560acfda8f6daff",
+        "actions/actions/keymaps/selection/selection_all_none.py": "e8008178d932507bda67125ea23328bdf23eaf97be8cdb646cbcee37858c1e06",
+        "actions/actions/keymaps/selection/selection_circle.py": "bf2a3c9150631ab1898edf042353b362ab7bef434159f223a3a6f40dae98d093",
+        "actions/actions/keymaps/selection/__init__.py": "81d1b17ceebe8561410259aef78d1a8320184a06cf246fbe21d0011b455bf833",
+        "actions/actions/keymaps/transform/transform_tools_modal.py": "8f94c479a500bf1e481ea8f6aaf44438999fd56b81e1617ee1e3bd07d92d4d73",
+        "actions/actions/keymaps/transform/transform_tools_gizmo.py": "9fdc0215edfa462e9e1034dc8a41067adf2bd8c4210738b834fdf0d6a6061d83",
+        "actions/actions/keymaps/transform/__init__.py": "6cdb22f83fa9f8531324c62aec8fc1fccd8d5367124a43804f5a7ffc0d8fd1cd",
+        "keymaps/navigation_keymaps_register.py": "755f9ae30b2875185226ba45369729e2451ab73df730e23aeb77bb9048ba1a95",
+        "keymaps/selection_keymaps_register.py": "2f1f18c4af5b4fea7bcd6052a3906ee12ddcb6ecdd33403842969f7044b9d8ac",
+        "keymaps/transform_keymaps_register.py": "469a42609f2a66096547f3b01601c855db5db1f9aa337509b0a81960c7f1c08f",
+        "preferences/addon/keymaps/keymap_props_navigation.py": "965ffe1d7a8cffd000c175a1d0659891dd43bba26bcbd7c2fe016e6591874683",
+        "preferences/addon/keymaps/keymap_props_selection.py": "8f2a6f7c5e1c7de03e88a647a4c9fff6e1ab432597d8e2362d7f0a45cc4b781d",
+        "preferences/addon/keymaps/keymap_props_transform.py": "0913737c3f052982199d60855a390580bcc7e3a741fa0428a98f7390f8f692a3",
+        "operators/box_xray_ops.py": "ca5f5d8ea2cc7538166c568528866d48dedb2c9ebbe33937acb2cff88c823a0a",
+        "operators/selection_more_less_ops.py": "b11bdcaa068ca16c497e0ae749b61b696d726d30e6f92ab40c30b4a29dd9b2dc",
+        "operators/operators_register.py": "0f35dc97d171ca049ef6e2ac69e9eb35f5b3dc9fa81cde712ef2e6390e24b9a1",
+        "keymaps/pipeline_keymaps_register.py": "5c5d65fb1cc02e4053aa4de64355602ba585c141dc53058334ed4b28a5ab693a",
+        "actions/actions/keymaps/pipeline/obligatory.py": "7661e368bf59eddf46b2b675b0b3964f772eb222ff4c54aca0e8cad2bda4138a",
+        "keymaps/keymap_utils.py": "0708e8ee57abb8591c456721c900f1864ece67f2900c7ad9ad8ad5fa3f410522",
+        "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+        "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+        "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+        "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+      },
+      "native_driver_sha256": "521677201402314ab50caeb330aa19b9618b127b3e8f02aabe08d92b8b46f25d",
+      "ordinary_fixture_sha256": "4a6fb81a0852cfabb936e7d65ab2224e4166b74da1f28786e2ba947f86aa05b9",
+      "modal_fixture_sha256": "1e1e16275ea24ddbd10817d76b491c52a5f86936057c8f2cca03561e89e1e5ba",
+      "modal_probe_fixture_sha256": "e1dff4af8be70779a2ee7f9a09443064a76313f8fc588a719fef88f64c22c145",
+      "ordinary_ledger_sha256": "a5a500da8d9ada01dc5cf8aa04111e9fd73864d933469ebfea4313ecebffb8e3",
+      "private_launch_log_sha256": "c6d986db8d79267ad868a0fa58cccef46324b8ff0794dbb4e21b4354c8e52b92",
+      "crash_files_found": 0,
+      "crash_retained_files": [],
+      "protected_before": {
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f"
+      },
+      "protected_after": {
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f"
+      },
+      "protected_unchanged": true,
+      "removed_resources": [
+        "resources",
+        "config",
+        "scripts",
+        "extensions",
+        "datafiles",
+        "tmp",
+        "cache"
+      ],
+      "id": "modal_alias_probe-1794565828872658000",
+      "private_process_receipt_sha256": "a8fcd94dfdd6ef4097c832c3acb54ad96c6916c2d436224c53679eb7ec4beca2",
+      "native_status": "error",
+      "native": {
+        "version": "4.5.1 LTS",
+        "build": "b0a72b245dcf",
+        "background": false
+      },
+      "steps": [
+        {
+          "label": "scheduled",
+          "seconds": 0.2552
+        },
+        {
+          "label": "ready",
+          "seconds": 6.7175,
+          "runtime": {
+            "checked": 6,
+            "created": 450,
+            "removed": 226,
+            "reinsertions": 0,
+            "features": 174,
+            "owned": 224,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 224
+          },
+          "active_keyconfig": "Blender"
+        },
+        {
+          "label": "keyboard_sentinel_passed",
+          "seconds": 7.0205
+        },
+        {
+          "label": "modal_readiness_before_capture",
+          "seconds": 8.1774
+        },
+        {
+          "label": "ordinary_ready",
+          "seconds": 8.4946
+        },
+        {
+          "label": "modal_switch_ready",
+          "seconds": 8.4968
+        },
+        {
+          "label": "modal_alias_probe_ready",
+          "seconds": 8.5326
+        },
+        {
+          "label": "modal_alias_rotate_cancel_control_before",
+          "seconds": 8.778
+        },
+        {
+          "label": "modal_alias_rotate_cancel_control_initial_motion",
+          "seconds": 9.9772
+        },
+        {
+          "label": "modal_alias_rotate_cancel_control_after_cancel",
+          "seconds": 10.5772
+        },
+        {
+          "label": "modal_alias_install_rollback",
+          "seconds": 10.8974
+        },
+        {
+          "label": "modal_alias_pair_installed",
+          "seconds": 11.1891
+        },
+        {
+          "label": "modal_alias_E_enabled_before",
+          "seconds": 11.4774
+        },
+        {
+          "label": "modal_alias_E_enabled_initial_motion",
+          "seconds": 12.6772
+        },
+        {
+          "label": "modal_alias_E_enabled_after_first_e_motion",
+          "seconds": 13.5772
+        },
+        {
+          "label": "modal_alias_E_enabled_after_second_e_motion",
+          "seconds": 14.4773
+        },
+        {
+          "label": "modal_alias_E_enabled_after_confirm",
+          "seconds": 15.0772
+        },
+        {
+          "label": "modal_alias_E_enabled_after_extra_motion",
+          "seconds": 15.6772
+        },
+        {
+          "label": "modal_alias_R_with_E_enabled_before",
+          "seconds": 16.2775
+        },
+        {
+          "label": "modal_alias_R_with_E_enabled_initial_motion",
+          "seconds": 17.4773
+        },
+        {
+          "label": "modal_alias_R_with_E_enabled_after_first_e_motion",
+          "seconds": 18.3773
+        },
+        {
+          "label": "modal_alias_R_with_E_enabled_after_second_e_motion",
+          "seconds": 19.2773
+        },
+        {
+          "label": "modal_alias_R_with_E_enabled_after_confirm",
+          "seconds": 19.8773
+        },
+        {
+          "label": "modal_alias_R_with_E_enabled_after_extra_motion",
+          "seconds": 20.4773
+        },
+        {
+          "label": "modal_alias_pair_released",
+          "seconds": 21.088
+        },
+        {
+          "label": "modal_alias_E_after_release_before",
+          "seconds": 21.3775
+        },
+        {
+          "label": "modal_alias_E_after_release_initial_motion",
+          "seconds": 22.5773
+        },
+        {
+          "label": "modal_alias_E_after_release_after_first_e_motion",
+          "seconds": 23.4774
+        },
+        {
+          "label": "modal_alias_E_after_release_after_second_e_motion",
+          "seconds": 24.3773
+        },
+        {
+          "label": "modal_alias_E_after_release_after_confirm",
+          "seconds": 24.9773
+        },
+        {
+          "label": "modal_alias_E_after_release_after_extra_motion",
+          "seconds": 25.5773
+        },
+        {
+          "label": "modal_alias_R_after_release_before",
+          "seconds": 26.1775
+        },
+        {
+          "label": "modal_alias_R_after_release_initial_motion",
+          "seconds": 27.3773
+        },
+        {
+          "label": "modal_alias_R_after_release_after_first_e_motion",
+          "seconds": 28.2774
+        },
+        {
+          "label": "modal_alias_R_after_release_after_second_e_motion",
+          "seconds": 29.1774
+        },
+        {
+          "label": "modal_alias_R_after_release_after_confirm",
+          "seconds": 29.7774
+        },
+        {
+          "label": "modal_alias_R_after_release_after_extra_motion",
+          "seconds": 30.3773
+        },
+        {
+          "label": "modal_alias_pair_installed",
+          "seconds": 30.9897
+        },
+        {
+          "label": "modal_alias_user_edits",
+          "seconds": 31.3065
+        },
+        {
+          "label": "modal_alias_pair_released",
+          "seconds": 31.5881
+        },
+        {
+          "label": "modal_switch_preservation",
+          "seconds": 31.8703
+        },
+        {
+          "label": "modal_readiness_before_addon_shutdown",
+          "seconds": 32.1601
+        },
+        {
+          "label": "failed",
+          "seconds": 32.4553
+        }
+      ],
+      "dispatch": [
+        {
+          "case": "modal_alias_rotate_cancel_control",
+          "minimal_invocation": "transform.rotate",
+          "switch_key": "E",
+          "phases": [
+            {
+              "phase": "before",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "initial_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.9836747050285339,
+                  -0.13536259531974792,
+                  -0.11857908964157104,
+                  0.13480079174041748,
+                  0.9907902479171753,
+                  -0.012783068232238293,
+                  0.11921735107898712,
+                  -0.0034101740457117558,
+                  0.992862343788147
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.9836747050285339,
+                  -0.1759713739156723,
+                  -0.08300536125898361,
+                  0.0,
+                  0.13480079174041748,
+                  1.288027286529541,
+                  -0.008948147296905518,
+                  0.0,
+                  0.11921735107898712,
+                  -0.004433226305991411,
+                  0.6950036287307739,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_rotate"
+                ]
+              }
+            },
+            {
+              "phase": "after_cancel",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            }
+          ],
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW"
+              }
+            ],
+            "delivered": true
+          },
+          "invoke_poll": true,
+          "invoke_result": [
+            "RUNNING_MODAL"
+          ],
+          "initial_positive_effect": true,
+          "cancel_restored_geometry": true
+        },
+        {
+          "case": "modal_alias_E_enabled",
+          "minimal_invocation": "transform.translate",
+          "switch_key": "E",
+          "phases": [
+            {
+              "phase": "before",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "initial_motion",
+              "snapshot": {
+                "location": [
+                  0.10887196660041809,
+                  0.15821373462677002,
+                  0.1354818344116211
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.10887196660041809,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.15821373462677002,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.1354818344116211,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_translate"
+                ]
+              }
+            },
+            {
+              "phase": "after_first_e_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.9521715641021729,
+                  -0.23018977046012878,
+                  -0.20095255970954895,
+                  0.22854386270046234,
+                  0.9730181097984314,
+                  -0.03167829290032387,
+                  0.2028224915266037,
+                  -0.015763306990265846,
+                  0.9790886044502258
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.9521715641021729,
+                  -0.2992466986179352,
+                  -0.14066678285598755,
+                  0.0,
+                  0.22854386270046234,
+                  1.2649234533309937,
+                  -0.022174805402755737,
+                  0.0,
+                  0.2028224915266037,
+                  -0.020492298528552055,
+                  0.6853620409965515,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_rotate"
+                ]
+              }
+            },
+            {
+              "phase": "after_second_e_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_trackball"
+                ]
+              }
+            },
+            {
+              "phase": "after_confirm",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "after_extra_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            }
+          ],
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW"
+              }
+            ],
+            "delivered": true
+          },
+          "invoke_poll": true,
+          "invoke_result": [
+            "RUNNING_MODAL"
+          ],
+          "initial_positive_effect": true,
+          "first_e_rotation_observed": true,
+          "second_e_rotation_changed": true,
+          "trackball_identity": "unresolved by geometry change alone",
+          "confirmation_stopped_motion": true,
+          "expected_operator_sequence_verified": true
+        },
+        {
+          "case": "modal_alias_R_with_E_enabled",
+          "minimal_invocation": "transform.translate",
+          "switch_key": "R",
+          "phases": [
+            {
+              "phase": "before",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "initial_motion",
+              "snapshot": {
+                "location": [
+                  0.10887196660041809,
+                  0.15821373462677002,
+                  0.1354818344116211
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.10887196660041809,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.15821373462677002,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.1354818344116211,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_translate"
+                ]
+              }
+            },
+            {
+              "phase": "after_first_e_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.9521715641021729,
+                  -0.23018977046012878,
+                  -0.20095255970954895,
+                  0.22854386270046234,
+                  0.9730181097984314,
+                  -0.03167829290032387,
+                  0.2028224915266037,
+                  -0.015763306990265846,
+                  0.9790886044502258
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.9521715641021729,
+                  -0.2992466986179352,
+                  -0.14066678285598755,
+                  0.0,
+                  0.22854386270046234,
+                  1.2649234533309937,
+                  -0.022174805402755737,
+                  0.0,
+                  0.2028224915266037,
+                  -0.020492298528552055,
+                  0.6853620409965515,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_rotate"
+                ]
+              }
+            },
+            {
+              "phase": "after_second_e_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_trackball"
+                ]
+              }
+            },
+            {
+              "phase": "after_confirm",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "after_extra_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            }
+          ],
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW"
+              }
+            ],
+            "delivered": true
+          },
+          "invoke_poll": true,
+          "invoke_result": [
+            "RUNNING_MODAL"
+          ],
+          "initial_positive_effect": true,
+          "first_e_rotation_observed": true,
+          "second_e_rotation_changed": true,
+          "trackball_identity": "unresolved by geometry change alone",
+          "confirmation_stopped_motion": true,
+          "expected_operator_sequence_verified": true
+        },
+        {
+          "case": "modal_alias_E_after_release",
+          "minimal_invocation": "transform.translate",
+          "switch_key": "E",
+          "phases": [
+            {
+              "phase": "before",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "initial_motion",
+              "snapshot": {
+                "location": [
+                  0.10887196660041809,
+                  0.15821373462677002,
+                  0.1354818344116211
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.10887196660041809,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.15821373462677002,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.1354818344116211,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_translate"
+                ]
+              }
+            },
+            {
+              "phase": "after_first_e_motion",
+              "snapshot": {
+                "location": [
+                  0.19724135100841522,
+                  0.33739757537841797,
+                  0.2901327610015869
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.19724135100841522,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.33739757537841797,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.2901327610015869,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_translate"
+                ]
+              }
+            },
+            {
+              "phase": "after_second_e_motion",
+              "snapshot": {
+                "location": [
+                  0.49535104632377625,
+                  0.21220211684703827,
+                  0.169593945145607
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.49535104632377625,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.21220211684703827,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.169593945145607,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_translate"
+                ]
+              }
+            },
+            {
+              "phase": "after_confirm",
+              "snapshot": {
+                "location": [
+                  0.49535104632377625,
+                  0.21220211684703827,
+                  0.169593945145607
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.49535104632377625,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.21220211684703827,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.169593945145607,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "after_extra_motion",
+              "snapshot": {
+                "location": [
+                  0.49535104632377625,
+                  0.21220211684703827,
+                  0.169593945145607
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.49535104632377625,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.21220211684703827,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.169593945145607,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            }
+          ],
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW"
+              }
+            ],
+            "delivered": true
+          },
+          "invoke_poll": true,
+          "invoke_result": [
+            "RUNNING_MODAL"
+          ],
+          "initial_positive_effect": true,
+          "first_e_rotation_observed": false,
+          "second_e_rotation_changed": false,
+          "trackball_identity": "unresolved by geometry change alone",
+          "confirmation_stopped_motion": true,
+          "expected_operator_sequence_verified": true
+        },
+        {
+          "case": "modal_alias_R_after_release",
+          "minimal_invocation": "transform.translate",
+          "switch_key": "R",
+          "phases": [
+            {
+              "phase": "before",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "initial_motion",
+              "snapshot": {
+                "location": [
+                  0.10887196660041809,
+                  0.15821373462677002,
+                  0.1354818344116211
+                ],
+                "rotation_matrix": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0,
+                  0.0,
+                  -0.0,
+                  0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.10887196660041809,
+                  0.0,
+                  1.2999999523162842,
+                  0.0,
+                  0.15821373462677002,
+                  0.0,
+                  0.0,
+                  0.699999988079071,
+                  0.1354818344116211,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_translate"
+                ]
+              }
+            },
+            {
+              "phase": "after_first_e_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.9521715641021729,
+                  -0.23018977046012878,
+                  -0.20095255970954895,
+                  0.22854386270046234,
+                  0.9730181097984314,
+                  -0.03167829290032387,
+                  0.2028224915266037,
+                  -0.015763306990265846,
+                  0.9790886044502258
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.9521715641021729,
+                  -0.2992466986179352,
+                  -0.14066678285598755,
+                  0.0,
+                  0.22854386270046234,
+                  1.2649234533309937,
+                  -0.022174805402755737,
+                  0.0,
+                  0.2028224915266037,
+                  -0.020492298528552055,
+                  0.6853620409965515,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_rotate"
+                ]
+              }
+            },
+            {
+              "phase": "after_second_e_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": [
+                  "TRANSFORM_OT_trackball"
+                ]
+              }
+            },
+            {
+              "phase": "after_confirm",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            },
+            {
+              "phase": "after_extra_motion",
+              "snapshot": {
+                "location": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "rotation_matrix": [
+                  0.19848209619522095,
+                  -0.9135363101959229,
+                  0.35504406690597534,
+                  0.26324233412742615,
+                  0.3986293375492096,
+                  0.8785204291343689,
+                  -0.944091260433197,
+                  -0.08090795576572418,
+                  0.31960222125053406
+                ],
+                "scale": [
+                  1.0,
+                  1.2999999523162842,
+                  0.699999988079071
+                ],
+                "matrix_world": [
+                  0.19848209619522095,
+                  -1.1875971555709839,
+                  0.24853084981441498,
+                  0.0,
+                  0.26324233412742615,
+                  0.5182181000709534,
+                  0.6149643063545227,
+                  0.0,
+                  -0.944091260433197,
+                  -0.10518033802509308,
+                  0.22372154891490936,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "mesh_coordinates": [
+                  [
+                    -1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    -1.0,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    -1.0,
+                    1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    -1.0
+                  ],
+                  [
+                    1.0,
+                    1.0,
+                    1.0
+                  ]
+                ],
+                "modal_operators_observable": true,
+                "modal_operators": []
+              }
+            }
+          ],
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW"
+              }
+            ],
+            "delivered": true
+          },
+          "invoke_poll": true,
+          "invoke_result": [
+            "RUNNING_MODAL"
+          ],
+          "initial_positive_effect": true,
+          "first_e_rotation_observed": true,
+          "second_e_rotation_changed": true,
+          "trackball_identity": "unresolved by geometry change alone",
+          "confirmation_stopped_motion": true,
+          "expected_operator_sequence_verified": true
+        }
+      ],
+      "invariants": [],
+      "modal_switch_proof": {
+        "status": "prepared",
+        "ledger_ids": [
+          "299e9dbeb54d018fa47270d4aef02ecc9143a6bc0882df7d3dc0c836fa2df822",
+          "95d1e4739cb33e21cb88513fd041e4a20cd56a06dd022e945218fb4d65af778e"
+        ],
+        "modal_map_mutations": 5,
+        "runtime_capability_changes": 0,
+        "interpretation": "Test-only native-template aliases; inspect live identities and exact preservation.",
+        "exact_rows": {
+          "299e9dbeb54d018fa47270d4aef02ecc9143a6bc0882df7d3dc0c836fa2df822": {
+            "default": 0,
+            "active": 0,
+            "addon": 0,
+            "user": 0
+          },
+          "95d1e4739cb33e21cb88513fd041e4a20cd56a06dd022e945218fb4d65af778e": {
+            "default": 0,
+            "active": 0,
+            "addon": 0,
+            "user": 0
+          }
+        },
+        "maps_before_without_control": {
+          "default": [
+            {
+              "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+            },
+            {
+              "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+            },
+            {
+              "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+            },
+            {
+              "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+            },
+            {
+              "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+            },
+            {
+              "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+            },
+            {
+              "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+            },
+            {
+              "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+            }
+          ],
+          "active": [
+            {
+              "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+            },
+            {
+              "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+            },
+            {
+              "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+            },
+            {
+              "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+            },
+            {
+              "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+            },
+            {
+              "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+            },
+            {
+              "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+            },
+            {
+              "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+            }
+          ],
+          "addon": [
+            {
+              "$snapshot": "77375d34da9ad315407599d7ba04a354c545b1423e5bccdbc9bc18bd320c72ee"
+            }
+          ],
+          "user": [
+            {
+              "$snapshot": "878b1bd2a54bc1351391900842e6a4965c7cc7c2ec1ae65a2e945b8a79bc5b47"
+            },
+            {
+              "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+            },
+            {
+              "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+            },
+            {
+              "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+            },
+            {
+              "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+            },
+            {
+              "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+            },
+            {
+              "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+            },
+            {
+              "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+            }
+          ]
+        },
+        "maps_after_without_control": {
+          "default": [
+            {
+              "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+            },
+            {
+              "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+            },
+            {
+              "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+            },
+            {
+              "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+            },
+            {
+              "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+            },
+            {
+              "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+            },
+            {
+              "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+            },
+            {
+              "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+            }
+          ],
+          "active": [
+            {
+              "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+            },
+            {
+              "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+            },
+            {
+              "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+            },
+            {
+              "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+            },
+            {
+              "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+            },
+            {
+              "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+            },
+            {
+              "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+            },
+            {
+              "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+            }
+          ],
+          "addon": [
+            {
+              "$snapshot": "77375d34da9ad315407599d7ba04a354c545b1423e5bccdbc9bc18bd320c72ee"
+            }
+          ],
+          "user": [
+            {
+              "$snapshot": "878b1bd2a54bc1351391900842e6a4965c7cc7c2ec1ae65a2e945b8a79bc5b47"
+            },
+            {
+              "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+            },
+            {
+              "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+            },
+            {
+              "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+            },
+            {
+              "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+            },
+            {
+              "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+            },
+            {
+              "$snapshot": "6980b4657c7fc47a962a91a7eaac58b07c96c5b8b2a6aa6e0a79d1b8e87b9c3f"
+            },
+            {
+              "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+            }
+          ]
+        },
+        "exact_source_and_merged_preservation": false
+      },
+      "modal_alias_probe": {
+        "test_only": true,
+        "runtime_capability_changes": 0,
+        "E_ledger_ids": [
+          "299e9dbeb54d018fa47270d4aef02ecc9143a6bc0882df7d3dc0c836fa2df822",
+          "95d1e4739cb33e21cb88513fd041e4a20cd56a06dd022e945218fb4d65af778e"
+        ],
+        "R_template_ids": [
+          "12ce5dca52b981775597be57252b0f9b8582d7f4b180aab5c1dd837b03340b93",
+          "75db925e83eecc24de09c1eef4cd3b8aa8307566aaf417835807d258ede0d2df"
+        ],
+        "expected_E_order": [
+          "ROTATE",
+          "TRACKBALL"
+        ],
+        "copy_changes": {
+          "type": [
+            "R",
+            "E"
+          ],
+          "repeat": [
+            false,
+            true
+          ]
+        },
+        "generations": [
+          {
+            "pointer": 50388609160,
+            "native_id": 57,
+            "token": "TRACKBALL"
+          },
+          {
+            "pointer": 50415338440,
+            "native_id": 58,
+            "token": "TRACKBALL"
+          },
+          {
+            "pointer": 50415350728,
+            "native_id": 59,
+            "token": "ROTATE"
+          },
+          {
+            "pointer": 50415347272,
+            "native_id": 60,
+            "token": "TRACKBALL"
+          },
+          {
+            "pointer": 50415350920,
+            "native_id": 61,
+            "token": "ROTATE"
+          }
+        ],
+        "checkpoints": [
+          {
+            "label": "modal_alias_install_rollback",
+            "exact": true,
+            "maps": {
+              "default": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "active": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "addon": [
+                {
+                  "$snapshot": "9f95b62910c31941c110f2bf96346651212b004cb6330be36696e0a91e208893"
+                }
+              ],
+              "user": [
+                {
+                  "$snapshot": "44a51693123c16f0e169a36dd205d1f34fc3c2a9ada6dbd255ec4fb4a2399982"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ]
+            }
+          },
+          {
+            "label": "modal_alias_pair_released",
+            "exact": true,
+            "maps": {
+              "default": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "active": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "addon": [
+                {
+                  "$snapshot": "9f95b62910c31941c110f2bf96346651212b004cb6330be36696e0a91e208893"
+                }
+              ],
+              "user": [
+                {
+                  "$snapshot": "44a51693123c16f0e169a36dd205d1f34fc3c2a9ada6dbd255ec4fb4a2399982"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ]
+            }
+          },
+          {
+            "label": "modal_alias_pair_released",
+            "exact": false,
+            "maps": {
+              "default": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "active": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "addon": [
+                {
+                  "$snapshot": "9f95b62910c31941c110f2bf96346651212b004cb6330be36696e0a91e208893"
+                }
+              ],
+              "user": [
+                {
+                  "$snapshot": "44a51693123c16f0e169a36dd205d1f34fc3c2a9ada6dbd255ec4fb4a2399982"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "6980b4657c7fc47a962a91a7eaac58b07c96c5b8b2a6aa6e0a79d1b8e87b9c3f"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ]
+            }
+          }
+        ],
+        "user_edit_limit": "Current-process merged edits and exact release only; no save/reopen or production UI claim.",
+        "install_failures": [
+          {
+            "type": "PlannedInstallFailure",
+            "planned": true,
+            "owned": [
+              {
+                "pointer": 50388609160,
+                "native_id": 57,
+                "token": "TRACKBALL"
+              }
+            ],
+            "maps": {
+              "default": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "da14235d07111d30ef08553c36acdecd18a569a2a732bbbb5bcdff137c215188"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "active": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "da14235d07111d30ef08553c36acdecd18a569a2a732bbbb5bcdff137c215188"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "addon": [
+                {
+                  "$snapshot": "9f95b62910c31941c110f2bf96346651212b004cb6330be36696e0a91e208893"
+                }
+              ],
+              "user": [
+                {
+                  "$snapshot": "44a51693123c16f0e169a36dd205d1f34fc3c2a9ada6dbd255ec4fb4a2399982"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "3d31a70caaa9fe05edd184893c5f52bac0939aea64af47ede7abb764d0aba8f6"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ]
+            }
+          }
+        ],
+        "partial_install_rollback_passed": true,
+        "installations": [
+          {
+            "owned_ids_by_role": {
+              "default": {
+                "ROTATE": 59,
+                "TRACKBALL": 58
+              },
+              "active": {
+                "ROTATE": 59,
+                "TRACKBALL": 58
+              },
+              "user": {
+                "ROTATE": 59,
+                "TRACKBALL": 58
+              }
+            },
+            "maps": {
+              "default": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "acdc1fa3c5843d49cd020cf1c7db30bef23386da671b283bb7bbcca921183f03"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "active": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "acdc1fa3c5843d49cd020cf1c7db30bef23386da671b283bb7bbcca921183f03"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "addon": [
+                {
+                  "$snapshot": "9f95b62910c31941c110f2bf96346651212b004cb6330be36696e0a91e208893"
+                }
+              ],
+              "user": [
+                {
+                  "$snapshot": "44a51693123c16f0e169a36dd205d1f34fc3c2a9ada6dbd255ec4fb4a2399982"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "acdc1fa3c5843d49cd020cf1c7db30bef23386da671b283bb7bbcca921183f03"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ]
+            }
+          },
+          {
+            "owned_ids_by_role": {
+              "default": {
+                "ROTATE": 61,
+                "TRACKBALL": 60
+              },
+              "active": {
+                "ROTATE": 61,
+                "TRACKBALL": 60
+              },
+              "user": {
+                "ROTATE": 61,
+                "TRACKBALL": 60
+              }
+            },
+            "maps": {
+              "default": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "active": [
+                {
+                  "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ],
+              "addon": [
+                {
+                  "$snapshot": "9f95b62910c31941c110f2bf96346651212b004cb6330be36696e0a91e208893"
+                }
+              ],
+              "user": [
+                {
+                  "$snapshot": "44a51693123c16f0e169a36dd205d1f34fc3c2a9ada6dbd255ec4fb4a2399982"
+                },
+                {
+                  "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+                },
+                {
+                  "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+                },
+                {
+                  "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+                },
+                {
+                  "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+                },
+                {
+                  "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+                },
+                {
+                  "$snapshot": "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a"
+                },
+                {
+                  "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+                }
+              ]
+            }
+          }
+        ],
+        "user_edits": {
+          "before": {
+            "default": [
+              {
+                "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ],
+            "active": [
+              {
+                "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ],
+            "addon": [
+              {
+                "$snapshot": "9f95b62910c31941c110f2bf96346651212b004cb6330be36696e0a91e208893"
+              }
+            ],
+            "user": [
+              {
+                "$snapshot": "44a51693123c16f0e169a36dd205d1f34fc3c2a9ada6dbd255ec4fb4a2399982"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ]
+          },
+          "edited_user_identities": {
+            "ROTATE": {
+              "pointer": 50388814088,
+              "native_id": 61
+            },
+            "TRACKBALL": {
+              "pointer": 50388822728,
+              "native_id": 60
+            }
+          },
+          "native_aliasing_assumed": false,
+          "after": {
+            "default": [
+              {
+                "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ],
+            "active": [
+              {
+                "$snapshot": "b2dde2e3ce662f88e6a173fd4ce567ba2e5fcbf8b699a3e28a2fe2f536a7c691"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "$snapshot": "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a"
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ],
+            "addon": [
+              {
+                "$snapshot": "9f95b62910c31941c110f2bf96346651212b004cb6330be36696e0a91e208893"
+              }
+            ],
+            "user": [
+              {
+                "$snapshot": "44a51693123c16f0e169a36dd205d1f34fc3c2a9ada6dbd255ec4fb4a2399982"
+              },
+              {
+                "$snapshot": "7e412ed00b80413f14d0963839571067529f5246ce0893ad7c46d195eb52042b"
+              },
+              {
+                "$snapshot": "fbbb71fcdd3f9ad122bf23515b9a69edf0769162aa2b3149963455ee20e45647"
+              },
+              {
+                "$snapshot": "d58cd629e914bb1a47e8633ac628a0c54f2d8518985a640a1ee785c5c3339f62"
+              },
+              {
+                "$snapshot": "8161f237dda9d185d9417a86fa675142b61b43dea8145729939c58cfedb7c250"
+              },
+              {
+                "$snapshot": "c3d27f01c99a9311474ad38f2f1ef9e9d9fbf95052b23d991201cc6838962598"
+              },
+              {
+                "scope": {
+                  "name": "Transform Modal Map",
+                  "space_type": "EMPTY",
+                  "region_type": "WINDOW",
+                  "is_modal": true,
+                  "is_tool": null
+                },
+                "is_user_modified": true,
+                "is_tool_source": "unavailable",
+                "tool_name_hint": false,
+                "items": [
+                  {
+                    "target": "ROTATE",
+                    "event": {
+                      "type": "F18",
+                      "value": "PRESS",
+                      "any": false,
+                      "shift": 0,
+                      "ctrl": 0,
+                      "alt": 0,
+                      "oskey": 0,
+                      "hyper": 0,
+                      "key_modifier": "NONE",
+                      "direction": "ANY",
+                      "repeat": true,
+                      "map_type": "KEYBOARD"
+                    },
+                    "active": false,
+                    "properties": {},
+                    "read_issues": {},
+                    "is_user_defined": false,
+                    "is_user_modified": true,
+                    "blender_id": 61
+                  },
+                  {
+                    "target": "TRACKBALL",
+                    "event": {
+                      "type": "F18",
+                      "value": "PRESS",
+                      "any": false,
+                      "shift": 0,
+                      "ctrl": 0,
+                      "alt": 0,
+                      "oskey": 0,
+                      "hyper": 0,
+                      "key_modifier": "NONE",
+                      "direction": "ANY",
+                      "repeat": true,
+                      "map_type": "KEYBOARD"
+                    },
+                    "active": true,
+                    "properties": {},
+                    "read_issues": {},
+                    "is_user_defined": false,
+                    "is_user_modified": true,
+                    "blender_id": 60
+                  },
+                  {
+                    "$snapshot": "58519a5f3e39bd9db5f4552dfdf44ba6e391368c17497fc511848eda1ab069e9"
+                  },
+                  {
+                    "$snapshot": "12002dc719b201d7fd56fab0d0e2aa188a242ea149f54ce12245cda08432b999"
+                  },
+                  {
+                    "$snapshot": "a2d8b4917aca68daa6adffc4db06fe2210f51fe32f6756bfd75d0969fe9f951a"
+                  },
+                  {
+                    "$snapshot": "cb3e40e86fb080f46e93e1474ebb94d2efd195b98950caf2584938a018461438"
+                  },
+                  {
+                    "$snapshot": "a22d08e0e77469c6e4307a345e83155209916f7ca7e559b525abd6973a2723a1"
+                  },
+                  {
+                    "$snapshot": "9e2cf8e1dd9c64c52630ce4ab80d31f7427f7a0060957e7ffcc0622cdb890f22"
+                  },
+                  {
+                    "$snapshot": "24fad712a7be1ac998a7c78b62fef93411c563dd6022138d72138c091cfff46f"
+                  },
+                  {
+                    "$snapshot": "7b9770c46ade182fb61d46d38a6d811cb6c2e730a0368317b29b57abcbe2931e"
+                  },
+                  {
+                    "$snapshot": "6ebc4ca7679e55aebe1b2783bf4daa7dbc3b3bce88b5821b8bccdbb2c83a46b6"
+                  },
+                  {
+                    "$snapshot": "8596be0194206b72504f824ec7e58318caf0672cc530580c698fe46e6b53b1ea"
+                  },
+                  {
+                    "$snapshot": "be15d3ca2732e4bb4c46b4d95e1d45233892494a95c72dd482f803a32240776d"
+                  },
+                  {
+                    "$snapshot": "d0e15e86d61f7f49d6ee189a6ff643b38bcdbcd15e8b4d1c0b07247d37026f3c"
+                  },
+                  {
+                    "$snapshot": "806a577757fe941e9d94a63a7c1483a8b3fa3681196b80efe732c23652f2a710"
+                  },
+                  {
+                    "$snapshot": "ad64a00e4ab62f47a705575b2da307648ee2b4e14964ccdce36eb67cf8165f2b"
+                  },
+                  {
+                    "$snapshot": "7070084a23d823be4ab542d18bf1bfd186bc62dd5e40d60a884531e15b89e8e8"
+                  },
+                  {
+                    "$snapshot": "24c6bdb13801b782d4ff67a595e4777496c59d1c37d742bd4a1db64d9cea839e"
+                  },
+                  {
+                    "$snapshot": "7a17e4e8c0a43b4dcff7924a6565d9873492849bea97878440bd9f3c5b268576"
+                  },
+                  {
+                    "$snapshot": "abcf7b73a12547f9d9074884fb3f6a4952c670becadc03b24330f1cc4766ac20"
+                  },
+                  {
+                    "$snapshot": "6eebcd8bd6621bab3653c7c1085adb48486b94ee95322d030e67c4707c56e491"
+                  },
+                  {
+                    "$snapshot": "fb081fed89828c8e226515853aaa40452a08b47c624bb72b2eefae324698f6d3"
+                  },
+                  {
+                    "$snapshot": "0a16d3939de21ca62128d543b5c1b3e6f2a3bc66fd37860404f30a7f90ac472c"
+                  },
+                  {
+                    "$snapshot": "20114969271f026bcde103a39db31463922526d0fd4d11f5bbcb8a4fcfd890e4"
+                  },
+                  {
+                    "$snapshot": "8c1b7b5efc1b32154c08294c0b81529b19165a5f38398d29e3e339be16623940"
+                  },
+                  {
+                    "$snapshot": "955af7642c179ad5b4768799045e9db2ed10d07aedebe79efa533ee469aebccd"
+                  },
+                  {
+                    "$snapshot": "cd0f81453641a9af956f096d24535cb658e169dcac37b2657753617d8839c8f6"
+                  },
+                  {
+                    "$snapshot": "3d6b884672478b1b49d39e076d7a884be75e8e66352e4e10b94bd27b728e9567"
+                  },
+                  {
+                    "$snapshot": "d31f0ef799d75fe1aafee151da575db2a29bab84e342f90271ddcf4c8703d3b5"
+                  },
+                  {
+                    "$snapshot": "e4de39a1e6220064ac0468544f507dd322ec21021bec4b878408ba5141696c35"
+                  },
+                  {
+                    "$snapshot": "aefb9488e26e4c1fe078c4be89c748c9e855254d6f05e3e140885f7ff1207ec4"
+                  },
+                  {
+                    "$snapshot": "3643bbac35d52d29c0e94782abc253a4b4d864e28ca667e0072b2885293e4917"
+                  },
+                  {
+                    "$snapshot": "98f4622d0103115443adf75b3f1c2e425061b8b64312890d0ffd7bd2a4347ccb"
+                  },
+                  {
+                    "$snapshot": "6adb57ca18534e2de3625f52402da164d084bbc3b394e56b18b63c1e6052e275"
+                  },
+                  {
+                    "$snapshot": "1fc4cc07b4a1d8a132c2e0f5142cd484cc8eb2f26aee02f5b0d2f2850df911d7"
+                  },
+                  {
+                    "$snapshot": "6a9e358ee45be3be22066a8799c98d3336d66308c8b8c6e7fe3540f9da453072"
+                  },
+                  {
+                    "$snapshot": "08496c06b6e3cd261b42c3c1fdd8230f09ef9dec14b0ee0a6a22071637a7d0e8"
+                  },
+                  {
+                    "$snapshot": "dd3491af0992c70bd57bf63d8d02ce7b257e5b2b0b7c7b04de52b792daba6992"
+                  },
+                  {
+                    "$snapshot": "492befb8933e837c1617d864e9f1a51b97dd318101f45cc37e1a09989d1b1c45"
+                  },
+                  {
+                    "$snapshot": "59e4fdb3a56d0dfc13a77817c459f21579c1bd07af41813b1adc1467defcaddb"
+                  },
+                  {
+                    "$snapshot": "8357c6d6aaf11955cc8e850491a92096ec91afce15a6285688a4025a9663a1e8"
+                  },
+                  {
+                    "$snapshot": "a2ceaf0dde6d6d9e8e5f3525f1a54b94e96f5fecc121054ac2204cf0754159c4"
+                  },
+                  {
+                    "$snapshot": "23634523b93b39a09cc2fb426a60ca5407c717bbbc1231fde298da21dfb6c09a"
+                  },
+                  {
+                    "$snapshot": "e4867619d28cd6c97b0d53d86ca4c1e34a912fc9a5031528884dd81e156ca981"
+                  },
+                  {
+                    "$snapshot": "b7a53e205532785a35362921fdb3de419c693e84f1429c92813c0018dfc805bc"
+                  },
+                  {
+                    "$snapshot": "9c7554e684d9bc0d3fdb1a1a9074fa212bc9a1f244133c6221692a4a50f3feec"
+                  },
+                  {
+                    "$snapshot": "19aa1a52f9acdcd2dcc0a471faca6dd393895d9c9d392f5cf2722a93642626f8"
+                  },
+                  {
+                    "$snapshot": "071b7c1b736f34630de231a14d7cd2a41afea40d96cf11b3c018fab0b949b0e2"
+                  },
+                  {
+                    "$snapshot": "9d35cb4327ffef06209b338245afb0232d847c9f3f8d5e3c1d8704813724c81a"
+                  },
+                  {
+                    "$snapshot": "246b4e064a3e547e52dd243709f3dd2a3cc6b781e6b5995cdba25cc02e101c8c"
+                  },
+                  {
+                    "$snapshot": "3f449d538ee06efb5d3de4eaf5b881fbb74e7b5eb0f15dbaf0a5a3a06937a16a"
+                  },
+                  {
+                    "$snapshot": "63ff670cd77c4760ad2096406df136420fd0d4281590053bfda9486addd2e918"
+                  },
+                  {
+                    "$snapshot": "5408036f077623f0214c226ea1f0cdfadaf37f44952dba7a08754347e7360e0b"
+                  },
+                  {
+                    "$snapshot": "3fd9d2ae308c486cfb1baa12b0e1cd6439eec0fda84a9d40abb0a292144c29f9"
+                  },
+                  {
+                    "$snapshot": "f0517e1212991935cc8070ba8f9c8f8900d7ec09d8ca4e6fb3fd82a5b89b00f1"
+                  },
+                  {
+                    "$snapshot": "8ccdd2bc8f8dedd07a17b714e0e78447970a75339cf7441b76bc94dd426dd764"
+                  },
+                  {
+                    "$snapshot": "9e9e2c375cd83fe2d0c33bc5ae223689062487a1585a2097e719d5a4e6e0ab94"
+                  },
+                  {
+                    "$snapshot": "cd51fd1d1d6c341d8de9bb12c79f470a93a09663dd91a47eaf769e06a207b2f6"
+                  }
+                ]
+              },
+              {
+                "$snapshot": "a8c6d5f447f15951fb9971b6d2738ca6d1cbda44632f4478116f6be31f755008"
+              }
+            ]
+          },
+          "complete_readback_passed": true
+        }
+      },
+      "modal_capture_readiness": {
+        "before_capture": {
+          "area": "VIEW_3D",
+          "region": "WINDOW",
+          "mode": "OBJECT",
+          "native_keyconfig_update": true,
+          "active_default_alias": true,
+          "modal_operators": [],
+          "map_item_counts": {
+            "default": [
+              {
+                "name": "Window",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 41
+              },
+              {
+                "name": "Screen",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 35
+              },
+              {
+                "name": "View2D",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 29
+              },
+              {
+                "name": "Frames",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 16
+              },
+              {
+                "name": "3D View",
+                "space_type": "VIEW_3D",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 149
+              },
+              {
+                "name": "UV Editor",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 97
+              },
+              {
+                "name": "Transform Modal Map",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": true,
+                "items": 56
+              },
+              {
+                "name": "Image",
+                "space_type": "IMAGE_EDITOR",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 56
+              }
+            ],
+            "active": [
+              {
+                "name": "Window",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 41
+              },
+              {
+                "name": "Screen",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 35
+              },
+              {
+                "name": "View2D",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 29
+              },
+              {
+                "name": "Frames",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 16
+              },
+              {
+                "name": "3D View",
+                "space_type": "VIEW_3D",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 149
+              },
+              {
+                "name": "UV Editor",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 97
+              },
+              {
+                "name": "Transform Modal Map",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": true,
+                "items": 56
+              },
+              {
+                "name": "Image",
+                "space_type": "IMAGE_EDITOR",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 56
+              }
+            ],
+            "addon": [
+              {
+                "name": "Window",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 3
+              }
+            ],
+            "user": [
+              {
+                "name": "Window",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 44
+              },
+              {
+                "name": "Screen",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 35
+              },
+              {
+                "name": "View2D",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 29
+              },
+              {
+                "name": "Frames",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 16
+              },
+              {
+                "name": "3D View",
+                "space_type": "VIEW_3D",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 149
+              },
+              {
+                "name": "UV Editor",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 97
+              },
+              {
+                "name": "Transform Modal Map",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": true,
+                "items": 56
+              },
+              {
+                "name": "Image",
+                "space_type": "IMAGE_EDITOR",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 56
+              }
+            ]
+          }
+        },
+        "before_addon_shutdown": {
+          "area": "VIEW_3D",
+          "region": "WINDOW",
+          "mode": "OBJECT",
+          "native_keyconfig_update": true,
+          "active_default_alias": true,
+          "modal_operators": [],
+          "map_item_counts": {
+            "default": [
+              {
+                "name": "Window",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 41
+              },
+              {
+                "name": "Screen",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 35
+              },
+              {
+                "name": "View2D",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 29
+              },
+              {
+                "name": "Frames",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 16
+              },
+              {
+                "name": "3D View",
+                "space_type": "VIEW_3D",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 149
+              },
+              {
+                "name": "UV Editor",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 97
+              },
+              {
+                "name": "Transform Modal Map",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": true,
+                "items": 56
+              },
+              {
+                "name": "Image",
+                "space_type": "IMAGE_EDITOR",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 56
+              }
+            ],
+            "active": [
+              {
+                "name": "Window",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 41
+              },
+              {
+                "name": "Screen",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 35
+              },
+              {
+                "name": "View2D",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 29
+              },
+              {
+                "name": "Frames",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 16
+              },
+              {
+                "name": "3D View",
+                "space_type": "VIEW_3D",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 149
+              },
+              {
+                "name": "UV Editor",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 97
+              },
+              {
+                "name": "Transform Modal Map",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": true,
+                "items": 56
+              },
+              {
+                "name": "Image",
+                "space_type": "IMAGE_EDITOR",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 56
+              }
+            ],
+            "addon": [
+              {
+                "name": "Window",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 3
+              }
+            ],
+            "user": [
+              {
+                "name": "Window",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 44
+              },
+              {
+                "name": "Screen",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 35
+              },
+              {
+                "name": "View2D",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 29
+              },
+              {
+                "name": "Frames",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 16
+              },
+              {
+                "name": "3D View",
+                "space_type": "VIEW_3D",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 149
+              },
+              {
+                "name": "UV Editor",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 97
+              },
+              {
+                "name": "Transform Modal Map",
+                "space_type": "EMPTY",
+                "region_type": "WINDOW",
+                "is_modal": true,
+                "items": 56
+              },
+              {
+                "name": "Image",
+                "space_type": "IMAGE_EDITOR",
+                "region_type": "WINDOW",
+                "is_modal": false,
+                "items": 56
+              }
+            ]
+          }
+        },
+        "matched_context_and_counts": true
+      },
+      "ordinary_proof": {
+        "stage": "readonly_reference_or_factory",
+        "cluster": "modal_switch",
+        "ledger_ids": [
+          "299e9dbeb54d018fa47270d4aef02ecc9143a6bc0882df7d3dc0c836fa2df822",
+          "95d1e4739cb33e21cb88513fd041e4a20cd56a06dd022e945218fb4d65af778e"
+        ],
+        "owned_created": 0,
+        "owned_exact_source": 0,
+        "owned_exact_merged": 0,
+        "owned_released": 0,
+        "production_capability_enabled": false,
+        "input_control": {
+          "key": "F23",
+          "addon_id": 12,
+          "merged_occurrences": 1,
+          "released": true
+        },
+        "foreign_source_fields_and_order_unchanged": true
+      },
+      "error": "Traceback (most recent call last):\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/executed-native-test.py\", line 2085, in tick\n    step()\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/modal-probe-fixture.py\", line 222, in release\n    self.exact_checkpoint('modal_alias_pair_released')\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/modal-probe-fixture.py\", line 143, in exact_checkpoint\n    assert exact, 'Strict source/merged comparison failed at ' + label\n           ^^^^^\nAssertionError: Strict source/merged comparison failed at modal_alias_pair_released\n",
+      "ordinary_fixture_cleanup_error": "Traceback (most recent call last):\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/executed-native-test.py\", line 2085, in tick\n    step()\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/modal-probe-fixture.py\", line 222, in release\n    self.exact_checkpoint('modal_alias_pair_released')\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/modal-probe-fixture.py\", line 143, in exact_checkpoint\n    assert exact, 'Strict source/merged comparison failed at ' + label\n           ^^^^^\nAssertionError: Strict source/merged comparison failed at modal_alias_pair_released\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/executed-native-test.py\", line 2045, in cleanup\n    state['ordinary_fixture'].cleanup()\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/modal-probe-fixture.py\", line 264, in cleanup\n    self.witness.cleanup()\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/modal-fixture.py\", line 162, in cleanup\n    assert self.proof['exact_source_and_merged_preservation']\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+      "cleanup": {
+        "checked": 226,
+        "created": 719,
+        "removed": 719,
+        "reinsertions": 0,
+        "features": 0,
+        "owned": 0,
+        "retained_edited": 0,
+        "pending_cleanup": 0,
+        "tracked_resources": 0
+      },
+      "watcher_stopped": true,
+      "cleanup_error": "Traceback (most recent call last):\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/executed-native-test.py\", line 2085, in tick\n    step()\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/modal-probe-fixture.py\", line 222, in release\n    self.exact_checkpoint('modal_alias_pair_released')\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/modal-probe-fixture.py\", line 143, in exact_checkpoint\n    assert exact, 'Strict source/merged comparison failed at ' + label\n           ^^^^^\nAssertionError: Strict source/merged comparison failed at modal_alias_pair_released\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/executed-native-test.py\", line 2095, in tick\n    cleanup()\n  File \"<repo>/test-results/deluxe-keymaps-category03/modal_alias_probe-1794565828872658000/executed-native-test.py\", line 2077, in cleanup\n    raise AssertionError('Ordinary fixture cleanup failed; addon shutdown completed')\nAssertionError: Ordinary fixture cleanup failed; addon shutdown completed\n",
+      "remaining_owned_resources": []
     }
   ],
   "reference_runs": [
@@ -332390,6 +336837,11 @@
       "sha256": "eb96a218532010cf377b9cdeded5a8490b24e64f12569799a3d1c8f145cdff72"
     },
     {
+      "id": "modal_alias_probe-1794565828872658000",
+      "path": "test-results/deluxe-keymaps-category03/sanitized-native/modal_alias_probe-1794565828872658000.json",
+      "sha256": "aa822e8fbd6e0d734d5174dac03471a3374a15b6412ba54a97300ec41a30c3be"
+    },
+    {
       "id": "reference-evidence-1794542844940563000",
       "path": "test-results/deluxe-keymaps-category03/sanitized-native/reference-evidence-1794542844940563000.json",
       "sha256": "d770652c7887fd8517279306a5ecd582afc03be6f1bd0e0363e57a8d37091dd3"
@@ -334138,6 +338590,61 @@
       "matched_context_and_counts": true,
       "strict_source_and_merged_preservation": true,
       "scope": "Factory Blender keyconfig, Object mode VIEW_3D/WINDOW, category switches off; no inserted modal rows"
+    }
+  },
+  "batch29": {
+    "factory_runs": [
+      "modal_alias_probe-1794565828872658000"
+    ],
+    "reference_runs": [],
+    "seconds": 34.4586,
+    "all_children_exited": true,
+    "protected_inputs_unchanged": true,
+    "remaining_resources": [],
+    "native_result": "blocked for production: edited aliases rebound to merged stock R after source-copy removal",
+    "interpretation": {
+      "status": "blocked for production: edited aliases rebound to merged stock R after source-copy removal",
+      "clean_controls": "Exact E/repeat=True emission/order, Translate\u2192Rotate\u2192Trackball via E, inherited R while installed and after release, factory E fallback after release, positive Rotate/cancel, RET/extra motion and deliberate first-copy rollback passed",
+      "owned_edited_user_ids": {
+        "ROTATE": 61,
+        "TRACKBALL": 60
+      },
+      "affected_merged_stock_ids": {
+        "ROTATE": 16,
+        "TRACKBALL": 17
+      },
+      "after_edited_release": {
+        "ROTATE": {
+          "type": "F18",
+          "repeat": true,
+          "active": false,
+          "is_user_modified": true
+        },
+        "TRACKBALL": {
+          "type": "F18",
+          "repeat": true,
+          "active": true,
+          "is_user_modified": true
+        }
+      },
+      "source_roles_exact": [
+        "default",
+        "active",
+        "addon"
+      ],
+      "merged_map_count_and_item_order_unchanged": true,
+      "merged_transform_modal_item_count": [
+        56,
+        56
+      ],
+      "merged_map_is_user_modified": [
+        false,
+        true
+      ],
+      "matched_readiness": true,
+      "strict_preservation": false,
+      "no_identical_repeat": true,
+      "runtime_production_changes": false
     }
   },
   "snapshot_encoding": "sha256-json-v1",
@@ -449815,6 +454322,910 @@
         }
       ]
     },
+    "29f85965a04bc70b72be0e607634ea8e25c7232c82bb0acc3b0610bacb629f5a": {
+      "target": "ROTATE",
+      "event": {
+        "type": "F18",
+        "value": "PRESS",
+        "any": false,
+        "shift": 0,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 0,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": true,
+        "map_type": "KEYBOARD"
+      },
+      "active": false,
+      "properties": {},
+      "read_issues": {},
+      "is_user_defined": false,
+      "is_user_modified": true,
+      "blender_id": 16
+    },
+    "1e8fab6972a67931691a586c7e65ecbcdc0643010d1fb2419546f8d1d3acdf78": {
+      "target": "TRACKBALL",
+      "event": {
+        "type": "F18",
+        "value": "PRESS",
+        "any": false,
+        "shift": 0,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 0,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": true,
+        "map_type": "KEYBOARD"
+      },
+      "active": true,
+      "properties": {},
+      "read_issues": {},
+      "is_user_defined": false,
+      "is_user_modified": true,
+      "blender_id": 17
+    },
+    "6980b4657c7fc47a962a91a7eaac58b07c96c5b8b2a6aa6e0a79d1b8e87b9c3f": {
+      "scope": {
+        "name": "Transform Modal Map",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": true,
+        "is_tool": null
+      },
+      "is_user_modified": true,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "58519a5f3e39bd9db5f4552dfdf44ba6e391368c17497fc511848eda1ab069e9"
+        },
+        {
+          "$snapshot": "12002dc719b201d7fd56fab0d0e2aa188a242ea149f54ce12245cda08432b999"
+        },
+        {
+          "$snapshot": "a2d8b4917aca68daa6adffc4db06fe2210f51fe32f6756bfd75d0969fe9f951a"
+        },
+        {
+          "$snapshot": "cb3e40e86fb080f46e93e1474ebb94d2efd195b98950caf2584938a018461438"
+        },
+        {
+          "$snapshot": "a22d08e0e77469c6e4307a345e83155209916f7ca7e559b525abd6973a2723a1"
+        },
+        {
+          "$snapshot": "9e2cf8e1dd9c64c52630ce4ab80d31f7427f7a0060957e7ffcc0622cdb890f22"
+        },
+        {
+          "$snapshot": "24fad712a7be1ac998a7c78b62fef93411c563dd6022138d72138c091cfff46f"
+        },
+        {
+          "$snapshot": "7b9770c46ade182fb61d46d38a6d811cb6c2e730a0368317b29b57abcbe2931e"
+        },
+        {
+          "$snapshot": "6ebc4ca7679e55aebe1b2783bf4daa7dbc3b3bce88b5821b8bccdbb2c83a46b6"
+        },
+        {
+          "$snapshot": "8596be0194206b72504f824ec7e58318caf0672cc530580c698fe46e6b53b1ea"
+        },
+        {
+          "$snapshot": "be15d3ca2732e4bb4c46b4d95e1d45233892494a95c72dd482f803a32240776d"
+        },
+        {
+          "$snapshot": "d0e15e86d61f7f49d6ee189a6ff643b38bcdbcd15e8b4d1c0b07247d37026f3c"
+        },
+        {
+          "$snapshot": "806a577757fe941e9d94a63a7c1483a8b3fa3681196b80efe732c23652f2a710"
+        },
+        {
+          "$snapshot": "ad64a00e4ab62f47a705575b2da307648ee2b4e14964ccdce36eb67cf8165f2b"
+        },
+        {
+          "$snapshot": "7070084a23d823be4ab542d18bf1bfd186bc62dd5e40d60a884531e15b89e8e8"
+        },
+        {
+          "$snapshot": "29f85965a04bc70b72be0e607634ea8e25c7232c82bb0acc3b0610bacb629f5a"
+        },
+        {
+          "$snapshot": "1e8fab6972a67931691a586c7e65ecbcdc0643010d1fb2419546f8d1d3acdf78"
+        },
+        {
+          "$snapshot": "abcf7b73a12547f9d9074884fb3f6a4952c670becadc03b24330f1cc4766ac20"
+        },
+        {
+          "$snapshot": "6eebcd8bd6621bab3653c7c1085adb48486b94ee95322d030e67c4707c56e491"
+        },
+        {
+          "$snapshot": "fb081fed89828c8e226515853aaa40452a08b47c624bb72b2eefae324698f6d3"
+        },
+        {
+          "$snapshot": "0a16d3939de21ca62128d543b5c1b3e6f2a3bc66fd37860404f30a7f90ac472c"
+        },
+        {
+          "$snapshot": "20114969271f026bcde103a39db31463922526d0fd4d11f5bbcb8a4fcfd890e4"
+        },
+        {
+          "$snapshot": "8c1b7b5efc1b32154c08294c0b81529b19165a5f38398d29e3e339be16623940"
+        },
+        {
+          "$snapshot": "955af7642c179ad5b4768799045e9db2ed10d07aedebe79efa533ee469aebccd"
+        },
+        {
+          "$snapshot": "cd0f81453641a9af956f096d24535cb658e169dcac37b2657753617d8839c8f6"
+        },
+        {
+          "$snapshot": "3d6b884672478b1b49d39e076d7a884be75e8e66352e4e10b94bd27b728e9567"
+        },
+        {
+          "$snapshot": "d31f0ef799d75fe1aafee151da575db2a29bab84e342f90271ddcf4c8703d3b5"
+        },
+        {
+          "$snapshot": "e4de39a1e6220064ac0468544f507dd322ec21021bec4b878408ba5141696c35"
+        },
+        {
+          "$snapshot": "aefb9488e26e4c1fe078c4be89c748c9e855254d6f05e3e140885f7ff1207ec4"
+        },
+        {
+          "$snapshot": "3643bbac35d52d29c0e94782abc253a4b4d864e28ca667e0072b2885293e4917"
+        },
+        {
+          "$snapshot": "98f4622d0103115443adf75b3f1c2e425061b8b64312890d0ffd7bd2a4347ccb"
+        },
+        {
+          "$snapshot": "6adb57ca18534e2de3625f52402da164d084bbc3b394e56b18b63c1e6052e275"
+        },
+        {
+          "$snapshot": "1fc4cc07b4a1d8a132c2e0f5142cd484cc8eb2f26aee02f5b0d2f2850df911d7"
+        },
+        {
+          "$snapshot": "6a9e358ee45be3be22066a8799c98d3336d66308c8b8c6e7fe3540f9da453072"
+        },
+        {
+          "$snapshot": "08496c06b6e3cd261b42c3c1fdd8230f09ef9dec14b0ee0a6a22071637a7d0e8"
+        },
+        {
+          "$snapshot": "dd3491af0992c70bd57bf63d8d02ce7b257e5b2b0b7c7b04de52b792daba6992"
+        },
+        {
+          "$snapshot": "492befb8933e837c1617d864e9f1a51b97dd318101f45cc37e1a09989d1b1c45"
+        },
+        {
+          "$snapshot": "59e4fdb3a56d0dfc13a77817c459f21579c1bd07af41813b1adc1467defcaddb"
+        },
+        {
+          "$snapshot": "8357c6d6aaf11955cc8e850491a92096ec91afce15a6285688a4025a9663a1e8"
+        },
+        {
+          "$snapshot": "a2ceaf0dde6d6d9e8e5f3525f1a54b94e96f5fecc121054ac2204cf0754159c4"
+        },
+        {
+          "$snapshot": "23634523b93b39a09cc2fb426a60ca5407c717bbbc1231fde298da21dfb6c09a"
+        },
+        {
+          "$snapshot": "e4867619d28cd6c97b0d53d86ca4c1e34a912fc9a5031528884dd81e156ca981"
+        },
+        {
+          "$snapshot": "b7a53e205532785a35362921fdb3de419c693e84f1429c92813c0018dfc805bc"
+        },
+        {
+          "$snapshot": "9c7554e684d9bc0d3fdb1a1a9074fa212bc9a1f244133c6221692a4a50f3feec"
+        },
+        {
+          "$snapshot": "19aa1a52f9acdcd2dcc0a471faca6dd393895d9c9d392f5cf2722a93642626f8"
+        },
+        {
+          "$snapshot": "071b7c1b736f34630de231a14d7cd2a41afea40d96cf11b3c018fab0b949b0e2"
+        },
+        {
+          "$snapshot": "9d35cb4327ffef06209b338245afb0232d847c9f3f8d5e3c1d8704813724c81a"
+        },
+        {
+          "$snapshot": "246b4e064a3e547e52dd243709f3dd2a3cc6b781e6b5995cdba25cc02e101c8c"
+        },
+        {
+          "$snapshot": "3f449d538ee06efb5d3de4eaf5b881fbb74e7b5eb0f15dbaf0a5a3a06937a16a"
+        },
+        {
+          "$snapshot": "63ff670cd77c4760ad2096406df136420fd0d4281590053bfda9486addd2e918"
+        },
+        {
+          "$snapshot": "5408036f077623f0214c226ea1f0cdfadaf37f44952dba7a08754347e7360e0b"
+        },
+        {
+          "$snapshot": "3fd9d2ae308c486cfb1baa12b0e1cd6439eec0fda84a9d40abb0a292144c29f9"
+        },
+        {
+          "$snapshot": "f0517e1212991935cc8070ba8f9c8f8900d7ec09d8ca4e6fb3fd82a5b89b00f1"
+        },
+        {
+          "$snapshot": "8ccdd2bc8f8dedd07a17b714e0e78447970a75339cf7441b76bc94dd426dd764"
+        },
+        {
+          "$snapshot": "9e9e2c375cd83fe2d0c33bc5ae223689062487a1585a2097e719d5a4e6e0ab94"
+        },
+        {
+          "$snapshot": "cd51fd1d1d6c341d8de9bb12c79f470a93a09663dd91a47eaf769e06a207b2f6"
+        }
+      ]
+    },
+    "b1089cbabd96d0b10d7d684311ce2b3b944edb0d57a020027fb4750c0fc843a7": {
+      "target": "TRACKBALL",
+      "event": {
+        "type": "E",
+        "value": "PRESS",
+        "any": false,
+        "shift": 0,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 0,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": true,
+        "map_type": "KEYBOARD"
+      },
+      "active": true,
+      "properties": {},
+      "read_issues": {},
+      "is_user_defined": false,
+      "is_user_modified": false,
+      "blender_id": 57
+    },
+    "da14235d07111d30ef08553c36acdecd18a569a2a732bbbb5bcdff137c215188": {
+      "scope": {
+        "name": "Transform Modal Map",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": true,
+        "is_tool": null
+      },
+      "is_user_modified": false,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "b1089cbabd96d0b10d7d684311ce2b3b944edb0d57a020027fb4750c0fc843a7"
+        },
+        {
+          "$snapshot": "58519a5f3e39bd9db5f4552dfdf44ba6e391368c17497fc511848eda1ab069e9"
+        },
+        {
+          "$snapshot": "12002dc719b201d7fd56fab0d0e2aa188a242ea149f54ce12245cda08432b999"
+        },
+        {
+          "$snapshot": "a2d8b4917aca68daa6adffc4db06fe2210f51fe32f6756bfd75d0969fe9f951a"
+        },
+        {
+          "$snapshot": "cb3e40e86fb080f46e93e1474ebb94d2efd195b98950caf2584938a018461438"
+        },
+        {
+          "$snapshot": "a22d08e0e77469c6e4307a345e83155209916f7ca7e559b525abd6973a2723a1"
+        },
+        {
+          "$snapshot": "9e2cf8e1dd9c64c52630ce4ab80d31f7427f7a0060957e7ffcc0622cdb890f22"
+        },
+        {
+          "$snapshot": "24fad712a7be1ac998a7c78b62fef93411c563dd6022138d72138c091cfff46f"
+        },
+        {
+          "$snapshot": "7b9770c46ade182fb61d46d38a6d811cb6c2e730a0368317b29b57abcbe2931e"
+        },
+        {
+          "$snapshot": "6ebc4ca7679e55aebe1b2783bf4daa7dbc3b3bce88b5821b8bccdbb2c83a46b6"
+        },
+        {
+          "$snapshot": "8596be0194206b72504f824ec7e58318caf0672cc530580c698fe46e6b53b1ea"
+        },
+        {
+          "$snapshot": "be15d3ca2732e4bb4c46b4d95e1d45233892494a95c72dd482f803a32240776d"
+        },
+        {
+          "$snapshot": "d0e15e86d61f7f49d6ee189a6ff643b38bcdbcd15e8b4d1c0b07247d37026f3c"
+        },
+        {
+          "$snapshot": "806a577757fe941e9d94a63a7c1483a8b3fa3681196b80efe732c23652f2a710"
+        },
+        {
+          "$snapshot": "ad64a00e4ab62f47a705575b2da307648ee2b4e14964ccdce36eb67cf8165f2b"
+        },
+        {
+          "$snapshot": "7070084a23d823be4ab542d18bf1bfd186bc62dd5e40d60a884531e15b89e8e8"
+        },
+        {
+          "$snapshot": "24c6bdb13801b782d4ff67a595e4777496c59d1c37d742bd4a1db64d9cea839e"
+        },
+        {
+          "$snapshot": "7a17e4e8c0a43b4dcff7924a6565d9873492849bea97878440bd9f3c5b268576"
+        },
+        {
+          "$snapshot": "abcf7b73a12547f9d9074884fb3f6a4952c670becadc03b24330f1cc4766ac20"
+        },
+        {
+          "$snapshot": "6eebcd8bd6621bab3653c7c1085adb48486b94ee95322d030e67c4707c56e491"
+        },
+        {
+          "$snapshot": "fb081fed89828c8e226515853aaa40452a08b47c624bb72b2eefae324698f6d3"
+        },
+        {
+          "$snapshot": "0a16d3939de21ca62128d543b5c1b3e6f2a3bc66fd37860404f30a7f90ac472c"
+        },
+        {
+          "$snapshot": "20114969271f026bcde103a39db31463922526d0fd4d11f5bbcb8a4fcfd890e4"
+        },
+        {
+          "$snapshot": "8c1b7b5efc1b32154c08294c0b81529b19165a5f38398d29e3e339be16623940"
+        },
+        {
+          "$snapshot": "955af7642c179ad5b4768799045e9db2ed10d07aedebe79efa533ee469aebccd"
+        },
+        {
+          "$snapshot": "cd0f81453641a9af956f096d24535cb658e169dcac37b2657753617d8839c8f6"
+        },
+        {
+          "$snapshot": "3d6b884672478b1b49d39e076d7a884be75e8e66352e4e10b94bd27b728e9567"
+        },
+        {
+          "$snapshot": "d31f0ef799d75fe1aafee151da575db2a29bab84e342f90271ddcf4c8703d3b5"
+        },
+        {
+          "$snapshot": "e4de39a1e6220064ac0468544f507dd322ec21021bec4b878408ba5141696c35"
+        },
+        {
+          "$snapshot": "aefb9488e26e4c1fe078c4be89c748c9e855254d6f05e3e140885f7ff1207ec4"
+        },
+        {
+          "$snapshot": "3643bbac35d52d29c0e94782abc253a4b4d864e28ca667e0072b2885293e4917"
+        },
+        {
+          "$snapshot": "98f4622d0103115443adf75b3f1c2e425061b8b64312890d0ffd7bd2a4347ccb"
+        },
+        {
+          "$snapshot": "6adb57ca18534e2de3625f52402da164d084bbc3b394e56b18b63c1e6052e275"
+        },
+        {
+          "$snapshot": "1fc4cc07b4a1d8a132c2e0f5142cd484cc8eb2f26aee02f5b0d2f2850df911d7"
+        },
+        {
+          "$snapshot": "6a9e358ee45be3be22066a8799c98d3336d66308c8b8c6e7fe3540f9da453072"
+        },
+        {
+          "$snapshot": "08496c06b6e3cd261b42c3c1fdd8230f09ef9dec14b0ee0a6a22071637a7d0e8"
+        },
+        {
+          "$snapshot": "dd3491af0992c70bd57bf63d8d02ce7b257e5b2b0b7c7b04de52b792daba6992"
+        },
+        {
+          "$snapshot": "492befb8933e837c1617d864e9f1a51b97dd318101f45cc37e1a09989d1b1c45"
+        },
+        {
+          "$snapshot": "59e4fdb3a56d0dfc13a77817c459f21579c1bd07af41813b1adc1467defcaddb"
+        },
+        {
+          "$snapshot": "8357c6d6aaf11955cc8e850491a92096ec91afce15a6285688a4025a9663a1e8"
+        },
+        {
+          "$snapshot": "a2ceaf0dde6d6d9e8e5f3525f1a54b94e96f5fecc121054ac2204cf0754159c4"
+        },
+        {
+          "$snapshot": "23634523b93b39a09cc2fb426a60ca5407c717bbbc1231fde298da21dfb6c09a"
+        },
+        {
+          "$snapshot": "e4867619d28cd6c97b0d53d86ca4c1e34a912fc9a5031528884dd81e156ca981"
+        },
+        {
+          "$snapshot": "b7a53e205532785a35362921fdb3de419c693e84f1429c92813c0018dfc805bc"
+        },
+        {
+          "$snapshot": "9c7554e684d9bc0d3fdb1a1a9074fa212bc9a1f244133c6221692a4a50f3feec"
+        },
+        {
+          "$snapshot": "19aa1a52f9acdcd2dcc0a471faca6dd393895d9c9d392f5cf2722a93642626f8"
+        },
+        {
+          "$snapshot": "071b7c1b736f34630de231a14d7cd2a41afea40d96cf11b3c018fab0b949b0e2"
+        },
+        {
+          "$snapshot": "9d35cb4327ffef06209b338245afb0232d847c9f3f8d5e3c1d8704813724c81a"
+        },
+        {
+          "$snapshot": "246b4e064a3e547e52dd243709f3dd2a3cc6b781e6b5995cdba25cc02e101c8c"
+        },
+        {
+          "$snapshot": "3f449d538ee06efb5d3de4eaf5b881fbb74e7b5eb0f15dbaf0a5a3a06937a16a"
+        },
+        {
+          "$snapshot": "63ff670cd77c4760ad2096406df136420fd0d4281590053bfda9486addd2e918"
+        },
+        {
+          "$snapshot": "5408036f077623f0214c226ea1f0cdfadaf37f44952dba7a08754347e7360e0b"
+        },
+        {
+          "$snapshot": "3fd9d2ae308c486cfb1baa12b0e1cd6439eec0fda84a9d40abb0a292144c29f9"
+        },
+        {
+          "$snapshot": "f0517e1212991935cc8070ba8f9c8f8900d7ec09d8ca4e6fb3fd82a5b89b00f1"
+        },
+        {
+          "$snapshot": "8ccdd2bc8f8dedd07a17b714e0e78447970a75339cf7441b76bc94dd426dd764"
+        },
+        {
+          "$snapshot": "9e9e2c375cd83fe2d0c33bc5ae223689062487a1585a2097e719d5a4e6e0ab94"
+        },
+        {
+          "$snapshot": "cd51fd1d1d6c341d8de9bb12c79f470a93a09663dd91a47eaf769e06a207b2f6"
+        }
+      ]
+    },
+    "911c2b6513c469d2efcc33822d7aa6c59758b2c459c8e7084e9bd1bf92720141": {
+      "target": "ROTATE",
+      "event": {
+        "type": "E",
+        "value": "PRESS",
+        "any": false,
+        "shift": 0,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 0,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": true,
+        "map_type": "KEYBOARD"
+      },
+      "active": true,
+      "properties": {},
+      "read_issues": {},
+      "is_user_defined": false,
+      "is_user_modified": false,
+      "blender_id": 59
+    },
+    "4be7bcb84c0209f89c247df51af7f4f2fc05fbe0a9bc05f6244fe4c20d6a7a52": {
+      "target": "TRACKBALL",
+      "event": {
+        "type": "E",
+        "value": "PRESS",
+        "any": false,
+        "shift": 0,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 0,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": true,
+        "map_type": "KEYBOARD"
+      },
+      "active": true,
+      "properties": {},
+      "read_issues": {},
+      "is_user_defined": false,
+      "is_user_modified": false,
+      "blender_id": 58
+    },
+    "acdc1fa3c5843d49cd020cf1c7db30bef23386da671b283bb7bbcca921183f03": {
+      "scope": {
+        "name": "Transform Modal Map",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": true,
+        "is_tool": null
+      },
+      "is_user_modified": false,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "911c2b6513c469d2efcc33822d7aa6c59758b2c459c8e7084e9bd1bf92720141"
+        },
+        {
+          "$snapshot": "4be7bcb84c0209f89c247df51af7f4f2fc05fbe0a9bc05f6244fe4c20d6a7a52"
+        },
+        {
+          "$snapshot": "58519a5f3e39bd9db5f4552dfdf44ba6e391368c17497fc511848eda1ab069e9"
+        },
+        {
+          "$snapshot": "12002dc719b201d7fd56fab0d0e2aa188a242ea149f54ce12245cda08432b999"
+        },
+        {
+          "$snapshot": "a2d8b4917aca68daa6adffc4db06fe2210f51fe32f6756bfd75d0969fe9f951a"
+        },
+        {
+          "$snapshot": "cb3e40e86fb080f46e93e1474ebb94d2efd195b98950caf2584938a018461438"
+        },
+        {
+          "$snapshot": "a22d08e0e77469c6e4307a345e83155209916f7ca7e559b525abd6973a2723a1"
+        },
+        {
+          "$snapshot": "9e2cf8e1dd9c64c52630ce4ab80d31f7427f7a0060957e7ffcc0622cdb890f22"
+        },
+        {
+          "$snapshot": "24fad712a7be1ac998a7c78b62fef93411c563dd6022138d72138c091cfff46f"
+        },
+        {
+          "$snapshot": "7b9770c46ade182fb61d46d38a6d811cb6c2e730a0368317b29b57abcbe2931e"
+        },
+        {
+          "$snapshot": "6ebc4ca7679e55aebe1b2783bf4daa7dbc3b3bce88b5821b8bccdbb2c83a46b6"
+        },
+        {
+          "$snapshot": "8596be0194206b72504f824ec7e58318caf0672cc530580c698fe46e6b53b1ea"
+        },
+        {
+          "$snapshot": "be15d3ca2732e4bb4c46b4d95e1d45233892494a95c72dd482f803a32240776d"
+        },
+        {
+          "$snapshot": "d0e15e86d61f7f49d6ee189a6ff643b38bcdbcd15e8b4d1c0b07247d37026f3c"
+        },
+        {
+          "$snapshot": "806a577757fe941e9d94a63a7c1483a8b3fa3681196b80efe732c23652f2a710"
+        },
+        {
+          "$snapshot": "ad64a00e4ab62f47a705575b2da307648ee2b4e14964ccdce36eb67cf8165f2b"
+        },
+        {
+          "$snapshot": "7070084a23d823be4ab542d18bf1bfd186bc62dd5e40d60a884531e15b89e8e8"
+        },
+        {
+          "$snapshot": "24c6bdb13801b782d4ff67a595e4777496c59d1c37d742bd4a1db64d9cea839e"
+        },
+        {
+          "$snapshot": "7a17e4e8c0a43b4dcff7924a6565d9873492849bea97878440bd9f3c5b268576"
+        },
+        {
+          "$snapshot": "abcf7b73a12547f9d9074884fb3f6a4952c670becadc03b24330f1cc4766ac20"
+        },
+        {
+          "$snapshot": "6eebcd8bd6621bab3653c7c1085adb48486b94ee95322d030e67c4707c56e491"
+        },
+        {
+          "$snapshot": "fb081fed89828c8e226515853aaa40452a08b47c624bb72b2eefae324698f6d3"
+        },
+        {
+          "$snapshot": "0a16d3939de21ca62128d543b5c1b3e6f2a3bc66fd37860404f30a7f90ac472c"
+        },
+        {
+          "$snapshot": "20114969271f026bcde103a39db31463922526d0fd4d11f5bbcb8a4fcfd890e4"
+        },
+        {
+          "$snapshot": "8c1b7b5efc1b32154c08294c0b81529b19165a5f38398d29e3e339be16623940"
+        },
+        {
+          "$snapshot": "955af7642c179ad5b4768799045e9db2ed10d07aedebe79efa533ee469aebccd"
+        },
+        {
+          "$snapshot": "cd0f81453641a9af956f096d24535cb658e169dcac37b2657753617d8839c8f6"
+        },
+        {
+          "$snapshot": "3d6b884672478b1b49d39e076d7a884be75e8e66352e4e10b94bd27b728e9567"
+        },
+        {
+          "$snapshot": "d31f0ef799d75fe1aafee151da575db2a29bab84e342f90271ddcf4c8703d3b5"
+        },
+        {
+          "$snapshot": "e4de39a1e6220064ac0468544f507dd322ec21021bec4b878408ba5141696c35"
+        },
+        {
+          "$snapshot": "aefb9488e26e4c1fe078c4be89c748c9e855254d6f05e3e140885f7ff1207ec4"
+        },
+        {
+          "$snapshot": "3643bbac35d52d29c0e94782abc253a4b4d864e28ca667e0072b2885293e4917"
+        },
+        {
+          "$snapshot": "98f4622d0103115443adf75b3f1c2e425061b8b64312890d0ffd7bd2a4347ccb"
+        },
+        {
+          "$snapshot": "6adb57ca18534e2de3625f52402da164d084bbc3b394e56b18b63c1e6052e275"
+        },
+        {
+          "$snapshot": "1fc4cc07b4a1d8a132c2e0f5142cd484cc8eb2f26aee02f5b0d2f2850df911d7"
+        },
+        {
+          "$snapshot": "6a9e358ee45be3be22066a8799c98d3336d66308c8b8c6e7fe3540f9da453072"
+        },
+        {
+          "$snapshot": "08496c06b6e3cd261b42c3c1fdd8230f09ef9dec14b0ee0a6a22071637a7d0e8"
+        },
+        {
+          "$snapshot": "dd3491af0992c70bd57bf63d8d02ce7b257e5b2b0b7c7b04de52b792daba6992"
+        },
+        {
+          "$snapshot": "492befb8933e837c1617d864e9f1a51b97dd318101f45cc37e1a09989d1b1c45"
+        },
+        {
+          "$snapshot": "59e4fdb3a56d0dfc13a77817c459f21579c1bd07af41813b1adc1467defcaddb"
+        },
+        {
+          "$snapshot": "8357c6d6aaf11955cc8e850491a92096ec91afce15a6285688a4025a9663a1e8"
+        },
+        {
+          "$snapshot": "a2ceaf0dde6d6d9e8e5f3525f1a54b94e96f5fecc121054ac2204cf0754159c4"
+        },
+        {
+          "$snapshot": "23634523b93b39a09cc2fb426a60ca5407c717bbbc1231fde298da21dfb6c09a"
+        },
+        {
+          "$snapshot": "e4867619d28cd6c97b0d53d86ca4c1e34a912fc9a5031528884dd81e156ca981"
+        },
+        {
+          "$snapshot": "b7a53e205532785a35362921fdb3de419c693e84f1429c92813c0018dfc805bc"
+        },
+        {
+          "$snapshot": "9c7554e684d9bc0d3fdb1a1a9074fa212bc9a1f244133c6221692a4a50f3feec"
+        },
+        {
+          "$snapshot": "19aa1a52f9acdcd2dcc0a471faca6dd393895d9c9d392f5cf2722a93642626f8"
+        },
+        {
+          "$snapshot": "071b7c1b736f34630de231a14d7cd2a41afea40d96cf11b3c018fab0b949b0e2"
+        },
+        {
+          "$snapshot": "9d35cb4327ffef06209b338245afb0232d847c9f3f8d5e3c1d8704813724c81a"
+        },
+        {
+          "$snapshot": "246b4e064a3e547e52dd243709f3dd2a3cc6b781e6b5995cdba25cc02e101c8c"
+        },
+        {
+          "$snapshot": "3f449d538ee06efb5d3de4eaf5b881fbb74e7b5eb0f15dbaf0a5a3a06937a16a"
+        },
+        {
+          "$snapshot": "63ff670cd77c4760ad2096406df136420fd0d4281590053bfda9486addd2e918"
+        },
+        {
+          "$snapshot": "5408036f077623f0214c226ea1f0cdfadaf37f44952dba7a08754347e7360e0b"
+        },
+        {
+          "$snapshot": "3fd9d2ae308c486cfb1baa12b0e1cd6439eec0fda84a9d40abb0a292144c29f9"
+        },
+        {
+          "$snapshot": "f0517e1212991935cc8070ba8f9c8f8900d7ec09d8ca4e6fb3fd82a5b89b00f1"
+        },
+        {
+          "$snapshot": "8ccdd2bc8f8dedd07a17b714e0e78447970a75339cf7441b76bc94dd426dd764"
+        },
+        {
+          "$snapshot": "9e9e2c375cd83fe2d0c33bc5ae223689062487a1585a2097e719d5a4e6e0ab94"
+        },
+        {
+          "$snapshot": "cd51fd1d1d6c341d8de9bb12c79f470a93a09663dd91a47eaf769e06a207b2f6"
+        }
+      ]
+    },
+    "8c555213fb20fad26b20d95014dc4807ce931431272e122d4441775d8a6317da": {
+      "target": "ROTATE",
+      "event": {
+        "type": "E",
+        "value": "PRESS",
+        "any": false,
+        "shift": 0,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 0,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": true,
+        "map_type": "KEYBOARD"
+      },
+      "active": true,
+      "properties": {},
+      "read_issues": {},
+      "is_user_defined": false,
+      "is_user_modified": false,
+      "blender_id": 61
+    },
+    "979354db0d1fd38b5433e6b0175c5fbbffd73f79ffc1b576b5826bd6640d86fc": {
+      "target": "TRACKBALL",
+      "event": {
+        "type": "E",
+        "value": "PRESS",
+        "any": false,
+        "shift": 0,
+        "ctrl": 0,
+        "alt": 0,
+        "oskey": 0,
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "direction": "ANY",
+        "repeat": true,
+        "map_type": "KEYBOARD"
+      },
+      "active": true,
+      "properties": {},
+      "read_issues": {},
+      "is_user_defined": false,
+      "is_user_modified": false,
+      "blender_id": 60
+    },
+    "99c80c9489cdb18957263a994cc0f61d96c6be9f74e906e26e0110283056596a": {
+      "scope": {
+        "name": "Transform Modal Map",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "is_modal": true,
+        "is_tool": null
+      },
+      "is_user_modified": false,
+      "is_tool_source": "unavailable",
+      "tool_name_hint": false,
+      "items": [
+        {
+          "$snapshot": "8c555213fb20fad26b20d95014dc4807ce931431272e122d4441775d8a6317da"
+        },
+        {
+          "$snapshot": "979354db0d1fd38b5433e6b0175c5fbbffd73f79ffc1b576b5826bd6640d86fc"
+        },
+        {
+          "$snapshot": "58519a5f3e39bd9db5f4552dfdf44ba6e391368c17497fc511848eda1ab069e9"
+        },
+        {
+          "$snapshot": "12002dc719b201d7fd56fab0d0e2aa188a242ea149f54ce12245cda08432b999"
+        },
+        {
+          "$snapshot": "a2d8b4917aca68daa6adffc4db06fe2210f51fe32f6756bfd75d0969fe9f951a"
+        },
+        {
+          "$snapshot": "cb3e40e86fb080f46e93e1474ebb94d2efd195b98950caf2584938a018461438"
+        },
+        {
+          "$snapshot": "a22d08e0e77469c6e4307a345e83155209916f7ca7e559b525abd6973a2723a1"
+        },
+        {
+          "$snapshot": "9e2cf8e1dd9c64c52630ce4ab80d31f7427f7a0060957e7ffcc0622cdb890f22"
+        },
+        {
+          "$snapshot": "24fad712a7be1ac998a7c78b62fef93411c563dd6022138d72138c091cfff46f"
+        },
+        {
+          "$snapshot": "7b9770c46ade182fb61d46d38a6d811cb6c2e730a0368317b29b57abcbe2931e"
+        },
+        {
+          "$snapshot": "6ebc4ca7679e55aebe1b2783bf4daa7dbc3b3bce88b5821b8bccdbb2c83a46b6"
+        },
+        {
+          "$snapshot": "8596be0194206b72504f824ec7e58318caf0672cc530580c698fe46e6b53b1ea"
+        },
+        {
+          "$snapshot": "be15d3ca2732e4bb4c46b4d95e1d45233892494a95c72dd482f803a32240776d"
+        },
+        {
+          "$snapshot": "d0e15e86d61f7f49d6ee189a6ff643b38bcdbcd15e8b4d1c0b07247d37026f3c"
+        },
+        {
+          "$snapshot": "806a577757fe941e9d94a63a7c1483a8b3fa3681196b80efe732c23652f2a710"
+        },
+        {
+          "$snapshot": "ad64a00e4ab62f47a705575b2da307648ee2b4e14964ccdce36eb67cf8165f2b"
+        },
+        {
+          "$snapshot": "7070084a23d823be4ab542d18bf1bfd186bc62dd5e40d60a884531e15b89e8e8"
+        },
+        {
+          "$snapshot": "24c6bdb13801b782d4ff67a595e4777496c59d1c37d742bd4a1db64d9cea839e"
+        },
+        {
+          "$snapshot": "7a17e4e8c0a43b4dcff7924a6565d9873492849bea97878440bd9f3c5b268576"
+        },
+        {
+          "$snapshot": "abcf7b73a12547f9d9074884fb3f6a4952c670becadc03b24330f1cc4766ac20"
+        },
+        {
+          "$snapshot": "6eebcd8bd6621bab3653c7c1085adb48486b94ee95322d030e67c4707c56e491"
+        },
+        {
+          "$snapshot": "fb081fed89828c8e226515853aaa40452a08b47c624bb72b2eefae324698f6d3"
+        },
+        {
+          "$snapshot": "0a16d3939de21ca62128d543b5c1b3e6f2a3bc66fd37860404f30a7f90ac472c"
+        },
+        {
+          "$snapshot": "20114969271f026bcde103a39db31463922526d0fd4d11f5bbcb8a4fcfd890e4"
+        },
+        {
+          "$snapshot": "8c1b7b5efc1b32154c08294c0b81529b19165a5f38398d29e3e339be16623940"
+        },
+        {
+          "$snapshot": "955af7642c179ad5b4768799045e9db2ed10d07aedebe79efa533ee469aebccd"
+        },
+        {
+          "$snapshot": "cd0f81453641a9af956f096d24535cb658e169dcac37b2657753617d8839c8f6"
+        },
+        {
+          "$snapshot": "3d6b884672478b1b49d39e076d7a884be75e8e66352e4e10b94bd27b728e9567"
+        },
+        {
+          "$snapshot": "d31f0ef799d75fe1aafee151da575db2a29bab84e342f90271ddcf4c8703d3b5"
+        },
+        {
+          "$snapshot": "e4de39a1e6220064ac0468544f507dd322ec21021bec4b878408ba5141696c35"
+        },
+        {
+          "$snapshot": "aefb9488e26e4c1fe078c4be89c748c9e855254d6f05e3e140885f7ff1207ec4"
+        },
+        {
+          "$snapshot": "3643bbac35d52d29c0e94782abc253a4b4d864e28ca667e0072b2885293e4917"
+        },
+        {
+          "$snapshot": "98f4622d0103115443adf75b3f1c2e425061b8b64312890d0ffd7bd2a4347ccb"
+        },
+        {
+          "$snapshot": "6adb57ca18534e2de3625f52402da164d084bbc3b394e56b18b63c1e6052e275"
+        },
+        {
+          "$snapshot": "1fc4cc07b4a1d8a132c2e0f5142cd484cc8eb2f26aee02f5b0d2f2850df911d7"
+        },
+        {
+          "$snapshot": "6a9e358ee45be3be22066a8799c98d3336d66308c8b8c6e7fe3540f9da453072"
+        },
+        {
+          "$snapshot": "08496c06b6e3cd261b42c3c1fdd8230f09ef9dec14b0ee0a6a22071637a7d0e8"
+        },
+        {
+          "$snapshot": "dd3491af0992c70bd57bf63d8d02ce7b257e5b2b0b7c7b04de52b792daba6992"
+        },
+        {
+          "$snapshot": "492befb8933e837c1617d864e9f1a51b97dd318101f45cc37e1a09989d1b1c45"
+        },
+        {
+          "$snapshot": "59e4fdb3a56d0dfc13a77817c459f21579c1bd07af41813b1adc1467defcaddb"
+        },
+        {
+          "$snapshot": "8357c6d6aaf11955cc8e850491a92096ec91afce15a6285688a4025a9663a1e8"
+        },
+        {
+          "$snapshot": "a2ceaf0dde6d6d9e8e5f3525f1a54b94e96f5fecc121054ac2204cf0754159c4"
+        },
+        {
+          "$snapshot": "23634523b93b39a09cc2fb426a60ca5407c717bbbc1231fde298da21dfb6c09a"
+        },
+        {
+          "$snapshot": "e4867619d28cd6c97b0d53d86ca4c1e34a912fc9a5031528884dd81e156ca981"
+        },
+        {
+          "$snapshot": "b7a53e205532785a35362921fdb3de419c693e84f1429c92813c0018dfc805bc"
+        },
+        {
+          "$snapshot": "9c7554e684d9bc0d3fdb1a1a9074fa212bc9a1f244133c6221692a4a50f3feec"
+        },
+        {
+          "$snapshot": "19aa1a52f9acdcd2dcc0a471faca6dd393895d9c9d392f5cf2722a93642626f8"
+        },
+        {
+          "$snapshot": "071b7c1b736f34630de231a14d7cd2a41afea40d96cf11b3c018fab0b949b0e2"
+        },
+        {
+          "$snapshot": "9d35cb4327ffef06209b338245afb0232d847c9f3f8d5e3c1d8704813724c81a"
+        },
+        {
+          "$snapshot": "246b4e064a3e547e52dd243709f3dd2a3cc6b781e6b5995cdba25cc02e101c8c"
+        },
+        {
+          "$snapshot": "3f449d538ee06efb5d3de4eaf5b881fbb74e7b5eb0f15dbaf0a5a3a06937a16a"
+        },
+        {
+          "$snapshot": "63ff670cd77c4760ad2096406df136420fd0d4281590053bfda9486addd2e918"
+        },
+        {
+          "$snapshot": "5408036f077623f0214c226ea1f0cdfadaf37f44952dba7a08754347e7360e0b"
+        },
+        {
+          "$snapshot": "3fd9d2ae308c486cfb1baa12b0e1cd6439eec0fda84a9d40abb0a292144c29f9"
+        },
+        {
+          "$snapshot": "f0517e1212991935cc8070ba8f9c8f8900d7ec09d8ca4e6fb3fd82a5b89b00f1"
+        },
+        {
+          "$snapshot": "8ccdd2bc8f8dedd07a17b714e0e78447970a75339cf7441b76bc94dd426dd764"
+        },
+        {
+          "$snapshot": "9e9e2c375cd83fe2d0c33bc5ae223689062487a1585a2097e719d5a4e6e0ab94"
+        },
+        {
+          "$snapshot": "cd51fd1d1d6c341d8de9bb12c79f470a93a09663dd91a47eaf769e06a207b2f6"
+        }
+      ]
+    },
     "dc87191919f2486d4e591ac5de53f9126d55acef35ddb93d0023105cc6ccb0d3": {
       "target": "object.paste_group_override",
       "event": {
@@ -506161,5 +511572,5 @@
       "target": "wm.tool_set_by_id"
     }
   },
-  "expanded_sha256": "9abe6ab9c1097f61399c47bd9740950b51a9c956cc048e78993f4042a4ce9ce9"
+  "expanded_sha256": "722b544f56404225339660b6a171e240c026e405cfb9fad5bb8ae59101256a61"
 }
