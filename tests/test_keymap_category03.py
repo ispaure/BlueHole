@@ -1,6 +1,7 @@
 """Portable category 03 reconciliation and registration checks."""
 
 from collections import Counter
+from contextlib import nullcontext
 import copy
 from dataclasses import asdict
 from hashlib import sha256
@@ -331,6 +332,141 @@ class Category03ReconciliationTests(Category03Evidence, unittest.TestCase):
 
 
 class Category03ModalProbeTests(unittest.TestCase):
+    def test_uv_extend_shared_schedule_keeps_three_event_paths_separate(self):
+        from blender_keymap_category03_handlers import UVExtendCases
+        ledger = {row['row_id']: row for row in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        bindings = {cell[0]: ledger[cell[0]]['binding'] for cell in UVExtendCases.CELLS}
+        self.assertEqual([binding['event']['value'] for binding in bindings.values()], ['CLICK', 'PRESS', 'PRESS'])
+        self.assertEqual(len({binding['scope']['name'] for binding in bindings.values()}), 3)
+        for binding in bindings.values():
+            self.assertEqual(binding['target'], 'uv.select')
+            self.assertTrue(binding['properties']['extend'])
+            self.assertFalse(binding['properties']['toggle'])
+        configs = types.SimpleNamespace(**{role: types.SimpleNamespace(keymaps=[])
+                                          for role in ('default', 'active', 'addon', 'user')})
+        fake_bpy = types.SimpleNamespace(context=types.SimpleNamespace(
+            window_manager=types.SimpleNamespace(keyconfigs=configs)))
+        for probe, count in ((False, 40), (True, 67)):
+            with self.subTest(probe=probe), patch.dict(sys.modules, {'bpy': fake_bpy}):
+                steps, receipt = [], {'dispatch': []}
+                fixture = UVExtendCases(steps, receipt, Mock(), None, None, None,
+                                        bindings=bindings, probe=probe)
+                methods = ('prepare', 'start', 'begin_cell', 'prepare_cell', 'install_candidate',
+                           'begin_trial', 'press_input', 'release_input', 'finish_trial',
+                           'release_cell', 'cleanup')
+                for method in methods:
+                    setattr(fixture, method, Mock())
+                fixture.append()
+                self.assertEqual(len(steps), count)
+                for step in steps:
+                    step()
+                self.assertEqual([call.args for call in fixture.begin_cell.call_args_list], list(UVExtendCases.CELLS))
+                expected = [(True, False), (False, False)]
+                if probe:
+                    expected += [(True, True), (False, True)]
+                self.assertEqual([call.args for call in fixture.begin_trial.call_args_list], expected * 3)
+                fixture.prepare.assert_called_once()
+                fixture.cleanup.assert_called_once()
+                self.assertEqual(fixture.install_candidate.call_count, 3 if probe else 0)
+                self.assertFalse(receipt['uv_extend_proof']['production_capability_enabled'])
+
+    def test_uv_extend_positive_control_requires_real_addition_and_unchanged_geometry(self):
+        from blender_keymap_category03_handlers import UVExtendCases
+        before = {'target_selected': False, 'bystander_selected': True,
+                  'uv_positions': [[0, 0, .2, .2], [0, 2, .8, .8]]}
+        after = {**before, 'target_selected': True, 'selected': [[0, 0], [0, 2]], 'modal_operators': []}
+        control = {'result': ['FINISHED', 'PASS_THROUGH']}
+        UVExtendCases.assert_positive_control(control, before, after)
+        for changed in ({'target_selected': False}, {'bystander_selected': False},
+                        {'selected': [[0, 0], [0, 1], [0, 2]]}, {'uv_positions': []},
+                        {'modal_operators': ['TRANSFORM_OT_translate']}):
+            with self.subTest(changed=changed), self.assertRaises(AssertionError):
+                UVExtendCases.assert_positive_control(control, before, {**after, **changed})
+        for result in (['PASS_THROUGH'], ['FINISHED', 'CANCELLED'], ['RUNNING_MODAL']):
+            with self.subTest(result=result), self.assertRaises(AssertionError):
+                UVExtendCases.assert_positive_control({'result': result}, before, after)
+
+    def test_uv_extend_direct_control_uses_uv_location_instead_of_projected_pixels(self):
+        from blender_keymap_category03_handlers import UVExtendCases
+        fixture = UVExtendCases.__new__(UVExtendCases)
+        fixture.cell = {'tool_requested': 'builtin.select_box', 'tool_map_field': None}
+        fixture.tool_state = Mock(return_value={'idname': 'builtin.select_box'})
+        ledger = {row['row_id']: row for row in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}
+        fixture.binding = ledger[UVExtendCases.CELLS[0][0]]['binding']
+        fixture.values = {'point': (2055, 1229)}
+        fixture.reset_selection = Mock()
+        before = {'target_selected': False, 'bystander_selected': True, 'uv_positions': [[0, 0, .2, .2]]}
+        after = {**before, 'target_selected': True, 'selected': [[0, 0], [0, 2]], 'modal_operators': []}
+        fixture.snapshot = Mock(side_effect=[before, after])
+        fixture.context = nullcontext
+        operator = Mock(return_value={'FINISHED', 'PASS_THROUGH'})
+        operator.poll.return_value = True
+        fixture.bpy = types.SimpleNamespace(ops=types.SimpleNamespace(uv=types.SimpleNamespace(select=operator)))
+        fixture.configs, fixture.maps = Mock(), Mock(return_value={})
+        fixture.control_class = types.SimpleNamespace(bl_idname='wm.category03_uv_extend_control')
+        fixture.allocations, fixture.cell_allocations = [object()], []
+        fixture.add_item = Mock()
+        fixture.prepare_cell()
+        operator.assert_called_once_with('EXEC_DEFAULT', location=(.2, .2), extend=True)
+        fixture.reset_selection.assert_called_once_with(False)
+        self.assertTrue(fixture.cell['direct_control']['positive_addition'])
+
+    def test_uv_extend_selection_effect_alone_does_not_establish_handler_admission(self):
+        from blender_keymap_category03_handlers import UVExtendCases
+        trials = [{'probe': probe, 'initial_selected': selected,
+                   'exact_map_event_witnessed': True, 'expected_selection_observed': True,
+                   'geometry_and_tool_unchanged': True}
+                  for probe in (False, True) for selected in (True, False)]
+        self.assertTrue(UVExtendCases.matched_effects(trials))
+        self.assertFalse(UVExtendCases.matched_effects(trials[:2]))
+        self.assertFalse(UVExtendCases.matched_effects(trials[::-1]))
+        for index in range(4):
+            for field in ('exact_map_event_witnessed', 'expected_selection_observed', 'geometry_and_tool_unchanged'):
+                changed = copy.deepcopy(trials)
+                changed[index][field] = False
+                with self.subTest(index=index, field=field):
+                    self.assertFalse(UVExtendCases.matched_effects(changed))
+
+    def test_uv_extend_mouse_witness_only_passes_through(self):
+        from blender_keymap_category03_handlers import UVExtendCases
+        fixture = UVExtendCases.__new__(UVExtendCases)
+        fixture.configs = types.SimpleNamespace(update=Mock(), user=types.SimpleNamespace(keymaps=[]))
+        fixture.maps, fixture.add_item, fixture.record = Mock(return_value={}), Mock(), Mock()
+        fixture.cell, fixture.proof, fixture.input_callbacks = {'ledger_id': 'exact-test-row'}, {}, []
+        fixture.bpy = types.SimpleNamespace(types=types.SimpleNamespace(Operator=object),
+                                           utils=types.SimpleNamespace(register_class=Mock()))
+        fixture.start()
+        context = types.SimpleNamespace(area=types.SimpleNamespace(type='IMAGE_EDITOR', ui_type='UV'),
+                                        region=types.SimpleNamespace(type='WINDOW'))
+        for key, value in (('LEFTMOUSE', 'PRESS'), ('LEFTMOUSE', 'CLICK'), ('F23', 'PRESS')):
+            event = types.SimpleNamespace(type=key, value=value, mouse_region_x=150, mouse_region_y=200,
+                                          **UVExtendCases.CONTROL_MODIFIERS)
+            result = fixture.control_class().invoke(context, event)
+            self.assertEqual(result, {'FINISHED'} if key == 'F23' else {'PASS_THROUGH'})
+            self.assertEqual(fixture.input_callbacks[-1]['event'], [key, value])
+            self.assertEqual(fixture.input_callbacks[-1]['ledger_id'], 'exact-test-row')
+
+    def test_uv_extend_cleanup_refuses_an_unowned_item_and_retains_strict_failure(self):
+        from blender_keymap_category03_handlers import UVExtendCases
+        fixture = UVExtendCases.__new__(UVExtendCases)
+        foreign = types.SimpleNamespace(id=9, as_pointer=lambda: 22)
+        km = types.SimpleNamespace(keymap_items=[foreign])
+        allocation = (km, object(), 11, 9)
+        fixture.cell_allocations = [allocation]
+        fixture.allocations = [allocation]
+        with self.assertRaises(AssertionError):
+            fixture.release_cell()
+        self.assertEqual(km.keymap_items, [foreign])
+        self.assertEqual(fixture.allocations, [allocation])
+        fixture.cell_allocations, fixture.created_maps = [], []
+        fixture.cell = {'trials': [], 'maps_before_witness': {'foreign': 'original'}}
+        fixture.maps = Mock(return_value={'foreign': 'changed'})
+        fixture.configs, fixture.record, fixture.probe = Mock(), Mock(), True
+        with self.assertRaises(AssertionError):
+            fixture.release_cell()
+        self.assertFalse(fixture.cell['exact_cell_preservation'])
+        self.assertFalse(fixture.cell['production_accepted'])
+
     def test_extend_production_reuses_two_states_without_probe_injection(self):
         from blender_keymap_category03_handlers import ObjectExtendProductionCases, ObjectExtendTrial
         ledger = {r['row_id']: r for r in read_jsonl(BASELINE / 'reconciliation-ledger.jsonl')}

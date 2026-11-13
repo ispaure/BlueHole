@@ -1001,6 +1001,340 @@ class ObjectExtendCases:
         return self
 
 
+class UVExtendCases(ObjectSubtractCases):
+    """One UV scene and ownership journal; separate CLICK/primary/fallback trials.
+
+    A pass-through witness observes admission of the exact map/event, not the C
+    operator call itself. Stock and candidate effects remain separately recorded.
+    No product registration or persistence claim is made by this disposable probe.
+    """
+
+    CELLS = (
+        ('0e8d690a0470457363cd15ff3448c54325c24261cae1dc525ebff9c3dd459f1d',
+         'builtin.select_box', 'CLICK', None),
+        ('db66d17a9af566c8cbe574022a8be9da2b9c82397876f6fc0c8a69b5d6ed1c7e',
+         'builtin.select', 'PRESS', 'keymap'),
+        ('e1c7c89e3738f8a7ec537e2adc7f5f5a283a537bc2776edb4fa9476745994f6a',
+         'builtin.move', 'PRESS', 'keymap_fallback'),
+    )
+    CONTROL_MODIFIERS = {'shift': True, 'ctrl': False, 'alt': False, 'oskey': False}
+    LABEL_PREFIX = 'uv_extend'
+    UV_POSITIONS = ((.2, .2), (.8, .2), (.8, .8), (.2, .8))
+
+    def __init__(self, *args, bindings, **kwargs):
+        super().__init__(*args, binding=bindings[self.CELLS[0][0]], **kwargs)
+        assert set(bindings) == {cell[0] for cell in self.CELLS}
+        self.bindings = bindings
+        self.scope_names.update(row['scope']['name'] for row in bindings.values())
+        self.scope_names.update(km.name for role in ('default', 'active', 'addon', 'user')
+                                for km in getattr(self.configs, role).keymaps
+                                if km.name.startswith(('Image', 'UV')))
+        self.cell = None
+        self.cell_allocations = []
+        self.proof = {'test_only_driver': True, 'production_capability_enabled': False,
+                      'ledger_ids': list(bindings), 'probe': self.probe, 'cells': [],
+                      'lifecycle': 'Reuse accepted ordinary lifecycle; no save/reopen or product toggle suite'}
+        self.receipt['uv_extend_proof'] = self.proof
+
+    def prepare(self):
+        import bmesh
+        bpy = self.bpy
+        self.area.type = 'VIEW_3D'
+        with self.context():
+            if bpy.context.object and bpy.context.object.mode != 'OBJECT':
+                bpy.ops.object.mode_set(mode='OBJECT')
+            mesh = bpy.data.meshes.new('Category03 UV Extend Quad')
+            mesh.from_pydata([(-1, -1, 0), (1, -1, 0), (1, 1, 0), (-1, 1, 0)],
+                             [], [(0, 1, 2, 3)])
+            obj = bpy.data.objects.new('Category03 UV Extend Quad', mesh)
+            bpy.context.scene.collection.objects.link(obj)
+            for other in bpy.context.scene.objects:
+                other.select_set(other == obj)
+                other.hide_set(other != obj)
+            bpy.context.view_layer.objects.active = obj
+            mesh.uv_layers.new()
+            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.mesh.select_all(action='SELECT')
+            settings = bpy.context.scene.tool_settings
+            settings.use_uv_select_sync = False
+            settings.uv_select_mode = 'VERTEX'
+            settings.uv_sticky_select_mode = 'DISABLED'
+            bm = bmesh.from_edit_mesh(mesh)
+            bm.faces.ensure_lookup_table()
+            uv = bm.loops.layers.uv.active
+            assert len(bm.faces) == 1 and len(bm.faces[0].loops) == 4
+            for loop, position in zip(bm.faces[0].loops, self.UV_POSITIONS):
+                loop[uv].uv = position
+            bmesh.update_edit_mesh(mesh)
+            self.values = {'kind': 'uv', 'object_name': obj.name}
+        self.area.type = 'IMAGE_EDITOR'
+        self.area.ui_type = 'UV'
+        # Keep the selection target independent of a transform gizmo hit region.
+        self.area.spaces.active.show_gizmo = False
+        with self.context():
+            bpy.ops.wm.tool_set_by_id(name='builtin.select_box')
+            bpy.ops.image.view_all()
+        self.reset_selection(False)
+
+    def reset_selection(self, selected):
+        import bmesh
+        obj = self.bpy.data.objects[self.values['object_name']]
+        bm = bmesh.from_edit_mesh(obj.data)
+        bm.faces.ensure_lookup_table()
+        uv = bm.loops.layers.uv.active
+        for index, loop in enumerate(bm.faces[0].loops):
+            loop[uv].select = index == 2 or (index == 0 and selected)
+            loop[uv].select_edge = False
+        bmesh.update_edit_mesh(obj.data)
+
+    def tool_state(self):
+        with self.context():
+            tool = self.bpy.context.workspace.tools.from_space_image_mode('UV', create=False)
+            fields = ('idname', 'keymap', 'idname_fallback', 'keymap_fallback')
+            return {field: getattr(tool, field, None) for field in fields}
+
+    def snapshot(self, phase):
+        import bmesh
+        with self.context():
+            obj = self.bpy.data.objects[self.values['object_name']]
+            bm = bmesh.from_edit_mesh(obj.data)
+            uv = bm.loops.layers.uv.active
+            loops = [[f.index, i, *loop[uv].uv] for f in bm.faces for i, loop in enumerate(f.loops)]
+            value = {**self.read(), 'uv_positions': loops, 'tool': self.tool_state(),
+                     'area': self.area.type, 'ui_type': self.area.ui_type,
+                     'region': self.region().type, 'mode': self.bpy.context.mode,
+                     'target_visible': obj.visible_get(),
+                     'sync': self.bpy.context.scene.tool_settings.use_uv_select_sync,
+                     'selection_mode': self.bpy.context.scene.tool_settings.uv_select_mode,
+                     'sticky': self.bpy.context.scene.tool_settings.uv_sticky_select_mode,
+                     'gizmos': self.area.spaces.active.show_gizmo}
+        value['target_selected'] = [0, 0] in value['selected']
+        value['bystander_selected'] = [0, 2] in value['selected']
+        if self.result is not None:
+            self.result['phases'].append({'phase': phase, 'snapshot': value})
+        return value
+
+    def start(self):
+        self.configs.update()
+        self.initial_maps = self.maps()
+        self.proof['maps_before_without_controls'] = self.initial_maps
+        assert not any(item.type == 'F23' for km in self.configs.user.keymaps for item in km.keymap_items)
+        fixture, bpy = self, self.bpy
+
+        class WM_OT_category03_uv_extend_control(bpy.types.Operator):
+            bl_idname = 'wm.category03_uv_extend_control'
+            bl_label = 'Category 03 UV selection input witness'
+
+            def invoke(self, context, event):
+                fixture.input_callbacks.append({
+                    'ledger_id': fixture.cell['ledger_id'] if fixture.cell else None,
+                    'event': [event.type, event.value], 'area': context.area.type,
+                    'ui_type': context.area.ui_type, 'region': context.region.type,
+                    'point': [event.mouse_region_x, event.mouse_region_y],
+                    'modifiers': {name: getattr(event, name) for name in fixture.CONTROL_MODIFIERS}})
+                return {'FINISHED'} if event.type == 'F23' else {'PASS_THROUGH'}
+
+        bpy.utils.register_class(WM_OT_category03_uv_extend_control)
+        self.control_class = WM_OT_category03_uv_extend_control
+        self.add_item({'name': 'Window', 'space_type': 'EMPTY', 'region_type': 'WINDOW'},
+                      self.control_class.bl_idname,
+                      {'type': 'F23', 'value': 'PRESS', **self.CONTROL_MODIFIERS}, {})
+        self.configs.update()
+        self.record('uv_extend_shared_ready')
+
+    def begin_cell(self, ledger_id, tool, event, tool_map_field):
+        assert not self.cell_allocations
+        self.binding = self.bindings[ledger_id]
+        assert self.binding['event']['value'] == event
+        self.cell = {'ledger_id': ledger_id, 'tool_requested': tool,
+                     'event': event, 'tool_map_field': tool_map_field, 'trials': []}
+        self.proof['cells'].append(self.cell)
+        self.result = None
+        with self.context():
+            assert self.bpy.ops.wm.tool_set_by_id(name=tool) == {'FINISHED'}
+            if tool_map_field == 'keymap_fallback':
+                assert self.bpy.ops.wm.tool_set_by_id(name='builtin.select', as_fallback=True) == {'FINISHED'}
+
+    @staticmethod
+    def assert_positive_control(control, before, after):
+        result = set(control['result'])
+        assert 'FINISHED' in result and not result.intersection({'CANCELLED', 'RUNNING_MODAL', 'INTERFACE'})
+        assert not before['target_selected'] and before['bystander_selected']
+        assert after['target_selected'] and after['bystander_selected']
+        assert sorted(after['selected']) == [[0, 0], [0, 2]]
+        assert before['uv_positions'] == after['uv_positions']
+        assert not after['modal_operators']
+
+    def prepare_cell(self):
+        self.cell['tool_readback'] = self.tool_state()
+        assert self.cell['tool_readback']['idname'] == self.cell['tool_requested']
+        field = self.cell['tool_map_field']
+        self.cell['tool_map_matches_scope'] = (self.cell['tool_readback'].get(field) ==
+                                               self.binding['scope']['name']) if field else None
+        self.reset_selection(False)
+        before = self.snapshot('direct_reset')
+        uv_location = tuple(before['uv_positions'][0][2:])
+        with self.context():
+            operator = self.bpy.ops.uv.select
+            control = {'poll': operator.poll(), 'location_uv': list(uv_location),
+                       'properties': {'extend': True}, 'before': before,
+                       'method': 'UV-coordinate positive control; not native dispatch evidence'}
+            self.cell['direct_control'] = control
+            assert control['poll']
+            control['result'] = sorted(operator('EXEC_DEFAULT', location=uv_location, extend=True))
+        control['after'] = self.snapshot('after_direct')
+        self.assert_positive_control(control, before, control['after'])
+        control['positive_addition'] = True
+        self.configs.update()
+        self.cell['maps_before_witness'] = self.maps()
+        event = {name: self.binding['event'][name] for name in
+                 ('type', 'value', 'any', 'shift', 'ctrl', 'alt', 'oskey',
+                  'key_modifier', 'repeat', 'direction')}
+        # This owned item only logs and passes through; it cannot make selection
+        # succeed. Its merged order ahead of competing rows is checked below.
+        self.add_item(self.binding['scope'], self.control_class.bl_idname,
+                      {**event, 'head': True}, {})
+        self.cell_allocations.append(self.allocations[-1])
+        self.configs.update()
+
+    def install_candidate(self):
+        event = {name: self.binding['event'][name] for name in
+                 ('type', 'value', 'any', 'shift', 'ctrl', 'alt', 'oskey',
+                  'key_modifier', 'repeat', 'direction')}
+        self.add_item(self.binding['scope'], self.binding['target'], event, self.binding['properties'])
+        self.cell_allocations.append(self.allocations[-1])
+        self.configs.update()
+
+    def candidate_maps(self, probe):
+        captured = self.maps()
+        counts = {role: {ledger_id: sum(
+            all(row[field] == binding[field] for field in ('target', 'event', 'active', 'properties', 'read_issues'))
+            for km in maps if km['scope'] == binding['scope'] for row in km['items'])
+            for ledger_id, binding in self.bindings.items()} for role, maps in captured.items()}
+        for role, rows in counts.items():
+            for ledger_id, count in rows.items():
+                assert count == int(probe and role in ('addon', 'user') and ledger_id == self.cell['ledger_id'])
+        relevant = {role: [km for km in maps if km['scope'] == self.binding['scope']]
+                    for role, maps in captured.items()}
+        user_map, = relevant['user']
+        witness = [i for i, item in enumerate(user_map['items'])
+                   if item['target'] == self.control_class.bl_idname]
+        assert len(witness) == 1
+        competing = [i for i, item in enumerate(user_map['items'])
+                     if item['active'] and item['event'] == self.binding['event']
+                     and item['target'] != self.control_class.bl_idname]
+        assert competing and all(witness[0] < index for index in competing), 'Witness is not ahead of competing rows'
+        self.result.update(exact_candidate_counts=counts, native_maps=relevant,
+                           witness_order={'index': witness[0], 'competing_indices': competing})
+
+    def begin_trial(self, selected, probe):
+        self.initial_selected = selected
+        self.reset_selection(selected)
+        self.result = {'case': 'uv_extend_' + self.cell['ledger_id'][:8] +
+                       ('_probe' if probe else '_stock') + ('_selected' if selected else '_unselected'),
+                       'ledger_id': self.cell['ledger_id'], 'probe': probe,
+                       'initial_selected': selected, 'phases': []}
+        self.cell['trials'].append(self.result)
+        self.receipt['dispatch'].append(self.result)
+        position = self.cell['direct_control']['location_uv']
+        self.values['point'] = tuple(map(int, self.region().view2d.view_to_region(*position, clip=False)))
+        x, y = self.values['point']
+        assert 0 <= x < self.region().width and 0 <= y < self.region().height
+        self.result['projected_point'] = list(self.values['point'])
+        if 'projected_point' in self.cell:
+            assert self.result['projected_point'] == self.cell['projected_point'], 'UV target projection changed within cell'
+        else:
+            self.cell['projected_point'] = self.result['projected_point']
+        self.input_callbacks.clear()
+        self.event('MOUSEMOVE', 'NOTHING')
+        self.press('F23', **self.CONTROL_MODIFIERS)
+
+    def expected_delivery(self, key, event):
+        return {'ledger_id': self.cell['ledger_id'], 'event': [key, event],
+                'area': 'IMAGE_EDITOR', 'ui_type': 'UV', 'region': 'WINDOW',
+                'point': self.result['projected_point'], 'modifiers': self.CONTROL_MODIFIERS}
+
+    def press_input(self):
+        expected = self.expected_delivery('F23', 'PRESS')
+        self.result['input_delivery'] = {'callbacks': list(self.input_callbacks),
+                                         'delivered': expected in self.input_callbacks}
+        assert self.result['input_delivery']['delivered']
+        before = self.snapshot('before_press')
+        assert before['target_selected'] == self.initial_selected and before['bystander_selected']
+        assert sorted(before['selected']) == ([[0, 0], [0, 2]] if self.initial_selected else [[0, 2]])
+        assert before['target_visible'] and before['mode'] == 'EDIT_MESH' and not before['modal_operators']
+        assert not before['sync'] and before['selection_mode'] == 'VERTEX' and before['sticky'] == 'DISABLED'
+        assert before['tool'] == self.cell['tool_readback']
+        self.candidate_maps(self.result['probe'])
+        self.event('LEFTMOUSE', **self.CONTROL_MODIFIERS)
+
+    def release_input(self):
+        self.snapshot('after_press')
+        self.result['callbacks_after_press'] = list(self.input_callbacks)
+        self.event('LEFTMOUSE', 'RELEASE', **self.CONTROL_MODIFIERS)
+
+    def finish_trial(self):
+        after = self.snapshot('after_release')
+        self.result['event_callbacks'] = list(self.input_callbacks)
+        expected = self.expected_delivery('LEFTMOUSE', self.cell['event'])
+        self.result['exact_map_event_witnessed'] = (
+            self.input_callbacks.count(expected) == 1 and
+            self.result['callbacks_after_press'].count(expected) == int(self.cell['event'] == 'PRESS'))
+        self.result['expected_selection_observed'] = (
+            after['target_selected'] == (True if self.result['probe'] else not self.initial_selected)
+            and after['bystander_selected'] and sorted(after['selected']) ==
+            ([[0, 0], [0, 2]] if after['target_selected'] else [[0, 2]]))
+        before = self.result['phases'][0]['snapshot']
+        self.result['geometry_and_tool_unchanged'] = (
+            before['uv_positions'] == after['uv_positions'] and before['tool'] == after['tool'])
+        assert not after['modal_operators'], 'Unexpected modal after UV click'
+        self.record(self.result['case'])
+
+    @staticmethod
+    def matched_effects(trials):
+        return (len(trials) == 4 and
+                [(row['probe'], row['initial_selected']) for row in trials] ==
+                [(False, True), (False, False), (True, True), (True, False)] and all(
+                    row['exact_map_event_witnessed'] and row['expected_selection_observed']
+                    and row['geometry_and_tool_unchanged'] for row in trials))
+
+    def release_cell(self):
+        for allocation in reversed(self.cell_allocations):
+            km, item, pointer, native_id = allocation
+            live = [candidate for candidate in km.keymap_items
+                    if candidate.as_pointer() == pointer and candidate.id == native_id]
+            assert len(live) == 1, 'Owned UV item generation missing or ambiguous'
+            km.keymap_items.remove(live[0])
+            self.allocations.remove(allocation)
+        self.cell_allocations.clear()
+        for km in self.created_maps[:]:
+            if not len(km.keymap_items):
+                self.configs.addon.keymaps.remove(km)
+                self.created_maps.remove(km)
+        self.configs.update()
+        self.cell['maps_after_witness'] = self.maps()
+        self.cell['exact_cell_preservation'] = self.cell['maps_after_witness'] == self.cell['maps_before_witness']
+        trials = self.cell['trials']
+        self.cell['matched_stock_probe_effects'] = self.probe and self.matched_effects(trials)
+        self.cell['production_accepted'] = False
+        self.record('uv_extend_cell_released')
+        assert self.cell['exact_cell_preservation'], 'UV cell source/merged maps changed'
+
+    def append(self):
+        self.steps.extend((self.prepare, lambda: None, self.start))
+        for cell in self.CELLS:
+            self.steps.extend((lambda cell=cell: self.begin_cell(*cell), lambda: None, self.prepare_cell))
+            for probe in ((False, True) if self.probe else (False,)):
+                if probe:
+                    self.steps.append(self.install_candidate)
+                for selected in (True, False):
+                    self.steps.extend((lambda selected=selected, probe=probe: self.begin_trial(selected, probe),
+                                       self.press_input, self.release_input, self.finish_trial))
+            self.steps.append(self.release_cell)
+        self.steps.append(self.cleanup)
+        return self
+
+
 class ObjectExtendProductionCases(ObjectSubtractProductionCases):
     """Two actual-production states, reusing accepted stock/reference controls."""
 
