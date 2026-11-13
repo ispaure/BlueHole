@@ -8,8 +8,9 @@ beside the selected item's settings in wide windows. In narrow windows the
 settings appear below the list. Assignment search spans all sections. The
 category and section menus browse one section at a time when search is empty.
 
-- Select an assignment to see its shortcut, keymap context, command source
-  and section. The section link opens its assignments and the checkbox stages its enabled
+- The Assignments list shows each command's source, such as Blender, Blue Hole
+  or a named add-on. Select an assignment to see its settings and section.
+  The section link opens its assignments and the checkbox stages its enabled
   state. **View Commands** and **View Assignments** switch between views for
   that section. Select **Key-Binding** in Assignments to type a shortcut such
   as `Shift F10` or `Ctrl Shift A`. Use **Name** to search by command name,

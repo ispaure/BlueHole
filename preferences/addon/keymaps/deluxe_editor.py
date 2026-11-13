@@ -11,6 +11,7 @@ from ....keymaps.deluxe_schema import same_value
 
 PAGE_SIZE = 8
 DETAIL_PANE_MIN_WIDTH = 480
+ASSIGNMENT_SOURCE_SPLIT = 0.62
 
 
 def find(text, query):
@@ -224,16 +225,26 @@ def assignments(layout, current, preview, query, *, side_by_side, search_keys=Fa
             matches = find(' '.join((ops.command_name(current, row['command']), operator, event,
                                      scope, owner, catalog['sections'][row['section']]['label'])), query)
         if matches:
-            found.append((id_, command, event, scope))
+            found.append((id_, command, event, scope, owner))
     if found:
         listing, detail = detail_columns(layout, side_by_side)
         shown = paginate(listing, current, found)
         if current.assignment not in {item[0] for item in shown}:
             current.assignment = shown[0][0]
-        for id_, command, event, scope in shown:
+        if side_by_side:
+            heading = listing.split(factor=ASSIGNMENT_SOURCE_SPLIT, align=True)
+            heading.label(text='Assignment')
+            heading.label(text='Source')
+        for id_, command, event, scope, owner in shown:
             item = listing.column(align=True)
-            ops.operator_button(item, 'assignment', command, id_, depress=id_ == current.assignment)
-            item.label(text=f'{event}  ·  {scope}')
+            header = item.split(factor=ASSIGNMENT_SOURCE_SPLIT, align=True) if side_by_side else item
+            ops.operator_button(header, 'assignment', command, id_, depress=id_ == current.assignment)
+            summary = f'{event}  ·  {scope}'
+            if side_by_side:
+                header.label(text=owner)
+            else:
+                summary = f'{owner}  ·  {summary}'
+            item.label(text=summary)
         inspector(detail.box().column(align=True), current, preview, current.assignment)
     else:
         current.assignment = ''
