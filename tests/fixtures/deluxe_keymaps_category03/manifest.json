@@ -1002,11 +1002,18 @@
   "blocking_dispatch_reconciliation": {},
   "uv_cursor_dispatch": {
     "row_id": "ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1",
-    "production_run": "ordinary_production-1794557329510485000",
-    "reference_run": "reference-evidence-1794557393495550000",
-    "status": "unverified: no gesture effect on either setup, direct enum-flag conversion failed",
-    "fixture_repair": "schema-gated enum-flag arguments match accepted runtime conversion; press/motion/release snapshots added, native unrun",
-    "next_cluster": "uv_cursor: singleton subset excluding accepted arrows"
+    "production_run": "ordinary_production-1794560686280956000",
+    "reference_run": "reference-evidence-1794560733807712000",
+    "status": "unverified: gesture and direct control had no effect in either setup",
+    "fixture_repair": "Schema-gated enum conversion passed natively. Four input phases observed; no cursor effect. Direct poll True/FINISHED is not a positive effect control.",
+    "next_cluster": "uv_cursor: singleton subset excluding accepted arrows",
+    "historical_fixture_error": {
+      "production_run": "ordinary_production-1794557329510485000",
+      "reference_run": "reference-evidence-1794557393495550000",
+      "status": "unverified: no gesture effect on either setup, direct enum-flag conversion failed",
+      "fixture_repair": "schema-gated enum-flag arguments match accepted runtime conversion; press/motion/release snapshots added, native unrun"
+    },
+    "next": "No identical repeat. First establish active UV cursor movement with a supported cursor-placement control, then separately test translate behavior; physical-input witness through06 if needed."
   },
   "handler_adaptations": {
     "89f634fdfe8e4bf1fcc76b809e7d29b4eb03a658acbeea752515cfee3db0168a": {

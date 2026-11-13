@@ -184,9 +184,17 @@ The same UV pair observed no Ctrl-Shift-middle cursor movement in either setup.
 Its direct control failed because JSON enum-flag lists were passed to RNA without
 conversion to sets. The corrected fixture validates native enum-flag schema and
 members using the accepted runtime rules, and captures press, initial motion,
-second motion and release snapshots. These fixture changes are not yet natively
-verified. The reference UV run also retained a strict 192-row readability
-comparison failure; its arrow effects and that failure are reported separately.
+second motion and release snapshots. Batch25 ran that cursor-only comparison.
+Exact source/merged admission and Window delivery passed on both configurations;
+all four phases left the cursor, UV coordinates, selection and view unchanged.
+The direct control now polls true and returns FINISHED with a nonzero value, but
+still moves nothing. Completion without an observable effect is not a positive
+cursor control. The row remains unresolved, with no parity or unavailability
+claim and no identical rerun planned. Production preservation and shutdown passed;
+the reference again failed the strict comparison on 192 readability changes.
+Both children exited, all owned resources were removed and protected inputs were
+unchanged. A future different probe needs a basic cursor-state control, such as
+supported cursor placement, separated from evidence that translate moves it.
 
 ## Verification and boundaries
 
@@ -196,14 +204,14 @@ Run the portable category checks with:
 python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q
 ```
 
-Forty-eight category checks currently pass. They cover exact assigned IDs and
+Forty-nine category checks currently pass. They cover exact assigned IDs and
 comparison links, base identity, inherited order, declaration semantics, group
 isolation and UI, Gizmo scopes, UV aliases, Q dispatch and box selection evidence,
 Transform effects, corrected Selection controls, exact eight-row ownership
 transfer, and honest partial native receipts. The affected runtime suite has 69
 checks, including nine numeric-array/enum-flag schema checks; Pie has two checks.
 The [native receipt](../tests/fixtures/deluxe_keymaps_category03/native.json)
-retains 53 factory attempts and fourteen copied-reference attempts. A completed
+retains 54 factory attempts and fifteen copied-reference attempts. A completed
 observation is not a successful process if that process later crashes.
 Repeated complete keymap/item snapshots are stored once by SHA-256 in this
 receipt. `tests/keymap_native_evidence.py` expands them and verifies every
@@ -403,7 +411,7 @@ confinement and disposable minimum-version adaptation. Original app/profile and
 provider sources remain read-only. Process, source hash, protected-input and
 cleanup receipts stay under ignored `test-results/deluxe-keymaps-category03/`.
 
-Required native work includes the corrected cursor control, Image framing/pan/zoom, the axis reference readiness
+Required native work includes a positive cursor-effect control, Image framing/pan/zoom, the axis reference readiness
 check, remaining ordinary clusters,
 and focused middle-mouse/subtract and modal/tool probes. G behavior and production persistence are accepted; composed UV/global
 parity remains. Existing proofs need no broader
@@ -459,3 +467,13 @@ production behavior and representative persistence checks in batch24.
 A source-bound single-step launcher retains the exact wheel comparison and shared
 lifecycle/control commands. Another native allocation is required for further
 families; the inconclusive wheel pair will not be repeated unchanged.
+
+The prepared combined tools/selection fixture covers ten exact rows in sixteen
+context observations per configuration. Image W/E/R/Q each run in VIEW and UV;
+Vertex/Weight Paint Q each run with selection masking off and face masking on.
+The bundled 4.5.1 tool definitions expose selection/transform tools in UV and
+conditionally expose paint selection tools, so a VIEW-only or unmasked failure
+cannot establish unavailability. Every observation retains its own reset,
+Window delivery, distinct starting-tool evidence and direct control. Factory
+and copied-reference configurations still require separate children. This
+combined fixture is prepared off desktop and has no native acceptance yet.

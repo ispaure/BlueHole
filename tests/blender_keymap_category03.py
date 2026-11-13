@@ -2058,7 +2058,7 @@ def cli():
     parser.add_argument('--editor-prime-readiness', action='store_true')
     parser.add_argument('--editor-matched-endpoints', action='store_true')
     parser.add_argument('--editor-cluster', choices=('selection', 'passthrough', 'remaining'), default='selection')
-    parser.add_argument('--ordinary-cluster', choices=('axis', 'wheel_zoom', 'uv_edit', 'uv_cursor', 'tools', 'selection'), default='axis')
+    parser.add_argument('--ordinary-cluster', choices=('axis', 'wheel_zoom', 'uv_edit', 'uv_cursor', 'tools', 'selection', 'tools_selection'), default='axis')
     parser.add_argument('--invert-zoom', action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument('--output', type=Path, default=REPO / 'test-results/deluxe-keymaps-category03')
     parser.add_argument('--incoming', type=Path)

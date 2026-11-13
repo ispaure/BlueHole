@@ -30,8 +30,8 @@
     "100 remaining owner03 candidate rows with exact technical/evidence decisions",
     "Composed UV G owner04/05/06 parity; production identity behavior and persistence are accepted at recorded 4.5.1 hashes",
     "Alt wheel zoom dispatch: current synthetic WHEELIN/OUT input unverified on both setups; physical wheel/trackpad witness through integrated 06 if needed",
-    "UV cursor drag: failed direct enum-flag control repaired and input phases prepared; native follow-up required, no parity or unavailability claim",
-    "Composed UV arrow behavior: batch24 production/persistence accepted; owner05 retains global Frames and owner06 verifies integration"
+    "Composed UV arrow behavior: batch24 production/persistence accepted; owner05 retains global Frames and owner06 verifies integration",
+    "UV cursor: batch25 exact input phases and corrected enum conversion passed, but gesture and nonzero direct FINISHED call both had no effect. Need a positive cursor-state/effect control; no parity/unavailability claim or identical rerun."
   ],
   "runs": [
     {
@@ -258229,6 +258229,3709 @@
       },
       "watcher_stopped": true,
       "remaining_owned_resources": []
+    },
+    {
+      "mode": "ordinary_production",
+      "pid": 41549,
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 20.0115,
+      "source_sha256": {
+        "actions/actions/keymaps/navigation/__init__.py": "bea86c0e302dd4333fd7047c841beaf988bd7d0f4ef5acbbd5afeaa42f678176",
+        "actions/actions/keymaps/navigation/viewport_movement.py": "b7f9f2b3862f256e72c741dadf8f7c541fbf67027ed10d6f5384cdb02cb106fe",
+        "actions/actions/keymaps/navigation/viewport_axis.py": "7daea590c729125bf617f1f9cc6a510c5878191f0254772a2fff8d7ffb3fef2f",
+        "actions/actions/keymaps/navigation/view_framing.py": "cd73184503c77077cba0740fe45aade2c281fdcbc06d0265156fe556a0eecb1e",
+        "actions/actions/keymaps/selection/selection_more_less.py": "6243684d09b82e8cedc02f4ce3635e1f3df0af214af7c2ed2a90588196c44b5f",
+        "actions/actions/keymaps/selection/selection_tool_switch.py": "53894b38e1c6d85e9502fe17070827e66f16b9e0e11f77af5560acfda8f6daff",
+        "actions/actions/keymaps/selection/selection_all_none.py": "e8008178d932507bda67125ea23328bdf23eaf97be8cdb646cbcee37858c1e06",
+        "actions/actions/keymaps/selection/selection_circle.py": "bf2a3c9150631ab1898edf042353b362ab7bef434159f223a3a6f40dae98d093",
+        "actions/actions/keymaps/selection/__init__.py": "81d1b17ceebe8561410259aef78d1a8320184a06cf246fbe21d0011b455bf833",
+        "actions/actions/keymaps/transform/transform_tools_modal.py": "8f94c479a500bf1e481ea8f6aaf44438999fd56b81e1617ee1e3bd07d92d4d73",
+        "actions/actions/keymaps/transform/transform_tools_gizmo.py": "9fdc0215edfa462e9e1034dc8a41067adf2bd8c4210738b834fdf0d6a6061d83",
+        "actions/actions/keymaps/transform/__init__.py": "6cdb22f83fa9f8531324c62aec8fc1fccd8d5367124a43804f5a7ffc0d8fd1cd",
+        "keymaps/navigation_keymaps_register.py": "755f9ae30b2875185226ba45369729e2451ab73df730e23aeb77bb9048ba1a95",
+        "keymaps/selection_keymaps_register.py": "2f1f18c4af5b4fea7bcd6052a3906ee12ddcb6ecdd33403842969f7044b9d8ac",
+        "keymaps/transform_keymaps_register.py": "469a42609f2a66096547f3b01601c855db5db1f9aa337509b0a81960c7f1c08f",
+        "preferences/addon/keymaps/keymap_props_navigation.py": "965ffe1d7a8cffd000c175a1d0659891dd43bba26bcbd7c2fe016e6591874683",
+        "preferences/addon/keymaps/keymap_props_selection.py": "8f2a6f7c5e1c7de03e88a647a4c9fff6e1ab432597d8e2362d7f0a45cc4b781d",
+        "preferences/addon/keymaps/keymap_props_transform.py": "0913737c3f052982199d60855a390580bcc7e3a741fa0428a98f7390f8f692a3",
+        "operators/box_xray_ops.py": "ca5f5d8ea2cc7538166c568528866d48dedb2c9ebbe33937acb2cff88c823a0a",
+        "operators/selection_more_less_ops.py": "b11bdcaa068ca16c497e0ae749b61b696d726d30e6f92ab40c30b4a29dd9b2dc",
+        "operators/operators_register.py": "0f35dc97d171ca049ef6e2ac69e9eb35f5b3dc9fa81cde712ef2e6390e24b9a1",
+        "keymaps/pipeline_keymaps_register.py": "5c5d65fb1cc02e4053aa4de64355602ba585c141dc53058334ed4b28a5ab693a",
+        "actions/actions/keymaps/pipeline/obligatory.py": "7661e368bf59eddf46b2b675b0b3964f772eb222ff4c54aca0e8cad2bda4138a",
+        "keymaps/keymap_utils.py": "0708e8ee57abb8591c456721c900f1864ece67f2900c7ad9ad8ad5fa3f410522",
+        "keymaps/keymap_action_utils.py": "771c736284a41f2e0dafdc36df0f832c528f5a632a09e598abeb0a877e762a64",
+        "keymaps/keymaps_register.py": "28c9f2a2df1f990a7d2089788523a76813e148e0a47cc914ebc7e568f3850382",
+        "actions/operator_action.py": "d7a44506fa42f1c7ce9526fe59c2768d95f5a638ada1ec12d5b392f97f3760ca",
+        "__init__.py": "69d0f105e4196bb0dd73d403408064954e290bfccfaae7014de9e9b33ade1191"
+      },
+      "native_driver_sha256": "661ceebebddb6a976828ef71683d3814c129e0a0093ca9a5b294a40c903d96c4",
+      "ordinary_fixture_sha256": "cc5e6c4056642060d0cfbd6ae0330e0dcf6eb80db2603419ad855ac3ccf13f91",
+      "ordinary_ledger_sha256": "a5a500da8d9ada01dc5cf8aa04111e9fd73864d933469ebfea4313ecebffb8e3",
+      "private_launch_log_sha256": "0f9c351a52b8b74edde048ac372fa84d68ea7a4b1cc99f5731db073040ab6eb2",
+      "crash_files_found": 0,
+      "crash_retained_files": [],
+      "protected_before": {
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f"
+      },
+      "protected_after": {
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314",
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f"
+      },
+      "protected_unchanged": true,
+      "removed_resources": [
+        "resources",
+        "config",
+        "scripts",
+        "extensions",
+        "datafiles",
+        "tmp",
+        "cache"
+      ],
+      "id": "ordinary_production-1794560686280956000",
+      "private_process_receipt_sha256": "e5cd99538f9a43964c42982d9042511a67faf9cfdd06079ca05a07d122c1fd83",
+      "native_status": "complete",
+      "native": {
+        "version": "4.5.1 LTS",
+        "build": "b0a72b245dcf",
+        "background": false
+      },
+      "steps": [
+        {
+          "label": "scheduled",
+          "seconds": 0.3513
+        },
+        {
+          "label": "ready",
+          "seconds": 7.0359,
+          "runtime": {
+            "checked": 6,
+            "created": 450,
+            "removed": 226,
+            "reinsertions": 0,
+            "features": 174,
+            "owned": 224,
+            "retained_edited": 0,
+            "pending_cleanup": 0,
+            "tracked_resources": 224
+          },
+          "active_keyconfig": "Blender"
+        },
+        {
+          "label": "keyboard_sentinel_passed",
+          "seconds": 7.3394
+        },
+        {
+          "label": "ordinary_ready",
+          "seconds": 10.3967
+        },
+        {
+          "label": "ordinary_uv_cursor_MIDDLEMOUSE_ade9ef951b1a",
+          "seconds": 15.2102
+        },
+        {
+          "label": "complete",
+          "seconds": 16.0385
+        }
+      ],
+      "dispatch": [
+        {
+          "case": "ordinary_uv_cursor_MIDDLEMOUSE_ade9ef951b1a",
+          "ledger_id": "ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1",
+          "tested_key": "MIDDLEMOUSE",
+          "expected_event": {
+            "alt": 0,
+            "any": false,
+            "ctrl": 1,
+            "direction": "ANY",
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "map_type": "MOUSE",
+            "oskey": 0,
+            "repeat": false,
+            "shift": 1,
+            "type": "MIDDLEMOUSE",
+            "value": "CLICK_DRAG"
+          },
+          "scope": {
+            "is_modal": false,
+            "is_tool": null,
+            "name": "UV Editor",
+            "region_type": "WINDOW",
+            "space_type": "EMPTY"
+          },
+          "target": "transform.translate",
+          "tool_setup": [],
+          "exact_rows_before_probe": {
+            "default": 0,
+            "active": 0,
+            "addon": 1,
+            "user": 1
+          },
+          "merged_event_candidates": [
+            {
+              "scope": "3D View",
+              "space_type": "VIEW_3D",
+              "target": "view3d.dolly",
+              "event": {
+                "type": "MIDDLEMOUSE",
+                "value": "PRESS",
+                "any": false,
+                "shift": 1,
+                "ctrl": 1,
+                "alt": 0,
+                "oskey": 0,
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "direction": "ANY",
+                "repeat": false,
+                "map_type": "MOUSE"
+              }
+            },
+            {
+              "scope": "UV Editor",
+              "space_type": "EMPTY",
+              "target": "transform.translate",
+              "event": {
+                "type": "MIDDLEMOUSE",
+                "value": "CLICK_DRAG",
+                "any": false,
+                "shift": 1,
+                "ctrl": 1,
+                "alt": 0,
+                "oskey": 0,
+                "hyper": 0,
+                "key_modifier": "NONE",
+                "direction": "ANY",
+                "repeat": false,
+                "map_type": "MOUSE"
+              }
+            }
+          ],
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "IMAGE_EDITOR",
+                "region": "WINDOW"
+              }
+            ],
+            "expected_area": "IMAGE_EDITOR",
+            "expected_region": "WINDOW",
+            "delivered": true
+          },
+          "before": {
+            "editor": "IMAGE_EDITOR",
+            "editor_ui_type": "UV",
+            "context_mode": "EDIT_MESH",
+            "active_tool": "builtin.select_box",
+            "frame_current": 1,
+            "operator_history": [],
+            "modal_operators_observable": true,
+            "modal_operators": [],
+            "cursor": [
+              0.5,
+              0.5
+            ],
+            "view_center": [
+              0.5,
+              0.5
+            ],
+            "selected_uv": [
+              [
+                0,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                0,
+                3
+              ]
+            ],
+            "uv_coordinates": [
+              [
+                0,
+                0,
+                0.0,
+                0.0
+              ],
+              [
+                0,
+                1,
+                0.25,
+                0.0
+              ],
+              [
+                0,
+                2,
+                0.25,
+                0.25
+              ],
+              [
+                0,
+                3,
+                0.0,
+                0.25
+              ],
+              [
+                1,
+                0,
+                0.25,
+                0.0
+              ],
+              [
+                1,
+                1,
+                0.5,
+                0.0
+              ],
+              [
+                1,
+                2,
+                0.5,
+                0.25
+              ],
+              [
+                1,
+                3,
+                0.25,
+                0.25
+              ],
+              [
+                2,
+                0,
+                0.5,
+                0.0
+              ],
+              [
+                2,
+                1,
+                0.75,
+                0.0
+              ],
+              [
+                2,
+                2,
+                0.75,
+                0.25
+              ],
+              [
+                2,
+                3,
+                0.5,
+                0.25
+              ],
+              [
+                3,
+                0,
+                0.75,
+                0.0
+              ],
+              [
+                3,
+                1,
+                1.0,
+                0.0
+              ],
+              [
+                3,
+                2,
+                1.0,
+                0.25
+              ],
+              [
+                3,
+                3,
+                0.75,
+                0.25
+              ],
+              [
+                4,
+                0,
+                0.0,
+                0.25
+              ],
+              [
+                4,
+                1,
+                0.25,
+                0.25
+              ],
+              [
+                4,
+                2,
+                0.25,
+                0.5
+              ],
+              [
+                4,
+                3,
+                0.0,
+                0.5
+              ],
+              [
+                5,
+                0,
+                0.25,
+                0.25
+              ],
+              [
+                5,
+                1,
+                0.5,
+                0.25
+              ],
+              [
+                5,
+                2,
+                0.5,
+                0.5
+              ],
+              [
+                5,
+                3,
+                0.25,
+                0.5
+              ],
+              [
+                6,
+                0,
+                0.5,
+                0.25
+              ],
+              [
+                6,
+                1,
+                0.75,
+                0.25
+              ],
+              [
+                6,
+                2,
+                0.75,
+                0.5
+              ],
+              [
+                6,
+                3,
+                0.5,
+                0.5
+              ],
+              [
+                7,
+                0,
+                0.75,
+                0.25
+              ],
+              [
+                7,
+                1,
+                1.0,
+                0.25
+              ],
+              [
+                7,
+                2,
+                1.0,
+                0.5
+              ],
+              [
+                7,
+                3,
+                0.75,
+                0.5
+              ],
+              [
+                8,
+                0,
+                0.0,
+                0.5
+              ],
+              [
+                8,
+                1,
+                0.25,
+                0.5
+              ],
+              [
+                8,
+                2,
+                0.25,
+                0.75
+              ],
+              [
+                8,
+                3,
+                0.0,
+                0.75
+              ],
+              [
+                9,
+                0,
+                0.25,
+                0.5
+              ],
+              [
+                9,
+                1,
+                0.5,
+                0.5
+              ],
+              [
+                9,
+                2,
+                0.5,
+                0.75
+              ],
+              [
+                9,
+                3,
+                0.25,
+                0.75
+              ],
+              [
+                10,
+                0,
+                0.5,
+                0.5
+              ],
+              [
+                10,
+                1,
+                0.75,
+                0.5
+              ],
+              [
+                10,
+                2,
+                0.75,
+                0.75
+              ],
+              [
+                10,
+                3,
+                0.5,
+                0.75
+              ],
+              [
+                11,
+                0,
+                0.75,
+                0.5
+              ],
+              [
+                11,
+                1,
+                1.0,
+                0.5
+              ],
+              [
+                11,
+                2,
+                1.0,
+                0.75
+              ],
+              [
+                11,
+                3,
+                0.75,
+                0.75
+              ],
+              [
+                12,
+                0,
+                0.0,
+                0.75
+              ],
+              [
+                12,
+                1,
+                0.25,
+                0.75
+              ],
+              [
+                12,
+                2,
+                0.25,
+                1.0
+              ],
+              [
+                12,
+                3,
+                0.0,
+                1.0
+              ],
+              [
+                13,
+                0,
+                0.25,
+                0.75
+              ],
+              [
+                13,
+                1,
+                0.5,
+                0.75
+              ],
+              [
+                13,
+                2,
+                0.5,
+                1.0
+              ],
+              [
+                13,
+                3,
+                0.25,
+                1.0
+              ],
+              [
+                14,
+                0,
+                0.5,
+                0.75
+              ],
+              [
+                14,
+                1,
+                0.75,
+                0.75
+              ],
+              [
+                14,
+                2,
+                0.75,
+                1.0
+              ],
+              [
+                14,
+                3,
+                0.5,
+                1.0
+              ],
+              [
+                15,
+                0,
+                0.75,
+                0.75
+              ],
+              [
+                15,
+                1,
+                1.0,
+                0.75
+              ],
+              [
+                15,
+                2,
+                1.0,
+                1.0
+              ],
+              [
+                15,
+                3,
+                0.75,
+                1.0
+              ]
+            ]
+          },
+          "input_phases": [
+            {
+              "phase": "after_press",
+              "snapshot": {
+                "editor": "IMAGE_EDITOR",
+                "editor_ui_type": "UV",
+                "context_mode": "EDIT_MESH",
+                "active_tool": "builtin.select_box",
+                "frame_current": 1,
+                "operator_history": [],
+                "modal_operators_observable": true,
+                "modal_operators": [],
+                "cursor": [
+                  0.5,
+                  0.5
+                ],
+                "view_center": [
+                  0.5,
+                  0.5
+                ],
+                "selected_uv": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    2
+                  ],
+                  [
+                    0,
+                    3
+                  ]
+                ],
+                "uv_coordinates": [
+                  [
+                    0,
+                    0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0,
+                    1,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    0,
+                    2,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    0,
+                    3,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    1,
+                    0,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    1,
+                    1,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    1,
+                    2,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    1,
+                    3,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    2,
+                    0,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    2,
+                    1,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    2,
+                    2,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    2,
+                    3,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    3,
+                    0,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    3,
+                    1,
+                    1.0,
+                    0.0
+                  ],
+                  [
+                    3,
+                    2,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    3,
+                    3,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    4,
+                    0,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    4,
+                    1,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    4,
+                    2,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    4,
+                    3,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    5,
+                    0,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    5,
+                    1,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    5,
+                    2,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    5,
+                    3,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    6,
+                    0,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    6,
+                    1,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    6,
+                    2,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    6,
+                    3,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    7,
+                    0,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    7,
+                    1,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    7,
+                    2,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    7,
+                    3,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    8,
+                    0,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    8,
+                    1,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    8,
+                    2,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    8,
+                    3,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    9,
+                    0,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    9,
+                    1,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    9,
+                    2,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    9,
+                    3,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    10,
+                    0,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    10,
+                    1,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    10,
+                    2,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    10,
+                    3,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    11,
+                    0,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    11,
+                    1,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    11,
+                    2,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    11,
+                    3,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    12,
+                    0,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    12,
+                    1,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    12,
+                    2,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    12,
+                    3,
+                    0.0,
+                    1.0
+                  ],
+                  [
+                    13,
+                    0,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    13,
+                    1,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    13,
+                    2,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    13,
+                    3,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    14,
+                    0,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    14,
+                    1,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    14,
+                    2,
+                    0.75,
+                    1.0
+                  ],
+                  [
+                    14,
+                    3,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    15,
+                    0,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    15,
+                    1,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    15,
+                    2,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    15,
+                    3,
+                    0.75,
+                    1.0
+                  ]
+                ]
+              }
+            },
+            {
+              "phase": "after_initial_motion",
+              "snapshot": {
+                "editor": "IMAGE_EDITOR",
+                "editor_ui_type": "UV",
+                "context_mode": "EDIT_MESH",
+                "active_tool": "builtin.select_box",
+                "frame_current": 1,
+                "operator_history": [],
+                "modal_operators_observable": true,
+                "modal_operators": [],
+                "cursor": [
+                  0.5,
+                  0.5
+                ],
+                "view_center": [
+                  0.5,
+                  0.5
+                ],
+                "selected_uv": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    2
+                  ],
+                  [
+                    0,
+                    3
+                  ]
+                ],
+                "uv_coordinates": [
+                  [
+                    0,
+                    0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0,
+                    1,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    0,
+                    2,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    0,
+                    3,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    1,
+                    0,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    1,
+                    1,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    1,
+                    2,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    1,
+                    3,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    2,
+                    0,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    2,
+                    1,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    2,
+                    2,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    2,
+                    3,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    3,
+                    0,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    3,
+                    1,
+                    1.0,
+                    0.0
+                  ],
+                  [
+                    3,
+                    2,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    3,
+                    3,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    4,
+                    0,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    4,
+                    1,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    4,
+                    2,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    4,
+                    3,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    5,
+                    0,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    5,
+                    1,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    5,
+                    2,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    5,
+                    3,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    6,
+                    0,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    6,
+                    1,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    6,
+                    2,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    6,
+                    3,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    7,
+                    0,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    7,
+                    1,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    7,
+                    2,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    7,
+                    3,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    8,
+                    0,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    8,
+                    1,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    8,
+                    2,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    8,
+                    3,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    9,
+                    0,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    9,
+                    1,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    9,
+                    2,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    9,
+                    3,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    10,
+                    0,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    10,
+                    1,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    10,
+                    2,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    10,
+                    3,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    11,
+                    0,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    11,
+                    1,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    11,
+                    2,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    11,
+                    3,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    12,
+                    0,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    12,
+                    1,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    12,
+                    2,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    12,
+                    3,
+                    0.0,
+                    1.0
+                  ],
+                  [
+                    13,
+                    0,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    13,
+                    1,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    13,
+                    2,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    13,
+                    3,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    14,
+                    0,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    14,
+                    1,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    14,
+                    2,
+                    0.75,
+                    1.0
+                  ],
+                  [
+                    14,
+                    3,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    15,
+                    0,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    15,
+                    1,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    15,
+                    2,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    15,
+                    3,
+                    0.75,
+                    1.0
+                  ]
+                ]
+              }
+            },
+            {
+              "phase": "after_second_motion",
+              "snapshot": {
+                "editor": "IMAGE_EDITOR",
+                "editor_ui_type": "UV",
+                "context_mode": "EDIT_MESH",
+                "active_tool": "builtin.select_box",
+                "frame_current": 1,
+                "operator_history": [],
+                "modal_operators_observable": true,
+                "modal_operators": [],
+                "cursor": [
+                  0.5,
+                  0.5
+                ],
+                "view_center": [
+                  0.5,
+                  0.5
+                ],
+                "selected_uv": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    2
+                  ],
+                  [
+                    0,
+                    3
+                  ]
+                ],
+                "uv_coordinates": [
+                  [
+                    0,
+                    0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0,
+                    1,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    0,
+                    2,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    0,
+                    3,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    1,
+                    0,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    1,
+                    1,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    1,
+                    2,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    1,
+                    3,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    2,
+                    0,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    2,
+                    1,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    2,
+                    2,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    2,
+                    3,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    3,
+                    0,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    3,
+                    1,
+                    1.0,
+                    0.0
+                  ],
+                  [
+                    3,
+                    2,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    3,
+                    3,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    4,
+                    0,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    4,
+                    1,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    4,
+                    2,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    4,
+                    3,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    5,
+                    0,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    5,
+                    1,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    5,
+                    2,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    5,
+                    3,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    6,
+                    0,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    6,
+                    1,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    6,
+                    2,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    6,
+                    3,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    7,
+                    0,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    7,
+                    1,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    7,
+                    2,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    7,
+                    3,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    8,
+                    0,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    8,
+                    1,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    8,
+                    2,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    8,
+                    3,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    9,
+                    0,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    9,
+                    1,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    9,
+                    2,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    9,
+                    3,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    10,
+                    0,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    10,
+                    1,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    10,
+                    2,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    10,
+                    3,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    11,
+                    0,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    11,
+                    1,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    11,
+                    2,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    11,
+                    3,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    12,
+                    0,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    12,
+                    1,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    12,
+                    2,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    12,
+                    3,
+                    0.0,
+                    1.0
+                  ],
+                  [
+                    13,
+                    0,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    13,
+                    1,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    13,
+                    2,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    13,
+                    3,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    14,
+                    0,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    14,
+                    1,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    14,
+                    2,
+                    0.75,
+                    1.0
+                  ],
+                  [
+                    14,
+                    3,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    15,
+                    0,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    15,
+                    1,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    15,
+                    2,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    15,
+                    3,
+                    0.75,
+                    1.0
+                  ]
+                ]
+              }
+            },
+            {
+              "phase": "after_release",
+              "snapshot": {
+                "editor": "IMAGE_EDITOR",
+                "editor_ui_type": "UV",
+                "context_mode": "EDIT_MESH",
+                "active_tool": "builtin.select_box",
+                "frame_current": 1,
+                "operator_history": [],
+                "modal_operators_observable": true,
+                "modal_operators": [],
+                "cursor": [
+                  0.5,
+                  0.5
+                ],
+                "view_center": [
+                  0.5,
+                  0.5
+                ],
+                "selected_uv": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    2
+                  ],
+                  [
+                    0,
+                    3
+                  ]
+                ],
+                "uv_coordinates": [
+                  [
+                    0,
+                    0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0,
+                    1,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    0,
+                    2,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    0,
+                    3,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    1,
+                    0,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    1,
+                    1,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    1,
+                    2,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    1,
+                    3,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    2,
+                    0,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    2,
+                    1,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    2,
+                    2,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    2,
+                    3,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    3,
+                    0,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    3,
+                    1,
+                    1.0,
+                    0.0
+                  ],
+                  [
+                    3,
+                    2,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    3,
+                    3,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    4,
+                    0,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    4,
+                    1,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    4,
+                    2,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    4,
+                    3,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    5,
+                    0,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    5,
+                    1,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    5,
+                    2,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    5,
+                    3,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    6,
+                    0,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    6,
+                    1,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    6,
+                    2,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    6,
+                    3,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    7,
+                    0,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    7,
+                    1,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    7,
+                    2,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    7,
+                    3,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    8,
+                    0,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    8,
+                    1,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    8,
+                    2,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    8,
+                    3,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    9,
+                    0,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    9,
+                    1,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    9,
+                    2,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    9,
+                    3,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    10,
+                    0,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    10,
+                    1,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    10,
+                    2,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    10,
+                    3,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    11,
+                    0,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    11,
+                    1,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    11,
+                    2,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    11,
+                    3,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    12,
+                    0,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    12,
+                    1,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    12,
+                    2,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    12,
+                    3,
+                    0.0,
+                    1.0
+                  ],
+                  [
+                    13,
+                    0,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    13,
+                    1,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    13,
+                    2,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    13,
+                    3,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    14,
+                    0,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    14,
+                    1,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    14,
+                    2,
+                    0.75,
+                    1.0
+                  ],
+                  [
+                    14,
+                    3,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    15,
+                    0,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    15,
+                    1,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    15,
+                    2,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    15,
+                    3,
+                    0.75,
+                    1.0
+                  ]
+                ]
+              }
+            }
+          ],
+          "after": {
+            "editor": "IMAGE_EDITOR",
+            "editor_ui_type": "UV",
+            "context_mode": "EDIT_MESH",
+            "active_tool": "builtin.select_box",
+            "frame_current": 1,
+            "operator_history": [],
+            "modal_operators_observable": true,
+            "modal_operators": [],
+            "cursor": [
+              0.5,
+              0.5
+            ],
+            "view_center": [
+              0.5,
+              0.5
+            ],
+            "selected_uv": [
+              [
+                0,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                0,
+                3
+              ]
+            ],
+            "uv_coordinates": [
+              [
+                0,
+                0,
+                0.0,
+                0.0
+              ],
+              [
+                0,
+                1,
+                0.25,
+                0.0
+              ],
+              [
+                0,
+                2,
+                0.25,
+                0.25
+              ],
+              [
+                0,
+                3,
+                0.0,
+                0.25
+              ],
+              [
+                1,
+                0,
+                0.25,
+                0.0
+              ],
+              [
+                1,
+                1,
+                0.5,
+                0.0
+              ],
+              [
+                1,
+                2,
+                0.5,
+                0.25
+              ],
+              [
+                1,
+                3,
+                0.25,
+                0.25
+              ],
+              [
+                2,
+                0,
+                0.5,
+                0.0
+              ],
+              [
+                2,
+                1,
+                0.75,
+                0.0
+              ],
+              [
+                2,
+                2,
+                0.75,
+                0.25
+              ],
+              [
+                2,
+                3,
+                0.5,
+                0.25
+              ],
+              [
+                3,
+                0,
+                0.75,
+                0.0
+              ],
+              [
+                3,
+                1,
+                1.0,
+                0.0
+              ],
+              [
+                3,
+                2,
+                1.0,
+                0.25
+              ],
+              [
+                3,
+                3,
+                0.75,
+                0.25
+              ],
+              [
+                4,
+                0,
+                0.0,
+                0.25
+              ],
+              [
+                4,
+                1,
+                0.25,
+                0.25
+              ],
+              [
+                4,
+                2,
+                0.25,
+                0.5
+              ],
+              [
+                4,
+                3,
+                0.0,
+                0.5
+              ],
+              [
+                5,
+                0,
+                0.25,
+                0.25
+              ],
+              [
+                5,
+                1,
+                0.5,
+                0.25
+              ],
+              [
+                5,
+                2,
+                0.5,
+                0.5
+              ],
+              [
+                5,
+                3,
+                0.25,
+                0.5
+              ],
+              [
+                6,
+                0,
+                0.5,
+                0.25
+              ],
+              [
+                6,
+                1,
+                0.75,
+                0.25
+              ],
+              [
+                6,
+                2,
+                0.75,
+                0.5
+              ],
+              [
+                6,
+                3,
+                0.5,
+                0.5
+              ],
+              [
+                7,
+                0,
+                0.75,
+                0.25
+              ],
+              [
+                7,
+                1,
+                1.0,
+                0.25
+              ],
+              [
+                7,
+                2,
+                1.0,
+                0.5
+              ],
+              [
+                7,
+                3,
+                0.75,
+                0.5
+              ],
+              [
+                8,
+                0,
+                0.0,
+                0.5
+              ],
+              [
+                8,
+                1,
+                0.25,
+                0.5
+              ],
+              [
+                8,
+                2,
+                0.25,
+                0.75
+              ],
+              [
+                8,
+                3,
+                0.0,
+                0.75
+              ],
+              [
+                9,
+                0,
+                0.25,
+                0.5
+              ],
+              [
+                9,
+                1,
+                0.5,
+                0.5
+              ],
+              [
+                9,
+                2,
+                0.5,
+                0.75
+              ],
+              [
+                9,
+                3,
+                0.25,
+                0.75
+              ],
+              [
+                10,
+                0,
+                0.5,
+                0.5
+              ],
+              [
+                10,
+                1,
+                0.75,
+                0.5
+              ],
+              [
+                10,
+                2,
+                0.75,
+                0.75
+              ],
+              [
+                10,
+                3,
+                0.5,
+                0.75
+              ],
+              [
+                11,
+                0,
+                0.75,
+                0.5
+              ],
+              [
+                11,
+                1,
+                1.0,
+                0.5
+              ],
+              [
+                11,
+                2,
+                1.0,
+                0.75
+              ],
+              [
+                11,
+                3,
+                0.75,
+                0.75
+              ],
+              [
+                12,
+                0,
+                0.0,
+                0.75
+              ],
+              [
+                12,
+                1,
+                0.25,
+                0.75
+              ],
+              [
+                12,
+                2,
+                0.25,
+                1.0
+              ],
+              [
+                12,
+                3,
+                0.0,
+                1.0
+              ],
+              [
+                13,
+                0,
+                0.25,
+                0.75
+              ],
+              [
+                13,
+                1,
+                0.5,
+                0.75
+              ],
+              [
+                13,
+                2,
+                0.5,
+                1.0
+              ],
+              [
+                13,
+                3,
+                0.25,
+                1.0
+              ],
+              [
+                14,
+                0,
+                0.5,
+                0.75
+              ],
+              [
+                14,
+                1,
+                0.75,
+                0.75
+              ],
+              [
+                14,
+                2,
+                0.75,
+                1.0
+              ],
+              [
+                14,
+                3,
+                0.5,
+                1.0
+              ],
+              [
+                15,
+                0,
+                0.75,
+                0.75
+              ],
+              [
+                15,
+                1,
+                1.0,
+                0.75
+              ],
+              [
+                15,
+                2,
+                1.0,
+                1.0
+              ],
+              [
+                15,
+                3,
+                0.75,
+                1.0
+              ]
+            ]
+          },
+          "input_status": "observed",
+          "direct_control_tool_setup": [],
+          "direct_control_before": {
+            "editor": "IMAGE_EDITOR",
+            "editor_ui_type": "UV",
+            "context_mode": "EDIT_MESH",
+            "active_tool": "builtin.select_box",
+            "frame_current": 1,
+            "operator_history": [],
+            "modal_operators_observable": true,
+            "modal_operators": [],
+            "cursor": [
+              0.5,
+              0.5
+            ],
+            "view_center": [
+              0.5,
+              0.5
+            ],
+            "selected_uv": [
+              [
+                0,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                0,
+                3
+              ]
+            ],
+            "uv_coordinates": [
+              [
+                0,
+                0,
+                0.0,
+                0.0
+              ],
+              [
+                0,
+                1,
+                0.25,
+                0.0
+              ],
+              [
+                0,
+                2,
+                0.25,
+                0.25
+              ],
+              [
+                0,
+                3,
+                0.0,
+                0.25
+              ],
+              [
+                1,
+                0,
+                0.25,
+                0.0
+              ],
+              [
+                1,
+                1,
+                0.5,
+                0.0
+              ],
+              [
+                1,
+                2,
+                0.5,
+                0.25
+              ],
+              [
+                1,
+                3,
+                0.25,
+                0.25
+              ],
+              [
+                2,
+                0,
+                0.5,
+                0.0
+              ],
+              [
+                2,
+                1,
+                0.75,
+                0.0
+              ],
+              [
+                2,
+                2,
+                0.75,
+                0.25
+              ],
+              [
+                2,
+                3,
+                0.5,
+                0.25
+              ],
+              [
+                3,
+                0,
+                0.75,
+                0.0
+              ],
+              [
+                3,
+                1,
+                1.0,
+                0.0
+              ],
+              [
+                3,
+                2,
+                1.0,
+                0.25
+              ],
+              [
+                3,
+                3,
+                0.75,
+                0.25
+              ],
+              [
+                4,
+                0,
+                0.0,
+                0.25
+              ],
+              [
+                4,
+                1,
+                0.25,
+                0.25
+              ],
+              [
+                4,
+                2,
+                0.25,
+                0.5
+              ],
+              [
+                4,
+                3,
+                0.0,
+                0.5
+              ],
+              [
+                5,
+                0,
+                0.25,
+                0.25
+              ],
+              [
+                5,
+                1,
+                0.5,
+                0.25
+              ],
+              [
+                5,
+                2,
+                0.5,
+                0.5
+              ],
+              [
+                5,
+                3,
+                0.25,
+                0.5
+              ],
+              [
+                6,
+                0,
+                0.5,
+                0.25
+              ],
+              [
+                6,
+                1,
+                0.75,
+                0.25
+              ],
+              [
+                6,
+                2,
+                0.75,
+                0.5
+              ],
+              [
+                6,
+                3,
+                0.5,
+                0.5
+              ],
+              [
+                7,
+                0,
+                0.75,
+                0.25
+              ],
+              [
+                7,
+                1,
+                1.0,
+                0.25
+              ],
+              [
+                7,
+                2,
+                1.0,
+                0.5
+              ],
+              [
+                7,
+                3,
+                0.75,
+                0.5
+              ],
+              [
+                8,
+                0,
+                0.0,
+                0.5
+              ],
+              [
+                8,
+                1,
+                0.25,
+                0.5
+              ],
+              [
+                8,
+                2,
+                0.25,
+                0.75
+              ],
+              [
+                8,
+                3,
+                0.0,
+                0.75
+              ],
+              [
+                9,
+                0,
+                0.25,
+                0.5
+              ],
+              [
+                9,
+                1,
+                0.5,
+                0.5
+              ],
+              [
+                9,
+                2,
+                0.5,
+                0.75
+              ],
+              [
+                9,
+                3,
+                0.25,
+                0.75
+              ],
+              [
+                10,
+                0,
+                0.5,
+                0.5
+              ],
+              [
+                10,
+                1,
+                0.75,
+                0.5
+              ],
+              [
+                10,
+                2,
+                0.75,
+                0.75
+              ],
+              [
+                10,
+                3,
+                0.5,
+                0.75
+              ],
+              [
+                11,
+                0,
+                0.75,
+                0.5
+              ],
+              [
+                11,
+                1,
+                1.0,
+                0.5
+              ],
+              [
+                11,
+                2,
+                1.0,
+                0.75
+              ],
+              [
+                11,
+                3,
+                0.75,
+                0.75
+              ],
+              [
+                12,
+                0,
+                0.0,
+                0.75
+              ],
+              [
+                12,
+                1,
+                0.25,
+                0.75
+              ],
+              [
+                12,
+                2,
+                0.25,
+                1.0
+              ],
+              [
+                12,
+                3,
+                0.0,
+                1.0
+              ],
+              [
+                13,
+                0,
+                0.25,
+                0.75
+              ],
+              [
+                13,
+                1,
+                0.5,
+                0.75
+              ],
+              [
+                13,
+                2,
+                0.5,
+                1.0
+              ],
+              [
+                13,
+                3,
+                0.25,
+                1.0
+              ],
+              [
+                14,
+                0,
+                0.5,
+                0.75
+              ],
+              [
+                14,
+                1,
+                0.75,
+                0.75
+              ],
+              [
+                14,
+                2,
+                0.75,
+                1.0
+              ],
+              [
+                14,
+                3,
+                0.5,
+                1.0
+              ],
+              [
+                15,
+                0,
+                0.75,
+                0.75
+              ],
+              [
+                15,
+                1,
+                1.0,
+                0.75
+              ],
+              [
+                15,
+                2,
+                1.0,
+                1.0
+              ],
+              [
+                15,
+                3,
+                0.75,
+                1.0
+              ]
+            ]
+          },
+          "direct_control": {
+            "poll": true,
+            "result": [
+              "FINISHED"
+            ],
+            "properties": {
+              "constraint_axis": [
+                false,
+                false,
+                false
+              ],
+              "cursor_transform": true,
+              "gpencil_strokes": false,
+              "mirror": false,
+              "orient_matrix": [
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              ],
+              "orient_matrix_type": "GLOBAL",
+              "orient_type": "GLOBAL",
+              "proportional_edit_falloff": "SMOOTH",
+              "proportional_size": 1.0,
+              "release_confirm": true,
+              "remove_on_cancel": false,
+              "snap": false,
+              "snap_align": false,
+              "snap_elements": [
+                "INCREMENT"
+              ],
+              "snap_normal": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "snap_point": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "snap_target": "CLOSEST",
+              "texture_space": false,
+              "translate_origin": false,
+              "use_accurate": false,
+              "use_automerge_and_split": false,
+              "use_duplicated_keyframes": false,
+              "use_proportional_connected": false,
+              "use_proportional_edit": false,
+              "use_proportional_projected": false,
+              "use_snap_edit": true,
+              "use_snap_nonedit": true,
+              "use_snap_project": false,
+              "use_snap_selectable": false,
+              "use_snap_self": true,
+              "value": [
+                0.125,
+                0.0625,
+                0.0
+              ],
+              "view2d_edge_pan": false
+            },
+            "native_enum_flag_arguments": {
+              "snap_elements": [
+                "INCREMENT"
+              ]
+            },
+            "method": "direct operator fixture control",
+            "after": {
+              "editor": "IMAGE_EDITOR",
+              "editor_ui_type": "UV",
+              "context_mode": "EDIT_MESH",
+              "active_tool": "builtin.select_box",
+              "frame_current": 1,
+              "operator_history": [],
+              "modal_operators_observable": true,
+              "modal_operators": [],
+              "cursor": [
+                0.5,
+                0.5
+              ],
+              "view_center": [
+                0.5,
+                0.5
+              ],
+              "selected_uv": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ],
+                [
+                  0,
+                  3
+                ]
+              ],
+              "uv_coordinates": [
+                [
+                  0,
+                  0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0,
+                  1,
+                  0.25,
+                  0.0
+                ],
+                [
+                  0,
+                  2,
+                  0.25,
+                  0.25
+                ],
+                [
+                  0,
+                  3,
+                  0.0,
+                  0.25
+                ],
+                [
+                  1,
+                  0,
+                  0.25,
+                  0.0
+                ],
+                [
+                  1,
+                  1,
+                  0.5,
+                  0.0
+                ],
+                [
+                  1,
+                  2,
+                  0.5,
+                  0.25
+                ],
+                [
+                  1,
+                  3,
+                  0.25,
+                  0.25
+                ],
+                [
+                  2,
+                  0,
+                  0.5,
+                  0.0
+                ],
+                [
+                  2,
+                  1,
+                  0.75,
+                  0.0
+                ],
+                [
+                  2,
+                  2,
+                  0.75,
+                  0.25
+                ],
+                [
+                  2,
+                  3,
+                  0.5,
+                  0.25
+                ],
+                [
+                  3,
+                  0,
+                  0.75,
+                  0.0
+                ],
+                [
+                  3,
+                  1,
+                  1.0,
+                  0.0
+                ],
+                [
+                  3,
+                  2,
+                  1.0,
+                  0.25
+                ],
+                [
+                  3,
+                  3,
+                  0.75,
+                  0.25
+                ],
+                [
+                  4,
+                  0,
+                  0.0,
+                  0.25
+                ],
+                [
+                  4,
+                  1,
+                  0.25,
+                  0.25
+                ],
+                [
+                  4,
+                  2,
+                  0.25,
+                  0.5
+                ],
+                [
+                  4,
+                  3,
+                  0.0,
+                  0.5
+                ],
+                [
+                  5,
+                  0,
+                  0.25,
+                  0.25
+                ],
+                [
+                  5,
+                  1,
+                  0.5,
+                  0.25
+                ],
+                [
+                  5,
+                  2,
+                  0.5,
+                  0.5
+                ],
+                [
+                  5,
+                  3,
+                  0.25,
+                  0.5
+                ],
+                [
+                  6,
+                  0,
+                  0.5,
+                  0.25
+                ],
+                [
+                  6,
+                  1,
+                  0.75,
+                  0.25
+                ],
+                [
+                  6,
+                  2,
+                  0.75,
+                  0.5
+                ],
+                [
+                  6,
+                  3,
+                  0.5,
+                  0.5
+                ],
+                [
+                  7,
+                  0,
+                  0.75,
+                  0.25
+                ],
+                [
+                  7,
+                  1,
+                  1.0,
+                  0.25
+                ],
+                [
+                  7,
+                  2,
+                  1.0,
+                  0.5
+                ],
+                [
+                  7,
+                  3,
+                  0.75,
+                  0.5
+                ],
+                [
+                  8,
+                  0,
+                  0.0,
+                  0.5
+                ],
+                [
+                  8,
+                  1,
+                  0.25,
+                  0.5
+                ],
+                [
+                  8,
+                  2,
+                  0.25,
+                  0.75
+                ],
+                [
+                  8,
+                  3,
+                  0.0,
+                  0.75
+                ],
+                [
+                  9,
+                  0,
+                  0.25,
+                  0.5
+                ],
+                [
+                  9,
+                  1,
+                  0.5,
+                  0.5
+                ],
+                [
+                  9,
+                  2,
+                  0.5,
+                  0.75
+                ],
+                [
+                  9,
+                  3,
+                  0.25,
+                  0.75
+                ],
+                [
+                  10,
+                  0,
+                  0.5,
+                  0.5
+                ],
+                [
+                  10,
+                  1,
+                  0.75,
+                  0.5
+                ],
+                [
+                  10,
+                  2,
+                  0.75,
+                  0.75
+                ],
+                [
+                  10,
+                  3,
+                  0.5,
+                  0.75
+                ],
+                [
+                  11,
+                  0,
+                  0.75,
+                  0.5
+                ],
+                [
+                  11,
+                  1,
+                  1.0,
+                  0.5
+                ],
+                [
+                  11,
+                  2,
+                  1.0,
+                  0.75
+                ],
+                [
+                  11,
+                  3,
+                  0.75,
+                  0.75
+                ],
+                [
+                  12,
+                  0,
+                  0.0,
+                  0.75
+                ],
+                [
+                  12,
+                  1,
+                  0.25,
+                  0.75
+                ],
+                [
+                  12,
+                  2,
+                  0.25,
+                  1.0
+                ],
+                [
+                  12,
+                  3,
+                  0.0,
+                  1.0
+                ],
+                [
+                  13,
+                  0,
+                  0.25,
+                  0.75
+                ],
+                [
+                  13,
+                  1,
+                  0.5,
+                  0.75
+                ],
+                [
+                  13,
+                  2,
+                  0.5,
+                  1.0
+                ],
+                [
+                  13,
+                  3,
+                  0.25,
+                  1.0
+                ],
+                [
+                  14,
+                  0,
+                  0.5,
+                  0.75
+                ],
+                [
+                  14,
+                  1,
+                  0.75,
+                  0.75
+                ],
+                [
+                  14,
+                  2,
+                  0.75,
+                  1.0
+                ],
+                [
+                  14,
+                  3,
+                  0.5,
+                  1.0
+                ],
+                [
+                  15,
+                  0,
+                  0.75,
+                  0.75
+                ],
+                [
+                  15,
+                  1,
+                  1.0,
+                  0.75
+                ],
+                [
+                  15,
+                  2,
+                  1.0,
+                  1.0
+                ],
+                [
+                  15,
+                  3,
+                  0.75,
+                  1.0
+                ]
+              ]
+            }
+          }
+        }
+      ],
+      "invariants": [],
+      "ordinary_proof": {
+        "stage": "readonly_reference_or_factory",
+        "cluster": "uv_cursor",
+        "ledger_ids": [
+          "ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1"
+        ],
+        "owned_created": 0,
+        "owned_exact_source": 0,
+        "owned_exact_merged": 0,
+        "owned_released": 0,
+        "production_capability_enabled": false,
+        "input_control": {
+          "key": "F23",
+          "addon_id": 12,
+          "merged_occurrences": 1,
+          "released": true
+        },
+        "foreign_source_fields_and_order_unchanged": true
+      },
+      "cleanup": {
+        "checked": 390,
+        "created": 1346,
+        "removed": 1346,
+        "reinsertions": 0,
+        "features": 0,
+        "owned": 0,
+        "retained_edited": 0,
+        "pending_cleanup": 0,
+        "tracked_resources": 0
+      },
+      "watcher_stopped": true,
+      "remaining_owned_resources": []
     }
   ],
   "reference_runs": [
@@ -288798,6 +292501,3796 @@
       "private_launch_log_sha256": "fe64f342b1d8038ed1888013e0e2f1db2433511e69b6fa2800ee7ce6b640689d",
       "crash_retained_files": [],
       "retention_errors": []
+    },
+    {
+      "id": "reference-evidence-1794560733807712000",
+      "returncode": 0,
+      "child_exited": true,
+      "seconds": 23.449,
+      "protected_before": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_after": {
+        "reference_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "reference_preferences": "ade8f06480896c1d9129593c820a418d8f0688172c4ff01089c33188ae25b32f",
+        "packaged_preset": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+        "packaged_preferences": "bfa078420cbc20aee76d77f7e4e51f602977e35f62a8e11e82769d9cc14da314"
+      },
+      "protected_unchanged": true,
+      "driver_sha256": "d430dcc2004b98d0948f0a172d4b1d5c0b21fc08a3f558c35cdd2e06ebc67d4a",
+      "probe_sha256": "7c9936f2dd5709b526430211499eef768a86e7a272e916f2d59f194969ff5acd",
+      "private_process_receipt_sha256": "90da869f152f76f0c28380533a52bb2fd842732ec070b3f990e4a1b172773b2a",
+      "observations": {
+        "status": "error",
+        "mode": "reference-affected",
+        "dispatch": [
+          {
+            "case": "ordinary_uv_cursor_MIDDLEMOUSE_ade9ef951b1a",
+            "ledger_id": "ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1",
+            "tested_key": "MIDDLEMOUSE",
+            "expected_event": {
+              "alt": 0,
+              "any": false,
+              "ctrl": 1,
+              "direction": "ANY",
+              "hyper": 0,
+              "key_modifier": "NONE",
+              "map_type": "MOUSE",
+              "oskey": 0,
+              "repeat": false,
+              "shift": 1,
+              "type": "MIDDLEMOUSE",
+              "value": "CLICK_DRAG"
+            },
+            "scope": {
+              "is_modal": false,
+              "is_tool": null,
+              "name": "UV Editor",
+              "region_type": "WINDOW",
+              "space_type": "EMPTY"
+            },
+            "target": "transform.translate",
+            "tool_setup": [],
+            "exact_rows_before_probe": {
+              "default": 0,
+              "active": 1,
+              "addon": 0,
+              "user": 1
+            },
+            "merged_event_candidates": [
+              {
+                "scope": "3D View",
+                "space_type": "VIEW_3D",
+                "target": "view3d.cursor3d",
+                "event": {
+                  "type": "MIDDLEMOUSE",
+                  "value": "PRESS",
+                  "any": false,
+                  "shift": 1,
+                  "ctrl": 1,
+                  "alt": 0,
+                  "oskey": 0,
+                  "hyper": 0,
+                  "key_modifier": "NONE",
+                  "direction": "ANY",
+                  "repeat": false,
+                  "map_type": "MOUSE"
+                }
+              },
+              {
+                "scope": "3D View",
+                "space_type": "VIEW_3D",
+                "target": "transform.translate",
+                "event": {
+                  "type": "MIDDLEMOUSE",
+                  "value": "PRESS",
+                  "any": false,
+                  "shift": 1,
+                  "ctrl": 1,
+                  "alt": 0,
+                  "oskey": 0,
+                  "hyper": 0,
+                  "key_modifier": "NONE",
+                  "direction": "ANY",
+                  "repeat": false,
+                  "map_type": "MOUSE"
+                }
+              },
+              {
+                "scope": "UV Editor",
+                "space_type": "EMPTY",
+                "target": "uv.cursor_set",
+                "event": {
+                  "type": "MIDDLEMOUSE",
+                  "value": "PRESS",
+                  "any": false,
+                  "shift": 1,
+                  "ctrl": 1,
+                  "alt": 0,
+                  "oskey": 0,
+                  "hyper": 0,
+                  "key_modifier": "NONE",
+                  "direction": "ANY",
+                  "repeat": false,
+                  "map_type": "MOUSE"
+                }
+              },
+              {
+                "scope": "UV Editor",
+                "space_type": "EMPTY",
+                "target": "transform.translate",
+                "event": {
+                  "type": "MIDDLEMOUSE",
+                  "value": "CLICK_DRAG",
+                  "any": false,
+                  "shift": 1,
+                  "ctrl": 1,
+                  "alt": 0,
+                  "oskey": 0,
+                  "hyper": 0,
+                  "key_modifier": "NONE",
+                  "direction": "ANY",
+                  "repeat": false,
+                  "map_type": "MOUSE"
+                }
+              }
+            ],
+            "input_delivery": {
+              "callbacks": [
+                {
+                  "area": "IMAGE_EDITOR",
+                  "region": "WINDOW"
+                }
+              ],
+              "expected_area": "IMAGE_EDITOR",
+              "expected_region": "WINDOW",
+              "delivered": true
+            },
+            "before": {
+              "editor": "IMAGE_EDITOR",
+              "editor_ui_type": "UV",
+              "context_mode": "EDIT_MESH",
+              "active_tool": "builtin.select_box",
+              "frame_current": 1,
+              "operator_history": [],
+              "modal_operators_observable": true,
+              "modal_operators": [],
+              "cursor": [
+                0.5,
+                0.5
+              ],
+              "view_center": [
+                0.5,
+                0.5
+              ],
+              "selected_uv": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ],
+                [
+                  0,
+                  3
+                ]
+              ],
+              "uv_coordinates": [
+                [
+                  0,
+                  0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0,
+                  1,
+                  0.25,
+                  0.0
+                ],
+                [
+                  0,
+                  2,
+                  0.25,
+                  0.25
+                ],
+                [
+                  0,
+                  3,
+                  0.0,
+                  0.25
+                ],
+                [
+                  1,
+                  0,
+                  0.25,
+                  0.0
+                ],
+                [
+                  1,
+                  1,
+                  0.5,
+                  0.0
+                ],
+                [
+                  1,
+                  2,
+                  0.5,
+                  0.25
+                ],
+                [
+                  1,
+                  3,
+                  0.25,
+                  0.25
+                ],
+                [
+                  2,
+                  0,
+                  0.5,
+                  0.0
+                ],
+                [
+                  2,
+                  1,
+                  0.75,
+                  0.0
+                ],
+                [
+                  2,
+                  2,
+                  0.75,
+                  0.25
+                ],
+                [
+                  2,
+                  3,
+                  0.5,
+                  0.25
+                ],
+                [
+                  3,
+                  0,
+                  0.75,
+                  0.0
+                ],
+                [
+                  3,
+                  1,
+                  1.0,
+                  0.0
+                ],
+                [
+                  3,
+                  2,
+                  1.0,
+                  0.25
+                ],
+                [
+                  3,
+                  3,
+                  0.75,
+                  0.25
+                ],
+                [
+                  4,
+                  0,
+                  0.0,
+                  0.25
+                ],
+                [
+                  4,
+                  1,
+                  0.25,
+                  0.25
+                ],
+                [
+                  4,
+                  2,
+                  0.25,
+                  0.5
+                ],
+                [
+                  4,
+                  3,
+                  0.0,
+                  0.5
+                ],
+                [
+                  5,
+                  0,
+                  0.25,
+                  0.25
+                ],
+                [
+                  5,
+                  1,
+                  0.5,
+                  0.25
+                ],
+                [
+                  5,
+                  2,
+                  0.5,
+                  0.5
+                ],
+                [
+                  5,
+                  3,
+                  0.25,
+                  0.5
+                ],
+                [
+                  6,
+                  0,
+                  0.5,
+                  0.25
+                ],
+                [
+                  6,
+                  1,
+                  0.75,
+                  0.25
+                ],
+                [
+                  6,
+                  2,
+                  0.75,
+                  0.5
+                ],
+                [
+                  6,
+                  3,
+                  0.5,
+                  0.5
+                ],
+                [
+                  7,
+                  0,
+                  0.75,
+                  0.25
+                ],
+                [
+                  7,
+                  1,
+                  1.0,
+                  0.25
+                ],
+                [
+                  7,
+                  2,
+                  1.0,
+                  0.5
+                ],
+                [
+                  7,
+                  3,
+                  0.75,
+                  0.5
+                ],
+                [
+                  8,
+                  0,
+                  0.0,
+                  0.5
+                ],
+                [
+                  8,
+                  1,
+                  0.25,
+                  0.5
+                ],
+                [
+                  8,
+                  2,
+                  0.25,
+                  0.75
+                ],
+                [
+                  8,
+                  3,
+                  0.0,
+                  0.75
+                ],
+                [
+                  9,
+                  0,
+                  0.25,
+                  0.5
+                ],
+                [
+                  9,
+                  1,
+                  0.5,
+                  0.5
+                ],
+                [
+                  9,
+                  2,
+                  0.5,
+                  0.75
+                ],
+                [
+                  9,
+                  3,
+                  0.25,
+                  0.75
+                ],
+                [
+                  10,
+                  0,
+                  0.5,
+                  0.5
+                ],
+                [
+                  10,
+                  1,
+                  0.75,
+                  0.5
+                ],
+                [
+                  10,
+                  2,
+                  0.75,
+                  0.75
+                ],
+                [
+                  10,
+                  3,
+                  0.5,
+                  0.75
+                ],
+                [
+                  11,
+                  0,
+                  0.75,
+                  0.5
+                ],
+                [
+                  11,
+                  1,
+                  1.0,
+                  0.5
+                ],
+                [
+                  11,
+                  2,
+                  1.0,
+                  0.75
+                ],
+                [
+                  11,
+                  3,
+                  0.75,
+                  0.75
+                ],
+                [
+                  12,
+                  0,
+                  0.0,
+                  0.75
+                ],
+                [
+                  12,
+                  1,
+                  0.25,
+                  0.75
+                ],
+                [
+                  12,
+                  2,
+                  0.25,
+                  1.0
+                ],
+                [
+                  12,
+                  3,
+                  0.0,
+                  1.0
+                ],
+                [
+                  13,
+                  0,
+                  0.25,
+                  0.75
+                ],
+                [
+                  13,
+                  1,
+                  0.5,
+                  0.75
+                ],
+                [
+                  13,
+                  2,
+                  0.5,
+                  1.0
+                ],
+                [
+                  13,
+                  3,
+                  0.25,
+                  1.0
+                ],
+                [
+                  14,
+                  0,
+                  0.5,
+                  0.75
+                ],
+                [
+                  14,
+                  1,
+                  0.75,
+                  0.75
+                ],
+                [
+                  14,
+                  2,
+                  0.75,
+                  1.0
+                ],
+                [
+                  14,
+                  3,
+                  0.5,
+                  1.0
+                ],
+                [
+                  15,
+                  0,
+                  0.75,
+                  0.75
+                ],
+                [
+                  15,
+                  1,
+                  1.0,
+                  0.75
+                ],
+                [
+                  15,
+                  2,
+                  1.0,
+                  1.0
+                ],
+                [
+                  15,
+                  3,
+                  0.75,
+                  1.0
+                ]
+              ]
+            },
+            "input_phases": [
+              {
+                "phase": "after_press",
+                "snapshot": {
+                  "editor": "IMAGE_EDITOR",
+                  "editor_ui_type": "UV",
+                  "context_mode": "EDIT_MESH",
+                  "active_tool": "builtin.select_box",
+                  "frame_current": 1,
+                  "operator_history": [],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "cursor": [
+                    0.5,
+                    0.5
+                  ],
+                  "view_center": [
+                    0.5,
+                    0.5
+                  ],
+                  "selected_uv": [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      0,
+                      3
+                    ]
+                  ],
+                  "uv_coordinates": [
+                    [
+                      0,
+                      0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0,
+                      1,
+                      0.25,
+                      0.0
+                    ],
+                    [
+                      0,
+                      2,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      0,
+                      3,
+                      0.0,
+                      0.25
+                    ],
+                    [
+                      1,
+                      0,
+                      0.25,
+                      0.0
+                    ],
+                    [
+                      1,
+                      1,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      1,
+                      2,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      1,
+                      3,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      2,
+                      0,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      2,
+                      1,
+                      0.75,
+                      0.0
+                    ],
+                    [
+                      2,
+                      2,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      2,
+                      3,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      3,
+                      0,
+                      0.75,
+                      0.0
+                    ],
+                    [
+                      3,
+                      1,
+                      1.0,
+                      0.0
+                    ],
+                    [
+                      3,
+                      2,
+                      1.0,
+                      0.25
+                    ],
+                    [
+                      3,
+                      3,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      4,
+                      0,
+                      0.0,
+                      0.25
+                    ],
+                    [
+                      4,
+                      1,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      4,
+                      2,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      4,
+                      3,
+                      0.0,
+                      0.5
+                    ],
+                    [
+                      5,
+                      0,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      5,
+                      1,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      5,
+                      2,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      5,
+                      3,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      6,
+                      0,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      6,
+                      1,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      6,
+                      2,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      6,
+                      3,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      7,
+                      0,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      7,
+                      1,
+                      1.0,
+                      0.25
+                    ],
+                    [
+                      7,
+                      2,
+                      1.0,
+                      0.5
+                    ],
+                    [
+                      7,
+                      3,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      8,
+                      0,
+                      0.0,
+                      0.5
+                    ],
+                    [
+                      8,
+                      1,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      8,
+                      2,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      8,
+                      3,
+                      0.0,
+                      0.75
+                    ],
+                    [
+                      9,
+                      0,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      9,
+                      1,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      9,
+                      2,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      9,
+                      3,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      10,
+                      0,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      10,
+                      1,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      10,
+                      2,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      10,
+                      3,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      11,
+                      0,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      11,
+                      1,
+                      1.0,
+                      0.5
+                    ],
+                    [
+                      11,
+                      2,
+                      1.0,
+                      0.75
+                    ],
+                    [
+                      11,
+                      3,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      12,
+                      0,
+                      0.0,
+                      0.75
+                    ],
+                    [
+                      12,
+                      1,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      12,
+                      2,
+                      0.25,
+                      1.0
+                    ],
+                    [
+                      12,
+                      3,
+                      0.0,
+                      1.0
+                    ],
+                    [
+                      13,
+                      0,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      13,
+                      1,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      13,
+                      2,
+                      0.5,
+                      1.0
+                    ],
+                    [
+                      13,
+                      3,
+                      0.25,
+                      1.0
+                    ],
+                    [
+                      14,
+                      0,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      14,
+                      1,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      14,
+                      2,
+                      0.75,
+                      1.0
+                    ],
+                    [
+                      14,
+                      3,
+                      0.5,
+                      1.0
+                    ],
+                    [
+                      15,
+                      0,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      15,
+                      1,
+                      1.0,
+                      0.75
+                    ],
+                    [
+                      15,
+                      2,
+                      1.0,
+                      1.0
+                    ],
+                    [
+                      15,
+                      3,
+                      0.75,
+                      1.0
+                    ]
+                  ]
+                }
+              },
+              {
+                "phase": "after_initial_motion",
+                "snapshot": {
+                  "editor": "IMAGE_EDITOR",
+                  "editor_ui_type": "UV",
+                  "context_mode": "EDIT_MESH",
+                  "active_tool": "builtin.select_box",
+                  "frame_current": 1,
+                  "operator_history": [],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "cursor": [
+                    0.5,
+                    0.5
+                  ],
+                  "view_center": [
+                    0.5,
+                    0.5
+                  ],
+                  "selected_uv": [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      0,
+                      3
+                    ]
+                  ],
+                  "uv_coordinates": [
+                    [
+                      0,
+                      0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0,
+                      1,
+                      0.25,
+                      0.0
+                    ],
+                    [
+                      0,
+                      2,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      0,
+                      3,
+                      0.0,
+                      0.25
+                    ],
+                    [
+                      1,
+                      0,
+                      0.25,
+                      0.0
+                    ],
+                    [
+                      1,
+                      1,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      1,
+                      2,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      1,
+                      3,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      2,
+                      0,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      2,
+                      1,
+                      0.75,
+                      0.0
+                    ],
+                    [
+                      2,
+                      2,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      2,
+                      3,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      3,
+                      0,
+                      0.75,
+                      0.0
+                    ],
+                    [
+                      3,
+                      1,
+                      1.0,
+                      0.0
+                    ],
+                    [
+                      3,
+                      2,
+                      1.0,
+                      0.25
+                    ],
+                    [
+                      3,
+                      3,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      4,
+                      0,
+                      0.0,
+                      0.25
+                    ],
+                    [
+                      4,
+                      1,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      4,
+                      2,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      4,
+                      3,
+                      0.0,
+                      0.5
+                    ],
+                    [
+                      5,
+                      0,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      5,
+                      1,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      5,
+                      2,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      5,
+                      3,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      6,
+                      0,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      6,
+                      1,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      6,
+                      2,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      6,
+                      3,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      7,
+                      0,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      7,
+                      1,
+                      1.0,
+                      0.25
+                    ],
+                    [
+                      7,
+                      2,
+                      1.0,
+                      0.5
+                    ],
+                    [
+                      7,
+                      3,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      8,
+                      0,
+                      0.0,
+                      0.5
+                    ],
+                    [
+                      8,
+                      1,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      8,
+                      2,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      8,
+                      3,
+                      0.0,
+                      0.75
+                    ],
+                    [
+                      9,
+                      0,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      9,
+                      1,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      9,
+                      2,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      9,
+                      3,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      10,
+                      0,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      10,
+                      1,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      10,
+                      2,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      10,
+                      3,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      11,
+                      0,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      11,
+                      1,
+                      1.0,
+                      0.5
+                    ],
+                    [
+                      11,
+                      2,
+                      1.0,
+                      0.75
+                    ],
+                    [
+                      11,
+                      3,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      12,
+                      0,
+                      0.0,
+                      0.75
+                    ],
+                    [
+                      12,
+                      1,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      12,
+                      2,
+                      0.25,
+                      1.0
+                    ],
+                    [
+                      12,
+                      3,
+                      0.0,
+                      1.0
+                    ],
+                    [
+                      13,
+                      0,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      13,
+                      1,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      13,
+                      2,
+                      0.5,
+                      1.0
+                    ],
+                    [
+                      13,
+                      3,
+                      0.25,
+                      1.0
+                    ],
+                    [
+                      14,
+                      0,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      14,
+                      1,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      14,
+                      2,
+                      0.75,
+                      1.0
+                    ],
+                    [
+                      14,
+                      3,
+                      0.5,
+                      1.0
+                    ],
+                    [
+                      15,
+                      0,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      15,
+                      1,
+                      1.0,
+                      0.75
+                    ],
+                    [
+                      15,
+                      2,
+                      1.0,
+                      1.0
+                    ],
+                    [
+                      15,
+                      3,
+                      0.75,
+                      1.0
+                    ]
+                  ]
+                }
+              },
+              {
+                "phase": "after_second_motion",
+                "snapshot": {
+                  "editor": "IMAGE_EDITOR",
+                  "editor_ui_type": "UV",
+                  "context_mode": "EDIT_MESH",
+                  "active_tool": "builtin.select_box",
+                  "frame_current": 1,
+                  "operator_history": [],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "cursor": [
+                    0.5,
+                    0.5
+                  ],
+                  "view_center": [
+                    0.5,
+                    0.5
+                  ],
+                  "selected_uv": [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      0,
+                      3
+                    ]
+                  ],
+                  "uv_coordinates": [
+                    [
+                      0,
+                      0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0,
+                      1,
+                      0.25,
+                      0.0
+                    ],
+                    [
+                      0,
+                      2,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      0,
+                      3,
+                      0.0,
+                      0.25
+                    ],
+                    [
+                      1,
+                      0,
+                      0.25,
+                      0.0
+                    ],
+                    [
+                      1,
+                      1,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      1,
+                      2,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      1,
+                      3,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      2,
+                      0,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      2,
+                      1,
+                      0.75,
+                      0.0
+                    ],
+                    [
+                      2,
+                      2,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      2,
+                      3,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      3,
+                      0,
+                      0.75,
+                      0.0
+                    ],
+                    [
+                      3,
+                      1,
+                      1.0,
+                      0.0
+                    ],
+                    [
+                      3,
+                      2,
+                      1.0,
+                      0.25
+                    ],
+                    [
+                      3,
+                      3,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      4,
+                      0,
+                      0.0,
+                      0.25
+                    ],
+                    [
+                      4,
+                      1,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      4,
+                      2,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      4,
+                      3,
+                      0.0,
+                      0.5
+                    ],
+                    [
+                      5,
+                      0,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      5,
+                      1,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      5,
+                      2,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      5,
+                      3,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      6,
+                      0,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      6,
+                      1,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      6,
+                      2,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      6,
+                      3,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      7,
+                      0,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      7,
+                      1,
+                      1.0,
+                      0.25
+                    ],
+                    [
+                      7,
+                      2,
+                      1.0,
+                      0.5
+                    ],
+                    [
+                      7,
+                      3,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      8,
+                      0,
+                      0.0,
+                      0.5
+                    ],
+                    [
+                      8,
+                      1,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      8,
+                      2,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      8,
+                      3,
+                      0.0,
+                      0.75
+                    ],
+                    [
+                      9,
+                      0,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      9,
+                      1,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      9,
+                      2,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      9,
+                      3,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      10,
+                      0,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      10,
+                      1,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      10,
+                      2,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      10,
+                      3,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      11,
+                      0,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      11,
+                      1,
+                      1.0,
+                      0.5
+                    ],
+                    [
+                      11,
+                      2,
+                      1.0,
+                      0.75
+                    ],
+                    [
+                      11,
+                      3,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      12,
+                      0,
+                      0.0,
+                      0.75
+                    ],
+                    [
+                      12,
+                      1,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      12,
+                      2,
+                      0.25,
+                      1.0
+                    ],
+                    [
+                      12,
+                      3,
+                      0.0,
+                      1.0
+                    ],
+                    [
+                      13,
+                      0,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      13,
+                      1,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      13,
+                      2,
+                      0.5,
+                      1.0
+                    ],
+                    [
+                      13,
+                      3,
+                      0.25,
+                      1.0
+                    ],
+                    [
+                      14,
+                      0,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      14,
+                      1,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      14,
+                      2,
+                      0.75,
+                      1.0
+                    ],
+                    [
+                      14,
+                      3,
+                      0.5,
+                      1.0
+                    ],
+                    [
+                      15,
+                      0,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      15,
+                      1,
+                      1.0,
+                      0.75
+                    ],
+                    [
+                      15,
+                      2,
+                      1.0,
+                      1.0
+                    ],
+                    [
+                      15,
+                      3,
+                      0.75,
+                      1.0
+                    ]
+                  ]
+                }
+              },
+              {
+                "phase": "after_release",
+                "snapshot": {
+                  "editor": "IMAGE_EDITOR",
+                  "editor_ui_type": "UV",
+                  "context_mode": "EDIT_MESH",
+                  "active_tool": "builtin.select_box",
+                  "frame_current": 1,
+                  "operator_history": [],
+                  "modal_operators_observable": true,
+                  "modal_operators": [],
+                  "cursor": [
+                    0.5,
+                    0.5
+                  ],
+                  "view_center": [
+                    0.5,
+                    0.5
+                  ],
+                  "selected_uv": [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      0,
+                      3
+                    ]
+                  ],
+                  "uv_coordinates": [
+                    [
+                      0,
+                      0,
+                      0.0,
+                      0.0
+                    ],
+                    [
+                      0,
+                      1,
+                      0.25,
+                      0.0
+                    ],
+                    [
+                      0,
+                      2,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      0,
+                      3,
+                      0.0,
+                      0.25
+                    ],
+                    [
+                      1,
+                      0,
+                      0.25,
+                      0.0
+                    ],
+                    [
+                      1,
+                      1,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      1,
+                      2,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      1,
+                      3,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      2,
+                      0,
+                      0.5,
+                      0.0
+                    ],
+                    [
+                      2,
+                      1,
+                      0.75,
+                      0.0
+                    ],
+                    [
+                      2,
+                      2,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      2,
+                      3,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      3,
+                      0,
+                      0.75,
+                      0.0
+                    ],
+                    [
+                      3,
+                      1,
+                      1.0,
+                      0.0
+                    ],
+                    [
+                      3,
+                      2,
+                      1.0,
+                      0.25
+                    ],
+                    [
+                      3,
+                      3,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      4,
+                      0,
+                      0.0,
+                      0.25
+                    ],
+                    [
+                      4,
+                      1,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      4,
+                      2,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      4,
+                      3,
+                      0.0,
+                      0.5
+                    ],
+                    [
+                      5,
+                      0,
+                      0.25,
+                      0.25
+                    ],
+                    [
+                      5,
+                      1,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      5,
+                      2,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      5,
+                      3,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      6,
+                      0,
+                      0.5,
+                      0.25
+                    ],
+                    [
+                      6,
+                      1,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      6,
+                      2,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      6,
+                      3,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      7,
+                      0,
+                      0.75,
+                      0.25
+                    ],
+                    [
+                      7,
+                      1,
+                      1.0,
+                      0.25
+                    ],
+                    [
+                      7,
+                      2,
+                      1.0,
+                      0.5
+                    ],
+                    [
+                      7,
+                      3,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      8,
+                      0,
+                      0.0,
+                      0.5
+                    ],
+                    [
+                      8,
+                      1,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      8,
+                      2,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      8,
+                      3,
+                      0.0,
+                      0.75
+                    ],
+                    [
+                      9,
+                      0,
+                      0.25,
+                      0.5
+                    ],
+                    [
+                      9,
+                      1,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      9,
+                      2,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      9,
+                      3,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      10,
+                      0,
+                      0.5,
+                      0.5
+                    ],
+                    [
+                      10,
+                      1,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      10,
+                      2,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      10,
+                      3,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      11,
+                      0,
+                      0.75,
+                      0.5
+                    ],
+                    [
+                      11,
+                      1,
+                      1.0,
+                      0.5
+                    ],
+                    [
+                      11,
+                      2,
+                      1.0,
+                      0.75
+                    ],
+                    [
+                      11,
+                      3,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      12,
+                      0,
+                      0.0,
+                      0.75
+                    ],
+                    [
+                      12,
+                      1,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      12,
+                      2,
+                      0.25,
+                      1.0
+                    ],
+                    [
+                      12,
+                      3,
+                      0.0,
+                      1.0
+                    ],
+                    [
+                      13,
+                      0,
+                      0.25,
+                      0.75
+                    ],
+                    [
+                      13,
+                      1,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      13,
+                      2,
+                      0.5,
+                      1.0
+                    ],
+                    [
+                      13,
+                      3,
+                      0.25,
+                      1.0
+                    ],
+                    [
+                      14,
+                      0,
+                      0.5,
+                      0.75
+                    ],
+                    [
+                      14,
+                      1,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      14,
+                      2,
+                      0.75,
+                      1.0
+                    ],
+                    [
+                      14,
+                      3,
+                      0.5,
+                      1.0
+                    ],
+                    [
+                      15,
+                      0,
+                      0.75,
+                      0.75
+                    ],
+                    [
+                      15,
+                      1,
+                      1.0,
+                      0.75
+                    ],
+                    [
+                      15,
+                      2,
+                      1.0,
+                      1.0
+                    ],
+                    [
+                      15,
+                      3,
+                      0.75,
+                      1.0
+                    ]
+                  ]
+                }
+              }
+            ],
+            "after": {
+              "editor": "IMAGE_EDITOR",
+              "editor_ui_type": "UV",
+              "context_mode": "EDIT_MESH",
+              "active_tool": "builtin.select_box",
+              "frame_current": 1,
+              "operator_history": [],
+              "modal_operators_observable": true,
+              "modal_operators": [],
+              "cursor": [
+                0.5,
+                0.5
+              ],
+              "view_center": [
+                0.5,
+                0.5
+              ],
+              "selected_uv": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ],
+                [
+                  0,
+                  3
+                ]
+              ],
+              "uv_coordinates": [
+                [
+                  0,
+                  0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0,
+                  1,
+                  0.25,
+                  0.0
+                ],
+                [
+                  0,
+                  2,
+                  0.25,
+                  0.25
+                ],
+                [
+                  0,
+                  3,
+                  0.0,
+                  0.25
+                ],
+                [
+                  1,
+                  0,
+                  0.25,
+                  0.0
+                ],
+                [
+                  1,
+                  1,
+                  0.5,
+                  0.0
+                ],
+                [
+                  1,
+                  2,
+                  0.5,
+                  0.25
+                ],
+                [
+                  1,
+                  3,
+                  0.25,
+                  0.25
+                ],
+                [
+                  2,
+                  0,
+                  0.5,
+                  0.0
+                ],
+                [
+                  2,
+                  1,
+                  0.75,
+                  0.0
+                ],
+                [
+                  2,
+                  2,
+                  0.75,
+                  0.25
+                ],
+                [
+                  2,
+                  3,
+                  0.5,
+                  0.25
+                ],
+                [
+                  3,
+                  0,
+                  0.75,
+                  0.0
+                ],
+                [
+                  3,
+                  1,
+                  1.0,
+                  0.0
+                ],
+                [
+                  3,
+                  2,
+                  1.0,
+                  0.25
+                ],
+                [
+                  3,
+                  3,
+                  0.75,
+                  0.25
+                ],
+                [
+                  4,
+                  0,
+                  0.0,
+                  0.25
+                ],
+                [
+                  4,
+                  1,
+                  0.25,
+                  0.25
+                ],
+                [
+                  4,
+                  2,
+                  0.25,
+                  0.5
+                ],
+                [
+                  4,
+                  3,
+                  0.0,
+                  0.5
+                ],
+                [
+                  5,
+                  0,
+                  0.25,
+                  0.25
+                ],
+                [
+                  5,
+                  1,
+                  0.5,
+                  0.25
+                ],
+                [
+                  5,
+                  2,
+                  0.5,
+                  0.5
+                ],
+                [
+                  5,
+                  3,
+                  0.25,
+                  0.5
+                ],
+                [
+                  6,
+                  0,
+                  0.5,
+                  0.25
+                ],
+                [
+                  6,
+                  1,
+                  0.75,
+                  0.25
+                ],
+                [
+                  6,
+                  2,
+                  0.75,
+                  0.5
+                ],
+                [
+                  6,
+                  3,
+                  0.5,
+                  0.5
+                ],
+                [
+                  7,
+                  0,
+                  0.75,
+                  0.25
+                ],
+                [
+                  7,
+                  1,
+                  1.0,
+                  0.25
+                ],
+                [
+                  7,
+                  2,
+                  1.0,
+                  0.5
+                ],
+                [
+                  7,
+                  3,
+                  0.75,
+                  0.5
+                ],
+                [
+                  8,
+                  0,
+                  0.0,
+                  0.5
+                ],
+                [
+                  8,
+                  1,
+                  0.25,
+                  0.5
+                ],
+                [
+                  8,
+                  2,
+                  0.25,
+                  0.75
+                ],
+                [
+                  8,
+                  3,
+                  0.0,
+                  0.75
+                ],
+                [
+                  9,
+                  0,
+                  0.25,
+                  0.5
+                ],
+                [
+                  9,
+                  1,
+                  0.5,
+                  0.5
+                ],
+                [
+                  9,
+                  2,
+                  0.5,
+                  0.75
+                ],
+                [
+                  9,
+                  3,
+                  0.25,
+                  0.75
+                ],
+                [
+                  10,
+                  0,
+                  0.5,
+                  0.5
+                ],
+                [
+                  10,
+                  1,
+                  0.75,
+                  0.5
+                ],
+                [
+                  10,
+                  2,
+                  0.75,
+                  0.75
+                ],
+                [
+                  10,
+                  3,
+                  0.5,
+                  0.75
+                ],
+                [
+                  11,
+                  0,
+                  0.75,
+                  0.5
+                ],
+                [
+                  11,
+                  1,
+                  1.0,
+                  0.5
+                ],
+                [
+                  11,
+                  2,
+                  1.0,
+                  0.75
+                ],
+                [
+                  11,
+                  3,
+                  0.75,
+                  0.75
+                ],
+                [
+                  12,
+                  0,
+                  0.0,
+                  0.75
+                ],
+                [
+                  12,
+                  1,
+                  0.25,
+                  0.75
+                ],
+                [
+                  12,
+                  2,
+                  0.25,
+                  1.0
+                ],
+                [
+                  12,
+                  3,
+                  0.0,
+                  1.0
+                ],
+                [
+                  13,
+                  0,
+                  0.25,
+                  0.75
+                ],
+                [
+                  13,
+                  1,
+                  0.5,
+                  0.75
+                ],
+                [
+                  13,
+                  2,
+                  0.5,
+                  1.0
+                ],
+                [
+                  13,
+                  3,
+                  0.25,
+                  1.0
+                ],
+                [
+                  14,
+                  0,
+                  0.5,
+                  0.75
+                ],
+                [
+                  14,
+                  1,
+                  0.75,
+                  0.75
+                ],
+                [
+                  14,
+                  2,
+                  0.75,
+                  1.0
+                ],
+                [
+                  14,
+                  3,
+                  0.5,
+                  1.0
+                ],
+                [
+                  15,
+                  0,
+                  0.75,
+                  0.75
+                ],
+                [
+                  15,
+                  1,
+                  1.0,
+                  0.75
+                ],
+                [
+                  15,
+                  2,
+                  1.0,
+                  1.0
+                ],
+                [
+                  15,
+                  3,
+                  0.75,
+                  1.0
+                ]
+              ]
+            },
+            "input_status": "observed",
+            "direct_control_tool_setup": [],
+            "direct_control_before": {
+              "editor": "IMAGE_EDITOR",
+              "editor_ui_type": "UV",
+              "context_mode": "EDIT_MESH",
+              "active_tool": "builtin.select_box",
+              "frame_current": 1,
+              "operator_history": [],
+              "modal_operators_observable": true,
+              "modal_operators": [],
+              "cursor": [
+                0.5,
+                0.5
+              ],
+              "view_center": [
+                0.5,
+                0.5
+              ],
+              "selected_uv": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ],
+                [
+                  0,
+                  3
+                ]
+              ],
+              "uv_coordinates": [
+                [
+                  0,
+                  0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0,
+                  1,
+                  0.25,
+                  0.0
+                ],
+                [
+                  0,
+                  2,
+                  0.25,
+                  0.25
+                ],
+                [
+                  0,
+                  3,
+                  0.0,
+                  0.25
+                ],
+                [
+                  1,
+                  0,
+                  0.25,
+                  0.0
+                ],
+                [
+                  1,
+                  1,
+                  0.5,
+                  0.0
+                ],
+                [
+                  1,
+                  2,
+                  0.5,
+                  0.25
+                ],
+                [
+                  1,
+                  3,
+                  0.25,
+                  0.25
+                ],
+                [
+                  2,
+                  0,
+                  0.5,
+                  0.0
+                ],
+                [
+                  2,
+                  1,
+                  0.75,
+                  0.0
+                ],
+                [
+                  2,
+                  2,
+                  0.75,
+                  0.25
+                ],
+                [
+                  2,
+                  3,
+                  0.5,
+                  0.25
+                ],
+                [
+                  3,
+                  0,
+                  0.75,
+                  0.0
+                ],
+                [
+                  3,
+                  1,
+                  1.0,
+                  0.0
+                ],
+                [
+                  3,
+                  2,
+                  1.0,
+                  0.25
+                ],
+                [
+                  3,
+                  3,
+                  0.75,
+                  0.25
+                ],
+                [
+                  4,
+                  0,
+                  0.0,
+                  0.25
+                ],
+                [
+                  4,
+                  1,
+                  0.25,
+                  0.25
+                ],
+                [
+                  4,
+                  2,
+                  0.25,
+                  0.5
+                ],
+                [
+                  4,
+                  3,
+                  0.0,
+                  0.5
+                ],
+                [
+                  5,
+                  0,
+                  0.25,
+                  0.25
+                ],
+                [
+                  5,
+                  1,
+                  0.5,
+                  0.25
+                ],
+                [
+                  5,
+                  2,
+                  0.5,
+                  0.5
+                ],
+                [
+                  5,
+                  3,
+                  0.25,
+                  0.5
+                ],
+                [
+                  6,
+                  0,
+                  0.5,
+                  0.25
+                ],
+                [
+                  6,
+                  1,
+                  0.75,
+                  0.25
+                ],
+                [
+                  6,
+                  2,
+                  0.75,
+                  0.5
+                ],
+                [
+                  6,
+                  3,
+                  0.5,
+                  0.5
+                ],
+                [
+                  7,
+                  0,
+                  0.75,
+                  0.25
+                ],
+                [
+                  7,
+                  1,
+                  1.0,
+                  0.25
+                ],
+                [
+                  7,
+                  2,
+                  1.0,
+                  0.5
+                ],
+                [
+                  7,
+                  3,
+                  0.75,
+                  0.5
+                ],
+                [
+                  8,
+                  0,
+                  0.0,
+                  0.5
+                ],
+                [
+                  8,
+                  1,
+                  0.25,
+                  0.5
+                ],
+                [
+                  8,
+                  2,
+                  0.25,
+                  0.75
+                ],
+                [
+                  8,
+                  3,
+                  0.0,
+                  0.75
+                ],
+                [
+                  9,
+                  0,
+                  0.25,
+                  0.5
+                ],
+                [
+                  9,
+                  1,
+                  0.5,
+                  0.5
+                ],
+                [
+                  9,
+                  2,
+                  0.5,
+                  0.75
+                ],
+                [
+                  9,
+                  3,
+                  0.25,
+                  0.75
+                ],
+                [
+                  10,
+                  0,
+                  0.5,
+                  0.5
+                ],
+                [
+                  10,
+                  1,
+                  0.75,
+                  0.5
+                ],
+                [
+                  10,
+                  2,
+                  0.75,
+                  0.75
+                ],
+                [
+                  10,
+                  3,
+                  0.5,
+                  0.75
+                ],
+                [
+                  11,
+                  0,
+                  0.75,
+                  0.5
+                ],
+                [
+                  11,
+                  1,
+                  1.0,
+                  0.5
+                ],
+                [
+                  11,
+                  2,
+                  1.0,
+                  0.75
+                ],
+                [
+                  11,
+                  3,
+                  0.75,
+                  0.75
+                ],
+                [
+                  12,
+                  0,
+                  0.0,
+                  0.75
+                ],
+                [
+                  12,
+                  1,
+                  0.25,
+                  0.75
+                ],
+                [
+                  12,
+                  2,
+                  0.25,
+                  1.0
+                ],
+                [
+                  12,
+                  3,
+                  0.0,
+                  1.0
+                ],
+                [
+                  13,
+                  0,
+                  0.25,
+                  0.75
+                ],
+                [
+                  13,
+                  1,
+                  0.5,
+                  0.75
+                ],
+                [
+                  13,
+                  2,
+                  0.5,
+                  1.0
+                ],
+                [
+                  13,
+                  3,
+                  0.25,
+                  1.0
+                ],
+                [
+                  14,
+                  0,
+                  0.5,
+                  0.75
+                ],
+                [
+                  14,
+                  1,
+                  0.75,
+                  0.75
+                ],
+                [
+                  14,
+                  2,
+                  0.75,
+                  1.0
+                ],
+                [
+                  14,
+                  3,
+                  0.5,
+                  1.0
+                ],
+                [
+                  15,
+                  0,
+                  0.75,
+                  0.75
+                ],
+                [
+                  15,
+                  1,
+                  1.0,
+                  0.75
+                ],
+                [
+                  15,
+                  2,
+                  1.0,
+                  1.0
+                ],
+                [
+                  15,
+                  3,
+                  0.75,
+                  1.0
+                ]
+              ]
+            },
+            "direct_control": {
+              "poll": true,
+              "result": [
+                "FINISHED"
+              ],
+              "properties": {
+                "constraint_axis": [
+                  false,
+                  false,
+                  false
+                ],
+                "cursor_transform": true,
+                "gpencil_strokes": false,
+                "mirror": false,
+                "orient_matrix": [
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                ],
+                "orient_matrix_type": "GLOBAL",
+                "orient_type": "GLOBAL",
+                "proportional_edit_falloff": "SMOOTH",
+                "proportional_size": 1.0,
+                "release_confirm": true,
+                "remove_on_cancel": false,
+                "snap": false,
+                "snap_align": false,
+                "snap_elements": [
+                  "INCREMENT"
+                ],
+                "snap_normal": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "snap_point": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "snap_target": "CLOSEST",
+                "texture_space": false,
+                "translate_origin": false,
+                "use_accurate": false,
+                "use_automerge_and_split": false,
+                "use_duplicated_keyframes": false,
+                "use_proportional_connected": false,
+                "use_proportional_edit": false,
+                "use_proportional_projected": false,
+                "use_snap_edit": true,
+                "use_snap_nonedit": true,
+                "use_snap_project": false,
+                "use_snap_selectable": false,
+                "use_snap_self": true,
+                "value": [
+                  0.125,
+                  0.0625,
+                  0.0
+                ],
+                "view2d_edge_pan": false
+              },
+              "native_enum_flag_arguments": {
+                "snap_elements": [
+                  "INCREMENT"
+                ]
+              },
+              "method": "direct operator fixture control",
+              "after": {
+                "editor": "IMAGE_EDITOR",
+                "editor_ui_type": "UV",
+                "context_mode": "EDIT_MESH",
+                "active_tool": "builtin.select_box",
+                "frame_current": 1,
+                "operator_history": [],
+                "modal_operators_observable": true,
+                "modal_operators": [],
+                "cursor": [
+                  0.5,
+                  0.5
+                ],
+                "view_center": [
+                  0.5,
+                  0.5
+                ],
+                "selected_uv": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    2
+                  ],
+                  [
+                    0,
+                    3
+                  ]
+                ],
+                "uv_coordinates": [
+                  [
+                    0,
+                    0,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0,
+                    1,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    0,
+                    2,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    0,
+                    3,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    1,
+                    0,
+                    0.25,
+                    0.0
+                  ],
+                  [
+                    1,
+                    1,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    1,
+                    2,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    1,
+                    3,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    2,
+                    0,
+                    0.5,
+                    0.0
+                  ],
+                  [
+                    2,
+                    1,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    2,
+                    2,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    2,
+                    3,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    3,
+                    0,
+                    0.75,
+                    0.0
+                  ],
+                  [
+                    3,
+                    1,
+                    1.0,
+                    0.0
+                  ],
+                  [
+                    3,
+                    2,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    3,
+                    3,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    4,
+                    0,
+                    0.0,
+                    0.25
+                  ],
+                  [
+                    4,
+                    1,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    4,
+                    2,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    4,
+                    3,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    5,
+                    0,
+                    0.25,
+                    0.25
+                  ],
+                  [
+                    5,
+                    1,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    5,
+                    2,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    5,
+                    3,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    6,
+                    0,
+                    0.5,
+                    0.25
+                  ],
+                  [
+                    6,
+                    1,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    6,
+                    2,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    6,
+                    3,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    7,
+                    0,
+                    0.75,
+                    0.25
+                  ],
+                  [
+                    7,
+                    1,
+                    1.0,
+                    0.25
+                  ],
+                  [
+                    7,
+                    2,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    7,
+                    3,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    8,
+                    0,
+                    0.0,
+                    0.5
+                  ],
+                  [
+                    8,
+                    1,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    8,
+                    2,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    8,
+                    3,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    9,
+                    0,
+                    0.25,
+                    0.5
+                  ],
+                  [
+                    9,
+                    1,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    9,
+                    2,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    9,
+                    3,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    10,
+                    0,
+                    0.5,
+                    0.5
+                  ],
+                  [
+                    10,
+                    1,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    10,
+                    2,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    10,
+                    3,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    11,
+                    0,
+                    0.75,
+                    0.5
+                  ],
+                  [
+                    11,
+                    1,
+                    1.0,
+                    0.5
+                  ],
+                  [
+                    11,
+                    2,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    11,
+                    3,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    12,
+                    0,
+                    0.0,
+                    0.75
+                  ],
+                  [
+                    12,
+                    1,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    12,
+                    2,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    12,
+                    3,
+                    0.0,
+                    1.0
+                  ],
+                  [
+                    13,
+                    0,
+                    0.25,
+                    0.75
+                  ],
+                  [
+                    13,
+                    1,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    13,
+                    2,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    13,
+                    3,
+                    0.25,
+                    1.0
+                  ],
+                  [
+                    14,
+                    0,
+                    0.5,
+                    0.75
+                  ],
+                  [
+                    14,
+                    1,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    14,
+                    2,
+                    0.75,
+                    1.0
+                  ],
+                  [
+                    14,
+                    3,
+                    0.5,
+                    1.0
+                  ],
+                  [
+                    15,
+                    0,
+                    0.75,
+                    0.75
+                  ],
+                  [
+                    15,
+                    1,
+                    1.0,
+                    0.75
+                  ],
+                  [
+                    15,
+                    2,
+                    1.0,
+                    1.0
+                  ],
+                  [
+                    15,
+                    3,
+                    0.75,
+                    1.0
+                  ]
+                ]
+              }
+            }
+          }
+        ],
+        "case_set": "ordinary",
+        "native": {
+          "version": "4.5.1 LTS",
+          "build": "b0a72b245dcf"
+        },
+        "active_keyconfig": "BH_Keymaps",
+        "original_invert_mouse_zoom": true,
+        "ordinary_proof": {
+          "stage": "readonly_reference_or_factory",
+          "cluster": "uv_cursor",
+          "ledger_ids": [
+            "ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1"
+          ],
+          "owned_created": 0,
+          "owned_exact_source": 0,
+          "owned_exact_merged": 0,
+          "owned_released": 0,
+          "production_capability_enabled": false,
+          "input_control": {
+            "key": "F23",
+            "addon_id": 13,
+            "merged_occurrences": 1,
+            "released": true
+          },
+          "foreign_source_fields_and_order_unchanged": false,
+          "foreign_source_changes": {
+            "removed": [],
+            "added": [],
+            "changed_in_place": [
+              {
+                "role": "active",
+                "pointer": 34993200328,
+                "changed_fields": [
+                  "items"
+                ],
+                "item_id_order_changed": false,
+                "before": {
+                  "$snapshot": "fea513928dd01ed858a6b25a1a8334b44b89c4a9b64da23315c3b99ebbee262a"
+                },
+                "after": {
+                  "$snapshot": "a7a35c380d5bef9b45025c0f7ba6b507a7a1f7883762f3d9a3749e633a1d553a"
+                }
+              },
+              {
+                "role": "active",
+                "pointer": 34993205768,
+                "changed_fields": [
+                  "items"
+                ],
+                "item_id_order_changed": false,
+                "before": {
+                  "$snapshot": "fccfee145fdc60e4be42d0cc9f8dc77907cd09cd39e79b0b3f318080639fbdc2"
+                },
+                "after": {
+                  "$snapshot": "81ba38d04d9c2509baa3aa03c402b7f11c14501ccabcbf5e8c61165c93d9cc12"
+                }
+              },
+              {
+                "role": "active",
+                "pointer": 34993489160,
+                "changed_fields": [
+                  "items"
+                ],
+                "item_id_order_changed": false,
+                "before": {
+                  "$snapshot": "21ee2ee12f7c9adef84020b0ea5743869717657c543c6deae0247383f5923813"
+                },
+                "after": {
+                  "$snapshot": "437891873c7833a028247ee5934f1d642d4f5a60e23b7f323d5a2d9d839cc809"
+                }
+              },
+              {
+                "role": "active",
+                "pointer": 35004418248,
+                "changed_fields": [
+                  "items"
+                ],
+                "item_id_order_changed": false,
+                "before": {
+                  "$snapshot": "77ad9576356daa80080b992beadb80e4c26c4adeabd25078485266c169b5def9"
+                },
+                "after": {
+                  "$snapshot": "05b25a6039402211a718f32883ba00c9ccc0d079e0fd3d62b1728d830ce7d729"
+                }
+              },
+              {
+                "role": "addon",
+                "pointer": 35033337608,
+                "changed_fields": [
+                  "items"
+                ],
+                "item_id_order_changed": false,
+                "before": {
+                  "$snapshot": "2116d9bd16cee7a1a414844e75ff775d4391d74e081d46d34b4aed771677957c"
+                },
+                "after": {
+                  "$snapshot": "b4c4d363e20752668f1548d0f28ae49576117c31a8b711a49a141978ba7847f6"
+                }
+              }
+            ],
+            "same_scope_removed_added_pairs": []
+          }
+        },
+        "error": "Traceback (most recent call last):\n  File \"<repo>/test-results/deluxe-keymaps-category03/reference-evidence-1794560733807712000/reference-input.py\", line 203, in tick\n    step();return 0.35\n    ^^^^^^\n  File \"<repo>/test-results/deluxe-keymaps-category03/reference-evidence-1794560733807712000/ordinary-fixture.py\", line 276, in cleanup\n    assert self.proof['foreign_source_fields_and_order_unchanged']\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+        "ordinary_cleanup_error": "Traceback (most recent call last):\n  File \"<repo>/test-results/deluxe-keymaps-category03/reference-evidence-1794560733807712000/reference-input.py\", line 214, in tick\n    try:ordinary_fixture.cleanup()\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<repo>/test-results/deluxe-keymaps-category03/reference-evidence-1794560733807712000/ordinary-fixture.py\", line 276, in cleanup\n    assert self.proof['foreign_source_fields_and_order_unchanged']\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+        "autosave_off": true,
+        "inversion_restored": true
+      },
+      "cleanup": {
+        "removed_resources": [
+          {
+            "session": "reference-affected-1794560733819711000",
+            "resource": "resources"
+          },
+          {
+            "session": "reference-affected-1794560733819711000",
+            "resource": "config"
+          },
+          {
+            "session": "reference-affected-1794560733819711000",
+            "resource": "scripts"
+          },
+          {
+            "session": "reference-affected-1794560733819711000",
+            "resource": "extensions"
+          },
+          {
+            "session": "reference-affected-1794560733819711000",
+            "resource": "datafiles"
+          },
+          {
+            "session": "reference-affected-1794560733819711000",
+            "resource": "tmp"
+          },
+          {
+            "session": "reference-affected-1794560733819711000",
+            "resource": "cache"
+          },
+          {
+            "session": "reference-affected-1794560733819711000",
+            "resource": "redirected"
+          }
+        ],
+        "crash_retained_files": [],
+        "processes": [
+          {
+            "session": "__pycache__"
+          },
+          {
+            "session": "reference-affected-1794560733819711000",
+            "pid": 42477,
+            "returncode": 0,
+            "receipt_sha256": "df384344bff7e1deb26c15a13774636cd57a7483cef9ca98c846593c973734a8",
+            "private_launch_log": "reference-affected-1794560733819711000/private-launch.log",
+            "private_launch_log_sha256": "ab2c0b86dfc8d87f53628e4eece2ac64c27473d96e73fe2258fc0f293fafea2d"
+          }
+        ],
+        "retention_errors": [],
+        "remaining_resources": []
+      },
+      "pid": 42477,
+      "run_success": false,
+      "launcher_sha256": "1b0a08c2900e446742db850a090043049dd7e52b7b2e02e31fc21be48f8abfa6",
+      "ordinary_fixture_sha256": "cc5e6c4056642060d0cfbd6ae0330e0dcf6eb80db2603419ad855ac3ccf13f91",
+      "ordinary_ledger_sha256": "a5a500da8d9ada01dc5cf8aa04111e9fd73864d933469ebfea4313ecebffb8e3",
+      "private_launch_log_sha256": "ab2c0b86dfc8d87f53628e4eece2ac64c27473d96e73fe2258fc0f293fafea2d",
+      "crash_retained_files": [],
+      "retention_errors": []
     }
   ],
   "failed_attempt_notes": {
@@ -289098,6 +296591,11 @@
       "sha256": "d4ed4ecce103b6a95847cba584ee1dbf074f1a94bf7b6945b7855d66dc90acd5"
     },
     {
+      "id": "ordinary_production-1794560686280956000",
+      "path": "test-results/deluxe-keymaps-category03/sanitized-native/ordinary_production-1794560686280956000.json",
+      "sha256": "a403c180a41117ca228d38ac73449dc535022541418a484c725b79c53c2bff53"
+    },
+    {
       "id": "reference-evidence-1794542844940563000",
       "path": "test-results/deluxe-keymaps-category03/sanitized-native/reference-evidence-1794542844940563000.json",
       "sha256": "d770652c7887fd8517279306a5ecd582afc03be6f1bd0e0363e57a8d37091dd3"
@@ -289166,6 +296664,11 @@
       "id": "reference-evidence-1794557393495550000",
       "path": "test-results/deluxe-keymaps-category03/sanitized-native/reference-evidence-1794557393495550000.json",
       "sha256": "9522d2131c498e77d1fb38e9e892e23162dfb8a0eb02be2e2bc011233c2a22b2"
+    },
+    {
+      "id": "reference-evidence-1794560733807712000",
+      "path": "test-results/deluxe-keymaps-category03/sanitized-native/reference-evidence-1794560733807712000.json",
+      "sha256": "6cb568e6d83ca25e4454a08055635c4cdc20c74a693ff14e4d422e335bd4f777"
     }
   ],
   "historical_claims": {
@@ -289480,6 +296983,27 @@
     "representative_saved_edit": "UP_ARROW/PRESS repeat=True -> F17/PRESS inactive; original declared source unchanged",
     "writer_restorations": 1,
     "fresh_reader_restorations": 2
+  },
+  "batch25": {
+    "factory_runs": [
+      "ordinary_production-1794560686280956000"
+    ],
+    "reference_runs": [
+      "reference-evidence-1794560733807712000"
+    ],
+    "all_children_exited": true,
+    "protected_inputs_unchanged": true,
+    "remaining_resources": [],
+    "result": "Cursor remains unverified: exact merged/source admission and keyboard delivery passed; press/motion/motion/release left cursor, UVs and view unchanged on both setups. Schema-gated direct enum conversion succeeded, poll=True/FINISHED with nonzero value still had no effect; this is not a positive cursor control or an unavailability/parity result. No identical rerun.",
+    "next": "Prepare tools/selection combined context matrix offscreen; any cursor follow-up first needs a real positive cursor control or an integrated physical-input witness. Keep exact selector with03.",
+    "reference_cleanup_failure": {
+      "changed_rows": 192,
+      "changed_fields": [
+        "read_issues"
+      ],
+      "all_other_fields_ids_and_order_unchanged": true,
+      "source_preservation": "strict failure retained"
+    }
   },
   "snapshot_encoding": "sha256-json-v1",
   "snapshot_pool": {
@@ -452161,5 +459685,5 @@
       ]
     }
   },
-  "expanded_sha256": "0686142c7dab7957154e8cbd7a56c3412ed208d9387b97c7de25bbe60de055bc"
+  "expanded_sha256": "f974dec4f82eb1281aae2edc48e0c335e1c1d7b6292b2957bbc955af4bb5be98"
 }

@@ -47,13 +47,14 @@ CLUSTERS = {
 CLUSTER_SUBSETS = {
     'uv_cursor': ('uv_edit', ('ade9ef951b1ade1364980da4a38375de3cf040ad12a2419e56e644958dabfda1',)),
 }
+CLUSTER_GROUPS = {'tools_selection': ('tools', 'selection')}
 MODIFIERS = ('shift', 'ctrl', 'alt', 'oskey')
 ITEM_FIELDS = ('type', 'value', 'any', *MODIFIERS, 'key_modifier', 'repeat', 'direction')
 CASE_ERRORS = (AttributeError, KeyError, ReferenceError, RuntimeError, StopIteration,
                TypeError, ValueError)
 TOOL_STARTS = {
     'Image': ('builtin.sample', 'builtin.annotate'),
-    'Image Paint': ('builtin_brush.Draw', 'builtin.brush', 'builtin.sample'),
+    'Image Paint': ('builtin_brush.Draw', 'builtin.brush', 'builtin.annotate'),
     'Vertex Paint': ('builtin_brush.Draw', 'builtin.brush', 'builtin.annotate'),
     'Weight Paint': ('builtin_brush.Draw', 'builtin.brush', 'builtin.annotate'),
     'UV Editor': ('builtin.select_box', 'builtin.select'),
@@ -95,6 +96,9 @@ class OrdinaryCases:
         if cluster in CLUSTER_SUBSETS:
             parent, ids = CLUSTER_SUBSETS[cluster]
             assert set(ids) <= set(CLUSTERS[parent])
+        elif cluster in CLUSTER_GROUPS:
+            ids = tuple(row_id for family in CLUSTER_GROUPS[cluster] for row_id in CLUSTERS[family])
+            assert len(ids) == len(set(ids))
         else:
             ids = CLUSTERS[cluster]
         if ledger_path is None:
@@ -408,17 +412,25 @@ class OrdinaryCases:
                 loop[uv].select = face.index == 0
         bmesh.update_edit_mesh(obj.data)
 
-    def setup(self, binding):
+    def setup(self, binding, variant=None):
         scope = binding['scope']['name']
+        setup_scope = 'UV Editor' if variant and variant.get('image_mode') == 'UV' else scope
+        if variant and variant.get('image_mode') == 'VIEW':
+            self.setup_object(scope)
         if scope in ('Image', 'Image Paint', 'UV Editor'):
-            self.setup_image(scope)
+            self.setup_image(setup_scope)
         else:
             self.setup_object(scope)
             if binding['target'] == 'view3d.localview':
                 self.bpy.data.objects['Category Ordinary Control'].select_set(False)
+        if variant and 'paint_mask' in variant:
+            with self.context():
+                mesh = self.bpy.context.object.data
+                mesh.use_paint_mask = variant['paint_mask']
+                mesh.use_paint_mask_vertex = False
         attempts = []
         if binding['target'] == 'wm.tool_set_by_id':
-            for name in TOOL_STARTS[scope]:
+            for name in TOOL_STARTS[setup_scope]:
                 try:
                     with self.context():
                         result = sorted(self.bpy.ops.wm.tool_set_by_id(name=name))
@@ -426,7 +438,10 @@ class OrdinaryCases:
                     result = [type(error).__name__]
                 active = self.active_tool()
                 attempts.append({'requested': name, 'result': result, 'active_tool': active})
-                if active is not None and active != binding['properties']['name']:
+                valid = active is not None and active != binding['properties']['name']
+                if variant:
+                    valid = valid and result == ['FINISHED'] and active == name
+                if valid:
                     break
         return attempts
 
@@ -467,7 +482,11 @@ class OrdinaryCases:
                 result['selected_objects'] = sorted(
                     obj.name for obj in ctx.selected_objects if obj.name.startswith('Category Ordinary')
                 )
+                if active and active.type == 'MESH' and ctx.mode in ('PAINT_VERTEX', 'PAINT_WEIGHT'):
+                    result['paint_mask'] = active.data.use_paint_mask
+                    result['paint_mask_vertex'] = active.data.use_paint_mask_vertex
             elif self.area.type == 'IMAGE_EDITOR':
+                result['image_mode'] = self.area.spaces.active.mode
                 result['cursor'] = list(self.area.spaces.active.cursor_location)
                 region = self.region()
                 coords = region.view2d.region_to_view(region.width / 2, region.height / 2)
@@ -522,7 +541,7 @@ class OrdinaryCases:
                     })
         return candidates
 
-    def case(self, row_id, binding):
+    def case(self, row_id, binding, variant=None):
         state = {}
         event = binding['event']
         key = event['type']
@@ -534,6 +553,11 @@ class OrdinaryCases:
             'ledger_id': row_id, 'tested_key': key, 'expected_event': event,
             'scope': binding['scope'], 'target': binding['target'],
         }
+        if variant:
+            result['context_variant'] = variant
+            result['case'] += '_' + variant['name']
+            result['family'] = next(family for family in CLUSTER_GROUPS[self.cluster]
+                                    if row_id in CLUSTERS[family])
 
         def attempt(phase, operation):
             if 'error' in result:
@@ -552,12 +576,18 @@ class OrdinaryCases:
 
         def prepare():
             def work():
-                result['tool_setup'] = self.setup(binding)
+                result['tool_setup'] = self.setup(binding, variant)
                 if is_tool:
                     active = self.active_tool()
                     result['distinct_start_tool'] = (
                         active is not None and active != binding['properties']['name']
                     )
+                    if variant:
+                        result['start_control_valid'] = any(
+                            attempt['result'] == ['FINISHED']
+                            and attempt['active_tool'] == attempt['requested'] == active
+                            and active != binding['properties']['name']
+                            for attempt in result['tool_setup'])
             attempt('fixture_setup', work)
 
         def observe_maps():
@@ -600,6 +630,25 @@ class OrdinaryCases:
                     result['input_status'] = 'window_control_missing'
                     return
                 result['before'] = self.snapshot()
+                if variant:
+                    before = result['before']
+                    scope = binding['scope']['name']
+                    expected = variant.get('image_mode')
+                    if expected == 'UV' or scope == 'UV Editor':
+                        ready = before['editor_ui_type'] == 'UV' and before['context_mode'] == 'EDIT_MESH'
+                    elif expected == 'VIEW' or scope == 'Image Paint':
+                        ready = (before['editor_ui_type'] != 'UV'
+                                 and before['image_mode'] == ('VIEW' if expected else 'PAINT'))
+                    elif scope in ('Vertex Paint', 'Weight Paint'):
+                        ready = (before['context_mode'] == {'Vertex Paint': 'PAINT_VERTEX',
+                                                          'Weight Paint': 'PAINT_WEIGHT'}[scope]
+                                 and before['paint_mask'] == variant['paint_mask']
+                                 and not before['paint_mask_vertex'])
+                    else:
+                        ready = before['editor'] == 'VIEW_3D' and before['context_mode'] == 'OBJECT'
+                    result['context_ready'] = ready
+                    if not ready:
+                        raise ValueError('Combined family fixture did not reach its declared context')
                 self.event('MOUSEMOVE', 'NOTHING')
                 self.event(key, **mods)
                 state['pressed'] = True
@@ -658,7 +707,7 @@ class OrdinaryCases:
 
         def fixture_control():
             def work():
-                result['direct_control_tool_setup'] = self.setup(binding)
+                result['direct_control_tool_setup'] = self.setup(binding, variant)
                 result['direct_control_before'] = self.snapshot()
                 result['direct_control'] = self.direct_control(binding)
             attempt('direct_fixture_control', work)
@@ -691,7 +740,20 @@ class OrdinaryCases:
     def append(self):
         self.steps.append(self.start)
         for row_id, binding in self.bindings.items():
-            self.case(row_id, binding)
+            if self.cluster == 'tools_selection':
+                scope = binding['scope']['name']
+                if scope == 'Image':
+                    variants = ({'name': 'image_view', 'image_mode': 'VIEW'},
+                                {'name': 'image_uv', 'image_mode': 'UV'})
+                elif scope in ('Vertex Paint', 'Weight Paint'):
+                    variants = ({'name': 'mask_off', 'paint_mask': False},
+                                {'name': 'face_mask_on', 'paint_mask': True})
+                else:
+                    variants = ({'name': 'exact_scope'},)
+                for variant in variants:
+                    self.case(row_id, binding, variant)
+            else:
+                self.case(row_id, binding)
         self.steps.append(self.cleanup)
         return self
 

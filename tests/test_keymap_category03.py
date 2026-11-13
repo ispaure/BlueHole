@@ -1205,6 +1205,33 @@ class Category03NativeReceiptTests(unittest.TestCase):
         self.assertTrue(run['watcher_stopped'])
         self.assertEqual(run['cleanup']['owned'], 0)
 
+    def test_cursor_phase_control_does_not_claim_an_effect_from_finished(self):
+        production = self.runs['ordinary_production-1794560686280956000']
+        reference = next(run for run in self.native['reference_runs']
+                         if run['id'] == 'reference-evidence-1794560733807712000')
+        self.assertEqual(production['native_status'], 'complete')
+        self.assertEqual(reference['observations']['status'], 'error')
+        self.assertFalse(reference['observations']['ordinary_proof']['foreign_source_fields_and_order_unchanged'])
+        for cases in (production['dispatch'], reference['observations']['dispatch']):
+            self.assertEqual(len(cases), 1)
+            case = cases[0]
+            self.assertEqual(case['ledger_id'], self.manifest['uv_cursor_dispatch']['row_id'])
+            self.assertTrue(case['input_delivery']['delivered'])
+            self.assertNotIn('error', case)
+            control = case['direct_control']
+            self.assertTrue(control['poll'])
+            self.assertEqual(control['result'], ['FINISHED'])
+            self.assertEqual(control['native_enum_flag_arguments'], {'snap_elements': ['INCREMENT']})
+            self.assertEqual(control['properties']['value'], [0.125, 0.0625, 0.0])
+            self.assertEqual([phase['phase'] for phase in case['input_phases']], [
+                'after_press', 'after_initial_motion', 'after_second_motion', 'after_release'])
+            for snapshot in [case['after'], control['after'],
+                             *(phase['snapshot'] for phase in case['input_phases'])]:
+                self.assertEqual(snapshot['cursor'], [0.5, 0.5])
+                for key in ('selected_uv', 'uv_coordinates', 'view_center'):
+                    self.assertEqual(snapshot[key], case['before'][key])
+        self.assertEqual(self.manifest['uv_cursor_dispatch']['status'], 'unverified: gesture and direct control had no effect in either setup')
+
     def test_shared_production_persistence_restores_editor_circle_framing_and_arrow_edits(self):
         pairs = (
             ('editor_save-1794555923466868000', 'editor_reopen-1794556023841045000', {'editor_more'}),
