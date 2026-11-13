@@ -686,3 +686,28 @@ remaining. Native evidence now retains
 59 factory and18 reference attempts, with historical failures unchanged.
 All63 category tests pass, including a retained-evidence check of the six-case
 matrix, production ownership, exact preservation and native cleanup.
+
+The next independent selection row is 3D View Cmd+Shift+LEFTMOUSE/CLICK
+`fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d`.
+Its reference properties retain toggle=True while enabling extend=True. Pinned
+Blender 4.5.1 source chooses extend before toggle; selected-and-active is the
+discriminating state because stock XOR may preserve a selected inactive target
+while activating it. The test-only fixture at `aad0b56` therefore uses six
+selected-active/unselected trials with a separate selected bystander: stock,
+exact owned candidate, then restored stock. UV/tool rows remain separate.
+
+Batch32 `extend_probe-1794569119579631000` completed in 44.1589 seconds.
+Stock deselected the selected-active target and selected the unselected target;
+the probe kept the selected target selected and selected the unselected target.
+Removing the probe restored both stock outcomes. The target ended active and
+the bystander stayed selected in all six cases. Exact Shift/OSKEY/Ctrl/Alt and
+point (2055,1229) delivery passed, as did every independently reset minimal add
+control. Exact candidate admission was addon/user1 only during the two probe
+trials and zero in both stock stages. All captured source/merged maps matched
+after each release and final cleanup.
+
+Native unregister ended with zero owned/pending/tracked resources and a stopped
+watcher. The PID and every owned temporary root were absent; all44 frozen source
+hashes and protected inputs matched. Slot released, with no other child.
+This establishes the scoped factory probe effect, not copied-reference behavior,
+production registration or other-mode parity. Accounting remains36/eight/96.

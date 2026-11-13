@@ -2469,5 +2469,497 @@
       "new_persistence_run": false,
       "limits": "Scoped group effect, not every internal handler invocation or other modes/editors; historical reference strict failure retained."
     }
+  },
+  "selection_extend_probe": {
+    "status": "factory exact-owned probe passed; reference and production pending",
+    "row_id": "fee4a4d6ed723ffaa6fff80bdf81c6a3449e33667c182ee2ec2019699bff7d6d",
+    "run": "extend_probe-1794569119579631000",
+    "executed_checkpoint": "aad0b56b8009ec8f26fc2d7e3e1683cd9287c9d0",
+    "fixture_sha256": "4ce020d518af2b404aeb08a185c26101c2b76869a4fb3faf80ac2497a16aa7a9",
+    "binding": {
+      "active": true,
+      "event": {
+        "alt": 0,
+        "any": false,
+        "ctrl": 0,
+        "direction": "ANY",
+        "hyper": 0,
+        "key_modifier": "NONE",
+        "map_type": "MOUSE",
+        "oskey": 1,
+        "repeat": false,
+        "shift": 1,
+        "type": "LEFTMOUSE",
+        "value": "CLICK"
+      },
+      "properties": {
+        "center": true,
+        "deselect": false,
+        "deselect_all": false,
+        "enumerate": false,
+        "extend": true,
+        "location": [
+          0,
+          0
+        ],
+        "object": false,
+        "select_passthrough": false,
+        "toggle": true
+      },
+      "read_issues": {},
+      "scope": {
+        "is_modal": false,
+        "is_tool": null,
+        "name": "3D View",
+        "region_type": "WINDOW",
+        "space_type": "VIEW_3D"
+      },
+      "target": "view3d.select"
+    },
+    "result": {
+      "batch": 32,
+      "checkpoint": "aad0b56b8009ec8f26fc2d7e3e1683cd9287c9d0",
+      "run": "extend_probe-1794569119579631000",
+      "pid": 20969,
+      "seconds": 44.1589,
+      "native_status": "complete",
+      "matrix": [
+        {
+          "case": "extend_stock_before_selected_active",
+          "stage": "stock_before",
+          "probe": false,
+          "initial_selected": true,
+          "phases": {
+            "before_press": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "after_press": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "after_release": {
+              "target_selected": false,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "direct_reset": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_direct": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            }
+          },
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "positive_addition": true,
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW",
+                "point": [
+                  2055,
+                  1229
+                ],
+                "modifiers": {
+                  "shift": true,
+                  "oskey": true,
+                  "ctrl": false,
+                  "alt": false
+                }
+              }
+            ],
+            "delivered": true
+          },
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 0,
+            "addon": 0,
+            "user": 0
+          },
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "extend_stock_before_unselected",
+          "stage": "stock_before",
+          "probe": false,
+          "initial_selected": false,
+          "phases": {
+            "before_press": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_press": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_release": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "direct_reset": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_direct": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            }
+          },
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "positive_addition": true,
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW",
+                "point": [
+                  2055,
+                  1229
+                ],
+                "modifiers": {
+                  "shift": true,
+                  "oskey": true,
+                  "ctrl": false,
+                  "alt": false
+                }
+              }
+            ],
+            "delivered": true
+          },
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 0,
+            "addon": 0,
+            "user": 0
+          },
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "extend_probe_selected_active",
+          "stage": "probe",
+          "probe": true,
+          "initial_selected": true,
+          "phases": {
+            "before_press": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "after_press": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "after_release": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "direct_reset": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_direct": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            }
+          },
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "positive_addition": true,
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW",
+                "point": [
+                  2055,
+                  1229
+                ],
+                "modifiers": {
+                  "shift": true,
+                  "oskey": true,
+                  "ctrl": false,
+                  "alt": false
+                }
+              }
+            ],
+            "delivered": true
+          },
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 0,
+            "addon": 1,
+            "user": 1
+          },
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "extend_probe_unselected",
+          "stage": "probe",
+          "probe": true,
+          "initial_selected": false,
+          "phases": {
+            "before_press": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_press": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_release": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "direct_reset": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_direct": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            }
+          },
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "positive_addition": true,
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW",
+                "point": [
+                  2055,
+                  1229
+                ],
+                "modifiers": {
+                  "shift": true,
+                  "oskey": true,
+                  "ctrl": false,
+                  "alt": false
+                }
+              }
+            ],
+            "delivered": true
+          },
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 0,
+            "addon": 1,
+            "user": 1
+          },
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "extend_stock_after_selected_active",
+          "stage": "stock_after",
+          "probe": false,
+          "initial_selected": true,
+          "phases": {
+            "before_press": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "after_press": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "after_release": {
+              "target_selected": false,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "direct_reset": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_direct": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            }
+          },
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "positive_addition": true,
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW",
+                "point": [
+                  2055,
+                  1229
+                ],
+                "modifiers": {
+                  "shift": true,
+                  "oskey": true,
+                  "ctrl": false,
+                  "alt": false
+                }
+              }
+            ],
+            "delivered": true
+          },
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 0,
+            "addon": 0,
+            "user": 0
+          },
+          "exact_trial_preservation": true
+        },
+        {
+          "case": "extend_stock_after_unselected",
+          "stage": "stock_after",
+          "probe": false,
+          "initial_selected": false,
+          "phases": {
+            "before_press": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_press": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_release": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            },
+            "direct_reset": {
+              "target_selected": false,
+              "target_active": false,
+              "bystander_selected": true
+            },
+            "after_direct": {
+              "target_selected": true,
+              "target_active": true,
+              "bystander_selected": true
+            }
+          },
+          "direct_result": [
+            "FINISHED",
+            "PASS_THROUGH"
+          ],
+          "positive_addition": true,
+          "input_delivery": {
+            "callbacks": [
+              {
+                "area": "VIEW_3D",
+                "region": "WINDOW",
+                "point": [
+                  2055,
+                  1229
+                ],
+                "modifiers": {
+                  "shift": true,
+                  "oskey": true,
+                  "ctrl": false,
+                  "alt": false
+                }
+              }
+            ],
+            "delivered": true
+          },
+          "point": [
+            2055,
+            1229
+          ],
+          "exact_candidate_counts": {
+            "default": 0,
+            "active": 0,
+            "addon": 0,
+            "user": 0
+          },
+          "exact_trial_preservation": true
+        }
+      ],
+      "stock_behavior_restored": true,
+      "exact_final_preservation": true,
+      "cleanup_errors": [],
+      "native_cleanup": {
+        "checked": 192,
+        "created": 721,
+        "removed": 721,
+        "reinsertions": 0,
+        "features": 0,
+        "owned": 0,
+        "retained_edited": 0,
+        "pending_cleanup": 0,
+        "tracked_resources": 0
+      },
+      "watcher_stopped": true,
+      "owned_pid_absent": true,
+      "remaining_resources": [],
+      "protected_inputs_unchanged": true,
+      "all44_frozen_sources_exact": true,
+      "released_at_utc": "2026-11-13T11:26:21.905926+00:00",
+      "attribution": "Exact owned factory probe distinguishes ADD from stock XOR for selected-active target, preserves unselected-target addition and selected bystander, and restores stock behavior after removal. No copied-reference behavior, production registration identity or other-mode parity is established.",
+      "accounting": {
+        "implemented": 36,
+        "transferred_04": 8,
+        "remaining_03": 96
+      }
+    },
+    "candidate_accounting_changed": false
   }
 }

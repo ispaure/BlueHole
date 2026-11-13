@@ -533,6 +533,41 @@ class Category03NativeReceiptTests(unittest.TestCase):
         cls.runs = {run['id']: run for run in cls.native['runs']}
         cls.reference_runs = {run['id']: run for run in cls.native['reference_runs']}
 
+    def test_extend_probe_changes_selected_active_without_losing_bystander(self):
+        evidence = self.manifest['selection_extend_probe']
+        run = self.runs[evidence['run']]
+        self.assertEqual(run['native_status'], 'complete')
+        self.assertEqual(run['handler_fixture_sha256'], evidence['fixture_sha256'])
+        proof = run['extend_proof']
+        self.assertFalse(proof['production_capability_enabled'])
+        self.assertEqual(len(proof['trials']), 6)
+        for trial, initial, final in zip(proof['trials'], [True, False] * 3,
+                                         [False, True, True, True, False, True]):
+            result = trial['result']
+            phases = {p['phase']: p['snapshot'] for p in result['phases']}
+            self.assertEqual(phases['before_press']['target_selected'], initial)
+            self.assertEqual(phases['before_press']['target_active'], initial)
+            after = phases['after_release']
+            self.assertEqual(after['target_selected'], final)
+            self.assertTrue(after['target_active'] and after['bystander_selected'])
+            self.assertTrue(result['input_delivery']['delivered'])
+            self.assertIn({'area': 'VIEW_3D', 'region': 'WINDOW',
+                           'point': result['projected_point'],
+                           'modifiers': {'shift': True, 'oskey': True, 'ctrl': False, 'alt': False}},
+                          result['input_delivery']['callbacks'])
+            self.assertEqual(result['direct_control']['point'], result['projected_point'])
+            self.assertTrue(result['direct_control']['positive_addition'])
+            preservation = trial['preservation']
+            self.assertTrue(preservation['exact_source_and_merged_preservation'])
+            self.assertEqual(preservation['exact_candidate_counts'], {
+                'default': 0, 'active': 0, 'addon': int(trial['probe']), 'user': int(trial['probe'])})
+        self.assertTrue(proof['stock_behavior_restored'] and proof['exact_final_preservation'])
+        self.assertEqual(proof['cleanup_errors'], [])
+        for key in ('owned', 'pending_cleanup', 'tracked_resources'):
+            self.assertEqual(run['cleanup'][key], 0)
+        self.assertTrue(run['watcher_stopped'])
+        self.assertEqual(run['remaining_owned_resources'], [])
+
     def test_subtract_production_selected_unselected_stock_on_off_and_cleanup(self):
         route = self.manifest['object_subtract_route']
         run = self.runs[route['acceptance']['production_run']]
