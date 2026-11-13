@@ -63,12 +63,18 @@ debugUtils.configure(project_prefix=f'{bl_info["name"]} {".".join(map(str, bl_in
 # STATE
 
 _keymaps_registered = False
+_addon_registered = False
+_post_register_wait = 0.05
+_post_register_error = None
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 
 def register():
+    global _addon_registered, _post_register_wait
+    _addon_registered = True
+    _post_register_wait = 0.05
     callbacks.register()
     addon_callbacks.register()
     addon_prefs.register()
@@ -87,18 +93,36 @@ def _post_register_init():
     AddonPreferences instance becomes available.
     """
 
-    global _keymaps_registered
+    global _keymaps_registered, _post_register_wait, _post_register_error
+
+    if not _addon_registered:
+        return None
 
     from .preferences.prefs import prefs
 
     p = prefs()
 
-    if not p.is_ready():
-        return 0.05
+    wm = getattr(bpy.context, 'window_manager', None)
+    configs = getattr(wm, 'keyconfigs', None)
+    if (not p.is_ready() or configs is None or configs.addon is None
+            or configs.user is None or configs.active is None):
+        _post_register_wait = min(2.0, _post_register_wait * 2)
+        return _post_register_wait
 
     if not _keymaps_registered:
-        keymaps_register.register()
-        _keymaps_registered = True
+        try:
+            keymaps_register.register()
+            _keymaps_registered = True
+            _post_register_error = None
+        except Exception as exc:
+            # Registration drains partial ownership. Keep a bounded retry until
+            # providers are ready; unload must also work before this succeeds.
+            message = type(exc).__name__ + ': ' + str(exc)
+            if message != _post_register_error:
+                print('Blue Hole keymap initialization pending: ' + message)
+                _post_register_error = message
+            _post_register_wait = min(2.0, _post_register_wait * 2)
+            return _post_register_wait
 
     envManager.if_current_env_missing_set_default()
 
@@ -112,7 +136,8 @@ def _post_register_init():
 
 
 def unregister():
-    global _keymaps_registered
+    global _keymaps_registered, _addon_registered
+    _addon_registered = False
 
     if bpy.app.timers.is_registered(_post_register_init):
         bpy.app.timers.unregister(_post_register_init)
@@ -120,8 +145,9 @@ def unregister():
     if bpy.app.timers.is_registered(update_env_timer):
         bpy.app.timers.unregister(update_env_timer)
 
-    if _keymaps_registered:
+    try:
         keymaps_register.unregister()
+    finally:
         _keymaps_registered = False
 
     menus_register.unregister()

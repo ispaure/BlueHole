@@ -62,13 +62,19 @@ class KeymapBinding:
     space_type: str
     key: str
     value: str = 'PRESS'
-    ctrl: bool = False
-    shift: bool = False
-    alt: bool = False
-    oskey: bool = False
+    ctrl: bool | int = False
+    shift: bool | int = False
+    alt: bool | int = False
+    oskey: bool | int = False
     repeat: bool = False
     region_type: str = 'WINDOW'
     direction: str = 'ANY'
+    any: bool = False
+    hyper: bool | int = False
+    key_modifier: str = 'NONE'
+    map_type: str | None = None
+    active: bool = True
+    is_tool: bool | None = None
 
 
 @dataclass
@@ -252,147 +258,49 @@ def draw_operator_action(
 
 
 def create_keymap_item(km, action: OperatorAction, binding: KeymapBinding, context=None):
-    """
-    Create and return a Blender keymap item for the given action and binding.
-
-    Returns:
-        kmi | None
-    """
+    """Create an exactly owned ordinary binding through the shared runtime."""
     if km is None:
         return None
+    from ..keymaps.keymap_utils import get_addon_keyconfig, capture_scope, KeymapScope
+    from ..keymaps.keymap_action_utils import ensure_action_keymaps
 
-    kmi = km.keymap_items.new(
-        action.get_idname(),
-        type=binding.key,
-        value=binding.value,
-        ctrl=binding.ctrl,
-        shift=binding.shift,
-        alt=binding.alt,
-        oskey=binding.oskey,
-        direction=binding.direction,
-    )
-
-    apply_properties(kmi.properties, action.get_props(context))
-    kmi.active = True
-
-    if hasattr(kmi, 'repeat'):
-        kmi.repeat = binding.repeat
-
-    return kmi
+    config = get_addon_keyconfig()
+    try:
+        if config is None or not any(candidate == km for candidate in config.keymaps):
+            return None
+    except (ReferenceError, RuntimeError):
+        return None
+    scope = KeymapScope(binding.keymap_name, binding.space_type, binding.region_type,
+                        False, binding.is_tool)
+    observed = capture_scope(km)
+    if ((observed.name, observed.space_type, observed.region_type, observed.is_modal)
+            != (scope.name, scope.space_type, scope.region_type, scope.is_modal)
+            or (scope.is_tool is not None and observed.is_tool != scope.is_tool)):
+        return None
+    one = OperatorAction(action.operator, props=action.props, props_fn=action.props_fn,
+                         keymap_bindings=(binding,))
+    pairs = ensure_action_keymaps('Direct', one, context=context,
+                                  keyconfig=config)
+    return next((item for map_, item in pairs if map_ == km), None)
 
 
 def create_keymap(kc, binding: KeymapBinding):
-    """
-    Return an existing keymap if found, otherwise create it.
-    """
-    if kc is None:
-        return None
-
-    km = kc.keymaps.get(binding.keymap_name)
-
-    if km is not None:
-        return km
-
-    return kc.keymaps.new(
-        name=binding.keymap_name,
-        space_type=binding.space_type,
-        region_type=binding.region_type,
-    )
+    """Resolve the full ordinary map scope for compatibility callers."""
+    from ..keymaps.keymap_utils import get_or_create_keymap
+    return get_or_create_keymap(kc, binding.keymap_name, binding.space_type,
+                               binding.region_type)
 
 
 def register_operator_action_keymaps(category: str, kc, action: OperatorAction, context=None) -> list[tuple[Any, Any]]:
-    """
-    Register all keymap bindings attached to this action in the given keyconfig.
-
-    Returns:
-        list[(km, kmi)]
-    """
-    registered = []
-
-    if kc is None:
-        return registered
-
-    log_title = f'{category} Keymaps'
-
-    for binding in action.keymap_bindings:
-
-        km = create_keymap(kc, binding)
-
-        if km is None:
-            log(
-                Severity.WARNING,
-                log_title,
-                f"Keymap not found/created: "
-                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type}"
-            )
-            continue
-
-        kmi = create_keymap_item(km, action, binding, context=context)
-
-        if kmi is None:
-            log(
-                Severity.WARNING,
-                log_title,
-                f"Keymap registration failed: "
-                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
-                f"{action.get_idname()} | {binding.key} "
-                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
-                f"oskey={binding.oskey} direction={binding.direction})"
-            )
-            continue
-
-        valid = (
-            kmi.idname == action.get_idname()
-            and kmi.type == binding.key
-            and kmi.value == binding.value
-            and kmi.shift == binding.shift
-            and kmi.ctrl == binding.ctrl
-            and kmi.alt == binding.alt
-            and getattr(kmi, 'oskey', False) == binding.oskey
-            and getattr(kmi, 'direction', 'ANY') == binding.direction
-        )
-
-        if not valid:
-            log(
-                Severity.WARNING,
-                log_title,
-                f"Created KMI does not match expected binding: "
-                f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
-                f"expected={action.get_idname()} {binding.key} value={binding.value} "
-                f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
-                f"oskey={binding.oskey} direction={binding.direction}) | "
-                f"got={kmi.idname} {kmi.type} value={kmi.value} "
-                f"(shift={kmi.shift} ctrl={kmi.ctrl} alt={kmi.alt} "
-                f"oskey={getattr(kmi, 'oskey', False)} "
-                f"direction={getattr(kmi, 'direction', 'ANY')})"
-            )
-        else:
-            if is_verbose(VERBOSE_KEYMAPS):
-                log(
-                    Severity.DEBUG,
-                    log_title,
-                    f"{binding.keymap_name} | {binding.space_type} | {binding.region_type} | "
-                    f"{action.get_idname()} | {binding.key} value={binding.value} "
-                    f"(shift={binding.shift} ctrl={binding.ctrl} alt={binding.alt} "
-                    f"oskey={binding.oskey} direction={binding.direction})"
-                )
-
-        registered.append((km, kmi))
-
-    return registered
+    """Register atomically; only this session's exact items can be released."""
+    from ..keymaps.keymap_action_utils import ensure_action_keymaps
+    return ensure_action_keymaps(category, action, context=context, keyconfig=kc)
 
 
 def unregister_registered_keymaps(registered_keymaps: list[tuple[Any, Any]]) -> None:
-    """
-    Remove all registered keymap items from Blender and clear the given runtime list.
-    """
-    for km, kmi in reversed(registered_keymaps):
-        try:
-            km.keymap_items.remove(kmi)
-        except Exception:
-            pass
-
-    registered_keymaps.clear()
+    """Release tracked ownership, including pending bindings in bound categories."""
+    from ..keymaps.keymap_utils import release_owned_pairs
+    release_owned_pairs(registered_keymaps)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -470,20 +378,11 @@ def action_matches_kmi(kmi, action: OperatorAction, context=None) -> bool:
 
 
 def remove_matching_action_kmis(km, action: OperatorAction, context=None) -> None:
-    """
-    Remove all keymap items in the given keymap that match the operator action.
-    """
-    if km is None:
-        return
-
-    items_to_remove = []
-
-    for kmi in km.keymap_items:
-        if action_matches_kmi(kmi, action, context=context):
-            items_to_remove.append(kmi)
-
-    for kmi in items_to_remove:
-        try:
-            km.keymap_items.remove(kmi)
-        except Exception:
-            pass
+    """Release matching session-owned items; foreign lookalikes are never deleted."""
+    from ..keymaps.keymap_utils import release_owned_pairs, owned_pairs_for_map
+    props = action.get_props(context)
+    pairs = [(map_, item) for map_, item in owned_pairs_for_map(km)
+             if item.idname == action.get_idname()
+             and all(getattr(item.properties, name, None) == value
+                     for name, value in props.items())]
+    release_owned_pairs(pairs)

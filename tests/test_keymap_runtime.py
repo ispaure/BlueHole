@@ -1,0 +1,1116 @@
+"""Behavioral contract for reversible, session-owned Deluxe keymaps.
+
+This suite runs without Blender.  Native dispatch and persistence evidence lives
+in the bounded Blender receipts; these cases exercise ownership and recovery.
+"""
+
+import importlib.util
+from pathlib import Path
+import sys
+import types
+import unittest
+from unittest.mock import patch
+
+from runtime_keymap_fakes import FakeRuntime, MergedMaps, row
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class RuntimeKeymapTests(unittest.TestCase):
+    def setUp(self):
+        self.runtime = FakeRuntime()
+        self.modules = set(sys.modules)
+        prefix = '_bluehole_runtime_' + self.id().rsplit('.', 1)[-1]
+        self.prefix = prefix
+        for name, path in ((prefix, ROOT), (prefix + '.keymaps', ROOT / 'keymaps')):
+            package = types.ModuleType(name)
+            package.__path__ = [str(path)]
+            sys.modules[name] = package
+        name = prefix + '.keymaps.keymap_utils'
+        spec = importlib.util.spec_from_file_location(name, ROOT / 'keymaps/keymap_utils.py')
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
+        with patch.dict(sys.modules, {'bpy': self.runtime.bpy}):
+            spec.loader.exec_module(module)
+        self.utils = module
+        self.addCleanup(lambda: [sys.modules.pop(name, None) for name in tuple(sys.modules)
+                         if name not in self.modules and name.startswith(prefix)])
+        self.bpy_patch = patch.dict(sys.modules, {'bpy': self.runtime.bpy})
+        self.bpy_patch.start()
+        self.addCleanup(self.bpy_patch.stop)
+
+    def scope(self, **changes):
+        values = dict(name='3D View', space_type='VIEW_3D', region_type='WINDOW',
+                      is_modal=False, is_tool=False)
+        values.update(changes)
+        return self.utils.KeymapScope(**values)
+
+    def event(self, **changes):
+        values = dict(type='A', value='PRESS')
+        values.update(changes)
+        return self.utils.KeymapEvent(**values)
+
+    def native_modal_event(self, **changes):
+        values = dict(type='LEFT_SHIFT', value='ANY', any=True, shift=-1,
+                      ctrl=-1, alt=-1, oskey=-1, hyper=-1,
+                      key_modifier='NONE', direction='ANY', repeat=False,
+                      map_type='KEYBOARD')
+        values.update(changes)
+        return self.utils.KeymapEvent(**values)
+
+    def native_modal_row(self, token='PRECISION', *, key='LEFT_SHIFT', **changes):
+        event = self.native_modal_event(type=key, **changes)
+        return row('', key=event.type, value=event.value, any=event.any,
+                   shift=event.shift, ctrl=event.ctrl, alt=event.alt,
+                   oskey=event.oskey, hyper=event.hyper,
+                   key_modifier=event.key_modifier, direction=event.direction,
+                   repeat=event.repeat, map_type=event.map_type,
+                   modal_value=token)
+
+    def target(self, name='object.select_all', **properties):
+        return self.utils.KeymapTarget(idname=name,
+                                       properties=tuple(sorted(properties.items())))
+
+    def selector(self, *, scope=None, event=None, target=None, role='default'):
+        return self.utils.KeymapSelector(scope or self.scope(), event or self.event(),
+                                         target or self.target(), source_role=role,
+                                         ledger_id='ledger-stock-a', sample_id='sample-a')
+
+    def assignment(self, request_id='replacement', *, event=None, target=None,
+                   scope=None):
+        return self.utils.KeymapAssignment(request_id, scope or self.scope(),
+                                           event or self.event(),
+                                           target or self.target('bluehole.replacement'))
+
+    def override(self, request_id='override', *, selector=None,
+                 assignment=None, capability='ordinary_tail',
+                 context='synthetic_ordinary_provider'):
+        return self.utils.KeymapOverride(request_id, selector or self.selector(),
+                                         assignment or self.assignment(),
+                                         capability=capability, context=context)
+
+    def source(self, *rows):
+        map_ = self.runtime.map('default', tool=False)
+        for item in rows:
+            map_.keymap_items.append_fixture(item)
+        return map_
+
+    def addon(self, *rows):
+        map_ = self.runtime.map('addon', tool=False)
+        for item in rows:
+            map_.keymap_items.append_fixture(item)
+        return map_
+
+    def merged_names(self):
+        return [item.idname for item in self.runtime.configs.user.keymaps.get('3D View').keymap_items]
+
+    def reasons(self, handle):
+        return {diagnostic.reason for diagnostic in handle.diagnostics}
+
+    def test_forward_prepend_priority_and_exact_release(self):
+        original = row(prop_values={'action': 'SELECT'})
+        foreign = row('other.fallback')
+        self.source(original, foreign)
+        addon = self.addon(row('other.provider'))
+        selector = self.selector(target=self.target(action='SELECT'))
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(selector=selector),))
+        self.assertEqual((handle.diagnostics[0].ledger_id,
+                          handle.diagnostics[0].sample_id,
+                          handle.diagnostics[0].observed_role),
+                         ('ledger-stock-a', 'sample-a', 'default'))
+        self.assertFalse(handle.diagnostics[0].dispatch_evidence)
+        self.assertEqual(self.merged_names()[0], 'bluehole.replacement')
+        self.assertEqual([item.idname for item in addon.keymap_items],
+                         ['other.provider', 'bluehole.replacement'])
+        lookalike = row('bluehole.replacement')
+        addon.keymap_items.append_fixture(lookalike)
+        handle.release()
+        handle.release()
+        self.assertEqual([item.idname for item in addon.keymap_items],
+                         ['other.provider', 'bluehole.replacement'])
+        self.assertIs(addon.keymap_items[-1], lookalike)
+        self.assertEqual([item.idname for item in self.runtime.configs.default.keymaps.get('3D View').keymap_items],
+                         ['object.select_all', 'other.fallback'])
+        self.assertTrue(original.active)
+
+    def test_full_scope_event_and_property_selector_blocks_near_matches(self):
+        source = self.source(row(prop_values={'action': 'DESELECT'}, shift=True),
+                             row(prop_values={'action': 'SELECT'}, ctrl=True))
+        self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(
+            self.override(selector=self.selector(target=self.target(action='SELECT'),
+                                                 event=self.event(shift=True))),))
+        self.assertEqual(len(self.runtime.configs.addon.keymaps.get('3D View').keymap_items), 0)
+        self.assertEqual(len(source.keymap_items), 2)
+        self.assertTrue(self.reasons(handle))
+        handle.release()
+
+    def test_every_observable_event_field_is_part_of_selector(self):
+        alternatives = dict(type='B', value='RELEASE', any=True, shift=-1,
+                            ctrl=True, alt=True, oskey=True, hyper=True,
+                            key_modifier='SHIFT', direction='NORTH', repeat=True,
+                            map_type='MOUSE')
+        for field, changed in alternatives.items():
+            with self.subTest(field=field):
+                original = row(**({'key': changed} if field == 'type' else {field: changed}))
+                source = self.source(original)
+                addon = self.addon()
+                handle = self.utils.register_feature('owner-' + field,
+                    overrides=(self.override(),))
+                self.assertEqual(len(addon.keymap_items), 0)
+                self.assertIs(source.keymap_items[0], original)
+                self.assertTrue(self.reasons(handle))
+                handle.release()
+                self.runtime.configs.default.keymaps.remove(source)
+                self.runtime.configs.addon.keymaps.remove(addon)
+
+    def test_unknown_tool_and_wrong_source_role_fail_closed(self):
+        source = self.source(row())
+        addon = self.addon()
+        cases = (self.selector(scope=self.scope(is_tool=None)),
+                 self.selector(role='user'),
+                 self.selector(scope=self.scope(space_type='NODE_EDITOR')))
+        for index, selector in enumerate(cases):
+            handle = self.utils.register_feature('gate-' + str(index),
+                overrides=(self.override(selector=selector),))
+            self.assertEqual(len(addon.keymap_items), 0)
+            self.assertTrue(self.reasons(handle))
+            handle.release()
+        self.assertEqual(len(source.keymap_items), 1)
+
+    def test_unreadable_schema_and_unknown_modal_token_fail_closed(self):
+        original = row(prop_values={'action': 'SELECT'})
+        original.properties.bl_rna.properties.append(types.SimpleNamespace(
+            identifier='unreadable', type='INT', is_array=False))
+        source = self.source(original)
+        addon = self.addon()
+        handle = self.utils.register_feature('schema-owner', overrides=(
+            self.override(selector=self.selector(target=self.target(action='SELECT'))),))
+        self.assertEqual(len(addon.keymap_items), 0)
+        self.assertTrue(self.reasons(handle))
+        handle.release()
+        modal = self.runtime.map('default', 'Transform Modal Map', space='EMPTY',
+                                 modal=True, tool=False)
+        modal.keymap_items.append_fixture(self.native_modal_row('NONE'))
+        scope = self.scope(name='Transform Modal Map', space_type='EMPTY', is_modal=True)
+        selector = self.selector(scope=scope, event=self.native_modal_event(),
+            target=self.utils.KeymapTarget(modal_value='PRECISION'))
+        request = self.override(selector=selector,
+            assignment=self.assignment(scope=scope, event=self.native_modal_event(),
+                target=self.utils.KeymapTarget(modal_value='CANCEL')),
+            capability='modal_head', context='transform_translate_precision_cancel')
+        handle = self.utils.register_feature('modal-owner', overrides=(request,))
+        self.assertEqual(len(modal.keymap_items), 1)
+        self.assertEqual(modal.keymap_items[0].propvalue, 'NONE')
+        self.assertTrue(self.reasons(handle))
+        handle.release()
+
+    def test_unemittable_nondefault_event_field_rolls_back(self):
+        for field, value in (('hyper', True), ('map_type', 'MOUSE')):
+            with self.subTest(field=field):
+                source = self.source(row(**{field: value}))
+                addon = self.addon()
+                event = self.event(**{field: value})
+                request = self.override(selector=self.selector(event=event),
+                    assignment=self.assignment(event=event))
+                handle = self.utils.register_feature('owner-' + field,
+                    overrides=(request,))
+                self.assertEqual(len(addon.keymap_items), 0)
+                self.assertTrue(self.reasons(handle))
+                handle.release()
+                self.runtime.configs.default.keymaps.remove(source)
+                self.runtime.configs.addon.keymaps.remove(addon)
+
+    def test_active_default_alias_is_one_source(self):
+        original = row()
+        source = self.source(original)
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(
+            selector=self.selector(role='active')),))
+        self.assertEqual(len(addon.keymap_items), 1)
+        self.assertIs(source.keymap_items[0], original)
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_missing_optional_native_tool_and_hyper_fields_are_unknown_defaults(self):
+        original = row()
+        del original.hyper
+        source = self.source(original)
+        addon = self.addon()
+        del source.is_tool
+        del addon.is_tool
+        addon.keymap_items.new_missing_fields.add('hyper')
+        self.assertEqual(self.utils.capture_scope(source), self.scope(is_tool=None))
+        captured = self.utils.capture_event(original)
+        self.assertEqual(captured, self.event(hyper=None))
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(
+            selector=self.selector(scope=self.scope(is_tool=None), event=captured),
+            assignment=self.assignment(scope=self.scope(is_tool=None), event=captured)),))
+        self.assertEqual(len(addon.keymap_items), 1)
+        self.assertIs(source.keymap_items[0], original)
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_missing_inactive_ambiguous_and_unsupported_fail_closed(self):
+        cases = (
+            ([], 'ordinary_tail'),
+            ([row(active=False)], 'ordinary_tail'),
+            ([row(), row()], 'ordinary_tail'),
+            ([row()], 'suppress_item'),
+        )
+        for index, (items, capability) in enumerate(cases):
+            with self.subTest(index=index):
+                source = self.source(*items)
+                addon = self.addon()
+                handle = self.utils.register_feature('owner-' + str(index),
+                    overrides=(self.override(capability=capability),))
+                self.assertEqual(len(addon.keymap_items), 0)
+                self.assertEqual(list(source.keymap_items), items)
+                self.assertTrue(self.reasons(handle))
+                handle.release()
+                self.runtime.configs.default.keymaps.remove(source)
+                self.runtime.configs.addon.keymaps.remove(addon)
+
+    def test_partial_failure_rolls_back_own_work_and_recovers(self):
+        self.source(row())
+        addon = self.addon()
+        addon.keymap_items.fail_next_new = True
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        self.assertEqual(len(addon.keymap_items), 0)
+        self.assertTrue(self.reasons(handle))
+        handle.refresh()
+        self.assertEqual([item.idname for item in addon.keymap_items], ['bluehole.replacement'])
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_second_request_failure_is_atomic(self):
+        self.source(row(), row('object.other', key='B'))
+        addon = self.addon()
+        addon.keymap_items.fail_create_at = 2
+        second = self.override('second', selector=self.selector(
+            event=self.event(type='B'), target=self.target('object.other')),
+            assignment=self.assignment('second-replacement', event=self.event(type='B'),
+                                       target=self.target('bluehole.second')))
+        handle = self.utils.register_feature('owner-a',
+            overrides=(self.override(), second))
+        self.assertEqual(len(addon.keymap_items), 0)
+        self.assertTrue(self.reasons(handle))
+        handle.refresh()
+        self.assertEqual([item.idname for item in addon.keymap_items],
+                         ['bluehole.replacement', 'bluehole.second'])
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_property_setter_failure_removes_created_item(self):
+        self.source(row())
+        addon = self.addon()
+        addon.keymap_items.new_prop_schema = {'mode': 0}
+        addon.keymap_items.new_prop_fail = 'mode'
+        replacement = self.assignment(target=self.target('bluehole.replacement', mode=1))
+        handle = self.utils.register_feature('owner-a', overrides=(
+            self.override(assignment=replacement),))
+        self.assertEqual(len(addon.keymap_items), 0)
+        self.assertTrue(self.reasons(handle))
+        addon.keymap_items.new_prop_fail = None
+        handle.refresh()
+        self.assertEqual(len(addon.keymap_items), 1)
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_modal_copy_changes_only_owned_token(self):
+        source = self.runtime.map('default', 'Transform Modal Map', space='EMPTY',
+                                  modal=True, tool=False)
+        original = self.native_modal_row()
+        source.keymap_items.append_fixture(original)
+        valid_cancel = source.keymap_items.append_fixture(
+            self.native_modal_row('CANCEL', key='ESC'))
+        scope = self.scope(name='Transform Modal Map', space_type='EMPTY',
+                           is_modal=True)
+        event = self.native_modal_event()
+        selector = self.selector(scope=scope, event=event,
+                                 target=self.utils.KeymapTarget(modal_value='PRECISION'))
+        replacement = self.assignment(scope=scope, event=event,
+            target=self.utils.KeymapTarget(modal_value='CANCEL'))
+        handle = self.utils.register_feature('modal-owner', overrides=(
+            self.override(selector=selector, assignment=replacement,
+                          capability='modal_head',
+                          context='transform_translate_precision_cancel'),))
+        self.assertEqual([item.propvalue for item in source.keymap_items],
+                         ['CANCEL', 'PRECISION', 'CANCEL'])
+        self.assertIs(source.keymap_items[1], original)
+        handle.release()
+        self.assertEqual(list(source.keymap_items), [original, valid_cancel])
+
+    def test_modal_replacement_token_must_be_observed_in_source(self):
+        source = self.runtime.map('default', 'Transform Modal Map', space='EMPTY',
+                                  modal=True, tool=False)
+        original = source.keymap_items.append_fixture(
+            self.native_modal_row())
+        scope = self.scope(name='Transform Modal Map', space_type='EMPTY',
+                           is_modal=True)
+        event = self.native_modal_event()
+        request = self.override(selector=self.selector(scope=scope, event=event,
+            target=self.utils.KeymapTarget(modal_value='PRECISION')),
+            assignment=self.assignment(scope=scope, event=event,
+                target=self.utils.KeymapTarget(modal_value='CANCEL')),
+            capability='modal_head', context='transform_translate_precision_cancel')
+        handle = self.utils.register_feature('modal-owner', overrides=(request,))
+        self.assertEqual(list(source.keymap_items), [original])
+        self.assertTrue(self.reasons(handle))
+        handle.release()
+
+    def test_stock_capability_accepts_exact_row_and_rejects_near_matches(self):
+        scope = self.scope(name='Object Mode', space_type='EMPTY')
+        for label, event, action in (
+                ('exact', self.event(), 'SELECT'),
+                ('alt_a', self.event(alt=True), 'SELECT'),
+                ('deselect', self.event(), 'DESELECT')):
+            with self.subTest(case=label):
+                source = self.runtime.map('default', 'Object Mode', space='EMPTY',
+                                          tool=False)
+                original = source.keymap_items.append_fixture(
+                    row(prop_values={'action': action}, alt=event.alt))
+                addon = self.runtime.map('addon', 'Object Mode', space='EMPTY',
+                                         tool=False)
+                selector = self.selector(scope=scope, event=event,
+                    target=self.target(action=action))
+                request = self.override(selector=selector,
+                    assignment=self.assignment(scope=scope, event=event),
+                    context='stock_object_mode_select_all')
+                handle = self.utils.register_feature('stock-' + label,
+                    overrides=(request,))
+                self.assertEqual(len(addon.keymap_items), 1 if label == 'exact' else 0)
+                self.assertEqual(list(source.keymap_items), [original])
+                if label != 'exact':
+                    self.assertTrue(self.reasons(handle))
+                handle.release()
+                self.runtime.configs.default.keymaps.remove(source)
+                self.runtime.configs.addon.keymaps.remove(addon)
+
+    def test_modal_capability_rejects_press_and_wrong_scope(self):
+        for label, event, space in (
+                ('press', self.native_modal_event(value='PRESS'), 'EMPTY'),
+                ('wrong_scope', self.native_modal_event(), 'VIEW_3D')):
+            with self.subTest(case=label):
+                source = self.runtime.map('default', 'Transform Modal Map',
+                                          space=space, modal=True, tool=False)
+                original = source.keymap_items.append_fixture(
+                    self.native_modal_row(value=event.value))
+                cancel = source.keymap_items.append_fixture(
+                    self.native_modal_row('CANCEL', key='ESC'))
+                scope = self.scope(name='Transform Modal Map', space_type=space,
+                                   is_modal=True)
+                selector = self.selector(scope=scope, event=event,
+                    target=self.utils.KeymapTarget(modal_value='PRECISION'))
+                request = self.override(selector=selector,
+                    assignment=self.assignment(scope=scope, event=event,
+                        target=self.utils.KeymapTarget(modal_value='CANCEL')),
+                    capability='modal_head',
+                    context='transform_translate_precision_cancel')
+                handle = self.utils.register_feature('modal-' + label,
+                    overrides=(request,))
+                self.assertEqual(list(source.keymap_items), [original, cancel])
+                self.assertTrue(self.reasons(handle))
+                handle.release()
+                self.runtime.configs.default.keymaps.remove(source)
+
+    def test_changed_source_selector_withdraws_owned_override(self):
+        original = row(prop_values={'action': 'SELECT'})
+        source = self.source(original)
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(
+            selector=self.selector(target=self.target(action='SELECT'))),))
+        self.assertEqual(len(addon.keymap_items), 1)
+        original.type = 'F19'
+        original.properties.action = 'DESELECT'
+        handle.refresh()
+        self.assertEqual(len(addon.keymap_items), 0)
+        self.assertEqual(original.type, 'F19')
+        self.assertEqual(original.properties.action, 'DESELECT')
+        self.assertIs(source.keymap_items[0], original)
+        handle.release()
+
+    def test_config_replacement_does_not_delete_new_lookalike(self):
+        self.source(row())
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        self.assertEqual(len(addon.keymap_items), 1)
+        self.runtime.replace_config('addon')
+        replacement_map = self.addon(row('bluehole.replacement'))
+        handle.release()
+        self.assertEqual(len(replacement_map.keymap_items), 1)
+        self.assertEqual(replacement_map.keymap_items[0].idname, 'bluehole.replacement')
+
+    def test_source_map_generation_change_revalidates_fresh_membership(self):
+        source = self.source(row())
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        prior = addon.keymap_items[0]
+        self.runtime.configs.default.keymaps.remove(source)
+        new_source = row()
+        recreated = self.source(new_source)
+        handle.refresh()
+        self.assertFalse(prior._alive)
+        self.assertEqual(len(addon.keymap_items), 0)
+        handle.refresh()
+        self.assertEqual(len(addon.keymap_items), 1)
+        self.assertEqual(list(recreated.keymap_items), [new_source])
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_reconcile_unchanged_does_not_rebuild(self):
+        self.source(row())
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        self.assertEqual(len(addon.keymap_items), 1)
+        identity = addon.keymap_items[0].as_pointer()
+        for _ in range(5):
+            self.utils.reconcile(budget=1)
+        self.assertEqual(addon.keymap_items.created, 1)
+        self.assertEqual(addon.keymap_items[0].as_pointer(), identity)
+        handle.release()
+
+    def test_late_provider_displacement_recovers_only_owned_item(self):
+        self.source(row())
+        foreign = row('other.provider')
+        addon = self.addon(foreign)
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        first = addon.keymap_items[-1]
+        self.assertEqual(self.merged_names()[0], 'bluehole.replacement')
+        replacement_provider = foreign.clone()
+        addon.keymap_items.remove(foreign)
+        addon.keymap_items.append_fixture(replacement_provider)
+        provider = addon.keymap_items[-1]
+        self.assertEqual(self.merged_names()[0], 'other.provider')
+        for _ in range(4):
+            self.utils.reconcile(budget=4)
+        self.assertIs(addon.keymap_items[-2], provider)
+        self.assertEqual(self.merged_names()[0], 'bluehole.replacement')
+        self.assertEqual([item.idname for item in addon.keymap_items],
+                         ['other.provider', 'bluehole.replacement'])
+        self.assertFalse(first._alive)
+        handle.release()
+        self.assertEqual(list(addon.keymap_items), [provider])
+
+    def test_conflicting_owners_do_not_choose_priority_by_registration_order(self):
+        self.source(row())
+        addon = self.addon()
+        first_request = self.override()
+        first = self.utils.register_feature('owner-a', overrides=(first_request,))
+        self.assertIs(self.utils.register_feature('owner-a', overrides=(first_request,)), first)
+        second_request = self.override(assignment=self.assignment(
+            target=self.target('bluehole.different')),
+            selector=self.utils.KeymapSelector(self.scope(), self.event(),
+                self.target(), source_role='default', ledger_id='other-ledger',
+                sample_id='other-sample'))
+        second = self.utils.register_feature('owner-b', overrides=(second_request,))
+        self.assertEqual(len(addon.keymap_items), 1)
+        self.assertEqual(addon.keymap_items[0].idname, 'bluehole.replacement')
+        self.assertIn('conflicting_assignment', self.reasons(second))
+        second.release()
+        first.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_direct_owned_source_edit_is_retained_and_request_cancelled(self):
+        self.source(row())
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        owned = addon.keymap_items[0]
+        owned.type = 'F19'
+        created = addon.keymap_items.created
+        for _ in range(4):
+            handle.refresh()
+            self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(addon.keymap_items.created, created)
+        self.assertEqual(list(addon.keymap_items), [owned])
+        trace = self.utils.retained_edits()
+        self.assertEqual(len(trace), 1)
+        self.assertEqual((trace[0]['owner_id'], trace[0]['request_id']),
+                         ('owner-a', 'override'))
+        self.assertEqual(self.utils.runtime_stats()['retained_edited'], 1)
+        handle.release()
+        self.assertEqual(list(addon.keymap_items), [owned])
+        again = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        self.assertEqual(list(addon.keymap_items), [owned])
+        self.assertEqual(addon.keymap_items.created, created)
+        self.assertIn('user_edited_owned_item_retained', self.reasons(again))
+        again.release()
+
+    def test_merged_user_wrapper_edit_does_not_transfer_owned_source(self):
+        self.source(row())
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        owned = addon.keymap_items[0]
+        merged = self.runtime.configs.user.keymaps.get('3D View')
+        merged.keymap_items[0].type = 'F19'
+        self.assertEqual(owned.type, 'A')
+        handle.release()
+        self.assertFalse(owned._alive)
+        self.assertEqual(len(addon.keymap_items), 0)
+        self.assertEqual(self.utils.retained_edits(), ())
+
+    def test_unrelated_late_provider_row_does_not_recreate_override(self):
+        self.source(row())
+        addon = self.addon(row('other.provider'))
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        owned = addon.keymap_items[-1]
+        addon.keymap_items.append_fixture(row('other.unrelated', key='B'))
+        for _ in range(4):
+            handle.refresh()
+        self.assertIs(addon.keymap_items[1], owned)
+        self.assertEqual(addon.keymap_items.created, 1)
+        handle.release()
+
+    def test_unrelated_unreadable_source_row_does_not_block_exact_target(self):
+        exact = row()
+        unreadable = row('other.unrelated')
+        unreadable.properties.bl_rna.properties.append(types.SimpleNamespace(
+            identifier='missing', type='INT', is_array=False))
+        source = self.source(unreadable, exact)
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        self.assertEqual(len(addon.keymap_items), 1)
+        self.assertEqual(list(source.keymap_items), [unreadable, exact])
+        handle.release()
+
+    def test_created_map_is_removed_after_release_and_creation_failure(self):
+        source = self.runtime.map('default', tool=None)
+        source.keymap_items.append_fixture(row())
+        request = self.override(selector=self.selector(scope=self.scope(is_tool=None)),
+            assignment=self.assignment(scope=self.scope(is_tool=None)))
+        handle = self.utils.register_feature('owner-a', overrides=(request,))
+        self.assertEqual(len(tuple(self.runtime.configs.addon.keymaps)), 1)
+        self.assertEqual(self.runtime.configs.update_calls[-1][0][1],
+                         ('bluehole.replacement',))
+        handle.release()
+        self.assertEqual(len(tuple(self.runtime.configs.addon.keymaps)), 0)
+        self.assertEqual(self.runtime.configs.update_calls[-1], ())
+
+    def test_feature_preflight_is_atomic_for_pending_second_request(self):
+        self.source(row())
+        addon = self.addon()
+        missing = self.override('missing', selector=self.selector(
+            event=self.event(type='B'), target=self.target('object.other')),
+            assignment=self.assignment('other', event=self.event(type='B'),
+                                       target=self.target('bluehole.other')))
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(), missing))
+        self.assertEqual(len(addon.keymap_items), 0)
+        self.assertIn('feature_preflight_incomplete', self.reasons(handle))
+        source = self.runtime.configs.default.keymaps.get('3D View')
+        source.keymap_items.append_fixture(row('object.other', key='B'))
+        handle.refresh()
+        self.assertEqual([item.idname for item in addon.keymap_items],
+                         ['bluehole.replacement', 'bluehole.other'])
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_partial_compatibility_pair_release_cancels_only_that_request(self):
+        addon = self.addon()
+        requests = (self.assignment('first', target=self.target('bluehole.first')),
+                    self.assignment('second', event=self.event(type='B'),
+                                    target=self.target('bluehole.second')))
+        handle = self.utils.register_feature('owner-a', assignments=requests)
+        self.assertEqual(len(addon.keymap_items), 2)
+        first_pair = [handle.owned_pairs[0]]
+        first = first_pair[0][1]
+        second = handle.owned_pairs[1][1]
+        self.utils.release_owned_pairs(first_pair)
+        self.assertEqual(first_pair, [])
+        self.assertFalse(first._alive)
+        self.assertEqual(list(addon.keymap_items), [second])
+        for _ in range(3):
+            handle.refresh()
+        self.assertEqual(list(addon.keymap_items), [second])
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_reprioritization_limit_survives_source_reallocation(self):
+        source = self.source(row())
+        addon = self.addon(row('other.provider'))
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        for _ in range(2):
+            provider = next(item for item in addon.keymap_items
+                            if item.idname == 'other.provider')
+            replacement = provider.clone()
+            addon.keymap_items.remove(provider)
+            addon.keymap_items.append_fixture(replacement)
+            handle.refresh()
+            self.assertEqual(self.merged_names()[0], 'bluehole.replacement')
+        self.runtime.configs.default.keymaps.remove(source)
+        self.source(row())
+        handle.refresh()
+        handle.refresh()
+        self.assertEqual(self.merged_names()[0], 'bluehole.replacement')
+        provider = next(item for item in addon.keymap_items
+                        if item.idname == 'other.provider')
+        replacement = provider.clone()
+        addon.keymap_items.remove(provider)
+        addon.keymap_items.append_fixture(replacement)
+        created = addon.keymap_items.created
+        for _ in range(3):
+            handle.refresh()
+        self.assertEqual(addon.keymap_items.created, created)
+        self.assertIn('provider_priority_conflict', self.reasons(handle))
+        handle.release()
+
+    def test_repeated_provider_overtaking_stops_priority_fight(self):
+        self.source(row())
+        provider = row('other.provider')
+        addon = self.addon(provider)
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        for _ in range(2):
+            current = next(item for item in addon.keymap_items
+                           if item.idname == 'other.provider')
+            copied = current.clone()
+            addon.keymap_items.remove(current)
+            addon.keymap_items.append_fixture(copied)
+            self.assertEqual(self.merged_names()[0], 'other.provider')
+            handle.refresh()
+            self.assertEqual(self.merged_names()[0], 'bluehole.replacement')
+        current = next(item for item in addon.keymap_items
+                       if item.idname == 'other.provider')
+        copied = current.clone()
+        addon.keymap_items.remove(current)
+        addon.keymap_items.append_fixture(copied)
+        created_before = addon.keymap_items.created
+        for _ in range(5):
+            handle.refresh()
+        self.assertEqual(addon.keymap_items.created, created_before)
+        self.assertIn('provider_priority_conflict', self.reasons(handle))
+        handle.release()
+        self.assertEqual([item.idname for item in addon.keymap_items], ['other.provider'])
+
+    def test_repeated_toggle_and_global_clear_are_idempotent(self):
+        self.source(row())
+        addon = self.addon()
+        for _ in range(3):
+            handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+            self.assertEqual(len(addon.keymap_items), 1)
+            handle.release()
+            self.assertEqual(len(addon.keymap_items), 0)
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        self.utils.release_all()
+        self.utils.release_all()
+        handle.release()
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_plain_assignment_owns_only_its_exact_item(self):
+        addon = self.addon(row('bluehole.replacement'))
+        foreign = addon.keymap_items[0]
+        handle = self.utils.register_feature('owner-a', assignments=(
+            self.assignment(),))
+        self.assertEqual(len(addon.keymap_items), 2)
+        self.assertIs(addon.keymap_items[0], foreign)
+        self.assertEqual(addon.keymap_items[1].idname, 'bluehole.replacement')
+        handle.release()
+        self.assertEqual(list(addon.keymap_items), [foreign])
+
+    def test_bound_empty_pending_list_later_fills_then_drains_exactly(self):
+        addon = self.addon()
+        pairs = []
+        self.utils.bind_category_pairs('Mesh', pairs)
+        request = self.override(selector=self.selector(role='addon',
+            target=self.target('other.provider')))
+        handle = self.utils.register_feature('legacy:Mesh:provider', overrides=(request,))
+        self.assertEqual(pairs, [])
+        provider = addon.keymap_items.append_fixture(row('other.provider'))
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(len(pairs), 1)
+        self.assertIs(pairs[0][1], addon.keymap_items[-1])
+        self.utils.release_owned_pairs(pairs)
+        self.assertEqual(pairs, [])
+        self.assertEqual(list(addon.keymap_items), [provider])
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(list(addon.keymap_items), [provider])
+        handle.release()
+
+    def test_bound_pending_empty_list_release_cancels_future_apply(self):
+        addon = self.addon()
+        pairs = []
+        self.utils.bind_category_pairs('Mesh', pairs)
+        handle = self.utils.register_feature('legacy:Mesh:provider', overrides=(
+            self.override(selector=self.selector(role='addon',
+                target=self.target('other.provider'))),))
+        self.assertEqual(pairs, [])
+        self.utils.release_owned_pairs(pairs)
+        provider = addon.keymap_items.append_fixture(row('other.provider'))
+        self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(list(addon.keymap_items), [provider])
+        self.assertEqual(pairs, [])
+        handle.release()
+
+    def test_capture_selector_freezes_complete_native_row(self):
+        original = row(prop_values={'action': 'SELECT', 'count': 3},
+                       ctrl=-1, direction='NORTH', repeat=True)
+        source = self.source(original)
+        selector = self.utils.capture_selector(source, original,
+            source_role='default', ledger_id='ledger-x', sample_id='sample-x')
+        self.assertEqual(selector.scope, self.scope())
+        self.assertEqual(selector.event, self.event(ctrl=-1, direction='NORTH',
+                                                   repeat=True))
+        self.assertEqual(selector.target, self.target(action='SELECT', count=3))
+        self.assertEqual((selector.ledger_id, selector.sample_id),
+                         ('ledger-x', 'sample-x'))
+        original.properties.action = 'DESELECT'
+        self.assertEqual(selector.target, self.target(action='SELECT', count=3))
+
+    def test_bounded_reconcile_visits_many_features_fairly(self):
+        self.addon()
+        handles = [self.utils.register_feature('owner-' + str(index), assignments=(
+            self.assignment('request-' + str(index),
+                event=self.event(type='F' + str(index + 1)),
+                target=self.target('bluehole.action_' + str(index))),))
+            for index in range(12)]
+        before = self.utils.runtime_stats()['checked']
+        for _ in range(12):
+            self.utils.reconcile(budget=1, time_budget=1)
+        after = self.utils.runtime_stats()['checked']
+        self.assertEqual(after - before, 12)
+        self.assertTrue(all(handle.stats['refreshes'] >= 2 for handle in handles))
+        self.utils.release_all()
+
+    def test_oversized_feature_is_skipped_without_exceeding_reconcile_budget(self):
+        self.addon()
+        requests = (self.assignment('one'),
+                    self.assignment('two', event=self.event(type='B'),
+                                    target=self.target('bluehole.second')))
+        handle = self.utils.register_feature('owner-a', assignments=requests)
+        before = self.utils.runtime_stats()['checked']
+        results = self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(self.utils.runtime_stats()['checked'], before)
+        self.assertIn('feature_exceeds_reconcile_budget',
+                      {result.reason for result in results})
+        self.assertEqual(handle.stats['refreshes'], 1)
+        handle.release()
+
+    def test_different_targets_same_event_conflict_across_owners(self):
+        addon = self.addon()
+        first = self.utils.register_feature('owner-a', assignments=(self.assignment(),))
+        second = self.utils.register_feature('owner-b', assignments=(
+            self.assignment('other', target=self.target('bluehole.other')),))
+        self.assertEqual(len(addon.keymap_items), 1)
+        self.assertIn('conflicting_assignment', self.reasons(second))
+        second.release()
+        first.release()
+
+    def test_user_active_keyconfigs_cannot_be_used_to_create_maps(self):
+        user = self.runtime.configs.user
+        active = self.runtime.configs.active
+        addon = self.runtime.configs.addon
+        self.assertIsNone(self.utils.get_or_create_keymap(user, 'No Write', 'EMPTY'))
+        self.assertIsNone(self.utils.get_or_create_keymap(active, 'No Write', 'EMPTY'))
+        self.assertEqual(len(tuple(active.keymaps)), 0)
+        created = self.utils.get_or_create_keymap(addon, 'Owned Empty', 'EMPTY')
+        self.assertIsNotNone(created)
+        self.assertEqual(len(tuple(addon.keymaps)), 1)
+        self.utils.release_all()
+        self.assertEqual(len(tuple(addon.keymaps)), 0)
+
+    def test_map_creation_collision_never_claims_or_deletes_foreign_scope(self):
+        foreign_map = self.runtime.map('addon', name='3D View', space='EMPTY',
+                                       tool=None)
+        foreign_item = foreign_map.keymap_items.append_fixture(row('other.foreign'))
+        maps = self.runtime.configs.addon.keymaps
+        maps.new = lambda **kwargs: foreign_map
+        handle = self.utils.register_feature('owner-a', assignments=(
+            self.assignment(),))
+        self.assertEqual(list(foreign_map.keymap_items), [foreign_item])
+        self.assertTrue(self.reasons(handle))
+        handle.release()
+        self.utils.release_all()
+        self.assertEqual(list(maps), [foreign_map])
+        self.assertEqual(list(foreign_map.keymap_items), [foreign_item])
+
+    def load_production_action_adapter(self):
+        for suffix in ('actions', 'Lib', 'Lib.commonUtils',
+                       'Lib.commonUtils.runtime', 'debug'):
+            package = types.ModuleType(self.prefix + '.' + suffix)
+            package.__path__ = []
+            sys.modules[package.__name__] = package
+        for suffix in ('Lib.commonUtils.runtime.diagnostics', 'debug.debug_flags'):
+            sys.modules[self.prefix + '.' + suffix] = types.ModuleType(self.prefix + '.' + suffix)
+        action_name = self.prefix + '.actions.operator_action'
+        action_spec = importlib.util.spec_from_file_location(action_name,
+            ROOT / 'actions/operator_action.py')
+        actions = importlib.util.module_from_spec(action_spec)
+        sys.modules[action_name] = actions
+        action_spec.loader.exec_module(actions)
+        name = self.prefix + '.keymaps.keymap_action_utils'
+        spec = importlib.util.spec_from_file_location(name,
+            ROOT / 'keymaps/keymap_action_utils.py')
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
+        spec.loader.exec_module(module)
+        return actions, module
+
+    def test_legacy_binding_accepts_unobservable_default_hyper(self):
+        addon = self.addon()
+        addon.keymap_items.new_missing_fields.add('hyper')
+        actions, module = self.load_production_action_adapter()
+        for key, expected_map_type in (('A', 'KEYBOARD'), ('LEFTMOUSE', 'MOUSE')):
+            with self.subTest(key=key):
+                binding = actions.KeymapBinding('3D View', 'VIEW_3D', key,
+                                                is_tool=False)
+                self.assertIsNone(binding.map_type)
+                action = actions.OperatorAction('bluehole.legacy_' + key.lower(),
+                                                keymap_bindings=(binding,))
+                pairs = module.ensure_action_keymaps('Legacy', action,
+                    context=self.runtime.bpy.context)
+                self.assertEqual(len(pairs), 1)
+                self.assertEqual(pairs[0][1].idname, 'bluehole.legacy_' + key.lower())
+                observed = self.utils.capture_event(pairs[0][1])
+                self.assertIsNone(observed.hyper)
+                self.assertEqual(observed.map_type, expected_map_type)
+                self.utils.release_owned_pairs(pairs)
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_equivalent_transient_actions_share_exact_legacy_owner(self):
+        addon = self.addon()
+        actions, adapter = self.load_production_action_adapter()
+        binding = actions.KeymapBinding('3D View', 'VIEW_3D', 'A', is_tool=False)
+        first_action = actions.OperatorAction('bluehole.legacy',
+                                              keymap_bindings=(binding,))
+        second_action = actions.OperatorAction('bluehole.legacy',
+                                               keymap_bindings=(binding,))
+        self.assertIsNot(first_action, second_action)
+        first = adapter.ensure_action_keymaps('Legacy', first_action,
+                                              context=self.runtime.bpy.context)
+        second = adapter.ensure_action_keymaps('Legacy', second_action,
+                                               context=self.runtime.bpy.context)
+        self.assertEqual(len(addon.keymap_items), 1)
+        self.assertEqual(self.utils.runtime_stats()['features'], 1)
+        self.assertEqual(len(first), 1)
+        self.assertIs(first[0][1], second[0][1])
+        self.utils.release_owned_pairs(first)
+        self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_equivalent_transient_action_cannot_recreate_direct_user_edit(self):
+        addon = self.addon()
+        actions, adapter = self.load_production_action_adapter()
+        binding = actions.KeymapBinding('3D View', 'VIEW_3D', 'A', is_tool=False)
+        first_action = actions.OperatorAction('bluehole.legacy',
+                                              keymap_bindings=(binding,))
+        first = adapter.ensure_action_keymaps('Legacy', first_action,
+                                              context=self.runtime.bpy.context)
+        self.assertEqual(len(first), 1)
+        owned = first[0][1]
+        owned.type = 'F19'
+        self.utils.release_owned_pairs(first)
+        self.assertEqual(list(addon.keymap_items), [owned])
+        replacement_action = actions.OperatorAction('bluehole.legacy',
+            keymap_bindings=(binding,))
+        second = adapter.ensure_action_keymaps('Legacy', replacement_action,
+                                               context=self.runtime.bpy.context)
+        self.assertEqual(second, [])
+        self.assertEqual(list(addon.keymap_items), [owned])
+        self.assertEqual(len(self.utils.retained_edits()), 1)
+
+    def test_stable_merged_priority_failure_does_not_rebuild_forever(self):
+        class ReversedMerged(MergedMaps):
+            def __iter__(self):
+                for map_ in super().__iter__():
+                    map_.keymap_items.rows.reverse()
+                    yield map_
+
+        self.runtime.configs.user.keymaps = ReversedMerged(self.runtime.configs)
+        self.source(row())
+        addon = self.addon()
+        handle = self.utils.register_feature('owner-a', overrides=(self.override(),))
+        self.assertEqual(len(addon.keymap_items), 0)
+        created = addon.keymap_items.created
+        self.assertGreater(created, 0)
+        for _ in range(5):
+            self.utils.reconcile(budget=1, time_budget=1)
+        self.assertEqual(addon.keymap_items.created, created)
+        handle.refresh()
+        self.assertEqual(addon.keymap_items.created, created)
+        handle.release()
+
+
+class LifecycleIntegrationTests(unittest.TestCase):
+    """Import only the orchestrator, with category and preference seams stubbed."""
+
+    def setUp(self):
+        harness = RuntimeKeymapTests('test_plain_assignment_owns_only_its_exact_item')
+        harness.setUp()
+        self.addCleanup(harness.doCleanups)
+        self.h = harness
+        self.core = harness.utils
+        self.runtime = harness.runtime
+        self.runtime.map('addon', tool=False)
+        prefix = harness.prefix
+        self.category_modules = {}
+        self.fail_category = None
+        self.calls = []
+        self.timers = {}
+
+        class Timers:
+            def __init__(timers_self, registry):
+                timers_self.registry = registry
+
+            def is_registered(timers_self, callback):
+                return callback in timers_self.registry
+
+            def register(timers_self, callback, **options):
+                timers_self.registry[callback] = options
+
+            def unregister(timers_self, callback):
+                del timers_self.registry[callback]
+
+        self.runtime.bpy.app = types.SimpleNamespace(timers=Timers(self.timers))
+        self.runtime.bpy.types = types.SimpleNamespace(PropertyGroup=type('PropertyGroup', (), {}))
+
+        def preference_group(**values):
+            group = types.SimpleNamespace(**values)
+            group.bl_rna = types.SimpleNamespace(properties=[types.SimpleNamespace(
+                identifier=name, type='BOOLEAN') for name in values])
+            return group
+
+        self.preferences = types.SimpleNamespace(
+            keymap=preference_group(enable_keymaps=True),
+            pie=preference_group(enable_pie_menus=True),
+            thirdparty=preference_group(enable_thirdparty=True),
+            is_ready=lambda: True)
+
+        def stub_module(name, *, package=False):
+            module = types.ModuleType(name)
+            if package:
+                module.__path__ = []
+            sys.modules[name] = module
+            return module
+
+        for suffix in ('Lib', 'Lib.commonUtils', 'Lib.commonUtils.runtime',
+                       'preferences', 'debug', 'keymaps.pie'):
+            stub_module(prefix + '.' + suffix, package=True)
+        diagnostics = stub_module(prefix + '.Lib.commonUtils.runtime.diagnostics')
+        diagnostics.log = lambda *args: None
+        diagnostics.Severity = types.SimpleNamespace(INFO=1, WARNING=2, DEBUG=3)
+        stub_module(prefix + '.debug.debug_flags')
+        preference_module = stub_module(prefix + '.preferences.prefs')
+        preference_module.prefs = lambda: self.preferences
+
+        category_names = ('Mesh', 'Navigation', 'Object', 'Pipeline', 'Sculpt',
+                          'Selection', 'Transform', 'UV', 'Pie')
+        for category_index, category in enumerate(category_names):
+            stem = category.lower() + '_keymaps_register'
+            path = prefix + ('.keymaps.pie.' if category == 'Pie' else '.keymaps.') + stem
+            module = stub_module(path)
+            module.KEYMAP_CATEGORY = category
+            pairs = []
+            setattr(module, 'registered_' + category.lower() + '_keymaps', pairs)
+
+            def register(category=category, pairs=pairs, category_index=category_index):
+                self.calls.append(('register', category))
+                if self.fail_category == category:
+                    raise RuntimeError('injected category failure')
+                if category == 'Pie' and not self.preferences.pie.enable_pie_menus:
+                    return 0
+                self.core.register_feature('legacy:' + category + ':fixture',
+                    assignments=(self.h.assignment('request-' + category,
+                        event=self.h.event(type='F' + str(category_index + 1)),
+                        target=self.h.target('bluehole.' + category.lower())),))
+                self.core.sync_category_pairs(category)
+                return len(pairs)
+
+            def unregister(category=category, pairs=pairs):
+                self.calls.append(('unregister', category))
+                self.core.release_owned_pairs(pairs)
+                return 0
+
+            module.register = register
+            module.unregister = unregister
+            self.category_modules[category] = module
+
+        name = prefix + '.keymaps.keymaps_register'
+        spec = importlib.util.spec_from_file_location(name, ROOT / 'keymaps/keymaps_register.py')
+        orchestrator = importlib.util.module_from_spec(spec)
+        sys.modules[name] = orchestrator
+        spec.loader.exec_module(orchestrator)
+        self.orchestrator = orchestrator
+        self.addCleanup(orchestrator.unregister)
+
+    def addon_names(self):
+        return [item.idname for item in self.runtime.configs.addon.keymaps.get('3D View').keymap_items]
+
+    def test_global_off_preserves_pipeline_and_independent_pie(self):
+        self.orchestrator.register()
+        self.assertEqual(len(self.addon_names()), 9)
+        self.assertEqual(len(self.timers), 1)
+        names_before = tuple(self.addon_names())
+        creations = self.runtime.configs.addon.keymaps.get('3D View').keymap_items.created
+        for _ in range(3):
+            self.orchestrator._watch_keymaps()
+        self.assertEqual(tuple(self.addon_names()), names_before)
+        self.assertEqual(self.runtime.configs.addon.keymaps.get('3D View').keymap_items.created,
+                         creations)
+        self.preferences.keymap.enable_keymaps = False
+        self.orchestrator._watch_keymaps()
+        self.assertEqual(set(self.addon_names()), {'bluehole.pipeline', 'bluehole.pie'})
+        self.preferences.pie.enable_pie_menus = False
+        self.orchestrator._watch_keymaps()
+        self.assertEqual(self.addon_names(), ['bluehole.pipeline'])
+        self.orchestrator.unregister()
+        self.assertEqual(self.addon_names(), [])
+        self.assertEqual(self.timers, {})
+
+    def test_later_category_failure_drains_earlier_work_and_timer(self):
+        self.fail_category = 'Sculpt'
+        with self.assertRaisesRegex(RuntimeError, 'injected category failure'):
+            self.orchestrator.register()
+        self.assertEqual(self.addon_names(), [])
+        self.assertEqual(self.timers, {})
+        self.assertEqual(self.core.runtime_stats()['features'], 0)
+        self.orchestrator.unregister()
+        self.assertEqual(self.addon_names(), [])
+
+    def test_addon_unload_drains_failed_post_register_init(self):
+        prefix = self.h.prefix
+
+        def stub(name, *, package=False, **attributes):
+            module = types.ModuleType(prefix + '.' + name)
+            if package:
+                module.__path__ = []
+            module.__dict__.update(attributes)
+            sys.modules[module.__name__] = module
+            return module
+
+        stub('Lib.commonUtils.ui', use_pyside=True)
+        diagnostics = sys.modules[prefix + '.Lib.commonUtils.runtime.diagnostics']
+        diagnostics.configure = lambda **kwargs: None
+        stub('Lib.commonUtils.ui.diagnostics', present_diagnostic=lambda *args: None)
+        stub('wrappers', package=True)
+        stub('wrappers.perforce', initialize_runtime=lambda: None)
+        stub('blenderUtils', package=True)
+        stub('operators', package=True)
+        stub('environment', package=True)
+        stub('ui', package=True)
+        stub('ui.menus', package=True)
+        for name in ('blenderUtils.callbacks', 'blenderUtils.addon_callbacks',
+                     'preferences.addon_prefs', 'operators.operators_register',
+                     'ui.menus.menus_register'):
+            stub(name, register=lambda: None, unregister=lambda: None)
+        env = stub('environment.envManager')
+        env.if_current_env_missing_set_default = lambda: None
+        env.get_env_from_prefs_active_env = lambda: types.SimpleNamespace(
+            set_pref_from_ini=lambda: None)
+        root_name = prefix
+        spec = importlib.util.spec_from_file_location(root_name, ROOT / '__init__.py',
+                                                       submodule_search_locations=[str(ROOT)])
+        addon = importlib.util.module_from_spec(spec)
+        sys.modules[root_name] = addon
+        spec.loader.exec_module(addon)
+        addon.register()
+        self.fail_category = 'Sculpt'
+        retry = addon._post_register_init()
+        self.assertGreater(retry, 0)
+        self.assertFalse(addon._keymaps_registered)
+        self.assertEqual(self.addon_names(), [])
+        self.assertEqual(self.core.runtime_stats()['features'], 0)
+        addon.unregister()
+        self.assertEqual(self.timers, {})
+        self.assertEqual(self.addon_names(), [])
+
+
+if __name__ == '__main__':
+    unittest.main()
