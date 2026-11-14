@@ -46,8 +46,8 @@ choices.
   **Assignment Settings** also lets you move an assignment to another section
   or choose an existing command, shortcut and keymap. To add a mapping, add a section from the menu
   beside the section selector or select an existing one,
-  choose **Add Assignment**, and select those three entries. **New Shortcut**
-  adds an input to the library for reuse in Assignment Settings.
+  choose **Add Assignment**, and select those three entries. **Actions → New
+  Shortcut** adds an input to the library for reuse in Assignment Settings.
 - The **Commands** tab has its own category and section filters based on where
   each command is used. Picking a category or section clears the text search.
   **All Categories** includes unused commands. The
@@ -64,7 +64,7 @@ choices.
   has no matching operator, the list shows **Waiting for add-on** and Deluxe
   leaves the shortcut unregistered. The saved choice remains available for
   when the operator loads.
-- **Disable Existing Shortcut** opens the live binding picker for the selected
+- **Actions → Find Existing Shortcut** opens the live binding picker for the selected
   section. Choose the source and search by command, key or keymap. Review the
   selected row's event and properties before staging it. The existing proved
   Object Mode Select All route can replace Select All with Deselect All.
@@ -72,7 +72,7 @@ choices.
   status. Use **Pick Again** when a rule's target changes or becomes ambiguous.
 - **Save and Apply Changes** writes the profile and applies it through the runtime.
   **Discard** drops staged edits. **Reset Draft** and **Reload Profile** are
-  in the **Profile** menu. Reset stages the shipped catalog.
+  in the gear menu beside **Enable Keymaps**. Reset stages the shipped catalog.
   **Reload Profile** reads the current file and drops the draft after a
   successful reload. **Save Recovered Profile** publishes recovered settings
   after reviewing them. **Reset Feature Switches** acts on the separate Blender

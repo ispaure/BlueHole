@@ -84,11 +84,13 @@ def draw(preference, context, layout):
     settings = preference.keymap
     blender_preset = uses_blender_keyconfig(context.window_manager.keyconfigs)
     if not blender_preset:
+        column_keymap.alignment = 'LEFT'
         column_keymap.label(text='Select the Blender preset in Preferences → Keymap to use the Blue Hole editor.', icon='INFO')
         column_keymap.operator('wm.bh_backup_keymap_setup')
         return
 
     if not settings.deluxe_configured:
+        column_keymap.alignment = 'LEFT'
         label = 'Use Keymap Editor' if settings.enable_keymaps else 'Enable Keymaps'
         column_keymap.operator('wm.bh_apply_deluxe_prefs', text=label)
         return
@@ -96,16 +98,9 @@ def draw(preference, context, layout):
     if not keymaps_register.runtime_keymaps_allowed(context, settings):
         return
 
-    column_keymap.prop(settings, 'enable_keymaps')
-
     from .keymaps import deluxe_editor
 
-    feature_settings = column_keymap.box()
-    feature_settings.label(text='Deluxe Settings')
-    feature_settings.prop(context.preferences.inputs, 'invert_mouse_zoom')
-    feature_settings.operator('wm.bh_reset_deluxe_keymaps', text='Reset Feature Switches')
-    column_keymap.separator()
-    deluxe_editor.draw(context, column_keymap)
+    deluxe_editor.draw(context, column_keymap, settings)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER

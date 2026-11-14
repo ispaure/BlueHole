@@ -167,10 +167,16 @@ class BlueHole(AddonPreferences):
             # General addon sub-tabs
             column = layout.column(align=True)
             row = column.row(align=True)
-            row.prop(self, 'general_addon_settings', expand=True)
+            scale = context.preferences.system.ui_scale or 1
+            wide = context.region is not None and context.region.width / scale >= 600
+            if wide:
+                row.prop(self, 'general_addon_settings', expand=True)
+            else:
+                row.prop(self, 'general_addon_settings', text='')
 
             # Draw selected general addon panel
-            box = column.box()
+            column.separator()
+            box = column.column() if self.general_addon_settings == 'KEYMAP' else column.box()
             module = _GENERAL_DRAW_MODULES.get(self.general_addon_settings)
             if module is None:
                 box.label(text=f'Unknown general addon settings panel: {self.general_addon_settings}')
