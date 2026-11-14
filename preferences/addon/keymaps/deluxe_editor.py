@@ -39,13 +39,22 @@ def paginate(layout, current, rows):
     return rows[page * PAGE_SIZE:(page + 1) * PAGE_SIZE]
 
 
-def detail_columns(layout, width):
+def detail_columns(layout, width, *, detail_first=False):
     if width >= DETAIL_PANE_MIN_WIDTH:
         split = layout.split(factor=LIST_WIDTH_FRACTION)
         return split.box().column(align=True), split.column(), width * LIST_WIDTH_FRACTION
-    listing = layout.box().column(align=True)
+    first = layout.column()
     layout.separator()
-    return listing, layout.column(), width
+    second = layout.column()
+    listing, detail = (second, first) if detail_first else (first, second)
+    return listing.box().column(align=True), detail, width
+
+
+def assignment_columns(layout):
+    row = layout.split(factor=0.40, align=True)
+    name = row.row(align=True)
+    binding = row.split(factor=0.52, align=True)
+    return name, binding.row(align=True), binding.row(align=True)
 
 
 class BH_MT_deluxe_categories(bpy.types.Menu):
@@ -277,39 +286,39 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
         if matches:
             found.append((id_, command, event, scope, meta))
     if found:
-        listing, detail, list_width = detail_columns(layout, width)
+        listing, detail, list_width = detail_columns(layout, width, detail_first=True)
         detail_width = width - list_width if width >= DETAIL_PANE_MIN_WIDTH else width
         table = list_width >= ASSIGNMENT_TABLE_MIN_WIDTH
         listing.label(text=f'{len(found)} {"matching " if query else ""}'
                            f'{"assignment" if len(found) == 1 else "assignments"}')
         listing.separator(factor=0.5)
-        shown = paginate(listing, current, found)
-        if current.assignment not in {item[0] for item in shown}:
-            current.assignment = shown[0][0]
+        if current.assignment not in {item[0] for item in found}:
+            current.assignment = found[0][0]
         if table:
-            header = listing.split(factor=0.48)
-            header.label(text='Command')
-            header.label(text='Shortcut / Context')
+            name, key, scope_column = assignment_columns(listing)
+            name.label(text='Command')
+            key.label(text='Shortcut')
+            scope_column.label(text='Context')
             listing.separator(type='LINE')
-        for id_, command, event, scope, meta in shown:
+        for id_, command, event, scope, meta in found:
             selected = id_ == current.assignment
+            waiting = meta['availability'] == 'waiting_for_provider'
             if table:
-                line = listing.split(factor=0.48, align=True)
-                name = line.row(align=True)
-                binding = line.column(align=True)
+                name, key, scope_column = assignment_columns(listing)
             else:
                 name = listing.row(align=True)
-                binding = listing
             icon = 'RADIOBUT_ON' if selected else 'RADIOBUT_OFF'
+            if table and waiting:
+                icon = 'ERROR'
             ops.operator_button(name, 'assignment', command, id_, icon=icon, emboss=selected, depress=selected)
             if table:
-                binding.label(text=event)
-                binding.label(text=scope)
+                key.label(text=event)
+                scope_column.label(text=scope)
             else:
-                binding.label(text=f'{event}  ·  {scope}', icon='BLANK1')
-            if meta['availability'] == 'waiting_for_provider':
-                listing.label(text=f"Waiting for {meta['dependency']}", icon='ERROR')
-            if id_ != shown[-1][0]:
+                listing.label(text=f'{event}  ·  {scope}', icon='BLANK1')
+                if waiting:
+                    listing.label(text=f"Waiting for {meta['dependency']}", icon='ERROR')
+            if id_ != found[-1][0]:
                 listing.separator(factor=0.5, type='LINE')
         inspector(detail.box().column(), current, preview, current.assignment, width=detail_width)
     else:

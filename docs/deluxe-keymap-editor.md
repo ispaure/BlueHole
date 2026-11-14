@@ -7,10 +7,12 @@ Editor** if you already had the older programmatic keymaps enabled.
 Choose a category tab, then use the category and section checkboxes to stage
 which shortcut groups are enabled. Sections show when a saved feature switch
 makes a group inactive or an enabled shortcut needs an add-on. Click **Save
-and Apply Changes** to save. Assignments and Commands put their list
-beside the selected item's settings in wide windows. In narrow windows the
-settings appear below the list. Assignment search spans all sections. The
-category and section menus browse one section at a time when search is empty.
+and Apply Changes** to save. Assignments shows every result in one list.
+When there is room, each assignment has one row with **Command**,
+**Shortcut**, and **Context** columns. Wide windows show the selected
+assignment's settings beside the list. Narrow windows show those settings
+above it. Assignment search spans all sections. The category and section
+menus browse one section at a time when search is empty.
 
 If activation asks for a review, **Back Up Saved Keymap Setup** copies the
 saved Blender preferences and available preset before you review conflicting
