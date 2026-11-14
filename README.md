@@ -10,11 +10,9 @@ the legacy version for existing installations.
 ## Install and start
 
 Follow the [installation guide](https://blue-hole.weebly.com/installation.html),
-then enable Blue Hole in Blender's add-on preferences. Start with the standard
-mode and enable the keymaps and tools you need.
-
-Choose **Enable Deluxe Keymaps** under **Updates & Deluxe** in the Blue Hole
-header menu to load the Deluxe shortcut catalog on the built-in Blender preset.
+then enable Blue Hole in Blender's add-on preferences. With the built-in
+Blender keymap preset selected, open **Addon Settings → Keymaps** and click
+**Enable Keymaps** to use the Deluxe shortcut catalog.
 Existing Deluxe users can back up and review their saved bindings before
 switching. [Activation and recovery guide](overlays/deluxe/README.md)
 

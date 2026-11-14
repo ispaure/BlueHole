@@ -159,6 +159,8 @@ def deluxe_profile():
 
 def deluxe_section_enabled(section):
     """Report the applied section state when the Deluxe profile is available."""
+    if not runtime_keymaps_allowed(bpy.context, prefs().keymap):
+        return False
     try:
         return deluxe_profile().section_enabled(section)
     except ValueError:
@@ -228,12 +230,8 @@ def _apply_categories(*, profile=None):
                 for module in modules:
                     keymap_utils.sync_category_pairs(module.KEYMAP_CATEGORY)
             else:
-                for module in modules:
-                    _bind_category(module)
-                    if not p.keymap.enable_keymaps and module not in (
-                            pipeline_keymaps_register, pie_keymaps_register):
-                        continue
-                    total += module.register()
+                _bind_category(pipeline_keymaps_register)
+                total = pipeline_keymaps_register.register_required()
         _preference_state = _preference_signature()
         watcher_stats['category_refreshes'] += 1
         return total

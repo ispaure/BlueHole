@@ -34,8 +34,8 @@ EDIT_DESCRIPTIONS = {
     'show_command': 'Open the command used by this assignment',
     'show_section_commands': 'Show commands used in this section',
     'show_assignments': 'Open the Assignments tab for this section',
-    'delete_section': 'Remove this empty section from the draft. Apply Changes saves the removal',
-    'remove_rule': 'Remove this existing-shortcut rule from the draft. Apply Changes saves the removal',
+    'delete_section': 'Stage removal of this empty section',
+    'remove_rule': 'Stage removal of this existing-shortcut rule',
     'linked_shortcut': 'Show or hide the sections that share this shortcut',
     'linked_section': 'Show or hide linked assignments in this section',
     'feature_category': 'Show the shortcut groups in this category',
@@ -310,8 +310,7 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
 class BH_OT_deluxe_remove_assignment(EditorOperator, bpy.types.Operator):
     bl_idname = 'wm.bh_deluxe_remove_assignment'
     bl_label = 'Remove Assignment'
-    bl_description = ('Remove this assignment from the draft and keep its command and linked assignments. '
-                      'Apply Changes saves the removal')
+    bl_description = 'Stage removal of this assignment and keep its command and linked assignments'
 
     assignment: StringProperty(options=HIDDEN)
 

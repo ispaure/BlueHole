@@ -934,10 +934,11 @@ def native_lifecycle(root, bpy, addon_utils):
 
     def all_on():
         prefs = state['prefs']
+        prefs.keymap.deluxe_configured = True
         prefs.keymap.enable_keymaps = True
         prefs.pie.enable_pie_menus = True
         state['km'].refresh()
-        assert state['rt'].runtime_stats()['owned'] > 0
+        assert state['km'].pie_keymaps_register.registered_pie_keymaps
         record('global_and_pie_enabled', runtime=state['rt'].runtime_stats())
 
     def all_off():
@@ -949,10 +950,10 @@ def native_lifecycle(root, bpy, addon_utils):
             lists = [v for k, v in vars(module).items() if k.startswith('registered_')
                      and k.endswith('_keymaps') and isinstance(v, list)]
             counts[module.KEYMAP_CATEGORY] = len(lists[0])
-            if module not in (km.pipeline_keymaps_register, km.pie_keymaps_register):
+            if module is not km.pipeline_keymaps_register:
                 assert not lists[0], module.KEYMAP_CATEGORY
-        assert counts['Pipeline'] > 0 and counts['Pie'] > 0, counts
-        record('global_off_retains_obligatory_pipeline_and_independent_pie', counts=counts)
+        assert counts['Pipeline'] > 0 and prefs.pie.enable_pie_menus, counts
+        record('global_off_retains_obligatory_pipeline', counts=counts)
         prefs.pie.enable_pie_menus = False
         km.refresh()
         assert not km.pie_keymaps_register.registered_pie_keymaps
@@ -962,21 +963,22 @@ def native_lifecycle(root, bpy, addon_utils):
     def partial_failure():
         km, rt = state['km'], state['rt']
         state['prefs'].keymap.enable_keymaps = True
-        target = km.keymap_module_lst[1]
-        original_register = target.register
-        def fail():
-            raise RuntimeError('injected later category failure')
-        target.register = fail
+        store = km.deluxe_profile()
+        original_register = store.register
+        def fail(profile):
+            original_register(profile)
+            raise RuntimeError('injected catalog registration failure')
+        store.register = fail
         try:
             try:
                 km.refresh()
             except RuntimeError as exc:
-                assert str(exc) == 'injected later category failure'
+                assert str(exc) == 'injected catalog registration failure'
             else:
-                raise AssertionError('Expected native category failure')
+                raise AssertionError('Expected catalog registration failure')
             assert rt.runtime_stats()['owned'] == 0, rt.runtime_stats()
         finally:
-            target.register = original_register
+            store.register = original_register
         km.refresh()
         assert rt.runtime_stats()['owned'] > 0
         record('partial_category_failure_rolled_back_and_recovered', runtime=rt.runtime_stats())

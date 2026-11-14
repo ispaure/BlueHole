@@ -1,10 +1,11 @@
 # Deluxe keymaps
 
-Enable Blue Hole, then choose **Enable Deluxe Keymaps** under **Updates &
-Deluxe** in the Blue Hole header menu. Deluxe uses the built-in **Blender**
-preset. Blue Hole adds the shortcuts and pies at runtime. Every feature group
-starts enabled in a fresh profile. The standard Blue Hole installation keeps
-its existing Keymaps and Pie Menus opt-ins.
+Enable Blue Hole and select the built-in **Blender** keymap preset. In Blue
+Hole's **Addon Settings → Keymaps**, choose **Enable Keymaps** or **Use Keymap
+Editor** to open the Deluxe catalog. You can also choose **Enable Deluxe
+Keymaps** under **Updates & Deluxe** in the Blue Hole header menu. Blue Hole
+adds the shortcuts and pies at runtime. Every feature group starts enabled in
+a fresh profile.
 
 Use **Addon Settings > Keymaps**, **Pie Menus**, and **Third-Party Add-ons** in
 Blue Hole preferences to change features. **Disable Deluxe Keymaps** removes
@@ -12,8 +13,8 @@ the runtime catalog and its pie shortcuts and keeps your feature choices for
 the next enable. Blender saves the Blue Hole activation and feature switches
 on normal exit if **Auto-Save Preferences** is enabled. Otherwise choose
 **Save Preferences** in Blender to keep the choice across sessions. The
-shortcut editor's **Apply Changes** saves assignment edits to a separate
-Deluxe JSON profile.
+shortcut editor's **Save and Apply Changes** writes assignment edits to
+`keymaps/deluxe-defaults.json` in the active Blue Hole installation.
 The standard Blue Hole Save As shortcut is part of Blue Hole's pipeline while
 the add-on is enabled. Disable Blue Hole to restore the stock Save As shortcut.
 

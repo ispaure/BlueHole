@@ -1,11 +1,13 @@
 # Edit Deluxe keymaps in Blender
 
-Open **Preferences → Add-ons → Blue Hole → Addon Settings → Keymaps** after
-configuring Deluxe on the Blender preset. **Sections** is the default view.
+Open **Preferences → Add-ons → Blue Hole → Addon Settings → Keymaps** with
+Blender's built-in keymap preset. Click **Enable Keymaps**, or **Use Keymap
+Editor** if you already had the older programmatic keymaps enabled.
+**Sections** is the default view.
 Choose a category tab, then use the category and section checkboxes to stage
 which shortcut groups are enabled. Sections show when a saved feature switch
-makes a group inactive or an enabled shortcut needs an add-on. Click **Apply
-Changes** to save. Assignments and Commands put their list
+makes a group inactive or an enabled shortcut needs an add-on. Click **Save
+and Apply Changes** to save. Assignments and Commands put their list
 beside the selected item's settings in wide windows. In narrow windows the
 settings appear below the list. Assignment search spans all sections. The
 category and section menus browse one section at a time when search is empty.
@@ -68,7 +70,7 @@ choices.
   Object Mode Select All route can replace Select All with Deselect All.
   Generic suppression targets can be staged and reviewed with an unsupported
   status. Use **Pick Again** when a rule's target changes or becomes ambiguous.
-- **Apply Changes** writes the profile and applies it through the runtime.
+- **Save and Apply Changes** writes the profile and applies it through the runtime.
   **Discard** drops staged edits. **Reset Draft** and **Reload Profile** are
   in the **Profile** menu. Reset stages the shipped catalog.
   **Reload Profile** reads the current file and drops the draft after a

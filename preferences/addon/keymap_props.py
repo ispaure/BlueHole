@@ -38,18 +38,8 @@ show_verbose = True
 # ----------------------------------------------------------------------------------------------------------------------
 # DRAW MODULE LOOKUP
 
-_KEYMAP_DRAW_MODULES = {
-    'SELECTION': keymap_props_selection,
-    'NAVIGATION': keymap_props_navigation,
-    'TRANSFORM': keymap_props_transform,
-    'OBJECT': keymap_props_object,
-    'MESH': keymap_props_mesh,
-    'UV': keymap_props_uv,
-    'SCULPT': keymap_props_sculpt,
-    'PIPELINE': keymap_props_pipeline,
-    'OTHER': keymap_props_other,
-}
-KEYMAP_CATEGORIES = tuple(name.lower() for name in _KEYMAP_DRAW_MODULES)
+KEYMAP_CATEGORIES = ('selection', 'navigation', 'transform', 'object', 'mesh',
+                     'uv', 'sculpt', 'pipeline', 'other')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -61,23 +51,6 @@ def _update_keymaps(self, context):
 
 
 class KeymapPG(bpy.types.PropertyGroup):
-
-    keymap_settings: EnumProperty(
-        name='Keymap Settings',
-        description='Keymap settings to display',
-        items=[
-            ('SELECTION', 'Selection', ''),
-            ('NAVIGATION', 'Navigation', ''),
-            ('TRANSFORM', 'Transform', ''),
-            ('OBJECT', 'Object', ''),
-            ('MESH', 'Mesh', ''),
-            ('UV', 'UV', ''),
-            ('SCULPT', 'Sculpt', ''),
-            ('PIPELINE', 'Pipeline', ''),
-            ('OTHER', 'Other', ''),
-        ],
-        default='SELECTION'
-    )
 
     selection: PointerProperty(type=keymap_props_selection.SelectionKeymapPG)
     navigation: PointerProperty(type=keymap_props_navigation.NavigationKeymapPG)
@@ -100,6 +73,7 @@ class KeymapPG(bpy.types.PropertyGroup):
 
 def draw(preference, context, layout):
     from ...keymaps import keymaps_register
+    from ...overlays.deluxe.applyDeluxePrefs import uses_blender_keyconfig
 
     # -------------------------------------------------------------------------------------------------
     # KEYMAPS
@@ -107,44 +81,31 @@ def draw(preference, context, layout):
     column_keymap = layout.column()
     column_keymap.operator_context = 'INVOKE_DEFAULT'
 
-    if not preference.keymap.deluxe_configured:
-        column_keymap.operator('wm.bh_apply_deluxe_prefs')
-
-    if not keymaps_register.runtime_keymaps_allowed(context, preference.keymap):
-        column_keymap.label(text='Deluxe requires the Blender preset and a reviewed keymap setup.', icon='INFO')
+    settings = preference.keymap
+    blender_preset = uses_blender_keyconfig(context.window_manager.keyconfigs)
+    if not blender_preset:
+        column_keymap.label(text='Select the Blender preset in Preferences → Keymap to use the Blue Hole editor.', icon='INFO')
         column_keymap.operator('wm.bh_backup_keymap_setup')
         return
 
-    label = 'Enable Deluxe Keymaps' if preference.keymap.deluxe_configured else 'Enable Keymaps'
-    column_keymap.prop(preference.keymap, 'enable_keymaps', text=label)
-
-    if preference.keymap.deluxe_configured:
-        from .keymaps import deluxe_editor
-
-        settings = column_keymap.box()
-        settings.label(text='Deluxe Settings')
-        settings.prop(context.preferences.inputs, 'invert_mouse_zoom')
-        settings.operator('wm.bh_reset_deluxe_keymaps', text='Reset Feature Switches')
-        column_keymap.separator()
-        deluxe_editor.draw(context, column_keymap)
+    if not settings.deluxe_configured:
+        label = 'Use Keymap Editor' if settings.enable_keymaps else 'Enable Keymaps'
+        column_keymap.operator('wm.bh_apply_deluxe_prefs', text=label)
         return
 
-    if not preference.keymap.enable_keymaps:
-        row = column_keymap.row()
-        row.label(text='Keymaps are currently disabled.')
+    if not keymaps_register.runtime_keymaps_allowed(context, settings):
         return
 
-    row = column_keymap.row(align=True)
-    row.prop(preference.keymap, 'keymap_settings', expand=True)
+    column_keymap.prop(settings, 'enable_keymaps')
 
-    module = _KEYMAP_DRAW_MODULES.get(preference.keymap.keymap_settings)
+    from .keymaps import deluxe_editor
 
-    if module is None:
-        row = column_keymap.row()
-        row.label(text=f'Unknown keymap settings panel: {preference.keymap.keymap_settings}')
-        return
-
-    module.draw(preference, context, column_keymap)
+    feature_settings = column_keymap.box()
+    feature_settings.label(text='Deluxe Settings')
+    feature_settings.prop(context.preferences.inputs, 'invert_mouse_zoom')
+    feature_settings.operator('wm.bh_reset_deluxe_keymaps', text='Reset Feature Switches')
+    column_keymap.separator()
+    deluxe_editor.draw(context, column_keymap)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER

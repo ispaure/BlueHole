@@ -610,7 +610,7 @@ def transaction_controls(layout, current):
     ops.operator_button(discard, 'discard', 'Discard')
     apply = staged.row(align=True)
     apply.enabled = current.dirty or bool(current.store.load_issue)
-    label = 'Save Recovered Profile' if current.store.load_issue and not current.dirty else 'Apply Changes'
+    label = 'Save Recovered Profile' if current.store.load_issue and not current.dirty else 'Save and Apply Changes'
     ops.operator_button(apply, 'apply', label, icon='CHECKMARK')
     if current.message:
         layout.label(text=current.message)

@@ -1602,7 +1602,7 @@ class LifecycleIntegrationTests(unittest.TestCase):
             return group
 
         self.preferences = types.SimpleNamespace(
-            keymap=preference_group(enable_keymaps=True, deluxe_configured=False),
+            keymap=preference_group(enable_keymaps=True, deluxe_configured=True),
             pie=preference_group(enable_pie_menus=True),
             thirdparty=preference_group(enable_thirdparty=True),
             is_ready=lambda: True)
@@ -1654,6 +1654,8 @@ class LifecycleIntegrationTests(unittest.TestCase):
                 return 0
 
             module.register = register
+            if category == 'Pipeline':
+                module.register_required = register
             module.unregister = unregister
             self.category_modules[category] = module
 
@@ -1675,9 +1677,10 @@ class LifecycleIntegrationTests(unittest.TestCase):
     def addon_names(self):
         return [item.idname for item in self.runtime.configs.addon.keymaps.get('3D View').keymap_items]
 
-    def test_global_off_preserves_pipeline_and_independent_pie(self):
+    def test_unconfigured_profile_registers_only_required_pipeline_despite_saved_opt_ins(self):
+        self.preferences.keymap.deluxe_configured = False
         self.orchestrator.register()
-        self.assertEqual(len(self.addon_names()), 10)
+        self.assertEqual(self.addon_names(), ['bluehole.pipeline'])
         self.assertEqual(len(self.timers), 1)
         names_before = tuple(self.addon_names())
         creations = self.runtime.configs.addon.keymaps.get('3D View').keymap_items.created
@@ -1688,7 +1691,7 @@ class LifecycleIntegrationTests(unittest.TestCase):
                          creations)
         self.preferences.keymap.enable_keymaps = False
         self.orchestrator._watch_keymaps()
-        self.assertEqual(set(self.addon_names()), {'bluehole.pipeline', 'bluehole.pie'})
+        self.assertEqual(self.addon_names(), ['bluehole.pipeline'])
         self.preferences.pie.enable_pie_menus = False
         self.orchestrator._watch_keymaps()
         self.assertEqual(self.addon_names(), ['bluehole.pipeline'])
@@ -1735,6 +1738,7 @@ class LifecycleIntegrationTests(unittest.TestCase):
         self.assertEqual(self.core.pending_cleanup(), ())
 
     def test_legacy_profile_blocks_saved_runtime_switches_until_review(self):
+        self.preferences.keymap.deluxe_configured = False
         settings = self.runtime.bpy.context.preferences.keymap
         settings.active_keyconfig = 'BH_Keymaps'
         self.orchestrator.register()

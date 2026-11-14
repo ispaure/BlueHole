@@ -66,7 +66,7 @@ open.
 
 ## Persistence and recovery
 
-**Apply Changes** saves `keymaps/deluxe-defaults.json` in the active Blue Hole
+**Save and Apply Changes** saves `keymaps/deluxe-defaults.json` in the active Blue Hole
 installation. With the Logistics **Local** source, the installation links to
 the checkout, so the edit appears in Git. With **GitHub**, the edit goes into
 the preset's installed Blue Hole copy. The next Blue Hole update installs its

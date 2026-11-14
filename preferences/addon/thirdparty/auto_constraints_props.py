@@ -17,7 +17,6 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-from ...prefs import prefs
 from ....blenderUtils.operatorUtils import op_exists
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -65,28 +64,11 @@ def draw(preference, context, layout):
     row = box.row()
     row.label(text='KEYMAPS')
 
-    if not prefs().keymap.enable_keymaps:
-        row = box.row()
-        row.label(text='Blue Hole keymaps must be enabled to show this section.', icon='ERROR')
-        return
+    from ....keymaps.keymaps_register import deluxe_section_enabled
 
-    transform_keymaps_ready = (
-        prefs().keymap.transform.enable_transform_keymaps and
-        prefs().keymap.transform.enable_transform_tools_modal
-    )
-
+    transform_keymaps_ready = deluxe_section_enabled('transform.tools_modal')
     if not transform_keymaps_ready:
-        row = box.row()
-        row.label(
-            text='Requires Transform keymaps and Transform Tools (Modal) to be enabled.',
-            icon='ERROR'
-        )
-    elif preference.keymap.deluxe_configured:
-        from ....keymaps.keymaps_register import deluxe_section_enabled
-
-        transform_keymaps_ready = deluxe_section_enabled('transform.tools_modal')
-        if not transform_keymaps_ready:
-            box.label(text='Transform → Modal tools is inactive in the applied Deluxe profile.', icon='INFO')
+        box.label(text='Enable Transform → Modal tools in Blue Hole’s Keymaps panel.', icon='INFO')
 
     row = box.row()
     row.enabled = transform_keymaps_ready

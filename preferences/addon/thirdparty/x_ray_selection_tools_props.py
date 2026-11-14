@@ -17,7 +17,6 @@ __status__ = 'Production'
 
 import bpy
 from bpy.props import *
-from ...prefs import prefs
 from ....blenderUtils.operatorUtils import op_exists
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -65,28 +64,11 @@ def draw(preference, context, layout):
     row = box.row()
     row.label(text='KEYMAPS')
 
-    if not prefs().keymap.enable_keymaps:
-        row = box.row()
-        row.label(text='Blue Hole keymaps must be enabled to show this section.', icon='ERROR')
-        return
+    from ....keymaps.keymaps_register import deluxe_section_enabled
 
-    selection_keymaps_ready = (
-        prefs().keymap.selection.enable_selection_keymaps and
-        prefs().keymap.selection.enable_selection_tool_switch
-    )
-
+    selection_keymaps_ready = deluxe_section_enabled('selection.tool_switch')
     if not selection_keymaps_ready:
-        row = box.row()
-        row.label(
-            text='Requires Selection keymaps and Selection Tool Switch to be enabled.',
-            icon='ERROR'
-        )
-    elif preference.keymap.deluxe_configured:
-        from ....keymaps.keymaps_register import deluxe_section_enabled
-
-        selection_keymaps_ready = deluxe_section_enabled('selection.tool_switch')
-        if not selection_keymaps_ready:
-            box.label(text='Selection → Tool switch is inactive in the applied Deluxe profile.', icon='INFO')
+        box.label(text='Enable Selection → Tool switch in Blue Hole’s Keymaps panel.', icon='INFO')
 
     row = box.row()
     row.enabled = selection_keymaps_ready

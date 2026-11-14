@@ -54,10 +54,15 @@ def get_enabled_pipeline_actions():
 
 
 def register() -> int:
+    return _register_actions(get_enabled_pipeline_actions())
+
+
+def register_required() -> int:
+    return _register_actions(get_obligatory_pipeline_actions())
+
+
+def _register_actions(actions) -> int:
     unregister()
-
-    actions = get_enabled_pipeline_actions()
-
     registered_count = 0
 
     for action in actions:

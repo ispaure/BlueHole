@@ -1,8 +1,7 @@
 Here is the list of Pie Menus for Blue Hole.
   
 > [!NOTE] Dependencies
-> Enable Deluxe keymaps for the reference pie shortcuts, or opt in to the
-> standard Blue Hole pie menus separately. Some menu actions require other
+> Enable Blue Hole keymaps to use the pie shortcuts. Some menu actions require other
 > add-ons. See the [Deluxe guide](../README.md) for the runtime setup.
   
   

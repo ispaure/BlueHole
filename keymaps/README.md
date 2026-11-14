@@ -2,17 +2,11 @@
 
 This section is responsible for **registering and managing keymaps** for Blue Hole.
 
-Keymaps are not defined here directly. Instead, they are created from
-`OperatorAction` objects declared in the `actions/` section of the addon.
-
-The keymap system reads those action definitions and registers their
-`KeymapBinding` entries into Blender's keyconfig when the addon loads or
-when preferences change.
-
-
-Configured Deluxe uses [versioned profiles](../docs/deluxe-keymap-profiles.md)
-and the same runtime ownership ledger. The action path described below continues
-to supply standard Keymaps, standard Pie and the existing preference panels.
+Blue Hole's editable shortcuts come from the
+[Deluxe catalog](../docs/deluxe-keymap-profiles.md) and use the runtime ownership
+ledger. The programmatic action declarations below supply the required Save As
+bindings before Deluxe is configured and provide reference coverage for the
+migration to JSON.
 
 ---
 
