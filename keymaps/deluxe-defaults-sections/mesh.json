@@ -1,0 +1,41 @@
+{
+  "category": "mesh",
+  "definition": {
+    "label": "Mesh",
+    "enabled": true
+  },
+  "sections": {
+    "mesh.modeling": {"label": "Modeling", "category": "mesh", "enabled": true},
+    "mesh.tools": {"label": "Tools", "category": "mesh", "enabled": true}
+  },
+  "events": {
+    "middlemouse-click-80064ca4962c": {"type": "MIDDLEMOUSE", "value": "CLICK", "shift": true, "map_type": "MOUSE"}
+  },
+  "commands": {
+    "mesh-spin-037461d1155d": {"operator": "mesh.spin", "properties": {"dupli": true}},
+    "mesh-vertices-smooth-63322e37054d": {"operator": "mesh.vertices_smooth", "properties": {"wait_for_input": false}},
+    "mesh-spin-e21a2d0a601f": {"operator": "mesh.spin", "properties": {}},
+    "mesh-polybuild-delete-at-cursor-0e7122cd51b2": {"operator": "mesh.polybuild_delete_at_cursor", "properties": {}},
+    "mesh-bisect-1dc230b71582": {"operator": "mesh.bisect", "properties": {}},
+    "mesh-knife-tool-65ef3dafd231": {"operator": "mesh.knife_tool", "properties": {"wait_for_input": false}},
+    "mesh-bevel-304f467e39ad": {"operator": "mesh.bevel", "properties": {"release_confirm": true}},
+    "mesh-inset-4b4cafdc306a": {"operator": "mesh.inset", "properties": {"release_confirm": true}},
+    "mesh-dupli-extrude-cursor-e60c1f222dd7": {"operator": "mesh.dupli_extrude_cursor", "properties": {}},
+    "mesh-smart-delete-f70965785c88": {"operator": "mesh.smart_delete", "properties": {}, "provider": "Interactive Tools"},
+    "view3d-ruler-add-d7b22fcd4db7": {"operator": "view3d.ruler_add", "properties": {}}
+  },
+  "assignments": {
+    "mesh-3d-view-tool-edit-mesh-spin-duplicates-ba4711cb256e": {"order": 0, "section": "mesh.tools", "feature": "mesh-mesh-spin-caeddd2fe890", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-spin-037461d1155d", "scope": {"name": "3D View Tool: Edit Mesh, Spin Duplicates", "space_type": "VIEW_3D"}, "samples": ["20006917fb115bfe4e7a77704e45835b603cdc5f4ef12abe1f0af93dabd592e7"]},
+    "mesh-3d-view-tool-edit-mesh-smooth-f1df689163eb": {"order": 1, "section": "mesh.tools", "feature": "mesh-mesh-vertices-smooth-d45c85ef18cb", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-vertices-smooth-63322e37054d", "scope": {"name": "3D View Tool: Edit Mesh, Smooth", "space_type": "VIEW_3D"}, "samples": ["d8cd023df47ab29c27794bf7fb85cca435353afef589c51a168aec12af7ef25f"]},
+    "mesh-3d-view-tool-edit-mesh-spin-8b2e677d558b": {"order": 2, "section": "mesh.tools", "feature": "mesh-mesh-spin-4d97e772250e", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-spin-e21a2d0a601f", "scope": {"name": "3D View Tool: Edit Mesh, Spin", "space_type": "VIEW_3D"}, "samples": ["c833011a50ab1d50fee6fc1becbe33896236874ef3dfbcfb5e69c46f08ac430f"]},
+    "mesh-3d-view-tool-edit-mesh-poly-build-77f40417d096": {"order": 3, "section": "mesh.tools", "feature": "mesh-mesh-polybuild-delete-at-cursor-6818b01e6a90", "event": "middlemouse-click-80064ca4962c", "command": "mesh-polybuild-delete-at-cursor-0e7122cd51b2", "scope": {"name": "3D View Tool: Edit Mesh, Poly Build", "space_type": "VIEW_3D"}, "samples": ["6d050b91822f66544249fbea9b6e35973de6eab2b6ef802eb2beb16963fe1072"]},
+    "mesh-3d-view-tool-edit-mesh-bisect-f7f6cd5b6c39": {"order": 4, "section": "mesh.tools", "feature": "mesh-mesh-bisect-2fa90416fdcb", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-bisect-1dc230b71582", "scope": {"name": "3D View Tool: Edit Mesh, Bisect", "space_type": "VIEW_3D"}, "samples": ["54cc7bae276824b03606263b36075be9aa7567d03d86171b63064c24024d55e3"]},
+    "mesh-3d-view-tool-edit-mesh-knife-721c68c86fcc": {"order": 5, "section": "mesh.tools", "feature": "mesh-mesh-knife-tool-7d0304025719", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-knife-tool-65ef3dafd231", "scope": {"name": "3D View Tool: Edit Mesh, Knife", "space_type": "VIEW_3D"}, "samples": ["4b3de21b3ab1ee655736a60b3618826ff279e2c3909e22f060fa20a3e3bc8eab"]},
+    "mesh-3d-view-tool-edit-mesh-bevel-5975e41419f3": {"order": 6, "section": "mesh.tools", "feature": "mesh-mesh-bevel-d3dbb3b1e56d", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-bevel-304f467e39ad", "scope": {"name": "3D View Tool: Edit Mesh, Bevel", "space_type": "VIEW_3D"}, "samples": ["8aa820727c50f64243e143e68a15b3e8b78ef313cf054c1437e46fcbf0d8189e"]},
+    "mesh-3d-view-tool-edit-mesh-inset-faces-f97f30f63484": {"order": 7, "section": "mesh.tools", "feature": "mesh-mesh-inset-45f1516e3e51", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-inset-4b4cafdc306a", "scope": {"name": "3D View Tool: Edit Mesh, Inset Faces", "space_type": "VIEW_3D"}, "samples": ["450f04a4e645b136d511d6d1cee1d5b6d9c5122e6c28234a5a56d6654dd33bbf"]},
+    "mesh-3d-view-tool-edit-mesh-extrude-to-cursor-34099ff3b52c": {"order": 8, "section": "mesh.tools", "feature": "mesh-mesh-dupli-extrude-cursor-89e7c2cc6d55", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-dupli-extrude-cursor-e60c1f222dd7", "scope": {"name": "3D View Tool: Edit Mesh, Extrude to Cursor", "space_type": "VIEW_3D"}, "samples": ["d6599cf4a5a469492aac3e2c5435a2c904b2b000b33a3849bc6d7072acd38a87"]},
+    "mesh-3d-view-de461d8d7129": {"order": 9, "section": "mesh.modeling", "feature": "mesh-mesh-smart-delete-d2f9de0be0e2", "event": "d-press-9ba7aeacbbd3", "command": "mesh-smart-delete-f70965785c88", "scope": {"name": "Mesh"}, "samples": ["8bce3a1fb349dd222c49b6912946d61ee4ea10e13cb59b681cc10bd6e4300c51"]},
+    "other-3d-view-tool-measure-ab40c963af0b": {"order": 361, "section": "mesh.tools", "feature": "other-view3d-ruler-add-1c07ae8f6cce", "event": "middlemouse-press-a32f80d6dfcd", "command": "view3d-ruler-add-d7b22fcd4db7", "scope": {"name": "3D View Tool: Measure", "space_type": "VIEW_3D"}, "samples": ["3206445c01936acb614c20c2739a8685e463f811188e74a280081eca70da49f5"]}
+  },
+  "suppressions": {}
+}

@@ -5,6 +5,7 @@ from dataclasses import asdict
 import hashlib
 import importlib
 import json
+import shutil
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
@@ -20,7 +21,10 @@ DEFAULTS = ROOT / 'keymaps/deluxe-defaults.json'
 
 
 def read(path):
-    return json.loads(path.read_text())
+    data = json.loads(path.read_text())
+    if 'storage_version' in data:
+        return sys.modules['_deluxe_profiles_test.keymaps.deluxe_catalog'].load(path)
+    return data
 
 
 class ProfileTests(unittest.TestCase):
@@ -92,7 +96,9 @@ class ProfileTests(unittest.TestCase):
             'pie-mesh-action-uvspecial', 'pie-object-mode-global-import-export',
             'pie-object-mode-object-tool', 'pie-object-mode-object-action',
         }
-        payload = [(owner.split(':')[1], [reference_row(request) for request in requests
+        # The Other cleanup changes only organizational owners. Compare against
+        # the historical owner while preserving all ordered binding assertions.
+        payload = [('Other' if owner.split(':')[2].startswith('deluxe-other-') else owner.split(':')[1], [reference_row(request) for request in requests
                     if request.request_id in catalog['assignments'] and request.request_id not in restored_pies])
                    for owner, requests in groups.items()
                    if any(request.request_id not in restored_pies for request in requests)]
@@ -243,14 +249,17 @@ class ProfileTests(unittest.TestCase):
     def test_checkout_edit_preserves_catalog_format_and_private_profile_is_independent(self):
         checkout = self.path.with_name('deluxe-defaults.json')
         checkout.write_bytes(DEFAULTS.read_bytes())
+        shutil.copytree(DEFAULTS.parent / 'deluxe-defaults-sections', checkout.parent / 'deluxe-defaults-sections')
         defaults = read(checkout)
         checkout_store = self.api.ProfileStore.open_catalog(checkout, lambda: self.settings, lambda *args: None)
         draft = checkout_store.begin()
         draft.update('sections', 'navigation.view_framing', label='Framing from checkout')
         catalog = checkout_store.apply(draft)
         self.assertEqual(read(checkout), catalog)
-        changed = [(before, after) for before, after in zip(DEFAULTS.read_text().splitlines(),
-                                                            checkout.read_text().splitlines()) if before != after]
+        self.assertEqual(DEFAULTS.read_bytes(), checkout.read_bytes())
+        relative = 'deluxe-defaults-sections/navigation.json'
+        changed = [(before, after) for before, after in zip((DEFAULTS.parent / relative).read_text().splitlines(),
+                                                            (checkout.parent / relative).read_text().splitlines()) if before != after]
         self.assertEqual(len(changed), 1)
         self.assertIn('Framing from checkout', changed[0][1])
         self.assertFalse(self.path.exists())
@@ -364,6 +373,89 @@ class ProfileTests(unittest.TestCase):
         self.settings.keymap.enable_keymaps = False
         self.assertFalse(self.store.section_enabled('framing'))
         self.assertFalse(self.store.section_enabled('unknown'))
+
+    def test_catalog_sections_ignore_legacy_preference_switches(self):
+        catalog = read(DEFAULTS)
+        self.assertTrue(all('switch' not in row for table in ('categories', 'sections')
+                            for row in catalog[table].values()))
+        # Older edited catalogs may retain these paths. They are inert metadata.
+        catalog['categories']['navigation']['switch'] = 'keymap.navigation.enable_navigation_keymaps'
+        catalog['sections']['navigation.view_framing']['switch'] = 'keymap.navigation.enable_navigation_view_framing'
+        self.settings.keymap.navigation = SimpleNamespace(enable_navigation_keymaps=False,
+                                                         enable_navigation_view_framing=False)
+        resolver = self.resolver.Resolver(catalog)
+        state, groups = resolver.plan(catalog, self.settings)
+        self.assertTrue(state['navigation.view_framing'])
+        self.assertTrue(state['pie.menus'])  # No Pie preference group is needed.
+        self.assertTrue(groups)
+        catalog['sections']['navigation.view_framing']['enabled'] = False
+        self.assertFalse(resolver.section_enabled(catalog, self.settings, 'navigation.view_framing'))
+        catalog['categories']['navigation']['enabled'] = False
+        self.assertFalse(resolver.section_enabled(catalog, self.settings, 'navigation.viewport_movement'))
+        self.settings.keymap.enable_keymaps = False
+        state, _ = resolver.plan(catalog, self.settings)
+        self.assertEqual([id_ for id_, enabled in state.items() if enabled], ['pipeline.required'])
+
+    def test_category_and_section_choices_reopen_from_catalog(self):
+        path = self.path.with_name('deluxe-defaults.json')
+        path.write_bytes(DEFAULTS.read_bytes())
+        shutil.copytree(DEFAULTS.parent / 'deluxe-defaults-sections', path.parent / 'deluxe-defaults-sections')
+        store = self.api.ProfileStore.open_catalog(path, lambda: self.settings, lambda *args: None)
+        draft = store.begin()
+        draft.update('categories', 'pie', enabled=False)
+        draft.update('sections', 'navigation.view_framing', enabled=False)
+        store.apply(draft)
+        saved = path.read_bytes()
+        self.settings.keymap.enable_keymaps = False
+        self.settings.keymap.enable_keymaps = True
+        fresh_settings = SimpleNamespace(keymap=SimpleNamespace(enable_keymaps=True))
+        reopened = self.api.ProfileStore.open_catalog(path, lambda: fresh_settings, lambda *args: None)
+        self.assertFalse(reopened.section_enabled('pie.menus'))
+        self.assertFalse(reopened.section_enabled('navigation.view_framing'))
+        self.assertTrue(reopened.section_enabled('navigation.viewport_movement'))
+        self.assertEqual(path.read_bytes(), saved)
+
+    def test_every_catalog_group_toggle_preserves_other_assignments_and_required_rows(self):
+        catalog = read(DEFAULTS)
+        resolver = self.resolver.Resolver(catalog)
+
+        def planned():
+            return {row.request_id: row for rows in resolver.plan(catalog, self.settings)[1].values()
+                    for row in rows}
+
+        baseline = planned()
+        for table in ('categories', 'sections'):
+            for id_, row in catalog[table].items():
+                if row.get('required'):
+                    continue
+                with self.subTest(table=table, id=id_):
+                    row['enabled'] = False
+                    remaining = planned()
+                    expected = {}
+                    for request_id, request in baseline.items():
+                        assignment = catalog['assignments'][self.resolver.profile_assignment_id(request_id)]
+                        section = catalog['sections'][assignment['section']]
+                        affected = (assignment['section'] == id_ if table == 'sections'
+                                    else section['category'] == id_)
+                        if section.get('required') or not affected:
+                            expected[request_id] = request
+                    self.assertEqual(remaining, expected)
+                    row['enabled'] = True
+
+    def test_required_only_plan_uses_same_json_save_as_bindings_before_activation(self):
+        catalog = read(DEFAULTS)
+        resolver = self.resolver.Resolver(catalog)
+        self.settings.keymap.enable_keymaps = True  # A saved opt-in cannot enable the other sections.
+        sections, groups = resolver.plan(catalog, self.settings, required_only=True)
+        self.assertEqual([id_ for id_, enabled in sections.items() if enabled], ['pipeline.required'])
+        requests = [row for rows in groups.values() for row in rows]
+        self.assertEqual(len(requests), 2)
+        for request in requests:
+            self.assertEqual(request.target.idname, 'wm.bh_save_as_mainfile')
+            self.assertEqual(request.scope.name, 'Window')
+            self.assertEqual(request.event.type, 'S')
+            self.assertTrue(request.event.shift)
+        self.assertEqual([(r.event.ctrl, r.event.oskey) for r in requests], [(True, False), (False, True)])
 
     def test_edit_metadata_and_enum_validation_use_rna(self):
         enum_items = [SimpleNamespace(identifier=name) for name in ('DESELECT', 'SELECT', 'TOGGLE')]

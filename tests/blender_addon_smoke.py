@@ -31,11 +31,13 @@ def launch(binary, minimum=None, package_archive=None):
                 raise ValueError('Exact-package acceptance cannot override Blender compatibility.')
             extract_package(package_archive, package)
         else:
-            names = subprocess.check_output(['git', '-C', str(ROOT), 'ls-files', '-z']).decode().split('\0')
+            names = subprocess.check_output(['git', '-C', str(ROOT), 'ls-files', '--cached', '--others', '--exclude-standard', '-z']).decode().split('\0')
             for name in filter(None, names):
                 if name.startswith(('tests/', '.github/')):
                     continue
                 source = ROOT / name
+                if not source.exists():
+                    continue
                 if source.is_symlink() or not source.is_file():
                     raise RuntimeError('Expected a regular tracked file: ' + name)
                 destination = package / name

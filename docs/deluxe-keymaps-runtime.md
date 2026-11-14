@@ -126,6 +126,25 @@ that other X-Ray Selection Tools operators fail or succeed.
 
 ## Lifecycle and diagnostics
 
+Bulk Deluxe registration and category cleanup coalesce ordinary source changes
+into merged-keymap updates at their return boundaries. Source membership and
+complete readback checks still run per item. Replacement preflight/order proofs
+and the Shift+A stock-menu check explicitly flush before inspecting merged maps.
+Nested batches flush at the outer boundary, including rollback removals; a failed
+final registration merge propagates to the category rollback. Conflict checks
+reject unrelated captured events before scanning native collections.
+
+On November 14, 2026, isolated Blender 5.2.2 LTS (`d13f752e3b9c`) runs with 806
+owned bindings measured median load/unload times of 8.073/1.317 seconds before
+this change and 0.379/0.049 seconds afterward (three cycles each). Load/unload
+merged updates fell from 807/807 to 2/1. Deluxe switch enable/disable measured
+0.340/0.052 seconds after the JSON-only cleanup. The complete readable merged-binding digest was
+identical before/after; all owned resources drained on unload, and a native
+Preferences edit survived refresh and toggling. These measurements use factory
+preferences without third-party providers. Reproduce with
+`tests/blender_keymap_performance.py`; logs and profiles are under ignored
+`test-results/keymap-performance/`.
+
 One persistent watcher runs every 0.25 seconds when ready. Preference/keyconfig
 readiness failures back off to 2 seconds. It processes at most 16 requests per
 pass, with a 4 ms deadline checked between atomic features. An individual feature
@@ -147,8 +166,11 @@ failed merged-order proof withdraws once and waits for a changed source generati
 or explicit re-registration. Stale references never authorize deletion of a new
 lookalike. A user-deleted owned source item cancels the request.
 
-The global switch disables standard categories while Pipeline retains its
-obligatory bindings and Pie follows its independent switch. Startup waits for
+The global switch disables all optional categories, including Pie. Pipeline
+retains its required Save As bindings. All bindings now come from JSON, including
+the required-only plan before Deluxe is configured. Category and subsection
+enable choices are saved in JSON; the separate Pie and feature preference
+switches and Python declaration modules have been removed. Startup waits for
 preferences and actual keyconfigs. Failure after partial category registration
 drains ownership. Unload cancels the watcher and pending initialization even when
 initial registration never completed. If operator properties become unreadable
@@ -174,8 +196,8 @@ receipts supply dispatch evidence separately.
 
 ## User edits and cleanup
 
-Foreign source/user rows, their active flags, properties, events and relative
-order are never rewritten. An edited foreign selector withdraws its owned
+The replacement runtime in `keymap_utils.py` does not rewrite foreign source/user
+rows, their active flags, properties, events or relative order. An edited foreign selector withdraws its owned
 replacement. No preference-save interception or preset/profile writing is used.
 Immediate edit/save and fresh reopen are tested with the replacement still
 present, without an intervening watcher tick. Read-only preflight requires a
@@ -254,8 +276,14 @@ build `b0a72b245dcf`; it is not a Blender 5.2.2 execution claim.
 The [sanitized integrated receipt](../tests/fixtures/deluxe_keymaps_runtime/integrated-native.json)
 records the executed source/test hashes, cases and cleanup checks.
 Private process logs and disposable profiles stay under ignored `test-results/`.
-The source-active-bit suppression approach remains rejected by the accepted
-persistence experiment. Missing providers, unresolved baseline rows, broader
+That historical source-active-bit suppression experiment was rejected. The
+current editor has a separate, explicitly requested managed-default disable
+path in `default_bindings.py`: only exact, unchanged, ordinary Blender defaults
+are eligible; identity and full snapshot checks guard restoration. The current
+5.2.2 isolated performance/editor driver checks native disable/restore, master
+toggles, unload, and saving preferences during an unsaved preview followed by
+a fresh foreground process. This does not broaden the replacement runtime
+contract or authorize suppressing arbitrary add-on/user/modal rows. Missing providers, unresolved baseline rows, broader
 editors/tools/handlers, other modal operators/tokens and full shortcut parity
 remain row-specific gates for briefs 03–06. Category migration remains paused
 until the coordinator accepts this integrated runtime.

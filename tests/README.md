@@ -3,13 +3,16 @@
 ## Deluxe category 03
 
 `python3 -m unittest discover -s tests -p 'test_keymap_category03.py' -q` checks
-the category reconciliation boundary, exact reviewed declarations, toggle isolation,
-inherited row preservation and scoped native receipts. The separate
-`blender_keymap_category03_handlers.py`, `blender_keymap_category03_ordinary.py`,
-and `blender_keymap_category03_editors.py`
-fixtures prepare bounded reference/owned probes; they require the coordinated
-native input slot through the category driver. Native category verification is
-in progress; see the [category receipt](../docs/deluxe-keymaps-category03.md).
+historical reconciliation evidence and retained operator behavior. Category
+04/05 tests retain their reference reconciliation checks. The production
+catalog's full ordered binding digest and category/subsection isolation are
+checked by `test_deluxe_profiles.py` against the JSON runtime.
+
+`blender_keymap_category03.py` and its handler/ordinary/editor helpers are
+historical migration fixtures for the removed Python declarations. Directly
+running that driver reports its retirement. Use the current runtime and
+performance drivers below to exercise the JSON implementation. Historical
+native findings remain in the [category receipt](../docs/deluxe-keymaps-category03.md).
 `keymap_native_evidence.unpack_native()` expands the receipt's shared snapshots
 and verifies their hashes and the complete document hash. Full sanitized run
 receipts remain under ignored `test-results` with their hashes recorded in the
@@ -74,7 +77,8 @@ Pie action descriptors use the existing string menu-ID form of pie_menu_action.
 Menus depend on the actions they draw; declaration metadata does not import those
 menus back. tests/test_pie_actions.py rejects that dependency and checks all target
 IDs against literal menu declarations, without registering or executing the UI.
-The action catalog, fields, key bindings and registration code remain unchanged.
+The test also requires the retained actions to match actual UI references.
+Shortcut bindings now live only in JSON.
 
 Selected archive cases also check late source changes at ZIP publication and
 one-pass removal selections. They use plain ZIP fixtures without optional
@@ -86,6 +90,27 @@ iterators, container comments, ordering, attributes, cancellation and size bound
 Portable wiki catalog and directory snapshot/cache cases exercise junction-safe
 traversal in the embedded Python version, including versions before pathlib
 added `Path.is_junction`. Viewer tests remain in their Qt host suite.
+
+## Deluxe lifecycle performance
+
+`python3 tests/blender_keymap_performance.py --blender /path/to/Blender --output
+test-results/keymap-performance` runs the current checkout in an isolated GUI
+with factory preferences. It records three load/unload cycles, three Deluxe
+toggle cycles, merged-update counts, and separate CPU profiles. Application
+startup and profiling overhead are excluded from the cycle timings. It also
+checks stable merged bindings, complete owned-resource cleanup, and preservation
+of a native Preferences shortcut edit across refresh and disable/enable. It also
+edits category/section choices through native checkbox properties, verifies JSON
+persistence after reopening the store, and checks that legacy preference switches
+cannot override the catalog. Draft toggles must update the live keymaps without writing JSON. Discard
+restores saved behavior. Native checks also cover input type/Repeat changes,
+exact default disables, context-menu action routing, and save/reopen of a
+disposable userpref.blend to reject leaked preview deltas. Add `--capture-editor` to capture the Sections
+UI enabled and with its subsection, category and master disabled, plus
+the binding inspector and a live default-disable rule. The checks
+also verify checkbox reset on Discard and draft preservation across master
+toggles. On macOS the child is confined to the output directory with network access denied.
+The test does not load or save the user's preferences.
 
 The embedded driver also compiles vendored production Python sources without
 importing their optional toolkits. Syntax acceptance is separate from import,
@@ -125,3 +150,35 @@ and native registration/save/FBX/GLB fixture checks in Blender 4.5.1 LTS/Python 
 The vendor copy is byte-checked against its recorded commonUtils commit. Shared
 workflow documentation uses canonical repository URLs because `.github` files are
 intentionally excluded from vendored packages.
+
+Split-catalog regressions in `test_deluxe_catalog.py` cover shared record relocation,
+section addition/removal, malformed and duplicate JSON, broken references, stale
+external edits, rollback, and interrupted-save recovery. The native performance
+driver fingerprints every catalog file during previews and captures the in-field
+**Input Key…** prompt as well as the binding/default-rule panels.
+
+`blender_zenuv.py` uses an explicitly supplied Logistics checkout, Blender binary,
+and private add-on library to install legacy Zen UV into disposable resources,
+upgrade through Logistics' real `AddonLibrary.apply`, then dispatch the two Deluxe
+UV gestures in a foreground Blender window. It verifies removal of the old module
+and absence of legacy `BH_Keymaps.py`. macOS confinement blocks network access and
+writes outside the test output; temporary presets are removed on exit. The
+4.5.1 case lowers only the copied Blue Hole compatibility declaration.
+
+```sh
+python3 tests/blender_zenuv.py --blender /path/to/Blender --version 5.2.2 \
+  --logistics-source /path/to/logistics --library /path/to/Blender_Addons_Library \
+  --output test-results/zenuv-540/blender-522
+```
+
+The Other reorganization is checked against the historical ordered binding
+fingerprint while normalizing only organizational owner names. The native merged
+keymap digest also matches the catalog before reorganization. Capture checks
+verify that selecting another keyboard key preserves Repeat without writing JSON.
+
+The lifecycle driver also verifies the two-tab Bindings/Commands layout,
+combined section/context filters, clearing filters to show all uses, creating
+and duplicating unused commands, adding bindings to a shared command, and
+single-binding versus shared inline edits. It checks that these operations
+leave every catalog file unchanged until Save and Apply Changes. Editor capture
+includes All Bindings, context filtering and the full Commands library.

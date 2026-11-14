@@ -10,9 +10,10 @@ import bpy
 from bpy.props import (BoolProperty, CollectionProperty, EnumProperty, FloatProperty, IntProperty,
                        PointerProperty, StringProperty)
 
-from ....keymaps import deluxe_resolver as resolver, keymap_utils as runtime, keymaps_register
-from ....keymaps.deluxe_schema import event_descriptor, require, selector_descriptor
-from .deluxe_editor_model import Editor, SOURCE_LABELS, context_label, display_value, map_type, shortcut, title
+from ....keymaps import deluxe_resolver as resolver, keymap_utils as runtime, keymaps_register, default_bindings
+from ....keymaps.deluxe_schema import event_descriptor, require, selector_descriptor, same_value
+from .deluxe_editor_model import (Editor, SOURCE_LABELS, captured_input, context_label,
+                                 display_value, map_type, shortcut, title, context_id)
 
 _editor = None
 _dialog_choices = {}
@@ -23,7 +24,8 @@ HIDDEN = {'HIDDEN', 'SKIP_SAVE'}
 TRANSIENT = {'SKIP_SAVE'}
 
 EDIT_DESCRIPTIONS = {
-    'apply': 'Save the draft to the Blue Hole keymap catalog and update the active keymaps',
+    'apply': ('Save assignments, commands and section choices to this Blue Hole installation. '
+              'Installing a Blue Hole update replaces these changes'),
     'discard': 'Discard staged edits and return to the last applied profile',
     'reload': 'Reload the keymap catalog from disk and discard staged edits',
     'reset': 'Stage the catalog loaded when the editor opened',
@@ -33,12 +35,15 @@ EDIT_DESCRIPTIONS = {
     'command': 'Show this command’s settings and the sections that use it',
     'show_command': 'Open the command used by this assignment',
     'show_section_commands': 'Show commands used in this section',
-    'show_assignments': 'Open the Assignments tab for this section',
+    'show_assignments': 'Show bindings in this subsection',
+    'all_bindings': 'Show every binding and clear search, section, command and context filters',
+    'command_bindings': 'Show every binding of this command across all sections and contexts',
     'delete_section': 'Stage removal of this empty section',
     'remove_rule': 'Stage removal of this existing-shortcut rule',
     'linked_shortcut': 'Show or hide the sections that share this shortcut',
     'linked_section': 'Show or hide linked assignments in this section',
     'feature_category': 'Show the shortcut groups in this category',
+    'feature_section': 'Show this shortcut group’s enable setting and assignments',
 }
 TOGGLE_TARGETS = {'categories': 'category', 'sections': 'section',
                   'assignments': 'assignment', 'suppressions': 'rule'}
@@ -93,6 +98,8 @@ _syncing_inline = False
 INLINE_VALUES = {'BOOLEAN': 'boolean', 'INT': 'integer', 'FLOAT': 'number',
                  'STRING': 'string', 'ENUM': 'option'}
 EVENT_MODIFIERS = ('shift', 'ctrl', 'alt', 'oskey', 'hyper')
+INPUT_TYPES = (('KEYBOARD', 'Keyboard', 'Bind a keyboard key'),
+               ('MOUSE', 'Mouse', 'Bind a mouse button or wheel'))
 
 
 def inline_options(control, _context):
@@ -105,8 +112,13 @@ def inline_update(prop):
             return
         try:
             value = getattr(control, prop)
-            if control.command:
-                _editor.edit_command(control.command, control.field, value)
+            if control.table:
+                _editor.set_enabled(control.table, control.entry, value)
+            elif control.command:
+                command = (_editor.catalog['assignments'][control.assignment]['command']
+                           if control.assignment else control.command)
+                assignment = control.assignment if state(context).command_edit_scope == 'SINGLE' else ''
+                _editor.edit_command(command, control.field, value, assignment)
             else:
                 stage_event_field(_editor, control.assignment, control.field, value)
         except ERRORS as error:
@@ -116,6 +128,8 @@ def inline_update(prop):
 
 
 class BH_PG_deluxe_value(bpy.types.PropertyGroup):
+    table: StringProperty(options=HIDDEN)
+    entry: StringProperty(options=HIDDEN)
     command: StringProperty(options=HIDDEN)
     assignment: StringProperty(options=HIDDEN)
     field: StringProperty(options=HIDDEN)
@@ -138,9 +152,8 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
         self.search = ''
         self.reset_page(context)
 
-    tab: EnumProperty(items=[('SECTIONS', 'Sections', 'Enable or disable shortcut groups'),
-                            ('ASSIGNMENTS', 'Assignments', 'Edit individual shortcuts'),
-                            ('COMMANDS', 'Commands', 'Edit command settings')],
+    tab: EnumProperty(items=[('BINDINGS', 'Bindings', 'Browse and edit keymap bindings'),
+                            ('COMMANDS', 'Commands', 'Create and edit reusable commands')],
                       options=TRANSIENT, update=switch_tab)
     search_mode: EnumProperty(items=[('NAME', 'Name', 'Search for a command or keymap name'),
                                     ('KEY', 'Key-Binding', 'Type a shortcut, such as Shift F10')],
@@ -156,6 +169,9 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
                               items=[(key, label, '') for key, label in SOURCE_LABELS.items()],
                               options=TRANSIENT, update=lambda self, _context: setattr(self, 'live_page', 0))
     live_page: IntProperty(description='Choose the page of matching bindings, starting at zero', min=0, options=TRANSIENT)
+    command_edit_scope: EnumProperty(items=[('SINGLE', 'This Binding Only', 'Separate settings when this command is shared'),
+                                               ('SHARED', 'All Linked Bindings', 'Preview changes everywhere this command is used')],
+                                     options=TRANSIENT)
     values: CollectionProperty(type=BH_PG_deluxe_value, options=TRANSIENT)
 
 
@@ -163,16 +179,17 @@ def state(context):
     return getattr(context.window_manager, WM_PROPERTY)
 
 
-def inline_value(view, field, prop, value, *, command='', assignment='', items=()):
+def inline_value(view, field, prop, value, *, command='', assignment='', table='', entry='', items=()):
     """Bind a native widget to transient RNA, with changes staged in the draft."""
     global _syncing_inline
-    name = f'{command or assignment}:{field}'
+    name = f'{table}:{entry}:{field}' if table else f'{command}:{assignment}:{field}'
     control = view.values.get(name)
     _syncing_inline = True
     try:
         if control is None:
             control = view.values.add()
             control.name = name
+            control.table, control.entry = table, entry
             control.command, control.assignment, control.field = command, assignment, field
         if items:
             control.choices_key = repr(items)
@@ -219,20 +236,26 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
         return EDIT_DESCRIPTIONS.get(action, cls.bl_label)
 
     def invoke(self, context, event):
-        if self.action in {'reset', 'reload', 'delete_section'}:
+        if self.action in {'reset', 'reload', 'delete_section', 'remove_command'}:
             return context.window_manager.invoke_confirm(self, event)
         return self.execute(context)
 
     def execute(self, context):
-        if self.action == 'show_assignments':
-            def show_assignments(current):
-                section = current.catalog['sections'][self.target]
+        if self.action == 'restore_default':
+            section = editor().catalog['suppressions'][self.target]['section']
+            self.action = 'remove_rule'
+            result = super().execute(context)
+            if result == {'FINISHED'}:
+                open_assignment_section(context, section)
+            return result
+        if self.action in {'show_assignments', 'all_bindings', 'command_bindings'}:
+            def show_bindings(current):
                 view = state(context)
-                view.tab, view.search = 'ASSIGNMENTS', ''
-                current.category, current.section = section['category'], self.target
-                current.assignment, current.page = '', 0
-
-            return self.run(context, show_assignments)
+                view.tab, view.search = 'BINDINGS', ''
+                current.show_all_bindings(self.target if self.action == 'command_bindings' else '')
+                if self.action == 'show_assignments':
+                    current.select_section(self.target)
+            return self.run(context, show_bindings)
         if self.action in {'show_command', 'show_section_commands', 'command_category', 'command_section'}:
             def show(current):
                 view = state(context)
@@ -247,10 +270,11 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
                 view.tab = 'COMMANDS'
                 assignment = current.catalog['assignments'].get(self.target, {})
                 section = assignment.get('section', self.target)
-                current.command_section = section
-                current.command_category = current.catalog['sections'][section]['category']
+                current.command_section = '' if assignment else section
+                current.command_category = '' if assignment else current.catalog['sections'][section]['category']
                 current.command = assignment.get('command', '')
-                view.search = command_name(current, current.command) if assignment else ''
+                current.focus_command = bool(assignment)
+                view.search = ''
                 current.page = 0
 
             return self.run(context, show)
@@ -268,8 +292,7 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.draft.reset()
             current.changed('Initial catalog staged')
         elif action == 'category':
-            current.category, current.section, current.assignment = target, '', ''
-            current.page = 0
+            current.select_category(target)
         elif action in {'assignment', 'command'}:
             setattr(current, action, target)
         elif action == 'linked_shortcut':
@@ -278,22 +301,27 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
         elif action == 'linked_section':
             current.expanded_linked_section = '' if current.expanded_linked_section == target else target
         elif action == 'feature_category':
-            current.feature_category = target
-        elif action == 'section':
-            setattr(current, action, target)
-            current.assignment = ''
+            current.select_category(target)
+        elif action == 'feature_section':
+            current.select_section(target)
+        elif action == 'all_subsections':
+            current.binding_category_all = True
+            current.assignment, current.page = '', 0
+        elif action == 'clear_context':
+            current.binding_context = ''
             current.page = 0
+        elif action == 'clear_command_filter':
+            current.binding_command = ''
+            current.page = 0
+        elif action == 'section':
+            current.select_section(target)
         elif action == 'page':
             current.page = int(target)
         elif action == 'order':
             current.reorder_section(int(target))
         elif action in TOGGLE_TARGETS:
-            if action == 'assignments':
-                current.require_editable_assignment(target)
             row = current.catalog[action][target]
-            require(not row.get('required'), 'This section is required')
-            current.draft.update(action, target, enabled=not row.get('enabled', True))
-            current.changed()
+            current.set_enabled(action, target, not row.get('enabled', True))
         elif action == 'delete_section':
             row = current.catalog['sections'][target]
             require(not row.get('required'), 'This section is required')
@@ -302,6 +330,8 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.draft.delete('sections', target)
             current.section = ''
             current.changed()
+        elif action == 'remove_command':
+            current.remove_command(target)
         elif action == 'remove_rule':
             current.draft.delete('suppressions', target)
             current.changed()
@@ -309,7 +339,7 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
 
 class BH_OT_deluxe_remove_assignment(EditorOperator, bpy.types.Operator):
     bl_idname = 'wm.bh_deluxe_remove_assignment'
-    bl_label = 'Remove Assignment'
+    bl_label = 'Remove Binding'
     bl_description = 'Stage removal of this assignment and keep its command and linked assignments'
 
     assignment: StringProperty(options=HIDDEN)
@@ -418,22 +448,104 @@ class BH_OT_deluxe_context(EditorOperator, bpy.types.Operator):
                 current.changed()
 
 
+class BH_OT_deluxe_filter_context(EditorOperator, bpy.types.Operator):
+    bl_idname = 'wm.bh_deluxe_filter_context'
+    bl_label = 'Filter Blender Context'
+    bl_property = 'context'
+
+    choice_key: StringProperty(options=HIDDEN)
+    context: EnumProperty(items=lambda self, _: enum_items(self, 'context'), options=TRANSIENT)
+
+    def invoke(self, context, _event):
+        current = editor()
+        bind_choices(self, {'context': choices([('ALL', 'All Contexts', 'Include every Blender keymap'),
+            *((id_, context_label(scope), scope['name']) for id_, scope in current.binding_contexts().items())])})
+        self.context = current.binding_context or 'ALL'
+        context.window_manager.invoke_search_popup(self)
+        return {'INTERFACE'}
+
+    def stage(self, current):
+        current.binding_context = '' if self.context == 'ALL' else self.context
+        current.assignment, current.page = '', 0
+        current.ensure_selection()
+
+
+class BH_OT_deluxe_command(EditorOperator, bpy.types.Operator):
+    bl_idname = 'wm.bh_deluxe_command'
+    bl_label = 'Create Command'
+
+    source: StringProperty(options=HIDDEN)
+    choice_key: StringProperty(options=HIDDEN)
+    operator_id: EnumProperty(name='Operator', items=lambda self, _: enum_items(self, 'operator'), options=TRANSIENT)
+    label: StringProperty(name='Name', description='Optional descriptive name for this command variation', maxlen=128, options=TRANSIENT)
+
+    def invoke(self, context, _event):
+        current = editor()
+        self._draft = current.draft
+        if self.source:
+            source = current.catalog['commands'][self.source]
+            self._source = deepcopy(source)
+            self.label = current.preview()['commands'][self.source]['label'] + ' Copy'
+        else:
+            operators = []
+            for namespace in dir(bpy.ops):
+                if namespace.startswith('_'):
+                    continue
+                for name in dir(getattr(bpy.ops, namespace)):
+                    id_ = f'{namespace}.{name}'
+                    if name.startswith('_') or id_ in resolver.ROUTING_OPERATORS or '.bh_' in id_:
+                        continue
+                    rna = resolver._operator_rna(id_)
+                    variants = current.store.resolver.commands.get(id_, ())
+                    if rna is not None and not any(row.get('provider') for row in variants):
+                        operators.append((id_, f'{rna.name} · {id_}', rna.description or id_))
+            bind_choices(self, {'operator': choices(sorted(operators, key=lambda row: row[1].casefold()))})
+            if not operators:
+                self.report({'ERROR'}, 'No registered operators available')
+                self.release_choices()
+                return {'CANCELLED'}
+            self.operator_id = self._choices_first()
+            self.label = ''
+        return context.window_manager.invoke_props_dialog(self, width=550, confirm_text='Create Command')
+
+    def _choices_first(self):
+        return enum_items(self, 'operator')[0][0]
+
+    def draw(self, _context):
+        if self.source:
+            self.layout.label(text='Duplicate: ' + command_name(editor(), self.source))
+        else:
+            self.layout.prop(self, 'operator_id')
+        self.layout.prop(self, 'label')
+        self.layout.label(text='Configure its settings in Commands, then add a binding.')
+
+    def stage(self, current):
+        require(current.draft is self._draft, 'The draft changed. Reopen the command dialog.')
+        if self.source:
+            require(same_value(current.catalog['commands'].get(self.source), self._source),
+                    'The source command changed. Duplicate it again.')
+        current.create_command(operator=self.operator_id if not self.source else '', label=self.label, source=self.source)
+        view = state(bpy.context)
+        view.tab, view.search = 'COMMANDS', ''
+
+
 class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
     bl_idname = 'wm.bh_deluxe_mapping'
-    bl_label = 'Assignment Settings'
+    bl_label = 'Binding Settings'
 
     assignment: StringProperty(options=HIDDEN)
+    command_hint: StringProperty(options=HIDDEN)
     choice_key: StringProperty(options=HIDDEN)
     section: EnumProperty(name='Section', items=lambda self, _: enum_items(self, 'section'), options=TRANSIENT)
     command: EnumProperty(name='Command', items=lambda self, _: enum_items(self, 'command'), options=TRANSIENT)
-    event_id: EnumProperty(name='Shortcut', items=lambda self, _: enum_items(self, 'event'), options=TRANSIENT)
-    scope_id: EnumProperty(name='Keymap', items=lambda self, _: enum_items(self, 'scope'), options=TRANSIENT)
+    event_id: EnumProperty(name='Keymap Binding', items=lambda self, _: enum_items(self, 'event'), options=TRANSIENT)
+    scope_id: EnumProperty(name='Blender Context', items=lambda self, _: enum_items(self, 'scope'), options=TRANSIENT)
 
     @classmethod
     def description(cls, _context, props):
         if props.assignment:
-            return 'Change this assignment’s section, command, shortcut or Blender keymap'
-        return 'Create an assignment from an existing shortcut, a command and a Blender keymap'
+            return 'Change this binding’s section, command, shortcut or Blender keymap'
+        return 'Create a binding from an existing shortcut, a command and a Blender keymap'
 
     def invoke(self, context, _event):
         current = editor()
@@ -448,7 +560,8 @@ class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
         self._choices = {
             'section': choices((id_, f"{catalog['categories'][section['category']]['label']} / {section['label']}", '')
                                for id_, section in catalog['sections'].items() if not section.get('required')),
-            'command': choices(sorted(((id_, command_name(current, id_), meta['availability'])
+            'command': choices(sorted(((id_, command_name(current, id_) + ' · ' + catalog['commands'][id_]['operator'],
+                                         f"{len(current.draft.uses('commands', id_))} bindings · {meta['availability']}")
                                        for id_, meta in metadata.items() if 'operator' in catalog['commands'][id_]),
                                       key=lambda item: item[1].casefold())),
             'event': choices(sorted(((id_, shortcut(event), f"{len(current.draft.uses('events', id_))} assignments")
@@ -462,17 +575,22 @@ class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
         section = row['section'] if row else current.section
         self.section = (section if any(choice[0] == section for choice in self._choices['section'])
                         else self._choices['section'][0][0])
-        self.command = row['command'] if row else self._choices['command'][0][0]
+        self.command = (row['command'] if row else self.command_hint if self.command_hint in catalog['commands']
+                        else self._choices['command'][0][0])
         self.event_id = row['event'] if row else self._choices['event'][0][0]
         self.scope_id = (next(id_ for id_, scope in self._scopes.items() if scope_key(scope) == scope_key(row['scope']))
                          if row else self._choices['scope'][0][0])
+        if not row and current.binding_context:
+            self.scope_id = next((id_ for id_, scope in self._scopes.items() if context_id(scope) == current.binding_context), self.scope_id)
         self._draft = current.draft
         self._initial = row
-        return context.window_manager.invoke_props_dialog(self, width=500, confirm_text='Stage Assignment')
+        return context.window_manager.invoke_props_dialog(self, width=500, confirm_text='Add Binding' if not self.assignment else 'Apply Binding Edit')
 
     def draw(self, _context):
         for name in ('section', 'command', 'event_id', 'scope_id'):
             self.layout.prop(self, name)
+        uses = len(editor().draft.uses('commands', self.command))
+        self.layout.label(text=f'Shares command settings with {uses} existing bindings')
         metadata = editor().preview()['commands'].get(self.command, {})
         if metadata.get('dependency'):
             self.layout.label(text=f"{metadata['dependency']} · {title(metadata['availability'])}")
@@ -490,10 +608,12 @@ class BH_OT_deluxe_mapping(EditorOperator, bpy.types.Operator):
                                  command=self.command, event=self.event_id, scope=scope)
         else:
             self.assignment = current.draft.add_assignment(self.section, self.event_id, self.command, scope)
-        current.section = self.section
-        current.category = current.catalog['sections'][self.section]['category']
-        current.assignment = self.assignment
         current.changed()
+        current.select_section(self.section)
+        current.binding_context = current.binding_command = ''
+        current.assignment = self.assignment
+        view = state(bpy.context)
+        view.tab, view.search = 'BINDINGS', ''
 
 
 def command_name(current, id_):
@@ -598,7 +718,12 @@ def stage_event_field(current, assignment, field, value):
     row = current.catalog['assignments'][assignment]
     event = dict(current.catalog['events'][row['event']])
     event[field] = value
-    if field == 'type':
+    if field == 'map_type':
+        require(value in {'KEYBOARD', 'MOUSE'}, 'Choose Keyboard or Mouse')
+        if map_type(event['type']) != value:
+            event.update(type='A' if value == 'KEYBOARD' else 'LEFTMOUSE',
+                         value='PRESS', direction='ANY', repeat=False)
+    elif field == 'type':
         event['map_type'] = map_type(value)
     elif field == 'any':
         event.update(dict.fromkeys(EVENT_MODIFIERS, -1 if value else False))
@@ -621,7 +746,9 @@ class BH_OT_deluxe_inline_edit(EditorOperator, bpy.types.Operator):
 
     def stage(self, current):
         if self.command:
-            current.edit_command(self.command, self.field, None, unset=True)
+            assignment = self.assignment if state(bpy.context).command_edit_scope == 'SINGLE' else ''
+            command = current.catalog['assignments'][self.assignment]['command'] if self.assignment else self.command
+            current.edit_command(command, self.field, None, assignment, unset=True)
             return
         require(self.field in EVENT_MODIFIERS, 'Unknown modifier')
         row = current.catalog['assignments'][self.assignment]
@@ -641,7 +768,7 @@ def draw_uses(layout, current, table, assignment, shared=True):
 
 class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
     bl_idname = 'wm.bh_deluxe_capture'
-    bl_label = 'Capture Shortcut'
+    bl_label = 'Input Key'
 
     assignment: StringProperty(options=HIDDEN)
     shared: BoolProperty(options=HIDDEN)
@@ -697,19 +824,17 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
         self._event_data = event_data
         self._linked = linked
         self._area = context.area
-        current.message = 'Press a key or mouse button. Esc cancels.'
-        if self._area:
-            self._area.header_text_set(current.message)
+        current.capture_assignment = self.assignment
+        current.capture_shared = self.shared
+        current.message = ''
         context.window_manager.modal_handler_add(self)
         redraw(context)
         return {'RUNNING_MODAL'}
 
     def cancel(self, context):
-        if self._area:
-            try:
-                self._area.header_text_set(None)
-            except ReferenceError:
-                pass
+        if _editor is not None:
+            _editor.capture_assignment = ''
+            _editor.capture_shared = False
         redraw(context)
 
     def modal(self, context, event):
@@ -725,10 +850,7 @@ class BH_OT_deluxe_capture(EditorOperator, bpy.types.Operator):
                 'OSKEY', 'HYPER', 'NONE', 'MOUSEMOVE', 'INBETWEEN_MOUSEMOVE'} or event.type.startswith('TIMER'):
             return {'RUNNING_MODAL'}
         self.cancel(context)
-        captured = {
-            'type': event.type, 'map_type': map_type(event.type), 'shift': event.shift,
-            'ctrl': event.ctrl, 'alt': event.alt, 'oskey': event.oskey,
-        }
+        captured = captured_input(self._event_data, event)
 
         def stage_capture(current):
             row = current.catalog['assignments'].get(self.assignment)
@@ -751,7 +873,7 @@ class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):
     choice_key: StringProperty(options=HIDDEN)
     field: StringProperty(options=HIDDEN)
     assignment: StringProperty(options=HIDDEN)
-    single: BoolProperty(name='This assignment only',
+    single: BoolProperty(name='This binding only', default=True,
                          description='Give this assignment a separate command with its own settings', options=TRANSIENT)
     boolean: BoolProperty(options=TRANSIENT)
     integer: IntProperty(options=TRANSIENT)
@@ -770,6 +892,7 @@ class BH_OT_deluxe_field(EditorOperator, bpy.types.Operator):
 
     def invoke(self, context, _event):
         current = editor()
+        self.single = bool(self.assignment) and state(context).command_edit_scope == 'SINGLE'
         row = current.catalog['commands'][self.command]
         self._meta = current.store.resolver.describe_command(row, include_unset=True)['fields'][self.field]
         if not self._meta['editable']:
@@ -910,6 +1033,7 @@ class BH_OT_deluxe_binding_picker(bpy.types.Operator):
 
     section: StringProperty(options=HIDDEN)
     rule: StringProperty(options=HIDDEN)
+    defaults: BoolProperty(options=HIDDEN)
 
     @classmethod
     def description(cls, _context, props):
@@ -927,6 +1051,8 @@ class BH_OT_deluxe_binding_picker(bpy.types.Operator):
             view.live_search = selector['scope']['name']
         else:
             view.live_search = ''
+            if self.defaults:
+                view.live_source = 'default'
         return context.window_manager.invoke_popup(self, width=650)
 
     def execute(self, _context):
@@ -979,6 +1105,12 @@ class BH_OT_deluxe_stage_binding(EditorOperator, bpy.types.Operator):
     item_pointer: StringProperty(options=HIDDEN)
     item_id: IntProperty(options=HIDDEN)
     signature: StringProperty(options=HIDDEN)
+    choice_key: StringProperty(options=HIDDEN)
+    destination: EnumProperty(name='Section', items=lambda self, _: enum_items(self, 'section'), options=TRANSIENT)
+    open_editor: BoolProperty(options=HIDDEN)
+    disable_binding: BoolProperty(name='Disable binding with Blue Hole',
+                                  description='Preview a reversible disable, saved to JSON only with Save and Apply Changes',
+                                  options=TRANSIENT)
     use_replacement: BoolProperty(name='Replace Select All with Deselect All', options=TRANSIENT)
 
     def selected(self, context):
@@ -1002,6 +1134,14 @@ class BH_OT_deluxe_stage_binding(EditorOperator, bpy.types.Operator):
             self._replacement = known_replacement(self._candidate)
             current = editor()
             self._draft = current.draft
+            section_choices = choices((id_, f"{current.catalog['categories'][row['category']]['label']} / {row['label']}", '')
+                                      for id_, row in current.catalog['sections'].items() if not row.get('required'))
+            require(bool(section_choices), 'Add a section for this rule first')
+            bind_choices(self, {'section': section_choices})
+            self.destination = self.section if self.section in {row[0] for row in section_choices} else section_choices[0][0]
+            saved_rule = current.catalog['suppressions'].get(self.rule, {})
+            self.disable_binding = bool(self._candidate['can_disable'] and
+                                        (saved_rule.get('disable') or not saved_rule))
             self.use_replacement = bool(self._replacement and
                                         current.catalog['suppressions'].get(self.rule, {}).get('replacement'))
         except ERRORS as error:
@@ -1014,40 +1154,85 @@ class BH_OT_deluxe_stage_binding(EditorOperator, bpy.types.Operator):
         target = selector['target']
         self.layout.label(text=f"{target.get('idname', target.get('modal_value'))} · {shortcut(selector['event'])}")
         self.layout.label(text=f"{context_label(selector['scope'])} · {SOURCE_LABELS[selector['source_role']]}")
-        current = editor()
-        if self.section in current.catalog['sections']:
-            self.layout.label(text=f"Section: {current.catalog['sections'][self.section]['label']}")
+        self.layout.prop(self, 'destination')
         for name, value in target.get('properties', {}).items():
             self.layout.label(text=f'{title(name)}: {display_value(value)}')
+        disable = self.layout.row()
+        disable.enabled = self._candidate['can_disable']
+        disable.prop(self, 'disable_binding')
         if self._replacement:
-            self.layout.prop(self, 'use_replacement')
-        if not self._replacement or not self.use_replacement:
-            self.layout.label(text='The runtime cannot disable this shortcut. Save the target for review.', icon='INFO')
+            replacement = self.layout.row()
+            replacement.enabled = not self.disable_binding
+            replacement.prop(self, 'use_replacement')
+        if self.disable_binding:
+            self.layout.label(text='Previews immediately. Discard restores the saved setup.', icon='INFO')
+        elif not self._replacement or not self.use_replacement:
+            self.layout.label(text='Review only: this rule will not change the binding.', icon='INFO')
+        if not self._candidate['can_disable']:
+            self.layout.label(text='Only unchanged, non-modal Blender defaults can be disabled here.')
 
     def execute(self, context):
         def stage(current):
             require(current.draft is self._draft, 'The draft changed. Pick the binding again.')
-            section = current.catalog['sections'][self.section]
+            section = current.catalog['sections'][self.destination]
             require(not section.get('required'), 'This section is required')
             map_, item, candidate = self.selected(context)
-            command = known_replacement(candidate) if self.use_replacement else None
-            require(not self.use_replacement or command is not None, 'Replacement is no longer available')
+            require(not self.disable_binding or candidate['can_disable'], 'This default binding cannot be disabled')
+            command = known_replacement(candidate) if self.use_replacement and not self.disable_binding else None
+            require(not self.use_replacement or self.disable_binding or command is not None, 'Replacement is no longer available')
             replacement = None
             if command:
                 replacement = next((id_ for id_, row in current.catalog['commands'].items() if row == command), None)
                 if replacement is None:
                     replacement = uuid4().hex
                     current.draft.put('commands', replacement, command)
-            current.draft.stage_suppression(self.section, map_, item, self.source,
-                                            replacement=replacement, id_=self.rule or None)
+            current.draft.stage_suppression(self.destination, map_, item, self.source,
+                                            replacement=replacement, disable=self.disable_binding, id_=self.rule or None)
             current.changed()
 
-        return self.run(context, stage)
+        try:
+            result = self.run(context, stage)
+            if result == {'FINISHED'} and self.open_editor:
+                open_assignment_section(context, self.destination)
+            return result
+        finally:
+            self.release_choices()
+
+
+def open_assignment_section(context, section):
+    prefs = context.preferences.addons[__package__.split('.')[0]].preferences
+    prefs.main_settings, prefs.general_addon_settings = 'GENERAL_ADDON', 'KEYMAP'
+    bpy.ops.wm.bh_deluxe_edit(action='show_assignments', target=section)
+    bpy.ops.preferences.addon_show(module=__package__.split('.')[0])
+
+
+def draw_binding_context(self, context):
+    """Extend right-click on native KeyMapItem properties, using the exact row."""
+    item = getattr(context, 'button_pointer', None)
+    map_ = getattr(context, 'keymap', None)
+    if not isinstance(item, bpy.types.KeyMapItem) or map_ is None:
+        return
+    try:
+        current = editor()
+        candidate = resolver.capture_candidate(map_, item, 'user')
+        managed = default_bindings.managed_rule(map_, item)
+        if managed:
+            self.layout.separator()
+            operator_button(self.layout, 'restore_default', 'Restore Binding with Blue Hole', managed[0])
+        elif candidate['can_disable']:
+            self.layout.separator()
+            op = self.layout.operator(BH_OT_deluxe_stage_binding.bl_idname, text='Disable Binding with Blue Hole…')
+            op.section, op.source, op.open_editor = current.feature_section, 'user', True
+            op.map_pointer, op.item_pointer, op.item_id = str(map_.as_pointer()), str(item.as_pointer()), item.id
+            op.signature = json.dumps(candidate['selector'], sort_keys=True)
+    except (*ERRORS, runtime._Pending):
+        return
 
 
 classes = (
     BH_PG_deluxe_value, BH_PG_deluxe_editor, BH_OT_deluxe_edit, BH_OT_deluxe_remove_assignment, BH_OT_deluxe_inline_edit,
     BH_OT_deluxe_section, BH_OT_deluxe_mapping, BH_OT_deluxe_context,
+    BH_OT_deluxe_filter_context, BH_OT_deluxe_command,
     BH_OT_deluxe_shortcut, BH_OT_deluxe_capture, BH_OT_deluxe_field,
     BH_OT_deluxe_binding_picker, BH_OT_deluxe_stage_binding,
 )
@@ -1057,11 +1242,13 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     setattr(bpy.types.WindowManager, WM_PROPERTY, PointerProperty(type=BH_PG_deluxe_editor, options=TRANSIENT))
+    bpy.types.UI_MT_button_context_menu.append(draw_binding_context)
 
 
 def unregister():
     global _editor
     _editor = None
+    bpy.types.UI_MT_button_context_menu.remove(draw_binding_context)
     _dialog_choices.clear()
     _context_choices.clear()
     _inline_enums.clear()

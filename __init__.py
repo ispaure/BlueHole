@@ -111,6 +111,10 @@ def _post_register_init():
 
     if not _keymaps_registered:
         try:
+            # A saved selection of the retired Pie settings tab now opens Keymaps.
+            if getattr(p, 'general_addon_settings', 'GENERAL') not in (
+                    'GENERAL', 'THIRDPARTY', 'KEYMAP', 'HELP_N_UPDATE'):
+                p.general_addon_settings = 'KEYMAP'
             keymaps_register.register()
             _keymaps_registered = True
             _post_register_error = None

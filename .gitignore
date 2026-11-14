@@ -49,3 +49,4 @@ coverage.xml
 # Recovery files from editing the tracked Deluxe profile in a local checkout.
 /keymaps/deluxe-defaults.lock
 /keymaps/deluxe-defaults.previous.json
+/keymaps/deluxe-defaults.transaction.json

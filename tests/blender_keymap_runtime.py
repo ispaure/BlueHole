@@ -29,7 +29,7 @@ def digest(value):
 
 def stage_package(root, minimum):
     package = root / 'scripts/addons/bluehole_runtime'
-    names = subprocess.check_output(['git', '-C', str(REPO), 'ls-files', '-z']).decode().split('\0')
+    names = subprocess.check_output(['git', '-C', str(REPO), 'ls-files', '--cached', '--others', '--exclude-standard', '-z']).decode().split('\0')
     for name in filter(None, names):
         if name.startswith(('tests/', '.github/', 'overlays/deluxe/payload/', 'docs/')):
             continue
@@ -140,7 +140,7 @@ def native_main(root, mode):
                'native': {'version': bpy.app.version_string, 'build': bpy.app.build_hash.decode(),
                           'background': bpy.app.background},
                'source_sha256': {name: hashlib.sha256((root / 'scripts/addons/bluehole_runtime' / name).read_bytes()).hexdigest()
-                                  for name in ('keymaps/keymap_utils.py', 'keymaps/keymap_action_utils.py',
+                                  for name in ('keymaps/keymap_utils.py', 'keymaps/deluxe-defaults.json', 'keymaps/deluxe_profiles.py',
                                                'keymaps/keymaps_register.py', 'actions/operator_action.py', '__init__.py')}}
     began = time.monotonic()
 
@@ -886,7 +886,7 @@ def native_lifecycle(root, bpy, addon_utils):
     receipt = {'schema_version': 1, 'mode': 'lifecycle', 'status': 'running', 'steps': [],
                'native_test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                'source_sha256': {name: hashlib.sha256((root / 'scripts/addons/bluehole_runtime' / name).read_bytes()).hexdigest()
-                                  for name in ('keymaps/keymap_utils.py', 'keymaps/keymap_action_utils.py',
+                                  for name in ('keymaps/keymap_utils.py', 'keymaps/deluxe-defaults.json', 'keymaps/deluxe_profiles.py',
                                                'keymaps/keymaps_register.py', 'actions/operator_action.py', '__init__.py')},
                'native': {'version': bpy.app.version_string, 'build': bpy.app.build_hash.decode()}}
     started = time.monotonic()
@@ -936,37 +936,38 @@ def native_lifecycle(root, bpy, addon_utils):
         prefs = state['prefs']
         prefs.keymap.deluxe_configured = True
         prefs.keymap.enable_keymaps = True
-        prefs.pie.enable_pie_menus = True
         state['km'].refresh()
-        assert state['km'].pie_keymaps_register.registered_pie_keymaps
+        assert state['km'].deluxe_section_enabled('pie.menus')
         record('global_and_pie_enabled', runtime=state['rt'].runtime_stats())
 
     def all_off():
         prefs, km = state['prefs'], state['km']
         prefs.keymap.enable_keymaps = False
         km.refresh()
-        counts = {}
-        for module in (*km.keymap_module_lst, km.pie_keymaps_register):
-            lists = [v for k, v in vars(module).items() if k.startswith('registered_')
-                     and k.endswith('_keymaps') and isinstance(v, list)]
-            counts[module.KEYMAP_CATEGORY] = len(lists[0])
-            if module is not km.pipeline_keymaps_register:
-                assert not lists[0], module.KEYMAP_CATEGORY
-        assert counts['Pipeline'] > 0 and prefs.pie.enable_pie_menus, counts
-        record('global_off_retains_obligatory_pipeline', counts=counts)
-        prefs.pie.enable_pie_menus = False
-        km.refresh()
-        assert not km.pie_keymaps_register.registered_pie_keymaps
-        assert km.pipeline_keymaps_register.registered_pipeline_keymaps
+        rt = state['rt']
+        assert rt.runtime_stats()['owned'] == 2
+        assert {request.target.idname for handle in rt._FEATURES.values()
+                for request in handle.assignments} == {'wm.bh_save_as_mainfile'}
+        record('global_off_retains_obligatory_pipeline', runtime=rt.runtime_stats())
+        prefs.keymap.enable_keymaps = True
+        store = km.deluxe_profile()
+        draft = store.begin()
+        draft.update('categories', 'pie', enabled=False)
+        store.apply(draft)
+        assert not km.deluxe_section_enabled('pie.menus')
+        assert km.deluxe_section_enabled('pipeline.required')
         record('pie_disabled_independently')
+        draft = store.begin()
+        draft.update('categories', 'pie', enabled=True)
+        store.apply(draft)
 
     def partial_failure():
         km, rt = state['km'], state['rt']
         state['prefs'].keymap.enable_keymaps = True
         store = km.deluxe_profile()
         original_register = store.register
-        def fail(profile):
-            original_register(profile)
+        def fail(profile, **kwargs):
+            original_register(profile, **kwargs)
             raise RuntimeError('injected catalog registration failure')
         store.register = fail
         try:

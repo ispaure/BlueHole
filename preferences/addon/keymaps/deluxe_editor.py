@@ -1,6 +1,7 @@
-"""Assignments and Commands views inside Blue Hole's Keymaps preferences."""
+"""Bindings and Commands views inside Blue Hole's Keymaps preferences."""
 
 import sys
+import textwrap
 
 import bpy
 
@@ -79,16 +80,16 @@ class BH_MT_deluxe_sections(bpy.types.Menu):
 
 
 class BH_MT_deluxe_section_actions(bpy.types.Menu):
-    bl_label = 'Section Options'
+    bl_label = 'Subsection Options'
 
     def draw(self, _context):
         current = ops.editor()
         section = current.catalog['sections'].get(current.section)
         layout = self.layout
-        layout.operator(ops.BH_OT_deluxe_section.bl_idname, text='Add Section', icon='ADD')
-        if not section or section.get('required'):
+        layout.operator(ops.BH_OT_deluxe_section.bl_idname, text='Add Subsection', icon='ADD')
+        if current.binding_category_all or not section or section.get('required'):
             return
-        layout.operator(ops.BH_OT_deluxe_section.bl_idname, text='Rename Section').section = current.section
+        layout.operator(ops.BH_OT_deluxe_section.bl_idname, text='Rename Subsection').section = current.section
         sections = current.sections()
         index = sections.index(current.section)
         for offset, label, icon in ((-1, 'Move Up', 'TRIA_UP'), (1, 'Move Down', 'TRIA_DOWN')):
@@ -98,26 +99,26 @@ class BH_MT_deluxe_section_actions(bpy.types.Menu):
         has_entries = any(item['section'] == current.section for table in ('assignments', 'suppressions')
                           for item in current.catalog[table].values())
         if not has_entries:
-            ops.operator_button(layout, 'delete_section', 'Delete Empty Section', current.section, icon='TRASH')
+            ops.operator_button(layout, 'delete_section', 'Delete Empty Subsection', current.section, icon='TRASH')
 
 
 class BH_MT_deluxe_command_categories(bpy.types.Menu):
-    bl_label = 'Command Category'
+    bl_label = 'Used in Section'
 
     def draw(self, _context):
         current = ops.editor()
-        ops.operator_button(self.layout, 'command_category', 'All Categories')
+        ops.operator_button(self.layout, 'command_category', 'All Sections (including unused)')
         for id_, row in current.catalog['categories'].items():
             ops.operator_button(self.layout, 'command_category', row['label'], id_,
                                 icon='CHECKMARK' if id_ == current.command_category else 'NONE')
 
 
 class BH_MT_deluxe_command_sections(bpy.types.Menu):
-    bl_label = 'Command Section'
+    bl_label = 'Used in Subsection'
 
     def draw(self, _context):
         current = ops.editor()
-        ops.operator_button(self.layout, 'command_section', 'All Sections')
+        ops.operator_button(self.layout, 'command_section', 'All Subsections')
         for id_ in current.sections(current.command_category):
             row = current.catalog['sections'][id_]
             ops.operator_button(self.layout, 'command_section', row['label'], id_,
@@ -125,120 +126,66 @@ class BH_MT_deluxe_command_sections(bpy.types.Menu):
 
 
 def toggle(layout, table, id_, row, *, required=False, text=''):
-    button = layout.row(align=True)
-    button.enabled = not required
-    ops.operator_button(button, table, text, id_,
-                        icon='CHECKBOX_HLT' if row.get('enabled', True) else 'CHECKBOX_DEHLT')
+    control = ops.inline_value(ops.state(bpy.context), 'enabled', 'boolean', row.get('enabled', True),
+                               table=table, entry=id_)
+    checkbox = layout.row(align=True)
+    checkbox.enabled = not required
+    checkbox.prop(control, 'boolean', text=text, toggle=False)
 
 
-def group_controls(layout, current, preview, *, compact):
-    categories, sections = current.catalog['categories'], current.catalog['sections']
-    if current.category not in categories:
-        current.category = next(iter(categories), '')
-    section_ids = current.sections()
-    if current.section not in section_ids:
-        current.section = next(iter(section_ids), '')
-    if not categories:
-        return
+def binding_filters(layout, current, preview):
+    current.ensure_selection()
+    view = ops.state(bpy.context)
     group = layout.box()
-    group.label(text='BROWSE SECTIONS')
-    row = group.row(align=True)
-    category = categories[current.category]
-    toggle(row, 'categories', current.category, category)
-    row.menu(BH_MT_deluxe_categories.__name__, text=category['label'])
-    if compact:
+    bar = group.row(align=True)
+    ops.operator_button(bar, 'all_bindings', 'All Bindings', icon='HOME',
+                        depress=current.binding_all and not current.binding_context and not current.binding_command and not view.search)
+    bar.label(text='Blender Context:')
+    scope = current.binding_contexts().get(current.binding_context)
+    bar.operator(ops.BH_OT_deluxe_filter_context.bl_idname,
+                 text=context_label(scope) if scope else 'All Contexts', icon='VIEWZOOM')
+    if current.binding_context:
+        ops.operator_button(bar, 'clear_context', '', icon='X')
+    if current.binding_command:
         row = group.row(align=True)
-    section = sections.get(current.section)
-    if section:
-        toggle(row, 'sections', current.section, section, required=section.get('required', False))
-        row.menu(BH_MT_deluxe_sections.__name__, text=section['label'])
-    row.menu(BH_MT_deluxe_section_actions.__name__, text='', icon='THREE_DOTS')
-    if section is None:
-        return
-    if not preview['sections'][current.section]:
-        group.label(text='Section inactive', icon='INFO')
-    from ...prefs import prefs
-
-    # Existing saved feature choices still gate the profile. Let artists
-    # re-enable those choices in place if they block the selected section.
-    if category.get('enabled', True) and section.get('enabled', True):
-        for path in (category.get('switch'), section.get('switch')):
-            if path:
-                owner, name = preference_switch(prefs(), path)
-                if not getattr(owner, name):
-                    group.prop(owner, name)
-
-
-def preference_switch(preferences, path):
-    *parts, name = path.split('.')
-    owner = preferences
-    for part in parts:
-        owner = getattr(owner, part)
-    return getattr(owner, '_raw', owner), name
-
-
-def sections_view(layout, current, preview, *, width):
-    """Show group choices without opening the assignment editor."""
-    from ...prefs import prefs
-
+        row.label(text='Command: ' + ops.command_name(current, current.binding_command))
+        ops.operator_button(row, 'clear_command_filter', '', icon='X')
     categories = current.catalog['categories']
-    if not categories:
-        layout.label(text='No shortcut categories')
-        return
-    if current.feature_category not in categories:
-        current.feature_category = next(iter(categories))
-    category_id = current.feature_category
-    category = categories[category_id]
-    category_ids = tuple(categories)
-    columns = 5 if width >= DETAIL_PANE_MIN_WIDTH else 3
-    for start in range(0, len(category_ids), columns):
-        tabs = layout.row(align=True)
-        for id_ in category_ids[start:start + columns]:
-            ops.operator_button(tabs, 'feature_category', categories[id_]['label'], id_, depress=id_ == category_id)
-
-    box = layout.box()
-    category_line = box.row()
-    category_line.alignment = 'LEFT'
-    toggle(category_line, 'categories', category_id, category, text=f"Enable {category['label']} Shortcuts")
-    enabled = category.get('enabled', True)
-    if enabled and category.get('switch'):
-        owner, name = preference_switch(prefs(), category['switch'])
-        if not getattr(owner, name):
-            box.prop(owner, name)
-    box.separator(factor=0.5)
-
-    waiting = {}
-    section_ids = current.sections(category_id)
-    for id_, row in current.catalog['assignments'].items():
-        state = preview['assignments'][id_]
-        if row['section'] not in section_ids or not (state['eligible'] and state['active']):
-            continue
-        meta = preview['commands'][row['command']]
-        if meta['availability'] == 'waiting_for_provider':
-            waiting.setdefault(row['section'], set()).add(meta['dependency'])
-    for section_id in section_ids:
-        section = current.catalog['sections'][section_id]
-        items = box.column(align=True)
-        line = items.row(align=True)
-        line.alignment = 'LEFT'
-        label = section['label']
-        if section.get('required'):
-            line.label(text=f'{label} (required)', icon='LOCKED')
-        else:
-            toggle(line, 'sections', section_id, section, text=label)
-            if not preview['sections'][section_id] and section.get('enabled', True):
-                line.label(text='Inactive', icon='PAUSE')
-        ops.operator_button(line, 'show_assignments', 'View Assignments', section_id, icon='FORWARD', emboss=False)
-        if section_id in waiting:
-            items.label(text='Waiting for ' + ', '.join(sorted(waiting[section_id])), icon='INFO')
-        if enabled and section.get('enabled', True) and section.get('switch'):
-            owner, name = preference_switch(prefs(), section['switch'])
-            if not getattr(owner, name):
-                items.prop(owner, name)
+    tabs = group.row(align=True)
+    for id_, row in categories.items():
+        ops.operator_button(tabs, 'feature_category', row['label'], id_,
+                            depress=not current.binding_all and id_ == current.category)
+    if current.binding_all or not categories:
+        return True
+    category = categories[current.category]
+    line = group.row(align=True)
+    toggle(line, 'categories', current.category, category, text=f"Enable {category['label']} Keymaps")
+    line.menu(BH_MT_deluxe_section_actions.__name__, text='', icon='THREE_DOTS')
+    if not category.get('enabled', True):
+        return False
+    sections = current.sections()
+    if not sections:
+        group.label(text='No subsections')
+        return True
+    tabs = group.row(align=True)
+    ops.operator_button(tabs, 'all_subsections', 'All ' + category['label'], depress=current.binding_category_all)
+    for id_ in sections:
+        row = current.catalog['sections'][id_]
+        ops.operator_button(tabs, 'feature_section', row['label'], id_,
+                            depress=not current.binding_category_all and id_ == current.section)
+    if current.binding_category_all:
+        return True
+    section = current.catalog['sections'][current.section]
+    line = group.row(align=True)
+    if section.get('required'):
+        line.label(text=section['label'] + ' Keymaps (required)', icon='LOCKED')
+    else:
+        toggle(line, 'sections', current.section, section, text=f"Enable {section['label']} Keymaps")
+    return section.get('enabled', True) or section.get('required', False)
 
 
 class BH_MT_deluxe_assignment_actions(bpy.types.Menu):
-    bl_label = 'Assignment Actions'
+    bl_label = 'Binding Actions'
 
     def draw(self, _context):
         current = ops.editor()
@@ -249,27 +196,21 @@ class BH_MT_deluxe_assignment_actions(bpy.types.Menu):
 
 
 def assignments(layout, current, preview, query, *, width, search_keys=False):
-    compact = width < COMPACT_WIDTH
-    group_controls(layout, current, preview, compact=compact)
+    if not binding_filters(layout, current, preview):
+        return
     catalog = current.catalog
-    section = catalog['sections'].get(current.section)
-    if section:
-        row = layout.row(align=True)
-        row.alignment = 'LEFT'
-        if not section.get('required'):
-            row.operator(ops.BH_OT_deluxe_mapping.bl_idname, text='Add Assignment', icon='ADD')
-            row.menu(BH_MT_deluxe_assignment_actions.__name__, text='Actions')
-        if compact and not section.get('required'):
-            row = layout.row(align=True)
-            row.alignment = 'LEFT'
-        ops.operator_button(row, 'show_section_commands', 'View Commands', current.section, icon='FORWARD', emboss=False)
+    row = layout.row(align=True)
+    row.alignment = 'LEFT'
+    row.operator(ops.BH_OT_deluxe_mapping.bl_idname, text='Add Binding', icon='ADD')
+    row.menu(BH_MT_deluxe_assignment_actions.__name__, text='Actions')
+    rules(layout, current, preview)
     found = []
     matches_key = None
     if query and search_keys:
         events = bpy.types.Event.bl_rna.properties['type'].enum_items
         matches_key = key_filter(query, {key: item.name for key, item in events.items()})
     for id_, row in sorted(catalog['assignments'].items(), key=lambda entry: entry[1]['order']):
-        if not query and row['section'] != current.section:
+        if not current.accepts_binding(row):
             continue
         meta = preview['commands'][row['command']]
         command = meta['label']
@@ -278,7 +219,9 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
         scope = context_label(row['scope'])
         owner = meta['owner']
         operator = catalog['commands'][row['command']].get('operator', '')
-        if matches_key:
+        if not query:
+            matches = True
+        elif matches_key:
             matches = matches_key(event_data)
         else:
             matches = find(' '.join((ops.command_name(current, row['command']), operator, event,
@@ -289,15 +232,14 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
         listing, detail, list_width = detail_columns(layout, width, detail_first=True)
         detail_width = width - list_width if width >= DETAIL_PANE_MIN_WIDTH else width
         table = list_width >= ASSIGNMENT_TABLE_MIN_WIDTH
-        listing.label(text=f'{len(found)} {"matching " if query else ""}'
-                           f'{"assignment" if len(found) == 1 else "assignments"}')
+        listing.label(text=f'{len(found)} {"binding" if len(found) == 1 else "bindings"}')
         listing.separator(factor=0.5)
         if current.assignment not in {item[0] for item in found}:
             current.assignment = found[0][0]
         if table:
             name, key, scope_column = assignment_columns(listing)
             name.label(text='Command')
-            key.label(text='Shortcut')
+            key.label(text='Keymap Binding')
             scope_column.label(text='Context')
             listing.separator(type='LINE')
         for id_, command, event, scope, meta in found:
@@ -308,7 +250,9 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
             else:
                 name = listing.row(align=True)
             icon = 'RADIOBUT_ON' if selected else 'RADIOBUT_OFF'
-            if table and waiting:
+            if not preview['assignments'][id_]['eligible'] or not preview['assignments'][id_]['active']:
+                icon = 'PAUSE'
+            elif waiting:
                 icon = 'ERROR'
             ops.operator_button(name, 'assignment', command, id_, icon=icon, emboss=selected, depress=selected)
             if table:
@@ -323,9 +267,7 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
         inspector(detail.box().column(), current, preview, current.assignment, width=detail_width)
     else:
         current.assignment = ''
-        layout.label(text='No matching assignments' if query else 'No assignments in this section')
-    if section:
-        rules(layout, current, preview)
+        layout.label(text='No bindings match these filters')
 
 
 def inspector(layout, current, preview, id_, *, width):
@@ -335,7 +277,7 @@ def inspector(layout, current, preview, id_, *, width):
     event = current.catalog['events'][row['event']]
     heading = layout.row()
     heading.scale_y = 1.25
-    heading.label(text=meta['label'])
+    toggle(heading, 'assignments', id_, row, text=meta['label'], required=not state['editable'])
     command = current.catalog['commands'][row['command']]
     identity = layout.row(align=True)
     identity.alignment = 'LEFT'
@@ -344,7 +286,7 @@ def inspector(layout, current, preview, id_, *, width):
         if width < COMPACT_WIDTH:
             identity = layout.row(align=True)
     if id_ not in current.defaults['assignments']:
-        identity.label(text='Custom assignment')
+        identity.label(text='Custom binding')
     elif same_value(row, current.defaults['assignments'][id_]) and all(
             same_value(current.catalog[table][row[key]], current.defaults[table].get(row[key]))
             for table, key in (('events', 'event'), ('commands', 'command'))):
@@ -388,11 +330,10 @@ def inspector(layout, current, preview, id_, *, width):
         ops.operator_button(layout, 'show_command', 'View Command', id_, icon='FORWARD', emboss=False)
         return
     settings = layout.box()
-    settings.label(text='SHORTCUT')
+    settings.label(text='KEYMAP BINDING')
     shortcut_controls(settings.column(align=True), id_, event, compact=width < COMPACT_WIDTH)
     actions = settings.row(align=True)
     actions.alignment = 'LEFT'
-    toggle(actions, 'assignments', id_, row, text='Enabled')
     actions.operator(ops.BH_OT_deluxe_shortcut.bl_idname, text='Advanced Shortcut', emboss=False).assignment = id_
     actions.operator(ops.BH_OT_deluxe_mapping.bl_idname, text='', icon='PREFERENCES', emboss=False).assignment = id_
     actions.operator(ops.BH_OT_deluxe_remove_assignment.bl_idname, text='', icon='TRASH', emboss=False).assignment = id_
@@ -413,7 +354,7 @@ def linked_shortcut(layout, current, preview, id_):
     expanded = current.expanded_shortcut == event_id
     disclosure = box.row(align=True)
     disclosure.alignment = 'LEFT'
-    ops.operator_button(disclosure, 'linked_shortcut', f'Shared Shortcut · {len(linked)} Assignments',
+    ops.operator_button(disclosure, 'linked_shortcut', f'Shared Keymap Binding · {len(linked)} Bindings',
                         event_id, icon='TRIA_DOWN' if expanded else 'TRIA_RIGHT', emboss=False)
     if not expanded:
         return
@@ -421,7 +362,8 @@ def linked_shortcut(layout, current, preview, id_):
         actions = box.row()
         actions.alignment = 'LEFT'
         op = actions.operator(ops.BH_OT_deluxe_capture.bl_idname,
-                              text=f'Change All {len(linked)}', icon='LINKED')
+                              text='Input Key…' if current.capture_assignment == id_ and current.capture_shared
+                              else f'Change All {len(linked)}', icon='LINKED')
         op.assignment, op.shared = id_, True
     else:
         box.label(text='Includes a required assignment', icon='LOCKED')
@@ -449,19 +391,26 @@ def linked_shortcut(layout, current, preview, id_):
 def shortcut_controls(layout, assignment, event, *, compact):
     view = ops.state(bpy.context)
     options = ops.resolver.input_options()['event']
+    input_type = event.get('map_type', ops.map_type(event['type']))
     line = layout.row(align=True)
-    line.alignment = 'LEFT'
-    line.operator(ops.BH_OT_deluxe_capture.bl_idname, text=key_label(event['type']), icon='EVENT_A').assignment = assignment
-    controls = [('value', 'PRESS', '')]
-    if event.get('map_type', 'KEYBOARD') == 'KEYBOARD':
-        controls.append(('repeat', False, 'Repeat'))
-    for key, default, label in controls:
-        value = event.get(key, default)
-        prop = 'option' if key == 'value' else 'boolean'
-        control = ops.inline_value(view, key, prop, value, assignment=assignment, items=options.get(key, ()))
-        cell = line.row(align=True)
-        cell.enabled = key != 'repeat' or event.get('value', 'PRESS') in {'PRESS', 'ANY'}
-        cell.prop(control, prop, text=label)
+    if input_type in {'KEYBOARD', 'MOUSE'}:
+        control = ops.inline_value(view, 'map_type', 'option', input_type,
+                                   assignment=assignment, items=ops.INPUT_TYPES)
+        line.prop(control, 'option', text='')
+    else:
+        line.label(text=title(input_type))
+    capturing = ops.editor().capture_assignment == assignment
+    line.operator(ops.BH_OT_deluxe_capture.bl_idname,
+                  text='Input Key…' if capturing else key_label(event['type']),
+                  icon='EVENT_A', depress=capturing).assignment = assignment
+    trigger = layout.row(align=True)
+    phase = ops.inline_value(view, 'value', 'option', event.get('value', 'PRESS'),
+                             assignment=assignment, items=options.get('value', ()))
+    trigger.prop(phase, 'option', text='')
+    repeat = trigger.row(align=True)
+    repeat.enabled = input_type == 'KEYBOARD' and event.get('value', 'PRESS') in {'PRESS', 'ANY'}
+    control = ops.inline_value(view, 'repeat', 'boolean', event.get('repeat', False), assignment=assignment)
+    repeat.prop(control, 'boolean', text='Repeat', toggle=False)
     modifier_row = layout if compact else layout.split(factor=0.64, align=True)
     mods = modifier_row.row(align=True)
     any_mod = ops.inline_value(view, 'any', 'boolean', event.get('any', False), assignment=assignment)
@@ -488,11 +437,24 @@ def shortcut_controls(layout, assignment, event, *, compact):
 
 def command_fields(layout, current, id_, *, width, assignment=''):
     command = current.catalog['commands'][id_]
-    meta = current.store.resolver.describe_command(command, include_unset=not assignment)
+    meta = current.store.resolver.describe_command(command, include_unset=True)
     properties = command.get('properties', {})
     fields = meta['fields']
+    view = ops.state(bpy.context)
+    if assignment:
+        uses = len(current.draft.uses('commands', id_))
+        scope = layout.box()
+        scope.label(text=f'Command settings · used by {uses} binding' + ('s' if uses != 1 else ''))
+        if meta['editable']:
+            scope.row(align=True).prop(view, 'command_edit_scope', expand=True)
+        else:
+            scope.label(text='No editable command settings', icon='LOCKED')
+        ops.operator_button(scope, 'command_bindings', 'View All Bindings for This Command', id_, icon='FORWARD', emboss=False)
+
+    affected = ((assignment,) if assignment and view.command_edit_scope == 'SINGLE'
+                else current.draft.uses('commands', id_))
     editable = all(not current.catalog['sections'][current.catalog['assignments'][aid]['section']].get('required')
-                   for aid in current.draft.uses('commands', id_))
+                   for aid in affected)
     for explicit, heading in ((True, 'Configured Settings'), (False, 'Additional Blender Settings')):
         names = [name for name in fields if (name in properties) == explicit]
         if not names:
@@ -515,14 +477,11 @@ def command_fields(layout, current, id_, *, width, assignment=''):
             prop = ops.INLINE_VALUES.get(field.get('type'))
             if editable and field.get('editable') and prop and not (field['shape'] or field['flags']):
                 control = ops.inline_value(ops.state(bpy.context), name, prop, value,
-                                           command=id_, items=field['enum_items'])
+                                           command=id_, assignment=assignment, items=field['enum_items'])
                 cell.prop(control, prop, text=label)
                 if explicit:
                     reset = cell.operator(ops.BH_OT_deluxe_inline_edit.bl_idname, text='', icon='X')
-                    reset.command, reset.field = id_, name
-                if assignment:
-                    edit = cell.operator(ops.BH_OT_deluxe_field.bl_idname, text='', icon='DUPLICATE')
-                    edit.command, edit.field, edit.assignment = id_, name, assignment
+                    reset.command, reset.field, reset.assignment = id_, name, assignment
                 continue
             if value is not None:
                 label += ': ' + display_value(value)
@@ -544,24 +503,24 @@ def commands(layout, current, preview, query, *, width):
     if current.command_section not in current.sections(current.command_category):
         current.command_section = ''
     filters = layout.box()
-    filters.label(text='FILTER COMMANDS')
+    filters.label(text='COMMAND LIBRARY')
+    filters.operator(ops.BH_OT_deluxe_command.bl_idname, text='New Command', icon='ADD')
     row = filters.row(align=True)
     category = categories.get(current.command_category, {})
     section = current.catalog['sections'].get(current.command_section, {})
     row.menu(BH_MT_deluxe_command_categories.__name__,
-             text=category.get('label', 'All Categories'))
+             text=category.get('label', 'All Sections (including unused)'))
     if width < COMPACT_WIDTH:
         row = filters.row(align=True)
     section_menu = row.row(align=True)
     section_menu.enabled = bool(current.command_category)
     section_menu.menu(BH_MT_deluxe_command_sections.__name__,
-                      text=section.get('label', 'All Sections'))
+                      text=section.get('label', 'All Subsections'))
     if section:
-        toggle(row, 'sections', current.command_section, section, required=section.get('required', False))
         if width < COMPACT_WIDTH:
             row = filters.row(align=True)
             row.alignment = 'LEFT'
-        ops.operator_button(row, 'show_assignments', 'View Assignments', current.command_section, icon='FORWARD')
+        ops.operator_button(row, 'show_assignments', 'View Bindings', current.command_section, icon='FORWARD')
     found = []
     for id_ in current.command_ids():
         meta = preview['commands'][id_]
@@ -574,6 +533,9 @@ def commands(layout, current, preview, query, *, width):
         current.command = ''
         layout.label(text='No matching commands')
         return
+    if current.focus_command:
+        current.page = next((index // PAGE_SIZE for index, item in enumerate(found) if item[0] == current.command), 0)
+        current.focus_command = False
     listing, detail, list_width = detail_columns(layout, width)
     detail_width = width - list_width if width >= DETAIL_PANE_MIN_WIDTH else width
     listing.label(text=f'{len(found)} {"command" if len(found) == 1 else "commands"}')
@@ -585,7 +547,12 @@ def commands(layout, current, preview, query, *, width):
         selected = id_ == current.command
         icon = 'RADIOBUT_ON' if selected else 'RADIOBUT_OFF'
         ops.operator_button(listing, 'command', name, id_, icon=icon, emboss=selected, depress=selected)
-        listing.label(text=STATUS_LABELS.get(meta['availability'], meta['owner']), icon='BLANK1')
+        uses = len(current.draft.uses('commands', id_))
+        command = current.catalog['commands'][id_]
+        source = command.get('operator', command.get('modal_value', ''))
+        listing.label(text=f'{uses} binding' + ('s' if uses != 1 else '') + ' · ' + source, icon='BLANK1')
+        if meta['availability'] != 'available':
+            listing.label(text=STATUS_LABELS.get(meta['availability'], meta['owner']), icon='INFO')
         if id_ != shown[-1][0]:
             listing.separator(factor=0.5, type='LINE')
     command_details(detail.box().column(), current, preview['commands'][current.command], current.command,
@@ -601,8 +568,17 @@ def command_details(layout, current, meta, id_, *, width):
         layout.label(text=STATUS_LABELS[meta['availability']], icon='INFO')
     uses = current.draft.uses('commands', id_)
     sections = dict.fromkeys(current.catalog['assignments'][aid]['section'] for aid in uses)
+    actions = layout.row(align=True)
+    actions.operator(ops.BH_OT_deluxe_mapping.bl_idname, text='Add Binding', icon='ADD').command_hint = id_
+    actions.operator(ops.BH_OT_deluxe_command.bl_idname, text='Duplicate', icon='DUPLICATE').source = id_
+    replacements = sum(row.get('replacement') == id_ for row in current.catalog['suppressions'].values())
+    if not uses and not replacements:
+        ops.operator_button(actions, 'remove_command', 'Delete Unused', id_, icon='TRASH')
+    if replacements:
+        layout.label(text=f'Used by {replacements} default replacement rules')
     if uses:
-        layout.label(text=f'Used by {len(uses)} assignment{"s" if len(uses) != 1 else ""}')
+        layout.label(text=f'Edits apply to all {len(uses)} linked bindings, including inactive ones')
+        ops.operator_button(layout, 'command_bindings', 'View All Bindings', id_, icon='FORWARD')
         links = layout.grid_flow(columns=2 if width >= TWO_COLUMN_FIELDS_MIN_WIDTH else 1, align=True)
         for section_id in sections:
             section = current.catalog['sections'][section_id]
@@ -610,63 +586,92 @@ def command_details(layout, current, meta, id_, *, width):
             label = f"{category['label']} / {section['label']}"
             ops.operator_button(links, 'show_assignments', label, section_id, icon='FORWARD', emboss=False)
     else:
-        layout.label(text='No assignment uses this command')
+        layout.label(text='No bindings yet · add one to use this command')
     command_fields(layout, current, id_, width=width)
 
 
 def rules(layout, current, preview):
+    group = layout.box()
+    heading = group.row(align=True)
+    heading.label(text='BLENDER DEFAULTS & OVERRIDES')
+    view = ops.state(bpy.context)
+    browse = group.row()
+    browse.alignment = 'LEFT'
+    op = browse.operator(ops.BH_OT_deluxe_binding_picker.bl_idname, text='Browse Blender Defaults', icon='VIEWZOOM')
+    op.section, op.defaults = current.section, True
+    found = False
     for id_, row in current.catalog['suppressions'].items():
-        if row['section'] != current.section:
+        if not current.accepts_binding({'section': row['section'], 'scope': row['selector']['scope'],
+                                        'command': row.get('replacement', '')}):
             continue
+        found = True
         status = preview['suppressions'][id_]
-        box = layout.box()
+        box = group.box()
         selector = row['selector']
         target = selector['target']
         box.label(text=f"{target.get('idname', target.get('modal_value'))}  ·  {shortcut(selector['event'])}")
         box.label(text=f"{context_label(selector['scope'])}  ·  {SOURCE_LABELS[selector['source_role']]}")
-        committed = current.saved['suppressions'].get(id_)
-        if status['registered'] and same_value(row, committed):
-            label = 'Replacement active'
+        installed = current.store.runtime_catalog()['suppressions'].get(id_)
+        if status['registered'] and same_value(row, installed):
+            label = 'Disabled by Blue Hole' if row.get('disable') else 'Replacement active'
+            if not same_value(row, current.saved['suppressions'].get(id_)):
+                label += ' · unsaved preview'
         elif not status['eligible']:
             label = 'Rule inactive'
+        elif not row.get('disable') and 'replacement' not in row:
+            label = 'Review only · no runtime change'
         else:
             label = STATUS_LABELS[status['status']]
         box.label(text=label, icon='INFO')
         if 'replacement' in row:
             box.label(text='Replacement: ' + ops.command_name(current, row['replacement']))
+        for name, value in target.get('properties', {}).items():
+            box.label(text=f'{title(name)}: {display_value(value)}')
         row_layout = box.row(align=True)
-        toggle(row_layout, 'suppressions', id_, row)
+        toggle(row_layout, 'suppressions', id_, row, text='Enable Rule')
         pick = row_layout.operator(ops.BH_OT_deluxe_binding_picker.bl_idname, text='Pick Again')
         pick.section, pick.rule = current.section, id_
-        ops.operator_button(row_layout, 'remove_rule', 'Remove Rule', id_, icon='TRASH')
+        ops.operator_button(row_layout, 'remove_rule', 'Restore Binding' if row.get('disable') else 'Remove Rule', id_, icon='LOOP_BACK')
+        if current.binding_all or current.binding_category_all:
+            section = current.catalog['sections'][row['section']]
+            category = current.catalog['categories'][section['category']]
+            ops.operator_button(box, 'show_assignments', f"{category['label']} / {section['label']}",
+                                row['section'], icon='FORWARD', emboss=False)
+    if not found:
+        group.label(text='No managed default bindings match these filters')
 
 
 def draw(context, layout, settings):
     try:
         current = ops.editor()
         view = ops.state(context)
-    except ops.ERRORS:
-        layout.label(text='The Deluxe profile editor is waiting for Blender keymaps', icon='INFO')
+    except ops.ERRORS as error:
+        for line in textwrap.wrap(str(error), width=100):
+            layout.label(text=line, icon='ERROR')
         return
     layout.operator_context = 'INVOKE_DEFAULT'
     scale = context.preferences.system.ui_scale or 1
     width = context.region.width / scale if context.region else 0
     transaction_controls(layout, current, settings, compact=width < COMPACT_WIDTH)
+    if not settings.enable_keymaps:
+        return
+    notice = layout.column(align=True)
+    notice.label(text='Blue Hole updates replace editor changes', icon='ERROR')
+    message = ('Saved assignments, commands and section choices belong to this Blue Hole installation. '
+               'Installing an update replaces them with the new version’s catalog.')
+    for line in textwrap.wrap(message, width=max(24, int((width - 40) / 7))):
+        notice.label(text=line)
     layout.separator()
     toolbar = layout.row(align=True)
     toolbar.prop(view, 'tab', expand=True)
-    if view.tab != 'SECTIONS':
-        layout.separator(factor=0.5)
-        search_box = layout.box()
-        search_box.label(text='SEARCH')
-        search = search_box
-        if view.tab == 'ASSIGNMENTS':
-            fields = search_box.split(factor=0.38 if width < COMPACT_WIDTH else 0.22, align=True)
-            fields.prop(view, 'search_mode', text='')
-            search = fields.row(align=True)
-        placeholder = ('Search by Key-Binding' if view.tab == 'ASSIGNMENTS' and view.search_mode == 'KEY'
-                       else 'Search by Name')
-        search.prop(view, 'search', text='', icon='VIEWZOOM', placeholder=placeholder)
+    layout.separator(factor=0.5)
+    search_box = layout.box()
+    search = search_box.row(align=True)
+    if view.tab == 'BINDINGS':
+        search.prop(view, 'search_mode', text='')
+    placeholder = ('Search by Key-Binding' if view.tab == 'BINDINGS' and view.search_mode == 'KEY'
+                   else 'Search by Name')
+    search.prop(view, 'search', text='', icon='VIEWZOOM', placeholder=placeholder)
     layout.separator()
     try:
         preview = current.preview()
@@ -674,13 +679,11 @@ def draw(context, layout, settings):
         layout.label(text=str(error), icon='ERROR')
     else:
         query = view.search.strip()
-        if view.tab == 'SECTIONS':
-            sections_view(layout, current, preview, width=width)
-        elif view.tab == 'ASSIGNMENTS':
+        if view.tab == 'BINDINGS':
             assignments(layout, current, preview, query, width=width, search_keys=view.search_mode == 'KEY')
         else:
             commands(layout, current, preview, query, width=width)
-        if view.tab != 'SECTIONS' and current.dirty and preview['conflicts']:
+        if current.dirty and preview['conflicts']:
             layout.label(text=f"{len(preview['conflicts'])} conflicting Deluxe input groups", icon='ERROR')
 
 
@@ -695,13 +698,15 @@ def transaction_controls(layout, current, settings, *, compact):
     actions.alignment = 'LEFT' if compact else 'RIGHT'
     apply = actions.row(align=True)
     apply.enabled = current.dirty or bool(current.store.load_issue)
-    label = 'Save Recovered Profile' if current.store.load_issue and not current.dirty else 'Save and Apply Changes'
-    ops.operator_button(apply, 'apply', label, icon='CHECKMARK', depress=apply.enabled)
+    ops.operator_button(apply, 'apply', 'Save and Apply Changes', icon='CHECKMARK', depress=apply.enabled)
     discard = actions.row(align=True)
     discard.enabled = current.dirty
     ops.operator_button(discard, 'discard', 'Discard', emboss=False)
     if current.dirty:
-        bar.label(text='Unsaved keymap changes', icon='DOT')
+        live = same_value(current.catalog, current.store.runtime_catalog()) and not current.preview_error
+        bar.label(text='Unsaved changes · live preview' if live else 'Unsaved changes · preview not active', icon='DOT')
+    if current.preview_error:
+        bar.label(text='Preview failed: ' + current.preview_error, icon='ERROR')
     if current.message and current.message != 'Changes staged':
         bar.label(text=current.message, icon='INFO')
     if current.store.load_issue:
@@ -711,6 +716,8 @@ def transaction_controls(layout, current, settings, *, compact):
             'profile_saved_recovery_copy_unavailable': 'Profile saved. The recovery copy could not be updated.',
         }
         bar.label(text=messages.get(current.store.load_issue, 'Profile recovery required'), icon='ERROR')
+        for line in textwrap.wrap(current.store.load_error, width=60 if compact else 110):
+            bar.label(text=line)
 
 
 class BH_MT_deluxe_profile_actions(bpy.types.Menu):
@@ -720,10 +727,9 @@ class BH_MT_deluxe_profile_actions(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
         layout.prop(context.preferences.inputs, 'invert_mouse_zoom')
-        layout.operator('wm.bh_reset_deluxe_keymaps', text='Reset Feature Switches')
         layout.separator()
         ops.operator_button(layout, 'reset', 'Reset Draft')
-        ops.operator_button(layout, 'reload', 'Reload Profile', icon='FILE_REFRESH')
+        ops.operator_button(layout, 'reload', 'Validate and Reload JSON Files', icon='FILE_REFRESH')
 
 
 classes = (BH_MT_deluxe_categories, BH_MT_deluxe_sections, BH_MT_deluxe_section_actions,

@@ -83,19 +83,21 @@ class DeluxePreferencesTests(unittest.TestCase):
     def apply(self, **kwargs):
         self.module.apply_deluxe_prefs(self.context, self.pref, **kwargs)
 
-    def test_fresh_activation_enables_defaults_without_writing_profile(self):
+    def test_activation_saves_only_master_state_without_writing_files(self):
         self.assertFalse(self.pref.keymap.enable_keymaps)
         self.assertFalse(self.pref.pie.enable_pie_menus)
         self.apply()
         self.assertTrue(self.pref.keymap.deluxe_configured)
         self.assertTrue(self.pref.keymap.enable_keymaps)
         self.assertTrue(self.pref.keymap.navigation.enable_navigation_keymaps)
-        self.assertTrue(self.pref.pie.enable_pie_menus)
+        self.assertFalse(self.pref.pie.enable_pie_menus)
+        self.assertEqual(dict(self.pref.pie), {})
         self.assertTrue(self.pref.pie.enable_editor_pie_shortcuts)
         self.assertFalse(self.context.preferences.inputs.invert_mouse_zoom)
         self.assertFalse(self.saved.exists())
         self.assertFalse(self.preset.exists())
         self.assertTrue(self.context.preferences.is_dirty)
+        self.assertEqual(dict(self.pref.keymap), {'deluxe_configured': True, 'enable_keymaps': True})
         self.refresh.assert_called_once_with()
 
     def test_saved_choices_survive_activation_disable_and_reenable(self):
@@ -111,23 +113,12 @@ class DeluxePreferencesTests(unittest.TestCase):
         self.assertFalse(self.pref.keymap.navigation.enable_navigation_keymaps)
         self.assertFalse(self.pref.thirdparty.auto_constraints.enable_modal)
 
-    def test_explicit_reset_restores_feature_defaults_without_enabling_deluxe(self):
-        self.pref.keymap.navigation['enable_navigation_keymaps'] = False
-        self.pref.pie.update(enable_pie_menus=False, enable_editor_pie_shortcuts=False)
-        self.pref.thirdparty.auto_constraints['enable_modal'] = False
-        self.module.reset_deluxe_groups(self.context, self.pref)
-        self.assertTrue(self.pref.keymap.navigation.enable_navigation_keymaps)
-        self.assertTrue(self.pref.pie.enable_pie_menus)
-        self.assertTrue(self.pref.pie.enable_editor_pie_shortcuts)
-        self.assertTrue(self.pref.thirdparty.auto_constraints.enable_modal)
-        self.assertFalse(self.pref.keymap.enable_keymaps)
-
     def test_current_and_missing_legacy_presets_cannot_be_overlaid(self):
         for active in (SimpleNamespace(name='BH_Keymaps'), self.factory):
             with self.subTest(active=active):
                 self.configs.active = active
                 self.context.preferences.keymap.active_keyconfig = 'BH_Keymaps'
-                with self.assertRaisesRegex(ValueError, 'select Blender'):
+                with self.assertRaisesRegex(ValueError, 'Select Blender'):
                     self.apply(reviewed=True)
         self.assertFalse(self.pref.keymap.deluxe_configured)
         self.refresh.assert_not_called()
@@ -157,7 +148,7 @@ class DeluxePreferencesTests(unittest.TestCase):
 
     def test_ambiguous_preset_and_unattributed_saved_edits_require_review(self):
         self.configs.active = SimpleNamespace(name='Custom')
-        with self.assertRaisesRegex(ValueError, 'select Blender'):
+        with self.assertRaisesRegex(ValueError, 'Select Blender'):
             self.apply()
         self.assertEqual(self.configs.active.name, 'Custom')
         self.configs.active = self.factory
@@ -179,36 +170,6 @@ class DeluxePreferencesTests(unittest.TestCase):
         self.assertFalse(self.module.has_legacy_profile(self.context))
         self.preset.with_name('BH_Keymaps.py.previous-abc').write_bytes(b'previous preset')
         self.assertTrue(self.module.has_legacy_profile(self.context))
-
-    def test_backup_keeps_originals_and_never_overwrites_a_prior_copy(self):
-        self.saved.write_bytes(b'saved preferences')
-        self.preset.write_bytes(b'personal legacy preset')
-        self.configs.active = SimpleNamespace(name='BH_Keymaps')
-        first = self.module.backup_keymap_setup(self.context)
-        self.saved.write_bytes(b'newly saved preferences')
-        second = self.module.backup_keymap_setup(self.context)
-        self.assertNotEqual(first, second)
-        self.assertEqual((first / self.saved.name).read_bytes(), b'saved preferences')
-        self.assertEqual((second / self.saved.name).read_bytes(), b'newly saved preferences')
-        self.assertEqual((second / self.preset.name).read_bytes(), b'personal legacy preset')
-        self.assertEqual(self.preset.read_bytes(), b'personal legacy preset')
-        self.assertEqual(self.saved.read_bytes(), b'newly saved preferences')
-
-    def test_backup_failure_removes_partial_recovery_and_keeps_source(self):
-        self.saved.write_bytes(b'saved preferences')
-        self.preset.write_bytes(b'legacy preset')
-        original = self.module.atomic_write_bytes
-        def fail_preset_copy(path, *args, **kwargs):
-            if path.name != self.saved.name:
-                raise PermissionError('blocked')
-            return original(path, *args, **kwargs)
-
-        with patch.object(self.module, 'atomic_write_bytes', side_effect=fail_preset_copy):
-            with self.assertRaisesRegex(PermissionError, 'blocked'):
-                self.module.backup_keymap_setup(self.context)
-        self.assertFalse(list(self.saved.parent.glob('bluehole-keymap-recovery-*')))
-        self.assertEqual(self.saved.read_bytes(), b'saved preferences')
-        self.assertEqual(self.preset.read_bytes(), b'legacy preset')
 
     def test_failed_refresh_restores_the_exact_previous_choices(self):
         self.pref.pie['enable_pie_menus'] = False

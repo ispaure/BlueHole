@@ -7,11 +7,12 @@ import json
 import bpy
 
 from . import keymap_utils as runtime
+from . import default_bindings
 from .deluxe_schema import (ProfileError, SOURCE_ROLES, event_descriptor, require, same_value,
                             scope_descriptor, selector_descriptor)
 
 # A replacement may use only an already proved context and capability. Generic
-# per-item suppression remains a stored choice with an unsupported diagnostic.
+# review-only selectors remain inert; explicit default disables use default_bindings.
 PROOFS = {
     ('default', 'Object Mode', 'object.select_all', 'A'):
         ('ordinary_tail', 'stock_object_mode_select_all'),
@@ -116,15 +117,6 @@ def _valid_field(field, value):
     return check(value, field['shape'])
 
 
-def _switch(preferences, path):
-    if not path:
-        return True
-    value = preferences
-    for part in path.split('.'):
-        value = getattr(value, part)
-    return bool(value)
-
-
 def _selector_key(selector):
     target = selector.target
     return (selector.source_role, selector.scope.name, target.idname or target.modal_value,
@@ -207,15 +199,19 @@ def capture_candidate(map_, item, source_role):
     except runtime._Pending as issue:
         raise ProfileError(issue.reason) from issue
     if source_role == 'user':
+        managed = default_bindings.managed_rule(map_, item)
+        if managed:
+            selector = managed[1]
         # The merged map is not a source. Reuse the matcher to link to one
         # exact inherited source. User-only rows can still be staged explicitly.
-        selector, issue = _inherited_source(selector)
+        selector, issue = (selector, '') if managed else _inherited_source(selector)
         if issue:
             return {'selector': selector_data(selector), 'active': bool(item.active),
-                    'status': 'ambiguous', 'reason': issue, 'can_replace': False}
+                    'status': 'ambiguous', 'reason': issue, 'can_replace': False, 'can_disable': False}
     status, reason = selector_status(selector)
     return {'selector': selector_data(selector), 'active': bool(item.active),
-            'status': status, 'reason': reason, 'can_replace': _proof(selector) is not None}
+            'status': status, 'reason': reason, 'can_replace': _proof(selector) is not None,
+            'can_disable': default_bindings.status(selector)[0] == 'resolved'}
 
 
 def binding_candidates(source_role, map_):
@@ -283,7 +279,7 @@ class Resolver:
             label = getattr(getattr(bpy.types, name, None), 'bl_label', None) or name
             if name.startswith('BLUEHOLE_'):
                 owner = 'Blue Hole'
-        return {'label': label, 'owner': owner,
+        return {'label': command.get('label', label), 'owner': owner,
                 'dependency': provider, 'availability': ('available' if rna is not None
                                                            else 'waiting_for_provider' if provider
                                                            else 'unavailable'),
@@ -325,13 +321,17 @@ class Resolver:
             return
         idname = row['operator']
         variants = self.commands.get(idname)
-        require(variants and row.get('provider') == variants[0].get('provider'),
-                f'Unknown command or provider in {id_}')
-        if any(same_value(row, variant) for variant in variants):
+        variants = variants or ()
+        require(row.get('provider') == (variants[0].get('provider') if variants else None),
+                f'Unknown command provider in {id_}')
+        definition = {key: value for key, value in row.items() if key != 'label'}
+        if any(same_value(definition, {key: value for key, value in variant.items() if key != 'label'})
+               for variant in variants):
             return
         require(idname not in ROUTING_OPERATORS and '.bh_' not in idname and not row.get('provider'),
                 f'Command {id_} is code-managed')
         rna = _operator_rna(idname)
+        require(variants or rna is not None, f'Unknown command in {id_}')
         for name, value in row['properties'].items():
             if any(name in variant['properties'] and same_value(value, variant['properties'][name])
                    for variant in variants):
@@ -349,13 +349,13 @@ class Resolver:
         category = catalog['categories'][section['category']]
         return section.get('required', False) or (
             bool(preferences.keymap.enable_keymaps)
-            and category.get('enabled', True) and section.get('enabled', True)
-            and _switch(preferences, category.get('switch'))
-            and _switch(preferences, section.get('switch')))
+            and category.get('enabled', True) and section.get('enabled', True))
 
-    def plan(self, catalog, preferences):
+    def plan(self, catalog, preferences, *, required_only=False):
         sections = catalog['sections']
-        state = {id_: self.section_enabled(catalog, preferences, id_) for id_ in sections}
+        state = {id_: (bool(section.get('required')) if required_only else
+                       self.section_enabled(catalog, preferences, id_))
+                 for id_, section in sections.items()}
         groups = {}
         commands = catalog['commands']
         for id_, row in sorted(catalog['assignments'].items(), key=lambda entry: entry[1]['order']):

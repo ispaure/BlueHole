@@ -1,0 +1,60 @@
+{
+  "category": "uv",
+  "definition": {
+    "label": "UV",
+    "enabled": true
+  },
+  "sections": {
+    "uv.selection": {"label": "Selection", "category": "uv", "enabled": true},
+    "uv.tools": {"label": "Tools", "category": "uv", "enabled": true},
+    "uv.actions": {"label": "Actions", "category": "uv", "enabled": true}
+  },
+  "events": {
+    "middlemouse-press-52809775a202": {"type": "MIDDLEMOUSE", "shift": true, "ctrl": true, "alt": true, "repeat": true, "map_type": "MOUSE"},
+    "leftmouse-double-click-f2701d4e830a": {"type": "LEFTMOUSE", "value": "DOUBLE_CLICK", "ctrl": true, "map_type": "MOUSE"},
+    "leftmouse-double-click-036da3bc6aae": {"type": "LEFTMOUSE", "value": "DOUBLE_CLICK", "shift": true, "map_type": "MOUSE"},
+    "q-release-075cd00d4a37": {"type": "Q", "value": "RELEASE"},
+    "leftmouse-double-click-aaa3efec698b": {"type": "LEFTMOUSE", "value": "DOUBLE_CLICK", "alt": true, "map_type": "MOUSE"},
+    "leftmouse-double-click-3afdd29ea210": {"type": "LEFTMOUSE", "value": "DOUBLE_CLICK", "shift": true, "alt": true, "map_type": "MOUSE"}
+  },
+  "commands": {
+    "uv-snap-cursor-2bda874b139f": {"operator": "uv.snap_cursor", "properties": {"target": "SELECTED"}},
+    "uv-zenuv-move-cursor-to-fb20cb7ab12c": {"operator": "uv.zenuv_move_cursor_to", "properties": {"influence": "UV_AREA", "island_pivot": "tl", "position": [0.0, 0.0], "tile_number": 1001}, "provider": "Zen UV"},
+    "uv-zenuv-fit-to-trim-441eeccb8362": {"operator": "uv.zenuv_fit_to_trim", "properties": {"auto_unwrap": false, "fit_mode": "TO_TRIM_T", "influence_mode": "ISLAND", "influence_mode_faces": false, "info_message": "", "match_rotation": false, "op_align_to": "cen", "op_fit_axis": "AUTO", "op_keep_proportion": true, "op_order": "ONE_BY_ONE", "op_padding": 0.0}, "provider": "Zen UV"},
+    "uv-cursor-set-4e00b3c34e79": {"operator": "uv.cursor_set", "properties": {}},
+    "uv-select-linked-pick-ea7e01be1a4c": {"operator": "uv.select_linked_pick", "properties": {"extend": true, "deselect": true}},
+    "uv-select-linked-pick-9b475b0bae44": {"operator": "uv.select_linked_pick", "properties": {"extend": true, "deselect": false}},
+    "uv-select-linked-pick-ff9df46b774c": {"operator": "uv.select_linked_pick", "properties": {"extend": false, "deselect": false}},
+    "wm-tool-set-by-id-5485f198b7f4": {"operator": "wm.tool_set_by_id", "properties": {"name": "builtin.select_box", "cycle": false}},
+    "uv-hide-6343d1527d3a": {"operator": "uv.hide", "properties": {"unselected": false}},
+    "uv-select-loop-576e312338e8": {"operator": "uv.select_loop", "properties": {"extend": false}},
+    "uv-select-loop-83f6e03f56b5": {"operator": "uv.select_loop", "properties": {"extend": true}},
+    "uv-bh-place-and-move-cursor-3a179b47eb1a": {"operator": "uv.bh_place_and_move_cursor", "properties": {}},
+    "wm-context-menu-enum-ae48eab1a8cd": {"operator": "wm.context_menu_enum", "properties": {"data_path": "tool_settings.snap_uv_element"}},
+    "wm-call-menu-2a2f480203c1": {"operator": "wm.call_menu", "properties": {"name": "IMAGE_MT_uvs_context_menu"}}
+  },
+  "assignments": {
+    "uv-image-editor-tool-uv-tweak-fallback-fbf8990a360a": {"order": 334, "section": "uv.selection", "feature": "uv-uv-select-987c74c13c10", "event": "rightmouse-press-d24507019d68", "command": "uv-select-423bbfc9f536", "scope": {"name": "Image Editor Tool: Uv, Tweak (fallback)", "space_type": "IMAGE_EDITOR"}, "samples": ["797016483738b7c44213ce8949adee9466a5c1482832f8d34b928657015665f9"]},
+    "uv-image-editor-tool-uv-tweak-fallback-ad198a88a2f5": {"order": 335, "section": "uv.selection", "feature": "uv-uv-select-9828b3e2d1e2", "event": "rightmouse-press-e1f8405c2ae6", "command": "uv-select-3858e55c057d", "scope": {"name": "Image Editor Tool: Uv, Tweak (fallback)", "space_type": "IMAGE_EDITOR"}, "samples": ["31d610f08818ec7acff104b540013dcb8083d522e1494e45293aed9f43e9c0a8"]},
+    "uv-uv-editor-ccb4926ae40a": {"order": 336, "section": "uv.tools", "feature": "uv-uv-snap-cursor-5b41094ae33c", "event": "wheelrightmouse-press-a3296b868e13", "command": "uv-snap-cursor-2bda874b139f", "scope": {"name": "UV Editor"}, "samples": ["297b76f0871515c3a602f5a7423e5573ab4e2b8f762599397c5e00fb16ca57b6"]},
+    "uv-uv-editor-47a23a36f9f4": {"order": 337, "section": "uv.tools", "feature": "uv-uv-zenuv-move-cursor-to-b7c52b84f932", "event": "wheelleftmouse-press-5f49dc431250", "command": "uv-zenuv-move-cursor-to-fb20cb7ab12c", "scope": {"name": "UV Editor"}},
+    "uv-uv-editor-e49d125ed875": {"order": 338, "section": "uv.actions", "feature": "uv-uv-zenuv-fit-to-trim-fa5f2fb6e39f", "event": "middlemouse-press-52809775a202", "command": "uv-zenuv-fit-to-trim-441eeccb8362", "scope": {"name": "UV Editor"}, "samples": ["6a7a77ba23548cef2dec48b16e530194135e6035beb5929f897e39346be86928"]},
+    "uv-uv-editor-477bbd4d7b1a": {"order": 339, "section": "uv.tools", "feature": "uv-uv-cursor-set-5e09675a1105", "event": "middlemouse-press-5021049abe73", "command": "uv-cursor-set-4e00b3c34e79", "scope": {"name": "UV Editor"}, "samples": ["3c73547c2b700fb14d4ca9b93320a557cef7f95d8c4b0b18b689c8134caab810"]},
+    "uv-uv-editor-2674b110ad71": {"order": 340, "section": "uv.tools", "feature": "uv-uv-snap-cursor-f10397e53673", "event": "wheelupmouse-press-ab37832fa23c", "command": "uv-snap-cursor-2bda874b139f", "scope": {"name": "UV Editor"}, "samples": ["dcb6f79c6815728316fd55deb37520342ecd6616eb4b5f8aeb6d25fe8b7fd16e"]},
+    "uv-uv-editor-73fbb5a741a3": {"order": 341, "section": "uv.selection", "feature": "uv-uv-select-linked-pick-7cebd9ce4dae", "event": "leftmouse-double-click-f2701d4e830a", "command": "uv-select-linked-pick-ea7e01be1a4c", "scope": {"name": "UV Editor"}, "samples": ["aba49cd61706f407686fbb1a1d8add0f45a29d2e6c863a4e1c95543ff36ce6d3"]},
+    "uv-uv-editor-2c6fdc848041": {"order": 342, "section": "uv.selection", "feature": "uv-uv-select-linked-pick-6fdf7349f3f3", "event": "leftmouse-double-click-036da3bc6aae", "command": "uv-select-linked-pick-9b475b0bae44", "scope": {"name": "UV Editor"}, "samples": ["51527e5a764271307189138a0a1e1fd1f39358faa5c180ec70af846b49c3eebd"]},
+    "uv-uv-editor-7cecfe2cfe0e": {"order": 343, "section": "uv.selection", "feature": "uv-uv-select-linked-pick-0c3bf9b2f659", "event": "leftmouse-double-click-cad27df86ee0", "command": "uv-select-linked-pick-ff9df46b774c", "scope": {"name": "UV Editor"}, "samples": ["760e8d5e05afd1ab0afb175e64f56c724eb05227a9d7d83f9e451672077ae8ea"]},
+    "uv-uv-editor-1f36a133e78d": {"order": 344, "section": "uv.tools", "feature": "uv-wm-tool-set-by-id-532e1faa1977", "event": "q-release-075cd00d4a37", "command": "wm-tool-set-by-id-5485f198b7f4", "scope": {"name": "UV Editor"}, "samples": ["2cc296fd06d5bf974968ac07da759dec261c268a1dd598c61175b5b4f11e7f65"]},
+    "uv-uv-editor-2697d5a9996f": {"order": 345, "section": "uv.actions", "feature": "uv-uv-hide-64eec63086cd", "event": "h-press-5b34f4b38148", "command": "uv-hide-6343d1527d3a", "scope": {"name": "UV Editor"}, "samples": ["5cd2afd24dcb993de0c225921c2f69d83dbd583fc10135d98675b8c1db1412e0"]},
+    "uv-uv-editor-bd71dfbdb41e": {"order": 346, "section": "uv.selection", "feature": "uv-uv-select-loop-4657614c9bb8", "event": "leftmouse-double-click-aaa3efec698b", "command": "uv-select-loop-576e312338e8", "scope": {"name": "UV Editor"}, "samples": ["5fccd93d8aaf46c90ef18b42dc08a3e5d9babfb4263350b867b8c2dcf76b39fd"]},
+    "uv-uv-editor-d466d2c3e2c3": {"order": 347, "section": "uv.selection", "feature": "uv-uv-select-loop-525674df40a1", "event": "leftmouse-double-click-3afdd29ea210", "command": "uv-select-loop-83f6e03f56b5", "scope": {"name": "UV Editor"}, "samples": ["4be43c65802782650d9b12591136efbc6aa3bd962b6c0b77b96e059c2fac8c40"]},
+    "uv-image-editor-tool-uv-cursor-2f6988a78555": {"order": 348, "section": "uv.tools", "feature": "uv-uv-bh-place-and-move-cursor-8a3141757e85", "event": "middlemouse-press-a32f80d6dfcd", "command": "uv-bh-place-and-move-cursor-3a179b47eb1a", "scope": {"name": "Image Editor Tool: Uv, Cursor", "space_type": "IMAGE_EDITOR"}, "samples": ["4e2dc6fd4bdf26e2c0269c8384d35da4826c1a0f5d698621dabde8752cdacfa4", "653400cbc0a3037540a2a42b8f1ffdb90f62ad2c8155bf0bedafda0ffb86ed20"]},
+    "other-uv-editor-ba1f101d33fb": {"order": 576, "section": "uv.tools", "feature": "other-wm-context-menu-enum-864b93d9d2bb", "event": "x-press-f0f2e9a7027a", "command": "wm-context-menu-enum-ae48eab1a8cd", "scope": {"name": "UV Editor"}, "samples": ["722a9f3d88635234aaa29b918e4567bc984837499b9e935f166542308cb0d819"]},
+    "other-uv-editor-420e3d432bc5": {"order": 577, "section": "uv.selection", "feature": "other-uv-select-circle-3ff8991d1996", "event": "middlemouse-press-a32f80d6dfcd", "command": "uv-select-circle-80eeb98d142e", "scope": {"name": "UV Editor"}, "active": false, "samples": ["b87106c9fbc7d0e856b6c21f05616e9e9dcee170bd0c051549dc4e29bff6b730"]},
+    "other-uv-editor-b49ec71f1c98": {"order": 578, "section": "uv.tools", "feature": "other-wm-context-toggle-9939df6548fa", "event": "x-press-24d49a6c8b71", "command": "wm-context-toggle-a7297ca62aba", "scope": {"name": "UV Editor"}, "samples": ["159aa33a549e80f45262639cad33316678767e5aef2652ed64504b6600838438"]},
+    "other-uv-editor-a81916bb353d": {"order": 579, "section": "uv.tools", "feature": "other-wm-call-menu-e2b3e2ea759b", "event": "rightmouse-click-2c24f7057881", "command": "wm-call-menu-2a2f480203c1", "scope": {"name": "UV Editor"}, "samples": ["b90f275e701f1c676eff18af7af93b9e60cc2c1e0fdee420a6c6d3dbd691754a"]},
+    "other-uv-editor-b58c3764f6d4": {"order": 580, "section": "uv.tools", "feature": "other-wm-search-menu-4a2628d64f16", "event": "tab-press-4100a4f3dee7", "command": "wm-search-menu-1b31feeb626e", "scope": {"name": "UV Editor"}, "samples": ["218fd674c126e2f5d840ce223a70c70f6b0f5fe379885a5f82b26e26e141cda6"]},
+    "other-uv-editor-5ff39e5137c5": {"order": 581, "section": "uv.tools", "feature": "other-wm-call-panel-0be7444d72d7", "event": "ret-press-20195069023b", "command": "wm-call-panel-ee17374e9674", "scope": {"name": "UV Editor"}, "samples": ["bff17f9e8bcba4a651a21fc70305d836d27821848061e14ffc9db251037fd1d7"]}
+  },
+  "suppressions": {}
+}

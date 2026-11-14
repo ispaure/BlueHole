@@ -5,13 +5,11 @@ This module provides a unified way to describe:
 - an operator call
 - optional operator properties
 - optional UI enabled / disabled state with reason
-- optional keymap bindings
 
 The same OperatorAction can then be reused for:
 - pie menu buttons
 - menus
 - panels
-- keymap registration
 
 This does NOT replace the Blender operator classes themselves.
 It only describes how Blue Hole wants to expose or invoke them.
@@ -31,9 +29,7 @@ __status__ = 'Production'
 # IMPORTS
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Iterable
-from ..Lib.commonUtils.runtime.diagnostics import *
-from ..debug.debug_flags import *
+from typing import Any, Callable
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DATACLASSES
@@ -53,30 +49,6 @@ class UIState:
     icon: str = 'ERROR'
 
 
-@dataclass(frozen=True)
-class KeymapBinding:
-    """
-    Keymap binding metadata for an operator action.
-    """
-    keymap_name: str
-    space_type: str
-    key: str
-    value: str = 'PRESS'
-    ctrl: bool | int = False
-    shift: bool | int = False
-    alt: bool | int = False
-    oskey: bool | int = False
-    repeat: bool = False
-    region_type: str = 'WINDOW'
-    direction: str = 'ANY'
-    any: bool = False
-    hyper: bool | int = False
-    key_modifier: str = 'NONE'
-    map_type: str | None = None
-    active: bool = True
-    is_tool: bool | None = None
-
-
 @dataclass
 class OperatorAction:
     """
@@ -85,10 +57,9 @@ class OperatorAction:
     operator        : Operator bl_idname string or operator class.
     text            : UI label used when drawing the action.
     icon            : Default UI icon.
-    props           : Static operator properties applied to buttons and keymaps.
+    props           : Static operator properties applied to buttons.
     props_fn        : Optional callable -> dict of dynamic properties (fn(context)).
     ui_state_fn     : Optional callable -> UIState (fn(context)).
-    keymap_bindings : Optional tuple of KeymapBinding definitions.
     """
     operator: str | type
     text: str = ""
@@ -96,7 +67,6 @@ class OperatorAction:
     props: dict[str, Any] = field(default_factory=dict)
     props_fn: Callable[[Any], dict[str, Any]] | None = None
     ui_state_fn: Callable[[Any], UIState] | None = None
-    keymap_bindings: tuple[KeymapBinding, ...] = ()
 
     def get_idname(self) -> str:
         """
@@ -145,20 +115,6 @@ class OperatorAction:
         except Exception:
             return idname
 
-    def with_keymap_bindings(self, *bindings: KeymapBinding) -> "OperatorAction":
-        """
-        Return a copy of this action with additional keymap bindings appended.
-        """
-        return OperatorAction(
-            operator=self.operator,
-            text=self.text,
-            icon=self.icon,
-            props=dict(self.props),
-            props_fn=self.props_fn,
-            ui_state_fn=self.ui_state_fn,
-            keymap_bindings=tuple((*self.keymap_bindings, *bindings)),
-        )
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RESOLVE HELPERS
@@ -187,7 +143,7 @@ def resolve_bl_idname(target: str | type) -> str:
 
 def apply_properties(target, props: dict[str, Any]) -> None:
     """
-    Apply properties to a Blender operator button or keymap item properties object.
+    Apply properties to a Blender operator button properties object.
     """
     if target is None or not props:
         return
@@ -254,56 +210,6 @@ def draw_operator_action(
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# KEYMAP HELPERS
-
-
-def create_keymap_item(km, action: OperatorAction, binding: KeymapBinding, context=None):
-    """Create an exactly owned ordinary binding through the shared runtime."""
-    if km is None:
-        return None
-    from ..keymaps.keymap_utils import get_addon_keyconfig, capture_scope, KeymapScope
-    from ..keymaps.keymap_action_utils import ensure_action_keymaps
-
-    config = get_addon_keyconfig()
-    try:
-        if config is None or not any(candidate == km for candidate in config.keymaps):
-            return None
-    except (ReferenceError, RuntimeError):
-        return None
-    scope = KeymapScope(binding.keymap_name, binding.space_type, binding.region_type,
-                        False, binding.is_tool)
-    observed = capture_scope(km)
-    if ((observed.name, observed.space_type, observed.region_type, observed.is_modal)
-            != (scope.name, scope.space_type, scope.region_type, scope.is_modal)
-            or (scope.is_tool is not None and observed.is_tool != scope.is_tool)):
-        return None
-    one = OperatorAction(action.operator, props=action.props, props_fn=action.props_fn,
-                         keymap_bindings=(binding,))
-    pairs = ensure_action_keymaps('Direct', one, context=context,
-                                  keyconfig=config)
-    return next((item for map_, item in pairs if map_ == km), None)
-
-
-def create_keymap(kc, binding: KeymapBinding):
-    """Resolve the full ordinary map scope for compatibility callers."""
-    from ..keymaps.keymap_utils import get_or_create_keymap
-    return get_or_create_keymap(kc, binding.keymap_name, binding.space_type,
-                               binding.region_type)
-
-
-def register_operator_action_keymaps(category: str, kc, action: OperatorAction, context=None) -> list[tuple[Any, Any]]:
-    """Register atomically; only this session's exact items can be released."""
-    from ..keymaps.keymap_action_utils import ensure_action_keymaps
-    return ensure_action_keymaps(category, action, context=context, keyconfig=kc)
-
-
-def unregister_registered_keymaps(registered_keymaps: list[tuple[Any, Any]]) -> None:
-    """Release tracked ownership, including pending bindings in bound categories."""
-    from ..keymaps.keymap_utils import release_owned_pairs
-    release_owned_pairs(registered_keymaps)
-
-
-# ----------------------------------------------------------------------------------------------------------------------
 # CONVENIENCE HELPERS
 
 
@@ -313,7 +219,6 @@ def pie_menu_action(
         text: str = "",
         icon: str = 'NONE',
         ui_state_fn: Callable[[Any], UIState] | None = None,
-        keymap_bindings: Iterable[KeymapBinding] = (),
 ) -> OperatorAction:
     """
     Return an OperatorAction that opens a pie menu with wm.call_menu_pie.
@@ -327,7 +232,6 @@ def pie_menu_action(
         icon=icon,
         props={'name': resolve_bl_idname(menu)},
         ui_state_fn=ui_state_fn,
-        keymap_bindings=tuple(keymap_bindings),
     )
 
 
@@ -337,7 +241,6 @@ def menu_action(
         text: str = "",
         icon: str = 'NONE',
         ui_state_fn: Callable[[Any], UIState] | None = None,
-        keymap_bindings: Iterable[KeymapBinding] = (),
 ) -> OperatorAction:
     """
     Return an OperatorAction that opens a normal menu with wm.call_menu.
@@ -348,41 +251,4 @@ def menu_action(
         icon=icon,
         props={'name': resolve_bl_idname(menu)},
         ui_state_fn=ui_state_fn,
-        keymap_bindings=tuple(keymap_bindings),
     )
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# OPTIONAL MATCH HELPERS
-
-
-def action_matches_kmi(kmi, action: OperatorAction, context=None) -> bool:
-    """
-    Return True if the given keymap item matches the operator action.
-
-    Note:
-        Matching checks operator idname first.
-        Then all action props must match on kmi.properties.
-    """
-    if kmi is None:
-        return False
-
-    if kmi.idname != action.get_idname():
-        return False
-
-    for key, value in action.get_props(context).items():
-        if getattr(kmi.properties, key, None) != value:
-            return False
-
-    return True
-
-
-def remove_matching_action_kmis(km, action: OperatorAction, context=None) -> None:
-    """Release matching session-owned items; foreign lookalikes are never deleted."""
-    from ..keymaps.keymap_utils import release_owned_pairs, owned_pairs_for_map
-    props = action.get_props(context)
-    pairs = [(map_, item) for map_, item in owned_pairs_for_map(km)
-             if item.idname == action.get_idname()
-             and all(getattr(item.properties, name, None) == value
-                     for name, value in props.items())]
-    release_owned_pairs(pairs)

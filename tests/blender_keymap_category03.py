@@ -2246,7 +2246,4 @@ def cli():
 
 
 if __name__ == '__main__':
-    if 'DELUXE_CATEGORY_ROOT' in os.environ:
-        native_main(Path(os.environ['DELUXE_CATEGORY_ROOT']), os.environ['DELUXE_CATEGORY_MODE'])
-    else:
-        raise SystemExit(cli())
+    raise SystemExit('Historical migration fixture: run tests/blender_keymap_performance.py for the current JSON catalog.')

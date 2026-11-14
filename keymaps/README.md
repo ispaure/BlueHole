@@ -1,67 +1,31 @@
-# Keymap System
+# Deluxe keymaps
 
-This section is responsible for **registering and managing keymaps** for Blue Hole.
+[`deluxe-defaults.json`](deluxe-defaults.json) is the master for
+[ten section files](deluxe-defaults-sections). `deluxe_catalog.py` assembles and
+validates their assignments, commands, events, categories and sections, and
+publishes recoverable multi-file saves. Shared commands/events stay in the master. There is no second Python shortcut
+catalog. The required Save As bindings also come from JSON before the user
+configures Deluxe and while the Deluxe master switch is off.
 
-Blue Hole's editable shortcuts come from the
-[Deluxe catalog](../docs/deluxe-keymap-profiles.md) and use the runtime ownership
-ledger. The programmatic action declarations below supply the required Save As
-bindings before Deluxe is configured and provide reference coverage for the
-migration to JSON.
+`keymaps_register.py` coordinates startup, preference changes and cleanup.
+`deluxe_profiles.ProfileStore` loads the catalog, creates drafts, and validates
+and publishes **Save and Apply Changes** transactions. `deluxe_resolver.py`
+converts enabled entries into runtime requests. `keymap_utils.py` owns those
+requests, verifies native bindings, and safely withdraws only its own resources.
+Bulk load/unload batches merged-keymap updates while retaining immediate updates
+where a native readback proof needs one. `default_bindings.py` owns reversible
+disables of unchanged Blender defaults, with exact identity/readback guards.
 
----
+Category and section enable choices are part of the JSON draft, saved together
+with assignments and commands. Drafts preview automatically in Blender; only
+Save and Apply Changes writes the catalog, and Discard restores the saved state.
+Blender preferences keep the Deluxe master
+switch and first-activation marker. Installing a Blue Hole update replaces the
+edited catalog. UI menu actions stay in `actions/`; they contain no shortcut
+bindings or keymap registration methods.
 
-# Architecture Overview
-
-The system is divided into two responsibilities:
-
-## 1. Action Declaration (`actions/`)
-
-Operator actions are declared in the `actions/` package using the
-`OperatorAction` class.
-
-An `OperatorAction` describes:
-
-- the Blender operator to call
-- an optional UI label and icon
-- operator properties
-- one or more keymap bindings
-
-Example:
-
-```python
-OperatorAction(
-    operator='transform.translate',
-    text='Move Tool (Modal)',
-    keymap_bindings=(...)
-)
-```
-
-## 2. Keymap Registration (`keymaps/`)
-
-The keymap system reads `OperatorAction` definitions and registers their
-bindings into Blender.
-
-Each `OperatorAction` may contain one or more `KeymapBinding` entries which
-describe how the operator should be triggered.
-
-A `KeymapBinding` defines things such as:
-
-- keymap name (e.g. "3D View", "Mesh", etc.)
-- key
-- modifier keys
-- direction (for drag gestures)
-- region type
-- space type
-
-During registration the system:
-
-1. Collects all relevant `OperatorAction` objects
-2. Reads their `KeymapBinding` definitions
-3. Creates the corresponding Blender keymap items
-4. Stores them under the addon keyconfig
-
-This ensures keymaps are always generated from the action definitions rather
-than being duplicated across the codebase.
-
-
-
+See the [editor guide](../docs/deluxe-keymap-editor.md),
+[profile API](../docs/deluxe-keymap-profiles.md) and
+[runtime contract](../docs/deluxe-keymaps-runtime.md) for details. The older
+category receipts document migration evidence; their programmatic registration
+modules have been retired.

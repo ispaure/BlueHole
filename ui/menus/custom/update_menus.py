@@ -40,7 +40,6 @@ class BLUE_HOLE_MT_update_deluxe(bpy.types.Menu):
                     and keymaps_register.runtime_keymaps_allowed(context, settings)
                     else other_ops.WM_OT_Apply_Deluxe_Prefs)
         layout.operator(operator.bl_idname)
-        layout.operator(other_ops.WM_OT_Backup_Keymap_Setup.bl_idname)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

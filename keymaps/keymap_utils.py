@@ -12,6 +12,7 @@ __email__ = 'marcandre.voyer@gmail.com'
 __status__ = 'Production'
 
 from dataclasses import dataclass, field
+from contextlib import contextmanager
 import math
 import sys
 import time
@@ -268,6 +269,8 @@ _PENDING_CLEANUP = {}
 _CLEANUP_RETRY_REASONS = frozenset(('owned_remove_failed', 'owned_snapshot_unavailable'))
 _PROVIDER_REF_IDS = {}
 _RECONCILE_CURSOR = 0
+_MERGED_BATCH_DEPTH = 0
+_MERGED_DIRTY = False
 _COUNTS = {'checked': 0, 'created': 0, 'removed': 0, 'reinsertions': 0}
 
 
@@ -323,6 +326,8 @@ def _config(role):
 
 
 def _update_merged():
+    """Flush immediately, including inside a batch, before merged-map proofs."""
+    global _MERGED_DIRTY
     wm = get_window_manager()
     update = getattr(getattr(wm, 'keyconfigs', None), 'update', None)
     if callable(update):
@@ -330,6 +335,33 @@ def _update_merged():
             update()
         except (AttributeError, ReferenceError, RuntimeError, TypeError) as exc:
             raise _Pending('merged_update_failed') from exc
+    _MERGED_DIRTY = False
+
+
+def _request_merged_update():
+    global _MERGED_DIRTY
+    _MERGED_DIRTY = True
+    if not _MERGED_BATCH_DEPTH:
+        _update_merged()
+
+
+@contextmanager
+def batch_merged_updates():
+    """Coalesce source mutations on the main thread; flush before returning.
+
+    Source membership, readback, and removal checks still run for every item.
+    Callers that inspect merged keymaps must use _update_merged first. Nested
+    batches and failed operations flush at the outer boundary, including any
+    rollback removals. This is a merge boundary, not a source transaction.
+    """
+    global _MERGED_BATCH_DEPTH
+    _MERGED_BATCH_DEPTH += 1
+    try:
+        yield
+    finally:
+        _MERGED_BATCH_DEPTH -= 1
+        if not _MERGED_BATCH_DEPTH and _MERGED_DIRTY:
+            _update_merged()
 
 
 def _event(item):
@@ -561,7 +593,7 @@ def _remove_owned(owned):
         _COUNTS['removed'] += 1
         _remove_empty_map(owned.config, map_)
         try:
-            _update_merged()
+            _request_merged_update()
         except _Pending:
             return 'released_merged_update_failed'
         return 'released'
@@ -761,7 +793,7 @@ def _create_assignment(request, owner_id):
             owned.snapshot = actual
         else:
             _validate_created(owned, request.event, request.target, request.active)
-        _update_merged()
+        _request_merged_update()
         if not _valid_owned(owned):
             raise _Pending('created_membership_lost')
         _COUNTS['created'] += 1
@@ -782,7 +814,7 @@ def _remove_raw(owned):
         _remove_native_item(map_, item)
         _remove_empty_map(owned.config, map_)
         try:
-            _update_merged()
+            _request_merged_update()
         except _Pending:
             return 'released_merged_update_failed'
         return 'released'
@@ -816,12 +848,17 @@ def _conflicting_owned_event(owner_id, scope, event):
         if other.owner_id == owner_id:
             continue
         for owned in other._owned.values():
+            # Only a matching captured event can conflict. Native membership
+            # checks scan Blender collections, so avoid them for unrelated rows.
+            if not owned.snapshot or not owned.snapshot[2] or owned.snapshot[0] != event:
+                continue
             live = _live_owned_members(owned)
-            if live is not None and owned.snapshot and owned.snapshot[2] and \
-                    _scope(live[0]) == scope and owned.snapshot[0] == event:
+            if live is not None and _scope(live[0]) == scope:
                 return True
     for records in _PENDING_CLEANUP.values():
         for owned, _ in records:
+            if owned.snapshot and (not owned.snapshot[2] or owned.snapshot[0] != event):
+                continue
             live = _live_owned_members(owned)
             if live is None or _scope(live[0]) != scope:
                 continue
@@ -1491,6 +1528,21 @@ def drain_legacy(category):
 
 def capture_scope(map_):
     return _scope(map_)
+
+
+def resolve_scope(stated, config):
+    """Resolve a catalog scope's observable tool state without changing maps."""
+    if config is None or stated.is_tool is not None:
+        return stated
+    try:
+        candidates = [capture_scope(map_) for map_ in config.keymaps
+                      if map_.name == stated.name
+                      and map_.space_type == stated.space_type
+                      and map_.region_type == stated.region_type
+                      and not map_.is_modal]
+    except (AttributeError, ReferenceError, RuntimeError, TypeError):
+        return stated
+    return candidates[0] if len(candidates) == 1 else stated
 
 
 def capture_event(item):

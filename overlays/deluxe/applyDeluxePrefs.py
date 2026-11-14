@@ -2,12 +2,9 @@
 
 from hashlib import sha256
 from pathlib import Path
-from shutil import rmtree
-from tempfile import mkdtemp
 
 import bpy
 
-from ...Lib.commonUtils.persistence import atomic_write_bytes
 from ...Lib.commonUtils.runtime.diagnostics import Severity, log
 
 LEGACY_PRESET = 'BH_Keymaps'
@@ -56,30 +53,6 @@ def uses_blender_keyconfig(configs):
     return configs.default is not None and configs.active == configs.default
 
 
-def backup_keymap_setup(context):
-    """Keep private copies of the saved preferences and available preset for rollback."""
-    path = _preferences_path()
-    if not path.is_file():
-        raise ValueError('Save Blender Preferences before backing up the keymap setup.')
-    configs = context.window_manager.keyconfigs
-    name = configs.active.name
-    preset = _legacy_preset_path()
-    if not uses_blender_keyconfig(configs):
-        preset = bpy.utils.preset_find(name, 'keyconfig', display_name=False)
-        if not preset:
-            raise ValueError('Export the active keymap preset in Blender Preferences before switching.')
-    backup = Path(mkdtemp(prefix='bluehole-keymap-recovery-', dir=path.parent))
-    try:
-        atomic_write_bytes(backup / path.name, path.read_bytes(), overwrite=False, file_mode=0o600)
-        if preset:
-            source = Path(preset)
-            atomic_write_bytes(backup / source.name, source.read_bytes(), overwrite=False, file_mode=0o600)
-    except BaseException:
-        rmtree(backup)
-        raise
-    return backup
-
-
 def needs_keymap_review(context, preference):
     if preference.keymap.deluxe_configured:
         return False
@@ -126,31 +99,15 @@ def apply_deluxe_prefs(context, preference, *, reviewed=False):
     log(Severity.INFO, LOG_TITLE, 'Starting Deluxe keymap activation.')
     if (legacy_preset_active(context)
             or not uses_blender_keyconfig(context.window_manager.keyconfigs)):
-        raise ValueError('Back up your current setup, then select Blender in Preferences > Keymap.')
+        raise ValueError('Select Blender in Preferences > Keymap before enabling Deluxe Keymaps.')
     if needs_keymap_review(context, preference) and not reviewed:
         raise ValueError('Review the saved shortcuts before enabling Deluxe keymaps.')
 
     options = [(preference.keymap, 'deluxe_configured', True),
                (preference.keymap, 'enable_keymaps', True)]
-    if not preference.pie.is_property_set('enable_pie_menus'):
-        options.append((preference.pie, 'enable_pie_menus', True))
     _set_keymap_options(context, options, activating=True)
     log(Severity.INFO, LOG_TITLE, 'Deluxe keymaps enabled for the Blender preset.')
 
 
 def disable_deluxe_keymaps(context, preference):
     _set_keymap_options(context, [(preference.keymap, 'enable_keymaps', False)])
-
-
-def reset_deluxe_groups(context, preference):
-    """Restore feature switch defaults while keeping activation and user bindings."""
-    from ...preferences.addon.keymap_props import KEYMAP_CATEGORIES
-
-    groups = [getattr(preference.keymap, name) for name in KEYMAP_CATEGORIES]
-    groups.extend((preference.thirdparty.auto_constraints, preference.thirdparty.x_ray_selection_tools))
-    options = [(group, prop.identifier, None) for group in groups
-               for prop in group.bl_rna.properties
-               if prop.type == 'BOOLEAN' and prop.identifier.startswith('enable_')]
-    options.extend(((preference.pie, 'enable_pie_menus', True),
-                    (preference.pie, 'enable_editor_pie_shortcuts', None)))
-    _set_keymap_options(context, options)

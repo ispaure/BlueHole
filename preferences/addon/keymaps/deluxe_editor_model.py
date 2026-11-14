@@ -1,6 +1,8 @@
 """Draft operations and display values for the Deluxe Preferences editor."""
 
 from collections import Counter
+from copy import deepcopy
+import json
 from struct import pack, unpack
 from time import monotonic
 from uuid import uuid4
@@ -46,6 +48,21 @@ def map_type(key):
 
 def key_label(key):
     return KEY_LABELS.get(key, title(key) if len(key) > 1 else key)
+
+
+def captured_input(previous, event):
+    """Keep compatible binding settings when capturing only a new input."""
+    kind = map_type(event.type)
+    captured = dict(previous)
+    if kind != previous.get('map_type', map_type(previous['type'])):
+        captured.update(value='PRESS', direction='ANY', repeat=False)
+    captured.update(type=event.type, map_type=kind, any=False,
+                    **{key: bool(getattr(event, key, False)) for key in MODIFIERS if key != 'hyper'})
+    if hasattr(event, 'hyper'):
+        captured['hyper'] = bool(event.hyper)
+    if kind != 'KEYBOARD' or captured.get('value', 'PRESS') not in {'PRESS', 'ANY'}:
+        captured['repeat'] = False
+    return captured
 
 
 def key_filter(query, event_labels):
@@ -112,6 +129,10 @@ def context_label(scope):
                        *(['Modal'] if scope.get('is_modal') else [])])
 
 
+def context_id(scope):
+    return json.dumps([scope['name'], scope.get('space_type', 'EMPTY'), scope.get('region_type', 'WINDOW')])
+
+
 def display_value(value):
     if isinstance(value, bool):
         return 'On' if value else 'Off'
@@ -124,6 +145,8 @@ class Editor:
     """One working draft per loaded profile, shared across Preferences windows."""
 
     def __init__(self, store):
+        self.capture_assignment = ''
+        self.capture_shared = False
         self.store = store
         self.defaults = store.defaults()
         self.draft = store.begin()
@@ -131,6 +154,7 @@ class Editor:
         self.catalog = self.draft.snapshot()
         self.category = 'navigation' if 'navigation' in self.catalog['categories'] else ''
         self.feature_category = self.category
+        self.feature_section = ''
         self.section = ''
         self.assignment = ''
         self.expanded_shortcut = ''
@@ -138,17 +162,123 @@ class Editor:
         self.command = ''
         self.command_category = ''
         self.command_section = ''
+        self.binding_all = True
+        self.binding_category_all = True
+        self.binding_context = ''
+        self.binding_command = ''
+        self.focus_command = False
         self.page = 0
         self.message = ''
         self.dirty = False
+        self.preview_error = ''
         self._preview = None
         self._preview_at = 0
+        self.ensure_selection()
+
+    def ensure_selection(self):
+        """Keep transient tab/filter IDs valid after catalog edits or reloads."""
+        categories = self.catalog['categories']
+        if self.category not in categories:
+            self.binding_all = True
+        if self.section not in self.catalog['sections']:
+            self.binding_category_all = True
+        if self.binding_context not in self.binding_contexts():
+            self.binding_context = ''
+        if self.binding_command not in self.catalog['commands']:
+            self.binding_command = ''
+        for category_attr, section_attr in (('category', 'section'),
+                                            ('feature_category', 'feature_section')):
+            category = getattr(self, category_attr)
+            if category not in categories:
+                category = next(iter(categories), '')
+                setattr(self, category_attr, category)
+            sections = self.sections(category)
+            if getattr(self, section_attr) not in sections:
+                setattr(self, section_attr, next(iter(sections), ''))
+        if self.command_category not in categories:
+            self.command_category = self.command_section = ''
+        elif self.command_section not in self.sections(self.command_category):
+            self.command_section = ''
+
+    def binding_contexts(self):
+        rows = [row['scope'] for row in self.catalog['assignments'].values()]
+        rows += [row['selector']['scope'] for row in self.catalog['suppressions'].values()]
+        return {context_id(scope): scope for scope in sorted(rows, key=context_label)}
+
+    def accepts_binding(self, row):
+        if not self.binding_all:
+            if self.catalog['sections'][row['section']]['category'] != self.category:
+                return False
+            if not self.binding_category_all and row['section'] != self.section:
+                return False
+        return ((not self.binding_context or context_id(row['scope']) == self.binding_context)
+                and (not self.binding_command or row['command'] == self.binding_command))
+
+    def show_all_bindings(self, command=''):
+        self.binding_all = True
+        self.binding_category_all = True
+        self.binding_context = ''
+        self.binding_command = command
+        self.assignment, self.page = '', 0
+
+    def select_category(self, category):
+        require(category in self.catalog['categories'], 'Section no longer exists')
+        self.category = self.feature_category = category
+        self.binding_all, self.binding_category_all = False, True
+        self.assignment, self.page = '', 0
+        self.ensure_selection()
+
+    def select_section(self, section):
+        require(section in self.catalog['sections'], 'Subsection no longer exists')
+        self.category = self.feature_category = self.catalog['sections'][section]['category']
+        self.section = self.feature_section = section
+        self.binding_all = self.binding_category_all = False
+        self.assignment, self.page = '', 0
+
+    def create_command(self, operator='', label='', source=''):
+        row = deepcopy(self.catalog['commands'][source]) if source else {'operator': operator, 'properties': {}}
+        require('operator' in row, 'Modal tokens cannot be created as ordinary commands')
+        if label.strip():
+            row['label'] = label.strip()
+        self.store.resolver.validate_command(row, 'new-command')
+        id_ = uuid4().hex
+        self.draft.put('commands', id_, row)
+        self.command = id_
+        self.command_category = self.command_section = ''
+        self.focus_command = True
+        self.changed('Command added; create a binding to use it')
+        return id_
+
+    def remove_command(self, id_):
+        require(not self.draft.uses('commands', id_) and not any(
+            row.get('replacement') == id_ for row in self.catalog['suppressions'].values()),
+            'Remove or change every binding and replacement rule before deleting this command')
+        self.draft.delete('commands', id_)
+        self.command = ''
+        self.changed('Unused command removed')
 
     def changed(self, message='Changes staged'):
         self.catalog = self.draft.snapshot()
+        self.ensure_selection()
         self.dirty = not same_value(self.catalog, self.saved)
         self._preview = None
         self.message = message
+        try:
+            self.store.preview_draft(self.draft)
+        except (ValueError, OSError, RuntimeError, ReferenceError) as error:
+            self.preview_error = str(error)
+        else:
+            self.preview_error = ''
+
+    def set_enabled(self, table, id_, enabled):
+        require(table in ('categories', 'sections', 'assignments', 'suppressions'), 'Invalid toggle target')
+        if table == 'assignments':
+            self.require_editable_assignment(id_)
+        row = self.catalog[table][id_]
+        require(not row.get('required'), 'This section is required')
+        if row.get('enabled', True) != enabled:
+            self.draft.update(table, id_, enabled=enabled)
+            self.changed()
 
     def preview(self):
         now = monotonic()
@@ -158,6 +288,7 @@ class Editor:
         return self._preview
 
     def discard(self):
+        self.store.cancel_preview()
         self.draft.discard()
         self.saved = self.store.snapshot()
         self.draft = self.store.begin()
@@ -171,7 +302,8 @@ class Editor:
     def reload(self):
         self.store.reload()
         self.discard()
-        self.message = 'Profile reloaded'
+        self.message = ('JSON validation failed; kept the saved setup' if self.store.load_issue
+                        else 'JSON files validated and reloaded')
 
     def sections(self, category=None):
         category = self.category if category is None else category
@@ -194,6 +326,8 @@ class Editor:
             order = max((self.catalog['sections'][other].get('order', 0) for other in ids), default=-1)
             self.draft.put('sections', id_, {'label': name, 'category': self.category, 'order': order + 1})
         self.section = id_
+        self.feature_category, self.feature_section = self.category, id_
+        self.binding_all = self.binding_category_all = False
         self.page = 0
         self.changed()
 
@@ -289,7 +423,9 @@ class Editor:
             self.require_editable_assignment(assignment)
             require(self.catalog['assignments'][assignment]['command'] == command_id,
                     'The assignment command changed. Reopen the field.')
-            command_id = self.draft.clone('commands', assignment)
+            if len(self.draft.uses('commands', command_id)) > 1 or any(
+                    row.get('replacement') == command_id for row in self.catalog['suppressions'].values()):
+                command_id = self.draft.clone('commands', assignment)
         else:
             for id_ in self.draft.uses('commands', command_id):
                 self.require_editable_assignment(id_)

@@ -564,6 +564,102 @@ class RuntimeKeymapTests(unittest.TestCase):
             self.assertEqual(len(handle.owned_pairs), 1)
             update.assert_called_once()
 
+    def test_bulk_registration_bounds_native_scans_and_merges(self):
+        addon = self.addon()
+        count = 128
+        with patch.object(self.utils, '_live_owned_members', wraps=self.utils._live_owned_members) as live:
+            with self.utils.batch_merged_updates():
+                for index in range(count):
+                    self.utils.register_feature('bulk-' + str(index), assignments=(
+                        self.assignment(event=self.event(type='KEY_' + str(index))),))
+                self.assertEqual(len(addon.keymap_items), count)
+                self.assertEqual(self.runtime.configs.update_calls, [])
+            # Unrelated events must not trigger pairwise native collection scans.
+            self.assertLessEqual(live.call_count, count * 3)
+        self.assertEqual(len(self.runtime.configs.update_calls), 1)
+        with self.utils.batch_merged_updates():
+            self.utils.release_all()
+        self.assertEqual(len(addon.keymap_items), 0)
+        self.assertEqual(len(self.runtime.configs.update_calls), 2)
+        self.assertEqual(self.utils.runtime_stats()['tracked_resources'], 0)
+
+    def test_nested_batch_flushes_on_exception_and_resets_boundary(self):
+        self.addon()
+        with self.assertRaisesRegex(RuntimeError, 'interrupted'):
+            with self.utils.batch_merged_updates():
+                with self.utils.batch_merged_updates():
+                    handle = self.utils.register_feature('batched', assignments=(self.assignment(),))
+                self.assertEqual(self.runtime.configs.update_calls, [])
+                raise RuntimeError('interrupted')
+        self.assertEqual(len(self.runtime.configs.update_calls), 1)
+        handle.release()
+        self.assertEqual(len(self.runtime.configs.update_calls), 2)
+
+    def test_failed_batch_flush_propagates_and_can_be_retried(self):
+        self.addon()
+        with patch.object(self.runtime.configs, 'update', side_effect=RuntimeError('merge failed')):
+            with self.assertRaises(self.utils._Pending):
+                with self.utils.batch_merged_updates():
+                    self.utils.register_feature('batched', assignments=(self.assignment(),))
+        with self.utils.batch_merged_updates():
+            self.utils.release_all()
+        self.assertEqual(len(self.runtime.configs.update_calls), 1)
+        self.assertEqual(self.utils.runtime_stats()['tracked_resources'], 0)
+        # A successful retry leaves no dirty state behind.
+        with self.utils.batch_merged_updates():
+            pass
+        self.assertEqual(len(self.runtime.configs.update_calls), 1)
+
+    def test_batch_creation_failure_merges_the_rolled_back_state(self):
+        foreign = row('foreign.binding', key='Z')
+        addon = self.addon(foreign)
+        addon.keymap_items.fail_create_at = 2
+        with self.utils.batch_merged_updates():
+            handle = self.utils.register_feature('batched', assignments=(self.assignment(),
+                self.assignment('second', event=self.event(type='B'))))
+        self.assertEqual(list(addon.keymap_items), [foreign])
+        self.assertFalse(handle.owned_pairs)
+        self.assertEqual(self.runtime.configs.update_calls, [(('3D View', ('foreign.binding',)),)])
+
+    def test_batch_release_preserves_edits_and_retries_failed_removals(self):
+        addon = self.addon()
+        first = self.utils.register_feature('first', assignments=(self.assignment(),))
+        second = self.utils.register_feature('second', assignments=(
+            self.assignment(event=self.event(type='B')),))
+        edited = first.owned_pairs[0][1]
+        edited.type = 'F19'
+        addon.keymap_items.fail_next_remove = True
+        with self.utils.batch_merged_updates():
+            first.release()
+            second.release()
+        self.assertEqual(len(self.utils.retained_edits()), 1)
+        self.assertEqual(len(self.utils.pending_cleanup()), 1)
+        with self.utils.batch_merged_updates():
+            self.utils.release_all()
+        self.assertEqual(list(addon.keymap_items), [edited])
+        self.assertFalse(self.utils.pending_cleanup())
+
+    def test_override_proofs_flush_pending_assignments_inside_batch(self):
+        self.source(row())
+        addon = self.addon()
+        proof = self.utils._preflight_merged_source
+
+        def check_current(selector):
+            self.assertEqual(self.runtime.configs.update_calls[-1],
+                             (('3D View', tuple(item.idname for item in addon.keymap_items)),))
+            return proof(selector)
+
+        with patch.object(self.utils, '_preflight_merged_source', side_effect=check_current):
+            with self.utils.batch_merged_updates():
+                self.utils.register_feature('ordinary', assignments=(self.assignment(
+                    event=self.event(type='B'), target=self.target('bluehole.ordinary')),))
+                handle = self.utils.register_feature('override', overrides=(self.override(),))
+                self.assertEqual(len(handle.owned_pairs), 1)
+                # The replacement order proof must also merge its own creation.
+                self.assertEqual(self.runtime.configs.update_calls[-1],
+                                 (('3D View', ('bluehole.ordinary', 'bluehole.replacement')),))
+        self.assertEqual(len(self.runtime.configs.update_calls), 2)
+
     def test_property_setter_failure_removes_created_item(self):
         self.source(row())
         addon = self.addon()
@@ -1449,88 +1545,42 @@ class RuntimeKeymapTests(unittest.TestCase):
         self.assertEqual(list(maps), [foreign_map])
         self.assertEqual(list(foreign_map.keymap_items), [foreign_item])
 
-    def load_production_action_adapter(self):
-        for suffix in ('actions', 'Lib', 'Lib.commonUtils',
-                       'Lib.commonUtils.runtime', 'debug'):
-            package = types.ModuleType(self.prefix + '.' + suffix)
-            package.__path__ = []
-            sys.modules[package.__name__] = package
-        for suffix in ('Lib.commonUtils.runtime.diagnostics', 'debug.debug_flags'):
-            sys.modules[self.prefix + '.' + suffix] = types.ModuleType(self.prefix + '.' + suffix)
-        action_name = self.prefix + '.actions.operator_action'
-        action_spec = importlib.util.spec_from_file_location(action_name,
-            ROOT / 'actions/operator_action.py')
-        actions = importlib.util.module_from_spec(action_spec)
-        sys.modules[action_name] = actions
-        action_spec.loader.exec_module(actions)
-        name = self.prefix + '.keymaps.keymap_action_utils'
-        spec = importlib.util.spec_from_file_location(name,
-            ROOT / 'keymaps/keymap_action_utils.py')
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[name] = module
-        spec.loader.exec_module(module)
-        return actions, module
-
-    def test_legacy_binding_accepts_unobservable_default_hyper(self):
+    def test_catalog_assignment_accepts_unobservable_default_hyper(self):
         addon = self.addon()
         addon.keymap_items.new_missing_fields.add('hyper')
-        actions, module = self.load_production_action_adapter()
-        for key, expected_map_type in (('A', 'KEYBOARD'), ('LEFTMOUSE', 'MOUSE')):
+        for key, map_type in (('A', 'KEYBOARD'), ('LEFTMOUSE', 'MOUSE')):
             with self.subTest(key=key):
-                binding = actions.KeymapBinding('3D View', 'VIEW_3D', key,
-                                                is_tool=False)
-                self.assertIsNone(binding.map_type)
-                action = actions.OperatorAction('bluehole.legacy_' + key.lower(),
-                                                keymap_bindings=(binding,))
-                pairs = module.ensure_action_keymaps('Legacy', action,
-                    context=self.runtime.bpy.context)
-                self.assertEqual(len(pairs), 1)
-                self.assertEqual(pairs[0][1].idname, 'bluehole.legacy_' + key.lower())
-                observed = self.utils.capture_event(pairs[0][1])
+                request = replace(self.assignment(event=self.event(type=key, map_type=map_type)),
+                                  declared_properties_only=True)
+                handle = self.utils.register_feature('catalog-row', assignments=(request,))
+                self.assertEqual(len(handle.owned_pairs), 1)
+                observed = self.utils.capture_event(handle.owned_pairs[0][1])
                 self.assertIsNone(observed.hyper)
-                self.assertEqual(observed.map_type, expected_map_type)
-                self.utils.release_owned_pairs(pairs)
+                self.assertEqual(observed.map_type, map_type)
+                handle.release()
         self.assertEqual(len(addon.keymap_items), 0)
 
-    def test_equivalent_transient_actions_share_exact_legacy_owner(self):
+    def test_equivalent_catalog_request_reuses_owned_item(self):
         addon = self.addon()
-        actions, adapter = self.load_production_action_adapter()
-        binding = actions.KeymapBinding('3D View', 'VIEW_3D', 'A', is_tool=False)
-        first_action = actions.OperatorAction('bluehole.legacy',
-                                              keymap_bindings=(binding,))
-        second_action = actions.OperatorAction('bluehole.legacy',
-                                               keymap_bindings=(binding,))
-        self.assertIsNot(first_action, second_action)
-        first = adapter.ensure_action_keymaps('Legacy', first_action,
-                                              context=self.runtime.bpy.context)
-        second = adapter.ensure_action_keymaps('Legacy', second_action,
-                                               context=self.runtime.bpy.context)
+        request = self.assignment()
+        first = self.utils.register_feature('catalog-row', assignments=(request,))
+        item = first.owned_pairs[0][1]
+        second = self.utils.register_feature('catalog-row', assignments=(replace(request),))
+        self.assertIs(first, second)
+        self.assertIs(second.owned_pairs[0][1], item)
         self.assertEqual(len(addon.keymap_items), 1)
-        self.assertEqual(self.utils.runtime_stats()['features'], 1)
-        self.assertEqual(len(first), 1)
-        self.assertIs(first[0][1], second[0][1])
-        self.utils.release_owned_pairs(first)
-        self.assertEqual(len(addon.keymap_items), 0)
+        first.release()
 
-    def test_equivalent_transient_action_cannot_recreate_direct_user_edit(self):
+    def test_catalog_request_cannot_recreate_direct_user_edit(self):
         addon = self.addon()
-        actions, adapter = self.load_production_action_adapter()
-        binding = actions.KeymapBinding('3D View', 'VIEW_3D', 'A', is_tool=False)
-        first_action = actions.OperatorAction('bluehole.legacy',
-                                              keymap_bindings=(binding,))
-        first = adapter.ensure_action_keymaps('Legacy', first_action,
-                                              context=self.runtime.bpy.context)
-        self.assertEqual(len(first), 1)
-        owned = first[0][1]
-        owned.type = 'F19'
-        self.utils.release_owned_pairs(first)
-        self.assertEqual(list(addon.keymap_items), [owned])
-        replacement_action = actions.OperatorAction('bluehole.legacy',
-            keymap_bindings=(binding,))
-        second = adapter.ensure_action_keymaps('Legacy', replacement_action,
-                                               context=self.runtime.bpy.context)
-        self.assertEqual(second, [])
-        self.assertEqual(list(addon.keymap_items), [owned])
+        request = self.assignment()
+        first = self.utils.register_feature('catalog-row', assignments=(request,))
+        item = first.owned_pairs[0][1]
+        item.type = 'F19'
+        first.release()
+        second = self.utils.register_feature('catalog-row', assignments=(replace(request),))
+        self.assertFalse(second.owned_pairs)
+        self.assertEqual(list(addon.keymap_items), [item])
         self.assertEqual(len(self.utils.retained_edits()), 1)
 
     def test_stable_merged_priority_failure_does_not_rebuild_forever(self):
@@ -1556,7 +1606,7 @@ class RuntimeKeymapTests(unittest.TestCase):
 
 
 class LifecycleIntegrationTests(unittest.TestCase):
-    """Import only the orchestrator, with category and preference seams stubbed."""
+    """Import only the orchestrator, with catalog and preference seams stubbed."""
 
     def setUp(self):
         harness = RuntimeKeymapTests('test_plain_assignment_owns_only_its_exact_item')
@@ -1567,7 +1617,6 @@ class LifecycleIntegrationTests(unittest.TestCase):
         self.runtime = harness.runtime
         self.runtime.map('addon', tool=False)
         prefix = harness.prefix
-        self.category_modules = {}
         self.fail_category = None
         self.calls = []
         self.timers = {}
@@ -1625,53 +1674,30 @@ class LifecycleIntegrationTests(unittest.TestCase):
         preference_module = stub_module(prefix + '.preferences.prefs')
         preference_module.prefs = lambda: self.preferences
 
-        category_names = ('Mesh', 'Navigation', 'Object', 'Pipeline', 'Sculpt',
-                          'Selection', 'Transform', 'UV', 'Other', 'Pie')
-        for category_index, category in enumerate(category_names):
-            stem = category.lower() + '_keymaps_register'
-            path = prefix + ('.keymaps.pie.' if category == 'Pie' else '.keymaps.') + stem
-            module = stub_module(path)
-            module.KEYMAP_CATEGORY = category
-            pairs = []
-            setattr(module, 'registered_' + category.lower() + '_keymaps', pairs)
-
-            def register(category=category, pairs=pairs, category_index=category_index):
-                self.calls.append(('register', category))
-                if self.fail_category == category:
-                    raise RuntimeError('injected category failure')
-                if category == 'Pie' and not self.preferences.pie.enable_pie_menus:
-                    return 0
-                self.core.register_feature('legacy:' + category + ':fixture',
-                    assignments=(self.h.assignment('request-' + category,
-                        event=self.h.event(type='F' + str(category_index + 1)),
-                        target=self.h.target('bluehole.' + category.lower())),))
-                self.core.sync_category_pairs(category)
-                return len(pairs)
-
-            def unregister(category=category, pairs=pairs):
-                self.calls.append(('unregister', category))
-                self.core.release_owned_pairs(pairs)
-                return 0
-
-            module.register = register
-            if category == 'Pipeline':
-                module.register_required = register
-            module.unregister = unregister
-            self.category_modules[category] = module
-
         name = prefix + '.keymaps.keymaps_register'
         spec = importlib.util.spec_from_file_location(name, ROOT / 'keymaps/keymaps_register.py')
         orchestrator = importlib.util.module_from_spec(spec)
         sys.modules[name] = orchestrator
         spec.loader.exec_module(orchestrator)
         self.orchestrator = orchestrator
-        # This harness substitutes all native category registrars. Keep the
-        # same fixture for the Deluxe branch, which now installs one catalog.
-        def register_deluxe(_catalog):
-            return sum(module.register() for category, module in self.category_modules.items()
-                       if self.preferences.keymap.enable_keymaps or category == 'Pipeline')
+        @self.core.batch_merged_updates()
+        def register_deluxe(_catalog=None, *, required_only=False):
+            count = 0
+            for index, category in enumerate(('Mesh', 'Navigation', 'Object', 'Pipeline', 'Sculpt',
+                                              'Selection', 'Transform', 'UV', 'Other', 'Pie')):
+                if (required_only or not self.preferences.keymap.enable_keymaps) and category != 'Pipeline':
+                    continue
+                if self.fail_category == category:
+                    raise RuntimeError('injected category failure')
+                handle = self.core.register_feature('catalog:' + category, assignments=(
+                    self.h.assignment('request-' + category,
+                                      event=self.h.event(type='F' + str(index + 1)),
+                                      target=self.h.target('bluehole.' + category.lower())),))
+                count += len(handle.owned_pairs)
+            return count
 
-        orchestrator.deluxe_profile = lambda: types.SimpleNamespace(register=register_deluxe)
+        self.catalog_store = types.SimpleNamespace(register=register_deluxe)
+        orchestrator._catalog_store = lambda: self.catalog_store
         self.addCleanup(orchestrator.unregister)
 
     def addon_names(self):
@@ -1764,6 +1790,15 @@ class LifecycleIntegrationTests(unittest.TestCase):
         self.orchestrator.refresh()
         self.assertEqual(len(self.addon_names()), 10)
 
+    def test_legacy_switches_do_not_trigger_catalog_rebuilds(self):
+        self.orchestrator.register()
+        before = self.core.runtime_stats()['created']
+        self.preferences.pie.enable_pie_menus = False
+        self.preferences.thirdparty.enable_thirdparty = False
+        self.orchestrator._watch_keymaps()
+        self.assertEqual(self.core.runtime_stats()['created'], before)
+        self.assertEqual(len(self.addon_names()), 10)
+
     def test_later_category_failure_drains_earlier_work_and_timer(self):
         self.fail_category = 'Sculpt'
         with self.assertRaisesRegex(RuntimeError, 'injected category failure'):
@@ -1773,6 +1808,28 @@ class LifecycleIntegrationTests(unittest.TestCase):
         self.assertEqual(self.core.runtime_stats()['features'], 0)
         self.orchestrator.unregister()
         self.assertEqual(self.addon_names(), [])
+
+    def test_final_bulk_merge_failure_drains_all_categories(self):
+        register = self.orchestrator._catalog_store().register
+        self.orchestrator._catalog_store = lambda: types.SimpleNamespace(
+            register=self.core.batch_merged_updates()(register))
+        update = self.runtime.configs.update
+        attempts = []
+
+        def fail_once():
+            attempts.append(True)
+            if len(attempts) == 1:
+                raise RuntimeError('merge failed')
+            update()
+
+        with patch.object(self.runtime.configs, 'update', side_effect=fail_once):
+            with self.assertRaises(self.core._Pending):
+                self.orchestrator.register()
+        self.assertEqual(len(attempts), 2)
+        self.assertEqual(self.addon_names(), [])
+        self.assertEqual(self.core.runtime_stats()['tracked_resources'], 0)
+        self.assertEqual(self.timers, {})
+        self.assertEqual(self.orchestrator.register(), 10)
 
     def test_addon_unload_drains_failed_post_register_init(self):
         prefix = self.h.prefix

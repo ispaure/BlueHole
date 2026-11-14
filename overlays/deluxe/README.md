@@ -1,56 +1,44 @@
 # Deluxe keymaps
 
 Enable Blue Hole and select the built-in **Blender** keymap preset. In Blue
-Hole's **Addon Settings → Keymaps**, choose **Enable Keymaps** or **Use Keymap
-Editor** to open the Deluxe catalog. You can also choose **Enable Deluxe
-Keymaps** under **Updates & Deluxe** in the Blue Hole header menu. Blue Hole
-adds the shortcuts and pies at runtime. Every feature group starts enabled in
-a fresh profile.
+Hole's **Addon Settings → Keymaps**, choose **Enable Deluxe Keymaps** to open
+the catalog. The same command is available under **Updates & Deluxe** in the
+Blue Hole header menu. Blue Hole registers the shortcuts and pies at runtime.
 
-Use **Addon Settings > Keymaps**, **Pie Menus**, and **Third-Party Add-ons** in
-Blue Hole preferences to change features. **Disable Deluxe Keymaps** removes
-the runtime catalog and its pie shortcuts and keeps your feature choices for
-the next enable. Blender saves the Blue Hole activation and feature switches
-on normal exit if **Auto-Save Preferences** is enabled. Otherwise choose
-**Save Preferences** in Blender to keep the choice across sessions. The
-shortcut editor's **Save and Apply Changes** writes assignment edits to
-`keymaps/deluxe-defaults.json` in the active Blue Hole installation.
-The standard Blue Hole Save As shortcut is part of Blue Hole's pipeline while
-the add-on is enabled. Disable Blue Hole to restore the stock Save As shortcut.
+Use the editor's **Sections** tab to enable categories and sections, including
+**Pie**. Valid edits preview automatically without saving. **Discard** restores
+the saved setup. **Save and Apply Changes** writes those choices, assignments and command
+settings to `keymaps/deluxe-defaults.json` and its section files in the active Blue Hole installation.
+**Installing a Blue Hole update replaces these edits with the shipped catalog.**
+The editor displays this warning on all three tabs. With Logistics' Local source,
+the installation links to the checkout, so catalog edits appear in Git.
 
-**Reset Deluxe Feature Switches** restores the Blue Hole keymap, pie, and
-supported third-party shortcut switches to their Deluxe defaults. It leaves
-the current activation state and your Blender bindings in place. **Invert
-Mouse Zoom** is available in the Keymaps panel as a separate Blender input
-preference. Set it to match your preferred zoom direction.
+**Disable Deluxe Keymaps** removes the Deluxe shortcuts and keeps the JSON
+choices for the next enable. Blender preferences store the Deluxe master switch
+and an internal first-activation marker. Save Blender Preferences to keep that
+switch across sessions when Auto-Save Preferences is off. Native edits made in
+Blender's own Keymap preferences also remain Blender-managed. The old category,
+section and pie preference switches no longer control the Deluxe catalog.
 
-## Move an existing profile to runtime Deluxe
+The required Blue Hole Save As shortcuts remain while the add-on is enabled.
+**Reset Draft** restores the catalog loaded when the editor opened, and takes
+effect immediately as a preview, saved only with **Save and Apply Changes**. **Invert Mouse Zoom** remains a separate
+Blender input preference in the gear menu.
 
-The previous installer copied both a preset and a preferences file. The new
-version waits for a reviewed switch when it finds evidence of that installation.
-It also asks you to review saved keymap edits on first Deluxe activation.
-Blender can carry saved edits across a preset switch, and their origins can be
-ambiguous.
+## Existing Blender keymap customizations
 
-1. Save your current Blender preferences. Choose **Back Up Saved Keymap Setup**
-   under **Updates & Deluxe**. The command reports a new recovery directory
-   next to the saved preferences. It copies the saved settings and available
-   preset. Keep any older recovery copies too.
-2. In **Preferences > Keymap**, select **Blender**. Review saved customizations
-   and resolve shortcuts that came from the old Deluxe setup. Keep personal
-   bindings. If you are unsure which edits to keep, use your current setup
-   until you can review them. You can compare against a pre-Deluxe backup
-   in a separate Blender profile if one is available.
-3. Choose **Enable Deluxe Keymaps** and confirm your review. Check your
-   shortcuts, then use Blender's **Save Preferences** when ready.
+The installer for the previous Deluxe system copied `BH_Keymaps.py` and
+`userpref.blend`. Logistics' Blender 5.2.2-and-newer install/update path does
+not apply those payloads. It loads and saves existing Blender preferences to
+record the enabled add-on selection, preserving the other saved settings.
+Existing legacy files are left in place.
 
-To return to the previous setup, disable Deluxe and select the old preset in
-**Preferences > Keymap**. To recover the exact settings from the backup, close
-Blender and keep a copy of your current files first. Restore the saved
-`userpref.blend` and, if needed, the matching preset to the active profile.
-That restores other preferences as of the backup too. The runtime activation
-keeps the legacy preset, recovery copies, ordinary preferences, and installed
-add-ons in place.
+If a profile still uses the old preset, select **Blender** in
+**Preferences → Keymap** and review any saved customizations before enabling
+Deluxe. Keep personal shortcuts and resolve conflicting edits from the old
+setup. Blue Hole still checks for this first-use review; it does not overwrite
+or remove the old profile. The obsolete **Back Up Saved Keymap Setup** command
+was removed: copying `userpref.blend` did not back up the current JSON editor.
 
 ## Shortcut coverage
 

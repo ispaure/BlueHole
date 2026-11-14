@@ -1,20 +1,4 @@
-"""
-Top-level registration and refresh management for Blue Hole keymaps.
-
-This module orchestrates registration, unregistration, and refresh of all
-standard keymap categories and pie keymaps.
-
-Child keymap register modules are responsible for:
-- determining which actions are enabled
-- registering their own keymaps
-- storing runtime keymap references
-- returning the number of successfully registered keymaps
-
-This module is responsible for:
-- registration order
-- centralized high-level logging
-- total keymap registration summaries
-"""
+"""Register, refresh and release the JSON Deluxe catalog on Blender’s main thread."""
 
 # ----------------------------------------------------------------------------------------------------------------------
 # AUTHORSHIP INFORMATION - THIS FILE BELONGS TO THE BLUE HOLE BLENDER PLUGIN https://github.com/ispaure/BlueHole
@@ -36,19 +20,9 @@ import bpy
 
 from ..Lib.commonUtils.runtime.diagnostics import *
 from . import keymap_utils
+from . import default_bindings
 from ..preferences.prefs import prefs
 from ..overlays.deluxe import applyDeluxePrefs
-from ..debug.debug_flags import *
-from .pie import pie_keymaps_register
-from . import mesh_keymaps_register
-from . import navigation_keymaps_register
-from . import object_keymaps_register
-from . import pipeline_keymaps_register
-from . import sculpt_keymaps_register
-from . import selection_keymaps_register
-from . import transform_keymaps_register
-from . import uv_keymaps_register
-from . import other_keymaps_register
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONSTANTS
@@ -58,21 +32,8 @@ TOOL_NAME = 'Keymaps'
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
-keymap_module_lst = (
-    mesh_keymaps_register,
-    navigation_keymaps_register,
-    object_keymaps_register,
-    pipeline_keymaps_register,
-    sculpt_keymaps_register,
-    selection_keymaps_register,
-    transform_keymaps_register,
-    uv_keymaps_register,
-    other_keymaps_register,
-)
-
-
 # A single persistent timer owns readiness and reconciliation. No timer writes
-# preferences or changes a foreign keymap item.
+# preferences. Explicit managed-default rules use their own restoration ledger.
 _enabled = False
 _registering = False
 _preference_state = None
@@ -98,28 +59,12 @@ def _ready():
             configs.active is not None)
 
 
-def _boolean_preferences(group):
-    """Watch behavior switches, including categories with old no-op callbacks."""
-    raw = getattr(group, '_raw', group)
-    values = []
-    for prop in raw.bl_rna.properties:
-        if prop.identifier == 'rna_type':
-            continue
-        if prop.type == 'BOOLEAN':
-            values.append((prop.identifier, bool(getattr(raw, prop.identifier))))
-        elif prop.type == 'POINTER':
-            value = getattr(raw, prop.identifier)
-            if isinstance(value, bpy.types.PropertyGroup):
-                values.append((prop.identifier, _boolean_preferences(value)))
-    return tuple(values)
-
-
 def _preference_signature():
     p = prefs()
     allowed = runtime_keymaps_allowed(bpy.context, p.keymap)
-    switches = tuple((name, _boolean_preferences(getattr(p, name)))
-                     for name in ('keymap', 'pie', 'thirdparty'))
-    return allowed, switches
+    # Category and section choices are committed through the catalog editor.
+    # Legacy preference groups must neither gate nor rebuild that catalog.
+    return allowed, bool(p.keymap.deluxe_configured), bool(p.keymap.enable_keymaps)
 
 
 def runtime_keymaps_allowed(context, settings):
@@ -131,20 +76,16 @@ def runtime_keymaps_allowed(context, settings):
     return not _legacy_profile
 
 
-def _bind_category(module):
-    lists = [value for name, value in vars(module).items()
-             if name.startswith('registered_') and name.endswith('_keymaps')
-             and isinstance(value, list)]
-    if len(lists) != 1:
-        raise RuntimeError('Category must expose one registered keymap list: ' + module.KEYMAP_CATEGORY)
-    keymap_utils.bind_category_pairs(module.KEYMAP_CATEGORY, lists[0])
-
-
 def deluxe_profile():
     """Return the configured Deluxe editing API on Blender's main thread."""
-    global _profile_store
     if not _ready() or not prefs().keymap.deluxe_configured:
         raise ValueError('Configure Deluxe keymaps before opening the profile editor')
+    return _catalog_store()
+
+
+def _catalog_store():
+    """Load one catalog for required shortcuts and the configured editor."""
+    global _profile_store
     if _profile_store is None:
         from .deluxe_profiles import ProfileStore
 
@@ -178,7 +119,7 @@ def _install_profile(candidate, previous):
     before = store.registration_results() if previous is not None else None
     try:
         _apply_categories(profile=candidate)
-        if keymap_utils.pending_cleanup():
+        if keymap_utils.pending_cleanup() or default_bindings.pending_cleanup():
             raise ProfileError('Native keymap cleanup is pending')
         if before is not None:
             store.check_registration(candidate, before)
@@ -187,16 +128,11 @@ def _install_profile(candidate, previous):
         raise
 
 
+@keymap_utils.batch_merged_updates()
 def _clear_categories():
     if _profile_store is not None:
         _profile_store.restore_stock_add()
-    errors = []
-    for module in (pie_keymaps_register, *reversed(keymap_module_lst)):
-        try:
-            module.unregister()
-        except Exception as exc:
-            errors.append((module.KEYMAP_CATEGORY, type(exc).__name__))
-    # Drain pending requests and items from partial category initialization too.
+    default_bindings.release_all()
     keymap_utils.release_all()
     retained = keymap_utils.retained_edits()
     if retained:
@@ -208,8 +144,6 @@ def _clear_categories():
         log(Severity.WARNING, TOOL_NAME,
             f'{len(pending)} owned keymap item(s) still await cleanup; '
             'ownership is retained for the next cleanup attempt.')
-    for category, error in errors:
-        log(Severity.WARNING, TOOL_NAME, f'{category} cleanup reported {error}.')
 
 
 def _apply_categories(*, profile=None):
@@ -220,18 +154,11 @@ def _apply_categories(*, profile=None):
     total = 0
     try:
         _clear_categories()
+        if default_bindings.pending_cleanup():
+            raise RuntimeError('Blender default bindings still await restoration')
         p = prefs()
         if runtime_keymaps_allowed(bpy.context, p.keymap):
-            modules = (*keymap_module_lst, pie_keymaps_register)
-            if p.keymap.deluxe_configured:
-                for module in modules:
-                    _bind_category(module)
-                total = deluxe_profile().register(profile)
-                for module in modules:
-                    keymap_utils.sync_category_pairs(module.KEYMAP_CATEGORY)
-            else:
-                _bind_category(pipeline_keymaps_register)
-                total = pipeline_keymaps_register.register_required()
+            total = _catalog_store().register(profile, required_only=not p.keymap.deluxe_configured)
         _preference_state = _preference_signature()
         watcher_stats['category_refreshes'] += 1
         return total
@@ -255,6 +182,7 @@ def _watch_keymaps():
         if _preference_state != _preference_signature():
             _apply_categories()
         keymap_utils.reconcile(budget=WATCH_REQUEST_BUDGET, time_budget=WATCH_TIME_BUDGET)
+        default_bindings.retry_cleanup()
         _wait_interval = WATCH_INTERVAL
         _last_error = None
         return WATCH_INTERVAL
@@ -297,6 +225,7 @@ def _retry_unload_cleanup():
         return None
     _unload_cleanup_attempts -= 1
     remaining = keymap_utils.retry_unreadable_cleanup(WATCH_REQUEST_BUDGET)
+    remaining = bool(default_bindings.retry_cleanup()) or remaining
     if remaining and _unload_cleanup_attempts:
         return WATCH_INTERVAL
     return None
@@ -311,7 +240,8 @@ def unregister():
         _clear_categories()
     finally:
         # Read Preferences may unload us before Blender restores operator RNA.
-        if any(row['reason'] == 'owned_snapshot_unavailable' for row in keymap_utils.pending_cleanup()):
+        if (default_bindings.pending_cleanup() or
+                any(row['reason'] == 'owned_snapshot_unavailable' for row in keymap_utils.pending_cleanup())):
             if not bpy.app.timers.is_registered(_retry_unload_cleanup):
                 _unload_cleanup_attempts = UNLOAD_CLEANUP_ATTEMPTS
                 bpy.app.timers.register(_retry_unload_cleanup, first_interval=WATCH_INTERVAL)

@@ -53,32 +53,12 @@ class BH_OT_set_active_prefs_tab(bpy.types.Operator):
         return {'FINISHED'}
 
 
-# Runtime-only UI state (not saved in preferences)
-draw_action_feature_keymaps_dropdown_state = {}
-
-
-class WM_OT_BH_ToggleUISection(bpy.types.Operator):
-    """Toggle a temporary UI section state"""
-    bl_idname = "wm.bh_toggle_ui_section"
-    bl_label = "Toggle UI Section"
-    bl_options = {'INTERNAL'}
-
-    section_key: StringProperty()
-
-    def execute(self, context):
-        current_value = draw_action_feature_keymaps_dropdown_state.get(self.section_key, False)
-        draw_action_feature_keymaps_dropdown_state[self.section_key] = not current_value
-        return {'FINISHED'}
-
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
 # List of classes to register/unregister
 classes = (
     BH_OT_set_active_prefs_tab,
-    WM_OT_BH_ToggleUISection,
 )
 
 

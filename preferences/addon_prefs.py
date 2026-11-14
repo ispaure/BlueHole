@@ -25,7 +25,6 @@ from ..Lib.commonUtils.runtime.diagnostics import *
 from .addon import (
     general_props,
     keymap_props,
-    pie_props,
     help_update_props,
     thirdparty_props,
 )
@@ -62,7 +61,6 @@ _ENV_DRAW_MODULES = {
 _GENERAL_DRAW_MODULES = {
     "GENERAL": general_props,
     "THIRDPARTY": thirdparty_props,
-    "PIE": pie_props,
     "KEYMAP": keymap_props,
     "HELP_N_UPDATE": help_update_props,
 }
@@ -97,12 +95,12 @@ class BlueHole(AddonPreferences):
     general_addon_settings: EnumProperty(
         name='General Addon Settings',
         description='General addon settings to display',
+        # Keep saved enum values stable after retiring the separate Pie tab (3).
         items=[
-            ('GENERAL', 'General Settings', ''),
-            ('THIRDPARTY', 'Third-Party Add-ons', ''),
-            ('KEYMAP', 'Keymaps', ''),
-            ('PIE', 'Pie Menus', ''),
-            ('HELP_N_UPDATE', 'Help & Updates', ''),
+            ('GENERAL', 'General Settings', '', 0),
+            ('THIRDPARTY', 'Third-Party Add-ons', '', 1),
+            ('KEYMAP', 'Keymaps', '', 2),
+            ('HELP_N_UPDATE', 'Help & Updates', '', 4),
         ],
         default='GENERAL'
     )
@@ -110,7 +108,6 @@ class BlueHole(AddonPreferences):
     general: PointerProperty(type=general_props.GeneralPG)
     keymap: PointerProperty(type=keymap_props.KeymapPG)
     thirdparty: PointerProperty(type=thirdparty_props.ThirdPartyPG)
-    pie: PointerProperty(type=pie_props.PiePG)
     help_n_update: PointerProperty(type=help_update_props.HelpUpdatePG)
     directory: PointerProperty(type=directory_props.DirectoryPG)
     container: PointerProperty(type=container_props.ContainerPG)
@@ -193,7 +190,6 @@ classes = (
     # Addon Property Modules
     general_props,
     keymap_props,
-    pie_props,
     help_update_props,
     thirdparty_props,
 

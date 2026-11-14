@@ -53,7 +53,7 @@ class _PrefsProxy:
     Generic live proxy around Blender preference/property-group objects.
 
     This preserves the existing call pattern:
-        prefs().keymap.transform.enable_transform_tools_modal
+        prefs().thirdparty.auto_constraints.enable_transform_tools_modal_autoconstraint
 
     without requiring one manual wrapper property per Blender property.
     """

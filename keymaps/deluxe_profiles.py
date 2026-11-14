@@ -4,16 +4,15 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import replace
 from hashlib import sha256
-import json
 from pathlib import Path
 from uuid import uuid4
 
 from ..Lib.commonUtils.formats.jsonType import JSONFile
-from ..Lib.commonUtils.persistence.atomic import atomic_write_bytes
 from ..Lib.commonUtils.persistence.locking import file_lock
 from ..Lib.commonUtils.runtime.operations import MutationIncomplete
 from . import keymap_utils as runtime
-from .keymap_action_utils import resolve_scope
+from . import default_bindings, deluxe_catalog
+from .keymap_utils import resolve_scope
 from .deluxe_resolver import Resolver, capture_candidate, profile_assignment_id, selector_status
 from .deluxe_schema import (ProfileError, TABLES, identifier, merge_profile, profile_overlay,
                             require, same_value, selector_descriptor, validate_catalog)
@@ -81,12 +80,17 @@ class Draft:
                                         scope=scope, order=max(order + 1, 1_000_000), feature=id_))
         return id_
 
-    def stage_suppression(self, section, map_, item, source_role, *, replacement=None, id_=None):
+    def stage_suppression(self, section, map_, item, source_role, *, replacement=None, disable=False, id_=None):
         """Capture a selected live row. Passing a saved ID retargets that rule."""
         self._open()
         candidate = capture_candidate(map_, item, source_role)
+        if id_ is None and disable:
+            id_ = next((key for key, row in self._catalog['suppressions'].items()
+                        if row.get('disable') and same_value(row['selector'], candidate['selector'])), None)
         id_ = id_ or uuid4().hex
         rule = {'section': section, 'selector': candidate['selector']}
+        if disable:
+            rule['disable'] = True
         if replacement is not None:
             rule['replacement'] = replacement
         self.put('suppressions', id_, rule)
@@ -107,14 +111,14 @@ class ProfileStore:
     def open_catalog(cls, path, preferences, install, *, allowed=lambda: True):
         """Edit the active add-on's full catalog in place."""
         path = Path(path)
+        errors = []
         for source in (path, path.with_suffix('.previous.json')):
             try:
-                defaults = JSONFile(source).read_json()
-                validate_catalog(defaults)
+                defaults = deluxe_catalog.load(source)
                 return cls(defaults, path, preferences, install, allowed=allowed, edit_defaults=True)
-            except (OSError, ValueError, RecursionError):
-                continue
-        raise ProfileError('Cannot open the bundled Deluxe keymap catalog')
+            except (OSError, ValueError, RecursionError) as error:
+                errors.append(str(error))
+        raise ProfileError('Cannot open Deluxe keymaps: ' + errors[0])
 
     def __init__(self, defaults, path, preferences, install, *, allowed=lambda: True, edit_defaults=False):
         validate_catalog(defaults)
@@ -134,7 +138,9 @@ class ProfileStore:
         self._generation = 0
         self._revision = self._disk_revision()
         self.load_issue = None
+        self.load_error = ''
         self._catalog, self.load_issue = self._read()
+        self._live_catalog = None
 
     def defaults(self):
         return deepcopy(self._defaults)
@@ -144,7 +150,28 @@ class ProfileStore:
 
     def section_enabled(self, section):
         """Whether the applied profile and current preferences enable a section."""
-        return self._allowed() and self.resolver.section_enabled(self._catalog, self._preferences(), section)
+        return self._allowed() and self.resolver.section_enabled(self.runtime_catalog(), self._preferences(), section)
+
+    def runtime_catalog(self):
+        return self._catalog if self._live_catalog is None else self._live_catalog
+
+    def preview_draft(self, draft):
+        """Try the draft in Blender without publishing any files."""
+        self.validate(draft)
+        candidate = draft.snapshot()
+        previous = self.runtime_catalog()
+        if not same_value(candidate, previous):
+            try:
+                self._install(candidate, previous)
+            except BaseException:
+                self._install(previous, None)
+                raise
+        self._live_catalog = None if same_value(candidate, self._catalog) else candidate
+
+    def cancel_preview(self):
+        if self._live_catalog is not None:
+            self._install(self._catalog, None)
+            self._live_catalog = None
 
     def begin(self):
         require(not self._closed, 'Deluxe profile editor has been unloaded')
@@ -152,12 +179,16 @@ class ProfileStore:
 
     def close(self):
         self._closed = True
+        self._live_catalog = None
 
     def _defer_stock_add(self):
         """Let Blender distinguish Shift+A tap from drag before opening Add."""
         source = runtime._config('default')
         if not runtime._same(source, runtime._config('active')):
             return
+        # Ordinary bindings may still be waiting for the bulk merge. The stock
+        # source checks below require the current effective user keymaps.
+        runtime._update_merged()
         rows = []
         for name, menu in STOCK_ADD_MENUS:
             scope = resolve_scope(runtime.KeymapScope(name), source)
@@ -199,10 +230,12 @@ class ProfileStore:
                     and item.id == item_id
                     and runtime._snapshot(item, False) == (expected, target, True)):
                 item.value = 'PRESS'
-        runtime._update_merged()
+        runtime._request_merged_update()
         self._stock_add_rows.clear()
 
     def _disk_revision(self):
+        if self.edit_defaults:
+            return deluxe_catalog.revision(self.path)
         try:
             return sha256(self.path.read_bytes()).digest()
         except FileNotFoundError:
@@ -211,18 +244,20 @@ class ProfileStore:
             return 'unreadable'
 
     def _read(self):
+        self.load_error = ''
         try:
-            stored = self._file.read_json()
+            stored = deluxe_catalog.load(self.path) if self.edit_defaults else self._file.read_json()
             catalog = stored if self.edit_defaults else merge_profile(self._defaults, stored)
             self._validate(catalog)
             return catalog, None
         except FileNotFoundError:
             if not self.edit_defaults:
                 return self.defaults(), None
-        except (OSError, ValueError, RecursionError):
-            pass
+        except (OSError, ValueError, RecursionError) as error:
+            self.load_error = str(error)
         try:
-            stored = self._backup.read_json()
+            stored = (deluxe_catalog.load(self.path.with_suffix('.previous.json'))
+                      if self.edit_defaults else self._backup.read_json())
             catalog = stored if self.edit_defaults else merge_profile(self._defaults, stored)
             self._validate(catalog)
             return catalog, 'invalid_profile_recovered_previous'
@@ -327,6 +362,9 @@ class ProfileStore:
 
     def _suppression_status(self, row, catalog):
         selector = selector_descriptor(row['selector'])
+        if row.get('disable'):
+            status, reason = default_bindings.status(selector)
+            return {'status': status, 'reason': reason}
         replacement = (self.resolver.target(catalog['commands'][row['replacement']])
                        if 'replacement' in row else None)
         status, reason = selector_status(selector, replacement)
@@ -357,18 +395,21 @@ class ProfileStore:
                     else:
                         self._file.write_json(stored, compact=True)
                 except MutationIncomplete as issue:
-                    if not issue.result.destination_published:
+                    if self.edit_defaults or not issue.result.destination_published:
                         raise
             except BaseException:
                 try:
                     self._install(previous, None)
+                    self._live_catalog = None
                 except Exception as rollback:
                     raise ProfileError('Profile rollback failed. Reload the committed profile.') from rollback
                 raise
             self._catalog = candidate
+            self._live_catalog = None
             self._revision = self._disk_revision()
             self._generation += 1
             self.load_issue = None
+            self.load_error = ''
             draft.discard()
             try:
                 self._backup.write_json(stored, compact=True)
@@ -377,34 +418,12 @@ class ProfileStore:
             return self.snapshot()
 
     def _publish_catalog(self, catalog):
-        """Keep the shipped one-row-per-line layout for review in Git."""
-        def dump(value):
-            return json.dumps(value, ensure_ascii=False, allow_nan=False)
-
-        def table(rows):
-            if not rows:
-                return '{}'
-            return '{\n' + ',\n'.join(f'    {dump(key)}: {dump(row)}' for key, row in rows.items()) + '\n  }'
-
-        original = self._catalog
-        lines = []
-        for key, value in catalog.items():
-            if key in TABLES:
-                rows = {id_: value[id_] for id_ in original.get(key, {}) if id_ in value}
-                rows.update(value)
-                formatted = table(rows)
-            elif isinstance(value, dict):
-                formatted = table(value)
-            else:
-                formatted = dump(value)
-            lines.append(f'  {dump(key)}: {formatted}')
-        atomic_write_bytes(self.path, ('{\n' + ',\n'.join(lines) + '\n}\n').encode('utf-8'),
-                           validate=lambda: require(self._disk_revision() == self._revision,
-                                                    'Profile file changed during apply'))
+        deluxe_catalog.publish(self.path, catalog, self._catalog, self._revision)
 
     def reload(self):
         """Load a compatible profile or retain the last known good catalog."""
         require(not self._closed, 'Deluxe profile editor has been unloaded')
+        self.cancel_preview()
         revision = self._disk_revision()
         candidate, issue = self._read()
         require(self._disk_revision() == revision, 'Profile changed during reload')
@@ -427,14 +446,14 @@ class ProfileStore:
         self.load_issue = issue
         return self.snapshot()
 
-    def _plan(self, catalog):
+    def _plan(self, catalog, *, required_only=False):
         if not self._allowed():
             return dict.fromkeys(catalog['sections'], False), {}
-        return self.resolver.plan(catalog, self._preferences())
+        return self.resolver.plan(catalog, self._preferences(), required_only=required_only)
 
     @staticmethod
     def registration_results():
-        results = {}
+        results = default_bindings.registration_results()
         for diagnostic in runtime.runtime_diagnostics():
             if ':deluxe-' not in diagnostic.owner_id:
                 continue
@@ -477,11 +496,12 @@ class ProfileStore:
                           'created_membership_lost', 'conflicting_assignment'):
                 raise ProfileError(f'Cannot register replacement {id_}: {reason}')
 
-    def register(self, catalog=None):
+    @runtime.batch_merged_updates()
+    def register(self, catalog=None, *, required_only=False):
         """Register in source order through brief 02's feature ledger."""
         if catalog is None:
-            catalog = self._catalog
-        sections, groups = self._plan(catalog)
+            catalog = self.runtime_catalog()
+        sections, groups = self._plan(catalog, required_only=required_only)
         total = 0
         add_pie_registered = False
         for owner, requests in groups.items():
@@ -497,6 +517,9 @@ class ProfileStore:
                 and request.target == ADD_PIE_TARGET for request in requests)
         for id_, row in catalog['suppressions'].items():
             if not (sections[row['section']] and row.get('enabled', True)):
+                continue
+            if row.get('disable'):
+                default_bindings.install(id_, selector_descriptor(row['selector']))
                 continue
             request = self.resolver.suppression_request(id_, row, catalog['commands'])
             if request is not None:

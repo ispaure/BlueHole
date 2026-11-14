@@ -18,28 +18,10 @@ __status__ = 'Production'
 import bpy
 from bpy.props import *
 
-from .keymaps import (
-    keymap_props_mesh,
-    keymap_props_navigation,
-    keymap_props_object,
-    keymap_props_other,
-    keymap_props_pipeline,
-    keymap_props_sculpt,
-    keymap_props_selection,
-    keymap_props_transform,
-    keymap_props_uv,
-)
-
 # ----------------------------------------------------------------------------------------------------------------------
 # DEBUG
 
 show_verbose = True
-
-# ----------------------------------------------------------------------------------------------------------------------
-# DRAW MODULE LOOKUP
-
-KEYMAP_CATEGORIES = ('selection', 'navigation', 'transform', 'object', 'mesh',
-                     'uv', 'sculpt', 'pipeline', 'other')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE
@@ -52,19 +34,9 @@ def _update_keymaps(self, context):
 
 class KeymapPG(bpy.types.PropertyGroup):
 
-    selection: PointerProperty(type=keymap_props_selection.SelectionKeymapPG)
-    navigation: PointerProperty(type=keymap_props_navigation.NavigationKeymapPG)
-    transform: PointerProperty(type=keymap_props_transform.TransformKeymapPG)
-    object: PointerProperty(type=keymap_props_object.ObjectKeymapPG)
-    mesh: PointerProperty(type=keymap_props_mesh.MeshKeymapPG)
-    uv: PointerProperty(type=keymap_props_uv.UVKeymapPG)
-    sculpt: PointerProperty(type=keymap_props_sculpt.SculptKeymapPG)
-    pipeline: PointerProperty(type=keymap_props_pipeline.PipelineKeymapPG)
-    other: PointerProperty(type=keymap_props_other.OtherKeymapPG)
-
     enable_keymaps: BoolProperty(
-        name='Enable Keymaps',
-        description='Enable Blue Hole keymaps',
+        name='Enable Deluxe Keymaps',
+        description='Enable Deluxe shortcuts using the saved Blue Hole catalog',
         default=False,
         update=_update_keymaps
     )
@@ -86,13 +58,11 @@ def draw(preference, context, layout):
     if not blender_preset:
         column_keymap.alignment = 'LEFT'
         column_keymap.label(text='Select the Blender preset in Preferences → Keymap to use the Blue Hole editor.', icon='INFO')
-        column_keymap.operator('wm.bh_backup_keymap_setup')
         return
 
     if not settings.deluxe_configured:
         column_keymap.alignment = 'LEFT'
-        label = 'Use Keymap Editor' if settings.enable_keymaps else 'Enable Keymaps'
-        column_keymap.operator('wm.bh_apply_deluxe_prefs', text=label)
+        column_keymap.operator('wm.bh_apply_deluxe_prefs', text='Enable Deluxe Keymaps')
         return
 
     if not keymaps_register.runtime_keymaps_allowed(context, settings):
@@ -106,21 +76,7 @@ def draw(preference, context, layout):
 # REGISTER / UNREGISTER
 
 
-classes = (
-    # Keymap Sub-Properties Import Before KeymapPG
-    keymap_props_selection.SelectionKeymapPG,
-    keymap_props_navigation.NavigationKeymapPG,
-    keymap_props_transform.TransformKeymapPG,
-    keymap_props_object.ObjectKeymapPG,
-    keymap_props_mesh.MeshKeymapPG,
-    keymap_props_uv.UVKeymapPG,
-    keymap_props_sculpt.SculptKeymapPG,
-    keymap_props_pipeline.PipelineKeymapPG,
-    keymap_props_other.OtherKeymapPG,
-
-    # Import KeymapPG last
-    KeymapPG,
-)
+classes = (KeymapPG,)
 
 
 def register():

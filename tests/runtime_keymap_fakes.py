@@ -63,6 +63,13 @@ class FakeItem:
                 delattr(copy, name)
         return copy
 
+    def merged_copy(self):
+        copy = self.clone()
+        copy.id = self.id
+        copy.is_user_defined = self.is_user_defined
+        copy.is_user_modified = self.is_user_modified
+        return copy
+
     def alias(self):
         """Another live Python wrapper for the same native item identity."""
         copy = self.clone()
@@ -256,13 +263,13 @@ class MergedMaps:
                 for map_ in base.keymaps:
                     if (map_.name, map_.space_type, map_.region_type,
                             map_.is_modal, getattr(map_, 'is_tool', None)) == key:
-                        merged.keymap_items.rows.extend(row.clone() for row in map_.keymap_items)
+                        merged.keymap_items.rows.extend(row.merged_copy() for row in map_.keymap_items)
             if addon is not None:
                 for map_ in addon.keymaps:
                     if (map_.name, map_.space_type, map_.region_type,
                             map_.is_modal, getattr(map_, 'is_tool', None)) == key:
                         for row in map_.keymap_items:
-                            merged.keymap_items.rows.insert(0, row.clone())
+                            merged.keymap_items.rows.insert(0, row.merged_copy())
             yield merged
 
     def get(self, name):

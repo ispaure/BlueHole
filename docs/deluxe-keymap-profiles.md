@@ -1,9 +1,9 @@
 # Deluxe keymap profiles
 
-Configured Deluxe reads [deluxe-defaults.json](../keymaps/deluxe-defaults.json)
-on the built-in Blender preset. The catalog preserves source registration order
-and feature grouping from cutover `fa7891a`. It contains 795 assignments across
-10 categories and 29 sections. Four Navigation assignments record intentional
+Configured Deluxe reads the [master file](../keymaps/deluxe-defaults.json) and its
+[ten section files](../keymaps/deluxe-defaults-sections) on the built-in Blender preset. The catalog preserves source registration order
+and feature grouping from cutover `fa7891a`. It contains 803 assignments and 462 reusable commands across
+10 categories and 46 sections. Four Navigation assignments record intentional
 precedence changes for otherwise stock-equivalent rows. The Object Modes
 assignment for `3` enters Face Select on meshes and Pose Mode on armatures.
 It uses the same Object Mode registration rule as the other mode shortcuts.
@@ -12,10 +12,16 @@ from the current keyconfig. The reference captures remain verification evidence.
 
 Version 1 separates categories, sections, events, commands, assignments and
 suppressions. An assignment joins one event and one typed command in a full map
-scope. Its order controls runtime precedence. Category and section order is for
-editor display. Use the stable IDs as references. Existing feature IDs, shipped
-provenance, the Save As section and its bindings, and preference switch paths are
+scope. Its order controls runtime precedence. Category insertion order and section `order` values determine
+editor display. Commands have no owning section; the command filters follow
+the sections of their assignments and replacement rules. Use the stable IDs as references. Existing feature IDs, shipped
+provenance, and the Save As section and its bindings are
 code-managed. Commands with different property values retain distinct IDs.
+An ordinary command may have an optional `label` for its displayed name.
+New ordinary commands can use registered operators validated against live RNA.
+The editor includes unused commands in the library; shared command/event records
+and unused records are stored in the master file. Creating or duplicating a
+command only updates the draft until Save and Apply Changes.
 Menu, tool and context routes, Blue Hole operator behavior, and provider-managed
 fields are read-only. The resolver exposes Blender RNA labels, types, defaults,
 allowed enum identifiers, flags, array dimensions and limits for editable fields.
@@ -40,13 +46,14 @@ category and a provider command.
 | Edit one assignment's event or command | `id = draft.clone(table, assignment_id)`, then update the clone |
 | Create, rename, reorder, move or delete | `draft.put()`, `draft.update()`, `draft.delete()`, `draft.add_assignment()` |
 | Inspect live binding candidates | `deluxe_resolver.binding_candidates(source_role, map)` |
-| Stage or retarget a rule from a selected row | `draft.stage_suppression(section_id, map, item, source_role, replacement=command_id, id_=rule_id)` |
+| Stage or retarget a rule from a selected row | `draft.stage_suppression(section_id, map, item, source_role, disable=True, id_=rule_id)` or `replacement=command_id` |
+| Preview without writing; restore saved runtime | `store.preview_draft(draft)`, `store.cancel_preview()` |
 | Validate or commit | `store.validate(draft)`, `store.apply(draft)` |
 | Discard or reset a draft | `draft.discard()`, `draft.reset()` |
 | Reload a file and invalidate older drafts | `store.reload()` |
 
 The preview separates a stored choice from eligibility under the current preset
-and preference gates, native registration, command availability and active state.
+and Deluxe master switch, native registration, command availability and active state.
 It reports exact event collisions in the same map scope and exposes current
 runtime diagnostics. A draft preview's registration status describes the live
 session. The preview does not predict Blender's context-dependent dispatch.
@@ -59,33 +66,76 @@ targets, ambiguous matches, and unsupported capabilities. A selection from the
 merged user keyconfig can resolve to a unique inherited source. A user-only
 binding can be stored for review, and the runtime reports it as unsupported.
 A supported replacement uses the existing context-specific ordinary or modal
-path and withdraws on release. A suppression without a replacement is stored
-with an explicit unsupported diagnostic. This covers a UI that lets an artist
-stage and inspect a choice while the generic native disable capability remains
-open.
+path and withdraws on release. Rules with `disable: true` temporarily disable exact non-modal Blender defaults
+through `default_bindings.py`. The original source, item identity, full snapshot
+and inherited merged row are checked; user-modified rows are rejected. Unload,
+Discard or disable restores only the same unchanged item. Unreadable restoration
+is retained for retry; changed or replaced source rows are preserved. Rules
+without `disable` or a replacement remain review-only, including older saved
+review targets.
+
+The editor calls `preview_draft()` after each staged change. It validates and
+installs the candidate with rollback to the previous working runtime on failure.
+The saved snapshot and files do not change. Master/preset refreshes use the live
+candidate, while `cancel_preview()` restores the committed catalog. Closing the
+addon drops the preview. Discard and Reload explicitly restore the saved setup.
 
 ## Persistence and recovery
 
-**Save and Apply Changes** saves `keymaps/deluxe-defaults.json` in the active Blue Hole
+**Save and Apply Changes** saves the master and section files in the active Blue Hole
 installation. With the Logistics **Local** source, the installation links to
 the checkout, so the edit appears in Git. With **GitHub**, the edit goes into
 the preset's installed Blue Hole copy. The next Blue Hole update installs its
 shipped catalog. Existing per-preset override files stay on disk for reference
 and the editor now loads the bundled catalog.
 
-Apply validates the draft, compares the in-memory and on-disk revisions under
-the shared file lock, installs and verifies the candidate runtime, and then
-publishes the catalog atomically through commonUtils. A failed install or
-prepublication write restores the committed runtime. An interrupted process
-restarts from the last published catalog. An unreadable profile recovers the
-known-good in-session profile, recovery copy or shipped defaults and exposes a
-diagnostic. The original file is retained until the next explicit Apply. The
-recovery copy is refreshed after successful publication.
+Category and section `enabled` values live in that same JSON catalog. They are
+staged and saved with assignments and commands, and updates replace them too.
+Legacy category/section preference switches no longer gate the catalog; optional
+`switch` paths in older catalogs are ignored. Blender preferences retain the
+Deluxe master enable switch and the internal first-activation marker. Native
+Blender keymap customizations remain Blender-managed in `userpref.blend`.
+The editor displays an update warning on every tab. The former saved-preferences
+backup and feature-switch reset commands have been removed because they did not
+manage the JSON catalog.
 
-Unknown versions and incompatible bases trigger recovery. Native Preferences
-changes remain Blender-managed. The existing Deluxe reset button restores its
-Blender preference switches. **Reset Draft** restores the catalog loaded when
-the editor opened and takes effect on Apply.
+The master contains metadata, a `section_files` mapping, and events/commands used
+across top-level sections (or not currently assigned). Each `deluxe-defaults-sections/<category-id>.json`
+contains the category definition, its subsections, assignments, default rules,
+and commands/events used only there. IDs remain stable when a binding moves;
+shared records move into or out of the master automatically on save. Labels can
+change without renaming files. The storage format is version 1, independent of
+the logical schema version. Legacy single-file catalogs migrate on explicit save.
+
+Add a top-level section by adding its stable ID and canonical relative file path
+to `section_files` and a matching section document. New subsections belong in
+that file's `sections` table. Deleting a subsection requires moving or deleting
+its assignments/rules; dangling references are rejected. The UI only deletes
+empty subsections. Removing a top-level section from the master removes it from
+the next reload; its now-unreferenced file is ignored. A subsequent editor save
+retires only files owned by the previously loaded catalog. Unrelated files are
+preserved. Active tabs fall back when their selected entry disappears.
+
+Use **Keymap Settings → Validate and Reload JSON Files** after external edits.
+Parsing rejects duplicate keys and non-JSON numbers as well as malformed syntax.
+Syntax errors show `file:line:column`; record errors identify the file, record ID,
+and line where available. Validation covers required fields, types, versions,
+unique IDs/order, section membership, and all command/event/section references.
+File paths are restricted to the catalog's section folder, without symbolic links.
+The working setup remains active after a failed reload; the diagnostic stays
+visible. The files are left untouched until an explicit save.
+
+Apply validates the entire draft and fingerprints the master and section files
+under the shared lock; external edits block a stale save. It installs/verifies
+the candidate runtime, writes a complete recovery snapshot and a transaction
+marker, publishes changed section files, and publishes the master last. Failed
+publication rolls back the files and runtime. After an interrupted process the
+marker prevents loading a partial generation; the validated recovery snapshot is
+used instead. **Save Recovered Profile** repairs the catalog explicitly. The
+recovery copy is refreshed after success. No partial catalog is installed.
+
+Unknown versions and incompatible bases trigger recovery. **Reset Draft** restores the catalog loaded when
+the editor opened, previews it, and writes it only on Apply.
 
 The portable catalog test uses one digest of the ordered pre-conversion groups,
 scope, events, command properties and active state. Category 03–05 comparison

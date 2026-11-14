@@ -1,6 +1,7 @@
 """Versioned data and merge rules for Deluxe keymap profiles."""
 
 from collections import Counter
+from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import fields
 import math
@@ -30,9 +31,11 @@ def require(condition, message):
 
 
 def record(value, required, optional=()):
-    require(isinstance(value, dict) and set(required) <= value.keys()
-            and value.keys() <= set(required) | set(optional),
-            'Invalid fields. Expected ' + ', '.join(sorted(set(required) | set(optional))))
+    require(isinstance(value, dict), 'Expected an object')
+    missing = set(required) - value.keys()
+    unknown = value.keys() - set(required) - set(optional)
+    require(not missing, 'Missing fields: ' + ', '.join(sorted(missing)))
+    require(not unknown, 'Unknown fields: ' + ', '.join(sorted(unknown)))
     return value
 
 
@@ -110,6 +113,16 @@ def selector_descriptor(row):
                           row.get('ledger_id', ''), row.get('sample_id', ''))
 
 
+@contextmanager
+def row_location(table, id_):
+    try:
+        yield
+    except ProfileError as error:
+        issue = ProfileError(f'{table}[{id_!r}]: {error}')
+        issue.location = (table, id_)
+        raise issue from error
+
+
 def validate_catalog(catalog):
     record(catalog, ('schema_version', 'catalog_version', 'base', *TABLES))
     require(type(catalog['schema_version']) is int and catalog['schema_version'] == SCHEMA_VERSION,
@@ -124,66 +137,74 @@ def validate_catalog(catalog):
                 f'Invalid IDs in {table}')
     for table in ('categories', 'sections'):
         required = ('label', 'category') if table == 'sections' else ('label',)
-        for row in catalog[table].values():
-            record(row, required, ('enabled', 'order', 'switch', 'required'))
-            require(text(row['label']), 'Invalid category or section label')
-            toggle(row, 'enabled')
-            toggle(row, 'required', False)
-            if 'order' in row:
-                require(type(row['order']) is int and row['order'] >= 0, 'Invalid group order')
-            if row.get('switch') is not None:
-                require(identifier(row['switch']), 'Invalid preference switch')
-            if table == 'sections':
-                require(identifier(row['category']) and row['category'] in catalog['categories'],
-                        'Missing section category')
-    for row in catalog['events'].values():
-        event_descriptor(row)
-    for row in catalog['commands'].values():
-        if isinstance(row, dict) and 'modal_value' in row:
-            record(row, ('modal_value',))
-            require(token(row['modal_value']), 'Invalid modal command')
-        else:
-            record(row, ('operator', 'properties'), ('provider',))
-            require(isinstance(row['operator'], str) and OPERATOR.fullmatch(row['operator']),
-                    'Invalid operator ID')
-            properties(row['properties'])
-            require('provider' not in row or text(row['provider']), 'Invalid command provider')
+        for id_, row in catalog[table].items():
+            with row_location(table, id_):
+                record(row, required, ('enabled', 'order', 'switch', 'required'))
+                require(text(row['label']), 'Invalid category or section label')
+                toggle(row, 'enabled')
+                toggle(row, 'required', False)
+                if 'order' in row:
+                    require(type(row['order']) is int and row['order'] >= 0, 'Invalid group order')
+                if row.get('switch') is not None:
+                    require(identifier(row['switch']), 'Invalid preference switch')
+                if table == 'sections':
+                    require(identifier(row['category']) and row['category'] in catalog['categories'],
+                            'Missing section category')
+    for id_, row in catalog['events'].items():
+        with row_location('events', id_):
+            event_descriptor(row)
+    for id_, row in catalog['commands'].items():
+        with row_location('commands', id_):
+            if isinstance(row, dict) and 'modal_value' in row:
+                record(row, ('modal_value',))
+                require(token(row['modal_value']), 'Invalid modal command')
+            else:
+                record(row, ('operator', 'properties'), ('provider', 'label'))
+                require(isinstance(row['operator'], str) and OPERATOR.fullmatch(row['operator']),
+                        'Invalid operator ID')
+                properties(row['properties'])
+                require('provider' not in row or text(row['provider']), 'Invalid command provider')
+                require('label' not in row or text(row['label']), 'Invalid command label')
     orders = set()
     features = Counter()
     last = None
     assignments = catalog['assignments']
-    for row in assignments.values():
-        record(row, ('section', 'feature', 'event', 'command', 'scope', 'order'),
-               ('active', 'enabled', 'samples', 'kind'))
-        for key, table in (('section', 'sections'), ('event', 'events'), ('command', 'commands')):
-            require(identifier(row[key]) and row[key] in catalog[table], f'Missing {key} reference')
-        require(identifier(row['feature']), 'Invalid feature owner')
-        scope = scope_descriptor(row['scope'])
-        require(not scope.is_modal and scope.is_tool in (None, False)
-                and 'operator' in catalog['commands'][row['command']], 'Unsupported assignment scope or command')
-        toggle(row, 'enabled')
-        toggle(row, 'active')
-        require(row.get('kind', 'addition') in ('addition', 'precedence'), 'Invalid assignment kind')
-        order = row['order']
-        require(type(order) is int and order >= 0 and order not in orders, 'Invalid or duplicate assignment order')
-        orders.add(order)
-        require('samples' not in row or isinstance(row['samples'], list)
-                and all(identifier(sample) for sample in row['samples']), 'Invalid assignment provenance')
+    for id_, row in assignments.items():
+        with row_location('assignments', id_):
+            record(row, ('section', 'feature', 'event', 'command', 'scope', 'order'),
+                   ('active', 'enabled', 'samples', 'kind'))
+            for key, table in (('section', 'sections'), ('event', 'events'), ('command', 'commands')):
+                require(identifier(row[key]) and row[key] in catalog[table], f'Missing {key} reference')
+            require(identifier(row['feature']), 'Invalid feature owner')
+            scope = scope_descriptor(row['scope'])
+            require(not scope.is_modal and scope.is_tool in (None, False)
+                    and 'operator' in catalog['commands'][row['command']], 'Unsupported assignment scope or command')
+            toggle(row, 'enabled')
+            toggle(row, 'active')
+            require(row.get('kind', 'addition') in ('addition', 'precedence'), 'Invalid assignment kind')
+            order = row['order']
+            require(type(order) is int and order >= 0 and order not in orders, 'Invalid or duplicate assignment order')
+            orders.add(order)
+            require('samples' not in row or isinstance(row['samples'], list)
+                    and all(identifier(sample) for sample in row['samples']), 'Invalid assignment provenance')
     for row in sorted(assignments.values(), key=lambda row: row['order']):
         feature = row['feature']
         require(feature == last or feature not in features, 'Feature assignments must be consecutive')
         features[feature] += 1
         last = feature
     require(max(features.values(), default=0) <= 16, 'Feature exceeds runtime request budget')
-    for row in catalog['suppressions'].values():
-        record(row, ('section', 'selector'), ('enabled', 'replacement'))
-        require(identifier(row['section']) and row['section'] in catalog['sections'],
-                'Missing suppression section')
-        selector_descriptor(row['selector'])
-        toggle(row, 'enabled')
-        if 'replacement' in row:
-            require(identifier(row['replacement']) and row['replacement'] in catalog['commands'],
-                    'Missing replacement command')
+    for id_, row in catalog['suppressions'].items():
+        with row_location('suppressions', id_):
+            record(row, ('section', 'selector'), ('enabled', 'replacement', 'disable'))
+            require(identifier(row['section']) and row['section'] in catalog['sections'],
+                    'Missing suppression section')
+            selector_descriptor(row['selector'])
+            toggle(row, 'enabled')
+            toggle(row, 'disable', False)
+            require(not (row.get('disable') and 'replacement' in row), 'Choose disable or replacement')
+            if 'replacement' in row:
+                require(identifier(row['replacement']) and row['replacement'] in catalog['commands'],
+                        'Missing replacement command')
     require(not assignments.keys() & catalog['suppressions'].keys(), 'Duplicate runtime request ID')
 
 

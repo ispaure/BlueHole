@@ -26,9 +26,21 @@ class PieActionTests(unittest.TestCase):
             cls.catalog = importlib.import_module(cls.namespace + '.actions.actions.pie_actions')
 
     def test_catalog_import_does_not_load_presentation(self):
-        self.assertTrue(self.catalog.PIE_ACTIONS)
-        self.assertIs(self.catalog.get_all_pie_actions(), self.catalog.PIE_ACTIONS)
+        self.assertTrue(self.actions())
         self.assertFalse(any(name.startswith(self.namespace + '.ui') for name in sys.modules))
+
+    def actions(self):
+        return {name: action for name, action in vars(self.catalog).items() if name.startswith('PIE_')}
+
+    def test_actions_are_exactly_the_ui_references_and_have_no_shortcut_metadata(self):
+        used = set()
+        for path in (self.root / 'ui').rglob('*.py'):
+            used.update(node.attr for node in ast.walk(ast.parse(path.read_text()))
+                        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name)
+                        and node.value.id == 'pie_actions')
+        self.assertEqual(set(self.actions()), used)
+        for action in self.actions().values():
+            self.assertFalse(hasattr(action, 'keymap_bindings'))
 
     def test_action_targets_match_literal_menu_declarations(self):
         identifiers = set()
@@ -40,7 +52,7 @@ class PieActionTests(unittest.TestCase):
                                 isinstance(target, ast.Name) and target.id == 'bl_idname'
                                 for target in statement.targets):
                             identifiers.add(ast.literal_eval(statement.value))
-        for action in self.catalog.PIE_ACTIONS:
+        for action in self.actions().values():
             with self.subTest(menu=action.get_props(None)['name']):
                 self.assertEqual(action.get_idname(), 'wm.call_menu_pie')
                 self.assertIn(action.get_props(None)['name'], identifiers)

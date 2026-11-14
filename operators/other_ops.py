@@ -79,8 +79,6 @@ class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
         return self.execute(context)
 
     def draw(self, _context):
-        self.layout.label(text="Back up your saved setup before changing shortcuts.")
-        self.layout.operator('wm.bh_backup_keymap_setup')
         self.layout.label(text="Review Blender Preferences > Keymap for old Deluxe edits.")
         self.layout.label(text="Keep personal shortcuts and remove any conflicting legacy edits.")
         self.layout.prop(self, 'reviewed')
@@ -108,38 +106,6 @@ class WM_OT_Disable_Deluxe_Keymaps(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class WM_OT_Backup_Keymap_Setup(bpy.types.Operator):
-    """Copy saved Blender preferences and the available preset for rollback"""
-    bl_idname = "wm.bh_backup_keymap_setup"
-    bl_label = "Back Up Saved Keymap Setup"
-    bl_options = {'INTERNAL'}
-
-    def execute(self, context):
-        try:
-            backup = applyDeluxePrefs.backup_keymap_setup(context)
-        except (ValueError, OSError) as error:
-            message = str(error) if isinstance(error, ValueError) else (
-                'Could not create the backup. Check that Blender’s configuration folder is writable '
-                'and has free space, then try again.')
-            return _keymap_error(self, context, error, message)
-        self.report({'INFO'}, f'Keymap setup copied to {backup}')
-        return {'FINISHED'}
-
-
-class WM_OT_Reset_Deluxe_Keymaps(bpy.types.Operator):
-    """Restore the default Deluxe feature switches"""
-    bl_idname = "wm.bh_reset_deluxe_keymaps"
-    bl_label = "Reset Deluxe Feature Switches"
-    bl_options = {'INTERNAL'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_confirm(self, event)
-
-    def execute(self, context):
-        applyDeluxePrefs.reset_deluxe_groups(context, prefs().prefs)
-        return {'FINISHED'}
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -148,8 +114,6 @@ classes = (
     WM_OT_URLOpen,
     WM_OT_Apply_Deluxe_Prefs,
     WM_OT_Disable_Deluxe_Keymaps,
-    WM_OT_Backup_Keymap_Setup,
-    WM_OT_Reset_Deluxe_Keymaps,
 )
 
 

@@ -1,0 +1,73 @@
+{
+  "category": "pipeline",
+  "definition": {
+    "label": "Pipeline",
+    "enabled": true
+  },
+  "sections": {
+    "pipeline.export": {"label": "Export", "category": "pipeline", "enabled": true},
+    "pipeline.required": {"label": "Save As", "category": "pipeline", "enabled": true, "required": true},
+    "pipeline.files": {"label": "Files", "category": "pipeline", "enabled": true, "order": 1},
+    "pipeline.render": {"label": "Render", "category": "pipeline", "enabled": true, "order": 2}
+  },
+  "events": {
+    "e-press-152eda52e2e6": {"type": "E", "shift": true, "ctrl": true, "repeat": true},
+    "s-press-67f90cffa6ac": {"type": "S", "shift": true, "ctrl": true},
+    "s-press-5aa2234624ff": {"type": "S", "shift": true, "oskey": true},
+    "rightmouse-click-f94b89b4b5df": {"type": "RIGHTMOUSE", "value": "CLICK", "alt": true, "map_type": "MOUSE"},
+    "rightmouse-click-849bef63d7d7": {"type": "RIGHTMOUSE", "value": "CLICK", "shift": true, "map_type": "MOUSE"},
+    "leftmouse-click-0b350a5e53a0": {"type": "LEFTMOUSE", "value": "CLICK", "map_type": "MOUSE"},
+    "r-press-8774ce333a85": {"type": "R", "ctrl": true},
+    "r-press-27656a17e635": {"type": "R", "oskey": true},
+    "ret-press-e17bf1e95d61": {"type": "RET", "ctrl": true, "alt": true},
+    "ret-press-75399ecc44f3": {"type": "RET", "alt": true, "oskey": true},
+    "ret-press-19b8321a8664": {"type": "RET", "ctrl": true},
+    "r-press-74dce5f911f9": {"type": "R", "ctrl": true, "repeat": true},
+    "r-press-0ae0d6ce8ef7": {"type": "R", "shift": true, "alt": true, "repeat": true}
+  },
+  "commands": {
+    "export-scene-fbx-8ba72dbc752d": {"operator": "export_scene.fbx", "properties": {}, "provider": "Blender FBX"},
+    "wm-bh-save-as-mainfile-dd929325b8a8": {"operator": "wm.bh_save_as_mainfile", "properties": {}},
+    "file-view-selected-98ebfc4743e0": {"operator": "file.view_selected", "properties": {}},
+    "file-select-box-936be50bcfa0": {"operator": "file.select_box", "properties": {}},
+    "file-select-all-52e7e18a3661": {"operator": "file.select_all", "properties": {}},
+    "file-select-7d48003784e4": {"operator": "file.select", "properties": {"extend": true, "fill": true, "open": false}},
+    "file-select-4dfa21cc7713": {"operator": "file.select", "properties": {"extend": true, "open": false}},
+    "file-select-f77d7d217141": {"operator": "file.select", "properties": {"open": false, "deselect_all": true}},
+    "file-refresh-40a7ca1daad1": {"operator": "file.refresh", "properties": {}},
+    "file-next-6d3942d4af77": {"operator": "file.next", "properties": {}},
+    "file-previous-4508586a7c8d": {"operator": "file.previous", "properties": {}},
+    "file-parent-35ee0db7b75f": {"operator": "file.parent", "properties": {}},
+    "render-render-2da0ed20920a": {"operator": "render.render", "properties": {"animation": true, "use_viewport": true}},
+    "render-render-03dc375081fd": {"operator": "render.render", "properties": {"use_viewport": true}},
+    "render-opengl-9ac17ad9a6aa": {"operator": "render.opengl", "properties": {"animation": false, "render_keyed_only": false, "sequencer": false, "view_context": true, "write_still": false}}
+  },
+  "assignments": {
+    "pipeline-window-d8bcf0e3c541": {"order": 81, "section": "pipeline.export", "feature": "pipeline-export-scene-fbx-47aa804d1247", "event": "e-press-152eda52e2e6", "command": "export-scene-fbx-8ba72dbc752d", "scope": {"name": "Window"}, "samples": ["6aed7b816a73518dac58f67d356385f0204e4dc603c487334710e57619395417"]},
+    "pipeline-window-3f6c53c48424": {"order": 82, "section": "pipeline.required", "feature": "pipeline-wm-bh-save-as-mainfile-401d789bf450", "event": "s-press-67f90cffa6ac", "command": "wm-bh-save-as-mainfile-dd929325b8a8", "scope": {"name": "Window"}, "samples": ["86bc78241c42103b29d85eb6440eb4cc044cd11e76d048e8dc989daa38e57604"]},
+    "pipeline-window-550128fcd02f": {"order": 83, "section": "pipeline.required", "feature": "pipeline-wm-bh-save-as-mainfile-401d789bf450", "event": "s-press-5aa2234624ff", "command": "wm-bh-save-as-mainfile-dd929325b8a8", "scope": {"name": "Window"}, "samples": ["907b714c2c7e14a12372f874dd3c519632fce3100d0f7adde1242f659742801b"]},
+    "other-file-browser-main-14a79ed5be54": {"order": 462, "section": "pipeline.files", "feature": "other-file-view-selected-0d07a96b1eca", "event": "f-press-c5de524ad3a9", "command": "file-view-selected-98ebfc4743e0", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["964f092f1421acf19ce6f14b57e5f2db7d20e8e19b8a076956040cb21130b52b"]},
+    "other-file-browser-main-c8e0d7ffa5df": {"order": 463, "section": "pipeline.files", "feature": "other-file-select-box-78a842b5895c", "event": "q-press-2abed1079bef", "command": "file-select-box-936be50bcfa0", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["48eaa0e87a7b25fe3976f0fd9dd4e5e5e0dfeff260b169e52e1af04b3a0bd45b"]},
+    "other-file-browser-main-8b043ab6a98c": {"order": 464, "section": "pipeline.files", "feature": "other-file-select-all-191b00a743a2", "event": "a-press-7cb053b6f258", "command": "file-select-all-52e7e18a3661", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["812d9cc6062ff7b279c3d34666b55db0994ae0c1cfc22cfb1350f9927da95048"]},
+    "other-file-browser-main-3d18237f9956": {"order": 465, "section": "pipeline.files", "feature": "other-file-select-all-bfbb59702d0f", "event": "a-press-6343c76d195f", "command": "file-select-all-52e7e18a3661", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["d145902f8b13552b50fc45239b33292d60ff6ee4751a86f631aade380fa9a5b1"]},
+    "other-file-browser-main-a667722d8a1f": {"order": 466, "section": "pipeline.files", "feature": "other-file-select-877c2e64537d", "event": "rightmouse-click-f94b89b4b5df", "command": "file-select-7d48003784e4", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["91e001acb4c2023c92a60426fabd4a9100cae7beeebb5ce02ca70df90a267491"]},
+    "other-file-browser-main-9e2c421d46ec": {"order": 467, "section": "pipeline.files", "feature": "other-file-select-26907a837f77", "event": "rightmouse-click-849bef63d7d7", "command": "file-select-4dfa21cc7713", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["a20f06273003474a1eff59c594a6286cd5d135f27fb468c0a0cfd192b57a1903"]},
+    "other-file-browser-main-237cbbe72b1c": {"order": 468, "section": "pipeline.files", "feature": "other-file-select-42e342a18853", "event": "leftmouse-click-0b350a5e53a0", "command": "file-select-f77d7d217141", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["e26b178b1abcc25c83f09c8d3e83ecb6ecc39841b9ff978ae947542b8d4656c8"]},
+    "other-file-browser-main-1484d83d7d45": {"order": 469, "section": "pipeline.files", "feature": "other-file-refresh-cb39496244de", "event": "r-press-8774ce333a85", "command": "file-refresh-40a7ca1daad1", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["1f608148fc2c025555b230ef447bcd8b54940c018406829468871733c161e5dc"]},
+    "other-file-browser-main-98d7284b2869": {"order": 470, "section": "pipeline.files", "feature": "other-file-refresh-feac95a176a3", "event": "r-press-27656a17e635", "command": "file-refresh-40a7ca1daad1", "scope": {"name": "File Browser Main", "space_type": "FILE_BROWSER"}, "samples": ["4cfc2aaf31d6d011b6e64254201734a71a13ba120147277dd2c78794a1e806fa"]},
+    "other-file-browser-2d8389f84b44": {"order": 471, "section": "pipeline.files", "feature": "other-file-refresh-4e64d01a5ea1", "event": "r-press-8774ce333a85", "command": "file-refresh-40a7ca1daad1", "scope": {"name": "File Browser", "space_type": "FILE_BROWSER"}, "samples": ["67a52985791077ac7a9188947346cf938c193554b6507d7e001437e51f4f9c1c"]},
+    "other-file-browser-c930d7020f3e": {"order": 472, "section": "pipeline.files", "feature": "other-file-refresh-b14802bc100f", "event": "r-press-27656a17e635", "command": "file-refresh-40a7ca1daad1", "scope": {"name": "File Browser", "space_type": "FILE_BROWSER"}, "samples": ["49d470539e86bdfae267c07743ba1fa2cdc2a9e2c0cd3c471674d266ade4c613"]},
+    "other-file-browser-76e1f016a3ef": {"order": 473, "section": "pipeline.files", "feature": "other-file-next-42097864587d", "event": "right-arrow-press-26cb764c7bac", "command": "file-next-6d3942d4af77", "scope": {"name": "File Browser", "space_type": "FILE_BROWSER"}, "samples": ["49ad4879293ba2e6e6008e7899eb91be0bda77cccae5bc5322e00af6ee440129"]},
+    "other-file-browser-83b257217f4b": {"order": 474, "section": "pipeline.files", "feature": "other-file-next-5ab1a67ae106", "event": "right-arrow-press-c81c0a0aa188", "command": "file-next-6d3942d4af77", "scope": {"name": "File Browser", "space_type": "FILE_BROWSER"}, "samples": ["943e8e9923bdda0d483f5f710b71b1aca30edb2112db5e3b51910eb953f672c4"]},
+    "other-file-browser-2639898b116e": {"order": 475, "section": "pipeline.files", "feature": "other-file-previous-15c28ddf5e95", "event": "left-arrow-press-9d0c22947d14", "command": "file-previous-4508586a7c8d", "scope": {"name": "File Browser", "space_type": "FILE_BROWSER"}, "samples": ["6cf8958fb20c7f29981778f033f192140fa6202886b3dfa9a54f677042446530"]},
+    "other-file-browser-25bcc2414bf5": {"order": 476, "section": "pipeline.files", "feature": "other-file-previous-a38c5575730e", "event": "left-arrow-press-9755910cb304", "command": "file-previous-4508586a7c8d", "scope": {"name": "File Browser", "space_type": "FILE_BROWSER"}, "samples": ["358dddcacd2911fdc09150b7acaa1f03126ef9fad71127809c0c10fa73c45a77"]},
+    "other-file-browser-fd7bf6e68250": {"order": 477, "section": "pipeline.files", "feature": "other-file-parent-37bb7cc7ed21", "event": "up-arrow-press-4ff1e8556ab5", "command": "file-parent-35ee0db7b75f", "scope": {"name": "File Browser", "space_type": "FILE_BROWSER"}, "samples": ["d712cd482205ef155d967d0010276732e79866367b3f94469361acf03c89b60a"]},
+    "other-file-browser-36a5c3daee8d": {"order": 478, "section": "pipeline.files", "feature": "other-file-parent-3c87c8ca7a5c", "event": "up-arrow-press-703de24528ee", "command": "file-parent-35ee0db7b75f", "scope": {"name": "File Browser", "space_type": "FILE_BROWSER"}, "samples": ["cf6e6b2a1ef617101bdc799c99b1307a598b61ad2d1d9a01f09184f9ea5a4e07"]},
+    "other-screen-editing-44a25504e604": {"order": 763, "section": "pipeline.render", "feature": "other-render-render-48671685f11d", "event": "ret-press-e17bf1e95d61", "command": "render-render-2da0ed20920a", "scope": {"name": "Screen Editing"}, "samples": ["4ab6e7702c24ebc3d048986bde77dbbfcf3f93553fb3d4e934a548dacf22c59a"]},
+    "other-screen-editing-21596fa8dd12": {"order": 764, "section": "pipeline.render", "feature": "other-render-render-a19c32db38c6", "event": "ret-press-75399ecc44f3", "command": "render-render-2da0ed20920a", "scope": {"name": "Screen Editing"}, "samples": ["299ed9aaaae03ccf823bd3e8de3948bc9b42709e11ea7a5911aaf8e783bf3926"]},
+    "other-screen-editing-6348b0235614": {"order": 765, "section": "pipeline.render", "feature": "other-render-render-a25fc00a6d1a", "event": "ret-press-19b8321a8664", "command": "render-render-03dc375081fd", "scope": {"name": "Screen Editing"}, "samples": ["116a7f8d6481fa68f94308adb06fa4497a69aba2b6554af21372c2ada4f87fe3"]},
+    "other-screen-editing-1fcefbee0908": {"order": 766, "section": "pipeline.render", "feature": "other-render-render-c8f23227406c", "event": "r-press-74dce5f911f9", "command": "render-render-03dc375081fd", "scope": {"name": "Screen Editing"}, "samples": ["b21332684a07aa2d74f4d8ee4c37782313c4bf60544452c0a77d23cf4186241d"]},
+    "other-screen-eae76bf0edfe": {"order": 767, "section": "pipeline.render", "feature": "other-render-opengl-5ac941629ed8", "event": "r-press-0ae0d6ce8ef7", "command": "render-opengl-9ac17ad9a6aa", "scope": {"name": "Screen"}, "samples": ["1b739108e1dabfc43fe5a0a6455a010e73f3b8376f9e26ee6499fb0db969c99f"]}
+  },
+  "suppressions": {}
+}
