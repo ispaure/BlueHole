@@ -17,7 +17,8 @@ def run(request):
     service = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(service)
     if request['action'] == 'check':
-        return service.latest(request['channel'], request['blender_version'], json_get)
+        release = service.latest(request['channel'], request['blender_version'], json_get)
+        return {'release': release, 'check': service.check_release(request['installed_root'], release, json_get)}
     release = request['release']
     workspace = Path(request['workspace'])
     snapshot = GitHubSource(service.REPOSITORY).snapshot(release['commit'], workspace)
@@ -38,13 +39,13 @@ def run(request):
                 shutil.copyfileobj(inp, out)
     with package.open('rb') as stream:
         digest = hashlib.file_digest(stream, 'sha256').hexdigest()
-    return {**release, 'package_digest': digest}
+    return {'release': {**release, 'package_digest': digest}}
 
 
 if __name__ == '__main__':
     request_path, response_path = map(Path, sys.argv[1:])
     try:
-        result = {'ok': True, 'release': run(json.loads(request_path.read_text(encoding='utf-8')))}
+        result = {'ok': True, **run(json.loads(request_path.read_text(encoding='utf-8')))}
     except Exception as error:
         result = {'ok': False, 'error': f'{type(error).__name__}: {error}'}
     response_path.write_text(json.dumps(result), encoding='utf-8')

@@ -207,15 +207,15 @@ def validate_catalog(catalog):
     for id_, row in catalog['suppressions'].items():
         with row_location('suppressions', id_):
             record(row, ('section', 'selector'), ('enabled', 'replacement', 'disable', 'explicit_properties', 'requires_assignment'))
-            require('requires_assignment' not in row or row['requires_assignment'] in assignments,
-                    'Missing prerequisite assignment')
+            # Accept old profile metadata for migration, even when that other
+            # assignment was removed. Disable rules no longer depend on additions.
+            require('requires_assignment' not in row or identifier(row['requires_assignment']),
+                    'Invalid legacy prerequisite assignment')
             require(identifier(row['section']) and row['section'] in catalog['sections'],
                     'Missing suppression section')
             selector_descriptor(row['selector'])
             toggle(row, 'enabled')
             toggle(row, 'disable', False)
-            require('requires_assignment' not in row or row.get('disable'),
-                    'Only disables may require an assignment')
             toggle(row, 'explicit_properties', False)
             require(not row.get('explicit_properties') or
                     (row.get('disable') and row['selector']['source_role'] in {'default', 'addon'}),
@@ -257,6 +257,8 @@ def independent_commands(catalog):
     including unused legacy records. Loading never writes the source files.
     """
     result = deepcopy(catalog)
+    for row in result['suppressions'].values():
+        row.pop('requires_assignment', None)
     commands = result['commands']
     owners = set()
     bindings = sorted(result['assignments'].items(), key=lambda entry: (

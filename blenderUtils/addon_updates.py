@@ -15,7 +15,7 @@ from . import update_service as service
 
 ROOT = Path(__file__).absolute().parents[1]
 MODULE = __package__.split('.')[0]
-state = {'status': 'idle', 'message': '', 'release': None, 'channel': None}
+state = {'status': 'idle', 'message': '', 'blocked': '', 'release': None, 'channel': None}
 _job = None
 _handoff = False
 
@@ -50,7 +50,8 @@ def start(action):
     workspace = TemporaryDirectory(prefix='.bluehole-update-', dir=ROOT.parent if action == 'install' else None)
     folder = Path(workspace.name)
     request = {'action': 'check' if action == 'check' else 'stage', 'channel': channel,
-               'blender_version': list(bpy.app.version), 'workspace': str(folder), 'release': state['release']}
+               'blender_version': list(bpy.app.version), 'workspace': str(folder), 'release': state['release'],
+               'installed_root': str(ROOT)}
     (folder / 'request.json').write_text(json.dumps(request), encoding='utf-8')
     try:
         with (folder / 'worker.log').open('wb') as output:
@@ -70,7 +71,7 @@ def invalidate(_self=None, _context=None):
     # A channel change invalidates a checked commit; never install the previous
     # channel's candidate after the user changes this preference.
     if _job is None and not _handoff:
-        state.update(status='idle', release=None, channel=None, message='')
+        state.update(status='idle', release=None, channel=None, message='', blocked='')
 
 
 def poll():
@@ -109,9 +110,7 @@ def poll():
         if prefs.update_channel != release['channel']:
             invalidate()
         elif action == 'check':
-            current = service.installed_commit(ROOT)
-            state.update(status='current' if current == release['commit'] else 'available',
-                         release=release, channel=release['channel'], message=service.install_blocker(ROOT))
+            state.update(result['check'], release=release, channel=release['channel'])
         else:
             _handoff = True
             state.update(status='installing', message='Reloading Blue Hole…')
@@ -256,10 +255,11 @@ def draw_update(layout, *, details=False):
         row.enabled = False
         row.label(text={'checking': 'Checking for Blue Hole updates…', 'downloading': 'Downloading Blue Hole update…',
                         'installing': 'Reloading Blue Hole…'}[status], icon='TIME')
-    elif status == 'available' and release:
+    elif status in {'available', 'unverified', 'ahead', 'different'} and release:
         row = layout.row()
-        row.enabled = not bool(state['message'])
-        row.operator('wm.bh_update_addon', text=f'Update Blue Hole · {release["version"]} ({release["channel"]})', icon='IMPORT')
+        row.enabled = not bool(state['blocked'])
+        action = 'Update' if status == 'available' else 'Install'
+        row.operator('wm.bh_update_addon', text=f'{action} Blue Hole · {release["version"]} ({release["channel"]})', icon='IMPORT')
     else:
         layout.operator('wm.bh_check_update', text='Blue Hole up to date · Check Again' if status == 'current'
                         else 'Check for Blue Hole Updates', icon='FILE_REFRESH')
@@ -271,11 +271,11 @@ def draw_update(layout, *, details=False):
             row.prop(prefs, 'update_channel', text='Update channel')
         if release:
             layout.label(text=f'{release["branch"]} · {release["commit"][:12]}')
-        if state['message']:
+        for message in (state['message'], state['blocked']):
             import textwrap
-            for line in textwrap.wrap(state['message'], width=85):
+            for line in textwrap.wrap(message, width=85):
                 layout.label(text=line)
-        if status in {'available', 'current'}:
+        if release and status not in {'checking', 'downloading', 'installing'}:
             layout.operator('wm.bh_check_update', text='Check for Updates', icon='FILE_REFRESH')
 
 

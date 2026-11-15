@@ -147,10 +147,12 @@ def launch():
         env.update(BLUEHOLE_UPDATE_TEST_ROOT=str(root),BLUEHOLE_UPDATE_TEST_OUTPUT=str(output),PYTHONDONTWRITEBYTECODE='1')
         stage_package(root,None)
         (root/'scripts/addons/bluehole_runtime').rename(root/'scripts/addons/BlueHole')
+        previous_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD^'],
+                                                  cwd=Path(__file__).resolve().parents[1], text=True).strip()
         (root/'.logistics-addons.json').write_text(json.dumps(dict(selected=[],
             installed={'legacy:BlueHole':dict(path='scripts/addons/BlueHole',module='BlueHole',digest='0'*64,version='6.9.21')},
             bluehole=dict(enabled=True,source='github',branch='main',auto_update=False),
-            installed_bluehole=dict(branch='blender-5.2.2/main',commit='0'*40))))
+            installed_bluehole=dict(branch='blender-5.2.2/main',commit=previous_commit))))
         command=[str(args.blender),'--factory-startup','--disable-autoexec','--online-mode','--python-exit-code','1','--python',str(Path(__file__).resolve())]
         if sys.platform=='darwin':
             policy=root/'policy.sb'

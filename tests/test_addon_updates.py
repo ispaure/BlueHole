@@ -2,6 +2,7 @@
 import base64
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -100,6 +101,55 @@ class UpdateTests(unittest.TestCase):
         link = self.folder/'linked'
         link.symlink_to(self.root,target_is_directory=True)
         self.assertIn('checkout/link',service.install_blocker(link))
+
+    def test_checkout_revision_wins_over_markers_for_links_and_worktrees(self):
+        def git(*args):
+            return subprocess.check_output(['git', '-C', str(self.root), *args], text=True).strip()
+        git('init', '-q')
+        git('-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture')
+        head = git('rev-parse', 'HEAD')
+        (self.root/service.MARKER).write_text(json.dumps(self.release))
+        self.assertEqual(service.installed_commit(self.root), head)
+        link = self.folder/'linked'
+        link.symlink_to(self.root, target_is_directory=True)
+        self.assertEqual(service.installed_commit(link), head)
+        worktree = self.folder/'worktree'
+        git('worktree', 'add', '--quiet', '--detach', str(worktree))
+        self.assertTrue((worktree/'.git').is_file())
+        self.assertEqual(service.installed_commit(worktree), head)
+        with patch.object(service.subprocess, 'run', side_effect=FileNotFoundError):
+            self.assertEqual(service.installed_commit(self.root), '')
+
+    def test_same_commit_in_any_channel_is_current_without_comparison(self):
+        (self.root/service.MARKER).write_text(json.dumps({**self.release, 'channel': 'alpha'}))
+        def no_request(url):
+            self.fail('Identical commits should not require a comparison')
+        checked = service.check_release(self.root, self.release, no_request)
+        self.assertEqual(checked['status'], 'current')
+        self.assertFalse(checked['blocked'])
+
+    def test_badge_requires_a_newer_commit_not_just_a_different_commit(self):
+        (self.root/service.MARKER).write_text(json.dumps({**self.release, 'commit':'b'*40}))
+        for relationship, expected in [('ahead', 'available'), ('behind', 'ahead'),
+                                       ('diverged', 'different'), ('identical', 'current')]:
+            with self.subTest(relationship=relationship):
+                calls = []
+                def get(url):
+                    calls.append(url)
+                    return {'status': relationship}
+                checked = service.check_release(self.root, self.release, get)
+                self.assertEqual(checked['status'], expected)
+                self.assertTrue(calls[0].endswith('b'*40+'...'+'a'*40))
+                self.assertFalse(checked['blocked'])
+
+    def test_unknown_or_unpublished_revision_does_not_advertise_an_update(self):
+        def unavailable(url):
+            raise OSError('Unpublished commit or comparison offline')
+        checked = service.check_release(self.root, self.release, unavailable)
+        self.assertEqual(checked['status'], 'unverified')
+        self.assertFalse(checked['blocked'])
+        (self.root/service.MARKER).write_text(json.dumps({**self.release, 'commit':'b'*40}))
+        self.assertEqual(service.check_release(self.root, self.release, unavailable)['status'], 'unverified')
 
     def test_failed_folder_swap_restores_installation(self):
         install = service.Installation(self.root,self.staged,self.release,(5,2,2))

@@ -412,6 +412,12 @@ class Editor:
             return 'FILE_REFRESH', 'Blender Keymap Replaced by Blue Hole Deluxe'
         return 'INFO', 'Blender Keymap Reference · No change applied'
 
+    def rule_status(self, id_, preview):
+        state = preview['suppressions'][id_]
+        if not state['eligible']:
+            return 'Rule inactive'
+        return STATUS_LABELS.get(state['status'], state['status'])
+
     def changed(self, message='Changes staged', *, remember=True):
         catalog = self.draft.snapshot()
         if remember and not same_value(self.catalog, catalog):

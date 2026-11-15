@@ -322,7 +322,8 @@ def _scope(map_):
 
 def _maps(config, scope):
     try:
-        return [map_ for map_ in _members(config.keymaps) if _scope(map_) == scope]
+        return [map_ for map_ in _members(config.keymaps)
+                if map_.name == scope.name and _scope(map_) == scope]
     except (AttributeError, ReferenceError, RuntimeError, TypeError) as exc:
         raise _Pending('unreadable_keymaps') from exc
 

@@ -430,8 +430,7 @@ class ProfileStore:
         selector = selector_descriptor(row['selector'])
         if row.get('disable'):
             status, reason = default_bindings.status(
-                selector, explicit_properties=row.get('explicit_properties', False),
-                requires_assignment=row.get('requires_assignment', ''))
+                selector, explicit_properties=row.get('explicit_properties', False))
             return {'status': status, 'reason': reason}
         replacement = (self.resolver.target(catalog['commands'][row['replacement']])
                        if 'replacement' in row else None)
@@ -455,7 +454,8 @@ class ProfileStore:
             backup = previous if self.edit_defaults else profile_overlay(self._overlay_defaults, previous)
             self._backup.write_json(backup, compact=True)
             try:
-                self._install(candidate, previous)
+                if not same_value(candidate, self.runtime_catalog()):
+                    self._install(candidate, self.runtime_catalog())
                 require(self._disk_revision() == self._revision, 'Profile file changed during apply')
                 try:
                     if self.edit_defaults:
@@ -566,7 +566,58 @@ class ProfileStore:
                 raise ProfileError(f'Cannot register replacement {id_}: {reason}')
 
     @runtime.batch_merged_updates()
-    def register(self, catalog=None, *, required_only=False):
+    def update_registration(self, candidate, previous):
+        """Rebuild affected contexts in source order; leave other items intact."""
+        old_sections, old_groups = self._plan(previous)
+        new_sections, new_groups = self._plan(candidate)
+        owners = {owner for owner in old_groups.keys() | new_groups.keys()
+                  if old_groups.get(owner) != new_groups.get(owner)}
+
+        def scope_key(scope):
+            return scope.name, scope.space_type, scope.region_type, scope.is_modal
+
+        # Recreating just one item could change precedence in a shared shortcut
+        # chain. Include its whole context and any feature spanning that context.
+        scopes = set()
+        groups = list(old_groups.items()) + list(new_groups.items())
+        while True:
+            for owner, requests in groups:
+                if owner in owners:
+                    scopes.update(scope_key(request.scope) for request in requests)
+            expanded = owners | {owner for owner, requests in groups
+                                 if any(scope_key(request.scope) in scopes for request in requests)}
+            if expanded == owners:
+                break
+            owners = expanded
+
+        def rules(catalog, sections):
+            return {id_: row for id_, row in catalog['suppressions'].items()
+                    if sections[row['section']] and row.get('enabled', True)}
+        old_rules, new_rules = rules(previous, old_sections), rules(candidate, new_sections)
+        rule_ids = {id_ for id_ in old_rules.keys() | new_rules.keys()
+                    if not same_value(old_rules.get(id_), new_rules.get(id_))}
+        for id_, row in list(old_rules.items()) + list(new_rules.items()):
+            if scope_key(selector_descriptor(row['selector']).scope) in scopes:
+                rule_ids.add(id_)
+            if 'replacement' in row and not same_value(previous['commands'].get(row['replacement']),
+                                                       candidate['commands'].get(row['replacement'])):
+                rule_ids.add(id_)
+        for id_ in rule_ids:
+            default_bindings.release(id_)
+            if handle := runtime._FEATURES.get('profile:deluxe-' + id_):
+                handle.release()
+        if any(owner in owners and any(request.target == ADD_PIE_TARGET for request in requests)
+               for owner, requests in groups):
+            self.restore_stock_add()
+        for owner in reversed(tuple(runtime._FEATURES)):
+            if owner in owners and (handle := runtime._FEATURES.get(owner)):
+                handle.release()
+        if default_bindings.pending_cleanup() or runtime.pending_cleanup():
+            raise ProfileError('Native keymap cleanup is pending')
+        return self.register(candidate, owners=owners, rule_ids=rule_ids)
+
+    @runtime.batch_merged_updates()
+    def register(self, catalog=None, *, required_only=False, owners=None, rule_ids=None):
         """Register in source order through brief 02's feature ledger."""
         if catalog is None:
             catalog = self.runtime_catalog()
@@ -574,6 +625,8 @@ class ProfileStore:
         total = 0
         add_pie_registered = False
         for owner, requests in groups.items():
+            if owners is not None and owner not in owners:
+                continue
             config = runtime.get_addon_keyconfig()
             requests = tuple(replace(request, scope=resolve_scope(request.scope, config))
                              for request in requests)
@@ -585,12 +638,13 @@ class ProfileStore:
                 and replace(request.scope, is_tool=None) == ADD_PIE_SCOPE and request.scope.is_tool is not True
                 and request.target == ADD_PIE_TARGET for request in requests)
         for id_, row in catalog['suppressions'].items():
+            if rule_ids is not None and id_ not in rule_ids:
+                continue
             if not (sections[row['section']] and row.get('enabled', True)):
                 continue
             if row.get('disable'):
                 default_bindings.install(id_, selector_descriptor(row['selector']),
-                                         explicit_properties=row.get('explicit_properties', False),
-                                         requires_assignment=row.get('requires_assignment', ''))
+                                         explicit_properties=row.get('explicit_properties', False))
                 continue
             request = self.resolver.suppression_request(id_, row, catalog['commands'])
             if request is not None:

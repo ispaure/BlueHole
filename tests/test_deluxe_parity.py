@@ -191,7 +191,7 @@ class CatalogParityTests(unittest.TestCase):
         self.assertTrue(editor.binding_pending(id_, preview))
         self.assertEqual(editor.binding_origin(id_, preview)[0], 'REMOVE')
 
-    def test_removal_waits_for_replacement_and_restores_when_it_disappears(self):
+    def test_removal_is_independent_of_same_shortcut_assignment(self):
         core = self.h.core
         api = importlib.import_module('_deluxe_profiles_test.keymaps.default_bindings')
         self.addCleanup(api.release_all)
@@ -199,8 +199,8 @@ class CatalogParityTests(unittest.TestCase):
         km = self.h.runtime.map('default','Object Mode',space='EMPTY',tool=False)
         source = km.keymap_items.append_fixture(row('transform.translate', key='G'))
         selector = core.capture_selector(km,source)
-        api.install('rule', selector, requires_assignment='provider')
-        self.assertTrue(source.active)
+        api.install('rule', selector)
+        self.assertFalse(source.active)
         self.h.runtime.map('addon','Object Mode',space='EMPTY',tool=False)
         assignment = core.KeymapAssignment('provider',core.capture_scope(km),core.KeymapEvent('G'),core.KeymapTarget('provider.move'))
         handle = core.register_feature('provider',assignments=(assignment,))
@@ -208,8 +208,40 @@ class CatalogParityTests(unittest.TestCase):
         self.assertFalse(source.active)
         handle.release()
         api.reconcile()
+        self.assertFalse(source.active)
+        self.assertEqual(api.registration_results()['rule'], ('applied',''))
+        api.release_all()
         self.assertTrue(source.active)
-        self.assertEqual(api.registration_results()['rule'], ('pending','waiting_for_assignment'))
+
+    def test_hardops_shift_q_removal_resolves_without_meshmachine(self):
+        model = importlib.import_module('_deluxe_profiles_test.preferences.addon.keymaps.deluxe_editor_model')
+        store = self.h.api.ProfileStore(self.catalog, self.h.path, lambda: self.h.settings, lambda *_: None)
+        editor = model.Editor(store)
+        self.h.runtime.bpy.types = SimpleNamespace()
+        km = self.h.runtime.map('addon', '3D View', space='VIEW_3D')
+        km.keymap_items.append_fixture(row('wm.call_menu_pie', key='Q', shift=True,
+                                          prop_values={'name': 'HOPS_MT_MainPie'}))
+        preview = store.preview()
+        rule = 'parity-disable-400848e85e7b'
+        self.assertEqual(preview['suppressions'][rule]['status'], 'resolved')
+        self.assertEqual(editor.rule_status(rule, preview), 'Exact target resolved')
+        preview['suppressions'][rule]['eligible'] = False
+        self.assertEqual(editor.rule_status(rule, preview), 'Rule inactive')
+        self.assertTrue(editor.binding_origin(rule, preview)[1].endswith('Inactive'))
+
+    def test_legacy_assignment_dependencies_are_migrated_without_losing_rule_edits(self):
+        rule = 'parity-disable-400848e85e7b'
+        overlay = dict(schema_version=self.catalog['schema_version'], catalog_version=self.catalog['catalog_version'],
+                       base=self.catalog['base']['preset'], changes={'suppressions': {
+                           rule: {'enabled': False, 'requires_assignment': 'removed-assignment'}}})
+        self.h.path.write_text(json.dumps(overlay))
+        store = self.h.api.ProfileStore(self.catalog, self.h.path, lambda: self.h.settings, lambda *_: None)
+        self.assertIsNone(store.load_issue)
+        self.assertTrue(store.needs_migration)
+        self.assertFalse(store.snapshot()['suppressions'][rule]['enabled'])
+        self.assertNotIn('requires_assignment', store.snapshot()['suppressions'][rule])
+        store.apply(store.begin())
+        self.assertNotIn('requires_assignment', self.h.path.read_text())
 
     def test_modal_assignment_is_not_reported_as_its_own_inherited_conflict(self):
         core = self.h.core

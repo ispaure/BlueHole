@@ -23,29 +23,7 @@ class DisabledBinding:
 _bindings = {}
 _results = {}
 _requests = {}
-_requirements = {}
 _cursor = 0
-
-
-def _assignment_ready(id_):
-    if not id_:
-        return True
-    for handle in runtime._FEATURES.values():
-        owned = handle._owned.get(id_)
-        if owned is None:
-            continue
-        request = next((row for row in handle.assignments if row.request_id == id_), None)
-        if request is None or not request.active:
-            continue
-        if not runtime._assignment_dependency_ready(request):
-            continue
-        try:
-            if (runtime._valid_owned(owned) and
-                    runtime._snapshot(owned.item, request.scope.is_modal) == owned.snapshot):
-                return True
-        except runtime._Pending:
-            pass
-    return False
 
 
 def _valid(record):
@@ -121,9 +99,7 @@ def _resolve(selector, explicit_properties):
     return replace(selector, target=matches[0])
 
 
-def status(selector, *, explicit_properties=False, requires_assignment=''):
-    if not _assignment_ready(requires_assignment):
-        return 'missing', 'waiting_for_assignment'
+def status(selector, *, explicit_properties=False):
     try:
         for id_, record in _bindings.items():
             if (_requests.get(id_) == (selector, explicit_properties)
@@ -139,12 +115,8 @@ def status(selector, *, explicit_properties=False, requires_assignment=''):
         return state, error.reason
 
 
-def install(id_, selector, *, explicit_properties=False, requires_assignment=''):
+def install(id_, selector, *, explicit_properties=False):
     _requests[id_] = selector, explicit_properties
-    _requirements[id_] = requires_assignment
-    if not _assignment_ready(requires_assignment):
-        _results[id_] = ('pending', 'waiting_for_assignment')
-        return
     try:
         selector = _resolve(selector, explicit_properties)
         # An absent provider should not force a native keyconfig rebuild on
@@ -182,13 +154,6 @@ def reconcile(*, budget=4, time_budget=0.004):
         _cursor += 1
         checked += 1
         record = _bindings.get(id_)
-        requirement = _requirements.get(id_, '')
-        if not _assignment_ready(requirement):
-            if record is not None:
-                record.pending = True
-                retry_cleanup()
-            _results[id_] = ('pending', 'waiting_for_assignment')
-            continue
         if record is not None:
             try:
                 if _valid(record):
@@ -201,7 +166,7 @@ def reconcile(*, budget=4, time_budget=0.004):
                 continue
             del _bindings[id_]
         selector, explicit_properties = _requests[id_]
-        install(id_, selector, explicit_properties=explicit_properties, requires_assignment=requirement)
+        install(id_, selector, explicit_properties=explicit_properties)
     return checked
 
 
@@ -228,10 +193,18 @@ def retry_cleanup():
 def release_all():
     global _cursor
     _requests.clear()
-    _requirements.clear()
     _cursor = 0
     _results.clear()
     for record in _bindings.values():
+        record.pending = True
+    return retry_cleanup()
+
+
+def release(id_):
+    """Restore one rule without disturbing other managed bindings."""
+    _requests.pop(id_, None)
+    _results.pop(id_, None)
+    if record := _bindings.get(id_):
         record.pending = True
     return retry_cleanup()
 

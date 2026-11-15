@@ -8,7 +8,7 @@ import bpy
 from bl_keymap_utils import keymap_hierarchy
 
 from . import deluxe_editor_ops as ops
-from .deluxe_editor_model import (STATUS_LABELS, binding_context_path, binding_context_tree,
+from .deluxe_editor_model import (binding_context_path, binding_context_tree,
                                   context_label, display_value, key_filter, scope_key, shortcut, title)
 from ....keymaps.deluxe_schema import assignment_required, same_value
 
@@ -541,11 +541,13 @@ def rule_inspector(layout, current, preview, id_):
     if 'replacement' in rule:
         layout.label(text='Replacement: ' + ops.command_name(current, rule['replacement']))
     status = preview['suppressions'][id_]
-    layout.label(text=STATUS_LABELS.get(status['status'], status['status']), icon='INFO')
+    layout.label(text=current.rule_status(id_, preview), icon='INFO')
     if rule.get('disable'):
-        if selector['source_role'] == 'addon':
+        if not status['eligible']:
+            layout.label(text='Original shortcut left unchanged by this rule')
+        elif selector['source_role'] == 'addon':
             layout.label(text='Applies automatically when the add-on registers this shortcut')
-        layout.label(text='Remove this rule to restore the original binding')
+        layout.label(text='Disable or remove this rule to keep the original binding')
     actions = layout.row(align=True)
     ops.operator_button(actions, 'remove_rule', 'Restore Binding' if rule.get('disable') else 'Remove Rule', id_,
                         icon='LOOP_BACK')

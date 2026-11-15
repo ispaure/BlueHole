@@ -118,7 +118,10 @@ def _install_profile(candidate, previous):
     store = deluxe_profile()
     before = store.registration_results() if previous is not None else None
     try:
-        _apply_categories(profile=candidate)
+        if previous is None or _preference_state != _preference_signature():
+            _apply_categories(profile=candidate)
+        else:
+            store.update_registration(candidate, previous)
         if keymap_utils.pending_cleanup() or default_bindings.pending_cleanup():
             raise ProfileError('Native keymap cleanup is pending')
         if before is not None:

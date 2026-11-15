@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
 from urllib.parse import quote
 
 REPOSITORY = 'ispaure/BlueHole'
@@ -95,6 +96,20 @@ def install_blocker(root):
 
 
 def installed_commit(root):
+    checkout = Path(root).resolve()
+    if (checkout / '.git').exists():
+        # A linked development preset has no installation marker. Its checkout
+        # is authoritative, including worktrees and detached HEADs. Run this in
+        # the update worker so a slow Git executable never stalls Blender's UI.
+        try:
+            result = subprocess.run(['git', '-C', str(checkout), 'rev-parse', '--verify', 'HEAD'],
+                                    capture_output=True, text=True, timeout=10, check=True,
+                                    env={k: v for k, v in os.environ.items() if not k.startswith('GIT_')},
+                                    creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+            commit = result.stdout.strip()
+            return commit if COMMIT.fullmatch(commit) else ''
+        except (OSError, subprocess.SubprocessError):
+            return ''
     marker = Path(root) / MARKER
     if marker.is_file() and not marker.is_symlink():
         record = json.loads(marker.read_text(encoding='utf-8'))
@@ -103,6 +118,29 @@ def installed_commit(root):
         record = (managed[1].get('installed_bluehole') or managed[1].get('bluehole', {})) if managed else {}
     commit = record.get('commit')
     return commit if isinstance(commit, str) and COMMIT.fullmatch(commit) else ''
+
+
+def check_release(root, release, json_get):
+    """Only advertise an update when the selected branch is actually newer."""
+    current = installed_commit(root)
+    status = 'unverified'
+    message = 'Installed revision is unknown; the latest selected channel can be installed manually.'
+    if current == release['commit']:
+        status, message = 'current', ''
+    elif current:
+        try:
+            comparison = json_get(f'https://api.github.com/repos/{REPOSITORY}/compare/{current}...{release["commit"]}')
+            status, message = {
+                'identical': ('current', ''),
+                'ahead': ('available', ''),
+                'behind': ('ahead', 'Your installed revision is ahead of the selected channel.'),
+                'diverged': ('different', 'Your installed revision and the selected channel have different changes.'),
+            }[comparison['status']]
+        except Exception:
+            # An unpublished checkout or unavailable comparison is not evidence
+            # that a newer update exists. Keep manual channel installation usable.
+            message = 'Could not compare the installed revision with the selected channel.'
+    return dict(status=status, message=message, installed_commit=current, blocked=install_blocker(root))
 
 
 def validate_snapshot(root, blender_version):

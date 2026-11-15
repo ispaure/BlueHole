@@ -105,10 +105,7 @@ class NavigationTests(unittest.TestCase):
         self.assertIn('MACHIN3tools', labels)
         self.assertIn('MESHmachine', labels)
         for rule in catalog['suppressions'].values():
-            if rule.get('requires_assignment') and rule['selector']['source_role'] == 'default':
-                replacement = catalog['assignments'][rule['requires_assignment']]
-                if catalog['sections'][replacement['section']]['category'] == 'addons':
-                    self.assertEqual(rule['section'], replacement['section'])
+            self.assertNotIn('requires_assignment', rule)
         self.assertEqual(catalog['suppressions']['parity-disable-400848e85e7b']['section'], 'addons.hard-ops')
         outside_addons = {s['label'] for s in catalog['sections'].values() if s['category'] != 'addons'}
         self.assertFalse(outside_addons.intersection(labels))
