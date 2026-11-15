@@ -119,6 +119,25 @@ class UserProfileTests(unittest.TestCase):
         self.assertEqual(recovered.load_issue, 'invalid_profile_recovered_previous')
         self.assertFalse(recovered.snapshot()['assignments']['view-frame']['enabled'])
 
+    def test_wrong_json_shapes_recover_from_backup_or_defaults(self):
+        store, path = self.h.store, self.h.path
+        draft = store.begin()
+        draft.update('assignments', 'view-frame', enabled=False)
+        saved = store.apply(draft)
+        document = json.loads(path.read_text())
+        for malformed in (None, 42, [], {**document, 'changes': []},
+                          {**document, 'deleted_fields': None}):
+            with self.subTest(malformed=type(malformed)):
+                path.write_text(json.dumps(malformed))
+                recovered = self.h.api.ProfileStore(self.base, path, lambda: self.h.settings, None)
+                self.assertEqual(recovered.load_issue, 'invalid_profile_recovered_previous')
+                self.assertEqual(recovered.snapshot(), saved)
+
+        path.with_suffix('.previous.json').write_text('null')
+        recovered = self.h.api.ProfileStore(self.base, path, lambda: self.h.settings, None)
+        self.assertEqual(recovered.load_issue, 'invalid_profile_recovered_defaults')
+        self.assertEqual(recovered.snapshot(), self.base)
+
     def test_shipped_release_snapshot_matches_authoring_catalog(self):
         root = Path(__file__).resolve().parents[1] / 'keymaps'
         self.assertEqual(self.h.api.deluxe_catalog.load(root / 'deluxe-defaults.json'),

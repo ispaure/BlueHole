@@ -80,6 +80,46 @@ class IncrementalTests(unittest.TestCase):
         self.assertIs(self.image.keymap_items[0], unaffected)
         self.assertEqual(unaffected.type, 'H')
 
+    def test_stale_operator_properties_can_be_repaired_individually(self):
+        catalog = self.store.snapshot()
+        command = catalog['commands']['frame-selected'] = {
+            'operator': 'example.custom', 'properties': {'removed_one': True, 'removed_two': False},
+        }
+        catalog['events']['frame']['type'] = 'F11'
+        api = importlib.import_module('_deluxe_profiles_test.keymaps.profile_storage')
+        self.store._file.write_json(api.encode_profile(self.store.defaults(), catalog))
+        self.h.runtime.bpy.ops.example = SimpleNamespace(custom=SimpleNamespace(
+            get_rna_type=lambda: SimpleNamespace(name='Custom', properties={})))
+        self.h.runtime.bpy.ops.view3d.view_selected.get_rna_type = lambda: SimpleNamespace(name='Frame', properties={})
+        self.h.runtime.bpy.types = SimpleNamespace()
+        self.view.keymap_items.new_prop_schema = {}
+
+        def install(candidate, previous):
+            self.store.update_registration(candidate, previous, verify=True)
+
+        self.store = self.h.api.ProfileStore(self.store.defaults(), self.h.path, lambda: self.h.settings, install)
+        self.assertIsNone(self.store.load_issue)
+        self.store.register()
+        model = importlib.import_module('_deluxe_profiles_test.preferences.addon.keymaps.deluxe_editor_model')
+        editor = model.Editor(self.store)
+        self.assertFalse(self.view.keymap_items.rows)
+        self.assertEqual(self.image.keymap_items[0].type, 'F11')
+        self.assertEqual(editor.catalog['commands']['frame-selected'], command)
+        self.assertIn('need repair', editor.binding_origin('view-frame', editor.preview())[1])
+
+        editor.edit_command('frame-selected', 'removed_one', None, 'view-frame', unset=True)
+        self.assertFalse(editor.preview_error)
+        self.assertFalse(self.view.keymap_items.rows)
+        editor.apply()
+        self.assertEqual(self.store.snapshot()['commands']['frame-selected']['properties'], {'removed_two': False})
+        editor.edit_command('frame-selected', 'removed_two', None, 'view-frame', unset=True)
+        self.assertFalse(editor.preview_error)
+        self.assertEqual([(item.idname, item.type) for item in self.view.keymap_items], [('example.custom', 'F11')])
+        editor.apply()
+        editor.reload()
+        self.assertEqual(editor.catalog['commands']['frame-selected']['properties'], {})
+        self.assertEqual(self.image.keymap_items[0].type, 'F11')
+
     def test_saving_an_already_previewed_edit_does_not_reinstall_it(self):
         draft = self.store.begin()
         draft.update('assignments', 'view-frame', enabled=False)

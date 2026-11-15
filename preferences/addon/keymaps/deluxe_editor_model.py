@@ -152,6 +152,10 @@ class BindingContext:
     children: list
     scope: dict | None = None
 
+    @property
+    def has_bindings(self):
+        return bool(self.bindings) or any(child.has_bindings for child in self.children)
+
 
 def binding_context_tree(hierarchy, groups, available_scopes=()):
     """Keep Blender's context order and retain scopes outside its built-in tree."""
@@ -264,21 +268,29 @@ class Editor:
     def show_all_bindings(self):
         self.binding_all = True
         self.binding_category_all = True
-        self.assignment, self.page = '', 0
+        self.refresh_binding_selection()
 
     def select_category(self, category):
         require(category in self.catalog['categories'], 'Section no longer exists')
         self.category = self.feature_category = category
         self.binding_all, self.binding_category_all = False, True
-        self.assignment, self.page = '', 0
         self.ensure_selection()
+        self.refresh_binding_selection()
 
     def select_section(self, section):
         require(section in self.catalog['sections'], 'Subsection no longer exists')
         self.category = self.feature_category = self.catalog['sections'][section]['category']
         self.section = self.feature_section = section
         self.binding_all = self.binding_category_all = False
-        self.assignment, self.page = '', 0
+        self.refresh_binding_selection()
+
+    def refresh_binding_selection(self):
+        row = self.catalog['assignments'].get(self.assignment) or self.catalog['suppressions'].get(self.assignment)
+        if row is None or not self.accepts_binding(row):
+            self.assignment = ''
+        self.binding_selection_path = ()
+        self.binding_focus_context = ''
+        self.page = 0
 
     def expand_binding_contexts(self, contexts, expanded):
         def visit(context):
@@ -383,7 +395,9 @@ class Editor:
     def binding_pending(self, id_, preview):
         if id_ in self.catalog['assignments']:
             state = preview['assignments'][id_]
-            return state['availability'] != 'available' or (state['eligible'] and not state['registered'])
+            command = preview['commands'][self.catalog['assignments'][id_]['command']]
+            return (bool(command.get('invalid_properties')) or state['availability'] != 'available'
+                    or state['eligible'] and not state['registered'])
         state = preview['suppressions'][id_]
         rule = self.catalog['suppressions'][id_]
         return (rule.get('disable') or 'replacement' in rule) and (
@@ -399,6 +413,8 @@ class Editor:
             definition = self.catalog['commands'][self.catalog['assignments'][id_]['command']]
             if not definition.get('operator') and 'modal_value' not in definition:
                 status = 'Unassigned'
+            elif command.get('invalid_properties'):
+                status = 'Operator settings need repair'
             elif command['availability'] != 'available':
                 status = 'Waiting for ' + command['dependency'] if command.get('dependency') else 'Operator unavailable'
             return 'ADD', f'Keymap Added by Blue Hole Deluxe · {status}'
@@ -496,9 +512,10 @@ class Editor:
 
     def reload(self):
         self.store.reload()
+        if self.store.load_issue:
+            return
         self.discard()
-        self.message = ('JSON validation failed; kept the saved setup' if self.store.load_issue
-                        else 'JSON files validated and reloaded')
+        self.message = 'JSON files validated and reloaded'
 
     def sections(self, category=None):
         category = self.category if category is None else category
@@ -555,8 +572,10 @@ class Editor:
 
     def edit_command(self, command_id, field, value, assignment='', *, unset=False):
         original = self.catalog['commands'][command_id]
-        metadata = self.store.resolver.describe_command(original, include_unset=True)['fields'].get(field, {})
-        require(metadata.get('editable'), 'This command field is read-only')
+        description = self.store.resolver.describe_command(original, include_unset=True)
+        metadata = description['fields'].get(field, {})
+        require(metadata.get('editable') or unset and field in description.get('invalid_properties', {}),
+                'This command field is read-only')
         properties = dict(original['properties'])
         if unset:
             properties.pop(field, None)
@@ -565,7 +584,7 @@ class Editor:
         if same_value(properties, original['properties']):
             return
         updated = {**original, 'properties': properties}
-        self.store.resolver.validate_command(updated, command_id)
+        self.store.resolver.validate_command(updated, command_id, saved=original)
         if not unset and metadata['type'] == 'FLOAT':
             # RNA stores floats as float32. Persist the value Blender will read back.
             def native_float(part):

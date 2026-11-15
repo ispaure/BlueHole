@@ -255,9 +255,10 @@ class ProfileTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'changed on disk'):
             self.store.apply(draft)
         self.assertEqual(self.store.reload(), committed)
-        self.assertEqual(self.store.load_issue, 'invalid_profile_recovered_previous')
+        self.assertEqual(self.store.load_issue, 'profile_reload_failed')
         reopened = self.api.ProfileStore(self.defaults, self.path, lambda: self.settings, None)
         self.assertEqual(reopened.snapshot(), committed)
+        self.assertEqual(reopened.load_issue, 'invalid_profile_recovered_previous')
 
     def test_checkout_edit_preserves_catalog_format_and_private_profile_is_independent(self):
         checkout = self.path.with_name('deluxe-defaults.json')

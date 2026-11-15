@@ -7,8 +7,9 @@ the new release. Conflicts are returned to the UI, never silently discarded.
 from copy import deepcopy
 from dataclasses import dataclass
 
-from .deluxe_schema import (TABLES, ProfileError, assignment_required, independent_commands,
-                            merge_profile, record, require, same_value, validate_catalog)
+from .deluxe_schema import (TABLES, ProfileError, assignment_required, identifier,
+                            independent_commands, merge_profile, record, require,
+                            same_value, validate_catalog)
 
 PROFILE_VERSION = 2
 MISSING = object()
@@ -49,16 +50,18 @@ def _apply_document(document):
     baseline = document['baseline']
     validate_catalog(baseline)
     result = deepcopy(baseline)
-    for table, rows in document['changes'].items():
-        require(table in TABLES and isinstance(rows, dict), 'Invalid personal profile changes')
+    for table, rows in record(document['changes'], (), TABLES).items():
+        require(isinstance(rows, dict) and all(identifier(id_) for id_ in rows),
+                'Invalid personal profile changes')
         for id_, patch in rows.items():
             if patch is None:
                 result[table].pop(id_, None)
             else:
                 require(isinstance(patch, dict), 'Invalid personal profile row')
                 result[table][id_] = {**result[table].get(id_, {}), **deepcopy(patch)}
-    for table, rows in document.get('deleted_fields', {}).items():
-        require(table in TABLES and isinstance(rows, dict), 'Invalid deleted profile fields')
+    for table, rows in record(document.get('deleted_fields', {}), (), TABLES).items():
+        require(isinstance(rows, dict) and all(identifier(id_) for id_ in rows),
+                'Invalid deleted profile fields')
         for id_, fields in rows.items():
             require(isinstance(fields, list) and all(isinstance(field, str) for field in fields), 'Invalid deleted fields')
             require(id_ in result[table], 'Deleted fields reference a missing profile entry')
@@ -149,8 +152,11 @@ def decode_profile(defaults, document):
             'Unsupported personal profile version')
     record(document, ('profile_version', 'schema_version', 'catalog_version', 'base',
                       'baseline', 'changes'), ('deleted_fields',))
-    require(document.get('base') == 'Blender' and document.get('schema_version') == 1,
+    require(document['base'] == 'Blender' and type(document['schema_version']) is int
+            and document['schema_version'] == 1,
             'Incompatible personal profile base')
+    require(type(document['catalog_version']) is int and document['catalog_version'] > 0,
+            'Invalid personal profile catalog version')
     personal = independent_commands(_apply_document(document))
     previous = independent_commands(document['baseline'])
     if same_value(previous, defaults):

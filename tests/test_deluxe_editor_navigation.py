@@ -21,6 +21,33 @@ def function(file, name, **namespace):
 class NavigationTests(unittest.TestCase):
     setUp = test_deluxe_editor.EditorTests.setUp
 
+    def test_switching_views_keeps_the_binding_when_it_matches(self):
+        editor = self.editor
+        editor.assignment = 'view-frame'
+        editor.binding_selection_path = ('collapsed-context',)
+        editor.binding_focus_context = 'collapsed-context'
+        editor.select_category('navigation')
+        self.assertEqual(editor.assignment, 'view-frame')
+        self.assertEqual(editor.binding_selection_path, ())
+        self.assertEqual(editor.binding_focus_context, '')
+        editor.select_section('framing')
+        self.assertEqual(editor.assignment, 'view-frame')
+        editor.show_all_bindings()
+        self.assertEqual(editor.assignment, 'view-frame')
+        editor.select_category('selection')
+        self.assertEqual(editor.assignment, '')
+
+    def test_empty_context_rows_include_descendants_and_keep_add_new(self):
+        binding_rows = function('deluxe_editor.py', 'binding_rows', json=__import__('json'))
+        context = self.editor_module.BindingContext
+        empty = context('empty', 'Empty', [], [], {'name': 'Image'})
+        contexts = [context('root', 'Root', [], [context('child', 'Child', ['view-frame'], []), empty])]
+        self.editor.binding_context_expansion.update(root=True, empty=True)
+        rows = list(binding_rows(self.editor, {}, contexts, {}, searching=False))
+        self.assertEqual([(row['target'], row['empty']) for row in rows if row['kind'] == 'context'],
+                         [('root', False), ('child', False), ('empty', True)])
+        self.assertEqual(rows[-1]['kind'], 'add')
+
     def test_expand_all_opens_only_branches_with_bindings_and_collapse_closes_roots(self):
         cls = self.editor_module.BindingContext
         contexts = [cls('root', 'Root', [], [cls('leaf', 'Leaf', ['view-frame'], []),
@@ -83,6 +110,9 @@ class NavigationTests(unittest.TestCase):
         self.assertTrue(all(old is new for old, new in zip(old_rows, view.binding_rows)))
         self.assertEqual(view.binding_index, 0)
         self.assertEqual(view.list_selection, 'selected')
+        sync(view, 'new-category', rows, 'selected', reveal_selection=True)
+        self.assertEqual(view.binding_index, 1)
+        self.assertEqual(view.list_focus, '')
         sync(view, 'fresh-preview', rows, 'other')
         self.assertEqual(view.binding_index, 2)
         self.assertEqual(view.list_focus, '')

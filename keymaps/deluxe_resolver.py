@@ -279,6 +279,7 @@ class Resolver(CatalogPlanner):
                 'dependency': provider, 'availability': ('available' if available
                                                            else 'waiting_for_provider' if provider
                                                            else 'unavailable'),
+                'invalid_properties': self._property_issues(command, rna),
                 'editable': any(field['editable'] for field in fields.values()), 'fields': fields}
 
     @staticmethod
@@ -286,7 +287,7 @@ class Resolver(CatalogPlanner):
         rna = _operator_rna(idname)
         return None if rna is None else (getattr(rna, 'as_pointer', lambda: id(rna))(), rna.name)
 
-    def validate(self, catalog, baseline, *, previous=None):
+    def validate(self, catalog, baseline, *, previous=None, saved_commands=None):
         """Check edited values against live RNA and supported keymap scopes."""
         options = input_options()
         for id_, row in catalog['events'].items():
@@ -298,7 +299,7 @@ class Resolver(CatalogPlanner):
         for id_, row in catalog['commands'].items():
             if previous is not None and same_value(previous['commands'].get(id_), row):
                 continue
-            self.validate_command(row, id_)
+            self.validate_command(row, id_, saved=None if saved_commands is None else saved_commands.get(id_))
         for id_, row in catalog['assignments'].items():
             if same_value(baseline.get('assignments', {}).get(id_), row):
                 continue
@@ -318,7 +319,7 @@ class Resolver(CatalogPlanner):
                 pass
         return False
 
-    def validate_command(self, row, id_):
+    def validate_command(self, row, id_, *, saved=None):
         if 'modal_value' in row:
             require(any(row == known for known in getattr(self, 'modal_commands', ())), f'Unknown modal command {id_}')
             return
@@ -326,39 +327,59 @@ class Resolver(CatalogPlanner):
         require(isinstance(idname, str) and (not idname or OPERATOR.fullmatch(idname)),
                 'Use an operator ID such as wm.call_menu_pie')
         properties(row['properties'])
-        variants = self.commands.get(idname)
-        variants = variants or ()
+        for name, issue in self._property_issues(row, _operator_rna(idname)).items():
+            require(saved is not None and saved.get('operator') == idname and name in saved['properties']
+                    and same_value(row['properties'][name], saved['properties'][name]), f'{issue} in {id_}')
+
+    def _property_issues(self, row, rna):
+        # Missing providers remain valid choices. Blender's native registration
+        # still verifies setters and readback when their operators become available.
+        if rna is None or not row['properties']:
+            return {}
+        variants = self.commands.get(row['operator'], ())
         # Provider labels are profile metadata, including retired/missing addons.
         # Native availability and capability checks govern actual registration.
         definition = {key: value for key, value in row.items() if key != 'label'}
         if any(same_value(definition, {key: value for key, value in variant.items() if key != 'label'})
                for variant in variants):
-            return
-        rna = _operator_rna(idname)
-        # Missing add-ons are valid saved choices. RNA validation resumes when
-        # their operators become available; no binding is registered meanwhile.
-        if rna is None:
-            return
+            return {}
+        issues = {}
         for name, value in row['properties'].items():
             if any(name in variant['properties'] and same_value(value, variant['properties'][name])
                    for variant in variants):
                 continue
-            prop = rna.properties.get(name) if rna is not None else None
-            require(prop is not None and name != 'rna_type', f'Unknown editable field {name} in {id_}')
-            field = _field(prop) if prop is not None else {'editable': False}
-            require(field['editable'] and _valid_field(field, value), f'Invalid {name} value in {id_}')
+            prop = rna.properties.get(name)
+            if prop is None or name == 'rna_type':
+                issues[name] = f'Unknown editable field {name}'
+                continue
+            field = _field(prop)
+            if not field['editable'] or not _valid_field(field, value):
+                issues[name] = f'Invalid {name} value'
+        return issues
 
     def plan(self, catalog, preferences, *, required_only=False, assignment_ids=None):
-        rows = catalog['assignments'].values() if assignment_ids is None else (
-            catalog['assignments'][id_] for id_ in assignment_ids)
-        operators = {catalog['commands'][row['command']].get('operator') for row in rows}
-        available = frozenset(name for name in operators if name and _operator_rna(name) is not None)
+        rows = catalog['assignments']
+        ids = rows.keys() if assignment_ids is None else assignment_ids
+        commands = catalog['commands']
+        operators = {commands[rows[id_]['command']].get('operator') for id_ in ids}
+        schemas = {name: _operator_rna(name) for name in operators if name}
+        available = frozenset(name for name, rna in schemas.items() if rna is not None)
+        ready = []
+        for id_ in ids:
+            command = commands[rows[id_]['command']]
+            if not self._property_issues(command, schemas.get(command.get('operator'))):
+                ready.append(id_)
         return super().plan(catalog, preferences, required_only=required_only,
-                            assignment_ids=assignment_ids, available_operators=available)
+                            assignment_ids=ready, available_operators=available)
 
     def suppression_request(self, id_, row, commands):
         selector = selector_descriptor(row['selector'])
-        replacement = self.target(commands[row['replacement']]) if 'replacement' in row else None
+        if 'replacement' not in row:
+            return None
+        command = commands[row['replacement']]
+        if self._property_issues(command, _operator_rna(command.get('operator', ''))):
+            return None
+        replacement = self.target(command)
         proof = _proof(selector)
         if replacement is None or proof is None:
             return None

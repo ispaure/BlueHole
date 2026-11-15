@@ -99,7 +99,7 @@ class ProfileStore:
         self._revision = self._disk_revision()
         self.load_issue = None
         self.load_error = ''
-        self._catalog, self.load_issue = self._read()
+        self._load_profile()
         self.registration = RegistrationService(self.resolver, self._preferences,
             self.runtime_catalog, lambda: self._catalog, self._allowed)
         self._live_catalog = None
@@ -261,7 +261,7 @@ class ProfileStore:
 
     def begin(self):
         require(not self._closed, 'Deluxe profile editor has been unloaded')
-        return Draft(self, (self._generation, self._revision), self._catalog)
+        return Draft(self, self._generation, self._catalog)
 
     def close(self):
         self._closed = True
@@ -280,38 +280,46 @@ class ProfileStore:
         except OSError:
             return 'unreadable'
 
-    def _read(self):
-        self.load_error = ''
+    def _load_profile(self):
         self.needs_migration = False
         self.profile_conflicts = ()
         try:
-            stored = deluxe_catalog.load(self.path, migrate=False) if self.edit_defaults else self._file.read_json()
-            decoded = None if self.edit_defaults else self._decode_profile(stored)
-            original = stored if self.edit_defaults else decoded.catalog
-            catalog = independent_commands(original)
-            self._validate(catalog)
-            self.needs_migration = not same_value(original, catalog) or bool(decoded and decoded.migrated)
-            self.profile_conflicts = decoded.conflicts if decoded else ()
-            return catalog, None
-        except FileNotFoundError:
-            if not self.edit_defaults:
-                return self.defaults(), None
+            self._catalog, self.needs_migration, self.profile_conflicts = self._read()
+            return
         except (OSError, ValueError, RecursionError) as error:
             self.load_error = str(error)
         try:
             stored = (deluxe_catalog.load(self.path.with_suffix('.previous.json'), migrate=False)
                       if self.edit_defaults else self._backup.read_json())
-            catalog = independent_commands(stored if self.edit_defaults else self._decode_profile(stored).catalog)
-            self._validate(catalog)
-            return catalog, 'invalid_profile_recovered_previous'
+            self._catalog, self.needs_migration, self.profile_conflicts = self._read_catalog(stored)
+            self.load_issue = 'invalid_profile_recovered_previous'
         except (OSError, ValueError, RecursionError):
-            return self.defaults(), 'invalid_profile_recovered_defaults'
+            self.load_issue = 'invalid_profile_recovered_defaults'
+
+    def _read(self):
+        if self.edit_defaults:
+            stored = deluxe_catalog.load(self.path, migrate=False)
+        else:
+            try:
+                stored = self._file.read_json()
+            except FileNotFoundError:
+                return self.defaults(), False, ()
+        return self._read_catalog(stored)
+
+    def _read_catalog(self, stored):
+        decoded = None if self.edit_defaults else self._decode_profile(stored)
+        original = stored if self.edit_defaults else decoded.catalog
+        catalog = independent_commands(original)
+        self._validate(catalog, saved_catalog=catalog)
+        migrated = not same_value(original, catalog) or bool(decoded and decoded.migrated)
+        return catalog, migrated, decoded.conflicts if decoded else ()
 
     def _decode_profile(self, document):
+        require(isinstance(document, dict), 'Expected a personal profile object')
         baseline = self._defaults if 'profile_version' in document else self._overlay_defaults
         return decode_profile(baseline, document)
 
-    def _validate(self, catalog, *, rna_baseline=None):
+    def _validate(self, catalog, *, rna_baseline=None, saved_catalog=None):
         validate_catalog(catalog)
         commands = [row['command'] for row in catalog['assignments'].values()]
         commands += [row['replacement'] for row in catalog['suppressions'].values() if 'replacement' in row]
@@ -342,7 +350,9 @@ class ProfileStore:
             for key, table in (('event', 'events'), ('command', 'commands')):
                 require(same_value(catalog[table].get(row[key]), self._defaults[table][row[key]]),
                         'Required event or command is read-only')
-        self.resolver.validate(catalog, self._defaults, previous=rna_baseline)
+        saved = self._catalog if saved_catalog is None else saved_catalog
+        self.resolver.validate(catalog, self._defaults, previous=rna_baseline,
+                               saved_commands=None if self.edit_defaults else saved['commands'])
 
     def validate(self, draft):
         self._check_draft(draft)
@@ -359,7 +369,7 @@ class ProfileStore:
         require(not self._closed, 'Deluxe profile editor has been unloaded')
         require(isinstance(draft, Draft) and draft._store is self, 'Draft belongs to a different profile')
         draft._open()
-        require(draft._revision == (self._generation, self._revision), 'Profile edit is stale')
+        require(draft._revision == self._generation, 'Profile edit is stale')
 
     def preview(self, draft=None):
         """Return stored/effective state, command metadata and runtime diagnostics."""
@@ -531,27 +541,38 @@ class ProfileStore:
     def reload(self):
         """Load a compatible profile or retain the last known good catalog."""
         require(not self._closed, 'Deluxe profile editor has been unloaded')
-        self.cancel_preview()
         revision = self._disk_revision()
-        candidate, issue = self._read()
-        require(self._disk_revision() == revision, 'Profile changed during reload')
-        previous = self._catalog
-        if issue or same_value(candidate, previous):
-            # A failed read leaves the installed profile in place.
-            self._revision = revision
-            self._generation += 1
-            self.load_issue = issue
-            return self.snapshot()
         try:
-            self._install(candidate, previous)
+            candidate, migrated, conflicts = self._read()
+        except (OSError, ValueError, RecursionError) as error:
+            require(self._disk_revision() == revision, 'Profile changed during reload')
+            # Allow Save to repair this version of the file, without invalidating
+            # any draft or acknowledging subsequent external writes.
+            self._revision = revision
+            self.load_issue = 'profile_reload_failed'
+            self.load_error = str(error)
+            return self.snapshot()
+        require(self._disk_revision() == revision, 'Profile changed during reload')
+        previous = self.runtime_catalog()
+        changed = not same_value(candidate, previous)
+        try:
+            if changed:
+                self._install(candidate, previous)
             require(self._disk_revision() == revision, 'Profile changed during reload')
         except BaseException:
-            self._install(previous, None)
+            if changed:
+                self._preview_cache = self._applied_draft = self._validated_draft = None
+                self._install(previous, None)
             raise
         self._catalog = candidate
+        self._live_catalog = None
+        self._preview_cache = self._applied_draft = self._validated_draft = None
         self._revision = revision
         self._generation += 1
-        self.load_issue = issue
+        self.load_issue = None
+        self.load_error = ''
+        self.needs_migration = migrated
+        self.profile_conflicts = conflicts
         return self.snapshot()
 
     def _plan(self, catalog, *, required_only=False):

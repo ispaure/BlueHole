@@ -251,7 +251,8 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
     if current.assignment not in found:
         current.assignment = next(iter(found), '')
     path = binding_context_path(contexts, current.assignment)
-    if path != current.binding_selection_path:
+    reveal_selection = path != current.binding_selection_path
+    if reveal_selection:
         for context_id in path:
             if current.binding_context_expansion.get(context_id) is False:
                 del current.binding_context_expansion[context_id]
@@ -261,7 +262,8 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
                     tuple(current.binding_context_expansion.items())))
     ops.sync_binding_rows(view, row_key,
                           lambda: binding_rows(current, preview, contexts, found, searching=bool(query)),
-                          current.assignment, focus_context=current.binding_focus_context)
+                          current.assignment, focus_context=current.binding_focus_context,
+                          reveal_selection=reveal_selection)
     current.binding_focus_context = ''
     listing.template_list(BH_UL_deluxe_bindings.__name__, '', view, 'binding_rows', view,
                           'binding_index', rows=18, maxrows=18, sort_lock=True, item_dyntip_propname='tooltip')
@@ -284,7 +286,8 @@ def binding_rows(current, preview, contexts, found, *, searching, depth=0):
     for context in contexts:
         expanded = current.binding_context_expansion.get(
             context.id, searching or context.id in current.binding_selection_path)
-        yield dict(kind='context', target=context.id, label=context.label, depth=depth, expanded=expanded)
+        yield dict(kind='context', target=context.id, label=context.label, depth=depth,
+                   expanded=expanded, empty=not context.has_bindings)
         if not expanded:
             continue
         for id_ in context.bindings:
@@ -292,7 +295,7 @@ def binding_rows(current, preview, contexts, found, *, searching, depth=0):
             is_rule = id_ in current.catalog['suppressions']
             state = preview['suppressions' if is_rule else 'assignments'][id_]
             icon, origin = current.binding_origin(id_, preview)
-            if not state['eligible'] or not state.get('active', True):
+            if not state['eligible'] or not state.get('active', True) or meta.get('invalid_properties'):
                 command += ' (Inactive)'
             yield dict(kind='binding', target=id_, label=command, shortcut=event, depth=depth + 1,
                        icon=icon, tooltip=origin, rule=is_rule, pending=current.binding_pending(id_, preview), removable=is_rule or state['editable'])
@@ -313,8 +316,14 @@ class BH_UL_deluxe_bindings(bpy.types.UIList):
         if item.kind == 'context':
             row.alignment = 'LEFT'
             action = 'collapse_binding_context' if item.expanded else 'expand_binding_context'
-            ops.operator_button(row, action, item.label, item.target,
-                                icon='TRIA_DOWN' if item.expanded else 'TRIA_RIGHT', emboss=False)
+            icon = 'TRIA_DOWN' if item.expanded else 'TRIA_RIGHT'
+            if item.empty:
+                ops.operator_button(row, action, '', item.target, icon=icon, emboss=False)
+                muted = row.row()
+                muted.enabled = False
+                muted.label(text=item.label)
+            else:
+                ops.operator_button(row, action, item.label, item.target, icon=icon, emboss=False)
         elif item.kind == 'add':
             row.alignment = 'LEFT'
             add = row.operator(ops.BH_OT_deluxe_add_binding.bl_idname, text='Add New', icon='ADD', emboss=False)
@@ -398,7 +407,9 @@ def inspector(layout, current, preview, id_, *, width):
     field = command.row()
     field.enabled = state['editable']
     field.prop(control, 'operator_id', text='Operator')
-    if meta['availability'] != 'available':
+    if meta.get('invalid_properties'):
+        command.label(text='Binding inactive. Reset incompatible properties to repair it.', icon='ERROR')
+    elif meta['availability'] != 'available':
         command.label(text=('Choose an operator to see its properties' if not current.catalog['commands'][row['command']]['operator']
                             else 'Operator unavailable; properties appear when it is available'), icon='INFO')
     elif meta['dependency']:
@@ -511,7 +522,7 @@ def command_fields(layout, current, id_, *, width, assignment=''):
                     op.command, op.field, op.assignment = id_, name, assignment
                 else:
                     cell.label(text=label, icon='LOCKED')
-            if can_edit and name in properties:
+            if editable and name in properties and (can_edit or name in meta.get('invalid_properties', {})):
                 reset = cell.row(align=True)
                 reset.alignment = 'RIGHT'
                 op = reset.operator(ops.BH_OT_deluxe_inline_edit.bl_idname, text='Reset')
@@ -628,6 +639,7 @@ def transaction_controls(layout, current, settings, *, compact):
         messages = {
             'invalid_profile_recovered_previous': 'Profile file invalid. The last saved copy is active.',
             'invalid_profile_recovered_defaults': 'Profile file invalid. A valid profile is active.',
+            'profile_reload_failed': 'Reload failed. The current setup and draft are still active.',
             'profile_saved_recovery_copy_unavailable': 'Profile saved. The recovery copy could not be updated.',
             'invalid_installed_catalog_using_factory': 'Installed catalog invalid. Using the release snapshot and your personal profile.',
         }

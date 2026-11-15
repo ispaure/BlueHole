@@ -183,6 +183,7 @@ class BH_PG_deluxe_binding_row(bpy.types.PropertyGroup):
     tooltip: StringProperty(options=TRANSIENT)
     depth: IntProperty(options=TRANSIENT)
     expanded: BoolProperty(options=TRANSIENT)
+    empty: BoolProperty(options=TRANSIENT)
     removable: BoolProperty(options=TRANSIENT)
     rule: BoolProperty(options=TRANSIENT)
     pending: BoolProperty(options=TRANSIENT)
@@ -222,14 +223,14 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
     list_focus: StringProperty(options=TRANSIENT)
 
 
-def sync_binding_rows(view, key, rows, selection, *, focus_context=''):
+def sync_binding_rows(view, key, rows, selection, *, focus_context='', reveal_selection=False):
     """Rebuild native list storage only when its contents or expansion change."""
     global _syncing_inline
     _syncing_inline = True
     try:
         if focus_context:
             view.list_focus = focus_context
-        elif view.list_selection != selection:
+        elif reveal_selection or view.list_selection != selection:
             view.list_focus = ''
         rebuilt = view.rows_key != key
         if rebuilt:
@@ -256,7 +257,7 @@ def sync_binding_rows(view, key, rows, selection, *, focus_context=''):
             view.binding_index = next((index for index, row in enumerate(view.binding_rows)
                                        if row.kind == 'context' and row.target == view.list_focus), -1)
             view.list_selection = selection
-        elif rebuilt or view.list_selection != selection:
+        elif rebuilt or reveal_selection or view.list_selection != selection:
             view.binding_index = next((index for index, row in enumerate(view.binding_rows)
                                        if row.kind == 'binding' and row.target == selection), -1)
             view.list_selection = selection
@@ -384,7 +385,7 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             current.select_section(target)
         elif action == 'all_subsections':
             current.binding_category_all = True
-            current.assignment, current.page = '', 0
+            current.refresh_binding_selection()
         elif action == 'section':
             current.select_section(target)
         elif action == 'page':

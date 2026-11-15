@@ -64,6 +64,9 @@ keeps focus on that header instead of scrolling back to the inspected binding.
 
 Expand the arrows to browse Blender contexts. A parent such as **3D View** can
 contain **3D View (Global)**, **Mesh**, **Object Mode**, and other contexts.
+Switching views keeps the selected binding focused when it is visible in the
+destination. Grey context names indicate that the current view has no bindings
+in that branch. Expand a grey context to reach **Add New**.
 
 ### Category and context are different
 
@@ -122,6 +125,8 @@ operator is available. Its editable properties appear when Blender can describe 
 Changing the operator starts with the new operator's defaults. **PROPERTIES**
 shows the available settings and their current values. Use **Reset** beside an
 overridden value to return that setting to the operator's default.
+If an operator update makes a saved setting incompatible, the affected binding
+stays inactive. Use **Reset** beside each incompatible setting to repair it.
 
 For example, a pie-menu binding can use:
 
@@ -224,7 +229,8 @@ There is currently no editor control for creating a top-level category.
 | **Discard** | Restores the last saved setup and drops the draft |
 | **Undo**, Cmd+Z, or Ctrl+Z in the Blue Hole editor | Reverses the last staged editor change |
 
-Saving, discarding, or reloading clears the editor's undo history. If preview
+Saving, discarding, or successfully reloading clears the editor's undo history.
+A failed reload keeps the draft, undo history, and live preview. If preview
 fails, the previous working setup stays active and the editor reports the error.
 
 The native **Preferences → Keymap** view reflects the live preview: additions
@@ -242,6 +248,8 @@ Personal assignments, removal rules, and section choices are saved to
 `bluehole/keymaps.json` inside Blender's configuration directory. For a Logistics
 preset, that is the preset's `config` directory. This file is outside the addon
 and survives addon updates. A recovery copy is written alongside it.
+If the personal file is malformed when Blender opens it, Blue Hole loads the
+recovery copy when available and otherwise loads the shipped defaults.
 
 The profile records its original defaults. New releases merge updated defaults
 with your changes; your choices win overlapping edits, while required bindings

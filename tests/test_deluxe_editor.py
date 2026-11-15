@@ -51,6 +51,53 @@ class EditorTests(unittest.TestCase):
         self.assertFalse(editor.dirty)
         self.assertEqual(editor.catalog, self.h.defaults)
 
+    def test_invalid_reload_preserves_draft_preview_and_undo(self):
+        editor = self.editor
+        editor.stage_event('view-frame', {'type': 'F11'})
+        first = editor.draft.snapshot()
+        editor.stage_event('view-frame', {'type': 'F12'})
+        preview = editor.draft.snapshot()
+        active_draft = editor.draft
+        self.h.path.write_text('null')
+
+        editor.reload()
+
+        self.assertIs(editor.draft, active_draft)
+        self.assertTrue(editor.dirty)
+        self.assertEqual(editor.catalog, preview)
+        self.assertEqual(self.h.installed, preview)
+        self.assertEqual(editor.store.load_issue, 'profile_reload_failed')
+        self.h.path.write_text('42')
+        with self.assertRaisesRegex(ValueError, 'changed on disk'):
+            editor.apply()
+        self.h.path.write_text('null')
+        editor.undo()
+        self.assertEqual(self.h.installed, first)
+        editor.apply()
+        self.assertEqual(editor.saved, first)
+        self.assertIsNone(editor.store.load_issue)
+
+    def test_reload_install_failure_restores_live_preview_and_keeps_undo(self):
+        editor = self.editor
+        editor.stage_event('view-frame', {'type': 'F11'})
+        preview = editor.draft.snapshot()
+        install = editor.store._install
+
+        def fail_once(candidate, previous):
+            install(candidate, previous)
+            if previous is not None:
+                raise RuntimeError('Injected native install failure')
+
+        with patch.object(editor.store, '_install', side_effect=fail_once):
+            with self.assertRaisesRegex(RuntimeError, 'Injected native install failure'):
+                editor.reload()
+        self.assertEqual(editor.catalog, preview)
+        self.assertEqual(self.h.installed, preview)
+        self.assertTrue(editor.can_undo)
+        editor.reload()
+        self.assertEqual(self.h.installed, self.h.defaults)
+        self.assertFalse(editor.can_undo)
+
     def test_typed_key_search_matches_modifiers_and_key_names(self):
         labels = {'F10': 'F10', 'F11': 'F11', 'RIGHTMOUSE': 'Right Mouse',
                   'NUMPAD_PLUS': 'Numpad +', 'A': 'A'}
