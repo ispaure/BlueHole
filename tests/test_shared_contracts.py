@@ -130,7 +130,7 @@ class SharedContractTests(unittest.TestCase):
                 return BLENDER_PROPERTIES
             if name in files:
                 path = files[name]
-                source = path.read_text()
+                source = path.read_text(encoding='utf-8')
                 symbols = symtable.symtable(source, str(path), 'exec').get_symbols()
                 names = {symbol.get_name() for symbol in symbols if symbol.is_assigned() or symbol.is_imported()}
                 cache[name] = names

@@ -35,7 +35,7 @@ class PieActionTests(unittest.TestCase):
     def test_actions_are_exactly_the_ui_references_and_have_no_shortcut_metadata(self):
         used = set()
         for path in (self.root / 'ui').rglob('*.py'):
-            used.update(node.attr for node in ast.walk(ast.parse(path.read_text()))
+            used.update(node.attr for node in ast.walk(ast.parse(path.read_text(encoding='utf-8')))
                         if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name)
                         and node.value.id == 'pie_actions')
         self.assertEqual(set(self.actions()), used)
@@ -45,7 +45,7 @@ class PieActionTests(unittest.TestCase):
     def test_action_targets_match_literal_menu_declarations(self):
         identifiers = set()
         for path in (self.root / 'ui/menus/pie').glob('*_pies.py'):
-            for node in ast.parse(path.read_text()).body:
+            for node in ast.parse(path.read_text(encoding='utf-8')).body:
                 if isinstance(node, ast.ClassDef):
                     for statement in node.body:
                         if isinstance(statement, ast.Assign) and any(

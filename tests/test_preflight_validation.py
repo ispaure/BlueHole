@@ -1,6 +1,6 @@
 """Operation gates retain lazy checks, early exit and diagnostic behavior without Blender."""
 import importlib
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import sys
 import types
 import unittest
@@ -121,8 +121,10 @@ class PreflightValidationTests(unittest.TestCase):
                 m.get_os.side_effect = None
                 m.get_os.return_value = platform
                 m.get_valid_source_content_path.side_effect = None
-                m.get_valid_source_content_path.return_value = Path('/SOURCE')
-                self.assertEqual(m.check_tests('Example', check_blend_in_source_content=True), expected)
+                path_type = PureWindowsPath if platform == m.OS.WIN else PurePosixPath
+                m.get_valid_source_content_path.return_value = path_type('/SOURCE')
+                with patch.object(m, 'Path', path_type):
+                    self.assertEqual(m.check_tests('Example', check_blend_in_source_content=True), expected)
 
     def test_logger_failure_is_not_swallowed_or_replaced(self):
         m = self.module

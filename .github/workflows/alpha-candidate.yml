@@ -23,9 +23,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-24.04, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Preserve checked-in line endings
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: blender-5.2.2/alpha
@@ -46,8 +48,17 @@ jobs:
           submodules: recursive
           path: .manager-tooling
           persist-credentials: false
-      - run: python -m pip install --no-deps -e .manager-tooling/Python
-      - run: python -m unittest discover -s tests -v
+      - name: Run portable contracts with the project interpreter
+        shell: bash
+        run: |
+          python -m venv .venv
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            project_python=./.venv/Scripts/python.exe
+          else
+            project_python=./.venv/bin/python
+          fi
+          "$project_python" -m pip install --no-deps -e .manager-tooling/Python
+          "$project_python" -m unittest discover -s tests -v
   candidate:
     needs: portable
     runs-on: macos-latest
@@ -91,7 +102,7 @@ jobs:
   draft:
     if: ${{ inputs.create_draft }}
     needs: [portable, candidate]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: bluehole-alpha-review
     permissions:
       contents: write
