@@ -12,8 +12,25 @@ the legacy version for existing installations.
 Follow the [installation guide](https://blue-hole.weebly.com/installation.html),
 then enable Blue Hole in Blender's add-on preferences. With the built-in
 Blender keymap preset selected, open **Addon Settings → Keymaps** and click
-**Enable Deluxe Keymaps** to use the Deluxe shortcut catalog.
-Existing Deluxe users should review their saved bindings before switching. [Activation and recovery guide](overlays/deluxe/README.md)
+**Enable Blue Hole Keymaps & Pie Menus** to use the shortcut catalog.
+The switch applies directly without importing saved preferences. [Keymap guide](keymaps/keymaps_user_guide.md)
+
+## Update from Blender
+
+The top of the **Blue Hole** header menu and **Addon Settings → Help & Updates**
+show update status and provide **Check for Updates** and **Update Blue Hole**.
+Choose **Main** (default), **Beta**, or **Alpha** in Help & Updates. Like Logistics,
+Blue Hole selects the newest branch whose Blender minimum does not exceed the
+running Blender version. Checks respect Blender's **Allow Online Access** setting.
+Updates install only when you press the update button.
+
+Installed copies download and validate a commit-pinned package, unload Blue Hole,
+replace its files, and reload it without restarting Blender. Custom `envFiles`
+environments are preserved; `envFiles/default` comes from the new package.
+Blender preferences and the open scene are retained. Failed activation restores
+the previous installation. A Logistics-managed preset also receives the new
+installed revision and channel so subsequent launches keep that selection.
+Git checkouts and checkout links remain managed through Git or Logistics.
 
 ## What you can do
 

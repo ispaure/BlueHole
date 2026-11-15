@@ -8,10 +8,10 @@ Changes preview immediately. You decide when to save them.
 
 1. Open Blender's **Preferences → Add-ons → Blue Hole**.
 2. Choose **Addon Settings → Keymaps**.
-3. Turn on **Enable Deluxe Keymaps**.
+3. Turn on **Enable Blue Hole Keymaps & Pie Menus**.
 
-Use Blender's built-in keymap preset. If activation asks you to review existing
-Blender keymap customizations, read that review before proceeding.
+Use Blender's built-in keymap preset. Enabling and disabling applies directly;
+it does not import an old `userpref.blend` or ask for a legacy-preference review.
 
 The editor opens on **All Bindings**. The list is on the left and the selected
 binding's settings are on the right. Widen Preferences if the settings appear
@@ -23,12 +23,14 @@ can scroll through bindings while keeping their settings visible.
 | Row | Meaning | What its **X** does |
 | --- | --- | --- |
 | **+** | A shortcut added by Blue Hole | Deletes that Blue Hole binding |
-| **−**, with red text | A rule that disables a particular Blender or add-on shortcut | Removes the rule and restores the original shortcut when it is still managed by Blue Hole |
+| **−**, with red text | A removal rule with an available Blender or add-on target | Removes the rule and restores the original shortcut when it is still managed by Blue Hole |
+| Yellow **+** or **−**, with yellow text | A stored assignment or removal that cannot currently load, such as one awaiting an add-on | Deletes the stored addition or removal rule |
 
-Hover a row to see its origin and state. Red text identifies a disable rule; it
-does not mean the target is necessarily available or currently disabled. Select
-the rule to read its status. For example, an add-on rule can be waiting for its
-add-on to load.
+Hover a row to see its origin and state. Missing operators and menus stay in the
+list with yellow markers, command names and shortcuts. Select a row to read its status. When the provider
+loads, the assignment can register and its marker returns to the usual color.
+For provider-dependent replacements, the original Blender binding stays usable
+until its replacement is available.
 
 An inactive **+** row is still a Blue Hole addition. It does not become a **−**
 rule when you turn it off. **Undo** reverses a deletion or other staged change.
@@ -39,6 +41,17 @@ Blender's Shift+Cmd/Ctrl+Z Redo shortcuts. A disable rule targets one particular
 binding, not every shortcut that calls `ed.redo`.
 
 ## Find a binding
+
+Addon commands are grouped under **Addons**, with one subsection per addon.
+**Addons → Blue Hole** includes Blue Hole's own operators, custom Save As and
+pie menus. The required Save As bindings remain active and protected even when
+Deluxe or the Addons category is off. Stock Blender commands retain their
+feature categories. Tabs use balanced rows with at most 12 buttons per row.
+
+Use **Expand All** to open branches containing matching bindings, or **Collapse
+All** to return to top-level contexts. Opening or closing an individual branch
+keeps focus on that header instead of scrolling back to the inspected binding.
+
 
 - Choose **Name** to search by a command's name or operator ID, such as `Redo`,
   `ed.redo`, or `wm.call_menu_pie`.
@@ -118,6 +131,14 @@ Name:     BLUEHOLE_MT_pie_add
 
 The operator opens a pie menu; its **Name** property chooses which menu to open.
 
+Modal bindings show their action token, such as `TRANSLATE` or `CONFIRM`, instead
+of an operator. Their shortcuts can be edited in the same list.
+
+The shipped catalog includes the legacy Deluxe keymap customizations that used
+to live only in its bundled preferences. Enabling Deluxe on the Blender preset
+registers them from JSON; it does not load the old `userpref.blend`. Current
+Blender operator replacements are retained where the old API has changed.
+
 ## Add a shortcut
 
 1. Find the Blender context where the shortcut should work.
@@ -188,7 +209,7 @@ respective areas rather than shown on **All Bindings**.
 
 Turning a group off withdraws its additions and stops applying its disable
 rules. Turning it on restores the group's configured behavior. The required
-Save As subsection stays enabled.
+Save As bindings stay active.
 
 The subsection menu can add, rename, reorder, or delete an empty subsection.
 There is currently no editor control for creating a top-level category.

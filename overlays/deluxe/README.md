@@ -1,8 +1,8 @@
 # Deluxe keymaps
 
 Enable Blue Hole and select the built-in **Blender** keymap preset. In Blue
-Hole's **Addon Settings → Keymaps**, choose **Enable Deluxe Keymaps** to open
-the catalog. The same command is available under **Updates & Deluxe** in the
+Hole's **Addon Settings → Keymaps**, choose **Enable Blue Hole Keymaps & Pie Menus** to open
+the catalog. The same command is available under **Keymaps & Pie Menus** in the
 Blue Hole header menu. Blue Hole registers the shortcuts and pies at runtime.
 
 Use the editor's **Sections** tab to enable categories and sections, including
@@ -13,7 +13,7 @@ settings to `keymaps/deluxe-defaults.json` and its section files in the active B
 The editor displays this warning on all three tabs. With Logistics' Local source,
 the installation links to the checkout, so catalog edits appear in Git.
 
-**Disable Deluxe Keymaps** removes the Deluxe shortcuts and keeps the JSON
+**Disable Blue Hole Keymaps & Pie Menus** removes the shortcuts and keeps the JSON
 choices for the next enable. Blender preferences store the Deluxe master switch
 and an internal first-activation marker. Save Blender Preferences to keep that
 switch across sessions when Auto-Save Preferences is off. Native edits made in
@@ -36,7 +36,7 @@ Existing legacy files are left in place.
 If a profile still uses the old preset, select **Blender** in
 **Preferences → Keymap** and review any saved customizations before enabling
 Deluxe. Keep personal shortcuts and resolve conflicting edits from the old
-setup. Blue Hole still checks for this first-use review; it does not overwrite
+setup. The toggle applies directly without a review popup; it does not overwrite
 or remove the old profile. The obsolete **Back Up Saved Keymap Setup** command
 was removed: copying `userpref.blend` did not back up the current JSON editor.
 

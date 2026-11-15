@@ -8,7 +8,7 @@ from struct import pack, unpack
 from time import monotonic
 from uuid import uuid4
 
-from ....keymaps.deluxe_schema import MODIFIERS, require, same_value
+from ....keymaps.deluxe_schema import MODIFIERS, assignment_required, require, same_value
 
 SOURCE_LABELS = {'default': 'Blender', 'user': 'User keymap (merged)', 'addon': 'Add-on keymap'}
 PHASE_LABELS = {'CLICK_DRAG': 'Drag', 'DOUBLE_CLICK': 'Double Click'}
@@ -160,26 +160,29 @@ def binding_context_tree(hierarchy, groups, available_scopes=()):
     for key in available:
         remaining.setdefault(key, [])
 
-    def prune(entries):
+    def prune(entries, parent=()):
         contexts = []
         for name, space, region, subcontexts in entries:
             key = name, space, region
+            # Blender repeats scopes beneath different editors and tools.
+            # Each occurrence needs its own expansion and navigation state.
+            path = (*parent, key)
             bindings = remaining.pop(key, [])
-            children = prune(subcontexts)
+            children = prune(subcontexts, path)
             scope = available.get(key)
             if subcontexts and (bindings or scope):
-                children.insert(0, BindingContext(json.dumps((*key, 'global')), f'{name} (Global)', bindings, [], scope))
+                children.insert(0, BindingContext(json.dumps((*path, 'global')), f'{name} (Global)', bindings, [], scope))
                 bindings = []
                 scope = None
             if bindings or children or scope:
-                contexts.append(BindingContext(json.dumps(key), name, bindings, children, scope))
+                contexts.append(BindingContext(json.dumps(path), name, bindings, children, scope))
         return contexts
 
     contexts = prune(hierarchy)
     for key, bindings in sorted(remaining.items()):
         name, space, region = key
         label = context_label({'name': name, 'space_type': space, 'region_type': region})
-        contexts.append(BindingContext(json.dumps(key), label, bindings, [], available.get(key)))
+        contexts.append(BindingContext(json.dumps((key,)), label, bindings, [], available.get(key)))
     return contexts
 
 
@@ -221,6 +224,7 @@ class Editor:
         self.binding_category_all = True
         self.binding_context_expansion = {}
         self.binding_selection_path = ()
+        self.binding_focus_context = ''
         self.page = 0
         self.message = ''
         self.dirty = store.needs_migration
@@ -274,6 +278,16 @@ class Editor:
         self.section = self.feature_section = section
         self.binding_all = self.binding_category_all = False
         self.assignment, self.page = '', 0
+
+    def expand_binding_contexts(self, contexts, expanded):
+        def visit(context):
+            children = [visit(child) for child in context.children]
+            has_bindings = bool(context.bindings) or any(children)
+            self.binding_context_expansion[context.id] = bool(expanded and has_bindings)
+            return has_bindings
+        for context in contexts:
+            visit(context)
+        self.binding_focus_context = contexts[0].id if contexts else ''
 
     def configure_binding(self, section, event, operator, scope, *, assignment=''):
         """Create or edit a binding with its own operator configuration."""
@@ -336,7 +350,7 @@ class Editor:
     def can_change_operator(self, command):
         operator = self.catalog['commands'][command].get('operator')
         return operator is not None and all(
-            not self.catalog['sections'][self.catalog['assignments'][id_]['section']].get('required')
+            not assignment_required(self.catalog, self.catalog['assignments'][id_])
             for id_ in self.draft.uses('commands', command))
 
     def operator_command(self, command, operator):
@@ -365,6 +379,15 @@ class Editor:
         self.draft.put('commands', command, updated)
         return command
 
+    def binding_pending(self, id_, preview):
+        if id_ in self.catalog['assignments']:
+            state = preview['assignments'][id_]
+            return state['availability'] != 'available' or (state['eligible'] and not state['registered'])
+        state = preview['suppressions'][id_]
+        rule = self.catalog['suppressions'][id_]
+        return (rule.get('disable') or 'replacement' in rule) and (
+            state['status'] != 'resolved' or state['eligible'] and not state['registered'])
+
     def binding_origin(self, id_, preview):
         if id_ in self.catalog['assignments']:
             state = preview['assignments'][id_]
@@ -372,10 +395,11 @@ class Editor:
             if status == 'Active' and not state['registered']:
                 status = 'Pending registration'
             command = preview['commands'][self.catalog['assignments'][id_]['command']]
-            if not self.catalog['commands'][self.catalog['assignments'][id_]['command']]['operator']:
+            definition = self.catalog['commands'][self.catalog['assignments'][id_]['command']]
+            if not definition.get('operator') and 'modal_value' not in definition:
                 status = 'Unassigned'
             elif command['availability'] != 'available':
-                status = 'Operator unavailable'
+                status = 'Waiting for ' + command['dependency'] if command.get('dependency') else 'Operator unavailable'
             return 'ADD', f'Keymap Added by Blue Hole Deluxe · {status}'
         row = self.catalog['suppressions'][id_]
         state = preview['suppressions'][id_]
@@ -499,7 +523,7 @@ class Editor:
 
     def require_editable_assignment(self, id_):
         row = self.catalog['assignments'][id_]
-        require(not self.catalog['sections'][row['section']].get('required'), 'This shortcut is required')
+        require(not assignment_required(self.catalog, row), 'This shortcut is required')
 
     def stage_event(self, assignment, event):
         self.require_editable_assignment(assignment)

@@ -5,71 +5,26 @@
     "enabled": true
   },
   "sections": {
-    "pie.editor_shortcuts": {"label": "Editor shortcuts", "category": "pie", "enabled": true},
-    "pie.menus": {"label": "Menus", "category": "pie", "enabled": true}
+    "pie.editor_shortcuts": {"label": "Editor shortcuts", "category": "pie", "enabled": true}
   },
   "events": {
     "x-press-d0115e66e6bf": {"type": "X", "shift": true},
     "x-press-593d3a7c3d5d": {"type": "X", "shift": true, "alt": true},
-    "v-press-34f4b21d0e3a": {"type": "V"},
-    "rightmouse-press-d5026284596f": {"type": "RIGHTMOUSE", "shift": true, "ctrl": true, "map_type": "MOUSE"},
-    "rightmouse-press-63f585520403": {"type": "RIGHTMOUSE", "ctrl": true, "map_type": "MOUSE"},
-    "rightmouse-press-b44e4d3e981c": {"type": "RIGHTMOUSE", "shift": true, "ctrl": true, "alt": true, "map_type": "MOUSE"},
-    "a-click-drag-d86aebe1ca3a": {"type": "A", "value": "CLICK_DRAG", "shift": true}
+    "v-press-34f4b21d0e3a": {"type": "V"}
   },
   "commands": {
     "wm-call-menu-pie-24890914e337": {"operator": "wm.call_menu_pie", "properties": {"name": "NLA_MT_snap_pie"}},
     "wm-call-menu-pie-f8282defd7dd": {"operator": "wm.call_menu_pie", "properties": {"name": "GRAPH_MT_snap_pie"}},
     "wm-call-menu-pie-4d60ed8f84dc": {"operator": "wm.call_menu_pie", "properties": {"name": "VIEW3D_MT_snap_pie"}},
     "wm-call-menu-pie-5d76a851f09b": {"operator": "wm.call_menu_pie", "properties": {"name": "VIEW3D_MT_view_pie"}},
-    "wm-call-menu-pie-590ab24b74c9": {"operator": "wm.call_menu_pie", "properties": {"name": "DOPESHEET_MT_snap_pie"}},
-    "wm-call-menu-pie-3cffee1760d1": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_UV_cursor"}},
-    "wm-call-menu-pie-1718bb7b9b3c": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_UV_tool"}},
-    "wm-call-menu-pie-e558ce73d7ca": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_UV_action"}},
-    "wm-call-menu-pie-d5134672af17": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_UV_action_uvspecial"}},
-    "wm-call-menu-pie-59bd0dc478f2": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_add"}},
-    "wm-call-menu-pie-e5096db8931f": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_sculpt_tool"}},
-    "wm-call-menu-pie-31e6384434be": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_sculpt_action"}},
-    "wm-call-menu-pie-8b8401641702": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_sculpt_simulation"}},
-    "wm-call-menu-pie-58f860c7bbb9": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_help"}},
-    "wm-call-menu-pie-b6796dca85cc": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_dirs"}},
-    "wm-call-menu-pie-f7c2a4d1d214": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_import_export"}},
-    "pie-menu-curve-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_curve_action"}},
-    "pie-menu-curve-tool": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_curve_tool"}},
-    "pie-menu-mesh-tool": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_mesh_tool"}},
-    "pie-menu-mesh-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_mesh_action"}},
-    "pie-menu-mesh-action-uvspecial": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_mesh_action_uvspecial"}},
-    "pie-menu-object-tool": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_object_tool"}},
-    "pie-menu-object-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_object_action"}},
-    "wm-call-menu-pie-f7c2a4d1d214-binding-fa20e1a2efb7cfc4": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_import_export"}}
+    "wm-call-menu-pie-590ab24b74c9": {"operator": "wm.call_menu_pie", "properties": {"name": "DOPESHEET_MT_snap_pie"}}
   },
   "assignments": {
     "pie-nla-editor-718e51b1863c": {"order": 779, "section": "pie.editor_shortcuts", "feature": "pie-wm-call-menu-pie-19f487fe6ead", "event": "x-press-d0115e66e6bf", "command": "wm-call-menu-pie-24890914e337", "scope": {"name": "NLA Editor", "space_type": "NLA_EDITOR"}, "samples": ["164e20a482dd3434192960a28122217fd90b3d3eed6f5fbb6473f051f87eb150"]},
     "pie-graph-editor-e2b7b90f40d4": {"order": 780, "section": "pie.editor_shortcuts", "feature": "pie-wm-call-menu-pie-2dbe812d59e6", "event": "x-press-d0115e66e6bf", "command": "wm-call-menu-pie-f8282defd7dd", "scope": {"name": "Graph Editor", "space_type": "GRAPH_EDITOR"}, "samples": ["67c21b6154759a498bba9fbfa4069edab6c7c5d5056df61b72df9e73db91199f"]},
     "pie-3d-view-1f533cf023ed": {"order": 781, "section": "pie.editor_shortcuts", "feature": "pie-wm-call-menu-pie-346f516955c4", "event": "x-press-593d3a7c3d5d", "command": "wm-call-menu-pie-4d60ed8f84dc", "scope": {"name": "3D View", "space_type": "VIEW_3D"}, "samples": ["254f30e74623c44ca45112bbb6bb1b412734c1b22434c7614cac9e91e9db0e32"]},
     "pie-3d-view-1da05431ac03": {"order": 782, "section": "pie.editor_shortcuts", "feature": "pie-wm-call-menu-pie-12626acf7831", "event": "v-press-34f4b21d0e3a", "command": "wm-call-menu-pie-5d76a851f09b", "scope": {"name": "3D View", "space_type": "VIEW_3D"}, "samples": ["b8f4bdedcfe5854a6c08286c5920ea663a47bbd0ee3eb62a4428de6838353e83"]},
-    "pie-dopesheet-f35c7bf012a6": {"order": 783, "section": "pie.editor_shortcuts", "feature": "pie-wm-call-menu-pie-5b598e177aa1", "event": "x-press-d0115e66e6bf", "command": "wm-call-menu-pie-590ab24b74c9", "scope": {"name": "Dopesheet", "space_type": "DOPESHEET_EDITOR"}, "samples": ["4608f1f1f0a22d476128f91b3e5e1e375abc956765afe7dba340ce57ea566c1e"]},
-    "pie-uv-editor-617d07d80fe5": {"order": 784, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-75f00cf27aa5", "event": "rightmouse-press-d5026284596f", "command": "wm-call-menu-pie-3cffee1760d1", "scope": {"name": "UV Editor"}, "samples": ["111f1c8a70fa91b313a14c8cbcd6657c80eb4ff410755f93945f48cd1d9e82e6"]},
-    "pie-uv-editor-461a5c71e9a3": {"order": 785, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-c06ec55ec8b4", "event": "rightmouse-press-d24507019d68", "command": "wm-call-menu-pie-1718bb7b9b3c", "scope": {"name": "UV Editor"}, "samples": ["fa058af354379851c2f15b6ec02c1ea784feacd953008a093ec3c87f3f967533"]},
-    "pie-uv-editor-95e47d85f6dd": {"order": 786, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-78dccba1a72a", "event": "rightmouse-press-63f585520403", "command": "wm-call-menu-pie-e558ce73d7ca", "scope": {"name": "UV Editor"}, "samples": ["d58623ed144dc2452117a09d6a4760e9e7c2aa9601524dace4ab1684766ee394"]},
-    "pie-uv-editor-6987beb1a326": {"order": 787, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-9c4613f582a1", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-d5134672af17", "scope": {"name": "UV Editor"}, "samples": ["cdb6e12a0b5fc5a862c068b99397e3b2ecc99e90b7da38ce4a02e510ee089be4"]},
-    "pie-3d-view-afa5cfacc079": {"order": 788, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-558b495656c6", "event": "a-click-drag-d86aebe1ca3a", "command": "wm-call-menu-pie-59bd0dc478f2", "scope": {"name": "3D View", "space_type": "VIEW_3D"}, "samples": ["0cd76c92a60b885686fbf1d77c096aaed2ea4842665cad5fe4cc95a9b82fd4b1"]},
-    "pie-sculpt-848f32fc24bc": {"order": 789, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-b56fbfdabec1", "event": "rightmouse-press-d24507019d68", "command": "wm-call-menu-pie-e5096db8931f", "scope": {"name": "Sculpt"}, "samples": ["8d0f02f4432bb71a574ca93f2ac7c658cfd785b837c4e9df096ec1785b3ec005"]},
-    "pie-sculpt-2857c916f8f7": {"order": 790, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-24049d9e6f05", "event": "rightmouse-press-63f585520403", "command": "wm-call-menu-pie-31e6384434be", "scope": {"name": "Sculpt"}, "samples": ["806b8fce57a3fae95ee678d44220f6ce6ca620cc33e070b81a25351a2af5283f"]},
-    "pie-sculpt-1ea823f3cba1": {"order": 791, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-aeed432ff27d", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-8b8401641702", "scope": {"name": "Sculpt"}, "samples": ["cdbac1d415b13a777e1162bfea25cb3d17bfc828b4013492c4660017df89dc88"]},
-    "pie-window-ffa6273f5ca5": {"order": 792, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-f40d1bc097cd", "event": "f1-press-eeb8926b59cd", "command": "wm-call-menu-pie-58f860c7bbb9", "scope": {"name": "Window"}, "samples": ["2e472f6926236039807cad7a3e88201ac7f05dd19e77a3f8c3716758e3ce4610"]},
-    "pie-window-fc9a2cd4b28d": {"order": 793, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-a9d569983c57", "event": "f3-press-cf2a8a264cbf", "command": "wm-call-menu-pie-b6796dca85cc", "scope": {"name": "Window"}, "samples": ["77e7ec8d96b8d5814a5978d27b068fa95d465e22bc2f114bef2fd457f5ee4360"]},
-    "pie-window-70ccce0be59a": {"order": 794, "section": "pie.menus", "feature": "pie-wm-call-menu-pie-626dabd4ae16", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-f7c2a4d1d214", "scope": {"name": "Window"}, "samples": ["86b8b5a12775156a7518b0ab13288c157249bf95a2766925992a4a52233fd8d0"]},
-    "pie-curve-action": {"order": 795, "section": "pie.menus", "feature": "pie-curve-action", "event": "rightmouse-press-63f585520403", "command": "pie-menu-curve-action", "scope": {"name": "Curve"}, "samples": ["d432ac14abd383ca55efe72489756f7a20c2e59ce3c8047e5a920c06c9168995"]},
-    "pie-curve-tool": {"order": 796, "section": "pie.menus", "feature": "pie-curve-tool", "event": "rightmouse-press-d24507019d68", "command": "pie-menu-curve-tool", "scope": {"name": "Curve"}, "samples": ["5529828177a1aaeb168628a9dd6263adc06c63854463ae7391d358ce0fc0e030"]},
-    "pie-mesh-tool": {"order": 797, "section": "pie.menus", "feature": "pie-mesh-tool", "event": "rightmouse-press-d24507019d68", "command": "pie-menu-mesh-tool", "scope": {"name": "Mesh"}, "samples": ["135f17b7c5b588161b558ff0f98ee2e1fd3804bcfc969a89e0bb4692173d0b79"]},
-    "pie-mesh-action": {"order": 798, "section": "pie.menus", "feature": "pie-mesh-action", "event": "rightmouse-press-63f585520403", "command": "pie-menu-mesh-action", "scope": {"name": "Mesh"}, "samples": ["8cdd138fd7b99333b14290a967540a355eb5fa05de0d28b6e5ec620e002bc2bd"]},
-    "pie-mesh-action-uvspecial": {"order": 799, "section": "pie.menus", "feature": "pie-mesh-action-uvspecial", "event": "rightmouse-press-b44e4d3e981c", "command": "pie-menu-mesh-action-uvspecial", "scope": {"name": "Mesh"}, "samples": ["ac89af85d178f577f2b264119e87e8f575064be3f03f60812113299a4a50e415"]},
-    "pie-object-mode-global-import-export": {"order": 800, "section": "pie.menus", "feature": "pie-object-mode-global-import-export", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-f7c2a4d1d214-binding-fa20e1a2efb7cfc4", "scope": {"name": "Object Mode"}, "samples": ["2d95127bc7dca2e8b2682850b5dfd47f671203c57631aec9cbf90d97175908d8"]},
-    "pie-object-mode-object-tool": {"order": 801, "section": "pie.menus", "feature": "pie-object-mode-object-tool", "event": "rightmouse-press-d24507019d68", "command": "pie-menu-object-tool", "scope": {"name": "Object Mode"}, "samples": ["d791d21b08d0b34e1ff11f0cb156f4c568c3c7d4a1769c8ae94578a3cf6f27bb"]},
-    "pie-object-mode-object-action": {"order": 802, "section": "pie.menus", "feature": "pie-object-mode-object-action", "event": "rightmouse-press-63f585520403", "command": "pie-menu-object-action", "scope": {"name": "Object Mode"}, "samples": ["86d36dbe1514d153b3557d502d38591c87ff0a59591ff2e2a9b99e1a6406181e"]}
+    "pie-dopesheet-f35c7bf012a6": {"order": 783, "section": "pie.editor_shortcuts", "feature": "pie-wm-call-menu-pie-5b598e177aa1", "event": "x-press-d0115e66e6bf", "command": "wm-call-menu-pie-590ab24b74c9", "scope": {"name": "Dopesheet", "space_type": "DOPESHEET_EDITOR"}, "samples": ["4608f1f1f0a22d476128f91b3e5e1e375abc956765afe7dba340ce57ea566c1e"]}
   },
-  "suppressions": {
-    "legacy-addon-disable-3d-view-generic-2": {"section": "pie.menus", "selector": {"scope": {"name": "3D View Generic", "space_type": "VIEW_3D", "region_type": "WINDOW", "is_modal": false}, "event": {"type": "RIGHTMOUSE", "value": "PRESS", "shift": true, "ctrl": true, "map_type": "MOUSE"}, "source_role": "addon", "target": {"idname": "wm.call_menu_pie", "properties": {"name": "MACHIN3_MT_cursor_pie"}}, "ledger_id": "legacy-bh-keymaps-ea3acf8", "sample_id": "legacy-addon-disable-3d-view-generic-2"}, "disable": true, "explicit_properties": true}
-  }
+  "suppressions": {}
 }

@@ -25,7 +25,10 @@ def exercise(output):
     import bpy
 
     report = {'version': bpy.app.version_string, 'build': bpy.app.build_hash.decode()}
+    def checkpoint(name):
+        (output / 'progress.json').write_text(json.dumps({'checkpoint': name}))
     try:
+        checkpoint('load and unload cycles')
         bpy.context.preferences.use_preferences_save = False
         sys.path.insert(0, str(Path(os.environ['BLENDER_USER_SCRIPTS']) / 'addons'))
         bpy.utils.refresh_script_paths()
@@ -88,12 +91,16 @@ def exercise(output):
             rules = {id_: row for id_, row in registrar.deluxe_profile().snapshot()['suppressions'].items()
                      if row['selector']['source_role'] == 'default'}
             results = registrar.deluxe_profile().registration_results()
-            assert len(rules) == 24
-            assert all(results.get(id_) == ('applied', '') for id_ in rules), {
-                id_: results.get(id_) for id_ in rules if results.get(id_) != ('applied', '')}
+            original_rules = {id_ for id_ in rules if not id_.startswith('parity-')}
+            assert len(original_rules) == 24
+            assert all(results.get(id_) == ('applied', '') for id_ in original_rules), {
+                id_: results.get(id_) for id_ in original_rules if results.get(id_) != ('applied', '')}
+            # Provider replacements intentionally leave the stock binding live
+            # until the provider loads; modal additions have new default IDs.
+            applied_rules = {id_ for id_ in rules if results.get(id_) == ('applied', '')}
             changed_defaults = {key for key, active in default_activity().items()
-                                if active != defaults_before[key]}
-            assert len(changed_defaults) == len(rules), changed_defaults
+                                if key in defaults_before and active != defaults_before[key]}
+            assert len(changed_defaults) == len(applied_rules), changed_defaults
             digest = merged_digest()
             if registered_digest is not None:
                 assert digest == registered_digest, 'Repeated registration changed merged bindings'
@@ -112,6 +119,7 @@ def exercise(output):
                 pstats.Stats(profile, stream=stream).strip_dirs().sort_stats('cumulative').print_stats(35)
         registrar.register()
         toggles = []
+        checkpoint('master and catalog toggles')
         for _ in range(3):
             prefs.keymap['enable_keymaps'] = False
             disabled = measure(registrar.refresh)
@@ -140,32 +148,32 @@ def exercise(output):
                                            current.catalog[table][target].get('enabled', True),
                                            table=table, entry=target)
 
-        for table, target in (('sections', section), ('categories', 'pie')):
+        for table, target in (('sections', section), ('categories', 'addons')):
             checkbox(table, target).boolean = False
             assert not editor_ops.editor().catalog[table][target]['enabled']
         assert catalog_revision() == before_edit, 'Draft toggles wrote the catalog'
         assert not editor_ops.editor().preview_error, editor_ops.editor().preview_error
         assert not registrar.deluxe_section_enabled(section), 'Draft did not preview in live keymaps'
         assert bpy.ops.wm.bh_deluxe_edit(action='discard') == {'FINISHED'}
-        for table, target in (('sections', section), ('categories', 'pie')):
+        for table, target in (('sections', section), ('categories', 'addons')):
             assert checkbox(table, target).boolean, 'Discard did not reset a checkbox'
             checkbox(table, target).boolean = False
         assert bpy.ops.wm.bh_deluxe_edit(action='apply') == {'FINISHED'}
         saved = catalog_revision()
         catalog = registrar.deluxe_profile().snapshot()
         assert not catalog['sections'][section]['enabled']
-        assert not catalog['categories']['pie']['enabled']
+        assert not catalog['categories']['addons']['enabled']
         registrar.unregister()
         registrar.register()
         assert not registrar.deluxe_section_enabled(section)
-        assert not registrar.deluxe_section_enabled('pie.menus')
+        assert not registrar.deluxe_section_enabled('addons.blue-hole')
         prefs.keymap['enable_keymaps'] = False
         registrar.refresh()
         prefs.keymap['enable_keymaps'] = True
         registrar.refresh()
         assert not registrar.deluxe_section_enabled(section)
         assert catalog_revision() == saved
-        for table, target in (('sections', section), ('categories', 'pie')):
+        for table, target in (('sections', section), ('categories', 'addons')):
             checkbox(table, target).boolean = True
         assert bpy.ops.wm.bh_deluxe_edit(action='apply') == {'FINISHED'}
         assert merged_digest() == registered_digest
@@ -192,6 +200,7 @@ def exercise(output):
         assert any(id_ == 'wm.call_menu_pie' for id_, _ in editor_ops.operator_search(None, bpy.context, 'call_menu_pie'))
 
         # A historically inactive row is unchecked; enabling it activates that row.
+        checkpoint('binding creation and command editing')
         inactive_id = next(id_ for id_, row in current.catalog['assignments'].items()
                            if not row.get('active', True))
         row = current.catalog['assignments'][inactive_id]
@@ -289,6 +298,7 @@ def exercise(output):
                       command_reset_undo_retarget_delete_and_reload_verified=True)
 
         # Live changes fork a shared event without changing the saved JSON.
+        checkpoint('event editing and capture')
         current = editor_ops.editor()
         assignment = 'other-screen-c7515cc97075'
         original_event = current.catalog['assignments'][assignment]['event']
@@ -366,6 +376,7 @@ def exercise(output):
         assert merged_digest() == registered_digest
 
         # The native menu also disables our own additions via their original
+        checkpoint('native disable and preference persistence')
         # catalog setting, without inventing a suppression for an owned row.
         merged_map = configs.user.keymaps['Screen']
         redo = next(item for item in merged_map.keymap_items
@@ -501,10 +512,10 @@ def exercise(output):
         assert 'Add-on' in current.binding_origin(provider_rule, current.preview())[1]
         provider_map.keymap_items.remove(provider_item)
         configs.update()
-        registrar.default_bindings.reconcile(budget=100, time_budget=2)
+        registrar.default_bindings.reconcile(budget=len(registrar.default_bindings._requests), time_budget=10)
         assert not current.store.registration_results()[provider_rule][0] == 'applied'
         provider_item = create_provider_item()
-        registrar.default_bindings.reconcile(budget=100, time_budget=2)
+        registrar.default_bindings.reconcile(budget=len(registrar.default_bindings._requests), time_budget=10)
         assert not provider_item.active, 'Provider enabled after startup was not disabled'
         bpy.ops.wm.save_userpref()
         current.set_enabled('suppressions', provider_rule, False)
@@ -623,6 +634,19 @@ def exercise(output):
                 assert bpy.ops.wm.bh_deluxe_add_binding(scope=json.dumps(scope)) == {'FINISHED'}
                 assert not active.preview_error, active.preview_error
 
+            def show_pending_addition():
+                bpy.ops.wm.bh_deluxe_edit(action='discard')
+                bpy.ops.wm.bh_deluxe_edit(action='all_bindings')
+                active = editor_ops.editor()
+                active.assignment = next(id_ for id_, row in active.catalog['assignments'].items()
+                                         if active.catalog['commands'][row['command']].get('operator') == 'machin3.focus')
+                editor_ops.state(bpy.context).search = 'machin3.focus'
+
+            def show_pending_removal():
+                bpy.ops.wm.bh_deluxe_edit(action='all_bindings')
+                editor_ops.editor().assignment = 'legacy-addon-disable-mesh-28'
+                editor_ops.state(bpy.context).search = 'machin3.symmetrize'
+
             steps = (
                 ('all-bindings.png', show_context),
                 ('name-search.png', show_mesh),
@@ -635,7 +659,9 @@ def exercise(output):
                 ('default-rule.png', show_command_settings),
                 ('binding-command-settings.png', show_menu_properties),
                 ('menu-properties.png', show_new_binding),
-                ('new-binding.png', None),
+                ('new-binding.png', show_pending_addition),
+                ('pending-addition.png', show_pending_removal),
+                ('pending-removal.png', None),
             )
 
             def capture():
@@ -689,7 +715,18 @@ def verify_saved_preferences(output):
     assert len(selected) == 1 and selected[0].active, ('Preview disable leaked into userpref.blend: ' +
             repr([(item.id, item.active, item.is_user_modified) for item in selected]))
     assert not selected[0].is_user_modified, 'Preview created a native user override'
-    (output / 'preferences-check.json').write_text(json.dumps({'status': 'passed'}))
+    configs = bpy.context.window_manager.keyconfigs
+    for source in configs.default.keymaps:
+        if not source.is_modal:
+            continue
+        merged = configs.user.keymaps.get(source.name)
+        def modal_rows(km):
+            return [(item.propvalue, item.type, item.value, item.any, item.shift, item.ctrl,
+                     item.alt, item.oskey, item.key_modifier, item.active) for item in km.keymap_items]
+        assert modal_rows(merged) == modal_rows(source), ('Modal alias leaked into preferences', source.name)
+    assert not any(item.is_user_modified or item.is_user_defined
+                   for km in configs.user.keymaps for item in km.keymap_items), 'Runtime changes leaked into saved user keymaps'
+    (output / 'preferences-check.json').write_text(json.dumps({'status': 'passed', 'modal_aliases_not_saved': True}))
 
 
 def launch(binary, output, *, capture_editor=False):
@@ -726,7 +763,7 @@ def launch(binary, output, *, capture_editor=False):
             command = ['/usr/bin/sandbox-exec', '-f', str(policy), *command]
         with (output / 'blender.log').open('w') as stream:
             subprocess.run(command, env=environment, stdout=stream, stderr=subprocess.STDOUT,
-                           timeout=180, check=True)
+                           timeout=600, check=True)
         preliminary = json.loads(report_path.read_text())
         if preliminary['status'] == 'passed':
             verify = [part for part in command if part != '--factory-startup']

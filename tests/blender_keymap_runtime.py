@@ -937,7 +937,7 @@ def native_lifecycle(root, bpy, addon_utils):
         prefs.keymap.deluxe_configured = True
         prefs.keymap.enable_keymaps = True
         state['km'].refresh()
-        assert state['km'].deluxe_section_enabled('pie.menus')
+        assert state['km'].deluxe_section_enabled('addons.blue-hole')
         record('global_and_pie_enabled', runtime=state['rt'].runtime_stats())
 
     def all_off():
@@ -952,13 +952,14 @@ def native_lifecycle(root, bpy, addon_utils):
         prefs.keymap.enable_keymaps = True
         store = km.deluxe_profile()
         draft = store.begin()
-        draft.update('categories', 'pie', enabled=False)
+        draft.update('categories', 'addons', enabled=False)
         store.apply(draft)
-        assert not km.deluxe_section_enabled('pie.menus')
-        assert km.deluxe_section_enabled('pipeline.required')
+        assert not km.deluxe_section_enabled('addons.blue-hole')
+        assert any(request.target.idname == 'wm.bh_save_as_mainfile'
+                   for handle in rt._FEATURES.values() for request in handle.assignments)
         record('pie_disabled_independently')
         draft = store.begin()
-        draft.update('categories', 'pie', enabled=True)
+        draft.update('categories', 'addons', enabled=True)
         store.apply(draft)
 
     def partial_failure():

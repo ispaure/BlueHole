@@ -83,25 +83,35 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(face.target, self.core.KeymapTarget('object.bh_face_select_or_pose'))
         old_pose = resolver.target(catalog['commands']['object-mode-set-fa1f913c4675'])
         self.assertEqual(old_pose, self.core.KeymapTarget('object.mode_set', {'mode': 'POSE'}))
+        changed = read(FIXTURES / 'deluxe_parity_changed_bindings.json')
         def reference_row(request):
-            scope, target = request.scope, request.target
+            scope, target, event, active = request.scope, request.target, request.event, request.active
+            if request.request_id in changed:
+                original = changed[request.request_id]
+                scope = self.core.KeymapScope(**original['assignment']['scope'])
+                target = resolver.target(original['command'])
+                event = self.core.KeymapEvent(**original['event'])
+                active = original['assignment'].get('active', True)
             if target.idname in ('mesh.smart_delete', 'object.join_group_override'):
                 scope = self.core.KeymapScope('3D View', 'VIEW_3D')
             if request.request_id == face_id:
                 target = old_pose
-            return [asdict(scope), asdict(request.event), target.idname, dict(target.properties), request.active]
+            return [asdict(scope), asdict(event), target.idname, dict(target.properties), active]
 
         restored_pies = {
             'pie-curve-action', 'pie-curve-tool', 'pie-mesh-tool', 'pie-mesh-action',
             'pie-mesh-action-uvspecial', 'pie-object-mode-global-import-export',
             'pie-object-mode-object-tool', 'pie-object-mode-object-action',
         }
-        # The Other cleanup changes only organizational owners. Compare against
+        # Category cleanup changes only organizational owners. Compare against
         # the historical owner while preserving all ordered binding assertions.
-        payload = [('Other' if owner.split(':')[2].startswith('deluxe-other-') else owner.split(':')[1], [reference_row(request) for request in requests
-                    if request.request_id in catalog['assignments'] and request.request_id not in restored_pies])
+        def historical_owner(owner):
+            category = owner.split(':')[2].removeprefix('deluxe-').split('-')[0]
+            return 'UV' if category == 'uv' else category.capitalize()
+        payload = [(historical_owner(owner), [reference_row(request) for request in requests
+                    if request.request_id in catalog['assignments'] and request.request_id not in restored_pies and not request.request_id.startswith('parity-')])
                    for owner, requests in groups.items()
-                   if any(request.request_id not in restored_pies for request in requests)]
+                   if any(request.request_id not in restored_pies and not request.request_id.startswith('parity-') for request in requests)]
         blob = json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()
         self.assertEqual(hashlib.sha256(blob).hexdigest(), '9c48fa5b54876c7377817d306874f8ee96eb69518ae9947f5d64f92b95e4360c')
         self.assertEqual(sum(len(rows) for _, rows in payload), 795)
@@ -117,6 +127,8 @@ class ProfileTests(unittest.TestCase):
         object_mode_keys = []
         for requests in groups.values():
             for request in requests:
+                if request.request_id.startswith('parity-'):
+                    continue
                 if request.request_id not in catalog['assignments']:
                     original_id = self.resolver.profile_assignment_id(request.request_id)
                     original, = [row for row in requests if row.request_id == original_id]
@@ -165,12 +177,13 @@ class ProfileTests(unittest.TestCase):
     def test_reference_command_providers(self):
         catalog = read(DEFAULTS)
         resolver = self.resolver.Resolver(catalog)
-        for operator, provider, scope in (('mesh.smart_delete', 'Interactive Tools', 'Mesh'),
+        for operator, provider, scope in (('mesh.smart_delete', 'Interactive Tools', '3D View'),
                                           ('object.join_group_override', 'Group Pro', 'Object Mode')):
-            command, = resolver.commands[operator]
-            command_id, = [id_ for id_, row in catalog['commands'].items() if row == command]
-            assignment, = [row for row in catalog['assignments'].values() if row['command'] == command_id]
-            self.assertEqual(assignment['scope'], {'name': scope})
+            assignment, = [row for row in catalog['assignments'].values()
+                            if row['scope']['name'] == scope
+                            and catalog['commands'][row['command']].get('operator') == operator]
+            command = catalog['commands'][assignment['command']]
+            self.assertEqual(assignment['scope'], {'name': scope, **({'space_type': 'VIEW_3D'} if scope == '3D View' else {})})
             meta = resolver.describe_command(command)
             self.assertEqual(meta['owner'], provider)
             self.assertEqual(meta['availability'], 'waiting_for_provider')
@@ -181,7 +194,7 @@ class ProfileTests(unittest.TestCase):
         commands = catalog['commands']
         self.runtime.bpy.types = SimpleNamespace()
         menu = next(row for row in commands.values()
-                    if row['properties'].get('name') == 'BLUEHOLE_MT_pie_UV_cursor')
+                    if row.get('properties', {}).get('name') == 'BLUEHOLE_MT_pie_UV_cursor')
         self.assertEqual(resolver.describe_command(menu)['owner'], 'Blue Hole')
         self.assertEqual(resolver.describe_command(commands['view3d-view-selected-aa07ccdbfcd2'])['owner'],
                          'Blender')
@@ -386,7 +399,7 @@ class ProfileTests(unittest.TestCase):
         resolver = self.resolver.Resolver(catalog)
         state, groups = resolver.plan(catalog, self.settings)
         self.assertTrue(state['navigation.view_framing'])
-        self.assertTrue(state['pie.menus'])  # No Pie preference group is needed.
+        self.assertTrue(state['addons.blue-hole'])  # No Pie preference group is needed.
         self.assertTrue(groups)
         catalog['sections']['navigation.view_framing']['enabled'] = False
         self.assertFalse(resolver.section_enabled(catalog, self.settings, 'navigation.view_framing'))
@@ -394,7 +407,7 @@ class ProfileTests(unittest.TestCase):
         self.assertFalse(resolver.section_enabled(catalog, self.settings, 'navigation.viewport_movement'))
         self.settings.keymap.enable_keymaps = False
         state, _ = resolver.plan(catalog, self.settings)
-        self.assertEqual([id_ for id_, enabled in state.items() if enabled], ['pipeline.required'])
+        self.assertFalse(any(state.values()))
 
     def test_category_and_section_choices_reopen_from_catalog(self):
         path = self.path.with_name('deluxe-defaults.json')
@@ -402,7 +415,7 @@ class ProfileTests(unittest.TestCase):
         shutil.copytree(DEFAULTS.parent / 'deluxe-defaults-sections', path.parent / 'deluxe-defaults-sections')
         store = self.api.ProfileStore.open_catalog(path, lambda: self.settings, lambda *args: None)
         draft = store.begin()
-        draft.update('categories', 'pie', enabled=False)
+        draft.update('categories', 'addons', enabled=False)
         draft.update('sections', 'navigation.view_framing', enabled=False)
         store.apply(draft)
         saved = path.read_bytes()
@@ -410,7 +423,7 @@ class ProfileTests(unittest.TestCase):
         self.settings.keymap.enable_keymaps = True
         fresh_settings = SimpleNamespace(keymap=SimpleNamespace(enable_keymaps=True))
         reopened = self.api.ProfileStore.open_catalog(path, lambda: fresh_settings, lambda *args: None)
-        self.assertFalse(reopened.section_enabled('pie.menus'))
+        self.assertFalse(reopened.section_enabled('addons.blue-hole'))
         self.assertFalse(reopened.section_enabled('navigation.view_framing'))
         self.assertTrue(reopened.section_enabled('navigation.viewport_movement'))
         self.assertEqual(path.read_bytes(), saved)
@@ -437,7 +450,7 @@ class ProfileTests(unittest.TestCase):
                         section = catalog['sections'][assignment['section']]
                         affected = (assignment['section'] == id_ if table == 'sections'
                                     else section['category'] == id_)
-                        if section.get('required') or not affected:
+                        if assignment.get('required') or section.get('required') or not affected:
                             expected[request_id] = request
                     self.assertEqual(remaining, expected)
                     row['enabled'] = True
@@ -447,7 +460,7 @@ class ProfileTests(unittest.TestCase):
         resolver = self.resolver.Resolver(catalog)
         self.settings.keymap.enable_keymaps = True  # A saved opt-in cannot enable the other sections.
         sections, groups = resolver.plan(catalog, self.settings, required_only=True)
-        self.assertEqual([id_ for id_, enabled in sections.items() if enabled], ['pipeline.required'])
+        self.assertFalse(any(sections.values()))
         requests = [row for rows in groups.values() for row in rows]
         self.assertEqual(len(requests), 2)
         for request in requests:

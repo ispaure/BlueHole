@@ -1,4 +1,4 @@
-"""Activate Deluxe keymaps and help artists review legacy profiles."""
+"""Activate the programmatic Blue Hole keymaps without replacing preferences."""
 
 from hashlib import sha256
 from pathlib import Path
@@ -100,9 +100,6 @@ def apply_deluxe_prefs(context, preference, *, reviewed=False):
     if (legacy_preset_active(context)
             or not uses_blender_keyconfig(context.window_manager.keyconfigs)):
         raise ValueError('Select Blender in Preferences > Keymap before enabling Deluxe Keymaps.')
-    if needs_keymap_review(context, preference) and not reviewed:
-        raise ValueError('Review the saved shortcuts before enabling Deluxe keymaps.')
-
     options = [(preference.keymap, 'deluxe_configured', True),
                (preference.keymap, 'enable_keymaps', True)]
     _set_keymap_options(context, options, activating=True)

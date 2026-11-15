@@ -63,46 +63,29 @@ class WM_OT_URLOpen(bpy.types.Operator):
 class WM_OT_Apply_Deluxe_Prefs(bpy.types.Operator):
     """Enable the Deluxe shortcut catalog on the built-in Blender preset"""
     bl_idname = "wm.bh_apply_deluxe_prefs"
-    bl_label = "Enable Deluxe Keymaps"
+    bl_label = "Enable Blue Hole Keymaps & Pie Menus"
     bl_options = {'INTERNAL'}
-
-    reviewed: BoolProperty(
-        name="I reviewed saved shortcuts and resolved legacy conflicts",
-        options={'SKIP_SAVE'},
-    )
-
-    def invoke(self, context, _event):
-        self.reviewed = False
-        if (applyDeluxePrefs.uses_blender_keyconfig(context.window_manager.keyconfigs)
-                and applyDeluxePrefs.needs_keymap_review(context, prefs().prefs)):
-            return context.window_manager.invoke_props_dialog(self, width=470)
-        return self.execute(context)
-
-    def draw(self, _context):
-        self.layout.label(text="Review Blender Preferences > Keymap for old Deluxe edits.")
-        self.layout.label(text="Keep personal shortcuts and remove any conflicting legacy edits.")
-        self.layout.prop(self, 'reviewed')
 
     def execute(self, context):
         try:
-            applyDeluxePrefs.apply_deluxe_prefs(context, prefs().prefs, reviewed=self.reviewed)
+            applyDeluxePrefs.apply_deluxe_prefs(context, prefs().prefs)
         except Exception as error:
             message = str(error) if isinstance(error, (ValueError, applyDeluxePrefs.ActivationError)) else (
                 'Blender could not apply Deluxe keymaps. See the Blue Hole log and try again.')
             return _keymap_error(self, context, error, message)
-        _report_keymap_preference(self, context, 'Deluxe keymaps enabled.')
+        _report_keymap_preference(self, context, 'Blue Hole Keymaps & Pie Menus enabled.')
         return {'FINISHED'}
 
 
 class WM_OT_Disable_Deluxe_Keymaps(bpy.types.Operator):
     """Disable Deluxe shortcuts and keep your feature settings"""
     bl_idname = "wm.bh_disable_deluxe_keymaps"
-    bl_label = "Disable Deluxe Keymaps"
+    bl_label = "Disable Blue Hole Keymaps & Pie Menus"
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
         applyDeluxePrefs.disable_deluxe_keymaps(context, prefs().prefs)
-        _report_keymap_preference(self, context, 'Deluxe keymaps disabled.')
+        _report_keymap_preference(self, context, 'Blue Hole Keymaps & Pie Menus disabled.')
         return {'FINISHED'}
 
 

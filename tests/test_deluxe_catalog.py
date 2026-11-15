@@ -19,12 +19,19 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(len(records), 125)
         imported = {row['rule_id']: row['rule'] for row in records if row['decision'] == 'imported'}
         self.assertEqual(len(imported), 24)
-        self.assertEqual({id_: row for id_, row in catalog['suppressions'].items()
-                          if row['selector']['source_role'] == 'default'}, imported)
+        behavior = lambda rule: {k: v for k, v in rule.items() if k != 'section'}
+        imported = {i: behavior(row) for i, row in imported.items()}
+        self.assertEqual({id_: behavior(row) for id_, row in catalog['suppressions'].items()
+                          if row['selector']['source_role'] == 'default' and not id_.startswith('parity-')}, imported)
         providers = {row['rule_id']: row['rule'] for row in records if row['decision'] == 'provider_rule'}
         self.assertEqual(len(providers), 28)
-        self.assertEqual(catalog['suppressions'], {**imported, **providers})
-        self.assertEqual(len(catalog['assignments']), 803)
+        # The bundled userprefs re-enabled these three Auto Constraints drags;
+        # the later parity audit supersedes their preset-only removal rules.
+        for tool in ('move', 'rotate', 'scale'):
+            providers.pop('legacy-addon-disable-3d-view-tool-' + tool + '-0')
+        self.assertEqual({i: behavior(row) for i, row in catalog['suppressions'].items()
+                          if not i.startswith('parity-')}, {**imported, **{i: behavior(row) for i, row in providers.items()}})
+        self.assertEqual(sum(not i.startswith('parity-') for i in catalog['assignments']), 803)
         for row in records:
             if row['decision'] != 'imported':
                 continue

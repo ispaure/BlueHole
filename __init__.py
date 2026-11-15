@@ -35,7 +35,7 @@ debugUtils.configure(project_prefix="Blue Hole", use_time_delta=False, presenter
 from .wrappers.perforce import initialize_runtime as initialize_perforce_runtime
 initialize_perforce_runtime()
 
-from .blenderUtils import callbacks, addon_callbacks
+from .blenderUtils import callbacks, addon_callbacks, addon_updates
 from .preferences import addon_prefs
 from .operators import operators_register
 from .environment import envManager
@@ -80,6 +80,7 @@ def register():
     addon_prefs.register()
     operators_register.register()
     menus_register.register()
+    addon_updates.register()
 
     # Preference-dependent initialization must wait until Blender has fully
     # enabled the add-on and created its AddonPreferences instance.
@@ -142,6 +143,7 @@ def _post_register_init():
 def unregister():
     global _keymaps_registered, _addon_registered
     _addon_registered = False
+    addon_updates.unregister()
 
     if bpy.app.timers.is_registered(_post_register_init):
         bpy.app.timers.unregister(_post_register_init)

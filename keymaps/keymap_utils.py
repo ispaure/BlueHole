@@ -51,6 +51,7 @@ def _freeze_rna_array(prop, value):
     """
     try:
         from mathutils import Matrix, Vector
+        import mathutils
     except ImportError as exc:
         raise ValueError('unreadable_property_schema') from exc
     array_type = getattr(getattr(bpy, 'types', None), 'bpy_prop_array', None)
@@ -79,7 +80,8 @@ def _freeze_rna_array(prop, value):
         remaining = len(dimensions) - depth
         kind = type(part)
         if not ((isinstance(array_type, type) and kind is array_type)
-                or (scalar_type is float and kind is Vector and remaining == 1)
+                or (scalar_type is float and remaining == 1 and kind in
+                    tuple(getattr(mathutils, name, None) for name in ('Vector', 'Color', 'Euler', 'Quaternion')))
                 or (scalar_type is float and kind is Matrix and remaining == 2)):
             raise ValueError('unreadable_property_schema')
         if len(part) != dimensions[depth]:
@@ -166,6 +168,9 @@ class KeymapAssignment:
     declared_properties_only: bool = False
     active: bool = True
     requires_operator: bool = False
+    required_class: str = ''
+    required_addon: str = ''
+    dispatch_group: str = ''
 
 
 @dataclass(frozen=True)
@@ -186,6 +191,20 @@ def _scope_event(request):
     if isinstance(request, KeymapOverride):
         return request.selector.scope, request.selector.event
     return request.scope, request.event
+
+
+def _assignment_dependency_ready(request):
+    if request.required_class and not hasattr(getattr(bpy, 'types', None), request.required_class):
+        return False
+    return not request.required_addon or _addon_enabled(request.required_addon)
+
+
+def _addon_enabled(name):
+    # Logistics may install the same provider as a legacy add-on or as an
+    # extension in any repository namespace.
+    return any((module_name == name or module_name.startswith('bl_ext.') and module_name.endswith('.' + name))
+               and getattr(module, '__addon_enabled__', False)
+               for module_name, module in tuple(sys.modules.items()))
 
 
 @dataclass(frozen=True)
@@ -375,6 +394,16 @@ def _event(item):
 
 
 def _properties(item):
+    # A provider can unregister its operator before Blue Hole releases a KMI.
+    # Blender may leave that item's property RNA pointing at the freed type;
+    # even asking for properties.bl_rna can then segfault (not raise Python).
+    # Resolve the live operator first, without touching the property pointer.
+    if hasattr(getattr(bpy, 'app', None), 'version'):
+        try:
+            namespace, name = item.idname.split('.')
+            getattr(getattr(bpy.ops, namespace), name).get_rna_type()
+        except (AttributeError, KeyError, ReferenceError, RuntimeError, TypeError, ValueError) as exc:
+            raise _Pending('waiting_for_provider') from exc
     props = getattr(item, 'properties', None)
     if props is None:
         raise _Pending('unreadable_property_schema')
@@ -384,18 +413,41 @@ def _properties(item):
         if isinstance(props, Mapping):
             return _freeze(props)
         raise _Pending('unreadable_property_schema')
+    return _read_property_group(props)
+
+
+def _operator_property_group(prop, value):
+    base = getattr(prop, 'fixed_type', None)
+    while base is not None and base.identifier != 'OperatorProperties':
+        base = base.base
+    operator_properties = getattr(getattr(bpy, 'types', None), 'OperatorProperties', None)
+    return base is not None and operator_properties is not None and isinstance(value, operator_properties)
+
+
+def _read_property_group(props, depth=0):
+    if depth > 4:
+        raise _Pending('unreadable_property_schema')
     values = {}
     try:
-        for prop in schema:
+        for prop in props.bl_rna.properties:
             name = prop.identifier
             if name == 'rna_type':
                 continue
-            if prop.type in ('POINTER', 'COLLECTION'):
-                raise _Pending('unreadable_property_schema')
             value = getattr(props, name)
-            if prop.type == 'ENUM' and value == '':
+            if prop.type == 'POINTER':
+                if not _operator_property_group(prop, value):
+                    raise _Pending('unreadable_property_schema')
+                values[name] = _read_property_group(value, depth + 1)
+            elif prop.type == 'COLLECTION':
+                # Gesture paths, paint strokes and batch-rename actions are
+                # value collections. Include even empty collections so later
+                # user edits remain visible to the ownership comparison.
+                if len(value) > 4096:
+                    raise _Pending('unreadable_property_schema')
+                values[name] = tuple(_read_property_group(entry, depth + 1) for entry in value)
+            elif prop.type == 'ENUM' and value == '':
                 raise _Pending('unreadable_property_schema')
-            if getattr(prop, 'is_array', False):
+            elif getattr(prop, 'is_array', False):
                 values[name] = _freeze_rna_array(prop, value)
             elif prop.type == 'ENUM' and getattr(prop, 'is_enum_flag', False) is True:
                 allowed = _enum_flag_identifiers(prop)
@@ -407,6 +459,24 @@ def _properties(item):
     except (AttributeError, ReferenceError, RuntimeError, TypeError, ValueError) as exc:
         raise _Pending('unreadable_property_schema') from exc
     return _freeze(values)
+
+
+def _declared_properties_match(actual, expected):
+    def named_pairs(entries):
+        return isinstance(entries, tuple) and bool(entries) and all(
+            isinstance(pair, tuple) and len(pair) == 2 and isinstance(pair[0], str) for pair in entries)
+
+    actual = dict(actual)
+    for name, value in expected:
+        observed = actual.get(name, _MISSING)
+        # Nested tuples of named pairs are macro operator property groups.
+        group = named_pairs(value) or value == () and named_pairs(observed)
+        if group:
+            if not isinstance(observed, tuple) or not _declared_properties_match(observed, value):
+                return False
+        elif observed != value:
+            return False
+    return True
 
 
 def _enum_flag_identifiers(prop):
@@ -424,9 +494,19 @@ def _enum_flag_identifiers(prop):
 
 def _set_property(item, name, value):
     """Convert reviewed canonical flags/matrix rows to native RNA setter input."""
-    properties = item.properties
+    _set_property_group(item.properties, name, value)
+
+
+def _set_property_group(properties, name, value):
     schema = getattr(getattr(properties, 'bl_rna', None), 'properties', ())
     prop = next((prop for prop in schema if prop.identifier == name), None)
+    if prop is not None and prop.type == 'POINTER':
+        child = getattr(properties, name)
+        if not _operator_property_group(prop, child):
+            raise ValueError('unreadable_property_schema')
+        for key, entry in value:
+            _set_property_group(child, key, entry)
+        return
     if prop is not None and prop.type == 'ENUM' and getattr(prop, 'is_enum_flag', False) is True:
         allowed = _enum_flag_identifiers(prop)
         if (type(value) is not tuple
@@ -751,7 +831,9 @@ def _legacy_event_readback(actual, expected):
 
 
 def _create_assignment(request, owner_id):
-    if request.scope.is_modal or request.target.modal_value:
+    if request.scope.is_modal:
+        return _create_modal_assignment(request, owner_id)
+    if request.target.modal_value:
         raise _Pending('unsupported_assignment_kind', 'unsupported')
     config = _config('addon')
     map_ = _one_map(config, request.scope, required=False)
@@ -793,8 +875,7 @@ def _create_assignment(request, owner_id):
             if not _legacy_event_readback(actual[0], request.event) or \
                     actual[2] != request.active or actual[1].idname != request.target.idname:
                 raise _Pending('created_readback_mismatch', 'unsupported')
-            actual_properties = dict(actual[1].properties)
-            if any(actual_properties.get(key, _MISSING) != value for key, value in request.target.properties):
+            if not _declared_properties_match(actual[1].properties, request.target.properties):
                 raise _Pending('created_readback_mismatch', 'unsupported')
             owned.snapshot = actual
         else:
@@ -808,6 +889,53 @@ def _create_assignment(request, owner_id):
         _remove_raw(owned)
         if created_map:
             _remove_empty_map(config, map_)
+        raise
+
+
+def _create_modal_assignment(request, owner_id):
+    """Add a reversible modal alias to the actual built-in handler map.
+
+    Blender does not merge add-on modal maps into its modal handlers. Register
+    only in an existing default modal map, never in the saved user keyconfig.
+    """
+    if not request.target.modal_value:
+        raise _Pending('unsupported_assignment_kind', 'unsupported')
+    config = _config('default')
+    map_ = _one_map(config, request.scope)
+    event = request.event
+    kwargs = {name: getattr(event, name) for name in EVENT_FIELDS
+              if name not in {'map_type', 'hyper'}}
+    before = {_pointer(item) for item in _members(map_.keymap_items)}
+
+    def remove_partial():
+        for candidate in _members(map_.keymap_items):
+            if _pointer(candidate) not in before:
+                _remove_raw(_Owned(config, map_, candidate, (), owner_id=owner_id,
+                                   request_id=request.request_id))
+
+    try:
+        item = map_.keymap_items.new_modal(request.target.modal_value, **kwargs)
+    except (TypeError, ValueError, RuntimeError) as exc:
+        remove_partial()
+        raise _Pending('unsupported_modal_token_or_event', 'unsupported') from exc
+    owned = _Owned(config, map_, item, (), owner_id=owner_id, request_id=request.request_id)
+    try:
+        # new_modal has no head argument. Copy the freshly created item to the
+        # front so a built-in ANY event cannot swallow a more specific alias.
+        # Both objects are ours, so removing the temporary tail is safe.
+        front = map_.keymap_items.new_from_item(item, head=True)
+        owned = _Owned(config, map_, front, (), owner_id=owner_id, request_id=request.request_id)
+        _remove_native_item(map_, item)
+        item = front
+        if event.hyper not in (None, False):
+            item.hyper = event.hyper
+        item.active = request.active
+        _validate_created(owned, event, request.target, request.active)
+        _request_merged_update()
+        _COUNTS['created'] += 1
+        return owned
+    except Exception:
+        remove_partial()
         raise
 
 
@@ -849,7 +977,7 @@ def _remove_empty_map(config, map_):
         pass
 
 
-def _conflicting_owned_event(owner_id, scope, event):
+def _conflicting_owned_event(owner_id, scope, event, dispatch_group=''):
     for other in _FEATURES.values():
         if other.owner_id == owner_id:
             continue
@@ -860,6 +988,12 @@ def _conflicting_owned_event(owner_id, scope, event):
                 continue
             live = _live_owned_members(owned)
             if live is not None and _scope(live[0]) == scope:
+                # Reviewed poll chains (and Blender's paired modal actions)
+                # deliberately share an event. Unrelated assignments still fail.
+                if dispatch_group and any(request.request_id == owned.request_id
+                                          and request.dispatch_group == dispatch_group
+                                          for request in other.assignments):
+                    continue
                 return True
     for records in _PENDING_CLEANUP.values():
         for owned, _ in records:
@@ -1180,6 +1314,14 @@ class FeatureHandle:
                 continue
             seen_requests.add(semantic_key)
             prior = self._owned.get(key)
+            if isinstance(request, KeymapAssignment) and not _assignment_dependency_ready(request):
+                if prior is not None:
+                    removal = _remove_owned(prior)
+                    if removal not in _CLEANUP_RETRY_REASONS:
+                        self._owned.pop(key, None)
+                diagnostics.append(_diagnostic(self, request, 'pending', 'waiting_for_provider'))
+                preflight_failed = True
+                continue
             if prior is not None:
                 if not _valid_owned(prior):
                     self._owned.pop(key, None)
@@ -1290,7 +1432,8 @@ class FeatureHandle:
                     continue
             try:
                 scope, event = _scope_event(request)
-                if _conflicting_owned_event(self.owner_id, scope, event):
+                if _conflicting_owned_event(self.owner_id, scope, event,
+                                            getattr(request, 'dispatch_group', '')):
                     raise _Pending('conflicting_assignment', 'unsupported')
                 if isinstance(request, KeymapOverride):
                     proof = _preflight_override(request)

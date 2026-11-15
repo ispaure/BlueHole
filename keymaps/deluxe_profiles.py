@@ -304,7 +304,7 @@ class ProfileStore:
         for table in ('categories', 'sections', 'assignments'):
             for id_, row in catalog[table].items():
                 shipped = self._defaults[table].get(id_, {})
-                keys = ('switch', 'required') if table != 'assignments' else ('feature', 'samples', 'kind')
+                keys = ('switch', 'required') if table != 'assignments' else ('feature', 'samples', 'kind', 'dispatch_group', 'required')
                 for key in keys:
                     expected = shipped.get(key, id_ if key == 'feature' else None)
                     require(row.get(key) == expected, f'Code-managed {key} in {id_}')
@@ -321,7 +321,7 @@ class ProfileStore:
         for row in catalog['suppressions'].values():
             require(row['section'] not in required, 'Required section cannot contain suppressions')
         for id_, row in self._defaults['assignments'].items():
-            if row['section'] not in required:
+            if row['section'] not in required and not row.get('required'):
                 continue
             require(same_value(catalog['assignments'].get(id_), row), 'Required binding is read-only')
             for key, table in (('event', 'events'), ('command', 'commands')):
@@ -355,15 +355,18 @@ class ProfileStore:
                     scope = resolve_scope(request.scope, config)
                     active[scope, request.event].append(profile_assignment_id(request.request_id))
         inherited = self._inherited_conflicts(active)
-        conflicts = tuple(tuple(ids) for ids in active.values() if len(ids) > 1)
+        def reviewed_chain(ids):
+            group = assignments[ids[0]].get('dispatch_group')
+            return group and all(assignments[id_].get('dispatch_group') == group for id_ in ids)
+        conflicts = tuple(tuple(ids) for ids in active.values() if len(ids) > 1 and not reviewed_chain(ids))
         required = {id_ for id_, row in catalog['sections'].items() if row.get('required')}
         live = self.registration_results()
         return {
             'load_issue': self.load_issue,
             'sections': state,
-            'assignments': {id_: {'eligible': bool(state[row['section']] and row.get('enabled', True)),
+            'assignments': {id_: {'eligible': bool(row.get('required') or state[row['section']] and row.get('enabled', True)),
                                   'active': row.get('active', True),
-                                  'editable': row['section'] not in required,
+                                  'editable': row['section'] not in required and not row.get('required'),
                                   'availability': commands[row['command']]['availability'],
                                   'registered': live.get(id_, (None, None))[0] == 'applied'}
                             for id_, row in assignments.items()},
@@ -384,6 +387,10 @@ class ProfileStore:
         for id_ in sorted(operators):
             value = self.resolver.describe_operator_token(id_)
             rna.append((id_, value))
+        for command in catalog['commands'].values():
+            if command.get('operator') in {'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel'}:
+                name = command['properties'].get('name', '')
+                rna.append((name, id(getattr(getattr(runtime.bpy, 'types', None), name, None))))
         configs = []
         for role in ('default', 'addon', 'user', 'active'):
             try:
@@ -400,10 +407,14 @@ class ProfileStore:
         """Report exact event overlap with the built-in base by assignment ID."""
         matches = defaultdict(list)
         try:
-            for map_ in runtime._config('default').keymaps:
+            config = runtime._config('default')
+            owned_modal = {(owned.map_pointer, owned.item_pointer, owned.item_id)
+                           for handle in runtime._FEATURES.values() for owned in handle._owned.values()
+                           if owned.config_pointer == runtime._pointer(config)}
+            for map_ in config.keymaps:
                 scope = runtime.capture_scope(map_)
                 for item in map_.keymap_items:
-                    if not item.active:
+                    if not item.active or (runtime._pointer(map_), runtime._pointer(item), item.id) in owned_modal:
                         continue
                     try:
                         event = runtime.capture_event(item)
@@ -418,7 +429,9 @@ class ProfileStore:
     def _suppression_status(self, row, catalog):
         selector = selector_descriptor(row['selector'])
         if row.get('disable'):
-            status, reason = default_bindings.status(selector, explicit_properties=row.get('explicit_properties', False))
+            status, reason = default_bindings.status(
+                selector, explicit_properties=row.get('explicit_properties', False),
+                requires_assignment=row.get('requires_assignment', ''))
             return {'status': status, 'reason': reason}
         replacement = (self.resolver.target(catalog['commands'][row['replacement']])
                        if 'replacement' in row else None)
@@ -576,7 +589,8 @@ class ProfileStore:
                 continue
             if row.get('disable'):
                 default_bindings.install(id_, selector_descriptor(row['selector']),
-                                         explicit_properties=row.get('explicit_properties', False))
+                                         explicit_properties=row.get('explicit_properties', False),
+                                         requires_assignment=row.get('requires_assignment', ''))
                 continue
             request = self.resolver.suppression_request(id_, row, catalog['commands'])
             if request is not None:

@@ -23,7 +23,29 @@ class DisabledBinding:
 _bindings = {}
 _results = {}
 _requests = {}
+_requirements = {}
 _cursor = 0
+
+
+def _assignment_ready(id_):
+    if not id_:
+        return True
+    for handle in runtime._FEATURES.values():
+        owned = handle._owned.get(id_)
+        if owned is None:
+            continue
+        request = next((row for row in handle.assignments if row.request_id == id_), None)
+        if request is None or not request.active:
+            continue
+        if not runtime._assignment_dependency_ready(request):
+            continue
+        try:
+            if (runtime._valid_owned(owned) and
+                    runtime._snapshot(owned.item, request.scope.is_modal) == owned.snapshot):
+                return True
+        except runtime._Pending:
+            pass
+    return False
 
 
 def _valid(record):
@@ -45,20 +67,20 @@ def _merged_item(selector, item_id, active):
     matches = [item for item in merged.keymap_items
                if (item.id == item_id if selector.source_role == 'default' else
                    item.idname == selector.target.idname and runtime.capture_event(item) == selector.event
-                   and runtime._snapshot(item, False) == (selector.event, selector.target, active))]
+                   and runtime._snapshot(item, selector.scope.is_modal) == (selector.event, selector.target, active))]
     if len(matches) != 1:
         raise runtime._Pending('merged_source_missing_or_edited')
     item = matches[0]
     if (item.is_user_modified or item.is_user_defined
-            or runtime._snapshot(item, False) != (selector.event, selector.target, active)):
+            or runtime._snapshot(item, selector.scope.is_modal) != (selector.event, selector.target, active)):
         raise runtime._Pending('user_binding_modified', 'unsupported')
     return item
 
 
 def _preflight(selector):
-    if (selector.source_role not in {'default', 'addon'} or selector.scope.is_modal or selector.scope.is_tool
+    if (selector.source_role not in {'default', 'addon'} or selector.scope.is_tool
             or not runtime._same(runtime._config('active'), runtime._config('default'))):
-        raise runtime._Pending('only_ordinary_inherited_bindings', 'unsupported')
+        raise runtime._Pending('only_inherited_blender_bindings', 'unsupported')
     config, map_, item = runtime._exact_source(selector)
     runtime._preflight_merged_source(selector)
     _merged_item(selector, item.id, True)
@@ -71,7 +93,7 @@ def managed_rule(map_, item):
         if (not record.pending and _valid(record)
                 and (record.selector.source_role == 'addon' or item.id == record.item_id)
                 and runtime.capture_scope(map_) == record.selector.scope
-                and runtime._snapshot(item, False) == _snapshot(record, False)):
+                and runtime._snapshot(item, record.selector.scope.is_modal) == _snapshot(record, False)):
             return id_, record.selector
     return None
 
@@ -79,33 +101,34 @@ def managed_rule(map_, item):
 def _resolve(selector, explicit_properties):
     """Old preset exports contain only explicitly set properties, not RNA defaults.
 
-    Only imported add-on rules use this mode. Resolve one complete native
+    Imported default and add-on rules use this mode. Resolve one complete native
     snapshot before mutation and keep that exact snapshot for restoration.
     """
     if not explicit_properties:
         return selector
-    if selector.source_role != 'addon' or selector.scope.is_modal:
-        raise runtime._Pending('invalid_legacy_addon_selector', 'unsupported')
-    map_ = runtime._one_map(runtime._config('addon'), selector.scope)
+    if selector.source_role not in {'default', 'addon'} or selector.scope.is_modal:
+        raise runtime._Pending('invalid_explicit_property_selector', 'unsupported')
+    map_ = runtime._one_map(runtime._config(selector.source_role), selector.scope)
     matches = []
     for item in map_.keymap_items:
         if item.idname != selector.target.idname or runtime.capture_event(item) != selector.event:
             continue
         target = runtime.capture_target(item, modal=False)
-        actual = dict(target.properties)
-        if all(name in actual and actual[name] == value for name, value in selector.target.properties):
+        if runtime._declared_properties_match(target.properties, selector.target.properties):
             matches.append(target)
     if len(matches) != 1:
         raise runtime._Pending('ambiguous_source' if matches else 'source_missing_or_edited')
     return replace(selector, target=matches[0])
 
 
-def status(selector, *, explicit_properties=False):
+def status(selector, *, explicit_properties=False, requires_assignment=''):
+    if not _assignment_ready(requires_assignment):
+        return 'missing', 'waiting_for_assignment'
     try:
         for id_, record in _bindings.items():
             if (_requests.get(id_) == (selector, explicit_properties)
                     and not record.pending and _valid(record)):
-                if runtime._snapshot(record.item, False) == _snapshot(record, False):
+                if runtime._snapshot(record.item, record.selector.scope.is_modal) == _snapshot(record, False):
                     _merged_item(record.selector, record.item_id, False)
                     return 'resolved', ''
         _preflight(_resolve(selector, explicit_properties))
@@ -116,8 +139,12 @@ def status(selector, *, explicit_properties=False):
         return state, error.reason
 
 
-def install(id_, selector, *, explicit_properties=False):
+def install(id_, selector, *, explicit_properties=False, requires_assignment=''):
     _requests[id_] = selector, explicit_properties
+    _requirements[id_] = requires_assignment
+    if not _assignment_ready(requires_assignment):
+        _results[id_] = ('pending', 'waiting_for_assignment')
+        return
     try:
         selector = _resolve(selector, explicit_properties)
         # An absent provider should not force a native keyconfig rebuild on
@@ -132,7 +159,7 @@ def install(id_, selector, *, explicit_properties=False):
     try:
         record.item.active = False
         runtime._update_merged()
-        if not _valid(record) or runtime._snapshot(record.item, False) != _snapshot(record, False):
+        if not _valid(record) or runtime._snapshot(record.item, record.selector.scope.is_modal) != _snapshot(record, False):
             raise RuntimeError('Default binding changed while disabling it')
         _merged_item(selector, record.item_id, False)
     except Exception:
@@ -155,19 +182,26 @@ def reconcile(*, budget=4, time_budget=0.004):
         _cursor += 1
         checked += 1
         record = _bindings.get(id_)
+        requirement = _requirements.get(id_, '')
+        if not _assignment_ready(requirement):
+            if record is not None:
+                record.pending = True
+                retry_cleanup()
+            _results[id_] = ('pending', 'waiting_for_assignment')
+            continue
         if record is not None:
             try:
                 if _valid(record):
                     # An in-place edit belongs to the artist. Never keep
                     # disabling it; a recreated provider item is a new source.
-                    if runtime._snapshot(record.item, False) != _snapshot(record, False):
+                    if runtime._snapshot(record.item, record.selector.scope.is_modal) != _snapshot(record, False):
                         _results[id_] = ('pending', 'source_binding_edited')
                     continue
             except (runtime._Pending, AttributeError, ReferenceError, RuntimeError, TypeError):
                 continue
             del _bindings[id_]
         selector, explicit_properties = _requests[id_]
-        install(id_, selector, explicit_properties=explicit_properties)
+        install(id_, selector, explicit_properties=explicit_properties, requires_assignment=requirement)
     return checked
 
 
@@ -177,10 +211,10 @@ def retry_cleanup():
         if not record.pending:
             continue
         try:
-            if _valid(record) and runtime._snapshot(record.item, False) == _snapshot(record, False):
+            if _valid(record) and runtime._snapshot(record.item, record.selector.scope.is_modal) == _snapshot(record, False):
                 record.item.active = True
                 changed = True
-                if runtime._snapshot(record.item, False) != _snapshot(record, True):
+                if runtime._snapshot(record.item, record.selector.scope.is_modal) != _snapshot(record, True):
                     continue
             # Gone or edited entries no longer authorize mutation.
             del _bindings[id_]
@@ -194,6 +228,7 @@ def retry_cleanup():
 def release_all():
     global _cursor
     _requests.clear()
+    _requirements.clear()
     _cursor = 0
     _results.clear()
     for record in _bindings.values():
@@ -209,7 +244,7 @@ def registration_results():
     results = dict(_results)
     for id_, record in _bindings.items():
         try:
-            intact = not record.pending and _valid(record) and runtime._snapshot(record.item, False) == _snapshot(record, False)
+            intact = not record.pending and _valid(record) and runtime._snapshot(record.item, record.selector.scope.is_modal) == _snapshot(record, False)
             if intact:
                 _merged_item(record.selector, record.item_id, False)
         except (runtime._Pending, AttributeError, ReferenceError, RuntimeError, TypeError):

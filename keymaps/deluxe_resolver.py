@@ -34,6 +34,14 @@ MODE_OPERATORS = frozenset({'object.mode_set', 'object.mode_set_with_submode'})
 CONTEXT_MODE_OPERATORS = frozenset({'object.bh_face_select_or_pose'})
 
 
+def command_addon(command):
+    # Generic Blender operators can reference a provider's tools or properties
+    # while remaining registered after that provider has been disabled.
+    if command.get('provider') == 'Zen UV' and command.get('operator', '').startswith('wm.'):
+        return 'ZenUV'
+    return ''
+
+
 def profile_assignment_id(request_id):
     """Map an Object Mode runtime companion back to its editable assignment."""
     return request_id.partition(':')[0]
@@ -235,6 +243,9 @@ class Resolver:
     """Shipped command routes and scopes are the allowlist for profile edits."""
 
     def __init__(self, defaults):
+        self.modal_commands = tuple(command for command in defaults['commands'].values()
+                                    if 'modal_value' in command) + tuple(
+                                        {'modal_value': token} for token in MODAL_TOKENS)
         self.commands = defaultdict(list)
         for command in (*defaults['commands'].values(), *REPLACEMENT_COMMANDS):
             if 'operator' in command:
@@ -249,7 +260,7 @@ class Resolver:
                     'availability': 'available', 'editable': False, 'fields': {}}
         idname = command['operator']
         variants = self.commands.get(idname, ())
-        provider = variants[0].get('provider') if variants else None
+        provider = command.get('provider') or (variants[0].get('provider') if variants else None)
         rna = _operator_rna(idname)
         editable = rna is not None
         fields = {}
@@ -277,8 +288,14 @@ class Resolver:
             label = getattr(getattr(bpy.types, name, None), 'bl_label', None) or name or label
             if name.startswith('BLUEHOLE_'):
                 owner = 'Blue Hole'
+        available = rna is not None
+        if idname in {'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel'}:
+            available = available and hasattr(bpy.types, command['properties'].get('name', ''))
+        addon = command_addon(command)
+        if addon:
+            available = available and runtime._addon_enabled(addon)
         return {'label': command.get('label', label), 'owner': owner,
-                'dependency': provider, 'availability': ('available' if rna is not None
+                'dependency': provider, 'availability': ('available' if available
                                                            else 'waiting_for_provider' if provider
                                                            else 'unavailable'),
                 'editable': any(field['editable'] for field in fields.values()), 'fields': fields}
@@ -320,7 +337,7 @@ class Resolver:
 
     def validate_command(self, row, id_):
         if 'modal_value' in row:
-            require(row['modal_value'] in MODAL_TOKENS, f'Unknown modal command {id_}')
+            require(any(row == known for known in getattr(self, 'modal_commands', ())), f'Unknown modal command {id_}')
             return
         idname = row['operator']
         require(isinstance(idname, str) and (not idname or OPERATOR.fullmatch(idname)),
@@ -328,7 +345,7 @@ class Resolver:
         properties(row['properties'])
         variants = self.commands.get(idname)
         variants = variants or ()
-        require(not row.get('provider') or row.get('provider') == (variants[0].get('provider') if variants else None),
+        require(not row.get('provider') or any(row['provider'] == variant.get('provider') for variant in variants),
                 f'Unknown command provider in {id_}')
         definition = {key: value for key, value in row.items() if key != 'label'}
         if any(same_value(definition, {key: value for key, value in variant.items() if key != 'label'})
@@ -366,21 +383,25 @@ class Resolver:
         groups = {}
         commands = catalog['commands']
         for id_, row in sorted(catalog['assignments'].items(), key=lambda entry: entry[1]['order']):
-            if not (state[row['section']] and row.get('enabled', True)):
+            if not (row.get('required') or state[row['section']] and row.get('enabled', True)):
                 continue
             category = self.feature_categories.get(row['feature'], sections[row['section']]['category'])
             owner = 'legacy:' + self._category_label(category) + ':deluxe-' + row['feature']
             scope = scope_descriptor(row['scope'])
             event = event_descriptor(catalog['events'][row['event']])
             command = commands[row['command']]
-            if not command['operator']:
+            if not command.get('operator') and not command.get('modal_value'):
                 continue
             samples = row.get('samples', ())
             request = runtime.KeymapAssignment(
                 id_, scope, event, self.target(command), declared_properties_only=True,
                 active=row.get('active', True), ledger_id=catalog['base']['ledger'] if samples else '',
                 sample_id=samples[0] if samples else '',
-                requires_operator=bool(command.get('provider')) or _operator_rna(command['operator']) is None)
+                requires_operator='operator' in command and (bool(command.get('provider')) or _operator_rna(command['operator']) is None),
+                dispatch_group=row.get('dispatch_group', ''),
+                required_addon=command_addon(command),
+                required_class=command.get('properties', {}).get('name', '')
+                if command.get('operator') in {'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel'} else '')
             requests = groups.setdefault(owner, [])
             requests.append(request)
             # The viewport dispatches Object Mode before Object Non-modal.
@@ -388,8 +409,8 @@ class Resolver:
             # selection. The original route remains available in other modes.
             if (request.active and scope in OBJECT_NON_MODAL_SCOPES
                     and replace(event, repeat=False) in COLLECTION_NUMBER_EVENTS
-                    and (command['operator'] in CONTEXT_MODE_OPERATORS
-                         or command['operator'] in MODE_OPERATORS
+                    and (command.get('operator') in CONTEXT_MODE_OPERATORS
+                         or command.get('operator') in MODE_OPERATORS
                          and command['properties'].get('mode') not in (None, 'OBJECT'))):
                 requests.append(replace(request, request_id=id_ + ':object-mode', scope=OBJECT_MODE))
         return state, groups

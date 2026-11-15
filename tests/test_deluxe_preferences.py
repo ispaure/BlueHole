@@ -123,7 +123,7 @@ class DeluxePreferencesTests(unittest.TestCase):
         self.assertFalse(self.pref.keymap.deluxe_configured)
         self.refresh.assert_not_called()
 
-    def test_known_profile_waits_for_review_with_or_without_old_backups(self):
+    def test_known_profile_enables_directly_without_replacing_old_preferences(self):
         self.saved.write_bytes(b'legacy plus personal preferences')
         self.preset.write_bytes(b'legacy plus personal shortcuts')
         personal = SimpleNamespace(is_user_modified=True)
@@ -134,27 +134,25 @@ class DeluxePreferencesTests(unittest.TestCase):
                 if with_backup:
                     prior.write_bytes(b'older settings')
                 self.assertTrue(self.module.has_legacy_profile(self.context))
-                with self.assertRaisesRegex(ValueError, 'Review the saved shortcuts'):
-                    self.apply()
-                self.assertFalse(self.pref.keymap.deluxe_configured)
+                self.apply()
+                self.assertTrue(self.pref.keymap.deluxe_configured)
         addon = self.context.preferences.addons['existing']
-        self.apply(reviewed=True)
         self.assertEqual(self.saved.read_bytes(), b'legacy plus personal preferences')
         self.assertEqual(self.preset.read_bytes(), b'legacy plus personal shortcuts')
         self.assertEqual(prior.read_bytes(), b'older settings')
         self.assertIs(self.configs.user.keymaps[0], personal)
         self.assertIs(self.context.preferences.addons['existing'], addon)
-        self.refresh.assert_called_once_with()
+        self.assertEqual(self.refresh.call_count, 2)
 
-    def test_ambiguous_preset_and_unattributed_saved_edits_require_review(self):
+    def test_custom_preset_is_rejected_but_saved_edits_do_not_need_review(self):
         self.configs.active = SimpleNamespace(name='Custom')
         with self.assertRaisesRegex(ValueError, 'Select Blender'):
             self.apply()
         self.assertEqual(self.configs.active.name, 'Custom')
         self.configs.active = self.factory
         self.configs.user.keymaps.append(SimpleNamespace(is_user_modified=True))
-        with self.assertRaisesRegex(ValueError, 'Review the saved shortcuts'):
-            self.apply()
+        self.apply()
+        self.assertTrue(self.pref.keymap.enable_keymaps)
 
     def test_exact_legacy_preferences_detected_with_preset_missing(self):
         payload = b'original shipped settings'

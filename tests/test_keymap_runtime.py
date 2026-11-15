@@ -1887,7 +1887,7 @@ class LifecycleIntegrationTests(unittest.TestCase):
         stub('environment', package=True)
         stub('ui', package=True)
         stub('ui.menus', package=True)
-        for name in ('blenderUtils.callbacks', 'blenderUtils.addon_callbacks',
+        for name in ('blenderUtils.callbacks', 'blenderUtils.addon_callbacks', 'blenderUtils.addon_updates',
                      'preferences.addon_prefs', 'operators.operators_register',
                      'ui.menus.menus_register'):
             stub(name, register=lambda: None, unregister=lambda: None)

@@ -1,0 +1,348 @@
+{
+  "mesh-3d-view-de461d8d7129": {
+    "assignment": {
+      "order": 9,
+      "section": "mesh.modeling",
+      "feature": "mesh-mesh-smart-delete-d2f9de0be0e2",
+      "event": "d-press-9ba7aeacbbd3",
+      "command": "mesh-smart-delete-f70965785c88",
+      "scope": {
+        "name": "Mesh"
+      },
+      "samples": [
+        "8bce3a1fb349dd222c49b6912946d61ee4ea10e13cb59b681cc10bd6e4300c51"
+      ]
+    },
+    "event": {
+      "type": "D",
+      "alt": true,
+      "repeat": true
+    },
+    "command": {
+      "operator": "mesh.smart_delete",
+      "properties": {},
+      "provider": "Interactive Tools"
+    }
+  },
+  "sculpt-sculpt-31e4b764a5e1": {
+    "assignment": {
+      "order": 102,
+      "section": "sculpt.controls",
+      "feature": "sculpt-wm-radial-control-0509ff856f78",
+      "event": "space-press-29485728133c",
+      "command": "wm-radial-control-32b9bbf8498f",
+      "scope": {
+        "name": "Sculpt"
+      },
+      "samples": [
+        "355316b679e0243fdc2db256087ae31b10d76524ecfe60c88faf0f1f79ddab36"
+      ]
+    },
+    "event": {
+      "type": "SPACE",
+      "ctrl": true,
+      "repeat": true
+    },
+    "command": {
+      "operator": "wm.radial_control",
+      "properties": {
+        "data_path_primary": "tool_settings.sculpt.brush.strength",
+        "data_path_secondary": "tool_settings.unified_paint_settings.strength",
+        "use_secondary": "tool_settings.unified_paint_settings.use_unified_strength",
+        "rotation_path": "tool_settings.sculpt.brush.texture_slot.angle",
+        "color_path": "tool_settings.sculpt.brush.cursor_color_add",
+        "fill_color_path": "",
+        "fill_color_override_path": "",
+        "fill_color_override_test_path": "",
+        "zoom_path": "",
+        "image_id": "tool_settings.sculpt.brush",
+        "release_confirm": true
+      }
+    }
+  },
+  "sculpt-sculpt-0c680af6596f": {
+    "assignment": {
+      "order": 108,
+      "section": "sculpt.controls",
+      "feature": "sculpt-wm-radial-control-29e93a8fab67",
+      "event": "u-press-182512037f42",
+      "command": "wm-radial-control-3cbd3544f83a",
+      "scope": {
+        "name": "Sculpt"
+      },
+      "samples": [
+        "e5b98f29af265f10759a95f0dd6075bf55f7768066fa1dac7f842db746427001"
+      ]
+    },
+    "event": {
+      "type": "U"
+    },
+    "command": {
+      "operator": "wm.radial_control",
+      "properties": {
+        "data_path_primary": "tool_settings.sculpt.brush.strength",
+        "data_path_secondary": "tool_settings.unified_paint_settings.strength",
+        "use_secondary": "tool_settings.unified_paint_settings.use_unified_strength",
+        "rotation_path": "tool_settings.sculpt.brush.texture_slot.angle",
+        "color_path": "tool_settings.sculpt.brush.cursor_color_add",
+        "fill_color_path": "",
+        "fill_color_override_path": "",
+        "fill_color_override_test_path": "",
+        "zoom_path": "",
+        "image_id": "tool_settings.sculpt.brush",
+        "secondary_tex": false
+      }
+    }
+  },
+  "other-image-paint-f606844dffa1": {
+    "assignment": {
+      "order": 637,
+      "section": "sculpt.painting",
+      "feature": "other-wm-radial-control-61d56c354613",
+      "event": "u-press-182512037f42",
+      "command": "wm-radial-control-daeaad5bbf3e",
+      "scope": {
+        "name": "Image Paint"
+      },
+      "samples": [
+        "965536cf7118aa3b0aaf586898e96873c77da9667d37137a9a776c8cb228df69"
+      ]
+    },
+    "event": {
+      "type": "U"
+    },
+    "command": {
+      "operator": "wm.radial_control",
+      "properties": {
+        "data_path_primary": "tool_settings.image_paint.brush.strength",
+        "data_path_secondary": "tool_settings.unified_paint_settings.strength",
+        "use_secondary": "tool_settings.unified_paint_settings.use_unified_strength",
+        "rotation_path": "tool_settings.image_paint.brush.mask_texture_slot.angle",
+        "color_path": "tool_settings.image_paint.brush.cursor_color_add",
+        "fill_color_path": "tool_settings.image_paint.brush.color",
+        "fill_color_override_path": "tool_settings.unified_paint_settings.color",
+        "fill_color_override_test_path": "tool_settings.unified_paint_settings.use_unified_color",
+        "zoom_path": "",
+        "image_id": "tool_settings.image_paint.brush",
+        "secondary_tex": true
+      }
+    }
+  },
+  "other-image-paint-225b2edb0061": {
+    "assignment": {
+      "order": 638,
+      "section": "sculpt.painting",
+      "feature": "other-wm-radial-control-4c68fb65f8fb",
+      "event": "s-press-ed14190ccc38",
+      "command": "wm-radial-control-880e434110ef",
+      "scope": {
+        "name": "Image Paint"
+      },
+      "samples": [
+        "c58512bf02fb29ac976e70b306cc6524ee6428edf18993f12c14c4fc14822136"
+      ]
+    },
+    "event": {
+      "type": "S"
+    },
+    "command": {
+      "operator": "wm.radial_control",
+      "properties": {
+        "data_path_primary": "tool_settings.image_paint.brush.size",
+        "data_path_secondary": "tool_settings.unified_paint_settings.size",
+        "use_secondary": "tool_settings.unified_paint_settings.use_unified_size",
+        "rotation_path": "tool_settings.image_paint.brush.mask_texture_slot.angle",
+        "color_path": "tool_settings.image_paint.brush.cursor_color_add",
+        "fill_color_path": "tool_settings.image_paint.brush.color",
+        "fill_color_override_path": "tool_settings.unified_paint_settings.color",
+        "fill_color_override_test_path": "tool_settings.unified_paint_settings.use_unified_color",
+        "zoom_path": "space_data.zoom",
+        "image_id": "tool_settings.image_paint.brush",
+        "secondary_tex": true
+      }
+    }
+  },
+  "other-vertex-paint-5cba8df1034b": {
+    "assignment": {
+      "order": 646,
+      "section": "sculpt.painting",
+      "feature": "other-wm-radial-control-ab16aed10f39",
+      "event": "u-press-182512037f42",
+      "command": "wm-radial-control-47c1eb669de4",
+      "scope": {
+        "name": "Vertex Paint"
+      },
+      "samples": [
+        "9091f4d5324058ad8d40661dc0c9a1e414439bc8b2c4059cba22edcb478aac21"
+      ]
+    },
+    "event": {
+      "type": "U"
+    },
+    "command": {
+      "operator": "wm.radial_control",
+      "properties": {
+        "data_path_primary": "tool_settings.vertex_paint.brush.strength",
+        "data_path_secondary": "tool_settings.unified_paint_settings.strength",
+        "use_secondary": "tool_settings.unified_paint_settings.use_unified_strength",
+        "rotation_path": "tool_settings.vertex_paint.brush.texture_slot.angle",
+        "color_path": "tool_settings.vertex_paint.brush.cursor_color_add",
+        "fill_color_path": "tool_settings.vertex_paint.brush.color",
+        "fill_color_override_path": "tool_settings.unified_paint_settings.color",
+        "fill_color_override_test_path": "tool_settings.unified_paint_settings.use_unified_color",
+        "zoom_path": "",
+        "image_id": "tool_settings.vertex_paint.brush",
+        "secondary_tex": false
+      }
+    }
+  },
+  "other-vertex-paint-2989f5a334f7": {
+    "assignment": {
+      "order": 647,
+      "section": "sculpt.painting",
+      "feature": "other-wm-radial-control-7781e3ed0de1",
+      "event": "s-press-ed14190ccc38",
+      "command": "wm-radial-control-eba469074d28",
+      "scope": {
+        "name": "Vertex Paint"
+      },
+      "samples": [
+        "eedc51690c08a408177d44ed3b38258276f357bed0e595544d9570e484b131b7"
+      ]
+    },
+    "event": {
+      "type": "S"
+    },
+    "command": {
+      "operator": "wm.radial_control",
+      "properties": {
+        "data_path_primary": "tool_settings.vertex_paint.brush.size",
+        "data_path_secondary": "tool_settings.unified_paint_settings.size",
+        "use_secondary": "tool_settings.unified_paint_settings.use_unified_size",
+        "rotation_path": "tool_settings.vertex_paint.brush.texture_slot.angle",
+        "color_path": "tool_settings.vertex_paint.brush.cursor_color_add",
+        "fill_color_path": "tool_settings.vertex_paint.brush.color",
+        "fill_color_override_path": "tool_settings.unified_paint_settings.color",
+        "fill_color_override_test_path": "tool_settings.unified_paint_settings.use_unified_color",
+        "zoom_path": "",
+        "image_id": "tool_settings.vertex_paint.brush",
+        "secondary_tex": false
+      }
+    }
+  },
+  "other-weight-paint-5be3061b96e3": {
+    "assignment": {
+      "order": 651,
+      "section": "sculpt.painting",
+      "feature": "other-wm-radial-control-4b1b9e6dd96c",
+      "event": "u-press-182512037f42",
+      "command": "wm-radial-control-6bd139c1d96b",
+      "scope": {
+        "name": "Weight Paint"
+      },
+      "samples": [
+        "f00fbbdf7fb67f9265e4e337bcd4e89597609dcedb809dacab65b57d6c3766bd"
+      ]
+    },
+    "event": {
+      "type": "U"
+    },
+    "command": {
+      "operator": "wm.radial_control",
+      "properties": {
+        "data_path_primary": "tool_settings.weight_paint.brush.strength",
+        "data_path_secondary": "tool_settings.unified_paint_settings.strength",
+        "use_secondary": "tool_settings.unified_paint_settings.use_unified_strength",
+        "rotation_path": "tool_settings.weight_paint.brush.texture_slot.angle",
+        "color_path": "tool_settings.weight_paint.brush.cursor_color_add",
+        "fill_color_path": "",
+        "fill_color_override_path": "",
+        "fill_color_override_test_path": "",
+        "zoom_path": "",
+        "image_id": "tool_settings.weight_paint.brush",
+        "secondary_tex": false
+      }
+    }
+  },
+  "other-weight-paint-82647eed7056": {
+    "assignment": {
+      "order": 652,
+      "section": "sculpt.painting",
+      "feature": "other-wm-radial-control-4e0466462220",
+      "event": "s-press-ed14190ccc38",
+      "command": "wm-radial-control-df4740cb6e1f",
+      "scope": {
+        "name": "Weight Paint"
+      },
+      "samples": [
+        "11d1771f360ce8bbb2650a35e4ea587b69184fd21bae55cc743a18cf1478ae61"
+      ]
+    },
+    "event": {
+      "type": "S"
+    },
+    "command": {
+      "operator": "wm.radial_control",
+      "properties": {
+        "data_path_primary": "tool_settings.weight_paint.brush.size",
+        "data_path_secondary": "tool_settings.unified_paint_settings.size",
+        "use_secondary": "tool_settings.unified_paint_settings.use_unified_size",
+        "rotation_path": "tool_settings.weight_paint.brush.texture_slot.angle",
+        "color_path": "tool_settings.weight_paint.brush.cursor_color_add",
+        "fill_color_path": "",
+        "fill_color_override_path": "",
+        "fill_color_override_test_path": "",
+        "zoom_path": "",
+        "image_id": "tool_settings.weight_paint.brush",
+        "secondary_tex": false
+      }
+    }
+  },
+  "selection-curves-ec177c23aac8": {
+    "assignment": {
+      "order": 191,
+      "section": "selection.tool_switch",
+      "feature": "selection-wm-bh-tool-select-box-xray-curves-4948fa404ddf",
+      "event": "q-press-2abed1079bef",
+      "command": "wm-bh-tool-select-box-xray-curves-c00ac9dec29f",
+      "scope": {
+        "name": "Curves"
+      }
+    },
+    "event": {
+      "type": "Q"
+    },
+    "command": {
+      "operator": "wm.bh_tool_select_box_xray_curves",
+      "properties": {}
+    }
+  },
+  "transform-3d-view-1e50f09bad46": {
+    "assignment": {
+      "order": 310,
+      "section": "transform.tools_modal",
+      "feature": "transform-transform-translate-dda0c312ef55",
+      "event": "middlemouse-press-5021049abe73",
+      "command": "transform-translate-66b7a699ff3c",
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D"
+      },
+      "samples": [
+        "2da275dfdea64e1af816040ce670cc617972adff6d71209a08deb648aa0f9386"
+      ]
+    },
+    "event": {
+      "type": "MIDDLEMOUSE",
+      "shift": true,
+      "ctrl": true,
+      "map_type": "MOUSE"
+    },
+    "command": {
+      "operator": "transform.translate",
+      "properties": {
+        "cursor_transform": true
+      }
+    }
+  }
+}

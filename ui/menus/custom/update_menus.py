@@ -28,13 +28,13 @@ from ....preferences.prefs import prefs
 
 
 class BLUE_HOLE_MT_update_deluxe(bpy.types.Menu):
-    bl_label = "Updates & Deluxe"
+    bl_label = "Keymaps & Pie Menus"
     bl_idname = "BLUE_HOLE_MT_update_deluxe"
 
     def draw(self, context):
         layout = self.layout
         settings = prefs().keymap
-        layout.operator_context = 'INVOKE_DEFAULT'
+        layout.operator_context = 'EXEC_DEFAULT'
         operator = (other_ops.WM_OT_Disable_Deluxe_Keymaps
                     if settings.deluxe_configured and settings.enable_keymaps
                     and keymaps_register.runtime_keymaps_allowed(context, settings)

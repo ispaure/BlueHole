@@ -169,6 +169,14 @@ class FakeItems:
         self.created += 1
         return copy
 
+    def new_modal(self, propvalue, type, value, **event):
+        # Native new_modal has no head argument, unlike new_from_item.
+        if 'head' in event:
+            raise TypeError('new_modal does not accept head')
+        item = self.new('', type, value, **event)
+        item.propvalue = propvalue
+        return item
+
     def remove(self, item):
         if self.fail_next_remove or self.remove_failures_remaining:
             self.fail_next_remove = False

@@ -35,8 +35,8 @@ def _update_keymaps(self, context):
 class KeymapPG(bpy.types.PropertyGroup):
 
     enable_keymaps: BoolProperty(
-        name='Enable Deluxe Keymaps',
-        description='Enable Deluxe shortcuts using the saved Blue Hole catalog',
+        name='Enable Blue Hole Keymaps & Pie Menus',
+        description='Enable the programmatic Blue Hole shortcuts and pie menus',
         default=False,
         update=_update_keymaps
     )
@@ -62,7 +62,7 @@ def draw(preference, context, layout):
 
     if not settings.deluxe_configured:
         column_keymap.alignment = 'LEFT'
-        column_keymap.operator('wm.bh_apply_deluxe_prefs', text='Enable Deluxe Keymaps')
+        column_keymap.operator('wm.bh_apply_deluxe_prefs')
         return
 
     if not keymaps_register.runtime_keymaps_allowed(context, settings):

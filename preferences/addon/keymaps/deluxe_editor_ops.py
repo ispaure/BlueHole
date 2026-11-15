@@ -35,6 +35,8 @@ EDIT_DESCRIPTIONS = {
     'assignment': 'Show the shortcut and settings for this assignment',
     'expand_binding_context': 'Show bindings in this keymap context',
     'collapse_binding_context': 'Hide bindings in this keymap context',
+    'expand_binding_contexts': 'Expand every context containing matching bindings',
+    'collapse_binding_contexts': 'Collapse the tree to its top-level contexts',
     'show_assignments': 'Show bindings in this subsection',
     'all_bindings': 'Show every binding and clear search and category filters',
     'delete_section': 'Stage removal of this empty section',
@@ -179,6 +181,7 @@ class BH_PG_deluxe_binding_row(bpy.types.PropertyGroup):
     expanded: BoolProperty(options=TRANSIENT)
     removable: BoolProperty(options=TRANSIENT)
     rule: BoolProperty(options=TRANSIENT)
+    pending: BoolProperty(options=TRANSIENT)
     scope: StringProperty(options=TRANSIENT)
     section: StringProperty(options=TRANSIENT)
 
@@ -191,6 +194,7 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
         if row.kind == 'binding':
             _editor.assignment = row.target
             self.list_selection = row.target
+            self.list_focus = ''
             redraw(context)
 
     def reset_page(self, _context):
@@ -211,13 +215,18 @@ class BH_PG_deluxe_editor(bpy.types.PropertyGroup):
     binding_index: IntProperty(default=-1, update=select_binding, options=TRANSIENT)
     rows_key: StringProperty(options=TRANSIENT)
     list_selection: StringProperty(options=TRANSIENT)
+    list_focus: StringProperty(options=TRANSIENT)
 
 
-def sync_binding_rows(view, key, rows, selection):
+def sync_binding_rows(view, key, rows, selection, *, focus_context=''):
     """Rebuild native list storage only when its contents or expansion change."""
     global _syncing_inline
     _syncing_inline = True
     try:
+        if focus_context:
+            view.list_focus = focus_context
+        elif view.list_selection != selection:
+            view.list_focus = ''
         rebuilt = view.rows_key != key
         if rebuilt:
             view.binding_rows.clear()
@@ -226,7 +235,13 @@ def sync_binding_rows(view, key, rows, selection):
                 for name, value in values.items():
                     setattr(row, name, value)
             view.rows_key = key
-        if rebuilt or view.list_selection != selection:
+        if view.list_focus:
+            # Expansion is navigation, not a request to reveal the inspector's
+            # selection. Keep native list focus on the header just clicked.
+            view.binding_index = next((index for index, row in enumerate(view.binding_rows)
+                                       if row.kind == 'context' and row.target == view.list_focus), -1)
+            view.list_selection = selection
+        elif rebuilt or view.list_selection != selection:
             view.binding_index = next((index for index, row in enumerate(view.binding_rows)
                                        if row.kind == 'binding' and row.target == selection), -1)
             view.list_selection = selection
@@ -341,6 +356,11 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
             setattr(current, action, target)
         elif action in {'expand_binding_context', 'collapse_binding_context'}:
             current.binding_context_expansion[target] = action == 'expand_binding_context'
+            current.binding_focus_context = target
+        elif action in {'expand_binding_contexts', 'collapse_binding_contexts'}:
+            cached = current.display_cache.get('bindings')
+            if cached is not None:
+                current.expand_binding_contexts(cached[1][1], action == 'expand_binding_contexts')
         elif action == 'feature_category':
             current.select_category(target)
         elif action == 'feature_section':

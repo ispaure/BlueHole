@@ -6,10 +6,18 @@
   },
   "sections": {
     "mesh.modeling": {"label": "Modeling", "category": "mesh", "enabled": true},
-    "mesh.tools": {"label": "Tools", "category": "mesh", "enabled": true}
+    "mesh.tools": {"label": "Tools", "category": "mesh", "enabled": true},
+    "mesh.parity-knife-tool-modal-map": {"label": "Knife Tool Modal Map", "category": "mesh", "enabled": true}
   },
   "events": {
-    "middlemouse-click-80064ca4962c": {"type": "MIDDLEMOUSE", "value": "CLICK", "shift": true, "map_type": "MOUSE"}
+    "middlemouse-click-80064ca4962c": {"type": "MIDDLEMOUSE", "value": "CLICK", "shift": true, "map_type": "MOUSE"},
+    "parity-event-e9e7967e21eb": {"type": "LEFT_CTRL"},
+    "parity-event-f4a4f7eed675": {"type": "LEFT_CTRL", "value": "RELEASE"},
+    "parity-event-a3b638b7b148": {"type": "RIGHT_CTRL"},
+    "parity-event-4854b97b0cd4": {"type": "RIGHT_CTRL", "value": "RELEASE"},
+    "parity-event-5c5e2a766a16": {"alt": -1, "any": true, "ctrl": -1, "hyper": -1, "oskey": -1, "shift": -1, "type": "RIGHT_SHIFT"},
+    "parity-event-9eb69afd4efa": {"alt": -1, "any": true, "ctrl": -1, "hyper": -1, "oskey": -1, "shift": -1, "type": "RIGHT_SHIFT", "value": "RELEASE"},
+    "parity-event-af2290df4eb7": {"alt": 1, "map_type": "MOUSE", "type": "MIDDLEMOUSE"}
   },
   "commands": {
     "mesh-spin-037461d1155d": {"operator": "mesh.spin", "properties": {"dupli": true}},
@@ -21,8 +29,20 @@
     "mesh-bevel-304f467e39ad": {"operator": "mesh.bevel", "properties": {"release_confirm": true}},
     "mesh-inset-4b4cafdc306a": {"operator": "mesh.inset", "properties": {"release_confirm": true}},
     "mesh-dupli-extrude-cursor-e60c1f222dd7": {"operator": "mesh.dupli_extrude_cursor", "properties": {}},
-    "mesh-smart-delete-f70965785c88": {"operator": "mesh.smart_delete", "properties": {}, "provider": "Interactive Tools"},
-    "view3d-ruler-add-d7b22fcd4db7": {"operator": "view3d.ruler_add", "properties": {}}
+    "view3d-ruler-add-d7b22fcd4db7": {"operator": "view3d.ruler_add", "properties": {}},
+    "parity-panning-c353ec3bc3a0-command": {"modal_value": "PANNING"},
+    "parity-snap-midpoints-on-022c0a87d2e1-command": {"modal_value": "SNAP_MIDPOINTS_ON"},
+    "parity-snap-midpoints-off-1a4bbd482ec6-command": {"modal_value": "SNAP_MIDPOINTS_OFF"},
+    "parity-snap-midpoints-on-9b0d11e1accc-command": {"modal_value": "SNAP_MIDPOINTS_ON"},
+    "parity-snap-midpoints-off-f965aef39cc2-command": {"modal_value": "SNAP_MIDPOINTS_OFF"},
+    "parity-ignore-snap-on-8ed805cf22b8-command": {"modal_value": "IGNORE_SNAP_ON"},
+    "parity-ignore-snap-off-a348ab260f70-command": {"modal_value": "IGNORE_SNAP_OFF"},
+    "parity-ignore-snap-on-a7723a2cd7ab-command": {"modal_value": "IGNORE_SNAP_ON"},
+    "parity-ignore-snap-off-19a68c35340f-command": {"modal_value": "IGNORE_SNAP_OFF"},
+    "parity-panning-bea10d416fa6-command": {"modal_value": "PANNING"},
+    "parity-panning-b57da7ad610e-command": {"modal_value": "PANNING"},
+    "parity-show-distance-angle-toggle-32391f1664f6-command": {"modal_value": "SHOW_DISTANCE_ANGLE_TOGGLE"},
+    "parity-confirm-f38ac86f4fd4-command": {"modal_value": "CONFIRM"}
   },
   "assignments": {
     "mesh-3d-view-tool-edit-mesh-spin-duplicates-ba4711cb256e": {"order": 0, "section": "mesh.tools", "feature": "mesh-mesh-spin-caeddd2fe890", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-spin-037461d1155d", "scope": {"name": "3D View Tool: Edit Mesh, Spin Duplicates", "space_type": "VIEW_3D"}, "samples": ["20006917fb115bfe4e7a77704e45835b603cdc5f4ef12abe1f0af93dabd592e7"]},
@@ -34,15 +54,28 @@
     "mesh-3d-view-tool-edit-mesh-bevel-5975e41419f3": {"order": 6, "section": "mesh.tools", "feature": "mesh-mesh-bevel-d3dbb3b1e56d", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-bevel-304f467e39ad", "scope": {"name": "3D View Tool: Edit Mesh, Bevel", "space_type": "VIEW_3D"}, "samples": ["8aa820727c50f64243e143e68a15b3e8b78ef313cf054c1437e46fcbf0d8189e"]},
     "mesh-3d-view-tool-edit-mesh-inset-faces-f97f30f63484": {"order": 7, "section": "mesh.tools", "feature": "mesh-mesh-inset-45f1516e3e51", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-inset-4b4cafdc306a", "scope": {"name": "3D View Tool: Edit Mesh, Inset Faces", "space_type": "VIEW_3D"}, "samples": ["450f04a4e645b136d511d6d1cee1d5b6d9c5122e6c28234a5a56d6654dd33bbf"]},
     "mesh-3d-view-tool-edit-mesh-extrude-to-cursor-34099ff3b52c": {"order": 8, "section": "mesh.tools", "feature": "mesh-mesh-dupli-extrude-cursor-89e7c2cc6d55", "event": "middlemouse-press-a32f80d6dfcd", "command": "mesh-dupli-extrude-cursor-e60c1f222dd7", "scope": {"name": "3D View Tool: Edit Mesh, Extrude to Cursor", "space_type": "VIEW_3D"}, "samples": ["d6599cf4a5a469492aac3e2c5435a2c904b2b000b33a3849bc6d7072acd38a87"]},
-    "mesh-3d-view-de461d8d7129": {"order": 9, "section": "mesh.modeling", "feature": "mesh-mesh-smart-delete-d2f9de0be0e2", "event": "d-press-9ba7aeacbbd3", "command": "mesh-smart-delete-f70965785c88", "scope": {"name": "Mesh"}, "samples": ["8bce3a1fb349dd222c49b6912946d61ee4ea10e13cb59b681cc10bd6e4300c51"]},
-    "other-3d-view-tool-measure-ab40c963af0b": {"order": 361, "section": "mesh.tools", "feature": "other-view3d-ruler-add-1c07ae8f6cce", "event": "middlemouse-press-a32f80d6dfcd", "command": "view3d-ruler-add-d7b22fcd4db7", "scope": {"name": "3D View Tool: Measure", "space_type": "VIEW_3D"}, "samples": ["3206445c01936acb614c20c2739a8685e463f811188e74a280081eca70da49f5"]}
+    "other-3d-view-tool-measure-ab40c963af0b": {"order": 361, "section": "mesh.tools", "feature": "other-view3d-ruler-add-1c07ae8f6cce", "event": "middlemouse-press-a32f80d6dfcd", "command": "view3d-ruler-add-d7b22fcd4db7", "scope": {"name": "3D View Tool: Measure", "space_type": "VIEW_3D"}, "samples": ["3206445c01936acb614c20c2739a8685e463f811188e74a280081eca70da49f5"]},
+    "parity-panning-c353ec3bc3a0": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-panning-c353ec3bc3a0", "event": "parity-event-e0be493c3aff", "command": "parity-panning-c353ec3bc3a0-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1049},
+    "parity-snap-midpoints-on-022c0a87d2e1": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-snap-midpoints-on-022c0a87d2e1", "event": "parity-event-e9e7967e21eb", "command": "parity-snap-midpoints-on-022c0a87d2e1-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1048},
+    "parity-snap-midpoints-off-1a4bbd482ec6": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-snap-midpoints-off-1a4bbd482ec6", "event": "parity-event-f4a4f7eed675", "command": "parity-snap-midpoints-off-1a4bbd482ec6-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1047},
+    "parity-snap-midpoints-on-9b0d11e1accc": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-snap-midpoints-on-9b0d11e1accc", "event": "parity-event-a3b638b7b148", "command": "parity-snap-midpoints-on-9b0d11e1accc-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1046},
+    "parity-snap-midpoints-off-f965aef39cc2": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-snap-midpoints-off-f965aef39cc2", "event": "parity-event-4854b97b0cd4", "command": "parity-snap-midpoints-off-f965aef39cc2-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1045},
+    "parity-ignore-snap-on-8ed805cf22b8": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-ignore-snap-on-8ed805cf22b8", "event": "parity-event-58d5538c7900", "command": "parity-ignore-snap-on-8ed805cf22b8-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1044},
+    "parity-ignore-snap-off-a348ab260f70": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-ignore-snap-off-a348ab260f70", "event": "parity-event-6cb4552c737f", "command": "parity-ignore-snap-off-a348ab260f70-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1043},
+    "parity-ignore-snap-on-a7723a2cd7ab": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-ignore-snap-on-a7723a2cd7ab", "event": "parity-event-5c5e2a766a16", "command": "parity-ignore-snap-on-a7723a2cd7ab-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1042},
+    "parity-ignore-snap-off-19a68c35340f": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-ignore-snap-off-19a68c35340f", "event": "parity-event-9eb69afd4efa", "command": "parity-ignore-snap-off-19a68c35340f-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1041},
+    "parity-panning-bea10d416fa6": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-panning-bea10d416fa6", "event": "parity-event-af2290df4eb7", "command": "parity-panning-bea10d416fa6-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1040},
+    "parity-panning-b57da7ad610e": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-panning-b57da7ad610e", "event": "parity-event-8cab6bbae531", "command": "parity-panning-b57da7ad610e-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1039},
+    "parity-show-distance-angle-toggle-32391f1664f6": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-show-distance-angle-toggle-32391f1664f6", "event": "parity-event-54fd48936d2e", "command": "parity-show-distance-angle-toggle-32391f1664f6-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1038},
+    "parity-confirm-f38ac86f4fd4": {"section": "mesh.parity-knife-tool-modal-map", "feature": "parity-confirm-f38ac86f4fd4", "event": "parity-event-cc5ee1de0974", "command": "parity-confirm-f38ac86f4fd4-command", "scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "order": 1037}
   },
   "suppressions": {
     "legacy-disable-mesh-49": {"section": "mesh.modeling", "selector": {"scope": {"name": "Mesh", "space_type": "EMPTY", "region_type": "WINDOW", "is_modal": false, "is_tool": null}, "event": {"type": "ONE", "value": "PRESS", "any": false, "shift": 0, "ctrl": 0, "alt": 0, "oskey": 0, "hyper": 0, "key_modifier": "NONE", "direction": "ANY", "repeat": false, "map_type": "KEYBOARD"}, "source_role": "default", "target": {"idname": "mesh.select_mode", "properties": {"action": "TOGGLE", "type": "VERT", "use_expand": false, "use_extend": false}}, "ledger_id": "legacy-bh-keymaps-ea3acf8", "sample_id": "legacy-disable-mesh-49"}, "disable": true},
     "legacy-disable-mesh-50": {"section": "mesh.modeling", "selector": {"scope": {"name": "Mesh", "space_type": "EMPTY", "region_type": "WINDOW", "is_modal": false, "is_tool": null}, "event": {"type": "TWO", "value": "PRESS", "any": false, "shift": 0, "ctrl": 0, "alt": 0, "oskey": 0, "hyper": 0, "key_modifier": "NONE", "direction": "ANY", "repeat": false, "map_type": "KEYBOARD"}, "source_role": "default", "target": {"idname": "mesh.select_mode", "properties": {"action": "TOGGLE", "type": "EDGE", "use_expand": false, "use_extend": false}}, "ledger_id": "legacy-bh-keymaps-ea3acf8", "sample_id": "legacy-disable-mesh-50"}, "disable": true},
     "legacy-disable-mesh-51": {"section": "mesh.modeling", "selector": {"scope": {"name": "Mesh", "space_type": "EMPTY", "region_type": "WINDOW", "is_modal": false, "is_tool": null}, "event": {"type": "THREE", "value": "PRESS", "any": false, "shift": 0, "ctrl": 0, "alt": 0, "oskey": 0, "hyper": 0, "key_modifier": "NONE", "direction": "ANY", "repeat": false, "map_type": "KEYBOARD"}, "source_role": "default", "target": {"idname": "mesh.select_mode", "properties": {"action": "TOGGLE", "type": "FACE", "use_expand": false, "use_extend": false}}, "ledger_id": "legacy-bh-keymaps-ea3acf8", "sample_id": "legacy-disable-mesh-51"}, "disable": true},
-    "legacy-addon-disable-3d-view-7": {"section": "mesh.tools", "selector": {"scope": {"name": "3D View", "space_type": "VIEW_3D", "region_type": "WINDOW", "is_modal": false, "is_tool": null}, "event": {"type": "W", "value": "PRESS", "any": false, "shift": 0, "ctrl": 0, "alt": 1, "oskey": 0, "hyper": 0, "key_modifier": "NONE", "direction": "ANY", "repeat": false, "map_type": "KEYBOARD"}, "source_role": "addon", "target": {"idname": "bc.tool_activate", "properties": {"swap_tools": true}}, "ledger_id": "legacy-bh-keymaps-ea3acf8", "sample_id": "legacy-addon-disable-3d-view-7"}, "disable": true},
-    "legacy-addon-disable-mesh-28": {"section": "mesh.tools", "selector": {"scope": {"name": "Mesh", "space_type": "EMPTY", "region_type": "WINDOW", "is_modal": false}, "event": {"type": "X", "value": "PRESS", "alt": true, "map_type": "KEYBOARD"}, "source_role": "addon", "target": {"idname": "machin3.symmetrize", "properties": {}}, "ledger_id": "legacy-bh-keymaps-ea3acf8", "sample_id": "legacy-addon-disable-mesh-28"}, "disable": true, "explicit_properties": true},
-    "legacy-addon-disable-mesh-29": {"section": "mesh.tools", "selector": {"scope": {"name": "Mesh", "space_type": "EMPTY", "region_type": "WINDOW", "is_modal": false}, "event": {"type": "ONE", "value": "PRESS", "map_type": "KEYBOARD"}, "source_role": "addon", "target": {"idname": "machin3.smart_vert", "properties": {}}, "ledger_id": "legacy-bh-keymaps-ea3acf8", "sample_id": "legacy-addon-disable-mesh-29"}, "disable": true, "explicit_properties": true}
+    "parity-disable-c51093dbc1f4": {"section": "mesh.parity-knife-tool-modal-map", "selector": {"scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "event": {"alt": -1, "any": true, "ctrl": -1, "hyper": -1, "oskey": -1, "shift": -1, "type": "LEFT_SHIFT"}, "source_role": "default", "target": {"modal_value": "SNAP_MIDPOINTS_ON"}}, "disable": true, "requires_assignment": "parity-ignore-snap-on-8ed805cf22b8"},
+    "parity-disable-567430c189af": {"section": "mesh.parity-knife-tool-modal-map", "selector": {"scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "event": {"alt": -1, "any": true, "ctrl": -1, "hyper": -1, "oskey": -1, "shift": -1, "type": "LEFT_SHIFT", "value": "RELEASE"}, "source_role": "default", "target": {"modal_value": "SNAP_MIDPOINTS_OFF"}}, "disable": true, "requires_assignment": "parity-ignore-snap-off-a348ab260f70"},
+    "parity-disable-76899ba8bdea": {"section": "mesh.parity-knife-tool-modal-map", "selector": {"scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "event": {"alt": -1, "any": true, "ctrl": -1, "hyper": -1, "oskey": -1, "shift": -1, "type": "RIGHT_SHIFT"}, "source_role": "default", "target": {"modal_value": "SNAP_MIDPOINTS_ON"}}, "disable": true, "requires_assignment": "parity-ignore-snap-on-a7723a2cd7ab"},
+    "parity-disable-ecd03e4b6464": {"section": "mesh.parity-knife-tool-modal-map", "selector": {"scope": {"is_modal": true, "name": "Knife Tool Modal Map"}, "event": {"alt": -1, "any": true, "ctrl": -1, "hyper": -1, "oskey": -1, "shift": -1, "type": "RIGHT_SHIFT", "value": "RELEASE"}, "source_role": "default", "target": {"modal_value": "SNAP_MIDPOINTS_OFF"}}, "disable": true, "requires_assignment": "parity-ignore-snap-off-19a68c35340f"}
   }
 }

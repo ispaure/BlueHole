@@ -10,13 +10,52 @@ from bl_keymap_utils import keymap_hierarchy
 from . import deluxe_editor_ops as ops
 from .deluxe_editor_model import (STATUS_LABELS, binding_context_path, binding_context_tree,
                                   context_label, display_value, key_filter, scope_key, shortcut, title)
-from ....keymaps.deluxe_schema import same_value
+from ....keymaps.deluxe_schema import assignment_required, same_value
+
+_pending_icons = None
+
+
+def pending_icon(kind):
+    global _pending_icons
+    if _pending_icons is None:
+        from pathlib import Path
+        import bpy.utils.previews
+        _pending_icons = bpy.utils.previews.new()
+        root = Path(__file__).resolve().parent / 'icons'
+        for name in ('ADD', 'REMOVE', 'FILE_REFRESH'):
+            _pending_icons.load(name, str(root / ('pending-' + name.lower() + '.png')), 'IMAGE')
+    return _pending_icons[kind if kind in _pending_icons else 'ADD'].icon_id
+
+
+def release_pending_icons():
+    global _pending_icons
+    from . import colored_labels
+    colored_labels.clear()
+    if _pending_icons is not None:
+        import bpy.utils.previews
+        bpy.utils.previews.remove(_pending_icons)
+        _pending_icons = None
+
 
 COMPACT_WIDTH = 440
 DETAIL_PANE_MIN_WIDTH = 680
 TWO_COLUMN_FIELDS_MIN_WIDTH = 520
 ASSIGNMENT_TABLE_MIN_WIDTH = 380
 LIST_WIDTH_FRACTION = 0.41
+
+
+def balanced_rows(items, maximum=12):
+    """Keep tab rows even, with at most `maximum` controls in each row."""
+    items = list(items)
+    count = (len(items) + maximum - 1) // maximum
+    if not count:
+        return
+    size, extra = divmod(len(items), count)
+    offset = 0
+    for index in range(count):
+        length = size + (index < extra)
+        yield items[offset:offset + length]
+        offset += length
 
 
 def find(text, query):
@@ -96,10 +135,11 @@ def binding_filters(layout, current, preview):
     ops.operator_button(bar, 'all_bindings', 'All Bindings', icon='HOME',
                         depress=current.binding_all and not view.search)
     categories = current.catalog['categories']
-    tabs = group.row(align=True)
-    for id_, row in categories.items():
-        ops.operator_button(tabs, 'feature_category', row['label'], id_,
-                            depress=not current.binding_all and id_ == current.category)
+    for entries in balanced_rows(categories.items()):
+        tabs = group.row(align=True)
+        for id_, row in entries:
+            ops.operator_button(tabs, 'feature_category', row['label'], id_,
+                                depress=not current.binding_all and id_ == current.category)
     if current.binding_all or not categories:
         return True
     category = categories[current.category]
@@ -112,12 +152,16 @@ def binding_filters(layout, current, preview):
     if not sections:
         group.label(text='No subsections')
         return True
-    tabs = group.row(align=True)
-    ops.operator_button(tabs, 'all_subsections', 'All ' + category['label'], depress=current.binding_category_all)
-    for id_ in sections:
-        row = current.catalog['sections'][id_]
-        ops.operator_button(tabs, 'feature_section', row['label'], id_,
-                            depress=not current.binding_category_all and id_ == current.section)
+    for entries in balanced_rows(['', *sections]):
+        tabs = group.row(align=True)
+        for id_ in entries:
+            if not id_:
+                ops.operator_button(tabs, 'all_subsections', 'All ' + category['label'],
+                                    depress=current.binding_category_all)
+            else:
+                row = current.catalog['sections'][id_]
+                ops.operator_button(tabs, 'feature_section', row['label'], id_,
+                                    depress=not current.binding_category_all and id_ == current.section)
     if current.binding_category_all:
         return True
     section = current.catalog['sections'][current.section]
@@ -198,7 +242,11 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
         return
     listing, detail, list_width = detail_columns(layout, width, detail_first=True)
     detail_width = width - list_width if width >= DETAIL_PANE_MIN_WIDTH else width
-    listing.label(text=f'{len(found)} {"binding" if len(found) == 1 else "bindings"}')
+    header = listing.row(align=True)
+    removals = sum(id_ in catalog['suppressions'] for id_ in found)
+    header.label(text=f'{len(found) - removals} assignments · {removals} removal rules')
+    ops.operator_button(header, 'expand_binding_contexts', 'Expand All', icon='TRIA_DOWN')
+    ops.operator_button(header, 'collapse_binding_contexts', 'Collapse All', icon='TRIA_RIGHT')
     listing.separator(factor=0.5)
     if current.assignment not in found:
         current.assignment = next(iter(found), '')
@@ -212,7 +260,8 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
     row_key = repr((key, current.binding_selection_path, tuple(current.binding_context_expansion.items())))
     ops.sync_binding_rows(view, row_key,
                           lambda: binding_rows(current, preview, contexts, found, searching=bool(query)),
-                          current.assignment)
+                          current.assignment, focus_context=current.binding_focus_context)
+    current.binding_focus_context = ''
     listing.template_list(BH_UL_deluxe_bindings.__name__, '', view, 'binding_rows', view,
                           'binding_index', rows=18, maxrows=18, sort_lock=True, item_dyntip_propname='tooltip')
     if current.assignment in catalog['assignments']:
@@ -245,7 +294,7 @@ def binding_rows(current, preview, contexts, found, *, searching, depth=0):
             if not state['eligible'] or not state.get('active', True):
                 command += ' (Inactive)'
             yield dict(kind='binding', target=id_, label=command, shortcut=event, depth=depth + 1,
-                       icon=icon, tooltip=origin, rule=is_rule, removable=is_rule or state['editable'])
+                       icon=icon, tooltip=origin, rule=is_rule, pending=current.binding_pending(id_, preview), removable=is_rule or state['editable'])
         if context.scope is not None:
             section = ''
             if current.binding_all and context.bindings:
@@ -274,15 +323,24 @@ class BH_UL_deluxe_bindings(bpy.types.UIList):
             width = context.region.width / scale
             list_width = width * LIST_WIDTH_FRACTION if width >= DETAIL_PANE_MIN_WIDTH else width
             content = row.split(factor=0.60, align=True) if list_width >= ASSIGNMENT_TABLE_MIN_WIDTH else row
-            content.alert = item.icon == 'REMOVE'
-            if item.icon == 'REMOVE':
+            content.alert = item.icon == 'REMOVE' and not item.pending
+            if item.pending:
+                from .colored_labels import label as pending_label
+                cell = content.row(align=True)
+                cell.label(text='', icon_value=pending_icon(item.icon))
+                available = max(40, list_width - 80 - item.depth * 6)
+                pending_label(cell, item.label, width=available * (0.60 if content != row else 1) - 20)
+            elif item.icon == 'REMOVE':
                 # Native list selection keeps this label clickable without
                 # turning Blender's alert colour into a filled button.
                 content.label(text=item.label, icon=item.icon)
             else:
                 ops.operator_button(content, 'assignment', item.label, item.target, icon=item.icon, emboss=False)
             if content != row:
-                content.label(text=item.shortcut)
+                if item.pending:
+                    pending_label(content, item.shortcut, width=available * 0.40)
+                else:
+                    content.label(text=item.shortcut)
             remove = row.row(align=True)
             remove.alert = False
             remove.enabled = item.removable
@@ -328,6 +386,9 @@ def inspector(layout, current, preview, id_, *, width):
 
     command = layout.box().column(align=True)
     command.label(text='COMMAND')
+    if 'modal_value' in current.catalog['commands'][row['command']]:
+        command.label(text='Modal action: ' + current.catalog['commands'][row['command']]['modal_value'])
+        return
     control = ops.inline_value(ops.state(bpy.context), 'operator', 'operator_id',
                                current.catalog['commands'][row['command']]['operator'],
                                command=row['command'], assignment=id_)
@@ -424,7 +485,7 @@ def command_fields(layout, current, id_, *, width, assignment=''):
     properties = command.get('properties', {})
     fields = meta['fields']
     view = ops.state(bpy.context)
-    editable = not current.catalog['sections'][current.catalog['assignments'][assignment]['section']].get('required')
+    editable = not assignment_required(current.catalog, current.catalog['assignments'][assignment])
     group = layout.box()
     group.label(text='PROPERTIES')
     if fields:
@@ -591,6 +652,7 @@ def register():
 
 
 def unregister():
+    release_pending_icons()
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
     ops.unregister()

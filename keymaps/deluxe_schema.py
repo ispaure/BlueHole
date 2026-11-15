@@ -61,9 +61,11 @@ def toggle(row, key, default=True):
 def property_value(value, depth=0):
     if type(value) in (bool, int, str):
         return not isinstance(value, str) or len(value) <= 4096 and '\0' not in value
+    if isinstance(value, dict):
+        return depth < 4 and all(isinstance(k, str) and PROPERTY.fullmatch(k) and property_value(v, depth + 1) for k, v in value.items())
     if type(value) is float:
         return math.isfinite(value)
-    return (depth < 2 and isinstance(value, list) and len(value) <= 64
+    return (depth < 4 and isinstance(value, list) and len(value) <= 64
             and all(property_value(part, depth + 1) for part in value))
 
 
@@ -124,6 +126,10 @@ def row_location(table, id_):
         raise issue from error
 
 
+def assignment_required(catalog, row):
+    return bool(row.get('required') or catalog['sections'][row['section']].get('required'))
+
+
 def validate_catalog(catalog):
     record(catalog, ('schema_version', 'catalog_version', 'base', *TABLES))
     require(type(catalog['schema_version']) is int and catalog['schema_version'] == SCHEMA_VERSION,
@@ -173,15 +179,19 @@ def validate_catalog(catalog):
     for id_, row in assignments.items():
         with row_location('assignments', id_):
             record(row, ('section', 'feature', 'event', 'command', 'scope', 'order'),
-                   ('active', 'enabled', 'samples', 'kind'))
+                   ('active', 'enabled', 'samples', 'kind', 'dispatch_group', 'required'))
             for key, table in (('section', 'sections'), ('event', 'events'), ('command', 'commands')):
                 require(identifier(row[key]) and row[key] in catalog[table], f'Missing {key} reference')
             require(identifier(row['feature']), 'Invalid feature owner')
+            require('dispatch_group' not in row or identifier(row['dispatch_group']),
+                    'Invalid dispatch group')
             scope = scope_descriptor(row['scope'])
-            require(not scope.is_modal and scope.is_tool in (None, False)
-                    and 'operator' in catalog['commands'][row['command']], 'Unsupported assignment scope or command')
+            require(scope.is_tool in (None, False) and
+                    ('modal_value' if scope.is_modal else 'operator') in catalog['commands'][row['command']],
+                    'Unsupported assignment scope or command')
             toggle(row, 'enabled')
             toggle(row, 'active')
+            toggle(row, 'required', False)
             require(row.get('kind', 'addition') in ('addition', 'precedence'), 'Invalid assignment kind')
             order = row['order']
             require(type(order) is int and order >= 0 and order not in orders, 'Invalid or duplicate assignment order')
@@ -196,16 +206,20 @@ def validate_catalog(catalog):
     require(max(features.values(), default=0) <= 16, 'Feature exceeds runtime request budget')
     for id_, row in catalog['suppressions'].items():
         with row_location('suppressions', id_):
-            record(row, ('section', 'selector'), ('enabled', 'replacement', 'disable', 'explicit_properties'))
+            record(row, ('section', 'selector'), ('enabled', 'replacement', 'disable', 'explicit_properties', 'requires_assignment'))
+            require('requires_assignment' not in row or row['requires_assignment'] in assignments,
+                    'Missing prerequisite assignment')
             require(identifier(row['section']) and row['section'] in catalog['sections'],
                     'Missing suppression section')
             selector_descriptor(row['selector'])
             toggle(row, 'enabled')
             toggle(row, 'disable', False)
+            require('requires_assignment' not in row or row.get('disable'),
+                    'Only disables may require an assignment')
             toggle(row, 'explicit_properties', False)
             require(not row.get('explicit_properties') or
-                    (row.get('disable') and row['selector']['source_role'] == 'addon'),
-                    'Explicit-property matching is only for imported add-on disables')
+                    (row.get('disable') and row['selector']['source_role'] in {'default', 'addon'}),
+                    'Explicit-property matching is only for inherited disables')
             require(not (row.get('disable') and 'replacement' in row), 'Choose disable or replacement')
             if 'replacement' in row:
                 require(identifier(row['replacement']) and row['replacement'] in catalog['commands'],
@@ -246,7 +260,7 @@ def independent_commands(catalog):
     commands = result['commands']
     owners = set()
     bindings = sorted(result['assignments'].items(), key=lambda entry: (
-        not result['sections'][entry[1]['section']].get('required', False), entry[1]['order']))
+        not assignment_required(result, entry[1]), entry[1]['order']))
     references = [('assignments', id_, row, 'command') for id_, row in bindings]
     references += [('suppressions', id_, row, 'replacement')
                    for id_, row in result['suppressions'].items() if 'replacement' in row]

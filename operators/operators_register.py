@@ -47,7 +47,8 @@ from . import (
     source_control_ops,
     theme_ops,
     transform_ops,
-    ui_ops
+    ui_ops,
+    update_ops
 )
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +79,8 @@ OPERATOR_MODULES = (
     source_control_ops,
     theme_ops,
     transform_ops,
-    ui_ops
+    ui_ops,
+    update_ops
 )
 
 # ----------------------------------------------------------------------------------------------------------------------

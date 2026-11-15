@@ -19,6 +19,7 @@ import bpy
 from bpy.props import *
 
 from ...blenderUtils import blenderFile
+from ...blenderUtils import addon_updates
 from ...Lib.commonUtils.configuration import legacy as configUtils
 
 
@@ -32,6 +33,14 @@ show_verbose = True
 # CODE
 
 class HelpUpdatePG(bpy.types.PropertyGroup):
+
+    update_channel: EnumProperty(
+        name='Update channel',
+        description='Use the newest compatible Blender branch in this channel',
+        items=[('main', 'Main', 'Stable updates'), ('beta', 'Beta', 'Beta updates'),
+               ('alpha', 'Alpha', 'Development updates')],
+        default='main', update=addon_updates.invalidate,
+    )
 
     # UPDATES -----------------------------------------------------------------------------------------
 
@@ -59,6 +68,12 @@ def label_row(path, prop, row, label=''):
 def draw(preference, context, layout):
 
     column = layout.column()
+    updates = column.box()
+    updates.label(text='Blue Hole Updates')
+    addon_updates.draw_update(updates, details=True)
+    updates.label(text='Updates install only when you press Update Blue Hole.')
+    updates.label(text='Custom environments are kept; the default environment is updated.')
+    column.separator()
 
     # Support
     row = column.row()
@@ -78,14 +93,6 @@ def draw(preference, context, layout):
     row = column.row()
     row.operator("wm.bh_help_submit_feedback", text='Submit Feedback', icon='WINDOW')
     row.operator("wm.bh_join_bh_discord", text='Join the Blue Hole Discord', icon='FUND')
-
-    # Updates
-    row = column.row()
-    row.label(text="Updates (Coming soon):")
-
-    row = column.row()
-    row.prop(preference.help_n_update, 'auto_update_addon', text='Automatic Updates')
-    row.enabled = False
 
 
 # ----------------------------------------------------------------------------------------------------------------------

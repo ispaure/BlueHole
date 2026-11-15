@@ -20,7 +20,7 @@ import bpy
 
 # Blue Hole
 from ....preferences.prefs import *
-from ....blenderUtils import blenderFile
+from ....blenderUtils import blenderFile, addon_updates
 from ....operators import external_addon_ops, environment_ops
 from . import (
     containers_menu,
@@ -48,6 +48,8 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
 
         self.bl_label = f'{header_bh_name} [' + str(prefs().general.active_environment.lower()) + ']'
         layout = self.layout
+        addon_updates.draw_update(layout)
+        layout.separator()
         layout.operator(environment_ops.WM_OT_SetActiveEnvironment.bl_idname)
         layout.menu(directories_menu.BLUE_HOLE_MT_directories.bl_idname, icon='FILE_FOLDER')
         layout.menu(containers_menu.BLUE_HOLE_MT_containers.bl_idname, icon='OUTLINER')
@@ -90,7 +92,7 @@ class BLUE_HOLE_MT_top_menu(bpy.types.Menu):
         layout.menu(update_menus.BLUE_HOLE_MT_update_deluxe.bl_idname, icon='UV_SYNC_SELECT')
 
     def menu_draw(self, context):
-        self.layout.menu("BLUE_HOLE_MT_top_menu")  # Don't replace by self.bl_idname, does not work for some reason.
+        self.layout.menu("BLUE_HOLE_MT_top_menu", text=header_bh_name + (" • Update" if addon_updates.state["status"] == "available" else ""))  # Don't replace by self.bl_idname, does not work for some reason.
 
 
 # ----------------------------------------------------------------------------------------------------------------------
