@@ -27,9 +27,9 @@ _cursor = 0
 
 
 def _valid(record):
-    return (runtime._same(runtime._config(record.selector.source_role), record.config)
-            and runtime._contains(record.config.keymaps, record.map)
-            and runtime._contains(record.map.keymap_items, record.item)
+    return (runtime.same_identity(runtime.configuration(record.selector.source_role), record.config)
+            and runtime.contains_native(record.config.keymaps, record.map)
+            and runtime.contains_native(record.map.keymap_items, record.item)
             and record.item.id == record.item_id
             and runtime.capture_scope(record.map) == record.selector.scope)
 
@@ -39,28 +39,28 @@ def _snapshot(record, active):
 
 
 def _merged_item(selector, item_id, active):
-    merged = runtime._one_map(runtime._config('user'), selector.scope)
+    merged = runtime.matching_map(runtime.configuration('user'), selector.scope)
     # Blender assigns new IDs to add-on rows when merging them. Match the
     # complete unique snapshot there; source identity still controls restoration.
     matches = [item for item in merged.keymap_items
                if (item.id == item_id if selector.source_role == 'default' else
                    item.idname == selector.target.idname and runtime.capture_event(item) == selector.event
-                   and runtime._snapshot(item, selector.scope.is_modal) == (selector.event, selector.target, active))]
+                   and runtime.snapshot_item(item, selector.scope.is_modal) == (selector.event, selector.target, active))]
     if len(matches) != 1:
-        raise runtime._Pending('merged_source_missing_or_edited')
+        raise runtime.Pending('merged_source_missing_or_edited')
     item = matches[0]
     if (item.is_user_modified or item.is_user_defined
-            or runtime._snapshot(item, selector.scope.is_modal) != (selector.event, selector.target, active)):
-        raise runtime._Pending('user_binding_modified', 'unsupported')
+            or runtime.snapshot_item(item, selector.scope.is_modal) != (selector.event, selector.target, active)):
+        raise runtime.Pending('user_binding_modified', 'unsupported')
     return item
 
 
 def _preflight(selector):
     if (selector.source_role not in {'default', 'addon'} or selector.scope.is_tool
-            or not runtime._same(runtime._config('active'), runtime._config('default'))):
-        raise runtime._Pending('only_inherited_blender_bindings', 'unsupported')
-    config, map_, item = runtime._exact_source(selector)
-    runtime._preflight_merged_source(selector)
+            or not runtime.same_identity(runtime.configuration('active'), runtime.configuration('default'))):
+        raise runtime.Pending('only_inherited_blender_bindings', 'unsupported')
+    config, map_, item = runtime.exact_source(selector)
+    runtime.verify_merged_source(selector)
     _merged_item(selector, item.id, True)
     return DisabledBinding(selector, config, map_, item, item.id)
 
@@ -71,7 +71,7 @@ def managed_rule(map_, item):
         if (not record.pending and _valid(record)
                 and (record.selector.source_role == 'addon' or item.id == record.item_id)
                 and runtime.capture_scope(map_) == record.selector.scope
-                and runtime._snapshot(item, record.selector.scope.is_modal) == _snapshot(record, False)):
+                and runtime.snapshot_item(item, record.selector.scope.is_modal) == _snapshot(record, False)):
             return id_, record.selector
     return None
 
@@ -85,17 +85,17 @@ def _resolve(selector, explicit_properties):
     if not explicit_properties:
         return selector
     if selector.source_role not in {'default', 'addon'} or selector.scope.is_modal:
-        raise runtime._Pending('invalid_explicit_property_selector', 'unsupported')
-    map_ = runtime._one_map(runtime._config(selector.source_role), selector.scope)
+        raise runtime.Pending('invalid_explicit_property_selector', 'unsupported')
+    map_ = runtime.matching_map(runtime.configuration(selector.source_role), selector.scope)
     matches = []
     for item in map_.keymap_items:
         if item.idname != selector.target.idname or runtime.capture_event(item) != selector.event:
             continue
         target = runtime.capture_target(item, modal=False)
-        if runtime._declared_properties_match(target.properties, selector.target.properties):
+        if runtime.declared_properties_match(target.properties, selector.target.properties):
             matches.append(target)
     if len(matches) != 1:
-        raise runtime._Pending('ambiguous_source' if matches else 'source_missing_or_edited')
+        raise runtime.Pending('ambiguous_source' if matches else 'source_missing_or_edited')
     return replace(selector, target=matches[0])
 
 
@@ -104,12 +104,12 @@ def status(selector, *, explicit_properties=False):
         for id_, record in _bindings.items():
             if (_requests.get(id_) == (selector, explicit_properties)
                     and not record.pending and _valid(record)):
-                if runtime._snapshot(record.item, record.selector.scope.is_modal) == _snapshot(record, False):
+                if runtime.snapshot_item(record.item, record.selector.scope.is_modal) == _snapshot(record, False):
                     _merged_item(record.selector, record.item_id, False)
                     return 'resolved', ''
         _preflight(_resolve(selector, explicit_properties))
         return 'resolved', ''
-    except runtime._Pending as error:
+    except runtime.Pending as error:
         state = ('ambiguous' if error.reason.startswith('ambiguous') else
                  'unsupported' if error.status == 'unsupported' else 'missing')
         return state, error.reason
@@ -121,17 +121,17 @@ def install(id_, selector, *, explicit_properties=False):
         selector = _resolve(selector, explicit_properties)
         # An absent provider should not force a native keyconfig rebuild on
         # every watcher tick. Flush only after finding an actual source.
-        runtime._exact_source(selector)
-        runtime._update_merged()
+        runtime.exact_source(selector)
+        runtime.flush_merged()
         record = _preflight(selector)
-    except runtime._Pending as error:
+    except runtime.Pending as error:
         _results[id_] = (error.status, error.reason)
         return
     _bindings[id_] = record
     try:
         record.item.active = False
-        runtime._update_merged()
-        if not _valid(record) or runtime._snapshot(record.item, record.selector.scope.is_modal) != _snapshot(record, False):
+        runtime.flush_merged()
+        if not _valid(record) or runtime.snapshot_item(record.item, record.selector.scope.is_modal) != _snapshot(record, False):
             raise RuntimeError('Default binding changed while disabling it')
         _merged_item(selector, record.item_id, False)
     except Exception:
@@ -159,10 +159,10 @@ def reconcile(*, budget=4, time_budget=0.004):
                 if _valid(record):
                     # An in-place edit belongs to the artist. Never keep
                     # disabling it; a recreated provider item is a new source.
-                    if runtime._snapshot(record.item, record.selector.scope.is_modal) != _snapshot(record, False):
+                    if runtime.snapshot_item(record.item, record.selector.scope.is_modal) != _snapshot(record, False):
                         _results[id_] = ('pending', 'source_binding_edited')
                     continue
-            except (runtime._Pending, AttributeError, ReferenceError, RuntimeError, TypeError):
+            except (runtime.Pending, AttributeError, ReferenceError, RuntimeError, TypeError):
                 continue
             del _bindings[id_]
         selector, explicit_properties = _requests[id_]
@@ -176,17 +176,17 @@ def retry_cleanup():
         if not record.pending:
             continue
         try:
-            if _valid(record) and runtime._snapshot(record.item, record.selector.scope.is_modal) == _snapshot(record, False):
+            if _valid(record) and runtime.snapshot_item(record.item, record.selector.scope.is_modal) == _snapshot(record, False):
                 record.item.active = True
                 changed = True
-                if runtime._snapshot(record.item, record.selector.scope.is_modal) != _snapshot(record, True):
+                if runtime.snapshot_item(record.item, record.selector.scope.is_modal) != _snapshot(record, True):
                     continue
             # Gone or edited entries no longer authorize mutation.
             del _bindings[id_]
-        except (runtime._Pending, AttributeError, ReferenceError, RuntimeError, TypeError):
+        except (runtime.Pending, AttributeError, ReferenceError, RuntimeError, TypeError):
             continue
     if changed:
-        runtime._request_merged_update()
+        runtime.request_merged_update()
     return pending_cleanup()
 
 
@@ -219,10 +219,10 @@ def registration_results(ids=None):
         if ids is not None and id_ not in ids:
             continue
         try:
-            intact = not record.pending and _valid(record) and runtime._snapshot(record.item, record.selector.scope.is_modal) == _snapshot(record, False)
+            intact = not record.pending and _valid(record) and runtime.snapshot_item(record.item, record.selector.scope.is_modal) == _snapshot(record, False)
             if intact:
                 _merged_item(record.selector, record.item_id, False)
-        except (runtime._Pending, AttributeError, ReferenceError, RuntimeError, TypeError):
+        except (runtime.Pending, AttributeError, ReferenceError, RuntimeError, TypeError):
             intact = False
         if not intact:
             results[id_] = ('pending', 'default_binding_changed_or_unreadable')

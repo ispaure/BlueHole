@@ -8,7 +8,7 @@ from hashlib import sha256
 import math
 import re
 
-from .keymap_utils import KeymapEvent, KeymapScope, KeymapSelector, KeymapTarget
+from .descriptors import KeymapEvent, KeymapScope, KeymapSelector, KeymapTarget
 
 SCHEMA_VERSION = 1
 TABLES = ('categories', 'sections', 'events', 'commands', 'assignments', 'suppressions')

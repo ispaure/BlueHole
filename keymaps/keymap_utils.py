@@ -13,16 +13,17 @@ __status__ = 'Production'
 
 from dataclasses import dataclass, field
 from contextlib import contextmanager
+from collections.abc import Mapping
 import math
 import sys
 import time
-from collections.abc import Mapping
 
 import bpy
+from .provider_policy import PROVIDERS, module_matches
 
-EVENT_FIELDS = ('type', 'value', 'any', 'shift', 'ctrl', 'alt', 'oskey',
-                'hyper', 'key_modifier', 'direction', 'repeat', 'map_type')
-SCOPE_FIELDS = ('name', 'space_type', 'region_type', 'is_modal', 'is_tool')
+from .descriptors import (EVENT_FIELDS, SCOPE_FIELDS, KeymapScope, KeymapEvent, KeymapTarget,
+                          KeymapAssignment, KeymapSelector, KeymapOverride, KeymapDiagnostic, freeze as _freeze)
+
 _CONTEXT_PROOFS = frozenset(('stock_object_mode_select_all',
                              'synthetic_ordinary_provider',
                              'machin3tools_object_toggle_smooth',
@@ -30,17 +31,6 @@ _CONTEXT_PROOFS = frozenset(('stock_object_mode_select_all',
 _MODAL_PROOF = 'transform_translate_precision_cancel'
 _MISSING = object()
 
-
-def _freeze(value):
-    if value is None or type(value) in (str, bool, int):
-        return value
-    if type(value) is float and math.isfinite(value):
-        return 0.0 if value == 0 else value
-    if isinstance(value, Mapping):
-        return tuple(sorted((str(k), _freeze(v)) for k, v in value.items()))
-    if isinstance(value, (tuple, list)):
-        return tuple(_freeze(v) for v in value)
-    raise ValueError('unreadable_property_schema')
 
 
 def _freeze_rna_array(prop, value):
@@ -120,68 +110,6 @@ def _remove_native_item(map_, item):
     map_.keymap_items.remove(item)
 
 
-@dataclass(frozen=True)
-class KeymapScope:
-    name: str
-    space_type: str = 'EMPTY'
-    region_type: str = 'WINDOW'
-    is_modal: bool = False
-    is_tool: bool | None = None
-
-
-@dataclass(frozen=True)
-class KeymapEvent:
-    type: str
-    value: str = 'PRESS'
-    any: bool = False
-    shift: bool | int = False
-    ctrl: bool | int = False
-    alt: bool | int = False
-    oskey: bool | int = False
-    hyper: bool | int | None = False
-    key_modifier: str = 'NONE'
-    direction: str = 'ANY'
-    repeat: bool = False
-    map_type: str = 'KEYBOARD'
-
-
-@dataclass(frozen=True)
-class KeymapTarget:
-    idname: str = ''
-    properties: tuple = ()
-    modal_value: str = ''
-
-    def __post_init__(self):
-        object.__setattr__(self, 'properties', _freeze(dict(self.properties)))
-        if bool(self.idname) == bool(self.modal_value):
-            raise ValueError('Target requires exactly one operator or modal token')
-
-
-@dataclass(frozen=True)
-class KeymapAssignment:
-    request_id: str
-    scope: KeymapScope
-    event: KeymapEvent
-    target: KeymapTarget
-    ledger_id: str = ''
-    sample_id: str = ''
-    declared_properties_only: bool = False
-    active: bool = True
-    requires_operator: bool = False
-    required_class: str = ''
-    required_addon: str = ''
-    dispatch_group: str = ''
-
-
-@dataclass(frozen=True)
-class KeymapSelector:
-    scope: KeymapScope
-    event: KeymapEvent
-    target: KeymapTarget
-    source_role: str = 'default'
-    ledger_id: str = ''
-    sample_id: str = ''
-
 
 def _selector_key(selector):
     return (selector.scope, selector.event, selector.target, selector.source_role)
@@ -202,43 +130,10 @@ def _assignment_dependency_ready(request):
 def _addon_enabled(name):
     # Logistics may install the same provider as a legacy add-on or as an
     # extension in any repository namespace.
-    return any((module_name == name or module_name.startswith('bl_ext.') and module_name.endswith('.' + name))
+    return any(module_matches(module_name, (name,))
                and getattr(module, '__addon_enabled__', False)
                for module_name, module in tuple(sys.modules.items()))
 
-
-@dataclass(frozen=True)
-class KeymapOverride:
-    request_id: str
-    selector: KeymapSelector
-    replacement: KeymapTarget
-    capability: str = ''
-    context: str = ''
-    ledger_id: str = ''
-    sample_id: str = ''
-    replacement_event: KeymapEvent | None = field(default=None, init=False)
-    replacement_active: bool = field(default=True, init=False)
-
-    def __post_init__(self):
-        if isinstance(self.replacement, KeymapAssignment):
-            assignment = self.replacement
-            object.__setattr__(self, 'replacement_event', assignment.event)
-            object.__setattr__(self, 'replacement_active', assignment.active)
-            object.__setattr__(self, 'replacement', assignment.target)
-
-
-@dataclass(frozen=True)
-class KeymapDiagnostic:
-    owner_id: str
-    request_id: str
-    status: str
-    reason: str
-    ledger_id: str = ''
-    sample_id: str = ''
-    observed_role: str = ''
-    observed_context: str = ''
-    pending_capability: str = ''
-    dispatch_evidence: bool = False
 
 
 @dataclass
@@ -1103,24 +998,27 @@ def _proof_generation(proof):
 
 
 def _verify_machin3_provider(source_map, source_item):
-    module = sys.modules.get('MACHIN3tools')
-    if module is None or getattr(module, '__addon_enabled__', False) is not True:
+    policy = PROVIDERS['MACHIN3tools']
+    matches = [(name, module) for name, module in tuple(sys.modules.items())
+               if module_matches(name, policy.modules) and getattr(module, '__addon_enabled__', False) is True]
+    if len(matches) != 1:
         _PROVIDER_REF_IDS.clear()
         raise _Pending('provider_unavailable', role='addon')
+    module_name, module = matches[0]
     if any(record[0] is not module for record in _PROVIDER_REF_IDS.values()):
         _PROVIDER_REF_IDS.clear()
     info = getattr(module, 'bl_info', None)
     version = info.get('version', ()) if isinstance(info, dict) else ()
-    if not isinstance(version, (tuple, list)) or tuple(version[:3]) != (1, 13, 2):
+    if not isinstance(version, (tuple, list)) or tuple(version[:3]) not in policy.replacement_versions:
         raise _Pending('unproved_provider_version', 'unsupported', 'addon')
     addons = getattr(getattr(bpy.context, 'preferences', None), 'addons', None)
     if addons is None:
         _PROVIDER_REF_IDS.clear()
         raise _Pending('provider_unavailable', role='addon')
     try:
-        entry = addons.get('MACHIN3tools') if hasattr(addons, 'get') else next(
-            (entry for entry in addons if getattr(entry, 'module', None) == 'MACHIN3tools'), None)
-        if entry is None or getattr(entry, 'module', None) != 'MACHIN3tools' or \
+        entry = addons.get(module_name) if hasattr(addons, 'get') else next(
+            (entry for entry in addons if getattr(entry, 'module', None) == module_name), None)
+        if entry is None or getattr(entry, 'module', None) != module_name or \
                 getattr(getattr(entry, 'preferences', None), 'activate_smooth', None) is not True:
             _PROVIDER_REF_IDS.clear()
             raise _Pending('provider_unavailable', role='addon')
@@ -1790,3 +1688,78 @@ def find_matching_kmi(km, idname, property_name=None, property_value=None):
 def remove_matching_kmis(km, idname, property_name=None, property_value=None):
     """Legacy name retained for callers; matching cannot authorize deletion."""
     return 0
+
+
+# Public Blender adapter boundary. Internal ownership records never leave this module.
+Pending = _Pending
+
+
+def configuration(role):
+    return _config(role)
+
+
+def native_identity(value):
+    return _pointer(value)
+
+
+def same_identity(left, right):
+    return _same(left, right)
+
+
+def contains_native(collection, value):
+    return _contains(collection, value)
+
+
+def matching_maps(config, scope):
+    return _maps(config, scope)
+
+
+def matching_map(config, scope, *, required=True):
+    return _one_map(config, scope, required=required)
+
+
+def exact_source(selector):
+    return _exact_source(selector)
+
+
+def verify_merged_source(selector):
+    return _preflight_merged_source(selector)
+
+
+def snapshot_item(item, modal):
+    return _snapshot(item, modal)
+
+
+def flush_merged():
+    return _update_merged()
+
+
+def request_merged_update():
+    return _request_merged_update()
+
+
+def provider_enabled(name):
+    return _addon_enabled(name)
+
+
+def verify_override(request):
+    return _preflight_override(request)
+
+
+def declared_properties_match(actual, expected):
+    return _declared_properties_match(actual, expected)
+
+
+def release_features(owners):
+    """Release selected owners in reverse registration order."""
+    selected = set(owners)
+    return tuple((owner, handle.release()) for owner, handle in reversed(tuple(_FEATURES.items()))
+                 if owner in selected)
+
+
+def owned_item_tokens(config):
+    """Immutable native identities used to exclude our own modal aliases."""
+    pointer = _pointer(config)
+    return frozenset((owned.map_pointer, owned.item_pointer, owned.item_id)
+                     for handle in _FEATURES.values() for owned in handle._owned.values()
+                     if owned.config_pointer == pointer)

@@ -2,10 +2,10 @@
 
 from collections import defaultdict
 from copy import deepcopy
-from dataclasses import replace
 from hashlib import sha256
 from pathlib import Path
-from uuid import uuid4
+from .profile_draft import Draft
+from .registration import RegistrationService
 
 from ..Lib.commonUtils.formats.jsonType import JSONFile
 from ..Lib.commonUtils.persistence.locking import file_lock
@@ -15,126 +15,8 @@ from . import default_bindings, deluxe_catalog
 from .keymap_utils import resolve_scope
 from .dispatch_policy import reviewed_chain, reviewed_groups
 from .deluxe_resolver import Resolver, capture_candidate, command_addon, profile_assignment_id, selector_status
-from .deluxe_schema import (ProfileError, TABLES, identifier, independent_commands, merge_profile, profile_overlay,
+from .deluxe_schema import (ProfileError, independent_commands, merge_profile, profile_overlay,
                             require, same_value, selector_descriptor, validate_catalog)
-
-ADD_PIE_EVENT = runtime.KeymapEvent('A', value='CLICK_DRAG', shift=True)
-ADD_PIE_TARGET = runtime.KeymapTarget('wm.call_menu_pie', {'name': 'BLUEHOLE_MT_pie_add'})
-ADD_PIE_SCOPE = runtime.KeymapScope('3D View', 'VIEW_3D')
-STOCK_ADD_EVENT = runtime.KeymapEvent('A', shift=True)
-STOCK_ADD_MENUS = (('Object Mode', 'VIEW3D_MT_add'), ('Mesh', 'VIEW3D_MT_mesh_add'))
-
-
-class Draft:
-    """A detached working copy tied to one store revision."""
-
-    def __init__(self, store, revision, catalog):
-        self._store = store
-        self._revision = revision
-        self._catalog = deepcopy(catalog)
-        self._closed = False
-        self.serial = 0
-
-    def snapshot(self):
-        return deepcopy(self._catalog)
-
-    def _open(self):
-        require(not self._closed, 'Draft has been closed')
-
-    def put(self, table, id_, row):
-        """Insert or replace one complete row. Validation allows multi-step edits."""
-        self._open()
-        require(table in TABLES and identifier(id_) and isinstance(row, dict), 'Invalid draft entry')
-        row = deepcopy(row)
-        field = {'assignments': 'command', 'suppressions': 'replacement'}.get(table)
-        previous = self._catalog[table].get(id_, {}).get(field) if field else None
-        if field and field in row and row[field] in self._catalog['commands']:
-            source = row[field]
-            if any((other_table, other_id) != (table, id_)
-                   for other_table, other_id in self.command_owners(source)):
-                row[field] = uuid4().hex
-                self._catalog['commands'][row[field]] = deepcopy(self._catalog['commands'][source])
-        self._catalog[table][id_] = row
-        self.serial += 1
-        if previous and previous != row.get(field):
-            self._remove_unused_command(previous)
-
-    def command_owners(self, command):
-        return tuple((table, id_) for table, field in
-                     (('assignments', 'command'), ('suppressions', 'replacement'))
-                     for id_, row in self._catalog[table].items() if row.get(field) == command)
-
-    def _remove_unused_command(self, command):
-        if not self.command_owners(command):
-            self._catalog['commands'].pop(command, None)
-
-    def update(self, table, id_, **fields):
-        self.put(table, id_, {**self._catalog[table][id_], **fields})
-
-    def delete(self, table, id_):
-        self._open()
-        require(table in TABLES, 'Unknown profile table')
-        row = self._catalog[table].pop(id_)
-        self.serial += 1
-        field = {'assignments': 'command', 'suppressions': 'replacement'}.get(table)
-        if field and field in row:
-            self._remove_unused_command(row[field])
-
-    def uses(self, table, id_):
-        """Return assignment IDs affected by an event or command edit."""
-        require(table in ('events', 'commands'), 'Use counts require an event or command')
-        key = 'event' if table == 'events' else 'command'
-        return tuple(id2 for id2, row in self._catalog['assignments'].items() if row[key] == id_)
-
-    def clone(self, table, assignment, *, new_id=None):
-        """Give one assignment its own event or command record."""
-        self._open()
-        require(table in ('events', 'commands'), 'Clone requires an event or command')
-        key = 'event' if table == 'events' else 'command'
-        source = self._catalog['assignments'][assignment][key]
-        new_id = new_id or uuid4().hex
-        require(new_id not in self._catalog[table], 'Clone ID already exists')
-        self.put(table, new_id, self._catalog[table][source])
-        self.update('assignments', assignment, **{key: new_id})
-        return new_id
-
-    def add_assignment(self, section, event, command, scope, *, id_=None):
-        """Append a user assignment after shipped registrations."""
-        id_ = id_ or uuid4().hex
-        require(id_ not in self._catalog['assignments'], 'Assignment ID already exists')
-        order = max((row['order'] for row in self._catalog['assignments'].values()), default=0)
-        self.put('assignments', id_, dict(section=section, event=event, command=command,
-                                        scope=scope, order=max(order + 1, 1_000_000), feature=id_))
-        return id_
-
-    def stage_suppression(self, section, map_, item, source_role, *, replacement=None, disable=False, id_=None):
-        """Capture a selected live row. Passing a saved ID retargets that rule."""
-        self._open()
-        candidate = capture_candidate(map_, item, source_role)
-        if id_ is None and disable:
-            id_ = next((key for key, row in self._catalog['suppressions'].items()
-                        if row.get('disable') and same_value(row['selector'], candidate['selector'])), None)
-        id_ = id_ or uuid4().hex
-        rule = {'section': section, 'selector': candidate['selector']}
-        if disable:
-            rule['disable'] = True
-        if replacement is not None:
-            rule['replacement'] = replacement
-        self.put('suppressions', id_, rule)
-        return id_
-
-    def reset(self):
-        self._open()
-        self._catalog = self._store.defaults()
-        self.serial += 1
-
-    def restore(self, snapshot):
-        self._open()
-        self._catalog = deepcopy(snapshot)
-        self.serial += 1
-
-    def discard(self):
-        self._closed = True
 
 
 class ProfileStore:
@@ -174,12 +56,13 @@ class ProfileStore:
         self._applied_draft = None
         self._allowed = allowed
         self._closed = False
-        self._stock_add_rows = []
         self._generation = 0
         self._revision = self._disk_revision()
         self.load_issue = None
         self.load_error = ''
         self._catalog, self.load_issue = self._read()
+        self.registration = RegistrationService(self.resolver, self._preferences,
+            self.runtime_catalog, lambda: self._catalog, self._allowed)
         self._live_catalog = None
 
     def defaults(self):
@@ -312,57 +195,8 @@ class ProfileStore:
         self._closed = True
         self._live_catalog = None
 
-    def _defer_stock_add(self):
-        """Let Blender distinguish Shift+A tap from drag before opening Add."""
-        source = runtime._config('default')
-        if not runtime._same(source, runtime._config('active')):
-            return
-        # Ordinary bindings may still be waiting for the bulk merge. The stock
-        # source checks below require the current effective user keymaps.
-        runtime._update_merged()
-        rows = []
-        for name, menu in STOCK_ADD_MENUS:
-            scope = resolve_scope(runtime.KeymapScope(name), source)
-            if scope.is_tool:
-                continue
-            target = runtime.KeymapTarget('wm.call_menu', {'name': menu})
-            selector = runtime.KeymapSelector(scope, STOCK_ADD_EVENT, target)
-            try:
-                _, source_map, item = runtime._exact_source(selector)
-                runtime._preflight_merged_source(selector)
-                merged = runtime._one_map(runtime._config('user'), scope)
-                user_item = merged.keymap_items.from_id(item.id)
-                if (user_item is None or user_item.is_user_modified or user_item.is_user_defined
-                        or runtime._snapshot(user_item, False) != (STOCK_ADD_EVENT, target, True)):
-                    continue
-            except runtime._Pending:
-                # A custom binding or a different Blender keymap takes precedence.
-                continue
-            rows.append((source_map, item, item.id, target))
-        try:
-            # Edit the in-memory default source so Blender saves no user keymap delta.
-            for row in rows:
-                self._stock_add_rows.append(row)
-                row[1].value = 'RELEASE'
-            if rows:
-                runtime._update_merged()
-        except Exception:
-            self.restore_stock_add()
-            raise
-
     def restore_stock_add(self):
-        if not self._stock_add_rows:
-            return
-        source = runtime._config('default')
-        expected = replace(STOCK_ADD_EVENT, value='RELEASE')
-        for source_map, item, item_id, target in self._stock_add_rows:
-            if (runtime._contains(source.keymaps, source_map)
-                    and runtime._contains(source_map.keymap_items, item)
-                    and item.id == item_id
-                    and runtime._snapshot(item, False) == (expected, target, True)):
-                item.value = 'PRESS'
-        runtime._request_merged_update()
-        self._stock_add_rows.clear()
+        return self.registration.restore_stock_add()
 
     def _disk_revision(self):
         if self.edit_defaults:
@@ -506,37 +340,35 @@ class ProfileStore:
         configs = []
         for role in ('default', 'addon', 'user', 'active'):
             try:
-                config = runtime._config(role)
+                config = runtime.configuration(role)
                 configs.append((role, getattr(config, 'as_pointer', lambda: id(config))(),
                                 len(tuple(config.keymaps))))
-            except runtime._Pending:
+            except runtime.Pending:
                 configs.append((role, None))
         return (self._generation, self._allowed(), self._preferences().keymap.enable_keymaps,
-                tuple(configs), tuple(rna), tuple((name, runtime._addon_enabled(name)) for name in sorted(addons)))
+                tuple(configs), tuple(rna), tuple((name, runtime.provider_enabled(name)) for name in sorted(addons)))
 
     @staticmethod
     def _inherited_conflicts(active, scopes=None):
         """Report exact event overlap with the built-in base by assignment ID."""
         matches = defaultdict(list)
         try:
-            config = runtime._config('default')
-            owned_modal = {(owned.map_pointer, owned.item_pointer, owned.item_id)
-                           for handle in runtime._FEATURES.values() for owned in handle._owned.values()
-                           if owned.config_pointer == runtime._pointer(config)}
+            config = runtime.configuration('default')
+            owned_modal = runtime.owned_item_tokens(config)
             for map_ in config.keymaps:
                 scope = runtime.capture_scope(map_)
                 if scopes is not None and scope not in scopes:
                     continue
                 for item in map_.keymap_items:
-                    if not item.active or (runtime._pointer(map_), runtime._pointer(item), item.id) in owned_modal:
+                    if not item.active or (runtime.native_identity(map_), runtime.native_identity(item), item.id) in owned_modal:
                         continue
                     try:
                         event = runtime.capture_event(item)
-                    except runtime._Pending:
+                    except runtime.Pending:
                         continue
                     for id_ in active.get((scope, event), ()):
                         matches[id_].append(item.propvalue if scope.is_modal else item.idname)
-        except runtime._Pending:
+        except runtime.Pending:
             pass
         return {id_: tuple(targets) for id_, targets in matches.items()}
 
@@ -630,156 +462,20 @@ class ProfileStore:
         return self.snapshot()
 
     def _plan(self, catalog, *, required_only=False):
-        if not self._allowed():
-            return dict.fromkeys(catalog['sections'], False), {}
-        return self.resolver.plan(catalog, self._preferences(), required_only=required_only)
+        return self.registration.plan(catalog, required_only=required_only)
+
+    def registration_results(self, ids=None):
+        return self.registration.registration_results(ids)
+
+    def check_registration(self, catalog, before, **options):
+        return self.registration.check_registration(catalog, before, **options)
+
+    def update_registration(self, candidate, previous, **options):
+        return self.registration.update_registration(candidate, previous, **options)
+
+    def register(self, catalog=None, **options):
+        return self.registration.register(catalog, **options)
 
     @staticmethod
-    def registration_results(ids=None):
-        results = default_bindings.registration_results(ids)
-        for diagnostic in runtime.runtime_diagnostics():
-            if ':deluxe-' not in diagnostic.owner_id:
-                continue
-            id_ = profile_assignment_id(diagnostic.request_id)
-            if ids is not None and id_ not in ids:
-                continue
-            if id_ not in results or diagnostic.status != 'applied':
-                results[id_] = (diagnostic.status, diagnostic.reason)
-        return results
-
-    def check_registration(self, catalog, before, *, plan=None, ids=None):
-        """Reject new registration errors, preserving known or unavailable rows."""
-        after = self.registration_results(ids)
-        sections, groups = self._plan(catalog) if plan is None else plan
-        for requests in groups.values():
-            for request in requests:
-                id_ = request.request_id
-                if id_ not in catalog['assignments']:
-                    continue
-                status, reason = after.get(id_, ('pending', 'feature_registration_incomplete'))
-                if status == 'applied':
-                    continue
-                row = catalog['assignments'][id_]
-                command = catalog['commands'][row['command']]
-                if self.resolver.describe_command(command)['availability'] != 'available':
-                    continue
-                unchanged = same_value(self._catalog['assignments'].get(id_), row)
-                unchanged = unchanged and all(same_value(self._catalog[table].get(row[key]),
-                                                          catalog[table][row[key]])
-                                              for key, table in (('command', 'commands'), ('event', 'events')))
-                if unchanged and before.get(id_) == (status, reason):
-                    continue
-                raise ProfileError(f'Cannot register {id_}: {reason}')
-        for id_, row in catalog['suppressions'].items():
-            if ids is not None and id_ not in ids:
-                continue
-            if not (sections[row['section']] and row.get('enabled', True)):
-                continue
-            status, reason = after.get(id_, (None, None))
-            if status in (None, 'applied'):
-                continue
-            if reason in ('creation_or_setter_failed', 'owned_remove_failed',
-                          'unsupported_creation_schema', 'created_readback_mismatch',
-                          'created_membership_lost', 'conflicting_assignment'):
-                raise ProfileError(f'Cannot register replacement {id_}: {reason}')
-
-    @runtime.batch_merged_updates()
-    def update_registration(self, candidate, previous, *, plans=None, verify=False):
-        """Rebuild affected contexts in source order; leave other items intact."""
-        old_plan, new_plan = plans if plans is not None else (self._plan(previous), self._plan(candidate))
-        old_sections, old_groups = old_plan
-        new_sections, new_groups = new_plan
-        owners = {owner for owner in old_groups.keys() | new_groups.keys()
-                  if old_groups.get(owner) != new_groups.get(owner)}
-
-        def scope_key(scope):
-            return scope.name, scope.space_type, scope.region_type, scope.is_modal
-
-        # Recreating just one item could change precedence in a shared shortcut
-        # chain. Include its whole context and any feature spanning that context.
-        scopes = set()
-        groups = list(old_groups.items()) + list(new_groups.items())
-        while True:
-            for owner, requests in groups:
-                if owner in owners:
-                    scopes.update(scope_key(request.scope) for request in requests)
-            expanded = owners | {owner for owner, requests in groups
-                                 if any(scope_key(request.scope) in scopes for request in requests)}
-            if expanded == owners:
-                break
-            owners = expanded
-
-        def rules(catalog, sections):
-            return {id_: row for id_, row in catalog['suppressions'].items()
-                    if sections[row['section']] and row.get('enabled', True)}
-        old_rules, new_rules = rules(previous, old_sections), rules(candidate, new_sections)
-        rule_ids = {id_ for id_ in old_rules.keys() | new_rules.keys()
-                    if not same_value(old_rules.get(id_), new_rules.get(id_))}
-        for id_, row in list(old_rules.items()) + list(new_rules.items()):
-            # Independent disables own the inherited source's active flag;
-            # rebuilding our additions does not change that source. Overrides
-            # create ordered items and must still follow the context rebuild.
-            if not row.get('disable') and scope_key(selector_descriptor(row['selector']).scope) in scopes:
-                rule_ids.add(id_)
-            if 'replacement' in row and not same_value(previous['commands'].get(row['replacement']),
-                                                       candidate['commands'].get(row['replacement'])):
-                rule_ids.add(id_)
-        changed_assignments = {profile_assignment_id(request.request_id) for owner, requests in groups
-                               if owner in owners for request in requests}
-        ids = changed_assignments | rule_ids
-        before = self.registration_results(ids) if verify else None
-        for id_ in rule_ids:
-            default_bindings.release(id_)
-            if handle := runtime._FEATURES.get('profile:deluxe-' + id_):
-                handle.release()
-        if any(owner in owners and any(request.target == ADD_PIE_TARGET for request in requests)
-               for owner, requests in groups):
-            self.restore_stock_add()
-        for owner in reversed(tuple(runtime._FEATURES)):
-            if owner in owners and (handle := runtime._FEATURES.get(owner)):
-                handle.release()
-        if default_bindings.pending_cleanup() or runtime.pending_cleanup():
-            raise ProfileError('Native keymap cleanup is pending')
-        self.register(candidate, owners=owners, rule_ids=rule_ids, plan=new_plan)
-        if verify:
-            self.check_registration(candidate, before, ids=ids,
-                                    plan=(new_sections, {k:v for k,v in new_groups.items() if k in owners}))
-        return changed_assignments, rule_ids
-
-    @runtime.batch_merged_updates()
-    def register(self, catalog=None, *, required_only=False, owners=None, rule_ids=None, plan=None):
-        """Register in source order through brief 02's feature ledger."""
-        if catalog is None:
-            catalog = self.runtime_catalog()
-        sections, groups = self._plan(catalog, required_only=required_only) if plan is None else plan
-        total = 0
-        add_pie_registered = False
-        for owner, requests in groups.items():
-            if owners is not None and owner not in owners:
-                continue
-            config = runtime.get_addon_keyconfig()
-            requests = tuple(replace(request, scope=resolve_scope(request.scope, config))
-                             for request in requests)
-            handle = runtime.register_feature(owner, assignments=requests)
-            total += len(handle.owned_pairs)
-            applied = {row.request_id for row in handle.diagnostics if row.status == 'applied'}
-            add_pie_registered |= any(
-                request.request_id in applied and request.active and request.event == ADD_PIE_EVENT
-                and replace(request.scope, is_tool=None) == ADD_PIE_SCOPE and request.scope.is_tool is not True
-                and request.target == ADD_PIE_TARGET for request in requests)
-        for id_, row in catalog['suppressions'].items():
-            if rule_ids is not None and id_ not in rule_ids:
-                continue
-            if not (sections[row['section']] and row.get('enabled', True)):
-                continue
-            if row.get('disable'):
-                default_bindings.install(id_, selector_descriptor(row['selector']),
-                                         explicit_properties=row.get('explicit_properties', False))
-                continue
-            request = self.resolver.suppression_request(id_, row, catalog['commands'])
-            if request is not None:
-                handle = runtime.register_feature('profile:deluxe-' + id_, overrides=(request,))
-                total += len(handle.owned_pairs)
-        if add_pie_registered:
-            self._defer_stock_add()
-        return total
+    def capture_binding(map_, item, source_role):
+        return capture_candidate(map_, item, source_role)

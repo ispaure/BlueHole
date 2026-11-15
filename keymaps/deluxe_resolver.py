@@ -8,7 +8,8 @@ import bpy
 
 from . import keymap_utils as runtime
 from . import default_bindings
-from .dispatch_policy import reviewed_groups
+from .catalog_plan import CatalogPlanner, profile_assignment_id
+from .provider_policy import command_addon
 from .deluxe_schema import (OPERATOR, ProfileError, SOURCE_ROLES, event_descriptor, properties, require, same_value,
                             scope_descriptor, selector_descriptor)
 
@@ -26,26 +27,6 @@ MODAL_TOKENS = frozenset({'CANCEL'})
 # The stock Select All proof uses a consuming, known selection command.
 REPLACEMENT_COMMANDS = ({'operator': 'object.select_all', 'properties': {'action': 'DESELECT'}},)
 COMMAND_ERRORS = (AttributeError, KeyError, ReferenceError, RuntimeError, TypeError, ValueError)
-OBJECT_NON_MODAL_SCOPES = frozenset(runtime.KeymapScope('Object Non-modal', is_tool=is_tool)
-                                   for is_tool in (None, False))
-OBJECT_MODE = runtime.KeymapScope('Object Mode')
-COLLECTION_NUMBER_EVENTS = frozenset(runtime.KeymapEvent(key) for key in (
-    'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'ZERO'))
-MODE_OPERATORS = frozenset({'object.mode_set', 'object.mode_set_with_submode'})
-CONTEXT_MODE_OPERATORS = frozenset({'object.bh_face_select_or_pose'})
-
-
-def command_addon(command):
-    # Generic Blender operators can reference a provider's tools or properties
-    # while remaining registered after that provider has been disabled.
-    if command.get('provider') == 'Zen UV' and command.get('operator', '').startswith('wm.'):
-        return 'ZenUV'
-    return ''
-
-
-def profile_assignment_id(request_id):
-    """Map an Object Mode runtime companion back to its editable assignment."""
-    return request_id.partition(':')[0]
 
 
 def _enum(prop):
@@ -157,9 +138,9 @@ def selector_status(selector, replacement=None):
         _, issue = _inherited_source(selector)
         return ('ambiguous', issue) if issue else ('unsupported', 'unproved_user_source')
     try:
-        runtime._exact_source(selector)
-        runtime._preflight_merged_source(selector)
-    except runtime._Pending as issue:
+        runtime.exact_source(selector)
+        runtime.verify_merged_source(selector)
+    except runtime.Pending as issue:
         if issue.reason.startswith('ambiguous'):
             state = 'ambiguous'
         elif issue.reason in {'source_missing_or_edited', 'merged_source_missing_or_edited',
@@ -174,8 +155,8 @@ def selector_status(selector, replacement=None):
     if not proof:
         return 'unsupported', 'unsupported_capability'
     try:
-        runtime._preflight_override(runtime.KeymapOverride('preview', selector, replacement, *proof))
-    except runtime._Pending as issue:
+        runtime.verify_override(runtime.KeymapOverride('preview', selector, replacement, *proof))
+    except runtime.Pending as issue:
         return ('missing' if issue.status == 'pending' else 'unsupported'), issue.reason
     return 'resolved', ''
 
@@ -185,9 +166,9 @@ def _inherited_source(selector):
     for role in ('default', 'addon'):
         candidate = replace(selector, source_role=role)
         try:
-            runtime._exact_source(candidate)
+            runtime.exact_source(candidate)
             matches.append(candidate)
-        except runtime._Pending as issue:
+        except runtime.Pending as issue:
             if issue.reason.startswith('ambiguous'):
                 return selector, issue.reason
     if len(matches) > 1:
@@ -199,11 +180,11 @@ def capture_candidate(map_, item, source_role):
     """Capture an actual selected row, with source membership checked immediately."""
     require(source_role in SOURCE_ROLES, 'Invalid keyconfig source')
     try:
-        config = runtime._config(source_role)
-        if not runtime._contains(config.keymaps, map_):
+        config = runtime.configuration(source_role)
+        if not runtime.contains_native(config.keymaps, map_):
             raise ProfileError('Selected map does not belong to that keyconfig')
         selector = runtime.capture_selector(map_, item, source_role=source_role)
-    except runtime._Pending as issue:
+    except runtime.Pending as issue:
         raise ProfileError(issue.reason) from issue
     if source_role == 'user':
         managed = default_bindings.managed_rule(map_, item)
@@ -240,10 +221,11 @@ def input_options():
     }
 
 
-class Resolver:
+class Resolver(CatalogPlanner):
     """Shipped command routes and scopes are the allowlist for profile edits."""
 
     def __init__(self, defaults):
+        super().__init__(defaults)
         self.modal_commands = tuple(command for command in defaults['commands'].values()
                                     if 'modal_value' in command) + tuple(
                                         {'modal_value': token} for token in MODAL_TOKENS)
@@ -251,8 +233,6 @@ class Resolver:
         for command in (*defaults['commands'].values(), *REPLACEMENT_COMMANDS):
             if 'operator' in command:
                 self.commands[command['operator']].append(command)
-        self.feature_categories = {row['feature']: defaults['sections'][row['section']]['category']
-                                   for row in defaults['assignments'].values()}
         self.scopes = {scope_descriptor(row['scope']) for row in defaults['assignments'].values()}
 
     def describe_command(self, command, *, include_unset=False):
@@ -294,7 +274,7 @@ class Resolver:
             available = available and hasattr(bpy.types, command['properties'].get('name', ''))
         addon = command_addon(command)
         if addon:
-            available = available and runtime._addon_enabled(addon)
+            available = available and runtime.provider_enabled(addon)
         return {'label': command.get('label', label), 'owner': owner,
                 'dependency': provider, 'availability': ('available' if available
                                                            else 'waiting_for_provider' if provider
@@ -330,9 +310,9 @@ class Resolver:
     def _live_scope(scope):
         for role in ('default', 'addon'):
             try:
-                if runtime._maps(runtime._config(role), scope):
+                if runtime.matching_maps(runtime.configuration(role), scope):
                     return True
-            except runtime._Pending:
+            except runtime.Pending:
                 pass
         return False
 
@@ -366,68 +346,13 @@ class Resolver:
             field = _field(prop) if prop is not None else {'editable': False}
             require(field['editable'] and _valid_field(field, value), f'Invalid {name} value in {id_}')
 
-    @staticmethod
-    def section_enabled(catalog, preferences, section_id):
-        section = catalog['sections'].get(section_id)
-        if section is None:
-            return False
-        category = catalog['categories'][section['category']]
-        return section.get('required', False) or (
-            bool(preferences.keymap.enable_keymaps)
-            and category.get('enabled', True) and section.get('enabled', True))
-
     def plan(self, catalog, preferences, *, required_only=False, assignment_ids=None):
-        sections = catalog['sections']
-        state = {id_: (bool(section.get('required')) if required_only else
-                       self.section_enabled(catalog, preferences, id_))
-                 for id_, section in sections.items()}
-        groups = {}
-        commands = catalog['commands']
-        dispatch_groups = reviewed_groups(catalog)
-        rows = catalog['assignments'].items() if assignment_ids is None else (
-            (id_, catalog['assignments'][id_]) for id_ in assignment_ids)
-        for id_, row in sorted(rows, key=lambda entry: entry[1]['order']):
-            if not (row.get('required') or state[row['section']] and row.get('enabled', True)):
-                continue
-            category = self.feature_categories.get(row['feature'], sections[row['section']]['category'])
-            owner = 'legacy:' + self._category_label(category) + ':deluxe-' + row['feature']
-            scope = scope_descriptor(row['scope'])
-            event = event_descriptor(catalog['events'][row['event']])
-            command = commands[row['command']]
-            if not command.get('operator') and not command.get('modal_value'):
-                continue
-            samples = row.get('samples', ())
-            request = runtime.KeymapAssignment(
-                id_, scope, event, self.target(command), declared_properties_only=True,
-                active=row.get('active', True), ledger_id=catalog['base']['ledger'] if samples else '',
-                sample_id=samples[0] if samples else '',
-                requires_operator='operator' in command and (bool(command.get('provider')) or _operator_rna(command['operator']) is None),
-                dispatch_group=row.get('dispatch_group', '') if row.get('dispatch_group') in dispatch_groups else '',
-                required_addon=command_addon(command),
-                required_class=command.get('properties', {}).get('name', '')
-                if command.get('operator') in {'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel'} else '')
-            requests = groups.setdefault(owner, [])
-            requests.append(request)
-            # The viewport dispatches Object Mode before Object Non-modal.
-            # Give compatible native mode changes a chance before stock collection
-            # selection. The original route remains available in other modes.
-            if (request.active and scope in OBJECT_NON_MODAL_SCOPES
-                    and replace(event, repeat=False) in COLLECTION_NUMBER_EVENTS
-                    and (command.get('operator') in CONTEXT_MODE_OPERATORS
-                         or command.get('operator') in MODE_OPERATORS
-                         and command['properties'].get('mode') not in (None, 'OBJECT'))):
-                requests.append(replace(request, request_id=id_ + ':object-mode', scope=OBJECT_MODE))
-        return state, groups
-
-    @staticmethod
-    def _category_label(category):
-        return 'UV' if category == 'uv' else category.capitalize()
-
-    @staticmethod
-    def target(row):
-        if 'modal_value' in row:
-            return runtime.KeymapTarget(modal_value=row['modal_value'])
-        return runtime.KeymapTarget(row['operator'], row['properties'])
+        rows = catalog['assignments'].values() if assignment_ids is None else (
+            catalog['assignments'][id_] for id_ in assignment_ids)
+        operators = {catalog['commands'][row['command']].get('operator') for row in rows}
+        available = frozenset(name for name in operators if name and _operator_rna(name) is not None)
+        return super().plan(catalog, preferences, required_only=required_only,
+                            assignment_ids=assignment_ids, available_operators=available)
 
     def suppression_request(self, id_, row, commands):
         selector = selector_descriptor(row['selector'])

@@ -486,7 +486,7 @@ def assignment_scopes(current, keyconfigs):
         for map_ in config.keymaps:
             try:
                 scope = runtime.capture_scope(map_)
-            except runtime._Pending:
+            except runtime.Pending:
                 continue
             if not scope.is_modal and not scope.is_tool and ' Tool:' not in scope.name:
                 descriptor = dict(name=scope.name, space_type=scope.space_type, region_type=scope.region_type)
@@ -976,7 +976,7 @@ def draw_binding_context(self, context):
             op.section, op.source, op.open_editor = current.feature_section, 'user', True
             op.map_pointer, op.item_pointer, op.item_id = str(map_.as_pointer()), str(item.as_pointer()), item.id
             op.signature = json.dumps(candidate['selector'], sort_keys=True)
-    except (*ERRORS, runtime._Pending):
+    except (*ERRORS, runtime.Pending):
         return
 
 
