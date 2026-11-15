@@ -95,8 +95,8 @@ def exercise(output):
             assert len(original_rules) == 24
             assert all(results.get(id_) == ('applied', '') for id_ in original_rules), {
                 id_: results.get(id_) for id_ in original_rules if results.get(id_) != ('applied', '')}
-            # Provider replacements intentionally leave the stock binding live
-            # until the provider loads; modal additions have new default IDs.
+            # Independent disable rules stay applied without a provider;
+            # modal additions have new default IDs.
             applied_rules = {id_ for id_ in rules if results.get(id_) == ('applied', '')}
             changed_defaults = {key for key, active in default_activity().items()
                                 if key in defaults_before and active != defaults_before[key]}
@@ -133,10 +133,11 @@ def exercise(output):
         prefs.keymap['navigation'] = {'enable_navigation_keymaps': False, 'enable_navigation_view_framing': False}
         registrar.refresh()
         assert merged_digest() == registered_digest
-        assert prefs.keymap.bl_rna.properties['enable_keymaps'].name == 'Enable Deluxe Keymaps'
+        assert prefs.keymap.bl_rna.properties['enable_keymaps'].name == 'Enable Blue Hole Keymaps & Pie Menus'
 
         section = 'navigation.view_framing'
         catalog_path = registrar.deluxe_profile().path
+        assert catalog_path == Path(bpy.utils.user_resource('CONFIG')) / 'bluehole/keymaps.json'
         def catalog_revision():
             return registrar.deluxe_profile()._disk_revision()
         before_edit = catalog_revision()
@@ -729,7 +730,7 @@ def verify_saved_preferences(output):
     (output / 'preferences-check.json').write_text(json.dumps({'status': 'passed', 'modal_aliases_not_saved': True}))
 
 
-def launch(binary, output, *, capture_editor=False):
+def launch(binary, output, *, capture_editor=False, package_archive=None):
     from blender_keymap_runtime import RESOURCE_NAMES, stage_package
 
     output = output.resolve()
@@ -752,7 +753,7 @@ def launch(binary, output, *, capture_editor=False):
         for name, folder in (('TMPDIR', 'tmp'), ('XDG_CACHE_HOME', 'cache')):
             (root / folder).mkdir()
             environment[name] = str(root / folder)
-        stage_package(root, None)
+        stage_package(root, None, package_archive)
         command = [str(binary), '--factory-startup', '--disable-autoexec', '--offline-mode',
                    '--python-exit-code', '1', '--python', str(Path(__file__).resolve())]
         if sys.platform == 'darwin':
@@ -797,5 +798,6 @@ if __name__ == '__main__':
         parser.add_argument('--blender', type=Path, required=True)
         parser.add_argument('--output', type=Path, required=True)
         parser.add_argument('--capture-editor', action='store_true', help='Capture the binding editor after validation')
+        parser.add_argument('--package', type=Path, help='Test these exact packaged addon bytes')
         args = parser.parse_args()
-        raise SystemExit(launch(args.blender, args.output, capture_editor=args.capture_editor))
+        raise SystemExit(launch(args.blender, args.output, capture_editor=args.capture_editor, package_archive=args.package))

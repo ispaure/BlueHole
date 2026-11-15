@@ -27,8 +27,14 @@ def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
 
-def stage_package(root, minimum):
+def stage_package(root, minimum, package_archive=None):
     package = root / 'scripts/addons/bluehole_runtime'
+    if package_archive is not None:
+        if minimum is not None:
+            raise ValueError('Exact package tests cannot override compatibility')
+        from blender_addon_smoke import extract_package
+        extract_package(package_archive, package)
+        return
     names = subprocess.check_output(['git', '-C', str(REPO), 'ls-files', '--cached', '--others', '--exclude-standard', '-z']).decode().split('\0')
     for name in filter(None, names):
         if name.startswith(('tests/', '.github/', 'overlays/deluxe/payload/', 'docs/')):
@@ -68,9 +74,10 @@ def launch_case(binary, provider_source, output, mode, *, incoming=None, minimum
         (root / folder).mkdir()
         environment[name] = str(root / folder)
     destination = root / 'scripts/addons' / PROVIDER
-    if any(p.is_symlink() for p in provider_source.rglob('*')):
-        raise ValueError('Provider fixture must not contain symlinks')
-    shutil.copytree(provider_source, destination, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+    if provider_source is not None:
+        if any(p.is_symlink() for p in provider_source.rglob('*')):
+            raise ValueError('Provider fixture must not contain symlinks')
+        shutil.copytree(provider_source, destination, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
     stage_package(root, minimum)
     if incoming:
         shutil.copytree(incoming, root / 'incoming')
@@ -216,8 +223,9 @@ def native_main(root, mode):
         selectors['stock'] = rt.capture_selector(km, item, source_role='default',
              ledger_id='deluxe-baseline-2026-11-12-v1',
              sample_id='587d6f920557a2ebfd965e899461aef183d9908ec703a37394c3c605ade92328')
-        km, item = source('addon', '3D View Generic', lambda i: i.idname == 'machin3.toggle_smooth')
-        selectors['provider'] = rt.capture_selector(km, item, source_role='addon', sample_id='installed-machin3-smooth-v1')
+        if mode != 'stock-dispatch':
+            km, item = source('addon', '3D View Generic', lambda i: i.idname == 'machin3.toggle_smooth')
+            selectors['provider'] = rt.capture_selector(km, item, source_role='addon', sample_id='installed-machin3-smooth-v1')
         km, item = source('default', 'Transform Modal Map', lambda i: i.propvalue == 'PRECISION'
                           and i.type == 'LEFT_SHIFT' and i.value == 'ANY')
         selectors['modal'] = rt.capture_selector(km, item, source_role='default',
@@ -289,7 +297,10 @@ def native_main(root, mode):
     runtime_addon = addon_utils.enable('bluehole_runtime', default_set=True, persistent=False)
     assert runtime_addon is not None
     rt = runtime_addon.keymaps_register.keymap_utils
-    enable_provider()
+    if mode != 'stock-dispatch':
+        enable_provider()
+    else:
+        receipt['provider'] = {'status': 'not_requested', 'scope': 'stock and modal dispatch only'}
     capture_selectors()
     record('isolated_runtime_loaded')
 
@@ -796,7 +807,22 @@ def native_main(root, mode):
         assert not any(i.idname == RUNTIME_OT_action.bl_idname for km in configs().addon.keymaps for i in km.keymap_items)
         record('owned_user_edit_fresh_reopen_and_release')
 
-    if mode == 'write':
+    if mode == 'stock-dispatch':
+        steps.extend((lambda: press('ESC'), lambda: press('ESC'), initialize))
+        case('keyboard_sentinel', 'F24', ['sentinel'])
+        case('stock_baseline', 'A', [], selected=3)
+        steps.append(lambda: owned_invariant('stock'))
+        case('stock_replacement', 'A', ['stock'], selected=1)
+        case('stock_poll_fallback', 'A', [], selected=3, poll=False)
+        case('stock_pass_through', 'A', ['stock'], selected=3, flow='pass')
+        steps.extend((lambda: remove('stock'), object_mode))
+        modal_case('modal_baseline', False)
+        steps.append(lambda: owned_invariant('modal'))
+        modal_case('modal_replacement_cancel', True)
+        steps.append(lambda: remove('modal'))
+        modal_case('modal_release_fallback', False)
+        steps.extend((modal_active_config_transition, unchanged))
+    elif mode == 'write':
         steps.extend((lambda: press('ESC'), lambda: press('ESC'), initialize))
         case('keyboard_sentinel', 'F24', ['sentinel'])
         case('stock_baseline', 'A', [], selected=3)
@@ -841,7 +867,8 @@ def native_main(root, mode):
             km.keymap_items.remove(item)
         sentinel_refs.clear()
         update()
-        disable_provider()
+        if mode != 'stock-dispatch':
+            disable_provider()
         update()
         remaining = [(role, km.name, item.idname) for role in ('default', 'addon', 'user')
                      for km in getattr(configs(), role).keymaps for item in km.keymap_items
@@ -1056,16 +1083,26 @@ def native_lifecycle(root, bpy, addon_utils):
 def cli():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--blender', type=Path, required=True)
-    parser.add_argument('--provider-source', type=Path, required=True)
+    parser.add_argument('--provider-source', type=Path)
+    parser.add_argument('--stock-only', action='store_true', help='Exercise stock/modal dispatch without a third-party fixture')
     parser.add_argument('--output', type=Path, default=REPO / 'test-results/deluxe-keymaps-runtime')
     parser.add_argument('--test-minimum-version', help='Change only the disposable add-on copy, e.g. 4.5.1')
     args = parser.parse_args()
+    if not args.stock_only and args.provider_source is None:
+        parser.error('--provider-source is required unless --stock-only is selected')
     if not Path('/usr/bin/sandbox-exec').is_file():
         parser.error('This GUI isolation launcher requires macOS sandbox-exec.')
     minimum = tuple(map(int, args.test_minimum_version.split('.'))) if args.test_minimum_version else None
     args.output = args.output.resolve()
     results, roots = [], []
     try:
+        if args.stock_only:
+            root, result = launch_case(args.blender, None, args.output, 'stock-dispatch', minimum=minimum)
+            roots.append(root); results.append(result)
+            if result['returncode'] != 0 or result['runtime']['status'] != 'complete':
+                raise RuntimeError('Stock/modal dispatch failed; inspect the native receipt')
+            print(json.dumps({'status': 'complete', 'cases': 1, 'scope': 'stock/modal dispatch'}))
+            return
         writer, result = launch_case(args.blender, args.provider_source, args.output, 'write', minimum=minimum)
         roots.append(writer); results.append(result)
         if result['returncode'] != 0 or result['runtime']['status'] != 'complete':

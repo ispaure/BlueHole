@@ -103,6 +103,9 @@ class ManagerSuiteTests(unittest.TestCase):
                 result = validation.native_suite(root/'native.xml', receipt)
             self.assertEqual(result['status'], 'passed')
             self.assertIn('--package', run.call_args.args[0])
+            self.assertEqual(run.call_count, 3)
+            self.assertTrue(result['keymap_lifecycle_tested'])
+            self.assertTrue(result['update_rollback_tested'])
             self.assertEqual(result['artifact_sha256'], json.loads(receipt.read_text())['sha256'])
 
     def test_zip_fixture_extraction_rejects_traversal_and_links(self):
@@ -132,7 +135,8 @@ class ManagerSuiteTests(unittest.TestCase):
             root = Path(directory);source = dict(dirty=False,commit='fixed')
             checks = self.evidence(root,'portable.contracts',['test_a.Case.test_one','Scripts.release_adapter.checks.<locals>.SharedCopy.test_pinned_shared_copy'],source)
             native = self.evidence(root,'blender.integration',['driver.NativeAcceptance.test_supported_runtime_and_install'],source)
-            native.update(runtime='Blender 5.2.2',registration_tested=True,artifact_sha256='digest')
+            native.update(runtime='Blender 5.2.2',registration_tested=True,artifact_sha256='digest',
+                          keymap_lifecycle_tested=True,update_rollback_tested=True)
             inspection = self.evidence(root,'package.inspection',['driver.PackageInspection.test_exact_member_inventory_and_checksums'],source)
             inspection['artifact_sha256'] = 'digest'
             receipt = dict(source=source,sha256='digest')

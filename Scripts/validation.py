@@ -83,9 +83,19 @@ def native_suite(junit, receipt=None):
             if package:
                 command += ['--package', package['artifact']]
             subprocess.run(command, cwd=ROOT, check=True, timeout=180)
+            output = Path(junit).resolve().with_suffix('')
+            drivers = [('tests/blender_keymap_performance.py', 'keymaps', []),
+                       ('tests/blender_addon_update.py', 'reload', ['--local'])]
+            for driver, label, options in drivers:
+                command = [sys.executable, driver, '--blender', str(binary),
+                           '--output', str(output / label), *options]
+                if package:
+                    command += ['--package', package['artifact']]
+                subprocess.run(command, cwd=ROOT, check=True, timeout=720)
             if source() != before or package and inspect_package(receipt) != package:
                 raise ValueError('Source or exact tested package changed during native acceptance.')
             evidence.update(source=before, runtime=version, registration_tested=True,
+                            keymap_lifecycle_tested=True, update_rollback_tested=True,
                             artifact_sha256=package['artifact_sha256'] if package else None)
     result = run_suite(unittest.defaultTestLoader.loadTestsFromTestCase(NativeAcceptance), junit, 'blender.integration', fail_on_skip=True)
     return dict(result, **evidence)
@@ -124,6 +134,8 @@ def release_acceptance(checks, receipt, inspection, native, hosted, *, expected_
     require_cases(inspection, current, 'package.inspection')
     require_cases(native, current, 'blender.integration')
     if (native.get('registration_tested') is not True
+            or native.get('keymap_lifecycle_tested') is not True
+            or native.get('update_rollback_tested') is not True
             or not re.match(r'^Blender 5\.2\.2(?:\s|$)', native.get('runtime', ''))
             or native.get('artifact_sha256') != receipt['sha256']
             or inspection.get('artifact_sha256') != receipt['sha256']):

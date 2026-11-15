@@ -124,6 +124,21 @@ class UserProfileTests(unittest.TestCase):
         self.assertEqual(self.h.api.deluxe_catalog.load(root / 'deluxe-defaults.json'),
                          self.h.api.deluxe_catalog.load(root / 'factory-defaults.json'))
 
+    def test_new_publisher_ids_do_not_replace_personal_bindings_or_commands(self):
+        personal, update = deepcopy(self.base), deepcopy(self.base)
+        for catalog, key in ((personal, 'F11'), (update, 'F12')):
+            catalog['events']['new-event'] = {'type': key}
+            catalog['commands']['new-command'] = {'operator': 'wm.search_menu', 'properties': {}, 'label': key}
+            catalog['assignments']['new-binding'] = dict(catalog['assignments']['view-frame'],
+                feature='new-binding', event='new-event', command='new-command', order=100)
+        decoded = self.api.decode_profile(update, self.api.encode_profile(self.base, personal))
+        rows = decoded.catalog['assignments']
+        self.assertIn('new-binding-personal', rows)
+        self.assertEqual(decoded.catalog['events'][rows['new-binding']['event']]['type'], 'F12')
+        self.assertEqual(decoded.catalog['events'][rows['new-binding-personal']['event']]['type'], 'F11')
+        self.h.schema.validate_catalog(decoded.catalog)
+        self.assertTrue(any('ID collision' in notice for notice in decoded.conflicts))
+
     def test_invalid_installed_catalog_does_not_destroy_a_personal_profile(self):
         root = self.h.path.parent
         (root / 'factory-defaults.json').write_text(json.dumps(self.base))

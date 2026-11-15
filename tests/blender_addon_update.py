@@ -178,6 +178,7 @@ def launch():
     parser.add_argument('--blender',required=True,type=Path)
     parser.add_argument('--output',required=True,type=Path)
     parser.add_argument('--local',action='store_true',help='Test the current checkout without downloading a branch')
+    parser.add_argument('--package',type=Path,help='Use these exact addon bytes for the local update test')
     args=parser.parse_args()
     output=args.output.resolve();output.mkdir(parents=True,exist_ok=True)
     from blender_keymap_runtime import stage_package
@@ -192,7 +193,9 @@ def launch():
         if args.local:
             env['BLUEHOLE_UPDATE_LOCAL'] = subprocess.check_output(['git', 'rev-parse', 'HEAD'],
                 cwd=Path(__file__).resolve().parents[1], text=True).strip()
-        stage_package(root,None)
+        if args.package and not args.local:
+            raise ValueError('--package requires --local')
+        stage_package(root,None,args.package)
         (root/'scripts/addons/bluehole_runtime').rename(root/'scripts/addons/BlueHole')
         previous_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD^'],
                                                   cwd=Path(__file__).resolve().parents[1], text=True).strip()

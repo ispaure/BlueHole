@@ -29,8 +29,9 @@ can scroll through bindings while keeping their settings visible.
 Hover a row to see its origin and state. Missing operators and menus stay in the
 list with yellow markers, command names and shortcuts. Select a row to read its status. When the provider
 loads, the assignment can register and its marker returns to the usual color.
-For provider-dependent replacements, the original Blender binding stays usable
-until its replacement is available.
+Removal rules run independently of added shortcuts. An unavailable addition
+does not turn a separately disabled Blender or addon shortcut back on. Explicit
+replacement operations require their own supported source and replacement.
 
 An inactive **+** row is still a Blue Hole addition. It does not become a **−**
 rule when you turn it off. **Undo** reverses a deletion or other staged change.

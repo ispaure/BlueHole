@@ -208,3 +208,40 @@ command settings for bindings that use the same operator. It exercises operator
 changes, reset, undo, deletion, save/reload, and preview cleanup. Catalog files
 remain unchanged until Save and Apply Changes. Editor captures include the
 context tree and the selected binding's command settings.
+
+## Current release acceptance
+
+`Scripts/validation.py native` requires Blender 5.2.2 and runs addon smoke,
+`blender_keymap_performance.py` and `blender_addon_update.py --local`. With a
+package receipt, all three use the exact reviewed ZIP bytes. The lifecycle
+probe covers master/category/section toggles, structural editing, live preview,
+provider source restoration, save/reload and a second-process preference reopen.
+The updater probe covers personal profiles, custom environments, replaced default
+environments and rollback after partial candidate registration. No additional
+Python packages are installed in Blender. The online updater probe is run again
+after pushing alpha to verify the published download path.
+
+`factory-defaults.json` must match the split authoring catalog; the portable suite
+checks it. Regenerate it with `Scripts/keymap_inventory.py --write-factory
+keymaps/factory-defaults.json` after deliberate shipped-default edits. Package
+members must match `Scripts/package-files.json`; candidate discovery alone never
+satisfies that release gate.
+
+The plugin-preset benchmark reports cumulative toggle, list-ready and painted
+latency. Use at least 20 samples and report median/p95, fixture/provider versions
+and cold versus warm behavior. Full category/master rebuilds and structural
+first-draw cost are separate measurements. All bpy/RNA work stays on Blender's
+main thread. Watcher time budgets are soft boundaries between atomic features,
+not permission to interrupt an RNA mutation mid-operation.
+
+Reviewed dispatch-chain signatures establish semantic identity and relative
+order. Native keyboard-event receipts establish dispatch only for their named
+stock/provider/modal cases. Missing plugin, hardware or OS cases remain explicit
+coverage limits. A saved preference capture is evidence, never runtime input.
+
+On Blender 5.2.2, `blender_keymap_runtime.py --stock-only --blender /path/to/Blender`
+exercises actual stock replacement, poll fallback, pass-through and modal
+cancel/restoration without a plugin dependency. The full provider mode still
+requires a compatible installed MACHIN3tools fixture. The tested 1.13.2 fixture
+cannot import on this build because `bpy_types` is absent; do not represent that
+failed provider setup as a dispatch pass or silently patch the plugin under test.

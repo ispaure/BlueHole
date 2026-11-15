@@ -1,9 +1,10 @@
 # Deluxe keymap profiles
 
 Configured Deluxe reads the [master file](../keymaps/deluxe-defaults.json) and its
-[ten section files](../keymaps/deluxe-defaults-sections) on the built-in Blender preset. The catalog preserves source registration order
-and feature grouping from cutover `fa7891a`. It contains 803 assignments with independent command records across
-10 categories and 46 sections. Four Navigation assignments record intentional
+[eleven section files](../keymaps/deluxe-defaults-sections) on the built-in Blender preset. The catalog preserves source registration order
+and feature grouping from cutover `fa7891a`. It contains 1,314 assignments and 244 disable/replacement rules across
+11 categories and 129 sections. The editor therefore lists 1,558 binding records;
+that count is not the number of active native keymap items. Four Navigation assignments record intentional
 precedence changes for otherwise stock-equivalent rows. The Object Modes
 assignment for `3` enters Face Select on meshes and Pose Mode on armatures.
 It uses the same Object Mode registration rule as the other mode shortcuts.
@@ -107,22 +108,32 @@ addon drops the preview. Discard and Reload explicitly restore the saved setup.
 
 ## Persistence and recovery
 
-**Save and Apply Changes** saves the master and section files in the active Blue Hole
-installation. With the Logistics **Local** source, the installation links to
-the checkout, so the edit appears in Git. With **GitHub**, the edit goes into
-the preset's installed Blue Hole copy. The next Blue Hole update installs its
-shipped catalog. Existing per-preset override files stay on disk for reference
-and the editor now loads the bundled catalog.
+**Save and Apply Changes** normally writes a personal profile at Blender's
+`CONFIG/bluehole/keymaps.json`. This file lives outside the replaceable addon,
+including in Logistics presets without a disk checkout. It stores a versioned
+baseline, field overrides and deletion markers. Updating defaults performs a
+three-way merge: untouched fields follow the new release, personal choices win
+conflicting ordinary edits, and required bindings/code-owned provenance follow
+the release. Merge notices remain visible until the merged profile is saved.
+Retired edited bindings keep their dependencies. New publisher IDs colliding
+with personal additions receive separate personal IDs. Invalid files recover
+from a validated previous profile, then shipped defaults; recovery never silently
+rewrites the damaged source.
 
-Category and section `enabled` values live in that same JSON catalog. They are
-staged and saved with assignments and commands, and updates replace them too.
-Legacy category/section preference switches no longer gate the catalog; optional
-`switch` paths in older catalogs are ignored. Blender preferences retain the
-Deluxe master enable switch and the internal first-activation marker. Native
-Blender keymap customizations remain Blender-managed in `userpref.blend`.
-The editor displays an update warning above the bindings. The former saved-preferences
-backup and feature-switch reset commands have been removed because they did not
-manage the JSON catalog.
+The release's `factory-defaults.json` is generated from the split authoring
+catalog. On first migration, differences in an available older installed catalog
+are backed up and converted into a personal overlay. Files already overwritten
+by an older updater cannot be reconstructed by this migration.
+
+**Keymap Settings → Edit Shipped Defaults** is an explicit authoring mode. It
+saves the split files below in the active installation; a Logistics local source
+can link that installation to the checkout. Publish the regenerated factory
+snapshot with authoring edits. Unsaved drafts block switching modes or updating.
+
+Category and section choices belong to the same personal profile as bindings.
+Blender preferences retain the master switch and first-activation marker. Native
+Blender customizations remain Blender-managed in `userpref.blend`; runtime
+registration does not create a saved native delta.
 
 The master contains metadata, a `section_files` mapping, and input records used
 across top-level sections, plus unused records. Each `deluxe-defaults-sections/<category-id>.json`
@@ -150,7 +161,7 @@ File paths are restricted to the catalog's section folder, without symbolic link
 The working setup remains active after a failed reload; the diagnostic stays
 visible. The files are left untouched until an explicit save.
 
-Apply validates the entire draft and fingerprints the master and section files
+In authoring mode, Apply validates the entire draft and fingerprints the master and section files
 under the shared lock; external edits block a stale save. It installs/verifies
 the candidate runtime, writes a complete recovery snapshot and a transaction
 marker, publishes changed section files, and publishes the master last. Failed
@@ -165,4 +176,24 @@ the editor opened, previews it, and writes it only on Apply.
 The portable catalog test uses one digest of the ordered pre-conversion groups,
 scope, events, command properties and active state. Category 03–05 comparison
 tests retain the reference reconciliation and exception evidence. Brief 07's
-modal, provider, SpaceMouse and in-process Read Preferences gaps carry forward.
+historical native limitations remain scoped to their recorded builds. Current
+acceptance runs separately on Blender 5.2.2; absent providers and untested device
+dispatch are reported as coverage limits, not inferred from structural parity.
+
+## Incremental editing and cleanup
+
+`CatalogChanges` follows command, event, section, category, feature and reviewed
+chain dependencies. `RegistrationService` extends changed owners to the complete
+affected native contexts before rebuilding in source order. Unrelated contexts
+and independent disable sources retain their native identities. Boolean edits
+reuse validated metadata; structural edits still validate the complete catalog
+and changed RNA. Provider/config identity changes invalidate those caches.
+`PreviewCache` names the draft generation, immutable catalog, compiled plan,
+active-event index, native environment and read model. Native UI rows retain
+identity when only their fields change; tree expansion keeps focus on its header.
+
+Cleanup includes owned additions, source disable flags and temporary stock
+Shift+A adjustments. Unreadable rows remain owned for retry. Reload waits for the
+old cleanup callable to finish before publishing files or loading another runtime.
+Partial candidate registration uses the same barrier before rollback. A timeout
+leaves the addon unloaded with an explicit error rather than creating two owners.

@@ -74,7 +74,8 @@ class ReleaseAdapterTests(unittest.TestCase):
                         tests_run=len(identities),failures=0,errors=0,skipped=0)
         portable=evidence_row('portable.contracts',portable_case_ids()+['Scripts.release_adapter.checks.<locals>.SharedCopy.test_pinned_shared_copy'])
         native=evidence_row('blender.integration',['driver.NativeAcceptance.test_supported_runtime_and_install'])
-        native.update(runtime='Blender 5.2.2',registration_tested=True,artifact_sha256=digest)
+        native.update(runtime='Blender 5.2.2',registration_tested=True,artifact_sha256=digest,
+                      keymap_lifecycle_tested=True,update_rollback_tested=True)
         inspection=evidence_row('package.inspection',['driver.PackageInspection.test_exact_member_inventory_and_checksums'])
         inspection['artifact_sha256']=digest
         evidence=dict(native=native,inspection=inspection,portable=portable,

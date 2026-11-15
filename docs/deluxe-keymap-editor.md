@@ -1,9 +1,9 @@
 # Edit Deluxe keymaps in Blender
 
 Open **Preferences → Add-ons → Blue Hole → Addon Settings → Keymaps** with
-Blender's built-in keymap preset. Click **Enable Deluxe Keymaps**.
-The editor opens on **All Bindings**. Each binding owns its operator and settings. Its single row of section tabs comes from the catalog:
-Mesh, Navigation, Object, Pipeline, Sculpt, Selection, Transform, UV, Other and Pie.
+Blender's built-in keymap preset. Use **Enable Blue Hole Keymaps & Pie Menus**.
+The editor opens on **All Bindings**. Each binding owns its operator and settings. Its section tabs come from the catalog, including an **Addons** section grouped
+by provider name. Rows contain at most 12 tabs and are balanced when wrapped.
 Pick a section to see its **Enable … Keymaps** checkbox and subsection tabs.
 **All Mesh**, for example, includes every Mesh subsection; choosing Modeling
 shows **Enable Modeling Keymaps** and its bindings. The required Save As
@@ -29,25 +29,22 @@ no top-level section-creation UI.
 
 Sections control organization and enable gates, not Blender dispatch contexts.
 Moving an assignment preserves its event, command, scope and priority; its new
-section/category enable checkboxes determine eligibility. The catalog cleanup
-moved 272 former Other bindings into Navigation (editor views), Selection
-(editor selection), Transform (editor transforms/snapping), Sculpt (painting),
-Object (Outliner/modifiers/creation/curves and text), Pipeline (files/render),
-Mesh and UV. All 803 binding definitions are retained. The remaining 158 Other
-bindings have General, Animation, Nodes, Sequencer, Tracking & Masks, Text & Info,
-Particles and Images subsections. The ten top-level tabs are unchanged.
+section/category enable checkboxes determine eligibility. The catalog contains 1,314 additions and 244 disable/replacement rules.
+Missing providers keep their rows and saved choices visible in yellow. Independent
+removals stay enabled even if a similarly named addition is unavailable.
+**Expand All** opens branches containing matching bindings; **Collapse All**
+returns to the roots. Expanding a branch keeps focus there instead of jumping to
+the inspector's selected binding.
 
-Click **Save and Apply Changes** to save category/section states and all other
-catalog edits together. Valid edits preview automatically in the running
+Click **Save and Apply Changes** to save category/section states and binding
+edits to your personal profile, which survives addon updates. Valid edits preview automatically in the running
 keymaps without writing JSON. The toolbar identifies unsaved live changes.
 If preview fails, the previous working setup stays active and the error is shown.
 **Discard** restores the saved setup and drops the draft. Browsing, filtering,
 adding bindings and choosing operators do not write JSON.
 
-If activation asks for a review, inspect saved Blender keymap customizations
-before proceeding. Activation failures show the next step in Blender and log
-the failure. If the runtime cannot rebuild the shortcuts, activation restores
-the prior preference choices.
+Enabling and disabling the master switch applies directly. Activation failures
+show the next step and restore prior preference choices if runtime setup fails.
 
 - Select a binding to see its key, section and command settings.
   Select **Key-Binding** to search for a shortcut such as `Shift F10` or
@@ -103,12 +100,9 @@ the prior preference choices.
   an addition, not a disabled Blender default. The **X** at the end of a row removes
   an addition or removes a rule and restores its original shortcut. **Undo** reverses
   either action. **Enable Rule** can temporarily turn a rule off.
-  The shipped catalog currently contains 803 additions, including 12 inactive
-  entries, 24 Blender-default disable rules and 28 add-on disable rules. The
-  latter cover 32 legacy entries (four duplicate shortcuts share a rule).
-  Add-on rules remain pending until an exact, unique source exists. The other
-  69 legacy disabled entries have no matching inherited shortcut in the audit;
-  they are recorded in `tests/fixtures/deluxe_legacy_default_disables.json`.
+  The shipped catalog contains 1,314 additions and 244 disable/replacement rules.
+  Rules remain pending until an exact, unique source exists. Historical migration
+  receipts record older inventories separately from these current totals.
 - In Blender's native **Preferences → Keymap**, right-click the small checkbox
   immediately to the left of a binding's name and choose **Disable Binding with Blue Hole…**. Review its destination
   section and stage it; Blue Hole opens the corresponding bindings area. A
@@ -128,13 +122,12 @@ the prior preference choices.
   defaults without deleting them.
 - **Save and Apply Changes** writes the profile and applies it through the runtime.
   **Discard** drops staged edits. **Reset Draft** and **Reload Profile** are
-  in the gear menu beside **Enable Deluxe Keymaps**. Reset stages the catalog
+  in the gear menu beside **Enable Blue Hole Keymaps & Pie Menus**. Reset stages the catalog
   loaded when the editor opened and previews it.
   **Reload Profile** reads the current file and drops the draft after a
   successful reload. **Save and Apply Changes** publishes recovered settings
   after reviewing them. Category and section choices are saved in the same JSON
-  catalog as assignments and commands. The editor warns that installing a Blue
-  Hole update replaces these edits. The Deluxe master switch is saved with
+  personal profile as assignments and commands. Addon updates preserve that profile. The Deluxe master switch is saved with
   Blender preferences; legacy feature switches no longer gate the catalog.
 
 ## Viewport pie shortcuts
@@ -207,14 +200,18 @@ Reference keyconfig and preference file hashes matched before and after.
 A disposable Blender 5.2.2 preset verifies context/category filters, direct
 operator selection, independent settings on bindings with identical operators,
 operator changes, reset, undo, deletion, key capture, save/reload and preview
-cleanup. The JSON migration preserves all 803 binding configurations and all
-810 resolved runtime requests exactly.
+cleanup. The refactor also preserves all 5,511 effective rows, including their
+order, in the tested Blender 5.2.2 plugin preset. This structural comparison does
+not claim dispatch coverage for every installed provider.
 
 The [profile API contract](deluxe-keymap-profiles.md) describes persistence,
 validation and recovery. The existing Blender Keymap preferences retain
 control of inherited bindings and native saved edits.
 
 ## Editing the JSON files
+
+Enable **Keymap Settings → Edit Shipped Defaults** to author the addon catalog.
+Normal editing saves the personal profile outside these files.
 
 The small [master JSON](../keymaps/deluxe-defaults.json) lists one file per top-level
 section in [deluxe-defaults-sections](../keymaps/deluxe-defaults-sections). Section

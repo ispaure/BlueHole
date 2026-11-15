@@ -55,7 +55,8 @@ def artifact_name():
     return 'BlueHole-'+'.'.join(map(str,metadata['version']))+'-blender5.2.2-alpha.zip'
 
 
-def members():
+def discover_members():
+    """Candidates under the packaging policy; never bypass the reviewed allowlist."""
     result=[]
     for name in git('ls-files','-c','-o','--exclude-standard','-z').split('\0'):
         if not name:continue
@@ -73,6 +74,11 @@ def members():
         if source.is_file():result.append(name)
     if not FILES.issubset(result) or 'Lib/commonUtils.revision' not in result:
         raise ValueError('Required add-on or shared identity files are missing.')
+    return sorted(result)
+
+
+def members():
+    result=discover_members()
     allowed=json.loads((ROOT/'Scripts/package-files.json').read_text())
     if allowed.get('schema')!=1:raise ValueError('Unsupported package allowlist schema.')
     expected=set(allowed['members'])

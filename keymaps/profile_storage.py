@@ -114,6 +114,33 @@ def _restore_references(result, personal, defaults, previous, conflicts):
         ensure('categories', row['category'])
 
 
+def _separate_new_ids(personal, previous, defaults, conflicts):
+    """A new publisher ID must not consume an unrelated artist-created record."""
+    references = {'categories': (('sections', 'category'),),
+                  'sections': (('assignments', 'section'), ('suppressions', 'section')),
+                  'commands': (('assignments', 'command'), ('suppressions', 'replacement')),
+                  'events': (('assignments', 'event'),)}
+    for table in TABLES:
+        collisions = sorted((personal[table].keys() & defaults[table].keys()) - previous[table].keys())
+        for id_ in collisions:
+            if same_value(personal[table][id_], defaults[table][id_]):
+                continue
+            stem, number = id_[:80] + '-personal', 1
+            new_id = stem
+            while any(new_id in catalog[table] for catalog in (personal, previous, defaults)):
+                number += 1
+                new_id = f'{stem}-{number}'
+            row = personal[table].pop(id_)
+            personal[table][new_id] = row
+            if table == 'assignments' and row['feature'] == id_:
+                row['feature'] = new_id
+            for target, field in references.get(table, ()):
+                for dependent in personal[target].values():
+                    if dependent.get(field) == id_:
+                        dependent[field] = new_id
+            conflicts.append(f'{table}.{id_}: new release ID collision; personal entry renamed {new_id}')
+
+
 def decode_profile(defaults, document):
     require(isinstance(document, dict), 'Expected a personal profile object')
     if 'profile_version' not in document:
@@ -129,6 +156,7 @@ def decode_profile(defaults, document):
     if same_value(previous, defaults):
         return ProfileRead(personal)
     conflicts = []
+    _separate_new_ids(personal, previous, defaults, conflicts)
     result = {key: deepcopy(defaults[key]) for key in ('schema_version', 'catalog_version', 'base')}
     for table in TABLES:
         result[table] = deepcopy(_merge(previous[table], personal[table], defaults[table], table, conflicts))
@@ -144,6 +172,12 @@ def decode_profile(defaults, document):
             conflicts.append(f'assignments.{id_}: retired upstream; personal binding retained')
     # Required bindings and registration provenance belong to the new release.
     for table in ('categories', 'sections'):
+        for id_, row in result[table].items():
+            for key in ('switch', 'required'):
+                if key in defaults[table].get(id_, {}):
+                    row[key] = deepcopy(defaults[table][id_][key])
+                else:
+                    row.pop(key, None)
         for id_, row in defaults[table].items():
             if row.get('required'):
                 result[table][id_] = deepcopy(row)
@@ -169,6 +203,18 @@ def decode_profile(defaults, document):
             row['order'] = next_order
             next_order += 1
         used_orders.add(row['order'])
+    seen, last = set(), None
+    for row in sorted(result['assignments'].values(), key=lambda row: row['order']):
+        if row['feature'] != last and row['feature'] in seen:
+            # A release can expand an atomic feature into an artist's old order
+            # range. Prefer the reviewed release sequence to an invalid profile.
+            for id_, source in defaults['assignments'].items():
+                if id_ in result['assignments']:
+                    result['assignments'][id_]['order'] = source['order']
+            conflicts.append('assignments: restored release ordering to keep atomic features consecutive')
+            break
+        seen.add(row['feature'])
+        last = row['feature']
     result = independent_commands(result)
     validate_catalog(result)
     return ProfileRead(result, tuple(conflicts), migrated=True)
