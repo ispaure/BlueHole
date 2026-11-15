@@ -138,7 +138,8 @@ def launch():
     output=args.output.resolve();output.mkdir(parents=True,exist_ok=True)
     from blender_keymap_runtime import stage_package
     with TemporaryDirectory(prefix='bluehole-update-test-') as temp:
-        root=Path(temp).resolve()
+        root=Path(temp).resolve()/'preset'
+        root.mkdir()
         env=dict(os.environ);env.pop('PYTHONPATH',None)
         for name in ('RESOURCES','CONFIG','SCRIPTS','EXTENSIONS','DATAFILES'):
             folder=root/name.lower();folder.mkdir();env['BLENDER_USER_'+name]=str(folder)
@@ -154,7 +155,7 @@ def launch():
         if sys.platform=='darwin':
             policy=root/'policy.sb'
             policy.write_text('(version 1)\n(allow default)\n(deny file-write*)\n'+
-                ''.join('(allow file-write* (subpath '+json.dumps(str(p))+'))\n' for p in (root,output))+
+                ''.join('(allow file-write* (subpath '+json.dumps(str(p))+'))\n' for p in (root.parent,output))+
                 '(allow file-write* (literal "/dev/null"))\n')
             command=['/usr/bin/sandbox-exec','-f',str(policy),*command]
         with (output/'blender.log').open('w') as log:
