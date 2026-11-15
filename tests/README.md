@@ -18,6 +18,27 @@ and verifies their hashes and the complete document hash. Full sanitized run
 receipts remain under ignored `test-results` with their hashes recorded in the
 checked-in receipt; packing removes duplication without dropping evidence fields.
 
+## Reproducible keymap audit
+
+`python Scripts/keymap_inventory.py --output test-results/keymap-refactor/inventory.json`
+records source-file hashes, semantic catalog identity, provider counts, duplicate
+candidates, and every shared-event chain without importing Blender.
+
+`python tests/blender_keymap_preset.py --blender /path/to/Blender --preset
+/path/to/Logistics/preset --output test-results/keymap-refactor/preset` copies a
+plugin preset, redirects its preferences, and runs under macOS write/network
+confinement. The receipt records Blender/provider versions, source preservation,
+native parity checks, and toggle timings through Preferences redraw. Use
+`--assignment ID --suppression ID --samples 20` for repeatable latency cases.
+`--reference-ref blender-4.5.1/alpha` additionally captures the historical payload.
+It never runs the source preset. Third-party source stays in temporary copies.
+
+`python Scripts/keymap_compare.py before.json after.json --role user --output
+test-results/keymap-refactor/delta.json` compares exported snapshots without
+discarding duplicate bindings, unreadable values, or registration-order changes.
+Structural snapshot equality is not proof of keyboard dispatch; dispatch tests
+must record their actual event/context and observed outcome separately.
+
 ## Deluxe runtime keymaps
 
 `python3 -m unittest discover -s tests -p 'test_keymap_runtime.py' -q` checks
