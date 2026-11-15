@@ -1,5 +1,5 @@
 These tables cover the [bundled Deluxe profile](../../../keymaps/deluxe-defaults.json)
-for Blender 5.2.2 and shortcuts from the Reference Blender 4.5.1 setup.
+for Blender 5.2.2 and shortcuts from the reference Blender 4.5.1 setup.
 Rows marked **Blender** come from the built-in Blender preset. The **Add-on**
 column shows dependencies and optional integrations. For the
 full list and your saved changes, open **Addon Settings > Keymaps > Assignments**
@@ -22,7 +22,7 @@ are enabled. See the [Deluxe guide](../README.md) for setup.
 - [UV EDITOR](#uv-editor)
 - [🎨 SCULPTING MODE](#-sculpting-mode)
 - [Add-on shortcuts](#add-on-shortcuts)
-- [Reference reference shortcuts](#reference-reference-shortcuts)
+- [Reference shortcuts](#reference-shortcuts)
 - [Additional information](#additional-information)
 
 # 💾 **SYSTEM**
@@ -257,9 +257,9 @@ controls. **Keymaps > Assignments** shows each shortcut's source and status.
 | Zen UV | Ctrl + Shift + Wheel Left and Ctrl + Shift + Alt + MMB in the UV Editor | Moves the UV cursor or fits selected islands to the active trim | The provider's operator is required for each action |
 | Blender FBX | Ctrl + Shift + E | Uses the exporter bundled with Blender when its operator is available | A missing exporter leaves this shortcut inactive |
 
-# Reference reference shortcuts
+# Reference shortcuts
 
-These mappings come from the shared Reference 4.5.1 keyconfig, saved
+These mappings come from the reference Blender 4.5.1 keyconfig, saved
 preferences, and installed add-ons. To use them in 5.2.2, the matching keymap
 settings and any listed add-ons need to be present in that profile.
 
@@ -284,14 +284,14 @@ settings and any listed add-ons need to be present in that profile.
 | Toggle autoConstraints | Shift + Alt + X | | In the 3D View | autoConstraints (required) |
 | Increase / Decrease Proportional Radius | Tab + Wheel Up / Down | `]` / `[` | During a proportional transform | |
 | Adjust Sculpt Brush Radius | Shift + Space | | In Sculpt Mode. Move the mouse to adjust the radius | |
-| Move UV Cursor to Upper-Left of UV Area | Ctrl + Shift + Wheel Down | | Additional Reference shortcut in the UV Editor | Zen UV (required) |
+| Move UV Cursor to Upper-Left of UV Area | Ctrl + Shift + Wheel Down | | Additional reference shortcut in the UV Editor | Zen UV (required) |
 | Toggle UV Island Isolation | S | | Zen UV runs on key press. The reference also assigns Hide Unselected on click | Zen UV (required for isolation) |
 | Toggle UV Checker | Alt + T | | Window shortcut in the reference profile | Zen UV (required) |
 | Zen UV Pie | Alt + U | | Image and UV Editor | Zen UV (required) |
 
 The [Object and Mesh audit](../../../docs/deluxe-keymaps-category04.md#exact-exceptions)
 and the [remaining reference exceptions](../../../docs/deluxe-keymaps-category05.md#exact-exceptions-and-03-composition)
-record overlapping bindings and other Reference customizations.
+record overlapping bindings and other reference customizations.
 
 # Additional information
 

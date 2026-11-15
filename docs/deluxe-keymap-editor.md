@@ -160,7 +160,7 @@ the command source separately. Search by source to find direct add-on commands.
 
 The **Third-Party Add-ons** controls reflect whether their Deluxe sections
 are enabled. The availability checks read registered Blender operators.
-In a disposable Blender 5.2.2 preset, Reference's autoConstraints 1.4.1
+In a disposable Blender 5.2.2 preset, the reference autoConstraints 1.4.1
 received native W/E/R input. In Mesh Edit Mode, Alt+D invoked Interactive
 Tools 1.4.1 Smart Delete and removed the selected faces. In Object Mode,
 Ctrl+J invoked Group Pro 3.0.6 and joined two test meshes. Their mode-specific
@@ -168,7 +168,7 @@ keymaps let the provider commands run ahead of Blender's own bindings.
 Without the add-ons, the assignments showed **Waiting for add-on** and
 registered no keymap items.
 
-Reference's Zen UV 5.0.3.0 and X-Ray Selection Tools 4.9.0 failed to load
+The reference Zen UV 5.0.3.0 and X-Ray Selection Tools 4.9.0 failed to load
 on 5.2.2. Zen UV's two bindings stayed inactive and Q used Blender Box Select.
 The [X-Ray Selection Tools 4.10.2 update](https://extensions.blender.org/add-ons/xray-selection-tools/versions/)
 loaded in a separate 5.2.2 preset. Q activated X-Ray Box in Object and Mesh
@@ -191,11 +191,11 @@ these two successful gestures are not a claim that every Zen UV feature works
 on that build. The private provider ZIP is never included in Blue Hole.
 
 
-Both Zen UV gestures were also replayed in a disposable copy of the Reference
+Both Zen UV gestures were also replayed in a disposable copy of the reference
 4.5.1 profile. Ctrl+Shift+Wheel Left and the reference-only Wheel Down variant
 both moved the UV cursor to (0, 1).
 Ctrl+Shift+Alt+MMB fitted the selected UVs inside the active trim. The
-Reference keyconfig and preference file hashes matched before and after.
+reference keyconfig and preference file hashes matched before and after.
 
 A disposable Blender 5.2.2 preset verifies context/category filters, direct
 operator selection, independent settings on bindings with identical operators,
