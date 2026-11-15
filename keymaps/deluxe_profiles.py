@@ -7,6 +7,9 @@ from pathlib import Path
 from .profile_draft import Draft
 from .registration import RegistrationService
 from .profile_storage import decode_profile, encode_profile
+from .catalog_changes import CatalogChanges
+from .preview_state import PreviewCache
+from .event_overlap import potential_overlaps
 
 from ..Lib.commonUtils.formats.jsonType import JSONFile
 from ..Lib.commonUtils.persistence.locking import file_lock
@@ -89,6 +92,7 @@ class ProfileStore:
         self._install_toggle = install_toggle
         self._preview_cache = None
         self._applied_draft = None
+        self._validated_draft = None
         self._allowed = allowed
         self._closed = False
         self._generation = 0
@@ -113,15 +117,33 @@ class ProfileStore:
     def runtime_catalog(self):
         return self._catalog if self._live_catalog is None else self._live_catalog
 
-    def preview_draft(self, draft):
+    @property
+    def has_unsaved_edits(self):
+        return self._live_catalog is not None and not same_value(self._live_catalog, self._catalog)
+
+    def preview_draft(self, draft, *, candidate=None):
         """Try the draft in Blender without publishing any files."""
         self.validate(draft)
-        candidate = draft.snapshot()
+        candidate = draft.snapshot() if candidate is None else candidate
         previous = self.runtime_catalog()
+        cache = self._preview_cache
+        incremental = (cache is not None and self._install_toggle is not None
+                       and cache.stamp == self._applied_draft
+                       and same_value(cache.catalog, previous)
+                       and cache.environment == self.preview_environment(previous))
         if not same_value(candidate, previous):
             try:
-                self._install(candidate, previous)
+                changed = None
+                if incremental:
+                    changes = CatalogChanges.between(previous, candidate)
+                    plan = changes.replan(self.resolver, self._preferences(), previous, candidate, cache.plan)
+                    changed = self._install_toggle(candidate, previous, (cache.plan, plan))
+                if changed is None:
+                    self._install(candidate, previous)
+                else:
+                    self._refresh_preview(draft, candidate, plan, changes, changed)
             except BaseException:
+                self._applied_draft = self._preview_cache = self._validated_draft = None
                 self._install(previous, None)
                 raise
         self._live_catalog = None if same_value(candidate, self._catalog) else candidate
@@ -142,57 +164,71 @@ class ProfileStore:
         """
         self._check_draft(draft)
         cache = self._preview_cache
-        if (self._install_toggle is None or table not in {'assignments', 'suppressions'}
-                or cache is None or cache[:2] != (draft, draft.serial)
+        if (self._install_toggle is None or table not in {'categories', 'sections', 'assignments', 'suppressions'}
+                or cache is None or cache.stamp != (draft, draft.serial)
                 or self._applied_draft != (draft, draft.serial)
-                or cache[-1] != self.preview_environment(draft._catalog)):
+                or cache.environment != self.preview_environment(draft._catalog)):
             return None
         require(set(updates) <= ({'enabled', 'active'} if table == 'assignments' else {'enabled'})
                 and all(type(value) is bool for value in updates.values()), 'Expected Boolean binding choices')
         row = draft._catalog[table][id_]
-        require(not row.get('required') and not draft._catalog['sections'][row['section']].get('required'),
+        require(not row.get('required') and (table in {'categories', 'sections'}
+                or not draft._catalog['sections'][row['section']].get('required')),
                 'Required bindings cannot be toggled')
         previous = self.runtime_catalog()
         updated = {**row, **updates}
         candidate = {**previous, table: {**previous[table], id_: updated}}
-        _, _, preview, old_plan, active, _ = cache
-        sections, groups = old_plan
-        new_groups = groups.copy()
-        if table == 'assignments':
-            feature_ids = {i for i,r in candidate['assignments'].items() if r['feature'] == row['feature']}
-            for owner, requests in groups.items():
-                if any(profile_assignment_id(request.request_id) in feature_ids for request in requests):
-                    new_groups.pop(owner)
-            _, planned = self.resolver.plan(candidate, self._preferences(), assignment_ids=feature_ids)
-            new_groups.update(planned)
-            new_groups = dict(sorted(new_groups.items(), key=lambda entry: min(
-                candidate['assignments'][profile_assignment_id(r.request_id)]['order'] for r in entry[1])))
-        new_plan = sections, new_groups
+        changes = CatalogChanges.between(previous, candidate)
+        new_plan = changes.replan(self.resolver, self._preferences(), previous, candidate, cache.plan)
         try:
-            changed = self._install_toggle(candidate, previous, (old_plan, new_plan))
+            changed = self._install_toggle(candidate, previous, (cache.plan, new_plan))
         except BaseException:
             self._applied_draft = self._preview_cache = None
             self._install(previous, None)
             raise
         if changed is None:
             return None
-        assignment_ids, rule_ids = changed
-        ids = assignment_ids | rule_ids
         draft.update(table, id_, **updates)
         self._live_catalog = candidate
         self._applied_draft = draft, draft.serial
+        preview = self._refresh_preview(draft, candidate, new_plan, changes, changed)
+        self._validated_draft = (draft, draft.serial, self._preview_cache.environment)
+        return preview
+
+    def _refresh_preview(self, draft, candidate, new_plan, changes, native_changed):
+        """Patch the read model after a verified edit; retain untouched metadata."""
+        cache = self._preview_cache
+        preview, active = cache.view, cache.active
+        sections, new_groups = new_plan
+        assignment_ids = set(native_changed[0]) | changes.assignments
+        rule_ids = set(native_changed[1]) | changes.suppressions
+        ids = assignment_ids | rule_ids
         live = self.registration_results(ids)
         for key in ids:
             preview['runtime'].pop(key, None)
         preview['runtime'].update(live)
+        preview['sections'] = sections
+        for key in changes.rows['commands']:
+            if key in candidate['commands']:
+                preview['commands'][key] = self.resolver.describe_command(candidate['commands'][key])
+            else:
+                preview['commands'].pop(key, None)
         for key in assignment_ids:
+            if key not in candidate['assignments']:
+                preview['assignments'].pop(key, None)
+                continue
             definition = candidate['assignments'][key]
-            preview['assignments'][key].update(
+            preview['assignments'][key] = dict(
                 eligible=bool(definition.get('required') or sections[definition['section']] and definition.get('enabled', True)),
+                editable=not (definition.get('required') or candidate['sections'][definition['section']].get('required')),
+                availability=preview['commands'][definition['command']]['availability'],
                 active=definition.get('active', True), registered=live.get(key, (None, None))[0] == 'applied')
         for key in rule_ids:
+            if key not in candidate['suppressions']:
+                preview['suppressions'].pop(key, None)
+                continue
             definition = candidate['suppressions'][key]
-            preview['suppressions'][key].update(self._suppression_status(definition, candidate),
+            preview['suppressions'][key] = dict(self._suppression_status(definition, candidate),
                 eligible=bool(sections[definition['section']] and definition.get('enabled', True)),
                 registered=live.get(key, (None, None))[0] == 'applied')
         if assignment_ids:
@@ -215,12 +251,13 @@ class ProfileStore:
             def reviewed(values):
                 return reviewed_chain(candidate, values, approved)
             preview['conflicts'] = tuple(tuple(values) for values in active.values() if len(values) > 1 and not reviewed(values))
-        self._preview_cache = (draft, draft.serial, preview, new_plan, active, self.preview_environment(candidate))
+            preview['potential_overlaps'] = potential_overlaps(active)
+        self._preview_cache = PreviewCache(draft, draft.serial, candidate, preview, new_plan, active,
+                                          self.preview_environment(candidate))
         return preview
 
     def cached_preview_token(self):
-        _, _, preview, _, _, environment = self._preview_cache
-        return environment + (tuple(sorted(preview['runtime'].items())),)
+        return self._preview_cache.token
 
     def begin(self):
         require(not self._closed, 'Deluxe profile editor has been unloaded')
@@ -274,7 +311,7 @@ class ProfileStore:
         baseline = self._defaults if 'profile_version' in document else self._overlay_defaults
         return decode_profile(baseline, document)
 
-    def _validate(self, catalog):
+    def _validate(self, catalog, *, rna_baseline=None):
         validate_catalog(catalog)
         commands = [row['command'] for row in catalog['assignments'].values()]
         commands += [row['replacement'] for row in catalog['suppressions'].values() if 'replacement' in row]
@@ -305,11 +342,18 @@ class ProfileStore:
             for key, table in (('event', 'events'), ('command', 'commands')):
                 require(same_value(catalog[table].get(row[key]), self._defaults[table][row[key]]),
                         'Required event or command is read-only')
-        self.resolver.validate(catalog, self._defaults)
+        self.resolver.validate(catalog, self._defaults, previous=rna_baseline)
 
     def validate(self, draft):
         self._check_draft(draft)
-        self._validate(draft._catalog)
+        environment = self.preview_environment(draft._catalog)
+        stamp = draft, draft.serial, environment
+        if self._validated_draft != stamp:
+            cache = self._preview_cache
+            previous = (cache.catalog if cache and cache.draft is draft
+                        and cache.environment == self.preview_environment(cache.catalog) else None)
+            self._validate(draft._catalog, rna_baseline=previous)
+            self._validated_draft = stamp
 
     def _check_draft(self, draft):
         require(not self._closed, 'Deluxe profile editor has been unloaded')
@@ -321,6 +365,11 @@ class ProfileStore:
         """Return stored/effective state, command metadata and runtime diagnostics."""
         if draft is not None:
             self.validate(draft)
+            cache = self._preview_cache
+            if cache and cache.stamp == (draft, draft.serial) and cache.environment == self.preview_environment(cache.catalog):
+                # Runtime diagnostics can change independently of this draft.
+                if cache.token == self.preview_token(cache.catalog):
+                    return cache.view
         catalog = self._catalog if draft is None else draft._catalog
         state, groups = self._plan(catalog)
         assignments = catalog['assignments']
@@ -348,6 +397,7 @@ class ProfileStore:
                                   'registered': live.get(id_, (None, None))[0] == 'applied'}
                             for id_, row in assignments.items()},
             'commands': commands, 'conflicts': conflicts, 'inherited_conflicts': inherited,
+            'potential_overlaps': potential_overlaps(active),
             'suppressions': {id_: {**self._suppression_status(row, catalog),
                                    'eligible': bool(state[row['section']] and row.get('enabled', True)),
                                    'registered': live.get(id_, (None, None))[0] == 'applied'}
@@ -355,8 +405,8 @@ class ProfileStore:
             'runtime': live,
         }
         if draft is not None:
-            self._preview_cache = (draft, draft.serial, preview, (state, groups), active,
-                                   self.preview_environment(catalog))
+            self._preview_cache = PreviewCache(draft, draft.serial, draft.snapshot(), preview, (state, groups), active,
+                                               self.preview_environment(catalog))
             if same_value(catalog, self.runtime_catalog()):
                 self._applied_draft = draft, draft.serial
         return preview

@@ -286,7 +286,7 @@ class Resolver(CatalogPlanner):
         rna = _operator_rna(idname)
         return None if rna is None else (getattr(rna, 'as_pointer', lambda: id(rna))(), rna.name)
 
-    def validate(self, catalog, baseline):
+    def validate(self, catalog, baseline, *, previous=None):
         """Check edited values against live RNA and supported keymap scopes."""
         options = input_options()
         for id_, row in catalog['events'].items():
@@ -296,6 +296,8 @@ class Resolver(CatalogPlanner):
             for key, values in options['event'].items():
                 require(getattr(event, key) in values, f'Unknown event {key} in {id_}')
         for id_, row in catalog['commands'].items():
+            if previous is not None and same_value(previous['commands'].get(id_), row):
+                continue
             self.validate_command(row, id_)
         for id_, row in catalog['assignments'].items():
             if same_value(baseline.get('assignments', {}).get(id_), row):

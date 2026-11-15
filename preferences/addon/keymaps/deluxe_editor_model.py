@@ -430,7 +430,7 @@ class Editor:
         self.display_cache.clear()
         self.message = message
         try:
-            self.store.preview_draft(self.draft)
+            self.store.preview_draft(self.draft, candidate=catalog)
         except (ValueError, OSError, RuntimeError, ReferenceError) as error:
             self.preview_error = str(error)
         else:

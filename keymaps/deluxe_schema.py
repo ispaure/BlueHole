@@ -257,6 +257,8 @@ def independent_commands(catalog):
 
 def same_value(left, right):
     """JSON equality that distinguishes Boolean, integer and float choices."""
+    if left is right:
+        return True
     if type(left) is not type(right):
         return False
     if isinstance(left, list):

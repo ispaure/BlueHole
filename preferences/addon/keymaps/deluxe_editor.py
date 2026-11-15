@@ -373,6 +373,8 @@ def inspector(layout, current, preview, id_, *, width):
         layout.label(text='Another Deluxe binding uses this input in this context', icon='ERROR')
     if id_ in preview['inherited_conflicts']:
         layout.label(text='Overlaps Blender: ' + ', '.join(preview['inherited_conflicts'][id_]), icon='INFO')
+    if any(id_ in group for group in preview.get('potential_overlaps', ())):
+        layout.label(text='Possible input overlap (wildcard/modifier/repeat); dispatch depends on context.', icon='INFO')
 
     keymap = layout.box().column(align=True)
     keymap.label(text='KEYMAP')

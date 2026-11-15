@@ -101,6 +101,11 @@ class IncrementalTests(unittest.TestCase):
         editor.preview()
         return editor
 
+    def assert_fresh_preview(self, editor):
+        previous = deepcopy(editor.preview())
+        self.store._preview_cache = None
+        self.assertEqual(previous, self.store.preview(editor.draft))
+
     def test_boolean_edit_reuses_metadata_and_checks_only_affected_native_rows(self):
         editor = self.fast_editor()
         preview = editor.preview()
@@ -113,7 +118,7 @@ class IncrementalTests(unittest.TestCase):
             editor.set_enabled('assignments', 'view-frame', True)
         self.assertTrue(preview['assignments']['view-frame']['registered'])
         self.assertIs(self.image.keymap_items[0], unaffected)
-        self.assertEqual(preview, self.store.preview(editor.draft))
+        self.assert_fresh_preview(editor)
         self.assertEqual(editor._preview_token, self.store.preview_token(editor.catalog))
 
     def test_fast_toggle_is_undoable_and_does_not_mutate_saved_or_undo_snapshots(self):
@@ -138,7 +143,7 @@ class IncrementalTests(unittest.TestCase):
             self.assertEqual(source.active, not enabled)
             self.assertEqual([item.as_pointer() for item in self.view.keymap_items], native_rows)
             preview = editor.preview()
-            self.assertEqual(preview, self.store.preview(editor.draft))
+            self.assert_fresh_preview(editor)
             self.assertEqual(editor._preview_token, self.store.preview_token(editor.catalog))
 
     def test_unvalidated_structural_edit_cannot_use_boolean_fast_path(self):
@@ -166,6 +171,40 @@ class IncrementalTests(unittest.TestCase):
         editor = self.fast_editor()
         del self.h.runtime.bpy.ops.view3d.view_selected
         self.assertIsNone(self.store.toggle_enabled(editor.draft, 'assignments', 'view-frame', {'enabled':False}))
+
+    def test_category_and_section_toggles_match_fresh_previews_without_full_validation(self):
+        editor = self.fast_editor()
+        for table, key in [('sections', 'framing'), ('categories', 'navigation')]:
+            for enabled in (False, True):
+                with patch.object(self.store, '_validate', side_effect=AssertionError('full Boolean validation')):
+                    editor.set_enabled(table, key, enabled)
+                self.assert_fresh_preview(editor)
+                self.assertEqual(editor.preview()['sections']['framing'], enabled)
+
+    def test_structural_edit_reuses_untouched_rna_and_matches_full_read_model(self):
+        editor = self.fast_editor()
+        command = editor.catalog['assignments']['view-frame']['command']
+        with patch.object(self.store.resolver, 'validate_command', wraps=self.store.resolver.validate_command) as validate:
+            editor.draft.update('commands', command, label='My framing')
+            editor.changed()
+            self.assertFalse(editor.preview_error)
+            editor.preview()
+            self.assertEqual([call.args[1] for call in validate.call_args_list], [command])
+        self.assert_fresh_preview(editor)
+        for key in ('G', 'H'):
+            editor.draft.update('events', 'frame', type=key)
+            editor.changed()
+            self.assertFalse(editor.preview_error)
+            self.assertEqual(self.view.keymap_items[0].type, key)
+            self.assert_fresh_preview(editor)
+
+    def test_deleted_assignment_is_removed_from_cached_diagnostics(self):
+        editor = self.fast_editor()
+        editor.draft.delete('assignments', 'view-frame')
+        editor.changed()
+        self.assertFalse(editor.preview_error)
+        self.assertNotIn('view-frame', editor.preview()['assignments'])
+        self.assert_fresh_preview(editor)
 
 
 if __name__ == '__main__':

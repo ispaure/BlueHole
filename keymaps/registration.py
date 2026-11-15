@@ -22,6 +22,7 @@ class RegistrationService:
         self._preferences, self.catalog, self.saved_catalog = preferences, catalog, saved_catalog
         self._allowed = allowed
         self._stock_add_rows = []
+        self._stock_restore_pending = False
 
     def _defer_stock_add(self):
         """Let Blender distinguish Shift+A tap from drag before opening Add."""
@@ -62,18 +63,34 @@ class RegistrationService:
             raise
 
     def restore_stock_add(self):
+        """Restore only unchanged owned values; retain unreadable rows for retry."""
         if not self._stock_add_rows:
-            return
-        source = runtime.configuration('default')
+            self._stock_restore_pending = False
+            return True
         expected = replace(STOCK_ADD_EVENT, value='RELEASE')
-        for source_map, item, item_id, target in self._stock_add_rows:
-            if (runtime.contains_native(source.keymaps, source_map)
-                    and runtime.contains_native(source_map.keymap_items, item)
-                    and item.id == item_id
-                    and runtime.snapshot_item(item, False) == (expected, target, True)):
-                item.value = 'PRESS'
-        runtime.request_merged_update()
-        self._stock_add_rows.clear()
+        pending = []
+        changed = False
+        for row in self._stock_add_rows:
+            source_map, item, item_id, target = row
+            try:
+                source = runtime.configuration('default')
+                if (runtime.contains_native(source.keymaps, source_map)
+                        and runtime.contains_native(source_map.keymap_items, item)
+                        and item.id == item_id
+                        and runtime.snapshot_item(item, False) == (expected, target, True)):
+                    item.value = 'PRESS'
+                    changed = True
+            except (runtime.Pending, AttributeError, ReferenceError, RuntimeError, TypeError):
+                pending.append(row)
+        self._stock_add_rows = pending
+        self._stock_restore_pending = bool(pending)
+        if changed:
+            runtime.request_merged_update()
+        return not pending
+
+    @property
+    def stock_cleanup_pending(self):
+        return self._stock_restore_pending
 
     def plan(self, catalog, *, required_only=False):
         if not self._allowed():
@@ -179,9 +196,10 @@ class RegistrationService:
             runtime.release_features(('profile:deluxe-' + id_,))
         if any(owner in owners and any(request.target == ADD_PIE_TARGET for request in requests)
                for owner, requests in groups):
-            self.restore_stock_add()
+            if not self.restore_stock_add():
+                raise ProfileError('Stock Add bindings still await restoration')
         runtime.release_features(owners)
-        if default_bindings.pending_cleanup() or runtime.pending_cleanup():
+        if self.stock_cleanup_pending or default_bindings.pending_cleanup() or runtime.pending_cleanup():
             raise ProfileError('Native keymap cleanup is pending')
         self.register(candidate, owners=owners, rule_ids=rule_ids, plan=new_plan)
         if verify:

@@ -38,6 +38,7 @@ _enabled = False
 _registering = False
 _preference_state = None
 _profile_store = None
+_retired_stock_services = []
 _legacy_profile = False
 _last_error = None
 _wait_interval = 0.25
@@ -81,6 +82,19 @@ def deluxe_profile():
     if not _ready() or not prefs().keymap.deluxe_configured:
         raise ValueError('Configure Deluxe keymaps before opening the profile editor')
     return _catalog_store()
+
+
+def has_unsaved_edits():
+    return _profile_store is not None and _profile_store.has_unsaved_edits
+
+
+def _restore_stock_bindings():
+    """Keep restoration ownership alive after its profile store is closed."""
+    if _profile_store is not None and _profile_store.registration not in _retired_stock_services:
+        _retired_stock_services.append(_profile_store.registration)
+    _retired_stock_services[:] = [service for service in _retired_stock_services
+                                 if not service.restore_stock_add()]
+    return not _retired_stock_services
 
 
 def _catalog_store():
@@ -165,8 +179,7 @@ def _install_profile(candidate, previous):
 
 @keymap_utils.batch_merged_updates()
 def _clear_categories():
-    if _profile_store is not None:
-        _profile_store.restore_stock_add()
+    _restore_stock_bindings()
     default_bindings.release_all()
     keymap_utils.release_all()
     retained = keymap_utils.retained_edits()
@@ -189,7 +202,7 @@ def _apply_categories(*, profile=None):
     total = 0
     try:
         _clear_categories()
-        if default_bindings.pending_cleanup():
+        if _retired_stock_services or default_bindings.pending_cleanup() or keymap_utils.pending_cleanup():
             raise RuntimeError('Blender default bindings still await restoration')
         p = prefs()
         if runtime_keymaps_allowed(bpy.context, p.keymap):
@@ -262,6 +275,7 @@ def _retry_unload_cleanup():
     _unload_cleanup_attempts -= 1
     remaining = keymap_utils.retry_unreadable_cleanup(WATCH_REQUEST_BUDGET)
     remaining = bool(default_bindings.retry_cleanup()) or remaining
+    remaining = not _restore_stock_bindings() or remaining
     if remaining and _unload_cleanup_attempts:
         return WATCH_INTERVAL
     return None
@@ -275,7 +289,8 @@ def drain_cleanup():
         bpy.app.timers.unregister(_retry_unload_cleanup)
     owned_ready = keymap_utils.drain_cleanup(WATCH_REQUEST_BUDGET)
     defaults_ready = not default_bindings.retry_cleanup()
-    return owned_ready and defaults_ready
+    stock_ready = _restore_stock_bindings()
+    return owned_ready and defaults_ready and stock_ready
 
 
 def unregister():
@@ -287,7 +302,7 @@ def unregister():
         _clear_categories()
     finally:
         # Read Preferences may unload us before Blender restores operator RNA.
-        if (default_bindings.pending_cleanup() or
+        if (_retired_stock_services or default_bindings.pending_cleanup() or
                 any(row['reason'] == 'owned_snapshot_unavailable' for row in keymap_utils.pending_cleanup())):
             if not bpy.app.timers.is_registered(_retry_unload_cleanup):
                 _unload_cleanup_attempts = UNLOAD_CLEANUP_ATTEMPTS

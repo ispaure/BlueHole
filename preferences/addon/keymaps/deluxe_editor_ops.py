@@ -56,7 +56,7 @@ def editor():
 
 
 def require_saved_draft():
-    if _editor is not None and _editor.dirty:
+    if (_editor is not None and _editor.dirty) or keymaps_register.has_unsaved_edits():
         raise ValueError('Save or discard your keymap draft before updating Blue Hole or switching editing mode')
 
 
@@ -233,11 +233,22 @@ def sync_binding_rows(view, key, rows, selection, *, focus_context=''):
             view.list_focus = ''
         rebuilt = view.rows_key != key
         if rebuilt:
-            view.binding_rows.clear()
-            for values in rows():
-                row = view.binding_rows.add()
+            values_list = list(rows())
+            # Preserve RNA row identities when just labels or status changed.
+            # Expansion changes the sequence; rebuilding then keeps header focus.
+            same_rows = (len(view.binding_rows) == len(values_list) and all(
+                (row.kind, row.target) == (values['kind'], values['target'])
+                for row, values in zip(view.binding_rows, values_list)))
+            if not same_rows:
+                view.binding_rows.clear()
+            for index, values in enumerate(values_list):
+                if same_rows:
+                    row = view.binding_rows[index]
+                else:
+                    row = view.binding_rows.add()
                 for name, value in values.items():
-                    setattr(row, name, value)
+                    if getattr(row, name, None) != value:
+                        setattr(row, name, value)
             view.rows_key = key
         if view.list_focus:
             # Expansion is navigation, not a request to reveal the inspector's
