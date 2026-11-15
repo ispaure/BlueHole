@@ -1,6 +1,7 @@
 """Exact default disables must restore without touching changed or foreign rows."""
 
 import importlib
+from dataclasses import replace
 import unittest
 from unittest.mock import patch
 
@@ -72,6 +73,71 @@ class DefaultBindingTests(unittest.TestCase):
         self.assertFalse(self.item.active)
         self.api.release_all()
         self.assertTrue(self.item.active)
+
+    def test_addon_rule_detects_merged_origin_and_follows_enable_reload_disable(self):
+        map_ = self.h.runtime.map('addon', '3D View', space='VIEW_3D', tool=False)
+        item = map_.keymap_items.append_fixture(row('provider.action', prop_values={'mode': 'A'}))
+        selector = self.h.core.capture_selector(map_, item, source_role='addon')
+        candidate = self.h.resolver.capture_candidate(map_, item, 'addon')
+        self.assertTrue(candidate['can_disable'])
+        self.assertEqual(candidate['selector']['source_role'], 'addon')
+        inherited, reason = self.h.resolver._inherited_source(replace(selector, source_role='user'))
+        self.assertEqual(inherited, selector)
+        self.assertFalse(reason)
+        map_.keymap_items.remove(item)
+        self.api.install('provider', selector)
+        self.assertEqual(self.api.registration_results()['provider'][0], 'pending')
+        item = map_.keymap_items.append_fixture(row('provider.action', prop_values={'mode': 'A'}))
+        self.api.reconcile()
+        self.assertFalse(item.active)
+        map_.keymap_items.remove(item)
+        item = map_.keymap_items.append_fixture(row('provider.action', prop_values={'mode': 'A'}))
+        self.api.reconcile()
+        self.assertFalse(item.active)
+        self.api.release_all()
+        self.assertTrue(item.active)
+        self.assertEqual(self.api.reconcile(), 0)
+
+    def test_addon_native_edit_survives_watcher_and_removal(self):
+        map_ = self.h.runtime.map('addon', '3D View', space='VIEW_3D', tool=False)
+        item = map_.keymap_items.append_fixture(row('provider.action'))
+        selector = self.h.core.capture_selector(map_, item, source_role='addon')
+        self.api.install('provider', selector)
+        item.type, item.active = 'B', True
+        self.api.reconcile()
+        self.assertTrue(item.active)
+        self.api.release_all()
+        self.assertEqual(item.type, 'B')
+        self.assertTrue(item.active)
+
+    def test_legacy_addon_rule_resolves_exact_snapshot_and_refuses_ambiguity(self):
+        map_ = self.h.runtime.map('addon', '3D View', space='VIEW_3D', tool=False)
+        item = map_.keymap_items.append_fixture(row('provider.action', prop_values={'mode': 'A', 'new_default': 7}))
+        selector = self.h.core.capture_selector(map_, item, source_role='addon')
+        legacy = replace(selector, target=self.h.core.KeymapTarget('provider.action', {'mode': 'A'}))
+        self.api.install('legacy', legacy, explicit_properties=True)
+        self.assertFalse(item.active)
+        self.assertEqual(self.api.status(legacy, explicit_properties=True), ('resolved', ''))
+        self.api.release_all()
+        self.assertTrue(item.active)
+        duplicate = map_.keymap_items.append_fixture(row('provider.action', prop_values={'mode': 'A', 'new_default': 8}))
+        self.api.install('legacy', legacy, explicit_properties=True)
+        self.assertTrue(item.active)
+        self.assertTrue(duplicate.active)
+        self.assertEqual(self.api.status(legacy, explicit_properties=True)[0], 'ambiguous')
+        map_.keymap_items.remove(duplicate)
+        self.api.reconcile()
+        self.assertFalse(item.active)
+
+    def test_addon_disable_has_no_assumption_about_merged_item_ids(self):
+        map_ = self.h.runtime.map('addon', '3D View', space='VIEW_3D', tool=False)
+        item = map_.keymap_items.append_fixture(row('provider.action'))
+        selector = self.h.core.capture_selector(map_, item, source_role='addon')
+        # The actual Blender merger renumbers these IDs independently.
+        with patch.object(type(item), 'merged_copy', autospec=True, side_effect=lambda original: original.clone()):
+            self.api.install('provider', selector)
+            self.assertFalse(item.active)
+            self.assertEqual(self.api.status(selector), ('resolved', ''))
 
 
 if __name__ == '__main__':

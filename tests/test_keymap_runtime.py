@@ -456,6 +456,8 @@ class RuntimeKeymapTests(unittest.TestCase):
             with self.subTest(field=field):
                 source = self.source(row(**{field: value}))
                 addon = self.addon()
+                if field == 'hyper':
+                    addon.keymap_items.new_missing_fields.add('hyper')
                 event = self.event(**{field: value})
                 request = self.override(selector=self.selector(event=event),
                     assignment=self.assignment(event=event))
@@ -1146,6 +1148,27 @@ class RuntimeKeymapTests(unittest.TestCase):
         handle.release()
         self.assertEqual(len(addon.keymap_items), 0)
 
+    def test_merged_owned_request_identifies_only_live_unchanged_unique_rows(self):
+        self.addon()
+        handle = self.utils.register_feature('owner-a', assignments=(self.assignment(),))
+        merged = self.runtime.configs.user.keymaps.get('3D View')
+        self.runtime.configs.user = FakeConfig('user')
+        self.runtime.configs.user.keymaps.rows.append(merged)
+        item = next(iter(merged.keymap_items))
+        self.assertEqual(self.utils.owned_request_for_merged_item(merged, item), ('owner-a', 'replacement'))
+        item.is_user_modified = True
+        self.assertIsNone(self.utils.owned_request_for_merged_item(merged, item))
+        item.is_user_modified = False
+        source_map, source = handle.owned_pairs[0]
+        source.type = 'B'
+        self.assertIsNone(self.utils.owned_request_for_merged_item(merged, item))
+        source.type = 'A'
+        duplicate = merged.keymap_items.append_fixture(row('bluehole.replacement'))
+        self.assertIsNone(self.utils.owned_request_for_merged_item(merged, item))
+        merged.keymap_items.remove(duplicate)
+        handle.release()
+        self.assertIsNone(self.utils.owned_request_for_merged_item(merged, item))
+
     def test_partial_compatibility_pair_release_cancels_only_that_request(self):
         addon = self.addon()
         requests = (self.assignment('first', target=self.target('bluehole.first')),
@@ -1559,6 +1582,17 @@ class RuntimeKeymapTests(unittest.TestCase):
                 self.assertEqual(observed.map_type, map_type)
                 handle.release()
         self.assertEqual(len(addon.keymap_items), 0)
+
+    def test_assignment_applies_hyper_when_the_native_item_supports_it(self):
+        addon = self.addon()
+        for value in (True, -1):
+            with self.subTest(hyper=value):
+                request = self.assignment(event=self.event(hyper=value))
+                handle = self.utils.register_feature('hyper-row', assignments=(request,))
+                self.assertEqual(len(handle.owned_pairs), 1)
+                self.assertEqual(self.utils.capture_event(handle.owned_pairs[0][1]).hyper, value)
+                handle.release()
+                self.assertEqual(len(addon.keymap_items), 0)
 
     def test_equivalent_catalog_request_reuses_owned_item(self):
         addon = self.addon()

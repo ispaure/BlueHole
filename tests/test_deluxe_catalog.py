@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 import json
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -10,6 +11,85 @@ import test_deluxe_profiles
 
 class CatalogTests(unittest.TestCase):
     setUp = test_deluxe_profiles.ProfileTests.setUp
+
+    def test_shipped_default_disables_match_audited_legacy_entries(self):
+        audit = json.loads((test_deluxe_profiles.FIXTURES / 'deluxe_legacy_default_disables.json').read_text())
+        catalog = self.api.deluxe_catalog.load(test_deluxe_profiles.DEFAULTS)
+        records = audit['records']
+        self.assertEqual(len(records), 125)
+        imported = {row['rule_id']: row['rule'] for row in records if row['decision'] == 'imported'}
+        self.assertEqual(len(imported), 24)
+        self.assertEqual({id_: row for id_, row in catalog['suppressions'].items()
+                          if row['selector']['source_role'] == 'default'}, imported)
+        providers = {row['rule_id']: row['rule'] for row in records if row['decision'] == 'provider_rule'}
+        self.assertEqual(len(providers), 28)
+        self.assertEqual(catalog['suppressions'], {**imported, **providers})
+        self.assertEqual(len(catalog['assignments']), 803)
+        for row in records:
+            if row['decision'] != 'imported':
+                continue
+            selector = row['rule']['selector']
+            self.assertEqual(selector['target']['idname'], row['operator'])
+            for key, value in row['properties'].items():
+                self.assertEqual(selector['target']['properties'][key], value)
+            self.assertTrue(row['rule']['disable'])
+
+    def test_legacy_shared_commands_migrate_without_changing_binding_behavior(self):
+        legacy = deepcopy(self.defaults)
+        legacy['assignments']['image-frame']['command'] = 'frame-selected'
+        legacy['commands']['frame-selected']['properties']['use_all_regions'] = True
+        self.path.write_text(json.dumps(legacy))
+        before = self.path.read_bytes()
+        store = self.api.ProfileStore.open_catalog(self.path, lambda: self.settings, lambda *args: None)
+        migrated = store.snapshot()
+        first = migrated['assignments']['view-frame']['command']
+        second = migrated['assignments']['image-frame']['command']
+        self.assertNotEqual(first, second)
+        self.assertEqual(migrated['commands'][first], migrated['commands'][second])
+        self.assertEqual(self.path.read_bytes(), before)
+        self.assertEqual(store.resolver.plan(legacy, self.settings), store.resolver.plan(migrated, self.settings))
+        self.assertEqual(self.api.deluxe_catalog.load(self.path), migrated)
+        self.assertTrue(store.needs_migration)
+        store.apply(store.begin())
+        self.assertFalse(store.needs_migration)
+        self.assertEqual(self.api.deluxe_catalog.load(self.path, migrate=False), migrated)
+        self.runtime.bpy.ops = SimpleNamespace(view3d=SimpleNamespace(
+            view_selected=SimpleNamespace(get_rna_type=lambda: SimpleNamespace(
+                name='Frame Selected', properties={'use_all_regions': SimpleNamespace(
+                    name='All Regions', type='BOOLEAN', is_readonly=False, default=False)}))))
+        draft = store.begin()
+        draft.update('commands', first, properties={'use_all_regions': False})
+        committed = store.apply(draft)
+        reopened = self.api.ProfileStore.open_catalog(self.path, lambda: self.settings, lambda *args: None)
+        self.assertEqual(reopened.snapshot(), committed)
+        self.assertFalse(committed['commands'][first]['properties']['use_all_regions'])
+        self.assertTrue(committed['commands'][second]['properties']['use_all_regions'])
+
+    def test_legacy_overlay_edits_are_applied_before_separating_commands(self):
+        legacy = deepcopy(self.defaults)
+        legacy['assignments']['image-frame']['command'] = 'frame-selected'
+        overlay = {'schema_version': 1, 'catalog_version': legacy['catalog_version'], 'base': 'Blender',
+                   'changes': {'commands': {'frame-selected': {'properties': {'use_all_regions': True}}}}}
+        self.path.write_text(json.dumps(overlay))
+        store = self.api.ProfileStore(legacy, self.path, lambda: self.settings, lambda *args: None)
+        migrated = store.snapshot()
+        ids = [migrated['assignments'][id_]['command'] for id_ in ('view-frame', 'image-frame')]
+        self.assertNotEqual(*ids)
+        self.assertTrue(all(migrated['commands'][id_]['properties']['use_all_regions'] for id_ in ids))
+        draft = store.begin()
+        draft.update('commands', ids[0], properties={'use_all_regions': False})
+        committed = store.apply(draft)
+        reopened = self.api.ProfileStore(legacy, self.path, lambda: self.settings, lambda *args: None)
+        self.assertEqual(reopened.snapshot(), committed)
+
+    def test_required_binding_keeps_its_command_when_legacy_references_are_shared(self):
+        legacy = deepcopy(self.defaults)
+        legacy['sections']['overview']['required'] = True
+        legacy['assignments']['image-frame']['command'] = 'frame-selected'
+        migrated = self.schema.independent_commands(legacy)
+        self.assertEqual(migrated['assignments']['image-frame']['command'], 'frame-selected')
+        self.assertNotEqual(migrated['assignments']['view-frame']['command'], 'frame-selected')
+        self.assertEqual(self.schema.independent_commands(migrated), migrated)
 
     def open_catalog(self):
         self.io = self.api.deluxe_catalog
@@ -24,7 +104,7 @@ class CatalogTests(unittest.TestCase):
     def section(self, category):
         return self.path.parent / ('profile-sections/' + category + '.json')
 
-    def test_split_preserves_shared_identity_and_retires_only_deleted_section_files(self):
+    def test_split_keeps_owned_commands_local_and_retires_only_deleted_section_files(self):
         original = self.open_catalog()
         draft = self.store.begin()
         draft.put('categories', 'custom', {'label': 'Custom'})
@@ -33,13 +113,18 @@ class CatalogTests(unittest.TestCase):
         committed = self.store.apply(draft)
         master = json.loads(self.path.read_text())
         self.assertIn('frame', master['events'])
-        self.assertIn('frame-selected', master['commands'])
+        self.assertNotIn('frame-selected', master['commands'])
+        command = committed['assignments']['image-frame']['command']
+        self.assertNotEqual(command, 'frame-selected')
+        self.assertIn(command, json.loads(self.section('custom').read_text())['commands'])
         self.assertEqual(self.io.load(self.path), committed)
         self.assertTrue(self.section('custom').exists())
         unrelated = self.section('notes')
         unrelated.write_text('Keep this text file untouched')
         self.store.reload()
         draft = self.store.begin()
+        original_command = original['assignments']['image-frame']['command']
+        draft.put('commands', original_command, original['commands'][original_command])
         draft.update('assignments', 'image-frame', **original['assignments']['image-frame'])
         draft.delete('sections', 'custom-tools')
         draft.delete('categories', 'custom')

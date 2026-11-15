@@ -89,15 +89,6 @@
     "s-press-b7363541717f": {"type": "S", "alt": true}
   },
   "commands": {
-    "object-mode-set-fa1f913c4675": {"operator": "object.mode_set", "properties": {"mode": "POSE"}},
-    "uv-select-3858e55c057d": {"operator": "uv.select", "properties": {"deselect_all": true}},
-    "wm-tool-set-by-id-b964c80389c6": {"operator": "wm.tool_set_by_id", "properties": {"name": "builtin.select_box", "cycle": true}},
-    "uv-select-circle-80eeb98d142e": {"operator": "uv.select_circle", "properties": {"wait_for_input": false}},
-    "uv-select-423bbfc9f536": {"operator": "uv.select", "properties": {"extend": true}},
-    "screen-repeat-last-e940361179f3": {"operator": "screen.repeat_last", "properties": {}},
-    "wm-search-menu-1b31feeb626e": {"operator": "wm.search_menu", "properties": {}},
-    "wm-call-panel-ee17374e9674": {"operator": "wm.call_panel", "properties": {"name": "TOPBAR_PT_name", "keep_open": false}},
-    "wm-context-toggle-0872f8055a0f": {"operator": "wm.context_toggle", "properties": {"data_path": "space_data.show_region_ui"}},
-    "wm-context-toggle-a7297ca62aba": {"operator": "wm.context_toggle", "properties": {"data_path": "tool_settings.use_snap"}}
+    "object-mode-set-fa1f913c4675": {"operator": "object.mode_set", "properties": {"mode": "POSE"}}
   }
 }

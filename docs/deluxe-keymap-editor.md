@@ -2,8 +2,7 @@
 
 Open **Preferences → Add-ons → Blue Hole → Addon Settings → Keymaps** with
 Blender's built-in keymap preset. Click **Enable Deluxe Keymaps**.
-The editor has two tabs: **Bindings** and **Commands**. Bindings starts with
-**All Bindings**. Its single row of section tabs comes from the catalog:
+The editor opens on **All Bindings**. Each binding owns its operator and settings. Its single row of section tabs comes from the catalog:
 Mesh, Navigation, Object, Pipeline, Sculpt, Selection, Transform, UV, Other and Pie.
 Pick a section to see its **Enable … Keymaps** checkbox and subsection tabs.
 **All Mesh**, for example, includes every Mesh subsection; choosing Modeling
@@ -12,19 +11,19 @@ subsection stays on. Turning off Deluxe hides the editor below its toolbar;
 turning off a section hides its subsection tabs and list; turning off a
 subsection hides its bindings. These changes preview immediately.
 
-**Blender Context** is an independent searchable filter, such as 3D View,
-Mesh, or UV Editor. It combines with the selected section/subsection and text
-search. **All Bindings** clears all filters, including search and command,
-and shows disabled bindings too, marked as inactive. This makes it possible
-to inspect every use of a shared command. Bindings stay in one scrolling list; wide windows
-show Command, Keymap Binding and Context columns beside the selected binding's
-settings. Narrow windows place the settings above the list.
+**All Bindings** clears category/subsection filters and search, and shows disabled bindings
+marked as inactive. Bindings use Blender's collapsible context hierarchy, with
+contexts such as Mesh nested under 3D View. Category and search filters apply
+before the tree is drawn. Wide windows keep selection on the left and the
+selected binding's editor on the right. Narrow windows put the editor above the list.
+The context tree has its own scrollbar and a resize handle. Scrolling it leaves
+the inspector in place. Unchanged metadata and tree rows are cached; edits,
+filters, context expansion and provider changes refresh the relevant display.
 
 Section and subsection tabs follow catalog additions, renames, ordering and
 removals. Their selection and all browsing filters are temporary, never saved
 in JSON or Blender preferences. Missing sections fall back to All Bindings;
-missing subsections fall back to their parent section; missing contexts clear
-the context filter. The section's three-dot menu can add subsections, and
+missing subsections fall back to their parent section. The section's three-dot menu can add subsections, and
 rename, reorder or delete the selected empty subsection. There is currently
 no top-level section-creation UI.
 
@@ -43,7 +42,7 @@ catalog edits together. Valid edits preview automatically in the running
 keymaps without writing JSON. The toolbar identifies unsaved live changes.
 If preview fails, the previous working setup stays active and the error is shown.
 **Discard** restores the saved setup and drops the draft. Browsing, filtering,
-creating commands and linking bindings do not write JSON.
+adding bindings and choosing operators do not write JSON.
 
 If activation asks for a review, inspect saved Blender keymap customizations
 before proceeding. Activation failures show the next step in Blender and log
@@ -51,7 +50,6 @@ the failure. If the runtime cannot rebuild the shortcuts, activation restores
 the prior preference choices.
 
 - Select a binding to see its key, section and command settings.
-  **View Command** opens the reusable command in the full Commands library.
   Select **Key-Binding** to search for a shortcut such as `Shift F10` or
   `Ctrl Shift A`. Use **Name** to search by command name, operator ID, Blender
   context, or add-on source such as `Zen UV`. Search respects the active filters.
@@ -61,60 +59,70 @@ the prior preference choices.
   Blender's collection shortcut. The same rule applies when you recreate an
   assignment. **Enter Object Mode** keeps the collection shortcut available
   when the object is already in Object Mode.
-- The checkbox beside the assignment name enables that assignment.
-  **Keymap Binding** contains a **Keyboard / Mouse** selector, key capture,
+- **Enabled** beside the assignment name turns that Blue Hole binding on or off
+  without deleting it. Inactive entries start unchecked; checking one activates it.
+  **KEYMAP** contains a **Keyboard / Mouse** selector, key capture,
   event phase and **Repeat** checkbox. Repeat is available for keyboard Press
-  or Any events and stays visible but inactive otherwise. Switching input type
-  starts from A or Left Mouse, preserving modifiers. Click the key to capture
+  or Any events and stays visible but inactive otherwise. Changing to a mouse
+  input or a non-repeating phase clears Repeat. Switching input type
+  starts from A or Left Mouse, preserving modifiers. Choose the key directly in
+  its dropdown (including Escape or None), or click the capture icon to enter
   the desired key or mouse button for that assignment.
-  Expand **Shared Shortcut** to see the linked assignments grouped by
-  section, with each assignment's context and enabled state. **Change All**
-  asks for confirmation before capturing a shortcut for the whole group,
-  including inactive assignments. Escape cancels capture. **Advanced
-  Shortcut** opens the full event settings for the selected assignment.
-- Click **Keymap Context** and type a Blender keymap name to change where the
+  Shortcut edits affect only the selected binding. Escape cancels key capture.
+  Modifier buttons cycle through Off, On and Either. Hyper appears on Blender
+  versions that support it. All shortcut settings are inline.
+- Click **Context** and type a Blender keymap name to change where the
   selected assignment runs. Choosing a result stages the change for that
   assignment. If a shortcut is needed in several contexts, create an
-  assignment for each context and reuse the same shortcut and command.
-  **Binding Settings** also lets you move an assignment to another section
-  or choose an existing command, shortcut and Blender context. To add a binding,
-  choose **Add Binding** and select its subsection, command, input and context.
-  **Actions → New Shortcut** adds an input to the library for reuse in Binding Settings.
-- **Commands** is the complete reusable library, including unused commands.
-  Its optional section/subsection filters follow where commands are used;
-  commands themselves do not belong to sections. **New Command** chooses a
-  registered Blender operator and optional name. **Duplicate** creates an
-  independent variation. **Add Binding** opens the binding dialog with that
-  command already selected. **Delete Unused** is available only when no binding
-  or replacement rule refers to the command.
-- Editing in Commands affects every linked binding, including disabled ones.
-  The inspector shows the usage count and **View All Bindings**, which clears
-  search, section and context filters and shows only that command's bindings.
-  In a binding's inspector, command editing defaults to **This Binding Only**:
-  shared commands are copied automatically on the first edit; further edits
-  reuse the private command. Choose **All Linked Bindings** to edit the shared
-  definition explicitly. This applies to inline fields, reset buttons and
-  array/flag dialogs.
-- Expand **Additional Blender Settings** to see fields using Blender defaults.
-  The **×** beside a configured value restores its default. Boolean, integer,
-  float, string, enum, enum-flag and fixed numeric array controls follow live
-  Blender RNA metadata. Menu/tool routes and provider-managed values remain
-  read-only. Missing add-on operators show **Waiting for add-on** and leave
-  the binding unregistered until the provider loads.
-- **Blender Defaults & Overrides** above the assignment list shows default
-  disables, replacements and review-only targets. It follows the same section,
-  context and command filters; **All Bindings** shows all rules. **Browse Blender Defaults** opens a searchable live picker.
-  Select an exact binding, choose its destination section, and stage
-  **Disable binding with Blue Hole**. The disable previews immediately;
-  **Save and Apply Changes** persists it. **Restore Binding** removes the rule
-  in the draft, and **Enable Rule** can temporarily turn it off.
-- In Blender's native **Preferences → Keymap**, right-click a binding's key or
-  checkbox and choose **Disable Binding with Blue Hole…**. Review its destination
-  section and stage it; Blue Hole opens the corresponding override list. A
+  assignment for each context. Each has independent command settings.
+  **Category** and **Subsection** dropdowns sit side by side above **KEYMAP** and
+  move the selected binding. Enable
+  checkboxes for those groups appear only when browsing their category or subsection.
+- **Add New** sits at the bottom of each supported concrete keymap context,
+  including empty contexts. Container contexts use a **(Global)** child for their
+  own bindings. A new row starts unassigned, with no runtime effect until configured;
+  edit its key, operator and properties on the right. There is no global Add Binding
+  button, setup dialog or Actions menu.
+- The right pane stacks **KEYMAP**, **COMMAND** and **PROPERTIES**. Type in the
+  **Operator** field to search registered operator IDs and names, or enter an ID
+  for an operator that is not installed yet. Changing
+  it starts with the new operator's defaults and leaves every other binding alone.
+  There is no separate Commands library or command-linking option.
+- **PROPERTIES** shows configured values and Blender defaults together.
+  **Reset** beside an overridden value restores Blender's default for this binding.
+  Boolean, integer, float, string, enum, enum-flag and fixed numeric array controls
+  follow live Blender RNA metadata, including menu names such as
+  `wm.call_menu_pie` → `name`. Missing operators remain saved and unregistered;
+  their editable properties appear when the operator becomes available.
+- **Undo**, Cmd+Z and Ctrl+Z reverse staged edits, including binding deletion,
+  operator changes and setting resets. Saving, discarding or reloading clears
+  the editor's undo history.
+- Additions and default-change rules share the context tree. A **+** icon identifies
+  a keymap added by Blue Hole Deluxe; red text with a **−** icon identifies a Blender or add-on
+  keymap disable rule. Hover the row for its origin and state. An inactive added binding remains
+  an addition, not a disabled Blender default. The **X** at the end of a row removes
+  an addition or removes a rule and restores its original shortcut. **Undo** reverses
+  either action. **Enable Rule** can temporarily turn a rule off.
+  The shipped catalog currently contains 803 additions, including 12 inactive
+  entries, 24 Blender-default disable rules and 28 add-on disable rules. The
+  latter cover 32 legacy entries (four duplicate shortcuts share a rule).
+  Add-on rules remain pending until an exact, unique source exists. The other
+  69 legacy disabled entries have no matching inherited shortcut in the audit;
+  they are recorded in `tests/fixtures/deluxe_legacy_default_disables.json`.
+- In Blender's native **Preferences → Keymap**, right-click the small checkbox
+  immediately to the left of a binding's name and choose **Disable Binding with Blue Hole…**. Review its destination
+  section and stage it; Blue Hole opens the corresponding bindings area. A
   managed disabled row offers **Restore Binding with Blue Hole** instead.
-  Disables require an exact, unchanged non-modal Blender default. Native user
+  On Blue Hole's own additions, **Disable Binding with Blue Hole** disables the
+  existing **+** binding and opens it in the editor, without adding a separate
+  disable rule. This also supports Undo and Discard. Adding a shortcut does not disable
+  another shortcut with the same command, including Blender's original binding.
+  The source is detected automatically, including add-on shortcuts. Rules
+  follow an add-on being enabled or reloaded after startup; turning a rule,
+  its category/subsection, or Deluxe off restores the original shortcut.
+  Disables require an exact, unchanged non-modal inherited shortcut. Native user
   customizations, modal/tool maps and ambiguous matches are not modified.
-  Disabling Deluxe or unloading Blue Hole restores its default changes.
+  Disabling Deluxe or unloading Blue Hole restores its managed changes.
   Existing review-only targets remain inert; the supported Select All replacement
   remains available. Other Deluxe additions can overlap or take precedence over
   defaults without deleting them.
@@ -196,12 +204,11 @@ both moved the UV cursor to (0, 1).
 Ctrl+Shift+Alt+MMB fitted the selected UVs inside the active trim. The
 Reference keyconfig and preference file hashes matched before and after.
 
-A disposable Blender 5.2.2 preset verifies Bindings and Commands, combined
-section/context filters, command creation/duplication and binding reuse,
-shared and single-binding command edits and key capture,
-typed key search, keymap context changes, inline command settings, and
-the supported Select All replacement in the binding picker. Apply,
-Discard, Reload Profile and a cold relaunch were also verified.
+A disposable Blender 5.2.2 preset verifies context/category filters, direct
+operator selection, independent settings on bindings with identical operators,
+operator changes, reset, undo, deletion, key capture, save/reload and preview
+cleanup. The JSON migration preserves all 803 binding configurations and all
+810 resolved runtime requests exactly.
 
 The [profile API contract](deluxe-keymap-profiles.md) describes persistence,
 validation and recovery. The existing Blender Keymap preferences retain
@@ -211,8 +218,9 @@ control of inherited bindings and native saved edits.
 
 The small [master JSON](../keymaps/deluxe-defaults.json) lists one file per top-level
 section in [deluxe-defaults-sections](../keymaps/deluxe-defaults-sections). Section
-files contain their subsections, assignments and local commands/events; shared
-commands/events remain in the master. UI edits preview immediately but only
+files contain their subsections, assignments and their independent commands.
+Shared input records and unused legacy records remain in the master. Legacy
+shared commands are separated on load and persisted on Save and Apply Changes. UI edits preview immediately but only
 **Save and Apply Changes** writes these files.
 
 After text-editor changes, use the gear menu's **Validate and Reload JSON Files**.

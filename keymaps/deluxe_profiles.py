@@ -14,7 +14,7 @@ from . import keymap_utils as runtime
 from . import default_bindings, deluxe_catalog
 from .keymap_utils import resolve_scope
 from .deluxe_resolver import Resolver, capture_candidate, profile_assignment_id, selector_status
-from .deluxe_schema import (ProfileError, TABLES, identifier, merge_profile, profile_overlay,
+from .deluxe_schema import (ProfileError, TABLES, identifier, independent_commands, merge_profile, profile_overlay,
                             require, same_value, selector_descriptor, validate_catalog)
 
 ADD_PIE_EVENT = runtime.KeymapEvent('A', value='CLICK_DRAG', shift=True)
@@ -43,7 +43,27 @@ class Draft:
         """Insert or replace one complete row. Validation allows multi-step edits."""
         self._open()
         require(table in TABLES and identifier(id_) and isinstance(row, dict), 'Invalid draft entry')
-        self._catalog[table][id_] = deepcopy(row)
+        row = deepcopy(row)
+        field = {'assignments': 'command', 'suppressions': 'replacement'}.get(table)
+        previous = self._catalog[table].get(id_, {}).get(field) if field else None
+        if field and field in row and row[field] in self._catalog['commands']:
+            source = row[field]
+            if any((other_table, other_id) != (table, id_)
+                   for other_table, other_id in self.command_owners(source)):
+                row[field] = uuid4().hex
+                self._catalog['commands'][row[field]] = deepcopy(self._catalog['commands'][source])
+        self._catalog[table][id_] = row
+        if previous and previous != row.get(field):
+            self._remove_unused_command(previous)
+
+    def command_owners(self, command):
+        return tuple((table, id_) for table, field in
+                     (('assignments', 'command'), ('suppressions', 'replacement'))
+                     for id_, row in self._catalog[table].items() if row.get(field) == command)
+
+    def _remove_unused_command(self, command):
+        if not self.command_owners(command):
+            self._catalog['commands'].pop(command, None)
 
     def update(self, table, id_, **fields):
         self.put(table, id_, {**self._catalog[table][id_], **fields})
@@ -51,7 +71,10 @@ class Draft:
     def delete(self, table, id_):
         self._open()
         require(table in TABLES, 'Unknown profile table')
-        del self._catalog[table][id_]
+        row = self._catalog[table].pop(id_)
+        field = {'assignments': 'command', 'suppressions': 'replacement'}.get(table)
+        if field and field in row:
+            self._remove_unused_command(row[field])
 
     def uses(self, table, id_):
         """Return assignment IDs affected by an event or command edit."""
@@ -100,6 +123,10 @@ class Draft:
         self._open()
         self._catalog = self._store.defaults()
 
+    def restore(self, snapshot):
+        self._open()
+        self._catalog = deepcopy(snapshot)
+
     def discard(self):
         self._closed = True
 
@@ -122,6 +149,8 @@ class ProfileStore:
 
     def __init__(self, defaults, path, preferences, install, *, allowed=lambda: True, edit_defaults=False):
         validate_catalog(defaults)
+        self._overlay_defaults = deepcopy(defaults)
+        defaults = independent_commands(defaults)
         self._defaults = deepcopy(defaults)
         self._catalog = deepcopy(defaults)
         self.resolver = Resolver(defaults)
@@ -245,10 +274,13 @@ class ProfileStore:
 
     def _read(self):
         self.load_error = ''
+        self.needs_migration = False
         try:
-            stored = deluxe_catalog.load(self.path) if self.edit_defaults else self._file.read_json()
-            catalog = stored if self.edit_defaults else merge_profile(self._defaults, stored)
+            stored = deluxe_catalog.load(self.path, migrate=False) if self.edit_defaults else self._file.read_json()
+            original = stored if self.edit_defaults else merge_profile(self._overlay_defaults, stored)
+            catalog = independent_commands(original)
             self._validate(catalog)
+            self.needs_migration = not same_value(original, catalog)
             return catalog, None
         except FileNotFoundError:
             if not self.edit_defaults:
@@ -256,9 +288,9 @@ class ProfileStore:
         except (OSError, ValueError, RecursionError) as error:
             self.load_error = str(error)
         try:
-            stored = (deluxe_catalog.load(self.path.with_suffix('.previous.json'))
+            stored = (deluxe_catalog.load(self.path.with_suffix('.previous.json'), migrate=False)
                       if self.edit_defaults else self._backup.read_json())
-            catalog = stored if self.edit_defaults else merge_profile(self._defaults, stored)
+            catalog = independent_commands(stored if self.edit_defaults else merge_profile(self._overlay_defaults, stored))
             self._validate(catalog)
             return catalog, 'invalid_profile_recovered_previous'
         except (OSError, ValueError, RecursionError):
@@ -266,6 +298,9 @@ class ProfileStore:
 
     def _validate(self, catalog):
         validate_catalog(catalog)
+        commands = [row['command'] for row in catalog['assignments'].values()]
+        commands += [row['replacement'] for row in catalog['suppressions'].values() if 'replacement' in row]
+        require(len(commands) == len(set(commands)), 'Each binding must own its command settings')
         for table in ('categories', 'sections', 'assignments'):
             for id_, row in catalog[table].items():
                 shipped = self._defaults[table].get(id_, {})
@@ -340,6 +375,26 @@ class ProfileStore:
             'runtime': live,
         }
 
+    def preview_token(self, catalog):
+        """Cheap invalidation for browsing; edits still validate before applying."""
+        operators = {row['operator'] for row in catalog['commands'].values() if 'operator' in row}
+        operators.update(row['selector']['target']['idname'] for row in catalog['suppressions'].values()
+                         if 'idname' in row['selector']['target'])
+        rna = []
+        for id_ in sorted(operators):
+            value = self.resolver.describe_operator_token(id_)
+            rna.append((id_, value))
+        configs = []
+        for role in ('default', 'addon', 'user', 'active'):
+            try:
+                config = runtime._config(role)
+                configs.append((role, getattr(config, 'as_pointer', lambda: id(config))(),
+                                len(tuple(config.keymaps))))
+            except runtime._Pending:
+                configs.append((role, None))
+        return (self._generation, self._allowed(), self._preferences().keymap.enable_keymaps,
+                tuple(configs), tuple(rna), tuple(self.registration_results().items()))
+
     @staticmethod
     def _inherited_conflicts(active):
         """Report exact event overlap with the built-in base by assignment ID."""
@@ -363,7 +418,7 @@ class ProfileStore:
     def _suppression_status(self, row, catalog):
         selector = selector_descriptor(row['selector'])
         if row.get('disable'):
-            status, reason = default_bindings.status(selector)
+            status, reason = default_bindings.status(selector, explicit_properties=row.get('explicit_properties', False))
             return {'status': status, 'reason': reason}
         replacement = (self.resolver.target(catalog['commands'][row['replacement']])
                        if 'replacement' in row else None)
@@ -374,17 +429,17 @@ class ProfileStore:
         """Install then publish. Restore the committed runtime if either step fails."""
         self.validate(draft)
         candidate = deepcopy(draft._catalog)
-        stored = candidate if self.edit_defaults else profile_overlay(self._defaults, candidate)
+        stored = candidate if self.edit_defaults else profile_overlay(self._overlay_defaults, candidate)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with file_lock(self._lock) as acquired:
             require(acquired, 'Another Blender process is saving this profile')
             require(self._disk_revision() == self._revision != 'unreadable', 'Profile file changed on disk')
-            if not self.load_issue and same_value(candidate, self._catalog):
+            if not self.load_issue and not self.needs_migration and same_value(candidate, self._catalog):
                 draft.discard()
                 return self.snapshot()
             previous = self._catalog
             # Keep an independently validated recovery copy before changing runtime.
-            backup = previous if self.edit_defaults else profile_overlay(self._defaults, previous)
+            backup = previous if self.edit_defaults else profile_overlay(self._overlay_defaults, previous)
             self._backup.write_json(backup, compact=True)
             try:
                 self._install(candidate, previous)
@@ -410,6 +465,7 @@ class ProfileStore:
             self._generation += 1
             self.load_issue = None
             self.load_error = ''
+            self.needs_migration = False
             draft.discard()
             try:
                 self._backup.write_json(stored, compact=True)
@@ -476,7 +532,7 @@ class ProfileStore:
                     continue
                 row = catalog['assignments'][id_]
                 command = catalog['commands'][row['command']]
-                if self.resolver.describe_command(command)['availability'] == 'waiting_for_provider':
+                if self.resolver.describe_command(command)['availability'] != 'available':
                     continue
                 unchanged = same_value(self._catalog['assignments'].get(id_), row)
                 unchanged = unchanged and all(same_value(self._catalog[table].get(row[key]),
@@ -519,7 +575,8 @@ class ProfileStore:
             if not (sections[row['section']] and row.get('enabled', True)):
                 continue
             if row.get('disable'):
-                default_bindings.install(id_, selector_descriptor(row['selector']))
+                default_bindings.install(id_, selector_descriptor(row['selector']),
+                                         explicit_properties=row.get('explicit_properties', False))
                 continue
             request = self.resolver.suppression_request(id_, row, catalog['commands'])
             if request is not None:

@@ -1,7 +1,8 @@
 """Draft operations and display values for the Deluxe Preferences editor."""
 
-from collections import Counter
+from collections import deque
 from copy import deepcopy
+from dataclasses import dataclass
 import json
 from struct import pack, unpack
 from time import monotonic
@@ -39,7 +40,13 @@ def title(identifier):
 
 
 def map_type(key):
-    if 'MOUSE' in key or key.startswith(('TRACKPAD', 'MOUSEROTATE')):
+    if key.startswith('TIMER'):
+        return 'TIMER'
+    if key == 'TEXTINPUT':
+        return 'TEXTINPUT'
+    # Blender classifies the legacy smart-zoom token as Keyboard, even though
+    # it is exposed alongside mouse inputs in RNA.
+    if key != 'MOUSESMARTZOOM' and ('MOUSE' in key or key.startswith('TRACKPAD') or key in {'PEN', 'ERASER'}):
         return 'MOUSE'
     if key.startswith('NDOF'):
         return 'NDOF'
@@ -129,8 +136,61 @@ def context_label(scope):
                        *(['Modal'] if scope.get('is_modal') else [])])
 
 
+def scope_key(scope):
+    return scope['name'], scope.get('space_type', 'EMPTY'), scope.get('region_type', 'WINDOW')
+
+
 def context_id(scope):
-    return json.dumps([scope['name'], scope.get('space_type', 'EMPTY'), scope.get('region_type', 'WINDOW')])
+    return json.dumps(scope_key(scope))
+
+
+@dataclass
+class BindingContext:
+    id: str
+    label: str
+    bindings: list
+    children: list
+    scope: dict | None = None
+
+
+def binding_context_tree(hierarchy, groups, available_scopes=()):
+    """Keep Blender's context order and retain scopes outside its built-in tree."""
+    remaining = dict(groups)
+    available = {scope_key(scope): scope for scope in available_scopes}
+    for key in available:
+        remaining.setdefault(key, [])
+
+    def prune(entries):
+        contexts = []
+        for name, space, region, subcontexts in entries:
+            key = name, space, region
+            bindings = remaining.pop(key, [])
+            children = prune(subcontexts)
+            scope = available.get(key)
+            if subcontexts and (bindings or scope):
+                children.insert(0, BindingContext(json.dumps((*key, 'global')), f'{name} (Global)', bindings, [], scope))
+                bindings = []
+                scope = None
+            if bindings or children or scope:
+                contexts.append(BindingContext(json.dumps(key), name, bindings, children, scope))
+        return contexts
+
+    contexts = prune(hierarchy)
+    for key, bindings in sorted(remaining.items()):
+        name, space, region = key
+        label = context_label({'name': name, 'space_type': space, 'region_type': region})
+        contexts.append(BindingContext(json.dumps(key), label, bindings, [], available.get(key)))
+    return contexts
+
+
+def binding_context_path(contexts, assignment):
+    for context in contexts:
+        if assignment in context.bindings:
+            return (context.id,)
+        path = binding_context_path(context.children, assignment)
+        if path:
+            return (context.id, *path)
+    return ()
 
 
 def display_value(value):
@@ -146,33 +206,29 @@ class Editor:
 
     def __init__(self, store):
         self.capture_assignment = ''
-        self.capture_shared = False
         self.store = store
         self.defaults = store.defaults()
         self.draft = store.begin()
         self.saved = store.snapshot()
         self.catalog = self.draft.snapshot()
+        self._undo = deque(maxlen=32)
         self.category = 'navigation' if 'navigation' in self.catalog['categories'] else ''
         self.feature_category = self.category
         self.feature_section = ''
         self.section = ''
         self.assignment = ''
-        self.expanded_shortcut = ''
-        self.expanded_linked_section = ''
-        self.command = ''
-        self.command_category = ''
-        self.command_section = ''
         self.binding_all = True
         self.binding_category_all = True
-        self.binding_context = ''
-        self.binding_command = ''
-        self.focus_command = False
+        self.binding_context_expansion = {}
+        self.binding_selection_path = ()
         self.page = 0
         self.message = ''
-        self.dirty = False
+        self.dirty = store.needs_migration
         self.preview_error = ''
         self._preview = None
         self._preview_at = 0
+        self._preview_token = None
+        self.display_cache = {}
         self.ensure_selection()
 
     def ensure_selection(self):
@@ -182,10 +238,6 @@ class Editor:
             self.binding_all = True
         if self.section not in self.catalog['sections']:
             self.binding_category_all = True
-        if self.binding_context not in self.binding_contexts():
-            self.binding_context = ''
-        if self.binding_command not in self.catalog['commands']:
-            self.binding_command = ''
         for category_attr, section_attr in (('category', 'section'),
                                             ('feature_category', 'feature_section')):
             category = getattr(self, category_attr)
@@ -195,15 +247,6 @@ class Editor:
             sections = self.sections(category)
             if getattr(self, section_attr) not in sections:
                 setattr(self, section_attr, next(iter(sections), ''))
-        if self.command_category not in categories:
-            self.command_category = self.command_section = ''
-        elif self.command_section not in self.sections(self.command_category):
-            self.command_section = ''
-
-    def binding_contexts(self):
-        rows = [row['scope'] for row in self.catalog['assignments'].values()]
-        rows += [row['selector']['scope'] for row in self.catalog['suppressions'].values()]
-        return {context_id(scope): scope for scope in sorted(rows, key=context_label)}
 
     def accepts_binding(self, row):
         if not self.binding_all:
@@ -211,14 +254,11 @@ class Editor:
                 return False
             if not self.binding_category_all and row['section'] != self.section:
                 return False
-        return ((not self.binding_context or context_id(row['scope']) == self.binding_context)
-                and (not self.binding_command or row['command'] == self.binding_command))
+        return True
 
-    def show_all_bindings(self, command=''):
+    def show_all_bindings(self):
         self.binding_all = True
         self.binding_category_all = True
-        self.binding_context = ''
-        self.binding_command = command
         self.assignment, self.page = '', 0
 
     def select_category(self, category):
@@ -235,33 +275,128 @@ class Editor:
         self.binding_all = self.binding_category_all = False
         self.assignment, self.page = '', 0
 
-    def create_command(self, operator='', label='', source=''):
-        row = deepcopy(self.catalog['commands'][source]) if source else {'operator': operator, 'properties': {}}
-        require('operator' in row, 'Modal tokens cannot be created as ordinary commands')
-        if label.strip():
-            row['label'] = label.strip()
-        self.store.resolver.validate_command(row, 'new-command')
-        id_ = uuid4().hex
-        self.draft.put('commands', id_, row)
-        self.command = id_
-        self.command_category = self.command_section = ''
-        self.focus_command = True
-        self.changed('Command added; create a binding to use it')
-        return id_
+    def configure_binding(self, section, event, operator, scope, *, assignment=''):
+        """Create or edit a binding with its own operator configuration."""
+        operator = operator.strip().removeprefix('bpy.ops.')
+        require(section in self.catalog['sections'] and not self.catalog['sections'][section].get('required'),
+                'Choose an editable section')
+        require(event in self.catalog['events'], 'Choose a shortcut')
+        if assignment:
+            self.require_editable_assignment(assignment)
+            command = self.catalog['assignments'][assignment]['command']
+            updated = self.operator_command(command, operator)
+        else:
+            command = uuid4().hex
+            updated = {'operator': operator, 'properties': {}}
+            self.store.resolver.validate_command(updated, command)
+        command = self.stage_command(command, updated)
+        if assignment:
+            self.draft.update('assignments', assignment, section=section, event=event, scope=scope)
+        else:
+            assignment = self.draft.add_assignment(section, event, command, scope)
+        self.changed('Binding updated' if assignment in self.saved['assignments'] else 'Binding added')
+        self.select_section(section)
+        self.assignment = assignment
+        return assignment
 
-    def remove_command(self, id_):
-        require(not self.draft.uses('commands', id_) and not any(
-            row.get('replacement') == id_ for row in self.catalog['suppressions'].values()),
-            'Remove or change every binding and replacement rule before deleting this command')
-        self.draft.delete('commands', id_)
-        self.command = ''
-        self.changed('Unused command removed')
+    def add_binding(self, scope, section=''):
+        """Add an unassigned row directly in a concrete context, without activating a shortcut."""
+        if not self.binding_all:
+            section = self.section
+        choices = [id_ for id_, row in self.catalog['sections'].items() if not row.get('required')
+                   and (self.binding_all or row['category'] == self.category)]
+        require(bool(choices), 'Create an editable subsection first')
+        if section not in choices:
+            section = self.section if self.section in choices else choices[0]
+        event = uuid4().hex
+        command = uuid4().hex
+        self.draft.put('events', event, {'type': 'NONE'})
+        self.draft.put('commands', command, {'operator': '', 'properties': {}})
+        assignment = self.draft.add_assignment(section, event, command, scope)
+        self.changed('Binding added')
+        self.assignment = assignment
+        return assignment
 
-    def changed(self, message='Changes staged'):
-        self.catalog = self.draft.snapshot()
+    def move_binding(self, id_, *, category='', section=''):
+        table = 'assignments' if id_ in self.catalog['assignments'] else 'suppressions'
+        if table == 'assignments':
+            self.require_editable_assignment(id_)
+        if category:
+            choices = [id_ for id_ in self.sections(category) if not self.catalog['sections'][id_].get('required')]
+            require(bool(choices), 'Choose a category with an editable subsection')
+            section = choices[0]
+        require(section in self.catalog['sections'] and not self.catalog['sections'][section].get('required'),
+                'Choose an editable subsection')
+        self.draft.update(table, id_, section=section)
+        if not self.binding_all:
+            self.select_section(section)
+        self.assignment = id_
+        self.changed('Binding category updated')
+
+    def can_change_operator(self, command):
+        operator = self.catalog['commands'][command].get('operator')
+        return operator is not None and all(
+            not self.catalog['sections'][self.catalog['assignments'][id_]['section']].get('required')
+            for id_ in self.draft.uses('commands', command))
+
+    def operator_command(self, command, operator):
+        original = self.catalog['commands'][command]
+        if operator == original['operator']:
+            return original
+        require(self.can_change_operator(command), 'This binding is required')
+        updated = {'operator': operator, 'properties': {}}
+        if original.get('label'):
+            updated['label'] = original['label']
+        self.store.resolver.validate_command(updated, command)
+        return updated
+
+    def change_command_operator(self, command, operator):
+        operator = operator.strip().removeprefix('bpy.ops.')
+        updated = self.operator_command(command, operator)
+        self.stage_command(command, updated)
+        self.changed('Command operator changed')
+
+    def stage_command(self, command, updated):
+        if 'provider' in self.catalog['commands'].get(command, {}) and 'provider' not in updated:
+            # Legacy overlay patches cannot remove a field from an existing
+            # record. Give a retargeted provider command a new owned record.
+            assignment, = self.draft.uses('commands', command)
+            command = self.draft.clone('commands', assignment)
+        self.draft.put('commands', command, updated)
+        return command
+
+    def binding_origin(self, id_, preview):
+        if id_ in self.catalog['assignments']:
+            state = preview['assignments'][id_]
+            status = ('Active' if state['eligible'] and state['active'] else 'Inactive')
+            if status == 'Active' and not state['registered']:
+                status = 'Pending registration'
+            command = preview['commands'][self.catalog['assignments'][id_]['command']]
+            if not self.catalog['commands'][self.catalog['assignments'][id_]['command']]['operator']:
+                status = 'Unassigned'
+            elif command['availability'] != 'available':
+                status = 'Operator unavailable'
+            return 'ADD', f'Keymap Added by Blue Hole Deluxe · {status}'
+        row = self.catalog['suppressions'][id_]
+        state = preview['suppressions'][id_]
+        if row.get('disable'):
+            source = 'Add-on' if row['selector']['source_role'] == 'addon' else 'Blender'
+            description = (f'{source} Keymap Disabled by Blue Hole Deluxe' if state['registered']
+                           else f'{source} Keymap Disable Rule · ' + ('Inactive' if not state['eligible'] else 'Pending'))
+            return 'REMOVE', description
+        if 'replacement' in row:
+            return 'FILE_REFRESH', 'Blender Keymap Replaced by Blue Hole Deluxe'
+        return 'INFO', 'Blender Keymap Reference · No change applied'
+
+    def changed(self, message='Changes staged', *, remember=True):
+        catalog = self.draft.snapshot()
+        if remember and not same_value(self.catalog, catalog):
+            self._undo.append(self.catalog)
+        self.catalog = catalog
         self.ensure_selection()
-        self.dirty = not same_value(self.catalog, self.saved)
+        self.dirty = self.store.needs_migration or not same_value(self.catalog, self.saved)
         self._preview = None
+        self.display_cache.clear()
         self.message = message
         try:
             self.store.preview_draft(self.draft)
@@ -276,28 +411,46 @@ class Editor:
             self.require_editable_assignment(id_)
         row = self.catalog[table][id_]
         require(not row.get('required'), 'This section is required')
-        if row.get('enabled', True) != enabled:
-            self.draft.update(table, id_, enabled=enabled)
+        updates = {'enabled': enabled}
+        if table == 'assignments' and enabled and not row.get('active', True):
+            updates['active'] = True
+        if any(row.get(key, True) != value for key, value in updates.items()):
+            self.draft.update(table, id_, **updates)
             self.changed()
 
     def preview(self):
         now = monotonic()
         if self._preview is None or now - self._preview_at > 1:
-            self._preview = self.store.preview(self.draft)
+            token = self.store.preview_token(self.catalog)
+            if self._preview is None or token != self._preview_token:
+                self._preview = self.store.preview(self.draft)
+                self.display_cache.clear()
+                self._preview_token = token
             self._preview_at = now
         return self._preview
+
+    @property
+    def can_undo(self):
+        return bool(self._undo)
+
+    def undo(self):
+        require(self.can_undo, 'No staged keymap edits to undo')
+        self.draft.restore(self._undo.pop())
+        self.changed('Keymap edit undone', remember=False)
 
     def discard(self):
         self.store.cancel_preview()
         self.draft.discard()
         self.saved = self.store.snapshot()
         self.draft = self.store.begin()
-        self.changed('Draft discarded')
+        self._undo.clear()
+        self.changed('Draft discarded', remember=False)
 
     def apply(self):
         self.saved = self.store.apply(self.draft)
         self.draft = self.store.begin()
-        self.changed('Profile saved and applied')
+        self._undo.clear()
+        self.changed('Profile saved and applied', remember=False)
 
     def reload(self):
         self.store.reload()
@@ -348,55 +501,15 @@ class Editor:
         row = self.catalog['assignments'][id_]
         require(not self.catalog['sections'][row['section']].get('required'), 'This shortcut is required')
 
-    def linked_sections(self, linked):
-        assignments = self.catalog['assignments']
-        totals = Counter(row['section'] for row in assignments.values())
-        groups = {}
-        for id_ in sorted(linked, key=lambda id_: assignments[id_]['order']):
-            groups.setdefault(assignments[id_]['section'], []).append(id_)
-        return [(section, ids, totals[section])
-                for section, ids in sorted(groups.items(), key=lambda pair: -len(pair[1]))]
-
-    def assignment_status(self, preview, id_):
-        row = self.catalog['assignments'][id_]
-        state = preview['assignments'][id_]
-        if not row.get('enabled', True):
-            return 'Disabled', 'CHECKBOX_DEHLT'
-        if not preview['sections'][row['section']]:
-            return 'Section inactive', 'PAUSE'
-        if not state['active']:
-            return 'Inactive', 'PAUSE'
-        command = preview['commands'][row['command']]
-        if command['availability'] == 'waiting_for_provider':
-            return f"Waiting for {command['dependency']}", 'INFO'
-        if command['availability'] != 'available':
-            return 'Command unavailable', 'ERROR'
-        return 'Enabled', 'CHECKMARK'
-
-    def stage_event(self, assignment, event, *, shared):
+    def stage_event(self, assignment, event):
         self.require_editable_assignment(assignment)
         event_id = self.catalog['assignments'][assignment]['event']
         if same_value(self.catalog['events'][event_id], event):
             return
-        if shared:
-            for id_ in self.draft.uses('events', event_id):
-                self.require_editable_assignment(id_)
-        elif len(self.draft.uses('events', event_id)) > 1:
+        if len(self.draft.uses('events', event_id)) > 1:
             event_id = self.draft.clone('events', assignment)
         self.draft.put('events', event_id, event)
         self.changed()
-
-    def command_ids(self):
-        """Filter reusable commands by assignment or rule usage."""
-        if not self.command_category:
-            return self.catalog['commands'].keys()
-        sections = set(self.sections(self.command_category))
-        if self.command_section:
-            sections.intersection_update({self.command_section})
-        return {
-            row[key] for table, key in (('assignments', 'command'), ('suppressions', 'replacement'))
-            for row in self.catalog[table].values() if row['section'] in sections and key in row
-        }
 
     def edit_command(self, command_id, field, value, assignment='', *, unset=False):
         original = self.catalog['commands'][command_id]
@@ -423,12 +536,8 @@ class Editor:
             self.require_editable_assignment(assignment)
             require(self.catalog['assignments'][assignment]['command'] == command_id,
                     'The assignment command changed. Reopen the field.')
-            if len(self.draft.uses('commands', command_id)) > 1 or any(
-                    row.get('replacement') == command_id for row in self.catalog['suppressions'].values()):
-                command_id = self.draft.clone('commands', assignment)
         else:
             for id_ in self.draft.uses('commands', command_id):
                 self.require_editable_assignment(id_)
         self.draft.put('commands', command_id, updated)
-        self.command = command_id
         self.changed()

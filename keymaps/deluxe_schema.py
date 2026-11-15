@@ -4,6 +4,7 @@ from collections import Counter
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import fields
+from hashlib import sha256
 import math
 import re
 
@@ -160,7 +161,7 @@ def validate_catalog(catalog):
                 require(token(row['modal_value']), 'Invalid modal command')
             else:
                 record(row, ('operator', 'properties'), ('provider', 'label'))
-                require(isinstance(row['operator'], str) and OPERATOR.fullmatch(row['operator']),
+                require(isinstance(row['operator'], str) and (not row['operator'] or OPERATOR.fullmatch(row['operator'])),
                         'Invalid operator ID')
                 properties(row['properties'])
                 require('provider' not in row or text(row['provider']), 'Invalid command provider')
@@ -195,12 +196,16 @@ def validate_catalog(catalog):
     require(max(features.values(), default=0) <= 16, 'Feature exceeds runtime request budget')
     for id_, row in catalog['suppressions'].items():
         with row_location('suppressions', id_):
-            record(row, ('section', 'selector'), ('enabled', 'replacement', 'disable'))
+            record(row, ('section', 'selector'), ('enabled', 'replacement', 'disable', 'explicit_properties'))
             require(identifier(row['section']) and row['section'] in catalog['sections'],
                     'Missing suppression section')
             selector_descriptor(row['selector'])
             toggle(row, 'enabled')
             toggle(row, 'disable', False)
+            toggle(row, 'explicit_properties', False)
+            require(not row.get('explicit_properties') or
+                    (row.get('disable') and row['selector']['source_role'] == 'addon'),
+                    'Explicit-property matching is only for imported add-on disables')
             require(not (row.get('disable') and 'replacement' in row), 'Choose disable or replacement')
             if 'replacement' in row:
                 require(identifier(row['replacement']) and row['replacement'] in catalog['commands'],
@@ -228,6 +233,35 @@ def merge_profile(defaults, overlay):
                 require(isinstance(patch, dict), f'Invalid edit for {key}')
                 result[table][key] = {**(default or {}), **deepcopy(patch)}
     validate_catalog(result)
+    return result
+
+
+def independent_commands(catalog):
+    """Migrate shared command references to stable, independently owned records.
+
+    Preserve the original ID for the first owner (required bindings first),
+    including unused legacy records. Loading never writes the source files.
+    """
+    result = deepcopy(catalog)
+    commands = result['commands']
+    owners = set()
+    bindings = sorted(result['assignments'].items(), key=lambda entry: (
+        not result['sections'][entry[1]['section']].get('required', False), entry[1]['order']))
+    references = [('assignments', id_, row, 'command') for id_, row in bindings]
+    references += [('suppressions', id_, row, 'replacement')
+                   for id_, row in result['suppressions'].items() if 'replacement' in row]
+    for table, id_, row, field in references:
+        source = row[field]
+        if source in owners:
+            suffix = sha256(f'{table}:{id_}'.encode()).hexdigest()[:16]
+            target = f'{source[:68]}-binding-{suffix}'
+            serial = 0
+            while target in commands:
+                serial += 1
+                target = f'binding-{suffix}-{serial}'
+            commands[target] = deepcopy(commands[source])
+            row[field] = target
+        owners.add(row[field])
     return result
 
 

@@ -40,7 +40,8 @@
     "pie-menu-mesh-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_mesh_action"}},
     "pie-menu-mesh-action-uvspecial": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_mesh_action_uvspecial"}},
     "pie-menu-object-tool": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_object_tool"}},
-    "pie-menu-object-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_object_action"}}
+    "pie-menu-object-action": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_object_action"}},
+    "wm-call-menu-pie-f7c2a4d1d214-binding-fa20e1a2efb7cfc4": {"operator": "wm.call_menu_pie", "properties": {"name": "BLUEHOLE_MT_pie_global_import_export"}}
   },
   "assignments": {
     "pie-nla-editor-718e51b1863c": {"order": 779, "section": "pie.editor_shortcuts", "feature": "pie-wm-call-menu-pie-19f487fe6ead", "event": "x-press-d0115e66e6bf", "command": "wm-call-menu-pie-24890914e337", "scope": {"name": "NLA Editor", "space_type": "NLA_EDITOR"}, "samples": ["164e20a482dd3434192960a28122217fd90b3d3eed6f5fbb6473f051f87eb150"]},
@@ -64,9 +65,11 @@
     "pie-mesh-tool": {"order": 797, "section": "pie.menus", "feature": "pie-mesh-tool", "event": "rightmouse-press-d24507019d68", "command": "pie-menu-mesh-tool", "scope": {"name": "Mesh"}, "samples": ["135f17b7c5b588161b558ff0f98ee2e1fd3804bcfc969a89e0bb4692173d0b79"]},
     "pie-mesh-action": {"order": 798, "section": "pie.menus", "feature": "pie-mesh-action", "event": "rightmouse-press-63f585520403", "command": "pie-menu-mesh-action", "scope": {"name": "Mesh"}, "samples": ["8cdd138fd7b99333b14290a967540a355eb5fa05de0d28b6e5ec620e002bc2bd"]},
     "pie-mesh-action-uvspecial": {"order": 799, "section": "pie.menus", "feature": "pie-mesh-action-uvspecial", "event": "rightmouse-press-b44e4d3e981c", "command": "pie-menu-mesh-action-uvspecial", "scope": {"name": "Mesh"}, "samples": ["ac89af85d178f577f2b264119e87e8f575064be3f03f60812113299a4a50e415"]},
-    "pie-object-mode-global-import-export": {"order": 800, "section": "pie.menus", "feature": "pie-object-mode-global-import-export", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-f7c2a4d1d214", "scope": {"name": "Object Mode"}, "samples": ["2d95127bc7dca2e8b2682850b5dfd47f671203c57631aec9cbf90d97175908d8"]},
+    "pie-object-mode-global-import-export": {"order": 800, "section": "pie.menus", "feature": "pie-object-mode-global-import-export", "event": "rightmouse-press-b44e4d3e981c", "command": "wm-call-menu-pie-f7c2a4d1d214-binding-fa20e1a2efb7cfc4", "scope": {"name": "Object Mode"}, "samples": ["2d95127bc7dca2e8b2682850b5dfd47f671203c57631aec9cbf90d97175908d8"]},
     "pie-object-mode-object-tool": {"order": 801, "section": "pie.menus", "feature": "pie-object-mode-object-tool", "event": "rightmouse-press-d24507019d68", "command": "pie-menu-object-tool", "scope": {"name": "Object Mode"}, "samples": ["d791d21b08d0b34e1ff11f0cb156f4c568c3c7d4a1769c8ae94578a3cf6f27bb"]},
     "pie-object-mode-object-action": {"order": 802, "section": "pie.menus", "feature": "pie-object-mode-object-action", "event": "rightmouse-press-63f585520403", "command": "pie-menu-object-action", "scope": {"name": "Object Mode"}, "samples": ["86d36dbe1514d153b3557d502d38591c87ff0a59591ff2e2a9b99e1a6406181e"]}
   },
-  "suppressions": {}
+  "suppressions": {
+    "legacy-addon-disable-3d-view-generic-2": {"section": "pie.menus", "selector": {"scope": {"name": "3D View Generic", "space_type": "VIEW_3D", "region_type": "WINDOW", "is_modal": false}, "event": {"type": "RIGHTMOUSE", "value": "PRESS", "shift": true, "ctrl": true, "map_type": "MOUSE"}, "source_role": "addon", "target": {"idname": "wm.call_menu_pie", "properties": {"name": "MACHIN3_MT_cursor_pie"}}, "ledger_id": "legacy-bh-keymaps-ea3acf8", "sample_id": "legacy-addon-disable-3d-view-generic-2"}, "disable": true, "explicit_properties": true}
+  }
 }

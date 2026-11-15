@@ -12,7 +12,8 @@ from pathlib import Path
 
 from ..Lib.commonUtils.persistence.atomic import atomic_write_bytes
 from ..Lib.commonUtils.runtime.operations import MutationIncomplete
-from .deluxe_schema import ProfileError, TABLES, identifier, record, require, validate_catalog
+from .deluxe_schema import (ProfileError, TABLES, identifier, independent_commands,
+                            record, require, validate_catalog)
 
 
 def transaction_path(path):
@@ -55,7 +56,7 @@ def section_paths(path, manifest):
     return result
 
 
-def load(path, *, allow_transaction=False):
+def load(path, *, allow_transaction=False, migrate=True):
     path = Path(path)
     initial_revision = revision(path)
     require(allow_transaction or not transaction_path(path).exists(),
@@ -117,11 +118,11 @@ def load(path, *, allow_transaction=False):
         raise ProfileError(f'{source.name}{line}: {error}') from error
     require(revision(path) == initial_revision, f'{path.name}: files changed while validating; reload again')
     require(allow_transaction or not transaction_path(path).exists(), f'{path.name}: save in progress; reload again')
-    return catalog
+    return independent_commands(catalog) if migrate else catalog
 
 
 def split(path, catalog):
-    """Keep shared/orphan commands and events in the master, with stable IDs."""
+    """Store owned commands with their bindings; keep shared events in the master."""
     path = Path(path)
     validate_catalog(catalog)
     master = {key: catalog[key] for key in ('schema_version', 'catalog_version', 'base')}

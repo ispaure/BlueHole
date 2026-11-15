@@ -183,6 +183,7 @@ def _watch_keymaps():
             _apply_categories()
         keymap_utils.reconcile(budget=WATCH_REQUEST_BUDGET, time_budget=WATCH_TIME_BUDGET)
         default_bindings.retry_cleanup()
+        default_bindings.reconcile(budget=4, time_budget=WATCH_TIME_BUDGET)
         _wait_interval = WATCH_INTERVAL
         _last_error = None
         return WATCH_INTERVAL

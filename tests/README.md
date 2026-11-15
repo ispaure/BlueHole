@@ -103,11 +103,15 @@ of a native Preferences shortcut edit across refresh and disable/enable. It also
 edits category/section choices through native checkbox properties, verifies JSON
 persistence after reopening the store, and checks that legacy preference switches
 cannot override the catalog. Draft toggles must update the live keymaps without writing JSON. Discard
-restores saved behavior. Native checks also cover input type/Repeat changes,
-exact default disables, context-menu action routing, and save/reopen of a
+restores saved behavior. Native checks also compare every offered input type
+against Blender's classification and cover Repeat changes when switching inputs
+or event phases,
+the 24 shipped default disables, artist-created add-on disables, provider source
+removal/recreation, context-menu source detection, and save/reopen of a
 disposable userpref.blend to reject leaked preview deltas. Add `--capture-editor` to capture the Sections
 UI enabled and with its subsection, category and master disabled, plus
-the binding inspector and a live default-disable rule. The checks
+the scrollable binding tree, binding inspector and a live default-disable rule.
+The report includes editor draw timings. The checks
 also verify checkbox reset on Discard and draft preservation across master
 toggles. On macOS the child is confined to the output directory with network access denied.
 The test does not load or save the user's preferences.
@@ -176,9 +180,10 @@ fingerprint while normalizing only organizational owner names. The native merged
 keymap digest also matches the catalog before reorganization. Capture checks
 verify that selecting another keyboard key preserves Repeat without writing JSON.
 
-The lifecycle driver also verifies the two-tab Bindings/Commands layout,
-combined section/context filters, clearing filters to show all uses, creating
-and duplicating unused commands, adding bindings to a shared command, and
-single-binding versus shared inline edits. It checks that these operations
-leave every catalog file unchanged until Save and Apply Changes. Editor capture
-includes All Bindings, context filtering and the full Commands library.
+The lifecycle driver also verifies the context-grouped binding editor,
+category filters and name/key search, direct context creation, typed operator
+suggestions, menu properties, unavailable operator persistence, category moves, and independent
+command settings for bindings that use the same operator. It exercises operator
+changes, reset, undo, deletion, save/reload, and preview cleanup. Catalog files
+remain unchanged until Save and Apply Changes. Editor captures include the
+context tree and the selected binding's command settings.

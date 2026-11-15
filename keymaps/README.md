@@ -1,9 +1,14 @@
 # Deluxe keymaps
 
+For artists and keymap authors, start with the
+[keymaps user guide](keymaps_user_guide.md).
+
 [`deluxe-defaults.json`](deluxe-defaults.json) is the master for
 [ten section files](deluxe-defaults-sections). `deluxe_catalog.py` assembles and
 validates their assignments, commands, events, categories and sections, and
-publishes recoverable multi-file saves. Shared commands/events stay in the master. There is no second Python shortcut
+publishes recoverable multi-file saves. Each binding owns its command record. Shared input records and unused legacy
+commands stay in the master. Older shared commands become independent on load
+and are persisted on explicit save. There is no second Python shortcut
 catalog. The required Save As bindings also come from JSON before the user
 configures Deluxe and while the Deluxe master switch is off.
 

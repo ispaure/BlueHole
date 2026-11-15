@@ -712,6 +712,12 @@ def _new_item(config, map_, target, event, owner_id, request_id):
     before = {_pointer(item) for item in _members(map_.keymap_items)}
     try:
         item = map_.keymap_items.new(target.idname, **kwargs)
+        # Hyper is exposed on newer keymap items but is not accepted by every
+        # version's creation API. Set it on the owned item, then verify readback.
+        if event.hyper not in (None, False):
+            if not hasattr(item, 'hyper'):
+                raise AttributeError('Hyper modifier is unavailable')
+            item.hyper = event.hyper
     except (TypeError, AttributeError, ValueError, RuntimeError) as exc:
         candidates = [item for item in _members(map_.keymap_items)
                       if _pointer(item) not in before]
@@ -1500,6 +1506,33 @@ def release_owned_pairs(pairs):
 def owned_pairs_for_map(map_):
     return [pair for handle in _FEATURES.values() for pair in handle.owned_pairs
             if _same(pair[0], map_)]
+
+
+def owned_request_for_merged_item(map_, item):
+    """Identify one unchanged merged row for navigation to its owning feature.
+
+    A merged item's ID is not an add-on ownership token. Require a unique
+    snapshot plus the original live source before returning a request ID.
+    """
+    try:
+        if (not _contains(_config('user').keymaps, map_)
+                or not _contains(map_.keymap_items, item)
+                or item.is_user_modified or item.is_user_defined):
+            return None
+        scope = _scope(map_)
+        snapshot = _snapshot(item, scope.is_modal)
+        candidates = [candidate for candidate in map_.keymap_items
+                      if _event(candidate) == snapshot[0]
+                      and _snapshot(candidate, scope.is_modal) == snapshot]
+        if len(candidates) != 1:
+            return None
+        matches = [(handle.owner_id, request_id)
+                   for handle in _FEATURES.values() for request_id, owned in handle._owned.items()
+                   if owned.snapshot == snapshot and _scope(owned.map) == scope
+                   and _valid_owned(owned) and _snapshot(owned.item, scope.is_modal) == snapshot]
+        return matches[0] if len(matches) == 1 else None
+    except (_Pending, AttributeError, ReferenceError, RuntimeError, ValueError):
+        return None
 
 
 def bind_category_pairs(category, pairs):

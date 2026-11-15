@@ -1,0 +1,4129 @@
+{
+  "source_commit": "ea3acf8300881fbbac540dbd7f3194af8693dc17",
+  "source_path": "overlays/deluxe/payload/keyconfig/BH_Keymaps.py",
+  "source_sha256": "bdd6e34f3df3f0e8e46a1a2e9a22c588f91bc2ae8c69fb0cc3c996f64971fff3",
+  "blender_version": "5.2.2 LTS",
+  "matching": "Same context, operator, physical event and all explicit legacy properties. Repeat does not change the physical shortcut; selectors capture its current value and all current operator defaults. No operator-only remapping.",
+  "records": [
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "bc.tool_activate",
+      "event": {
+        "type": "W",
+        "value": "PRESS",
+        "alt": true
+      },
+      "properties": {},
+      "index": 7,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-7",
+      "rule": {
+        "section": "mesh.tools",
+        "selector": {
+          "scope": {
+            "name": "3D View",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "W",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 1,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "bc.tool_activate",
+            "properties": {
+              "swap_tools": true
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-7"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.search_menu",
+      "event": {
+        "type": "TAB",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 13,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.view_all",
+      "event": {
+        "type": "A",
+        "value": "PRESS",
+        "shift": true,
+        "repeat": true
+      },
+      "properties": {
+        "use_all_regions": true,
+        "center": false
+      },
+      "index": 38,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.view_camera",
+      "event": {
+        "type": "F4",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 39,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.view_axis",
+      "event": {
+        "type": "F1",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "type": "FRONT"
+      },
+      "index": 40,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.view_axis",
+      "event": {
+        "type": "F2",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "type": "RIGHT"
+      },
+      "index": 41,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.view_axis",
+      "event": {
+        "type": "F3",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "type": "TOP"
+      },
+      "index": 42,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.view_orbit",
+      "event": {
+        "type": "F5",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "angle": 3.1415927,
+        "type": "ORBITRIGHT"
+      },
+      "index": 49,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK",
+        "shift": true,
+        "ctrl": true
+      },
+      "properties": {
+        "extend": false,
+        "deselect": false,
+        "toggle": true,
+        "center": false,
+        "object": true
+      },
+      "index": 73,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK",
+        "shift": true,
+        "alt": true
+      },
+      "properties": {
+        "toggle": true,
+        "enumerate": true
+      },
+      "index": 74,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-74",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK",
+            "any": false,
+            "shift": 1,
+            "ctrl": 0,
+            "alt": 1,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select",
+            "properties": {
+              "center": false,
+              "deselect": false,
+              "deselect_all": false,
+              "enumerate": true,
+              "extend": false,
+              "location": [
+                0,
+                0
+              ],
+              "object": false,
+              "select_passthrough": false,
+              "toggle": true
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-74"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK",
+        "shift": true,
+        "ctrl": true,
+        "alt": true
+      },
+      "properties": {
+        "toggle": true,
+        "center": true,
+        "enumerate": true
+      },
+      "index": 76,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-76",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK",
+            "any": false,
+            "shift": 1,
+            "ctrl": 1,
+            "alt": 1,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select",
+            "properties": {
+              "center": true,
+              "deselect": false,
+              "deselect_all": false,
+              "enumerate": true,
+              "extend": false,
+              "location": [
+                0,
+                0
+              ],
+              "object": false,
+              "select_passthrough": false,
+              "toggle": true
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-76"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.zoom_border",
+      "event": {
+        "type": "Z",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 77,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.call_menu_pie",
+      "event": {
+        "type": "RIGHTMOUSE",
+        "value": "PRESS",
+        "shift": true,
+        "ctrl": true,
+        "alt": true
+      },
+      "properties": {
+        "name": "UVTOOLKIT_MT_pie"
+      },
+      "index": 98,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.translate",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS",
+        "shift": true,
+        "ctrl": true
+      },
+      "properties": {
+        "cursor_transform": true
+      },
+      "index": 102,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View Generic",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.call_menu_pie",
+      "event": {
+        "type": "RIGHTMOUSE",
+        "value": "PRESS",
+        "shift": true,
+        "ctrl": true
+      },
+      "properties": {
+        "name": "MACHIN3_MT_cursor_pie"
+      },
+      "index": 2,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-generic-2",
+      "rule": {
+        "section": "pie.menus",
+        "selector": {
+          "scope": {
+            "name": "3D View Generic",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "RIGHTMOUSE",
+            "value": "PRESS",
+            "shift": true,
+            "ctrl": true,
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "wm.call_menu_pie",
+            "properties": {
+              "name": "MACHIN3_MT_cursor_pie"
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-generic-2"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Generic",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.translate_auto_constraint",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS",
+        "shift": true,
+        "ctrl": true
+      },
+      "properties": {},
+      "index": 6,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-generic-6",
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Generic",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "MIDDLEMOUSE",
+            "value": "PRESS",
+            "shift": true,
+            "ctrl": true,
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "transform.translate_auto_constraint",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-generic-6"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Generic",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_circle",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {
+        "mode": "SET"
+      },
+      "index": 22,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Cursor",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.cursor3d",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 0,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-cursor-0",
+      "repeat_changed": false,
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Cursor",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.cursor3d",
+            "properties": {
+              "orientation": "VIEW",
+              "use_depth": true
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-cursor-0"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Cursor",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.translate",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "properties": {
+        "cursor_transform": true,
+        "release_confirm": true
+      },
+      "index": 1,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-cursor-1",
+      "repeat_changed": false,
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Cursor",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "transform.translate",
+            "properties": {
+              "constraint_axis": [
+                false,
+                false,
+                false
+              ],
+              "cursor_transform": true,
+              "gpencil_strokes": false,
+              "mirror": false,
+              "orient_matrix": [
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.0,
+                  0.0
+                ]
+              ],
+              "orient_matrix_type": "GLOBAL",
+              "orient_type": "GLOBAL",
+              "proportional_edit_falloff": "SMOOTH",
+              "proportional_size": 1.0,
+              "release_confirm": true,
+              "remove_on_cancel": false,
+              "snap": false,
+              "snap_align": false,
+              "snap_elements": [
+                "INCREMENT"
+              ],
+              "snap_normal": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "snap_point": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "snap_target": "CLOSEST",
+              "texture_space": false,
+              "translate_origin": false,
+              "use_accurate": false,
+              "use_automerge_and_split": false,
+              "use_duplicated_keyframes": false,
+              "use_proportional_connected": false,
+              "use_proportional_edit": false,
+              "use_proportional_projected": false,
+              "use_snap_edit": true,
+              "use_snap_nonedit": true,
+              "use_snap_project": false,
+              "use_snap_selectable": false,
+              "use_snap_self": true,
+              "value": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "view2d_edge_pan": false
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-cursor-1"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Move",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.translate_auto_constraint",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "properties": {},
+      "index": 0,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-tool-move-0",
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Move",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "transform.translate_auto_constraint",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-tool-move-0"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Move",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.translate_auto_constraint",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 1,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-tool-move-1",
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Move",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "MIDDLEMOUSE",
+            "value": "PRESS",
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "transform.translate_auto_constraint",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-tool-move-1"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Rotate",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.rotate_auto_constraint",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "properties": {},
+      "index": 0,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-tool-rotate-0",
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Rotate",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "transform.rotate_auto_constraint",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-tool-rotate-0"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Rotate",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.rotate_auto_constraint",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 1,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-tool-rotate-1",
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Rotate",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "MIDDLEMOUSE",
+            "value": "PRESS",
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "transform.rotate_auto_constraint",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-tool-rotate-1"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Scale",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.resize_auto_constraint",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "properties": {},
+      "index": 0,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-tool-scale-0",
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Scale",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "transform.resize_auto_constraint",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-tool-scale-0"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Scale",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.resize_auto_constraint",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 1,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-3d-view-tool-scale-1",
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Scale",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "MIDDLEMOUSE",
+            "value": "PRESS",
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "transform.resize_auto_constraint",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-3d-view-tool-scale-1"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "properties": {},
+      "index": 0,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-0",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "SET",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-0"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "oskey": true
+      },
+      "properties": {
+        "mode": "SUB"
+      },
+      "index": 1,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-1",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 1,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "SUB",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-1"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "shift": true,
+        "oskey": true
+      },
+      "properties": {
+        "mode": "AND"
+      },
+      "index": 2,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-2",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 1,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 1,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "AND",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-2"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "shift": true,
+        "ctrl": true
+      },
+      "properties": {
+        "mode": "AND"
+      },
+      "index": 3,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-3",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 1,
+            "ctrl": 1,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "AND",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-3"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_lasso",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "ctrl": true,
+        "alt": true
+      },
+      "properties": {
+        "mode": "SUB"
+      },
+      "index": 4,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_lasso",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "shift": true,
+        "ctrl": true,
+        "alt": true
+      },
+      "properties": {
+        "mode": "ADD"
+      },
+      "index": 5,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box (fallback)",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "properties": {},
+      "index": 0,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-fallback-0",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box (fallback)",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "SET",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-fallback-0"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box (fallback)",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "shift": true
+      },
+      "properties": {
+        "mode": "ADD"
+      },
+      "index": 1,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-fallback-1",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box (fallback)",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 1,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "ADD",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-fallback-1"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box (fallback)",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "oskey": true
+      },
+      "properties": {
+        "mode": "SUB"
+      },
+      "index": 2,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-fallback-2",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box (fallback)",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 1,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "SUB",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-fallback-2"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box (fallback)",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "ctrl": true
+      },
+      "properties": {
+        "mode": "SUB"
+      },
+      "index": 3,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-fallback-3",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box (fallback)",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 0,
+            "ctrl": 1,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "SUB",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-fallback-3"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box (fallback)",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "shift": true,
+        "oskey": true
+      },
+      "properties": {
+        "mode": "AND"
+      },
+      "index": 4,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-fallback-4",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box (fallback)",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 1,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 1,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "AND",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-fallback-4"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Select Box (fallback)",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_box",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG",
+        "shift": true,
+        "ctrl": true
+      },
+      "properties": {
+        "mode": "AND"
+      },
+      "index": 5,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-select-box-fallback-5",
+      "repeat_changed": false,
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Select Box (fallback)",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 1,
+            "ctrl": 1,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view3d.select_box",
+            "properties": {
+              "mode": "AND",
+              "wait_for_input": true,
+              "xmax": 0,
+              "xmin": 0,
+              "ymax": 0,
+              "ymin": 0
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-select-box-fallback-5"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Transform",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.from_gizmo",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "properties": {},
+      "index": 0,
+      "decision": "imported",
+      "rule_id": "legacy-disable-3d-view-tool-transform-0",
+      "repeat_changed": false,
+      "rule": {
+        "section": "transform.tools_gizmo",
+        "selector": {
+          "scope": {
+            "name": "3D View Tool: Transform",
+            "space_type": "VIEW_3D",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "CLICK_DRAG",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "transform.from_gizmo",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-3d-view-tool-transform-0"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "3D View Tool: Transform",
+        "space_type": "VIEW_3D",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.from_gizmo",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 1,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Armature",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "armature.duplicate_move",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "oskey": true
+      },
+      "properties": {},
+      "index": 24,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Armature",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "armature.duplicate_move",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "ctrl": true
+      },
+      "properties": {},
+      "index": 25,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Curve",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "curve.duplicate_move",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "oskey": true
+      },
+      "properties": {},
+      "index": 22,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Curve",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "curve.duplicate_move",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "ctrl": true
+      },
+      "properties": {},
+      "index": 23,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Curve",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.annotate",
+        "cycle": true
+      },
+      "index": 42,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Curve",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "C",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.cursor",
+        "cycle": true
+      },
+      "index": 44,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Frames",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "screen.animation_play",
+      "event": {
+        "type": "MEDIA_PLAY",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 3,
+      "decision": "imported",
+      "rule_id": "legacy-disable-frames-3",
+      "repeat_changed": false,
+      "rule": {
+        "section": "other.animation",
+        "selector": {
+          "scope": {
+            "name": "Frames",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "MEDIA_PLAY",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "screen.animation_play",
+            "properties": {
+              "reverse": false,
+              "sync": false
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-frames-3"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Graph Editor",
+        "space_type": "GRAPH_EDITOR",
+        "region_type": "WINDOW"
+      },
+      "operator": "graph.select_linked",
+      "event": {
+        "type": "RIGHT_BRACKET",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 37,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Grease Pencil Stroke Edit Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "transform.translate",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "CLICK_DRAG"
+      },
+      "properties": {},
+      "index": 38,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Grease Pencil Stroke Edit Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "C",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.cursor",
+        "cycle": true
+      },
+      "index": 55,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Image",
+        "space_type": "IMAGE_EDITOR",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.call_menu_pie",
+      "event": {
+        "type": "TAB",
+        "value": "PRESS"
+      },
+      "properties": {
+        "name": "MACHIN3_MT_modes_pie"
+      },
+      "index": 1,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-image-1",
+      "rule": {
+        "section": "object.modes",
+        "selector": {
+          "scope": {
+            "name": "Image",
+            "space_type": "IMAGE_EDITOR",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "TAB",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "wm.call_menu_pie",
+            "properties": {
+              "name": "MACHIN3_MT_modes_pie"
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-image-1"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Image",
+        "space_type": "IMAGE_EDITOR",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.call_menu_pie",
+      "event": {
+        "type": "RIGHTMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {
+        "name": "MACHIN3_MT_modes_pie"
+      },
+      "index": 2,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-image-2",
+      "rule": {
+        "section": "object.modes",
+        "selector": {
+          "scope": {
+            "name": "Image",
+            "space_type": "IMAGE_EDITOR",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "RIGHTMOUSE",
+            "value": "PRESS",
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "wm.call_menu_pie",
+            "properties": {
+              "name": "MACHIN3_MT_modes_pie"
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-image-2"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Lattice",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "Q",
+        "value": "PRESS"
+      },
+      "properties": {
+        "name": "builtin.select_box",
+        "cycle": false
+      },
+      "index": 13,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.select_box_xray",
+      "event": {
+        "type": "B",
+        "value": "PRESS"
+      },
+      "properties": {
+        "mode": "ADD",
+        "wait_for_input": true
+      },
+      "index": 4,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-4",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "B",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "mesh.select_box_xray",
+            "properties": {
+              "mode": "ADD",
+              "wait_for_input": true
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-4"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.select_circle_xray",
+      "event": {
+        "type": "C",
+        "value": "PRESS"
+      },
+      "properties": {
+        "mode": "ADD",
+        "wait_for_input": true
+      },
+      "index": 5,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-14",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "C",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "mesh.select_circle_xray",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-14"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.select_lasso_xray",
+      "event": {
+        "type": "L",
+        "value": "PRESS"
+      },
+      "properties": {
+        "mode": "ADD",
+        "wait_for_input": true
+      },
+      "index": 6,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-6",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "L",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "mesh.select_lasso_xray",
+            "properties": {
+              "mode": "ADD",
+              "wait_for_input": true
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-6"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.select_circle_xray",
+      "event": {
+        "type": "C",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 14,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-14",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "C",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "mesh.select_circle_xray",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-14"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "machin3.select",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "PRESS",
+        "alt": true
+      },
+      "properties": {},
+      "index": 19,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-19",
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "PRESS",
+            "alt": true,
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "machin3.select",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-19"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "machin3.call_decal_pie",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "shift": true,
+        "ctrl": true
+      },
+      "properties": {},
+      "index": 26,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-26",
+      "rule": {
+        "section": "other.shortcuts",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "D",
+            "value": "PRESS",
+            "shift": true,
+            "ctrl": true,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "machin3.call_decal_pie",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-26"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "machin3.select",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "DOUBLE_CLICK",
+        "alt": true
+      },
+      "properties": {},
+      "index": 27,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-27",
+      "rule": {
+        "section": "selection.basic",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "DOUBLE_CLICK",
+            "alt": true,
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "machin3.select",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-27"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "machin3.symmetrize",
+      "event": {
+        "type": "X",
+        "value": "PRESS",
+        "alt": true
+      },
+      "properties": {},
+      "index": 28,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-28",
+      "rule": {
+        "section": "mesh.tools",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "X",
+            "value": "PRESS",
+            "alt": true,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "machin3.symmetrize",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-28"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "machin3.smart_vert",
+      "event": {
+        "type": "ONE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 29,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-mesh-29",
+      "rule": {
+        "section": "mesh.tools",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "ONE",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "machin3.smart_vert",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-mesh-29"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.loop_select",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "DOUBLE_CLICK",
+        "ctrl": true,
+        "alt": true
+      },
+      "properties": {
+        "extend": false,
+        "deselect": true,
+        "toggle": false,
+        "ring": false
+      },
+      "index": 33,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.loop_select",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "DOUBLE_CLICK",
+        "ctrl": true,
+        "alt": true
+      },
+      "properties": {
+        "extend": false,
+        "deselect": true,
+        "toggle": false,
+        "ring": true
+      },
+      "index": 37,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.select_linked",
+      "event": {
+        "type": "RIGHT_BRACKET",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 48,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.select_mode",
+      "event": {
+        "type": "ONE",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "type": "VERT"
+      },
+      "index": 49,
+      "decision": "imported",
+      "rule_id": "legacy-disable-mesh-49",
+      "repeat_changed": true,
+      "rule": {
+        "section": "mesh.modeling",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "ONE",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "mesh.select_mode",
+            "properties": {
+              "action": "TOGGLE",
+              "type": "VERT",
+              "use_expand": false,
+              "use_extend": false
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-mesh-49"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.select_mode",
+      "event": {
+        "type": "TWO",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "type": "EDGE"
+      },
+      "index": 50,
+      "decision": "imported",
+      "rule_id": "legacy-disable-mesh-50",
+      "repeat_changed": true,
+      "rule": {
+        "section": "mesh.modeling",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "TWO",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "mesh.select_mode",
+            "properties": {
+              "action": "TOGGLE",
+              "type": "EDGE",
+              "use_expand": false,
+              "use_extend": false
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-mesh-50"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.select_mode",
+      "event": {
+        "type": "THREE",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "type": "FACE"
+      },
+      "index": 51,
+      "decision": "imported",
+      "rule_id": "legacy-disable-mesh-51",
+      "repeat_changed": true,
+      "rule": {
+        "section": "mesh.modeling",
+        "selector": {
+          "scope": {
+            "name": "Mesh",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "THREE",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "mesh.select_mode",
+            "properties": {
+              "action": "TOGGLE",
+              "type": "FACE",
+              "use_expand": false,
+              "use_extend": false
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-mesh-51"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.duplicate_move",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "oskey": true
+      },
+      "properties": {},
+      "index": 70,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "mesh.duplicate_move",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "ctrl": true
+      },
+      "properties": {},
+      "index": 71,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.annotate",
+        "cycle": true
+      },
+      "index": 86,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "M",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.measure",
+        "cycle": true
+      },
+      "index": 87,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "C",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.cursor",
+        "cycle": true
+      },
+      "index": 88,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_circle",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {
+        "wait_for_input": false
+      },
+      "index": 98,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_circle",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS",
+        "shift": true
+      },
+      "properties": {
+        "wait_for_input": false,
+        "mode": "ADD"
+      },
+      "index": 99,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "view3d.select_circle",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS",
+        "ctrl": true
+      },
+      "properties": {
+        "wait_for_input": false,
+        "mode": "SUB"
+      },
+      "index": 100,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Mesh",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "uv.zenuv_isolate_island",
+      "event": {
+        "type": "S",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 123,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.select_box_xray",
+      "event": {
+        "type": "B",
+        "value": "PRESS"
+      },
+      "properties": {
+        "mode": "ADD",
+        "wait_for_input": true
+      },
+      "index": 3,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-object-mode-17",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Object Mode",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "B",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "object.select_box_xray",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-object-mode-17"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.select_circle_xray",
+      "event": {
+        "type": "C",
+        "value": "PRESS"
+      },
+      "properties": {
+        "mode": "ADD",
+        "wait_for_input": true
+      },
+      "index": 4,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-object-mode-18",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Object Mode",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "C",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "object.select_circle_xray",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-object-mode-18"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.select_lasso_xray",
+      "event": {
+        "type": "L",
+        "value": "PRESS"
+      },
+      "properties": {
+        "mode": "ADD",
+        "wait_for_input": true
+      },
+      "index": 5,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-object-mode-19",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Object Mode",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "L",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "object.select_lasso_xray",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-object-mode-19"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.select_box_xray",
+      "event": {
+        "type": "B",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 17,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-object-mode-17",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Object Mode",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "B",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "object.select_box_xray",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-object-mode-17"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.select_circle_xray",
+      "event": {
+        "type": "C",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 18,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-object-mode-18",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Object Mode",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "C",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "object.select_circle_xray",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-object-mode-18"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.select_lasso_xray",
+      "event": {
+        "type": "L",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 19,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-object-mode-19",
+      "rule": {
+        "section": "selection.tool_switch",
+        "selector": {
+          "scope": {
+            "name": "Object Mode",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "L",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "object.select_lasso_xray",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-object-mode-19"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.select_linked",
+      "event": {
+        "type": "RIGHT_BRACKET",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 42,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.location_clear",
+      "event": {
+        "type": "W",
+        "value": "PRESS",
+        "alt": true,
+        "repeat": true
+      },
+      "properties": {
+        "clear_delta": false
+      },
+      "index": 50,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.duplicate_move",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "ctrl": true
+      },
+      "properties": {},
+      "index": 57,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_insert_menu",
+      "event": {
+        "type": "S",
+        "value": "PRESS",
+        "shift": true,
+        "repeat": true
+      },
+      "properties": {},
+      "index": 58,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_insert_by_name",
+      "event": {
+        "type": "S",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "type": "LocRotScale"
+      },
+      "index": 59,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_insert_by_name",
+      "event": {
+        "type": "W",
+        "value": "PRESS",
+        "shift": true,
+        "repeat": true
+      },
+      "properties": {
+        "type": "Location"
+      },
+      "index": 60,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_insert_by_name",
+      "event": {
+        "type": "E",
+        "value": "PRESS",
+        "shift": true,
+        "repeat": true
+      },
+      "properties": {
+        "type": "Rotation"
+      },
+      "index": 61,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_insert_by_name",
+      "event": {
+        "type": "R",
+        "value": "PRESS",
+        "shift": true,
+        "repeat": true
+      },
+      "properties": {
+        "type": "Scaling"
+      },
+      "index": 62,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_delete_v3d",
+      "event": {
+        "type": "S",
+        "value": "PRESS",
+        "alt": true,
+        "repeat": true
+      },
+      "properties": {},
+      "index": 63,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keying_set_active_set",
+      "event": {
+        "type": "S",
+        "value": "PRESS",
+        "shift": true,
+        "ctrl": true,
+        "alt": true
+      },
+      "properties": {},
+      "index": 65,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.link_to_collection",
+      "event": {
+        "type": "G",
+        "value": "PRESS",
+        "shift": true,
+        "ctrl": true
+      },
+      "properties": {},
+      "index": 70,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.annotate",
+        "cycle": true
+      },
+      "index": 79,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "M",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.measure",
+        "cycle": true
+      },
+      "index": 80,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "C",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.cursor",
+        "cycle": true
+      },
+      "index": 81,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.duplicate_move_linked",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "shift": true,
+        "repeat": true
+      },
+      "properties": {
+        "OBJECT_OT_duplicate": [
+          [
+            "linked",
+            true
+          ]
+        ]
+      },
+      "index": 82,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Mode",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.duplicate_group_override",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "shift": true
+      },
+      "properties": {},
+      "index": 96,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Object Non-modal",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.call_menu_pie",
+      "event": {
+        "type": "TAB",
+        "value": "PRESS"
+      },
+      "properties": {
+        "name": "MACHIN3_MT_modes_pie"
+      },
+      "index": 0,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-object-non-modal-0",
+      "rule": {
+        "section": "object.modes",
+        "selector": {
+          "scope": {
+            "name": "Object Non-modal",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "TAB",
+            "value": "PRESS",
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "wm.call_menu_pie",
+            "properties": {
+              "name": "MACHIN3_MT_modes_pie"
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-object-non-modal-0"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Object Non-modal",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.call_menu_pie",
+      "event": {
+        "type": "RIGHTMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {
+        "name": "MACHIN3_MT_modes_pie"
+      },
+      "index": 1,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-object-non-modal-1",
+      "rule": {
+        "section": "object.modes",
+        "selector": {
+          "scope": {
+            "name": "Object Non-modal",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "RIGHTMOUSE",
+            "value": "PRESS",
+            "map_type": "MOUSE"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "wm.call_menu_pie",
+            "properties": {
+              "name": "MACHIN3_MT_modes_pie"
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-object-non-modal-1"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Object Non-modal",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "object.mode_set",
+      "event": {
+        "type": "ONE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 3,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Outliner",
+        "space_type": "OUTLINER",
+        "region_type": "WINDOW"
+      },
+      "operator": "outliner.drivers_add_selected",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "ctrl": true
+      },
+      "properties": {},
+      "index": 51,
+      "decision": "imported",
+      "rule_id": "legacy-disable-outliner-51",
+      "repeat_changed": false,
+      "rule": {
+        "section": "object.outliner",
+        "selector": {
+          "scope": {
+            "name": "Outliner",
+            "space_type": "OUTLINER",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "D",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 1,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "outliner.drivers_add_selected",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-outliner-51"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Outliner",
+        "space_type": "OUTLINER",
+        "region_type": "WINDOW"
+      },
+      "operator": "outliner.drivers_delete_selected",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "ctrl": true,
+        "alt": true
+      },
+      "properties": {},
+      "index": 53,
+      "decision": "imported",
+      "rule_id": "legacy-disable-outliner-53",
+      "repeat_changed": false,
+      "rule": {
+        "section": "object.outliner",
+        "selector": {
+          "scope": {
+            "name": "Outliner",
+            "space_type": "OUTLINER",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "D",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 1,
+            "alt": 1,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "outliner.drivers_delete_selected",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-outliner-53"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Pose",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "pose.loc_clear",
+      "event": {
+        "type": "W",
+        "value": "PRESS",
+        "alt": true,
+        "repeat": true
+      },
+      "properties": {},
+      "index": 14,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Pose",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_insert_by_name",
+      "event": {
+        "type": "W",
+        "value": "PRESS",
+        "shift": true
+      },
+      "properties": {
+        "type": "Location"
+      },
+      "index": 38,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Pose",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_insert_by_name",
+      "event": {
+        "type": "E",
+        "value": "PRESS",
+        "shift": true
+      },
+      "properties": {
+        "type": "Rotation"
+      },
+      "index": 39,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Pose",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.keyframe_insert_by_name",
+      "event": {
+        "type": "R",
+        "value": "PRESS",
+        "shift": true
+      },
+      "properties": {
+        "type": "Scaling"
+      },
+      "index": 40,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Property Editor",
+        "space_type": "PROPERTIES",
+        "region_type": "WINDOW"
+      },
+      "operator": "buttons.context_menu",
+      "event": {
+        "type": "RIGHTMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 1,
+      "decision": "imported",
+      "rule_id": "legacy-disable-property-editor-1",
+      "repeat_changed": false,
+      "rule": {
+        "section": "other.shortcuts",
+        "selector": {
+          "scope": {
+            "name": "Property Editor",
+            "space_type": "PROPERTIES",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "RIGHTMOUSE",
+            "value": "PRESS",
+            "any": false,
+            "shift": 0,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "buttons.context_menu",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-property-editor-1"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Screen Editing",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "pme.window_auto_close",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS",
+        "any": true
+      },
+      "properties": {},
+      "index": 4,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-screen-editing-4",
+      "rule": {
+        "section": "other.shortcuts",
+        "selector": {
+          "scope": {
+            "name": "Screen Editing",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "MIDDLEMOUSE",
+            "value": "PRESS",
+            "any": true,
+            "map_type": "MOUSE",
+            "shift": -1,
+            "ctrl": -1,
+            "alt": -1,
+            "oskey": -1,
+            "hyper": -1
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "pme.window_auto_close",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-screen-editing-4"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Screen Editing",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "pme.window_auto_close",
+      "event": {
+        "type": "RIGHTMOUSE",
+        "value": "PRESS",
+        "any": true
+      },
+      "properties": {},
+      "index": 5,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-screen-editing-5",
+      "rule": {
+        "section": "other.shortcuts",
+        "selector": {
+          "scope": {
+            "name": "Screen Editing",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "RIGHTMOUSE",
+            "value": "PRESS",
+            "any": true,
+            "map_type": "MOUSE",
+            "shift": -1,
+            "ctrl": -1,
+            "alt": -1,
+            "oskey": -1,
+            "hyper": -1
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "pme.window_auto_close",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-screen-editing-5"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Screen Editing",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "pme.window_auto_close",
+      "event": {
+        "type": "LEFTMOUSE",
+        "value": "PRESS",
+        "any": true
+      },
+      "properties": {},
+      "index": 6,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-screen-editing-6",
+      "rule": {
+        "section": "other.shortcuts",
+        "selector": {
+          "scope": {
+            "name": "Screen Editing",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "LEFTMOUSE",
+            "value": "PRESS",
+            "any": true,
+            "map_type": "MOUSE",
+            "shift": -1,
+            "ctrl": -1,
+            "alt": -1,
+            "oskey": -1,
+            "hyper": -1
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "pme.window_auto_close",
+            "properties": {}
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-screen-editing-6"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Sculpt",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "paint.brush_select",
+      "event": {
+        "type": "N",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 74,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Transform Modal Map",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "modal": true
+      },
+      "operator": "PROPORTIONAL_SIZE_UP",
+      "event": {
+        "type": "WHEELUPMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 27,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Transform Modal Map",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "modal": true
+      },
+      "operator": "PROPORTIONAL_SIZE_DOWN",
+      "event": {
+        "type": "WHEELDOWNMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 28,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "Transform Modal Map",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW",
+        "modal": true
+      },
+      "operator": "AUTOCONSTRAINPLANE",
+      "event": {
+        "type": "MIDDLEMOUSE",
+        "value": "PRESS"
+      },
+      "properties": {},
+      "index": 55,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "UV Editor",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "uv.select_linked",
+      "event": {
+        "type": "RIGHT_BRACKET",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {},
+      "index": 263,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "UV Editor",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.call_menu_pie",
+      "event": {
+        "type": "X",
+        "value": "PRESS",
+        "shift": true,
+        "repeat": true
+      },
+      "properties": {
+        "name": "IMAGE_MT_uvs_snap_pie"
+      },
+      "index": 275,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "UV Editor",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "W",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.move",
+        "cycle": true
+      },
+      "index": 281,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "UV Editor",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "E",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.rotate",
+        "cycle": true
+      },
+      "index": 282,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "UV Editor",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.tool_set_by_id",
+      "event": {
+        "type": "R",
+        "value": "PRESS",
+        "repeat": true
+      },
+      "properties": {
+        "name": "builtin.scale",
+        "cycle": true
+      },
+      "index": 283,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "UV Editor",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "uv.select_split",
+      "event": {
+        "type": "C",
+        "value": "PRESS",
+        "ctrl": true,
+        "alt": true,
+        "repeat": true
+      },
+      "properties": {},
+      "index": 298,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "User Interface",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "anim.driver_button_remove",
+      "event": {
+        "type": "D",
+        "value": "PRESS",
+        "alt": true,
+        "repeat": true
+      },
+      "properties": {},
+      "index": 13,
+      "decision": "no_matching_default"
+    },
+    {
+      "scope": {
+        "name": "View2D",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "view2d.scroll_down",
+      "event": {
+        "type": "WHEELDOWNMOUSE",
+        "value": "PRESS",
+        "shift": true
+      },
+      "properties": {},
+      "index": 10,
+      "decision": "imported",
+      "rule_id": "legacy-disable-view2d-10",
+      "repeat_changed": false,
+      "rule": {
+        "section": "navigation.editors",
+        "selector": {
+          "scope": {
+            "name": "View2D",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "WHEELDOWNMOUSE",
+            "value": "PRESS",
+            "any": false,
+            "shift": 1,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view2d.scroll_down",
+            "properties": {
+              "deltax": 0,
+              "deltay": 0,
+              "page": false
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-view2d-10"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "View2D",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "view2d.scroll_up",
+      "event": {
+        "type": "WHEELUPMOUSE",
+        "value": "PRESS",
+        "shift": true
+      },
+      "properties": {},
+      "index": 11,
+      "decision": "imported",
+      "rule_id": "legacy-disable-view2d-11",
+      "repeat_changed": false,
+      "rule": {
+        "section": "navigation.editors",
+        "selector": {
+          "scope": {
+            "name": "View2D",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false,
+            "is_tool": null
+          },
+          "event": {
+            "type": "WHEELUPMOUSE",
+            "value": "PRESS",
+            "any": false,
+            "shift": 1,
+            "ctrl": 0,
+            "alt": 0,
+            "oskey": 0,
+            "hyper": 0,
+            "key_modifier": "NONE",
+            "direction": "ANY",
+            "repeat": false,
+            "map_type": "MOUSE"
+          },
+          "source_role": "default",
+          "target": {
+            "idname": "view2d.scroll_up",
+            "properties": {
+              "deltax": 0,
+              "deltay": 0,
+              "page": false
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-disable-view2d-11"
+        },
+        "disable": true
+      }
+    },
+    {
+      "scope": {
+        "name": "Window",
+        "space_type": "EMPTY",
+        "region_type": "WINDOW"
+      },
+      "operator": "wm.call_menu_pie",
+      "event": {
+        "type": "S",
+        "value": "PRESS",
+        "ctrl": true
+      },
+      "properties": {
+        "name": "MACHIN3_MT_save_pie"
+      },
+      "index": 6,
+      "decision": "provider_rule",
+      "rule_id": "legacy-addon-disable-window-6",
+      "rule": {
+        "section": "pipeline.files",
+        "selector": {
+          "scope": {
+            "name": "Window",
+            "space_type": "EMPTY",
+            "region_type": "WINDOW",
+            "is_modal": false
+          },
+          "event": {
+            "type": "S",
+            "value": "PRESS",
+            "ctrl": true,
+            "map_type": "KEYBOARD"
+          },
+          "source_role": "addon",
+          "target": {
+            "idname": "wm.call_menu_pie",
+            "properties": {
+              "name": "MACHIN3_MT_save_pie"
+            }
+          },
+          "ledger_id": "legacy-bh-keymaps-ea3acf8",
+          "sample_id": "legacy-addon-disable-window-6"
+        },
+        "disable": true,
+        "explicit_properties": true
+      }
+    }
+  ],
+  "provider_matching": "Add-on source only. One unique matching context, complete event and every explicit legacy property. Four duplicate historical shortcuts share a single rule. Resolve full native snapshot before changing active; artist-created rules always capture the full snapshot."
+}

@@ -351,8 +351,8 @@ class ProfileTests(unittest.TestCase):
         preview = self.store.preview(draft)
         self.assertEqual(preview['conflicts'], (('view-frame', 'collision'),))
         self.assertEqual(preview['commands']['provider-fit']['availability'], 'waiting_for_provider')
-        draft.update('commands', 'frame-selected', operator='wm.python_file_run')
-        with self.assertRaisesRegex(ValueError, 'Unknown command'):
+        draft.update('commands', 'frame-selected', operator='not an operator')
+        with self.assertRaisesRegex(ValueError, 'Invalid operator ID'):
             self.store.validate(draft)
         draft.delete('commands', 'frame-selected')
         with self.assertRaisesRegex(ValueError, 'Missing command'):

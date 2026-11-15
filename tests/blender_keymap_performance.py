@@ -56,6 +56,11 @@ def exercise(output):
 
         initial = source_state()
         merged_before = merged_digest()
+        def default_activity():
+            return {(km.name, item.id): item.active for km in configs.default.keymaps
+                    for item in km.keymap_items}
+
+        defaults_before = default_activity()
         calls = []
         update = runtime._update_merged
 
@@ -80,6 +85,15 @@ def exercise(output):
         registered_digest = None
         for _ in range(3):
             loaded = measure(registrar.register)
+            rules = {id_: row for id_, row in registrar.deluxe_profile().snapshot()['suppressions'].items()
+                     if row['selector']['source_role'] == 'default'}
+            results = registrar.deluxe_profile().registration_results()
+            assert len(rules) == 24
+            assert all(results.get(id_) == ('applied', '') for id_ in rules), {
+                id_: results.get(id_) for id_ in rules if results.get(id_) != ('applied', '')}
+            changed_defaults = {key for key, active in default_activity().items()
+                                if active != defaults_before[key]}
+            assert len(changed_defaults) == len(rules), changed_defaults
             digest = merged_digest()
             if registered_digest is not None:
                 assert digest == registered_digest, 'Repeated registration changed merged bindings'
@@ -87,6 +101,7 @@ def exercise(output):
             unloaded = measure(registrar.unregister)
             assert source_state() == initial, 'Unloading changed foreign add-on rows'
             assert merged_digest() == merged_before, 'Unloading changed merged bindings'
+            assert default_activity() == defaults_before, 'Unloading did not restore default activity'
             assert unloaded['runtime']['tracked_resources'] == 0
             assert unloaded['runtime']['features'] == 0
             cycles.append({'load': loaded, 'unload': unloaded})
@@ -155,88 +170,123 @@ def exercise(output):
         assert bpy.ops.wm.bh_deluxe_edit(action='apply') == {'FINISHED'}
         assert merged_digest() == registered_digest
 
-        # Browse by section/context, then reach all uses without hidden filters.
+        # Category filters and name/key search remain; context browsing uses the tree.
         current = editor_ops.editor()
+        report['legacy_default_disables_verified'] = len(rules)
         view = editor_ops.state(bpy.context)
-        assert set(view.bl_rna.properties['tab'].enum_items.keys()) == {'BINDINGS', 'COMMANDS'}
+        assert 'tab' not in view.bl_rna.properties
+        assert 'command_edit_scope' not in view.bl_rna.properties
+        assert 'live_source' not in view.bl_rna.properties
+        assert not hasattr(editor_ops, 'BH_OT_deluxe_binding_picker')
+        assert not hasattr(editor_ops, 'BH_OT_deluxe_shortcut')
+        assert set(view.bl_rna.properties['search_mode'].enum_items.keys()) == {'NAME', 'KEY'}
         assert current.binding_all
         bpy.ops.wm.bh_deluxe_edit(action='feature_category', target='navigation')
         view.search = 'narrow search'
-        scope = next(scope for scope in current.binding_contexts().values() if scope['name'] == '3D View')
-        picker = SimpleNamespace(choice_key='')
-        popup_context = SimpleNamespace(window_manager=SimpleNamespace(invoke_search_popup=lambda _: None))
-        assert editor_ops.BH_OT_deluxe_filter_context.invoke(picker, popup_context, None) == {'INTERFACE'}
-        picker.context = editor_ops.context_id(scope)
-        editor_ops.BH_OT_deluxe_filter_context.stage(picker, current)
-        assert all(row['scope']['name'] == '3D View' and
-                   current.catalog['sections'][row['section']]['category'] == 'navigation'
+        assert all(current.catalog['sections'][row['section']]['category'] == 'navigation'
                    for row in current.catalog['assignments'].values() if current.accepts_binding(row))
-        editor_ops.EditorOperator.release_choices(picker)
-        shared_command = next(id_ for id_ in current.catalog['commands'] if len(current.draft.uses('commands', id_)) > 1)
-        bpy.ops.wm.bh_deluxe_edit(action='command_bindings', target=shared_command)
-        assert view.search == '' and current.binding_context == '' and current.binding_all
-        assert {id_ for id_, row in current.catalog['assignments'].items() if current.accepts_binding(row)} == set(
-            current.draft.uses('commands', shared_command))
         bpy.ops.wm.bh_deluxe_edit(action='all_bindings')
+        assert view.search == '' and current.binding_all
+        command_ids = [row['command'] for row in current.catalog['assignments'].values()]
+        assert len(command_ids) == len(set(command_ids))
+        assert any(id_ == 'wm.call_menu_pie' for id_, _ in editor_ops.operator_search(None, bpy.context, 'call_menu_pie'))
 
-        # Exercise the actual dialog operators with live RNA and keymaps.
+        # A historically inactive row is unchecked; enabling it activates that row.
+        inactive_id = next(id_ for id_, row in current.catalog['assignments'].items()
+                           if not row.get('active', True))
+        row = current.catalog['assignments'][inactive_id]
+        enabled = editor_ops.inline_value(view, 'enabled', 'binding_enabled',
+            row.get('enabled', True) and row.get('active', True), table='assignments', entry=inactive_id)
+        assert not enabled.binding_enabled
+        enabled.binding_enabled = True
+        assert current.catalog['assignments'][inactive_id]['active']
+        assert not current.preview_error, current.preview_error
+        current.discard()
+        assert merged_digest() == registered_digest
+        report['inactive_binding_enable_verified'] = True
+
+        # Add New creates an unassigned row directly; type operators and properties inline.
         saved = catalog_revision()
-        dialog_context = SimpleNamespace(window_manager=SimpleNamespace(
-            keyconfigs=configs, invoke_props_dialog=lambda *_args, **_kwargs: {'RUNNING_MODAL'}))
-        command_type = editor_ops.BH_OT_deluxe_command
-        new_command = SimpleNamespace(source='', choice_key='')
-        new_command._choices_first = MethodType(command_type._choices_first, new_command)
-        assert command_type.invoke(new_command, dialog_context, None) == {'RUNNING_MODAL'}
-        new_command.operator_id, new_command.label = 'view3d.view_selected', 'Test shared frame'
-        command_type.stage(new_command, current)
-        command_id = current.command
-        assert view.tab == 'COMMANDS' and not current.draft.uses('commands', command_id)
-        editor_ops.EditorOperator.release_choices(new_command)
-        duplicate = SimpleNamespace(source=command_id, choice_key='')
-        assert command_type.invoke(duplicate, dialog_context, None) == {'RUNNING_MODAL'}
-        command_type.stage(duplicate, current)
-        copy_id = current.command
-        assert current.catalog['commands'][copy_id]['label'] == 'Test shared frame Copy'
-        current.remove_command(copy_id)
-        current.draft.put('events', 'test-command-event',
-                          dict(type='F24', ctrl=True, shift=True, alt=True, oskey=True))
-        current.changed()
         mappings = []
         for scope_name in ('3D View', 'Image'):
-            mapping = SimpleNamespace(assignment='', command_hint=command_id, choice_key='')
-            assert editor_ops.BH_OT_deluxe_mapping.invoke(mapping, dialog_context, None) == {'RUNNING_MODAL'}
-            assert mapping.command == command_id
-            mapping.event_id = 'test-command-event'
-            mapping.section = 'navigation.view_framing'
-            mapping.scope_id = next(id_ for id_, scope in mapping._scopes.items() if scope['name'] == scope_name)
-            editor_ops.BH_OT_deluxe_mapping.stage(mapping, current)
-            mappings.append(mapping.assignment)
-            assert view.tab == 'BINDINGS' and current.assignment == mapping.assignment
-            editor_ops.EditorOperator.release_choices(mapping)
-        view.command_edit_scope = 'SINGLE'
+            before_add = merged_digest()
+            scope = next(scope for scope in editor_ops.assignment_scopes(current, configs) if scope['name'] == scope_name)
+            assert bpy.ops.wm.bh_deluxe_add_binding(scope=json.dumps(scope), section='navigation.view_framing') == {'FINISHED'}
+            assignment_id = current.assignment
+            command_id = current.catalog['assignments'][assignment_id]['command']
+            assert not current.catalog['commands'][command_id]['operator']
+            assert merged_digest() == before_add
+            current.stage_event(assignment_id, dict(type='F24', ctrl=True, shift=True, alt=True, oskey=True))
+            editor_ops.inline_value(view, 'operator', 'operator_id', '', command=command_id,
+                                   assignment=assignment_id).operator_id = 'view3d.view_selected'
+            mappings.append(assignment_id)
+            assert not current.preview_error, current.preview_error
+        first, second = [current.catalog['assignments'][id_]['command'] for id_ in mappings]
+        assert first != second
+        assert current.catalog['commands'][first] == current.catalog['commands'][second]
         control = editor_ops.inline_value(view, 'use_all_regions', 'boolean', False,
-                                         command=command_id, assignment=mappings[0])
+                                         command=first, assignment=mappings[0])
         control.boolean = True
-        clone = current.catalog['assignments'][mappings[0]]['command']
-        assert clone != command_id
-        assert 'use_all_regions' not in current.catalog['commands'][command_id]['properties']
-        control.boolean = False
-        assert current.catalog['assignments'][mappings[0]]['command'] == clone
-        current.draft.update('assignments', mappings[0], command=command_id)
-        current.changed()
-        view.command_edit_scope = 'SHARED'
-        editor_ops.inline_value(view, 'use_all_regions', 'boolean', False,
-                               command=command_id, assignment=mappings[0]).boolean = True
-        assert all(current.catalog['assignments'][id_]['command'] == command_id for id_ in mappings)
-        assert current.catalog['commands'][command_id]['properties']['use_all_regions']
+        assert current.catalog['commands'][first]['properties']['use_all_regions']
+        assert not current.catalog['commands'][second]['properties']
+        assert bpy.ops.wm.bh_deluxe_inline_edit(command=first, field='use_all_regions', assignment=mappings[0]) == {'FINISHED'}
+        current.undo()
+        assert current.catalog['commands'][first]['properties']['use_all_regions']
+        editor_ops.inline_value(view, 'operator', 'operator_id', 'view3d.view_selected',
+                               command=first, assignment=mappings[0]).operator_id = 'wm.call_menu_pie'
+        meta = current.store.resolver.describe_command(current.catalog['commands'][first], include_unset=True)
+        assert meta['fields']['name']['editable']
+        current.edit_command(first, 'name', 'BLUEHOLE_MT_pie_add', mappings[0])
         assert not current.preview_error, current.preview_error
-        assert catalog_revision() == saved, 'Creating/editing commands saved JSON before Apply'
-        current.discard()
-        view.command_edit_scope = 'SINGLE'
+        editor_ops.inline_value(view, 'operator', 'operator_id', 'wm.call_menu_pie',
+                               command=first, assignment=mappings[0]).operator_id = 'wm.bh_typed_command_test'
+        assert not current.preview_error, current.preview_error
+        assert current.preview()['commands'][first]['availability'] == 'unavailable'
+        current.apply()
+        current.reload()
+        assert current.catalog['commands'][first]['operator'] == 'wm.bh_typed_command_test'
+        class BH_OT_typed_command_test(bpy.types.Operator):
+            bl_idname = 'wm.bh_typed_command_test'
+            bl_label = 'Typed Test'
+            enabled: bpy.props.BoolProperty(default=False)
+            def execute(self, _context):
+                return {'FINISHED'}
+        bpy.utils.register_class(BH_OT_typed_command_test)
+        try:
+            current.edit_command(first, 'enabled', True, mappings[0])
+            assert not current.preview_error, current.preview_error
+            assert current.preview()['commands'][first]['availability'] == 'available'
+            current.change_command_operator(first, 'view3d.view_all')
+        finally:
+            bpy.utils.unregister_class(BH_OT_typed_command_test)
+        assert current.catalog['commands'][first]['properties'] == {}
+        assert current.catalog['commands'][second]['operator'] == 'view3d.view_selected'
+        original = dict(current.catalog['assignments'][mappings[0]])
+        category = editor_ops.inline_value(view, 'binding_category', 'option', 'navigation',
+            assignment=mappings[0], items=[('navigation', 'Navigation', ''), ('mesh', 'Mesh', '')])
+        category.option = 'mesh'
+        assert current.catalog['sections'][current.catalog['assignments'][mappings[0]]['section']]['category'] == 'mesh'
+        assert current.catalog['assignments'][mappings[0]]['command'] == first
+        current.undo()
+        assert current.catalog['assignments'][mappings[0]] == original
+        assert bpy.ops.wm.bh_deluxe_remove_assignment('EXEC_DEFAULT', assignment=mappings[0]) == {'FINISHED'}
+        assert first not in current.catalog['commands'] and second in current.catalog['commands']
+        current.undo()
+        current.apply()
+        current.reload()
+        assert current.catalog['commands'][first]['operator'] == 'view3d.view_all'
+        for assignment_id in mappings:
+            event_id = current.catalog['assignments'][assignment_id]['event']
+            current.draft.delete('assignments', assignment_id)
+            current.draft.delete('events', event_id)
+        current.changed()
+        current.apply()
         bpy.ops.wm.bh_deluxe_edit(action='all_bindings')
         assert merged_digest() == registered_digest
-        report.update(binding_filters_verified=True, command_library_verified=True,
-                      single_and_shared_command_preview_verified=True)
+        report.update(binding_filters_verified=True, independent_commands_verified=True,
+                      direct_context_add_verified=True, typed_missing_operator_verified=True,
+                      menu_properties_editable=True, category_move_verified=True,
+                      command_reset_undo_retarget_delete_and_reload_verified=True)
 
         # Live changes fork a shared event without changing the saved JSON.
         current = editor_ops.editor()
@@ -245,13 +295,13 @@ def exercise(output):
         def event_field(field, prop, value, items=()):
             data = current.catalog['events'][current.catalog['assignments'][assignment]['event']]
             control = editor_ops.inline_value(editor_ops.state(bpy.context), field, prop,
-                                               data.get(field, 'KEYBOARD' if field == 'map_type' else False),
+                                               data.get(field, {'map_type': 'KEYBOARD', 'value': 'PRESS'}.get(field, False)),
                                                assignment=assignment, items=items)
             setattr(control, prop, value)
             assert not current.preview_error, current.preview_error
 
         saved = catalog_revision()
-        event_field('repeat', 'boolean', False)
+        event_field('repeat', 'repeat', False)
         assert current.catalog['events'][original_event]['repeat']
         assert not next(item for item in configs.user.keymaps['Screen'].keymap_items
                         if item.idname == 'screen.repeat_last' and item.type == 'G').repeat
@@ -262,6 +312,40 @@ def exercise(output):
         assert catalog_revision() == saved
         current.discard()
         assert merged_digest() == registered_digest
+
+        # The inline key dropdown covers Escape/None without entering capture mode.
+        options = editor_ops.resolver.input_options()['event']
+        for key in ('ESC', 'NONE'):
+            event_field('type', 'option', key, options['type'])
+            assert current.catalog['events'][current.catalog['assignments'][assignment]['event']]['type'] == key
+        # Every offered input must register with Blender's actual input type.
+        native_map = configs.addon.keymaps['Screen']
+        for key in options['type']:
+            probe = native_map.keymap_items.new('screen.repeat_last', type=key, value='PRESS')
+            try:
+                assert probe.map_type == editor_ops.map_type(key), (key, probe.map_type)
+            finally:
+                native_map.keymap_items.remove(probe)
+        for key in ('LEFTMOUSE', 'PEN', 'ERASER', 'TIMER0', 'TEXTINPUT', 'MOUSESMARTZOOM'):
+            current.discard()
+            event_field('type', 'option', key, options['type'])
+            data = current.catalog['events'][current.catalog['assignments'][assignment]['event']]
+            assert data['map_type'] == editor_ops.map_type(key)
+            assert data['repeat'] == (data['map_type'] == 'KEYBOARD')
+        for phase in ('RELEASE', 'CLICK_DRAG'):
+            current.discard()
+            event_field('value', 'option', phase, options['value'])
+            data = current.catalog['events'][current.catalog['assignments'][assignment]['event']]
+            assert not data['repeat']
+        if 'hyper' in bpy.types.KeyMapItem.bl_rna.properties:
+            current.discard()
+            for expected in (True, -1, False):
+                assert bpy.ops.wm.bh_deluxe_inline_edit(assignment=assignment, field='hyper') == {'FINISHED'}
+                assert current.catalog['events'][current.catalog['assignments'][assignment]['event']]['hyper'] == expected
+                assert not current.preview_error, current.preview_error
+        current.discard()
+        assert merged_digest() == registered_digest
+        report['inline_shortcut_settings_verified'] = True
 
         # Capturing a different keyboard key retains Repeat and does not save.
         capture_type = editor_ops.BH_OT_deluxe_capture
@@ -280,6 +364,38 @@ def exercise(output):
         assert catalog_revision() == saved
         current.discard()
         assert merged_digest() == registered_digest
+
+        # The native menu also disables our own additions via their original
+        # catalog setting, without inventing a suppression for an owned row.
+        merged_map = configs.user.keymaps['Screen']
+        redo = next(item for item in merged_map.keymap_items
+                    if item.idname == 'ed.redo' and item.type == 'Y' and item.ctrl)
+        original_redo = [(item.id, item.active) for item in configs.default.keymaps['Screen'].keymap_items
+                         if item.idname == 'ed.redo']
+        menu_entries = []
+        class OwnedMenuLayout:
+            def separator(self):
+                pass
+            def operator(self, idname, **kwargs):
+                props = SimpleNamespace()
+                menu_entries.append((idname, props))
+                return props
+        editor_ops.draw_binding_context(SimpleNamespace(layout=OwnedMenuLayout()),
+                                       SimpleNamespace(button_pointer=redo, keymap=merged_map))
+        operator_id, props = menu_entries[0]
+        assert operator_id == editor_ops.BH_OT_deluxe_disable_owned_binding.bl_idname
+        rules_before = set(current.catalog['suppressions'])
+        assert bpy.ops.wm.bh_deluxe_disable_owned_binding(**vars(props)) == {'FINISHED'}
+        assert not current.catalog['assignments'][props.assignment]['enabled']
+        assert current.assignment == props.assignment
+        assert set(current.catalog['suppressions']) == rules_before
+        assert not any(item.idname == 'ed.redo' and item.type == 'Y' and item.ctrl
+                       for item in configs.user.keymaps['Screen'].keymap_items)
+        assert [(item.id, item.active) for item in configs.default.keymaps['Screen'].keymap_items
+                if item.idname == 'ed.redo'] == original_redo
+        current.undo()
+        assert merged_digest() == registered_digest
+        current.discard()
 
         # Disable an exact inherited default, test draft/commit/unload restoration.
         source = configs.default.keymaps['Object Mode']
@@ -304,6 +420,7 @@ def exercise(output):
         operator_id, properties = menu_entries[0]
         assert operator_id == editor_ops.BH_OT_deluxe_stage_binding.bl_idname
         operation_type = editor_ops.BH_OT_deluxe_stage_binding
+        existing_rules = set(current.catalog['suppressions'])
         operation = SimpleNamespace(rule='', use_replacement=False, **vars(properties))
         for name in ('selected', 'run', 'release_choices'):
             setattr(operation, name, MethodType(getattr(operation_type, name), operation))
@@ -313,12 +430,18 @@ def exercise(output):
         assert operation_type.invoke(operation, dialog_context, None) == {'RUNNING_MODAL'}
         assert operation.disable_binding
         assert operation_type.execute(operation, bpy.context) == {'FINISHED'}, report.get('operator_error')
-        rule, = current.catalog['suppressions']
+        rule, = set(current.catalog['suppressions']) - existing_rules
         assert not current.preview_error, current.preview_error
         assert not item.active, 'Default disable did not preview'
         user_item = configs.user.keymaps['Object Mode'].keymap_items.from_id(item.id)
         assert not user_item.active and not user_item.is_user_modified
         assert current.preview()['suppressions'][rule]['registered']
+        assert current.binding_origin(rule, current.preview()) == (
+            'REMOVE', 'Blender Keymap Disabled by Blue Hole Deluxe')
+        assert bpy.ops.wm.bh_deluxe_edit(action='remove_rule', target=rule) == {'FINISHED'}
+        assert item.active, 'Removing the tree row did not restore its Blender default'
+        current.undo()
+        assert not item.active, 'Undo did not restore the disable rule'
         assert catalog_revision() == saved
         # Save only this disposable profile while preview is active; a second
         # Blender process checks that no disabled user-keymap delta leaked out.
@@ -351,6 +474,51 @@ def exercise(output):
         report.update(automatic_preview_verified=True, default_disable_restore_verified=True,
                       native_context_action_verified=True)
 
+        # An artist can capture a provider's merged row without choosing its
+        # source. Recreated source IDs are observed by the existing watcher.
+        class BH_OT_disable_fixture(bpy.types.Operator):
+            bl_idname = 'wm.bh_disable_fixture'
+            bl_label = 'Provider Disable Fixture'
+            def execute(self, _context):
+                return {'FINISHED'}
+        bpy.utils.register_class(BH_OT_disable_fixture)
+        provider_map = configs.addon.keymaps.new(name='3D View Generic', space_type='VIEW_3D')
+        def create_provider_item():
+            provider_item = provider_map.keymap_items.new('wm.bh_disable_fixture', 'F18', 'PRESS')
+            configs.update()
+            return provider_item
+        provider_item = create_provider_item()
+        merged_map = configs.user.keymaps['3D View Generic']
+        merged_item = next(item for item in merged_map.keymap_items if item.idname == 'wm.bh_disable_fixture')
+        candidate = editor_ops.resolver.capture_candidate(merged_map, merged_item, 'user')
+        assert candidate['can_disable'] and candidate['selector']['source_role'] == 'addon', candidate
+        current = editor_ops.editor()
+        provider_rule = current.draft.stage_suppression('other.shortcuts', merged_map, merged_item, 'user', disable=True)
+        current.changed()
+        assert not current.preview_error, current.preview_error
+        assert not provider_item.active
+        assert current.binding_origin(provider_rule, current.preview())[0] == 'REMOVE'
+        assert 'Add-on' in current.binding_origin(provider_rule, current.preview())[1]
+        provider_map.keymap_items.remove(provider_item)
+        configs.update()
+        registrar.default_bindings.reconcile(budget=100, time_budget=2)
+        assert not current.store.registration_results()[provider_rule][0] == 'applied'
+        provider_item = create_provider_item()
+        registrar.default_bindings.reconcile(budget=100, time_budget=2)
+        assert not provider_item.active, 'Provider enabled after startup was not disabled'
+        bpy.ops.wm.save_userpref()
+        current.set_enabled('suppressions', provider_rule, False)
+        assert provider_item.active
+        current.undo()
+        assert not provider_item.active
+        current.discard()
+        assert provider_item.active
+        provider_map.keymap_items.remove(provider_item)
+        bpy.utils.unregister_class(BH_OT_disable_fixture)
+        configs.update()
+        assert merged_digest() == registered_digest
+        report['provider_disable_capture_reload_restore_verified'] = True
+
         def edited_binding():
             return next(item for item in configs.user.keymaps['Object Mode'].keymap_items
                         if item.idname == 'object.bh_face_select_or_pose')
@@ -366,12 +534,24 @@ def exercise(output):
         assert edited_binding().type == 'F19', 'Disable/enable lost a native Preferences edit'
         registrar.unregister()
         assert runtime.runtime_stats()['tracked_resources'] == 0
+        if runtime._contains(configs.addon.keymaps, provider_map) and not provider_map.keymap_items:
+            configs.addon.keymaps.remove(provider_map)
         assert source_state() == initial
         report.update(status='passed', cycles=cycles, toggles=toggles,
                       merged_digest=registered_digest, native_preferences_edit_preserved=True,
                       catalog_section_choices_preserved=True, legacy_switches_ignored=True)
         if os.environ.get('BLUEHOLE_CAPTURE_EDITOR'):
             registrar.register()
+            editor_ui = importlib.import_module('bluehole_runtime.preferences.addon.keymaps.deluxe_editor')
+            draw_times = []
+            original_draw = editor_ui.draw
+            def measured_draw(*args, **kwargs):
+                started = time.perf_counter()
+                try:
+                    return original_draw(*args, **kwargs)
+                finally:
+                    draw_times.append(time.perf_counter() - started)
+            editor_ui.draw = measured_draw
             prefs.main_settings = 'GENERAL_ADDON'
             prefs.general_addon_settings = 'KEYMAP'
             bpy.ops.wm.bh_deluxe_edit(action='all_bindings')
@@ -407,44 +587,64 @@ def exercise(output):
                     SimpleNamespace(type='ESC')) == {'CANCELLED'}
                 assert not editor_ops.editor().capture_assignment
                 active = editor_ops.editor()
-                active.draft.stage_suppression('selection.all_none', source, item, 'default', disable=True)
+                rule_id = active.draft.stage_suppression('selection.all_none', source, item, 'default', disable=True)
                 active.changed()
                 bpy.ops.wm.bh_deluxe_edit(action='show_assignments', target='selection.all_none')
+                active.assignment = rule_id
+                editor_ops.state(bpy.context).search = 'object.select_all'
 
             def show_mesh():
                 bpy.ops.wm.bh_deluxe_edit(action='show_assignments', target='mesh.tools')
 
             def show_context():
                 bpy.ops.wm.bh_deluxe_edit(action='feature_category', target='navigation')
-                editor_ops.editor().binding_context = editor_ops.context_id(scope)
+                editor_ops.state(bpy.context).search = 'view_selected'
 
-            def show_commands():
+            def show_command_settings():
                 bpy.ops.wm.bh_deluxe_edit(action='discard')
-                command = next(id_ for id_, row in editor_ops.editor().catalog['commands'].items()
-                               if row.get('operator') == 'view3d.view_selected')
+                bpy.ops.wm.bh_deluxe_edit(action='all_bindings')
                 active = editor_ops.editor()
-                active.command = command
-                active.focus_command = True
-                active.command_category = active.command_section = ''
-                editor_ops.state(bpy.context).tab = 'COMMANDS'
+                active.assignment = next(id_ for id_, row in active.catalog['assignments'].items()
+                                         if active.catalog['commands'][row['command']].get('operator') == 'mesh.bisect')
+                editor_ops.state(bpy.context).search = 'mesh.bisect'
+
+            def show_menu_properties():
+                bpy.ops.wm.bh_deluxe_edit(action='all_bindings')
+                active = editor_ops.editor()
+                active.assignment = next(id_ for id_, row in active.catalog['assignments'].items()
+                    if active.catalog['commands'][row['command']].get('properties', {}).get('name') == 'BLUEHOLE_MT_pie_add')
+                editor_ops.state(bpy.context).search = 'BLUEHOLE_MT_pie_add'
+
+            def show_new_binding():
+                active = editor_ops.editor()
+                bpy.ops.wm.bh_deluxe_edit(action='show_assignments', target='mesh.tools')
+                scope = next(scope for scope in editor_ops.assignment_scopes(active, configs)
+                             if scope['name'] == 'Mesh')
+                assert bpy.ops.wm.bh_deluxe_add_binding(scope=json.dumps(scope)) == {'FINISHED'}
+                assert not active.preview_error, active.preview_error
 
             steps = (
                 ('all-bindings.png', show_context),
-                ('context-filter.png', show_mesh),
+                ('name-search.png', show_mesh),
                 ('sections.png', lambda: setattr(checkbox('sections', 'mesh.tools'), 'boolean', False)),
                 ('subsection-disabled.png', lambda: setattr(checkbox('categories', 'mesh'), 'boolean', False)),
                 ('category-disabled.png', lambda: setattr(prefs.keymap, 'enable_keymaps', False)),
                 ('deluxe-disabled.png', show_binding),
                 ('keymap-binding.png', start_capture),
                 ('input-key.png', show_default_rule),
-                ('default-rule.png', show_commands),
-                ('commands.png', None),
+                ('default-rule.png', show_command_settings),
+                ('binding-command-settings.png', show_menu_properties),
+                ('menu-properties.png', show_new_binding),
+                ('new-binding.png', None),
             )
 
             def capture():
                 try:
                     name, change = steps[len(captures)]
                     with bpy.context.temp_override(window=window, area=area):
+                        # Screenshot reads the presented buffer. A timer can
+                        # run before the next swap even after a tagged redraw.
+                        bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
                         bpy.ops.screen.screenshot(filepath=str(output / name))
                     captures.append(name)
                     if change is not None:
@@ -460,6 +660,7 @@ def exercise(output):
                     assert checkbox('categories', 'mesh').boolean
                     assert checkbox('sections', 'mesh.tools').boolean
                     report['editor_screenshots'] = captures
+                    report['editor_draw_seconds'] = draw_times
                 except BaseException:
                     report.update(status='failed', error=traceback.format_exc())
                 addon_utils.disable('bluehole_runtime', default_set=True)
@@ -558,6 +759,6 @@ if __name__ == '__main__':
         parser = argparse.ArgumentParser(description=__doc__)
         parser.add_argument('--blender', type=Path, required=True)
         parser.add_argument('--output', type=Path, required=True)
-        parser.add_argument('--capture-editor', action='store_true', help='Capture the Bindings and Commands editor after validation')
+        parser.add_argument('--capture-editor', action='store_true', help='Capture the binding editor after validation')
         args = parser.parse_args()
         raise SystemExit(launch(args.blender, args.output, capture_editor=args.capture_editor))

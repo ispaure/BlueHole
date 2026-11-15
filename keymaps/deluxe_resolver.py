@@ -8,7 +8,7 @@ import bpy
 
 from . import keymap_utils as runtime
 from . import default_bindings
-from .deluxe_schema import (ProfileError, SOURCE_ROLES, event_descriptor, require, same_value,
+from .deluxe_schema import (OPERATOR, ProfileError, SOURCE_ROLES, event_descriptor, properties, require, same_value,
                             scope_descriptor, selector_descriptor)
 
 # A replacement may use only an already proved context and capability. Generic
@@ -24,10 +24,6 @@ PROOFS = {
 MODAL_TOKENS = frozenset({'CANCEL'})
 # The stock Select All proof uses a consuming, known selection command.
 REPLACEMENT_COMMANDS = ({'operator': 'object.select_all', 'properties': {'action': 'DESELECT'}},)
-ROUTING_OPERATORS = {
-    'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel', 'wm.context_menu_enum',
-    'wm.context_toggle', 'wm.radial_control', 'wm.tool_set_by_id',
-}
 COMMAND_ERRORS = (AttributeError, KeyError, ReferenceError, RuntimeError, TypeError, ValueError)
 OBJECT_NON_MODAL_SCOPES = frozenset(runtime.KeymapScope('Object Non-modal', is_tool=is_tool)
                                    for is_tool in (None, False))
@@ -55,6 +51,8 @@ def _rna_enums(class_name, names):
 
 
 def _operator_rna(idname):
+    if not OPERATOR.fullmatch(idname):
+        return None
     namespace, name = idname.split('.')
     try:
         return getattr(getattr(bpy.ops, namespace), name).get_rna_type()
@@ -253,14 +251,14 @@ class Resolver:
         variants = self.commands.get(idname, ())
         provider = variants[0].get('provider') if variants else None
         rna = _operator_rna(idname)
-        locked = idname in ROUTING_OPERATORS or provider is not None or '.bh_' in idname
-        editable = rna is not None and not locked
+        editable = rna is not None
         fields = {}
         properties = command['properties']
         if rna is not None:
-            names = dict.fromkeys(properties)
+            names = {}
             if include_unset and editable:
                 names.update(dict.fromkeys(name for name in rna.properties.keys() if name != 'rna_type'))
+            names.update(dict.fromkeys(properties))
             for name in names:
                 prop = rna.properties.get(name)
                 if name not in properties and (prop is None or getattr(prop, 'is_hidden', False)):
@@ -272,11 +270,11 @@ class Resolver:
                 fields[name] = field
         if rna is None:
             fields = {name: {'editable': False, 'type': 'UNAVAILABLE'} for name in command['properties']}
-        label = (rna.name if rna is not None else idname) or idname
+        label = (rna.name if rna is not None else idname) or 'Unassigned'
         owner = provider or ('Blue Hole' if '.bh_' in idname else 'Blender')
         if idname in {'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel'}:
-            name = command['properties']['name']
-            label = getattr(getattr(bpy.types, name, None), 'bl_label', None) or name
+            name = command['properties'].get('name', '')
+            label = getattr(getattr(bpy.types, name, None), 'bl_label', None) or name or label
             if name.startswith('BLUEHOLE_'):
                 owner = 'Blue Hole'
         return {'label': command.get('label', label), 'owner': owner,
@@ -285,8 +283,13 @@ class Resolver:
                                                            else 'unavailable'),
                 'editable': any(field['editable'] for field in fields.values()), 'fields': fields}
 
+    @staticmethod
+    def describe_operator_token(idname):
+        rna = _operator_rna(idname)
+        return None if rna is None else (getattr(rna, 'as_pointer', lambda: id(rna))(), rna.name)
+
     def validate(self, catalog, baseline):
-        """Check editable values against the live RNA and the approved routes."""
+        """Check edited values against live RNA and supported keymap scopes."""
         options = input_options()
         for id_, row in catalog['events'].items():
             if same_value(baseline.get('events', {}).get(id_), row):
@@ -320,18 +323,22 @@ class Resolver:
             require(row['modal_value'] in MODAL_TOKENS, f'Unknown modal command {id_}')
             return
         idname = row['operator']
+        require(isinstance(idname, str) and (not idname or OPERATOR.fullmatch(idname)),
+                'Use an operator ID such as wm.call_menu_pie')
+        properties(row['properties'])
         variants = self.commands.get(idname)
         variants = variants or ()
-        require(row.get('provider') == (variants[0].get('provider') if variants else None),
+        require(not row.get('provider') or row.get('provider') == (variants[0].get('provider') if variants else None),
                 f'Unknown command provider in {id_}')
         definition = {key: value for key, value in row.items() if key != 'label'}
         if any(same_value(definition, {key: value for key, value in variant.items() if key != 'label'})
                for variant in variants):
             return
-        require(idname not in ROUTING_OPERATORS and '.bh_' not in idname and not row.get('provider'),
-                f'Command {id_} is code-managed')
         rna = _operator_rna(idname)
-        require(variants or rna is not None, f'Unknown command in {id_}')
+        # Missing add-ons are valid saved choices. RNA validation resumes when
+        # their operators become available; no binding is registered meanwhile.
+        if rna is None:
+            return
         for name, value in row['properties'].items():
             if any(name in variant['properties'] and same_value(value, variant['properties'][name])
                    for variant in variants):
@@ -366,12 +373,14 @@ class Resolver:
             scope = scope_descriptor(row['scope'])
             event = event_descriptor(catalog['events'][row['event']])
             command = commands[row['command']]
+            if not command['operator']:
+                continue
             samples = row.get('samples', ())
             request = runtime.KeymapAssignment(
                 id_, scope, event, self.target(command), declared_properties_only=True,
                 active=row.get('active', True), ledger_id=catalog['base']['ledger'] if samples else '',
                 sample_id=samples[0] if samples else '',
-                requires_operator=bool(command.get('provider')))
+                requires_operator=bool(command.get('provider')) or _operator_rna(command['operator']) is None)
             requests = groups.setdefault(owner, [])
             requests.append(request)
             # The viewport dispatches Object Mode before Object Non-modal.
