@@ -8,6 +8,7 @@ import bpy
 
 from . import keymap_utils as runtime
 from . import default_bindings
+from .dispatch_policy import reviewed_groups
 from .deluxe_schema import (OPERATOR, ProfileError, SOURCE_ROLES, event_descriptor, properties, require, same_value,
                             scope_descriptor, selector_descriptor)
 
@@ -382,6 +383,7 @@ class Resolver:
                  for id_, section in sections.items()}
         groups = {}
         commands = catalog['commands']
+        dispatch_groups = reviewed_groups(catalog)
         rows = catalog['assignments'].items() if assignment_ids is None else (
             (id_, catalog['assignments'][id_]) for id_ in assignment_ids)
         for id_, row in sorted(rows, key=lambda entry: entry[1]['order']):
@@ -400,7 +402,7 @@ class Resolver:
                 active=row.get('active', True), ledger_id=catalog['base']['ledger'] if samples else '',
                 sample_id=samples[0] if samples else '',
                 requires_operator='operator' in command and (bool(command.get('provider')) or _operator_rna(command['operator']) is None),
-                dispatch_group=row.get('dispatch_group', ''),
+                dispatch_group=row.get('dispatch_group', '') if row.get('dispatch_group') in dispatch_groups else '',
                 required_addon=command_addon(command),
                 required_class=command.get('properties', {}).get('name', '')
                 if command.get('operator') in {'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel'} else '')

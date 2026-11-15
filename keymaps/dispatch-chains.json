@@ -1,0 +1,715 @@
+{
+  "version": 1,
+  "source_catalog": "a121cccf72fbfb6ec5e4cd18bd97f1818f1f3c7464ad7c3d10eb062685015512",
+  "source_reference": "4.5.1 Deluxe parity captured against Blender 5.2.2",
+  "chains": {
+    "parity-chain-01da8398ed5e": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "UV Toolkit"
+      ],
+      "members": [
+        {
+          "id": "transform-uv-editor-609a3ef6ff51",
+          "signature": "0def1a32b67136373612f2e38aeb72d609544a232a764d9fef793f130552b798"
+        },
+        {
+          "id": "parity-uv-toolkit-unwrap-selected-902b88fbd611",
+          "signature": "96d0fe15f543443b8eba20d9676aacfe9b53e58eb47570783f8250e8d5214c27"
+        }
+      ]
+    },
+    "parity-chain-28fd0fcdf7cd": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Auto Constraints",
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "transform-3d-view-tool-tweak-fallback-471c55059d0b",
+          "signature": "690fb3531784b276b53ce3265f9bfcb231d8c77b395f092f5ae035b54088d6c6"
+        },
+        {
+          "id": "parity-transform-translate-auto-constraint-d2ebe3d5c622",
+          "signature": "fe366bd781197ee43903cbe45a57063643c5c822837a854eafd399d9eaf91c1e"
+        }
+      ]
+    },
+    "parity-chain-24c156927916": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Auto Constraints",
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "transform-3d-view-tool-move-eff65a62e1b8",
+          "signature": "7910591167d1069e46fe83329799ec414f7af54bc0065a38e59e4568782d9e3a"
+        },
+        {
+          "id": "parity-transform-translate-auto-constraint-7f8c2de6845b",
+          "signature": "02dc51331ce033f4006834a2fa880db67ab5d4edb0600aa0331ac77f76596bda"
+        }
+      ]
+    },
+    "parity-chain-cc987d990650": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Auto Constraints",
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "transform-3d-view-tool-rotate-bcaad2b43a10",
+          "signature": "4b65b088b3c6832de25aadbe7532f5e8c8ce4164ff85f346d4eea3fdbd2503e8"
+        },
+        {
+          "id": "parity-transform-rotate-auto-constraint-a60031c9f05d",
+          "signature": "50fdde04e38899f7b95e50c4fa4baf2cbeb69931d579295535e0916a9722fa1a"
+        }
+      ]
+    },
+    "parity-chain-8431d92b1104": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Auto Constraints",
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "transform-3d-view-tool-scale-ccd3c489cd71",
+          "signature": "e8dc757044c6c5b7f755633db63bc5c26d1c54502de2b5b130a0e465f45648a4"
+        },
+        {
+          "id": "parity-transform-resize-auto-constraint-42c70e2e5f9f",
+          "signature": "461ff750fbca7047969de1aef3bacf4d00de9183d8dd7ba7330bc476ff181829"
+        }
+      ]
+    },
+    "parity-chain-cc62e7c3f3d6": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Blue Hole"
+      ],
+      "members": [
+        {
+          "id": "uv-image-editor-tool-uv-cursor-2f6988a78555",
+          "signature": "8e78a2ba9f926c2243144c59c714b1603d24c5d2d203b4df7525dc63e1db790c"
+        },
+        {
+          "id": "parity-uv-cursor-set-4d695db7fb99",
+          "signature": "d7165bc3e796afce02353d262048c1c8ce42d9fd2b31cf660e76259be38a87bf"
+        },
+        {
+          "id": "parity-transform-translate-a18722ed1913",
+          "signature": "bac7b3d678862e4a5bdd20972b6043039469f73d6c219f7b85ecdc20a593269a"
+        }
+      ]
+    },
+    "parity-chain-52350738971f": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-preview-tool-cursor-8b02818109ab",
+          "signature": "22eae21cea952e4bd32a725222e93ce1c2d1ce79b828b3b8cff42f645eb63cab"
+        },
+        {
+          "id": "parity-transform-translate-8b39593a8936",
+          "signature": "4855380702725d2c65cb6c6c36d6e0f6fc8f74c1e71c0f3e13e031e1bd70b73b"
+        }
+      ]
+    },
+    "parity-chain-f49ba57bbd01": {
+      "reason": "Preserve file and asset refresh routes; operator polling depends on browser mode.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-file-browser-main-1484d83d7d45",
+          "signature": "64eadb0524d05ca07ba2213e3fd7e8d92f336a87bfe51fee167e03d01e60c120"
+        },
+        {
+          "id": "parity-asset-library-refresh-d108e85a4a14",
+          "signature": "881db2518a212376afd45b3bf623c40fc8cb554810642272e5d7f844890e68ba"
+        }
+      ]
+    },
+    "parity-chain-df523fd1f6ef": {
+      "reason": "Preserve file and asset refresh routes; operator polling depends on browser mode.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-file-browser-main-98d7284b2869",
+          "signature": "2b2f119cc4de29d36ca13ea8f121734cc068ffe50ed2636eb28e19e563c725de"
+        },
+        {
+          "id": "parity-asset-library-refresh-652deb39e2c7",
+          "signature": "167bc092742d3a14ea3a350497f0d55598d4a8b859e466a9e743990d2c3845fa"
+        }
+      ]
+    },
+    "parity-chain-fc993cad514d": {
+      "reason": "Preserve file and asset refresh routes; operator polling depends on browser mode.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-file-browser-2d8389f84b44",
+          "signature": "d824c3a026341bd0c05084101c4fd2cdc03031f9d0818e6d6aeb182e9fd104a7"
+        },
+        {
+          "id": "parity-asset-library-refresh-37e13f420534",
+          "signature": "902c5f908d289ee0e1c5a5b5d2de74c310ecb17f1f3f03bdb95bb9d10c26f962"
+        }
+      ]
+    },
+    "parity-chain-b86e759fbac4": {
+      "reason": "Preserve file and asset refresh routes; operator polling depends on browser mode.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-file-browser-c930d7020f3e",
+          "signature": "43cb654ac07bb9a0a70e9d03aa21cb551233a6a7c53b4076905f66332e77315b"
+        },
+        {
+          "id": "parity-asset-library-refresh-10a07e9a5392",
+          "signature": "4cb3e47b90c589c95b16134f287e77763fd0a43ed73213779b759859c589c17d"
+        }
+      ]
+    },
+    "parity-chain-1e9e9c9b8b6d": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-node-editor-79d53ab10576",
+          "signature": "89625d0295ded8c5d5bacc9e8a6d97cf9eddc6921a1ca9ccbdf8a0c04aeed027"
+        },
+        {
+          "id": "parity-node-backimage-sample-ccac4be7d84f",
+          "signature": "759f93c0a26a4e9490a0857ff9a39eba2f81d29814872375bce3debd32f21f68"
+        }
+      ]
+    },
+    "parity-chain-73cf0bc69b96": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-image-paint-f91e681fc048",
+          "signature": "5c12abbde079fb1026ea8f632de083d37913e5aee104ab4ab8a1f88c9b2e3bbe"
+        },
+        {
+          "id": "parity-wm-call-panel-b01555ec6902",
+          "signature": "15a957fad8bc27d4131532b09173edeba6396619ca935f953a65c5de38a9632d"
+        }
+      ]
+    },
+    "parity-chain-f3dc9b6e2dbb": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-dopesheet-f4797d04a49d",
+          "signature": "e2f720c4bc5a220427c3ccddff6654a011ee5063cfaf9633f13cb601fc6fc9e2"
+        },
+        {
+          "id": "parity-anim-start-frame-set-1b1c59a909d2",
+          "signature": "c870315e9688ccde7576361ab9a59702a49a22005f06d199d63376b484027ef3"
+        }
+      ]
+    },
+    "parity-chain-3f463bebac43": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-dopesheet-a99e8f903128",
+          "signature": "d54fea89734c1e24cc865636885763bfd0aef194386d527e099cf43665ccac44"
+        },
+        {
+          "id": "parity-anim-start-frame-set-04167ce90578",
+          "signature": "d9d51be986c55bdebf3965bf53a5350cb9b1040dc76c13e2acfe409bb49ed19b"
+        }
+      ]
+    },
+    "parity-chain-71c62238aa10": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-dopesheet-100823a7dc06",
+          "signature": "6b2d24e9408363bbece43f81c3a1322817be148d1cfe2a51c57917887ed2ae51"
+        },
+        {
+          "id": "parity-anim-end-frame-set-f2ee8e58def4",
+          "signature": "5e9880f73a51258c226f44c5408739765f5c2ba53cc0b8fb3e319a6fda0d8646"
+        }
+      ]
+    },
+    "parity-chain-eb8d34f09cd8": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-dopesheet-a0e437fe6b99",
+          "signature": "418f3444672c353828472d30a526d3e172f43cf14438af861f168b2ac667030a"
+        },
+        {
+          "id": "parity-anim-end-frame-set-f1d3db2cbf01",
+          "signature": "069873f3638db9aaf105b12696fa35b263913c8f7690f7b89498e79616c3d4e0"
+        }
+      ]
+    },
+    "parity-chain-53c87f045609": {
+      "reason": "Preserve modifier, shader effect and constraint actions; each requires its own Properties context.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-property-editor-390bbce68493",
+          "signature": "80f08dab479168351f1aa2e3dfad3a56356532f8de3d8a06c8d44ae83082d1b7"
+        },
+        {
+          "id": "parity-object-shaderfx-copy-ae8d3cee7c1e",
+          "signature": "9e72c9bd38e85697048a03cb1defd64674f117710f16e45f97bf0771ae9a9175"
+        },
+        {
+          "id": "parity-constraint-copy-ae8d3cee7c1e",
+          "signature": "e40f83e04c0b73d5e407165e2de962466ce22a42b670556758802c84c1d0b70e"
+        }
+      ]
+    },
+    "parity-chain-b38b7b1bfe80": {
+      "reason": "Preserve modifier, shader effect and constraint actions; each requires its own Properties context.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-property-editor-8747b12fb3a4",
+          "signature": "bf4cd55ab048ae0583c15f41e8905d822e7bc6d19cfb269ac59a73c1da6c4cf4"
+        },
+        {
+          "id": "parity-object-shaderfx-copy-e71bf3fa0474",
+          "signature": "5ec6c89bdba98173fb31b7f1912a7b2da977adf8c30c284134e3fe65b4ae5222"
+        },
+        {
+          "id": "parity-constraint-copy-e71bf3fa0474",
+          "signature": "77dfbd36f7a44d76f5060fb5e1aaf73e6746fcbf178e81ee90cea19cccf3853a"
+        }
+      ]
+    },
+    "parity-chain-9ce934edc071": {
+      "reason": "Preserve modifier, shader effect and constraint actions; each requires its own Properties context.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "other-property-editor-7d3b747e463e",
+          "signature": "e7cc836aa2d8151fb95a1175b2cfa99755d800a9221eec3ca0d7a42f971e4f06"
+        },
+        {
+          "id": "parity-object-shaderfx-remove-352eac7f9b87",
+          "signature": "636471dd911a3c9efb89c805c2a18f75aefdaed6d8c8655f2164d5e9268f74f0"
+        },
+        {
+          "id": "parity-constraint-delete-352eac7f9b87",
+          "signature": "de5a85c94bbb53cfab3880eedfe3889088a5e577ff6b0c15b3131bb2ea4f2d47"
+        }
+      ]
+    },
+    "parity-chain-ea01061207a4": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Pie Menu Editor"
+      ],
+      "members": [
+        {
+          "id": "parity-wm-pmi-data-edit-0889d975a87a",
+          "signature": "6d47f8eeade824b35250aeb53dffc509ef566927638c7c49d7ba89c7a448b6df"
+        },
+        {
+          "id": "parity-wm-pmi-icon-select-0889d975a87a",
+          "signature": "463504fb1842131cb0166f6e0278536ef539c074baccf8367fa24ff7799d307a"
+        },
+        {
+          "id": "parity-render-view-cancel-934299a8fa4d",
+          "signature": "8e5e391fbc637ebbe18f569f2df5dc13fa9164446121ad6378857d31f78c6f8b"
+        }
+      ]
+    },
+    "parity-chain-aa770feb98fe": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "parity-ui-eyedropper-color-4a150478e520",
+          "signature": "2af7e174ea5aa85a0d02ff4232d39ed35d9cc7c4d743d5aaf80624e10afda5a9"
+        },
+        {
+          "id": "parity-ui-eyedropper-colorramp-4a150478e520",
+          "signature": "927beefa8f8c9dfa86ecfa32f033d1e729aa173b8d74148c4104ab32385e14b9"
+        },
+        {
+          "id": "parity-ui-eyedropper-id-4a150478e520",
+          "signature": "d6828a0bf96f72f45b7ad2971fd02bc5ed7614a9aadc38128f2d62fba82fac7e"
+        },
+        {
+          "id": "parity-ui-eyedropper-depth-4a150478e520",
+          "signature": "da31292eecfb7cce82d780a0c5f3f1c3e0de11ec12640042e4b89a5441a75144"
+        }
+      ]
+    },
+    "parity-chain-08ffb8689c6b": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "parity-action-select-linked-d2abfdb21f85",
+          "signature": "26286d915be0d8eacf23940cc30cd1b32748aa10447102a4b39c57a14296db05"
+        },
+        {
+          "id": "parity-action-select-more-3acaf4567a63",
+          "signature": "4c7484ab76fbf826477beb1841c420a9f64bb56fea623b79b49be19556bcc3df"
+        }
+      ]
+    },
+    "parity-chain-2f0d987c9c4f": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "parity-paintcurve-slide-61056531a483",
+          "signature": "ca7a7dda5fc41ab0db932fcb36b9bd989ce719db0b0b6bdeb52bce183e427489"
+        },
+        {
+          "id": "parity-paintcurve-cursor-61056531a483",
+          "signature": "501224a2237dba89b3094f44a6244b4b166595c1c57fa8113a930950bbf3c8f3"
+        }
+      ]
+    },
+    "parity-chain-895e6e663152": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "MACHIN3tools",
+        "UV Toolkit"
+      ],
+      "members": [
+        {
+          "id": "parity-wm-call-menu-pie-686e0d881352",
+          "signature": "5d3c7098d52440d386712afba761e73d97c7229c024b13cdf6f31ddf9d90b331"
+        },
+        {
+          "id": "parity-uv-toolkit-invert-selection-7963e5ab84a7",
+          "signature": "df9fbe32ed3d73668ffbf8370895f924ed3471c6f8cc721b499b3205591e37e6"
+        }
+      ]
+    },
+    "parity-chain-1bfbf431a6d8": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "UV Toolkit"
+      ],
+      "members": [
+        {
+          "id": "parity-uv-toolkit-distribute-6d35648a3501",
+          "signature": "12bf3743304a30734fab19618d6720f7451118769ea04db8a999ba778a6ed3d6"
+        },
+        {
+          "id": "parity-wm-tool-set-by-id-d4fa27b767e3",
+          "signature": "c04fd612239aa6eefc6bdcfcb6c3f2532b54bffc5587dbd844905953398180c3"
+        }
+      ]
+    },
+    "parity-chain-5a92949b6531": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "UV Toolkit",
+        "Zen UV"
+      ],
+      "members": [
+        {
+          "id": "parity-uv-toolkit-center-cursor-and-frame-all-3c39cd4cf7b2",
+          "signature": "af228a16cc744db38a6248f3eea3c3dd098dad09d3ffc285a6e32153a9596c0d"
+        },
+        {
+          "id": "parity-uv-zenuv-move-cursor-to-e4e67acf8bad",
+          "signature": "df6cef4ca6ea1d6759e7985b7b89a1b258851084d6bd1cb2f021211cba2ad1e2"
+        }
+      ]
+    },
+    "parity-chain-a9776d5f2a41": {
+      "reason": "Preserve native paired modal actions in reference order; handler selects the applicable transform action.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "parity-trackball-a2a12b5ecdee",
+          "signature": "f9a1791ae13e39b2d2b6940464975d6ba2b6a15a422c7b8d4416622467f50cbf"
+        },
+        {
+          "id": "parity-rotate-a2a12b5ecdee",
+          "signature": "f332dacc9b10a1cad3591b5c9e677ca780e12fe216095c32d4eb3669bf2c1de1"
+        }
+      ]
+    },
+    "parity-chain-f192d71707cc": {
+      "reason": "Preserve native paired modal actions in reference order; handler selects the applicable transform action.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "parity-vert-edge-slide-45d8a5cea725",
+          "signature": "813938f4971140e1589a0bc3ee594504cbe34ae8e450ee8c698e5bcfd3b5d46f"
+        },
+        {
+          "id": "parity-translate-45d8a5cea725",
+          "signature": "9929caa608a1e2f3f30c6bbd982ab2bbc19e5f2618e7d036b2841e3a2099ea95"
+        }
+      ]
+    },
+    "parity-chain-0dd54c685ded": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Pie Menu Editor"
+      ],
+      "members": [
+        {
+          "id": "parity-wm-pme-user-pie-menu-call-9072e4081a86",
+          "signature": "afcfa1f8bfa169f54615ae53abe2f854d8fdb15fb93d2fd05846c0728383bd9c"
+        },
+        {
+          "id": "parity-graph-cursor-set-9d80fa99389c",
+          "signature": "03257149db52752589eafa3b3959e0fcdda0e9370b76d2c3f1d2e77d93f6bf19"
+        }
+      ]
+    },
+    "parity-chain-f9a45de2e777": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Node Wrangler"
+      ],
+      "members": [
+        {
+          "id": "parity-node-nw-reset-nodes-41f95022110d",
+          "signature": "c05933fb9cd03e29afbae6743db067016825fbff6a210b7b037127a4d9369948"
+        },
+        {
+          "id": "parity-node-delete-41f95022110d",
+          "signature": "cccbb4b13c7bd4faf7aa3667127cb127036df238ffc59a9feac8fb0ae51a78e6"
+        }
+      ]
+    },
+    "parity-chain-f17415dc1743": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Node Wrangler"
+      ],
+      "members": [
+        {
+          "id": "parity-node-nw-preview-node-6823c56acfb7",
+          "signature": "f5e5db56b48c42d3f61580954dbc165199ad69918a4d57fc40bf39b0b810bc15"
+        },
+        {
+          "id": "parity-node-select-b55fd1f53630",
+          "signature": "3dad8b9596d27694154f481c0f1dd3514578bfc30de2d59e43c1f6e6d19a92d8"
+        }
+      ]
+    },
+    "parity-chain-32e430b52c0a": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Node Wrangler"
+      ],
+      "members": [
+        {
+          "id": "parity-node-nw-preview-node-18a4be0f7455",
+          "signature": "5c1bf8d0cd8e37a03c2155023d8a22e21fa3950860e496986ce5fa650c37e50c"
+        },
+        {
+          "id": "parity-node-select-c5db471f860d",
+          "signature": "33b4a437c4d9137114ecedaff66354a3de52ae90a6c73be929762514f381f0f0"
+        }
+      ]
+    },
+    "parity-chain-f8fe56879524": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Node Wrangler"
+      ],
+      "members": [
+        {
+          "id": "parity-node-nw-bg-reset-3f8d0dbd9afe",
+          "signature": "76eb53d1f4ab7fa111bfd4705632644d0f0c2c2de9eae5532d046d54473ac22b"
+        },
+        {
+          "id": "parity-node-viewer-border-3f8d0dbd9afe",
+          "signature": "9990cc0c98a2846b90f083030bf221698d1e92d85e01d109f0eb93fc11666a8c"
+        }
+      ]
+    },
+    "parity-chain-077f0e4a55af": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Node Wrangler"
+      ],
+      "members": [
+        {
+          "id": "parity-node-nw-select-parent-child-60ef4d6e7815",
+          "signature": "cf77f525219901f868db26fb9c61e14984b80d41c7959144c276eed7f5ca560b"
+        },
+        {
+          "id": "parity-node-select-linked-from-b2439ccb9e32",
+          "signature": "d182d4a0afe415189d747e0510d1cfb7c8532abe8b785f915704f9f82a09955a"
+        }
+      ]
+    },
+    "parity-chain-f57684243bd6": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender",
+        "Node Wrangler"
+      ],
+      "members": [
+        {
+          "id": "parity-node-nw-select-parent-child-cabc51d51d81",
+          "signature": "7d820dbb2d3a4056b28283c38f22db2f4c15bc5834a48006be6bc13d0db738a1"
+        },
+        {
+          "id": "parity-node-select-linked-to-5ed0c1fd7359",
+          "signature": "0e73214492dd4c311f8258579062fd045079af08e459f829c9fde84a4827b0a0"
+        }
+      ]
+    },
+    "parity-chain-ca1dfbd335b1": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "parity-node-backimage-fit-c9f55718d2ab",
+          "signature": "6a664dba0911e89bcb6e657dea99e17000c527ecfd91ab91a2516d35dcc211d8"
+        },
+        {
+          "id": "parity-node-select-all-e0634b2166b7",
+          "signature": "4beed8500c13d27db5c8e4bdf6d79f0fdaca1f10036fc5115cac88410b4bfd19"
+        }
+      ]
+    },
+    "parity-chain-f46ef69f5ead": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "parity-node-translate-attach-1e4910bfbe95",
+          "signature": "24f4d68535fa74834f2420d8ab1d97d0be0b45a7e74ae3b3cf845cfa60cd7a28"
+        },
+        {
+          "id": "parity-transform-translate-ebcbcf707595",
+          "signature": "020ed871ee85598eb0942ba016906e6c471e93c498bc2621d545be2ef789982e"
+        }
+      ]
+    },
+    "parity-chain-83a761ee46ee": {
+      "reason": "Preserve the ordered shared event from the reference catalog; polling/pass-through behavior requires native dispatch coverage for this context and provider set.",
+      "dispatch_evidence": "structural-order-only",
+      "providers": [
+        "Blender"
+      ],
+      "members": [
+        {
+          "id": "parity-sequencer-select-linked-pick-4d8966618386",
+          "signature": "d7033bc73520b84372db19196b0b2dff3ec898c797772bc8b9ad360e68e9495b"
+        },
+        {
+          "id": "parity-sequencer-select-more-9a76f8b6905a",
+          "signature": "d8394285227cd2f8a3ba166292de4dd346852b2f230597db6b5f90d0e2af2096"
+        }
+      ]
+    }
+  }
+}

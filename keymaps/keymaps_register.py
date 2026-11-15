@@ -243,6 +243,17 @@ def _retry_unload_cleanup():
     return None
 
 
+def drain_cleanup():
+    """Updater barrier: retain this callable until all old ownership is released."""
+    if _enabled:
+        raise RuntimeError('Keymap cleanup requires an unloaded runtime')
+    if bpy.app.timers.is_registered(_retry_unload_cleanup):
+        bpy.app.timers.unregister(_retry_unload_cleanup)
+    owned_ready = keymap_utils.drain_cleanup(WATCH_REQUEST_BUDGET)
+    defaults_ready = not default_bindings.retry_cleanup()
+    return owned_ready and defaults_ready
+
+
 def unregister():
     global _enabled, _preference_state, _last_error, _profile_store, _unload_cleanup_attempts
     _enabled = False

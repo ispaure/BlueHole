@@ -747,6 +747,12 @@ def pending_cleanup():
                  for _, reason in records)
 
 
+def drain_cleanup(budget=16):
+    """Retry released ownership without refreshing or creating any bindings."""
+    _retry_cleanup(limit=budget)
+    return not _PENDING_CLEANUP
+
+
 def _remember_pair(handle, request_id, owned):
     key = id(owned.map), id(owned.item)
     _PAIR_ALIASES[key] = (owned.map, owned.item, handle, request_id)
@@ -1479,23 +1485,32 @@ class FeatureHandle:
                 self._backoff(request.request_id)
                 if proof is not None and issue.reason == 'merged_priority_unproved':
                     self._blocked[request.request_id] = _proof_generation(proof)
-                for _, partial in reversed(created):
-                    _remove_raw(partial)
-                for prior_request, _ in created:
-                    self._owned.pop(prior_request.request_id, None)
                 diagnostics.append(_diagnostic(self, request, issue.status, issue.reason, issue.role, issue.capability))
+                self._rollback_creation(created, staged, request, diagnostics)
                 break
             except Exception:
                 self._backoff(request.request_id)
-                for _, partial in reversed(created):
-                    _remove_raw(partial)
-                for prior_request, _ in created:
-                    self._owned.pop(prior_request.request_id, None)
                 diagnostics.append(_diagnostic(self, request, 'unsupported', 'creation_or_setter_failed'))
+                self._rollback_creation(created, staged, request, diagnostics)
                 break
         self._refreshes += 1
         self.diagnostics = tuple(diagnostics)
         return self.diagnostics
+
+    def _rollback_creation(self, created, staged, failed, diagnostics):
+        """Report final transaction state, including unattempted and queued work."""
+        outcomes = {}
+        for request, owned in reversed(created):
+            outcomes[request.request_id] = _remove_raw(owned)
+            self._owned.pop(request.request_id, None)
+        diagnostics[:] = [row for row in diagnostics if row.request_id not in outcomes]
+        for request, _ in staged:
+            if request.request_id in outcomes:
+                outcome = outcomes[request.request_id]
+                reason = outcome if outcome in _CLEANUP_RETRY_REASONS else 'feature_creation_rolled_back'
+                diagnostics.append(_diagnostic(self, request, 'pending', reason))
+            elif request.request_id != failed.request_id:
+                diagnostics.append(_diagnostic(self, request, 'pending', 'feature_creation_not_attempted'))
 
     def _backoff(self, request_id):
         delay = min(2.0, self._retry_delay.get(request_id, 0.125) * 2)

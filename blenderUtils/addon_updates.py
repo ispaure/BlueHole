@@ -12,6 +12,7 @@ import addon_utils
 import bpy
 
 from . import update_service as service
+from .reload_transaction import ReloadTransaction
 
 ROOT = Path(__file__).absolute().parents[1]
 MODULE = __package__.split('.')[0]
@@ -136,6 +137,8 @@ def _purge_modules():
 
 def _disable():
     module = sys.modules.get(MODULE)
+    registrar = getattr(module, 'keymaps_register', None)
+    cleanup = getattr(registrar, 'drain_cleanup', lambda: True)
     errors = []
     if module is not None and getattr(module, '__addon_enabled__', False):
         addon_utils.disable(MODULE, default_set=False, handle_error=errors.append)
@@ -146,6 +149,7 @@ def _disable():
             errors.append(error)
     if errors:
         raise RuntimeError(f'Could not fully unload Blue Hole: {errors[0]}')
+    return cleanup
 
 
 def _enable():
@@ -155,72 +159,29 @@ def _enable():
         raise RuntimeError(f'Could not load Blue Hole: {errors[0] if errors else "addon remained disabled"}')
 
 
-class ReloadSession:
-    """This timer object survives removal of its defining module from sys.modules."""
+class ReloadSession(ReloadTransaction):
+    """Timer wrapper survives removal of its defining module from sys.modules."""
     def __init__(self, root, snapshot, release, workspace):
-        self.installation = service.Installation(root, snapshot, release, bpy.app.version)
         self.release, self.workspace = release, workspace
-        self.deadline = monotonic() + 30
-        self.error = ''
-        self.restoring = False
-        self.done = False
+        super().__init__(service.Installation(root, snapshot, release, bpy.app.version),
+                         disable=_disable, purge=_purge_modules, enable=_enable,
+                         readiness=self.readiness, complete=self.report_complete)
+
+    @staticmethod
+    def readiness():
+        module = sys.modules.get(MODULE)
+        error = getattr(module, '_post_register_error', None)
+        return bool(module and getattr(module, '_keymaps_registered', False)), error
 
     def begin(self):
-        try:
-            self.installation.prepare()
-        except Exception as error:
-            self.error = str(error)
-            self.complete()
-            return
-        try:
-            _disable()
-            self.installation.publish()
-            _purge_modules()
-            _enable()
-        except Exception as error:
-            self.rollback(error)
+        super().begin()
         if not self.done:
             bpy.app.timers.register(self.wait_ready, first_interval=0.1)
 
     def wait_ready(self):
-        module = sys.modules.get(MODULE)
-        error = getattr(module, '_post_register_error', None)
-        if module is not None and getattr(module, '_keymaps_registered', False) and not error:
-            try:
-                if not self.restoring:
-                    self.installation.finish()
-                self.complete()
-            except Exception as failure:
-                self.rollback(failure)
-            return None if self.done else 0.1
-        if error or monotonic() >= self.deadline:
-            self.rollback(RuntimeError(error or 'Blue Hole initialization timed out'))
-            return None if self.done else 0.1
-        return 0.1
+        return self.tick()
 
-    def rollback(self, error):
-        self.error = str(error)
-        if self.restoring:
-            self.complete(recovered=False)
-            return
-        self.restoring = True
-        try:
-            _disable()
-            self.installation.rollback()
-            _purge_modules()
-            _enable()
-            self.deadline = monotonic() + 30
-        except Exception as recovery:
-            # Restore files even when an incomplete registration could not be
-            # unloaded. Keep recovery evidence if either operation fails.
-            try:
-                self.installation.rollback()
-            except Exception as restore_error:
-                self.error += f'; file recovery: {restore_error}'
-            self.error += f'; reload recovery: {recovery}'
-            self.complete(recovered=False)
-
-    def complete(self, recovered=True):
+    def report_complete(self, recovered=True):
         global _handoff
         _handoff = False
         self.done = True

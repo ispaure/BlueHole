@@ -110,6 +110,38 @@ class RuntimeKeymapTests(unittest.TestCase):
     def reasons(self, handle):
         return {diagnostic.reason for diagnostic in handle.diagnostics}
 
+    def test_partial_creation_reports_rollback_and_unattempted_rows(self):
+        km = self.addon()
+        for index in (1, 2, 3):
+            with self.subTest(failure_index=index):
+                km.keymap_items.fail_create_at = km.keymap_items.created + index
+                requests = tuple(self.assignment(str(i), event=self.event(type=key))
+                                 for i, key in enumerate(('A', 'B', 'C'), 1))
+                handle = self.utils.register_feature('rollback-' + str(index), requests)
+                self.assertFalse(handle.owned_pairs)
+                self.assertEqual(len(km.keymap_items), 0)
+                results = {row.request_id: (row.status, row.reason) for row in handle.diagnostics}
+                self.assertEqual(set(results), {'1', '2', '3'})
+                self.assertFalse(any(status == 'applied' for status, _ in results.values()))
+                for i in range(1, index):
+                    self.assertEqual(results[str(i)], ('pending', 'feature_creation_rolled_back'))
+                for i in range(index + 1, 4):
+                    self.assertEqual(results[str(i)], ('pending', 'feature_creation_not_attempted'))
+                handle.release()
+
+    def test_failed_partial_rollback_retains_cleanup_ownership_and_pending_status(self):
+        km = self.addon()
+        km.keymap_items.fail_create_at = 2
+        km.keymap_items.remove_failures_remaining = 2
+        handle = self.utils.register_feature('rollback', (
+            self.assignment('first'), self.assignment('second', event=self.event(type='B'))))
+        self.assertTrue(self.utils.pending_cleanup())
+        first = next(row for row in handle.diagnostics if row.request_id == 'first')
+        self.assertEqual(first.status, 'pending')
+        self.assertFalse(self.utils.drain_cleanup())
+        self.assertTrue(self.utils.drain_cleanup())
+        self.assertEqual(len(km.keymap_items), 0)
+
     def numeric_rna_types(self):
         """Minimal stand-ins for the three classes observed in the native probe."""
         class NativeSequence:

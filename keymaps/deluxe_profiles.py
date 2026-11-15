@@ -13,6 +13,7 @@ from ..Lib.commonUtils.runtime.operations import MutationIncomplete
 from . import keymap_utils as runtime
 from . import default_bindings, deluxe_catalog
 from .keymap_utils import resolve_scope
+from .dispatch_policy import reviewed_chain, reviewed_groups
 from .deluxe_resolver import Resolver, capture_candidate, command_addon, profile_assignment_id, selector_status
 from .deluxe_schema import (ProfileError, TABLES, identifier, independent_commands, merge_profile, profile_overlay,
                             require, same_value, selector_descriptor, validate_catalog)
@@ -292,9 +293,9 @@ class ProfileStore:
                 preview['inherited_conflicts'].pop(key, None)
             inherited = self._inherited_conflicts(active, scopes)
             preview['inherited_conflicts'].update({k:v for k,v in inherited.items() if k in assignment_ids})
+            approved = reviewed_groups(candidate)
             def reviewed(values):
-                group = candidate['assignments'][values[0]].get('dispatch_group')
-                return group and all(candidate['assignments'][i].get('dispatch_group') == group for i in values)
+                return reviewed_chain(candidate, values, approved)
             preview['conflicts'] = tuple(tuple(values) for values in active.values() if len(values) > 1 and not reviewed(values))
         self._preview_cache = (draft, draft.serial, preview, new_plan, active, self.preview_environment(candidate))
         return preview
@@ -456,10 +457,9 @@ class ProfileStore:
                     scope = resolve_scope(request.scope, config)
                     active[scope, request.event].append(profile_assignment_id(request.request_id))
         inherited = self._inherited_conflicts(active)
-        def reviewed_chain(ids):
-            group = assignments[ids[0]].get('dispatch_group')
-            return group and all(assignments[id_].get('dispatch_group') == group for id_ in ids)
-        conflicts = tuple(tuple(ids) for ids in active.values() if len(ids) > 1 and not reviewed_chain(ids))
+        approved = reviewed_groups(catalog)
+        conflicts = tuple(tuple(ids) for ids in active.values()
+                          if len(ids) > 1 and not reviewed_chain(catalog, ids, approved))
         required = {id_ for id_, row in catalog['sections'].items() if row.get('required')}
         live = self.registration_results()
         preview = {
