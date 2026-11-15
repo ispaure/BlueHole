@@ -6,6 +6,7 @@ from hashlib import sha256
 from pathlib import Path
 from .profile_draft import Draft
 from .registration import RegistrationService
+from .profile_storage import decode_profile, encode_profile
 
 from ..Lib.commonUtils.formats.jsonType import JSONFile
 from ..Lib.commonUtils.persistence.locking import file_lock
@@ -15,12 +16,46 @@ from . import default_bindings, deluxe_catalog
 from .keymap_utils import resolve_scope
 from .dispatch_policy import reviewed_chain, reviewed_groups
 from .deluxe_resolver import Resolver, capture_candidate, command_addon, profile_assignment_id, selector_status
-from .deluxe_schema import (ProfileError, independent_commands, merge_profile, profile_overlay,
+from .deluxe_schema import (ProfileError, independent_commands,
                             require, same_value, selector_descriptor, validate_catalog)
 
 
 class ProfileStore:
     """Transactional catalog editing with a runtime apply callback."""
+
+    @classmethod
+    def open_user(cls, catalog_path, profile_path, preferences, install, **options):
+        """Open a personal overlay; preserve old installed-catalog edits once."""
+        catalog_path, profile_path = Path(catalog_path), Path(profile_path)
+        factory_path = catalog_path.with_name('factory-defaults.json')
+        factory = deluxe_catalog.load(factory_path) if factory_path.exists() else None
+        issue = ''
+        try:
+            defaults = deluxe_catalog.load(catalog_path)
+        except (OSError, ValueError) as error:
+            if factory is None:
+                raise
+            defaults, issue = factory, str(error)
+        factory = factory if factory is not None else defaults
+        if not profile_path.exists() and not same_value(defaults, factory):
+            # The immutable release snapshot distinguishes pre-overlay user edits
+            # from publisher defaults. Keep the full original before migrating.
+            profile_path.parent.mkdir(parents=True, exist_ok=True)
+            with file_lock(profile_path.with_suffix('.lock')) as acquired:
+                require(acquired, 'Another Blender process is migrating this profile')
+                if not profile_path.exists():
+                    backup = profile_path.with_name('legacy-installed-catalog.json')
+                    if backup.exists() and not same_value(JSONFile(backup).read_json(), defaults):
+                        from .catalog_inventory import digest
+                        backup = backup.with_name('legacy-installed-catalog-' + digest(defaults)[:12] + '.json')
+                    if not backup.exists():
+                        JSONFile(backup).write_json(defaults, compact=True)
+                    JSONFile(profile_path).write_json(encode_profile(factory, defaults), compact=True)
+        store = cls(factory, profile_path, preferences, install, **options)
+        if issue and not store.load_issue:
+            store.load_issue = 'invalid_installed_catalog_using_factory'
+            store.load_error = issue
+        return store
 
     @classmethod
     def open_catalog(cls, path, preferences, install, *, allowed=lambda: True, install_toggle=None):
@@ -211,12 +246,15 @@ class ProfileStore:
     def _read(self):
         self.load_error = ''
         self.needs_migration = False
+        self.profile_conflicts = ()
         try:
             stored = deluxe_catalog.load(self.path, migrate=False) if self.edit_defaults else self._file.read_json()
-            original = stored if self.edit_defaults else merge_profile(self._overlay_defaults, stored)
+            decoded = None if self.edit_defaults else self._decode_profile(stored)
+            original = stored if self.edit_defaults else decoded.catalog
             catalog = independent_commands(original)
             self._validate(catalog)
-            self.needs_migration = not same_value(original, catalog)
+            self.needs_migration = not same_value(original, catalog) or bool(decoded and decoded.migrated)
+            self.profile_conflicts = decoded.conflicts if decoded else ()
             return catalog, None
         except FileNotFoundError:
             if not self.edit_defaults:
@@ -226,11 +264,15 @@ class ProfileStore:
         try:
             stored = (deluxe_catalog.load(self.path.with_suffix('.previous.json'), migrate=False)
                       if self.edit_defaults else self._backup.read_json())
-            catalog = independent_commands(stored if self.edit_defaults else merge_profile(self._overlay_defaults, stored))
+            catalog = independent_commands(stored if self.edit_defaults else self._decode_profile(stored).catalog)
             self._validate(catalog)
             return catalog, 'invalid_profile_recovered_previous'
         except (OSError, ValueError, RecursionError):
             return self.defaults(), 'invalid_profile_recovered_defaults'
+
+    def _decode_profile(self, document):
+        baseline = self._defaults if 'profile_version' in document else self._overlay_defaults
+        return decode_profile(baseline, document)
 
     def _validate(self, catalog):
         validate_catalog(catalog)
@@ -387,7 +429,7 @@ class ProfileStore:
         """Install then publish. Restore the committed runtime if either step fails."""
         self.validate(draft)
         candidate = deepcopy(draft._catalog)
-        stored = candidate if self.edit_defaults else profile_overlay(self._overlay_defaults, candidate)
+        stored = candidate if self.edit_defaults else encode_profile(self._defaults, candidate)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with file_lock(self._lock) as acquired:
             require(acquired, 'Another Blender process is saving this profile')
@@ -397,7 +439,7 @@ class ProfileStore:
                 return self.snapshot()
             previous = self._catalog
             # Keep an independently validated recovery copy before changing runtime.
-            backup = previous if self.edit_defaults else profile_overlay(self._overlay_defaults, previous)
+            backup = previous if self.edit_defaults else encode_profile(self._defaults, previous)
             self._backup.write_json(backup, compact=True)
             try:
                 if not same_value(candidate, self.runtime_catalog()):
@@ -425,6 +467,7 @@ class ProfileStore:
             self.load_issue = None
             self.load_error = ''
             self.needs_migration = False
+            self.profile_conflicts = ()
             draft.discard()
             try:
                 self._backup.write_json(stored, compact=True)

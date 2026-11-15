@@ -25,8 +25,7 @@ HIDDEN = {'HIDDEN', 'SKIP_SAVE'}
 TRANSIENT = {'SKIP_SAVE'}
 
 EDIT_DESCRIPTIONS = {
-    'apply': ('Save assignments, commands and section choices to this Blue Hole installation. '
-              'Installing a Blue Hole update replaces these changes'),
+    'apply': 'Save assignments, commands and section choices to the selected profile',
     'discard': 'Discard staged edits and return to the last applied profile',
     'reload': 'Reload the keymap catalog from disk and discard staged edits',
     'reset': 'Stage the catalog loaded when the editor opened',
@@ -54,6 +53,11 @@ def editor():
     if _editor is None or _editor.store is not store:
         _editor = Editor(store)
     return _editor
+
+
+def require_saved_draft():
+    if _editor is not None and _editor.dirty:
+        raise ValueError('Save or discard your keymap draft before updating Blue Hole or switching editing mode')
 
 
 def redraw(context):
@@ -341,7 +345,9 @@ class BH_OT_deluxe_edit(EditorOperator, bpy.types.Operator):
 
     def stage(self, current):
         action, target = self.action, self.target
-        if action == 'apply':
+        if action == 'authoring_mode':
+            keymaps_register.set_authoring_mode(not current.store.edit_defaults)
+        elif action == 'apply':
             current.apply()
         elif action == 'discard':
             current.discard()

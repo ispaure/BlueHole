@@ -41,6 +41,8 @@ class KeymapPG(bpy.types.PropertyGroup):
         update=_update_keymaps
     )
     deluxe_configured: BoolProperty(default=False, options={'HIDDEN'})
+    edit_shipped_defaults: BoolProperty(default=False, options={'HIDDEN'},
+        name='Edit Shipped Defaults', description='Author the addon catalog instead of your personal keymap profile')
 
 
 def draw(preference, context, layout):

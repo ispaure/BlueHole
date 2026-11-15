@@ -4,7 +4,6 @@ from collections import Counter
 from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import fields
-from hashlib import sha256
 import math
 import re
 
@@ -251,34 +250,9 @@ def merge_profile(defaults, overlay):
 
 
 def independent_commands(catalog):
-    """Migrate shared command references to stable, independently owned records.
-
-    Preserve the original ID for the first owner (required bindings first),
-    including unused legacy records. Loading never writes the source files.
-    """
-    result = deepcopy(catalog)
-    for row in result['suppressions'].values():
-        row.pop('requires_assignment', None)
-    commands = result['commands']
-    owners = set()
-    bindings = sorted(result['assignments'].items(), key=lambda entry: (
-        not assignment_required(result, entry[1]), entry[1]['order']))
-    references = [('assignments', id_, row, 'command') for id_, row in bindings]
-    references += [('suppressions', id_, row, 'replacement')
-                   for id_, row in result['suppressions'].items() if 'replacement' in row]
-    for table, id_, row, field in references:
-        source = row[field]
-        if source in owners:
-            suffix = sha256(f'{table}:{id_}'.encode()).hexdigest()[:16]
-            target = f'{source[:68]}-binding-{suffix}'
-            serial = 0
-            while target in commands:
-                serial += 1
-                target = f'binding-{suffix}-{serial}'
-            commands[target] = deepcopy(commands[source])
-            row[field] = target
-        owners.add(row[field])
-    return result
+    """Compatibility entry point for the explicit catalog migration pipeline."""
+    from .catalog_migrations import migrate_catalog
+    return migrate_catalog(catalog)
 
 
 def same_value(left, right):

@@ -237,14 +237,25 @@ substitute for Blue Hole's **Save and Apply Changes**.
 
 ### Where changes are saved
 
-Bindings and disable rules are stored in the catalog rooted at
-[`deluxe-defaults.json`](deluxe-defaults.json), with category files in
-[`deluxe-defaults-sections/`](deluxe-defaults-sections/). Minus rules are saved
-alongside additions, in the relevant category file's `suppressions` section.
+Personal assignments, removal rules, and section choices are saved to
+`bluehole/keymaps.json` inside Blender's configuration directory. For a Logistics
+preset, that is the preset's `config` directory. This file is outside the addon
+and survives addon updates. A recovery copy is written alongside it.
 
-These files belong to the Blue Hole installation. **Installing a Blue Hole update
-can replace edited keymaps.** Keep a copy of the master JSON and the entire
-category-files folder before updating if you need to preserve local changes.
+The profile records its original defaults. New releases merge updated defaults
+with your changes; your choices win overlapping edits, while required bindings
+follow the release. Merge notices appear in the editor. Saving accepts the merged
+result. An update cannot discard an unsaved draft: save or discard it first.
+
+The settings menu also offers **Edit Shipped Defaults** for addon development.
+That mode writes [`deluxe-defaults.json`](deluxe-defaults.json) and its category
+files. Publish those edits with the addon and regenerate the release snapshot
+using `python Scripts/keymap_inventory.py --write-factory`. Switching modes
+requires a saved or discarded draft.
+
+Older edits found in an installed catalog are imported into the personal profile
+with a full `legacy-installed-catalog.json` backup. The release snapshot is used
+to distinguish those edits from the shipped defaults.
 
 ## Common questions
 

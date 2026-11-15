@@ -326,8 +326,8 @@ class Resolver(CatalogPlanner):
         properties(row['properties'])
         variants = self.commands.get(idname)
         variants = variants or ()
-        require(not row.get('provider') or any(row['provider'] == variant.get('provider') for variant in variants),
-                f'Unknown command provider in {id_}')
+        # Provider labels are profile metadata, including retired/missing addons.
+        # Native availability and capability checks govern actual registration.
         definition = {key: value for key, value in row.items() if key != 'label'}
         if any(same_value(definition, {key: value for key, value in variant.items() if key != 'label'})
                for variant in variants):

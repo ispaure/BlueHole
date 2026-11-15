@@ -43,6 +43,8 @@ def start(action):
         raise ValueError('Blue Hole preferences are not ready')
     channel = prefs.update_channel
     if action == 'install':
+        from ..preferences.addon.keymaps.deluxe_editor_ops import require_saved_draft
+        require_saved_draft()
         blocker = service.install_blocker(ROOT)
         if blocker:
             raise ValueError(blocker)
@@ -113,6 +115,8 @@ def poll():
         elif action == 'check':
             state.update(result['check'], release=release, channel=release['channel'])
         else:
+            from ..preferences.addon.keymaps.deluxe_editor_ops import require_saved_draft
+            require_saved_draft()
             _handoff = True
             state.update(status='installing', message='Reloading Blue Hole…')
             session = ReloadSession(ROOT, Path(workspace.name) / 'snapshot', release, workspace)
@@ -154,8 +158,17 @@ def _disable():
 
 def _enable():
     errors = []
-    addon_utils.enable(MODULE, default_set=False, persistent=True, handle_error=errors.append)
+    failed_modules = []
+    def capture(error):
+        errors.append(error)
+        # Blender deletes the module after calling this hook on register failure.
+        # Retain it so rollback can unregister partial classes/timers/keymaps.
+        failed_modules.append(sys.modules.get(MODULE))
+    addon_utils.enable(MODULE, default_set=False, persistent=True, handle_error=capture)
     if errors or not addon_utils.check(MODULE)[1]:
+        for module in failed_modules:
+            if module is not None:
+                sys.modules.setdefault(MODULE, module)
         raise RuntimeError(f'Could not load Blue Hole: {errors[0] if errors else "addon remained disabled"}')
 
 

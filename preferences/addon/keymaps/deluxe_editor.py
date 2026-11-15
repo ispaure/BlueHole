@@ -569,9 +569,10 @@ def draw(context, layout, settings):
     if not settings.enable_keymaps:
         return
     notice = layout.column(align=True)
-    notice.label(text='Blue Hole updates replace editor changes', icon='ERROR')
-    message = ('Saved assignments, commands and section choices belong to this Blue Hole installation. '
-               'Installing an update replaces them with the new version’s catalog.')
+    notice.label(text='Editing shipped defaults' if current.store.edit_defaults else 'Personal keymap profile',
+                 icon='ERROR' if current.store.edit_defaults else 'USER')
+    message = ('These edits change the addon catalog. Publish them with the addon to retain them in updates.'
+               if current.store.edit_defaults else 'Saved shortcuts and section choices are kept when Blue Hole updates.')
     for line in textwrap.wrap(message, width=max(24, int((width - 40) / 7))):
         notice.label(text=line)
     layout.separator()
@@ -626,10 +627,16 @@ def transaction_controls(layout, current, settings, *, compact):
             'invalid_profile_recovered_previous': 'Profile file invalid. The last saved copy is active.',
             'invalid_profile_recovered_defaults': 'Profile file invalid. A valid profile is active.',
             'profile_saved_recovery_copy_unavailable': 'Profile saved. The recovery copy could not be updated.',
+            'invalid_installed_catalog_using_factory': 'Installed catalog invalid. Using the release snapshot and your personal profile.',
         }
         bar.label(text=messages.get(current.store.load_issue, 'Profile recovery required'), icon='ERROR')
         for line in textwrap.wrap(current.store.load_error, width=60 if compact else 110):
             bar.label(text=line)
+    for conflict in current.store.profile_conflicts[:5]:
+        for line in textwrap.wrap(conflict, width=60 if compact else 110):
+            bar.label(text=line, icon='INFO')
+    if len(current.store.profile_conflicts) > 5:
+        bar.label(text=f'{len(current.store.profile_conflicts)} update merge notices; save to accept the merged profile.', icon='INFO')
 
 
 class BH_MT_deluxe_profile_actions(bpy.types.Menu):
@@ -642,6 +649,9 @@ class BH_MT_deluxe_profile_actions(bpy.types.Menu):
         layout.separator()
         ops.operator_button(layout, 'reset', 'Reset Draft')
         ops.operator_button(layout, 'reload', 'Validate and Reload JSON Files', icon='FILE_REFRESH')
+        layout.separator()
+        ops.operator_button(layout, 'authoring_mode', 'Edit Shipped Defaults',
+                            depress=ops.editor().store.edit_defaults)
 
 
 classes = (BH_UL_deluxe_bindings, BH_MT_deluxe_categories, BH_MT_deluxe_sections, BH_MT_deluxe_section_actions,

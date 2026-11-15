@@ -90,13 +90,37 @@ def _catalog_store():
         from .deluxe_profiles import ProfileStore
 
         path = Path(__file__).resolve().with_name('deluxe-defaults.json')
-        _profile_store = ProfileStore.open_catalog(
-            path, prefs, _install_profile,
-            install_toggle=_install_toggle,
-            allowed=lambda: runtime_keymaps_allowed(bpy.context, prefs().keymap))
+        options = dict(install_toggle=_install_toggle,
+                       allowed=lambda: runtime_keymaps_allowed(bpy.context, prefs().keymap))
+        if getattr(prefs().keymap, 'edit_shipped_defaults', False):
+            _profile_store = ProfileStore.open_catalog(path, prefs, _install_profile, **options)
+        else:
+            profile = Path(bpy.utils.user_resource('CONFIG')) / 'bluehole/keymaps.json'
+            _profile_store = ProfileStore.open_user(path, profile, prefs, _install_profile, **options)
         if _profile_store.load_issue:
             log(Severity.WARNING, TOOL_NAME, 'Deluxe profile recovery: ' + _profile_store.load_issue)
     return _profile_store
+
+
+def set_authoring_mode(enabled):
+    """Switch storage explicitly; unsaved drafts must be resolved first."""
+    global _profile_store
+    from ..preferences.addon.keymaps import deluxe_editor_ops
+    deluxe_editor_ops.require_saved_draft()
+    old = bool(getattr(prefs().keymap, 'edit_shipped_defaults', False))
+    _clear_categories()
+    if _profile_store is not None:
+        _profile_store.close()
+    _profile_store = None
+    prefs().keymap.edit_shipped_defaults = enabled
+    try:
+        _apply_categories()
+    except Exception:
+        _profile_store = None
+        prefs().keymap.edit_shipped_defaults = old
+        _apply_categories()
+        raise
+    bpy.context.preferences.is_dirty = True
 
 
 def deluxe_section_enabled(section):
