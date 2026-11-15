@@ -233,6 +233,7 @@ class Editor:
         self._preview_at = 0
         self._preview_token = None
         self.display_cache = {}
+        self.binding_state_revision = 0
         self.ensure_selection()
 
     def ensure_selection(self):
@@ -445,6 +446,17 @@ class Editor:
         if table == 'assignments' and enabled and not row.get('active', True):
             updates['active'] = True
         if any(row.get(key, True) != value for key, value in updates.items()):
+            preview = self.store.toggle_enabled(self.draft, table, id_, updates)
+            if preview is not None:
+                self._undo.append(self.catalog)
+                self.catalog = {**self.catalog, table: {**self.catalog[table], id_: {**row, **updates}}}
+                self.dirty = self.store.needs_migration or not same_value(self.catalog, self.saved)
+                self.message, self.preview_error = 'Changes staged', ''
+                self._preview = preview
+                self._preview_token = self.store.cached_preview_token()
+                self._preview_at = monotonic()
+                self.binding_state_revision += 1
+                return
             self.draft.update(table, id_, **updates)
             self.changed()
 

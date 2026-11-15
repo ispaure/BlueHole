@@ -13,7 +13,7 @@ from ..Lib.commonUtils.runtime.operations import MutationIncomplete
 from . import keymap_utils as runtime
 from . import default_bindings, deluxe_catalog
 from .keymap_utils import resolve_scope
-from .deluxe_resolver import Resolver, capture_candidate, profile_assignment_id, selector_status
+from .deluxe_resolver import Resolver, capture_candidate, command_addon, profile_assignment_id, selector_status
 from .deluxe_schema import (ProfileError, TABLES, identifier, independent_commands, merge_profile, profile_overlay,
                             require, same_value, selector_descriptor, validate_catalog)
 
@@ -32,6 +32,7 @@ class Draft:
         self._revision = revision
         self._catalog = deepcopy(catalog)
         self._closed = False
+        self.serial = 0
 
     def snapshot(self):
         return deepcopy(self._catalog)
@@ -53,6 +54,7 @@ class Draft:
                 row[field] = uuid4().hex
                 self._catalog['commands'][row[field]] = deepcopy(self._catalog['commands'][source])
         self._catalog[table][id_] = row
+        self.serial += 1
         if previous and previous != row.get(field):
             self._remove_unused_command(previous)
 
@@ -72,6 +74,7 @@ class Draft:
         self._open()
         require(table in TABLES, 'Unknown profile table')
         row = self._catalog[table].pop(id_)
+        self.serial += 1
         field = {'assignments': 'command', 'suppressions': 'replacement'}.get(table)
         if field and field in row:
             self._remove_unused_command(row[field])
@@ -122,10 +125,12 @@ class Draft:
     def reset(self):
         self._open()
         self._catalog = self._store.defaults()
+        self.serial += 1
 
     def restore(self, snapshot):
         self._open()
         self._catalog = deepcopy(snapshot)
+        self.serial += 1
 
     def discard(self):
         self._closed = True
@@ -135,19 +140,21 @@ class ProfileStore:
     """Transactional catalog editing with a runtime apply callback."""
 
     @classmethod
-    def open_catalog(cls, path, preferences, install, *, allowed=lambda: True):
+    def open_catalog(cls, path, preferences, install, *, allowed=lambda: True, install_toggle=None):
         """Edit the active add-on's full catalog in place."""
         path = Path(path)
         errors = []
         for source in (path, path.with_suffix('.previous.json')):
             try:
                 defaults = deluxe_catalog.load(source)
-                return cls(defaults, path, preferences, install, allowed=allowed, edit_defaults=True)
+                return cls(defaults, path, preferences, install, allowed=allowed,
+                           edit_defaults=True, install_toggle=install_toggle)
             except (OSError, ValueError, RecursionError) as error:
                 errors.append(str(error))
         raise ProfileError('Cannot open Deluxe keymaps: ' + errors[0])
 
-    def __init__(self, defaults, path, preferences, install, *, allowed=lambda: True, edit_defaults=False):
+    def __init__(self, defaults, path, preferences, install, *, allowed=lambda: True, edit_defaults=False,
+                 install_toggle=None):
         validate_catalog(defaults)
         self._overlay_defaults = deepcopy(defaults)
         defaults = independent_commands(defaults)
@@ -161,6 +168,9 @@ class ProfileStore:
         self._lock = self.path.with_suffix('.lock')
         self._preferences = preferences
         self._install = install
+        self._install_toggle = install_toggle
+        self._preview_cache = None
+        self._applied_draft = None
         self._allowed = allowed
         self._closed = False
         self._stock_add_rows = []
@@ -196,11 +206,102 @@ class ProfileStore:
                 self._install(previous, None)
                 raise
         self._live_catalog = None if same_value(candidate, self._catalog) else candidate
+        self._applied_draft = draft, draft.serial
 
     def cancel_preview(self):
+        self._applied_draft = None
+        self._preview_cache = None
         if self._live_catalog is not None:
             self._install(self._catalog, None)
             self._live_catalog = None
+
+    def toggle_enabled(self, draft, table, id_, updates):
+        """Apply a Boolean-only edit to an already validated, live draft.
+
+        Return None when a structural edit, stale view or runtime change requires
+        the normal validation path. No files or unchanged view metadata are rebuilt.
+        """
+        self._check_draft(draft)
+        cache = self._preview_cache
+        if (self._install_toggle is None or table not in {'assignments', 'suppressions'}
+                or cache is None or cache[:2] != (draft, draft.serial)
+                or self._applied_draft != (draft, draft.serial)
+                or cache[-1] != self.preview_environment(draft._catalog)):
+            return None
+        require(set(updates) <= ({'enabled', 'active'} if table == 'assignments' else {'enabled'})
+                and all(type(value) is bool for value in updates.values()), 'Expected Boolean binding choices')
+        row = draft._catalog[table][id_]
+        require(not row.get('required') and not draft._catalog['sections'][row['section']].get('required'),
+                'Required bindings cannot be toggled')
+        previous = self.runtime_catalog()
+        updated = {**row, **updates}
+        candidate = {**previous, table: {**previous[table], id_: updated}}
+        _, _, preview, old_plan, active, _ = cache
+        sections, groups = old_plan
+        new_groups = groups.copy()
+        if table == 'assignments':
+            feature_ids = {i for i,r in candidate['assignments'].items() if r['feature'] == row['feature']}
+            for owner, requests in groups.items():
+                if any(profile_assignment_id(request.request_id) in feature_ids for request in requests):
+                    new_groups.pop(owner)
+            _, planned = self.resolver.plan(candidate, self._preferences(), assignment_ids=feature_ids)
+            new_groups.update(planned)
+            new_groups = dict(sorted(new_groups.items(), key=lambda entry: min(
+                candidate['assignments'][profile_assignment_id(r.request_id)]['order'] for r in entry[1])))
+        new_plan = sections, new_groups
+        try:
+            changed = self._install_toggle(candidate, previous, (old_plan, new_plan))
+        except BaseException:
+            self._applied_draft = self._preview_cache = None
+            self._install(previous, None)
+            raise
+        if changed is None:
+            return None
+        assignment_ids, rule_ids = changed
+        ids = assignment_ids | rule_ids
+        draft.update(table, id_, **updates)
+        self._live_catalog = candidate
+        self._applied_draft = draft, draft.serial
+        live = self.registration_results(ids)
+        for key in ids:
+            preview['runtime'].pop(key, None)
+        preview['runtime'].update(live)
+        for key in assignment_ids:
+            definition = candidate['assignments'][key]
+            preview['assignments'][key].update(
+                eligible=bool(definition.get('required') or sections[definition['section']] and definition.get('enabled', True)),
+                active=definition.get('active', True), registered=live.get(key, (None, None))[0] == 'applied')
+        for key in rule_ids:
+            definition = candidate['suppressions'][key]
+            preview['suppressions'][key].update(self._suppression_status(definition, candidate),
+                eligible=bool(sections[definition['section']] and definition.get('enabled', True)),
+                registered=live.get(key, (None, None))[0] == 'applied')
+        if assignment_ids:
+            active = {pair: [i for i in values if i not in assignment_ids] for pair,values in active.items()}
+            active = defaultdict(list, {pair:values for pair,values in active.items() if values})
+            scopes = set()
+            config = runtime.get_addon_keyconfig()
+            for requests in new_groups.values():
+                for request in requests:
+                    key = profile_assignment_id(request.request_id)
+                    if key in assignment_ids and request.active:
+                        scope = resolve_scope(request.scope, config)
+                        active[scope, request.event].append(key)
+                        scopes.add(scope)
+            for key in assignment_ids:
+                preview['inherited_conflicts'].pop(key, None)
+            inherited = self._inherited_conflicts(active, scopes)
+            preview['inherited_conflicts'].update({k:v for k,v in inherited.items() if k in assignment_ids})
+            def reviewed(values):
+                group = candidate['assignments'][values[0]].get('dispatch_group')
+                return group and all(candidate['assignments'][i].get('dispatch_group') == group for i in values)
+            preview['conflicts'] = tuple(tuple(values) for values in active.values() if len(values) > 1 and not reviewed(values))
+        self._preview_cache = (draft, draft.serial, preview, new_plan, active, self.preview_environment(candidate))
+        return preview
+
+    def cached_preview_token(self):
+        _, _, preview, _, _, environment = self._preview_cache
+        return environment + (tuple(sorted(preview['runtime'].items())),)
 
     def begin(self):
         require(not self._closed, 'Deluxe profile editor has been unloaded')
@@ -361,7 +462,7 @@ class ProfileStore:
         conflicts = tuple(tuple(ids) for ids in active.values() if len(ids) > 1 and not reviewed_chain(ids))
         required = {id_ for id_, row in catalog['sections'].items() if row.get('required')}
         live = self.registration_results()
-        return {
+        preview = {
             'load_issue': self.load_issue,
             'sections': state,
             'assignments': {id_: {'eligible': bool(row.get('required') or state[row['section']] and row.get('enabled', True)),
@@ -377,9 +478,19 @@ class ProfileStore:
                              for id_, row in catalog['suppressions'].items()},
             'runtime': live,
         }
+        if draft is not None:
+            self._preview_cache = (draft, draft.serial, preview, (state, groups), active,
+                                   self.preview_environment(catalog))
+            if same_value(catalog, self.runtime_catalog()):
+                self._applied_draft = draft, draft.serial
+        return preview
 
     def preview_token(self, catalog):
         """Cheap invalidation for browsing; edits still validate before applying."""
+        return self.preview_environment(catalog) + (tuple(sorted(self.registration_results().items())),)
+
+    def preview_environment(self, catalog):
+        """Native config/provider identities shared by both editor apply paths."""
         operators = {row['operator'] for row in catalog['commands'].values() if 'operator' in row}
         operators.update(row['selector']['target']['idname'] for row in catalog['suppressions'].values()
                          if 'idname' in row['selector']['target'])
@@ -391,6 +502,7 @@ class ProfileStore:
             if command.get('operator') in {'wm.call_menu', 'wm.call_menu_pie', 'wm.call_panel'}:
                 name = command['properties'].get('name', '')
                 rna.append((name, id(getattr(getattr(runtime.bpy, 'types', None), name, None))))
+        addons = {command_addon(command) for command in catalog['commands'].values()} - {''}
         configs = []
         for role in ('default', 'addon', 'user', 'active'):
             try:
@@ -400,10 +512,10 @@ class ProfileStore:
             except runtime._Pending:
                 configs.append((role, None))
         return (self._generation, self._allowed(), self._preferences().keymap.enable_keymaps,
-                tuple(configs), tuple(rna), tuple(self.registration_results().items()))
+                tuple(configs), tuple(rna), tuple((name, runtime._addon_enabled(name)) for name in sorted(addons)))
 
     @staticmethod
-    def _inherited_conflicts(active):
+    def _inherited_conflicts(active, scopes=None):
         """Report exact event overlap with the built-in base by assignment ID."""
         matches = defaultdict(list)
         try:
@@ -413,6 +525,8 @@ class ProfileStore:
                            if owned.config_pointer == runtime._pointer(config)}
             for map_ in config.keymaps:
                 scope = runtime.capture_scope(map_)
+                if scopes is not None and scope not in scopes:
+                    continue
                 for item in map_.keymap_items:
                     if not item.active or (runtime._pointer(map_), runtime._pointer(item), item.id) in owned_modal:
                         continue
@@ -521,20 +635,22 @@ class ProfileStore:
         return self.resolver.plan(catalog, self._preferences(), required_only=required_only)
 
     @staticmethod
-    def registration_results():
-        results = default_bindings.registration_results()
+    def registration_results(ids=None):
+        results = default_bindings.registration_results(ids)
         for diagnostic in runtime.runtime_diagnostics():
             if ':deluxe-' not in diagnostic.owner_id:
                 continue
             id_ = profile_assignment_id(diagnostic.request_id)
+            if ids is not None and id_ not in ids:
+                continue
             if id_ not in results or diagnostic.status != 'applied':
                 results[id_] = (diagnostic.status, diagnostic.reason)
         return results
 
-    def check_registration(self, catalog, before):
+    def check_registration(self, catalog, before, *, plan=None, ids=None):
         """Reject new registration errors, preserving known or unavailable rows."""
-        after = self.registration_results()
-        sections, groups = self._plan(catalog)
+        after = self.registration_results(ids)
+        sections, groups = self._plan(catalog) if plan is None else plan
         for requests in groups.values():
             for request in requests:
                 id_ = request.request_id
@@ -555,6 +671,8 @@ class ProfileStore:
                     continue
                 raise ProfileError(f'Cannot register {id_}: {reason}')
         for id_, row in catalog['suppressions'].items():
+            if ids is not None and id_ not in ids:
+                continue
             if not (sections[row['section']] and row.get('enabled', True)):
                 continue
             status, reason = after.get(id_, (None, None))
@@ -566,10 +684,11 @@ class ProfileStore:
                 raise ProfileError(f'Cannot register replacement {id_}: {reason}')
 
     @runtime.batch_merged_updates()
-    def update_registration(self, candidate, previous):
+    def update_registration(self, candidate, previous, *, plans=None, verify=False):
         """Rebuild affected contexts in source order; leave other items intact."""
-        old_sections, old_groups = self._plan(previous)
-        new_sections, new_groups = self._plan(candidate)
+        old_plan, new_plan = plans if plans is not None else (self._plan(previous), self._plan(candidate))
+        old_sections, old_groups = old_plan
+        new_sections, new_groups = new_plan
         owners = {owner for owner in old_groups.keys() | new_groups.keys()
                   if old_groups.get(owner) != new_groups.get(owner)}
 
@@ -597,11 +716,18 @@ class ProfileStore:
         rule_ids = {id_ for id_ in old_rules.keys() | new_rules.keys()
                     if not same_value(old_rules.get(id_), new_rules.get(id_))}
         for id_, row in list(old_rules.items()) + list(new_rules.items()):
-            if scope_key(selector_descriptor(row['selector']).scope) in scopes:
+            # Independent disables own the inherited source's active flag;
+            # rebuilding our additions does not change that source. Overrides
+            # create ordered items and must still follow the context rebuild.
+            if not row.get('disable') and scope_key(selector_descriptor(row['selector']).scope) in scopes:
                 rule_ids.add(id_)
             if 'replacement' in row and not same_value(previous['commands'].get(row['replacement']),
                                                        candidate['commands'].get(row['replacement'])):
                 rule_ids.add(id_)
+        changed_assignments = {profile_assignment_id(request.request_id) for owner, requests in groups
+                               if owner in owners for request in requests}
+        ids = changed_assignments | rule_ids
+        before = self.registration_results(ids) if verify else None
         for id_ in rule_ids:
             default_bindings.release(id_)
             if handle := runtime._FEATURES.get('profile:deluxe-' + id_):
@@ -614,14 +740,18 @@ class ProfileStore:
                 handle.release()
         if default_bindings.pending_cleanup() or runtime.pending_cleanup():
             raise ProfileError('Native keymap cleanup is pending')
-        return self.register(candidate, owners=owners, rule_ids=rule_ids)
+        self.register(candidate, owners=owners, rule_ids=rule_ids, plan=new_plan)
+        if verify:
+            self.check_registration(candidate, before, ids=ids,
+                                    plan=(new_sections, {k:v for k,v in new_groups.items() if k in owners}))
+        return changed_assignments, rule_ids
 
     @runtime.batch_merged_updates()
-    def register(self, catalog=None, *, required_only=False, owners=None, rule_ids=None):
+    def register(self, catalog=None, *, required_only=False, owners=None, rule_ids=None, plan=None):
         """Register in source order through brief 02's feature ledger."""
         if catalog is None:
             catalog = self.runtime_catalog()
-        sections, groups = self._plan(catalog, required_only=required_only)
+        sections, groups = self._plan(catalog, required_only=required_only) if plan is None else plan
         total = 0
         add_pie_registered = False
         for owner, requests in groups.items():

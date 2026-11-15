@@ -257,7 +257,8 @@ def assignments(layout, current, preview, query, *, width, search_keys=False):
                 del current.binding_context_expansion[context_id]
         current.binding_selection_path = path
     view = ops.state(bpy.context)
-    row_key = repr((key, current.binding_selection_path, tuple(current.binding_context_expansion.items())))
+    row_key = repr((key, current.binding_state_revision, current.binding_selection_path,
+                    tuple(current.binding_context_expansion.items())))
     ops.sync_binding_rows(view, row_key,
                           lambda: binding_rows(current, preview, contexts, found, searching=bool(query)),
                           current.assignment, focus_context=current.binding_focus_context)

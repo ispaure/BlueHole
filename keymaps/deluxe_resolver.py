@@ -375,14 +375,16 @@ class Resolver:
             bool(preferences.keymap.enable_keymaps)
             and category.get('enabled', True) and section.get('enabled', True))
 
-    def plan(self, catalog, preferences, *, required_only=False):
+    def plan(self, catalog, preferences, *, required_only=False, assignment_ids=None):
         sections = catalog['sections']
         state = {id_: (bool(section.get('required')) if required_only else
                        self.section_enabled(catalog, preferences, id_))
                  for id_, section in sections.items()}
         groups = {}
         commands = catalog['commands']
-        for id_, row in sorted(catalog['assignments'].items(), key=lambda entry: entry[1]['order']):
+        rows = catalog['assignments'].items() if assignment_ids is None else (
+            (id_, catalog['assignments'][id_]) for id_ in assignment_ids)
+        for id_, row in sorted(rows, key=lambda entry: entry[1]['order']):
             if not (row.get('required') or state[row['section']] and row.get('enabled', True)):
                 continue
             category = self.feature_categories.get(row['feature'], sections[row['section']]['category'])

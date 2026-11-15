@@ -213,9 +213,11 @@ def pending_cleanup():
     return tuple(id_ for id_, record in _bindings.items() if record.pending)
 
 
-def registration_results():
-    results = dict(_results)
+def registration_results(ids=None):
+    results = {k:v for k,v in _results.items() if ids is None or k in ids}
     for id_, record in _bindings.items():
+        if ids is not None and id_ not in ids:
+            continue
         try:
             intact = not record.pending and _valid(record) and runtime._snapshot(record.item, record.selector.scope.is_modal) == _snapshot(record, False)
             if intact:

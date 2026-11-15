@@ -92,6 +92,7 @@ def _catalog_store():
         path = Path(__file__).resolve().with_name('deluxe-defaults.json')
         _profile_store = ProfileStore.open_catalog(
             path, prefs, _install_profile,
+            install_toggle=_install_toggle,
             allowed=lambda: runtime_keymaps_allowed(bpy.context, prefs().keymap))
         if _profile_store.load_issue:
             log(Severity.WARNING, TOOL_NAME, 'Deluxe profile recovery: ' + _profile_store.load_issue)
@@ -106,6 +107,13 @@ def deluxe_section_enabled(section):
         return deluxe_profile().section_enabled(section)
     except ValueError:
         return False
+
+
+def _install_toggle(candidate, previous, plans):
+    if (not _enabled or _registering or not _ready() or not prefs().keymap.deluxe_configured
+            or _preference_state != _preference_signature()):
+        return None
+    return deluxe_profile().update_registration(candidate, previous, plans=plans, verify=True)
 
 
 def _install_profile(candidate, previous):
