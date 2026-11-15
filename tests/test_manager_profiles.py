@@ -74,9 +74,17 @@ class ManagerProfileTests(unittest.TestCase):
             save_profile(profile, {}, allowed=set())
             bridge = ProjectBridge(registry, key)
             settings = bridge.call('settings', timeout=20)
-            plan = bridge.call('plan', operation='Check', target='blender', backend='Local',
-                               suite='portable.contracts', timeout=20)
-            self.assertEqual([phase['id'] for phase in plan['phases']], ['portable-contracts'])
+            branch = subprocess.check_output(['git', 'branch', '--show-current'], cwd=root, text=True).strip()
+            options = dict(operation='Check', target='blender', backend='Local',
+                           suite='portable.contracts', timeout=20)
+            if branch == 'blender-5.2.2/alpha':
+                plan = bridge.call('plan', **options)
+                self.assertEqual([phase['id'] for phase in plan['phases']], ['portable-contracts'])
+            else:
+                # Promoted and detached checkouts keep the same alpha-only
+                # packaging adapter. Test its restriction instead of bypassing it.
+                with self.assertRaisesRegex(ValueError, 'limited to the existing Blender 5.2.2 alpha branch'):
+                    bridge.call('plan', **options)
             self.assertEqual(settings['project.identity']['value'], 'Blue Hole · Blender 5.2.2 alpha')
             environment = dict(os.environ, BUILD_MANAGER_DEPENDENCIES='project')
             environment.pop('PYTHONPATH', None)

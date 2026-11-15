@@ -156,6 +156,11 @@ class ManagerSuiteTests(unittest.TestCase):
     def test_real_bridge_forwards_selected_suite_without_dispatch(self):
         request = dict(schema=1, action='plan', values=dict(operation='Check', target='blender', backend='Local', suite='portable.contracts', pattern='test_release*.py'))
         result = subprocess.run([sys.executable, 'Scripts/manager_bridge.py'], cwd=ROOT, input=json.dumps(request), capture_output=True, text=True, timeout=30)
+        branch = subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip()
+        if branch != 'blender-5.2.2/alpha':
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('limited to the existing Blender 5.2.2 alpha branch', result.stderr)
+            return
         self.assertEqual(result.returncode,0,result.stderr)
         plan = json.loads(result.stdout)['result']
         self.assertEqual([phase['id'] for phase in plan['phases']], ['portable-contracts'])
