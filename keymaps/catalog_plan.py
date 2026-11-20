@@ -8,6 +8,11 @@ from .provider_policy import command_addon, required_class
 OBJECT_NON_MODAL_SCOPES = frozenset(contract.KeymapScope('Object Non-modal', is_tool=is_tool)
                                    for is_tool in (None, False))
 OBJECT_MODE = contract.KeymapScope('Object Mode')
+DOPESHEET = contract.KeymapScope('Dopesheet', space_type='DOPESHEET_EDITOR')
+FRAMES = contract.KeymapScope('Frames')
+DOPESHEET_JUMP_EVENTS = frozenset(
+    contract.KeymapEvent(key, **{modifier: 1})
+    for key in ('LEFT_ARROW', 'RIGHT_ARROW') for modifier in ('ctrl', 'oskey'))
 COLLECTION_NUMBER_EVENTS = frozenset(contract.KeymapEvent(key) for key in (
     'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'ZERO'))
 MODE_OPERATORS = frozenset({'object.mode_set', 'object.mode_set_with_submode'})
@@ -15,7 +20,7 @@ CONTEXT_MODE_OPERATORS = frozenset({'object.bh_face_select_or_pose'})
 
 
 def profile_assignment_id(request_id):
-    """Map an Object Mode runtime companion back to its editable assignment."""
+    """Map a runtime companion back to its editable assignment."""
     return request_id.partition(':')[0]
 
 
@@ -74,6 +79,15 @@ class CatalogPlanner:
                          or command.get('operator') in MODE_OPERATORS
                          and command['properties'].get('mode') not in (None, 'OBJECT'))):
                 requests.append(replace(request, request_id=id_ + ':object-mode', scope=OBJECT_MODE))
+            # Frames gets these presses before Dopesheet. Give the Deluxe
+            # frame jump a scoped route without disabling the stock time jump.
+            if (request.active and scope == DOPESHEET
+                    and replace(event, repeat=False) in DOPESHEET_JUMP_EVENTS
+                    and command.get('operator') == 'screen.frame_jump'):
+                requests.append(replace(request, request_id=id_ + ':dopesheet-frames', scope=FRAMES,
+                                        target=contract.KeymapTarget('wm.bh_dopesheet_frame_jump',
+                                                                     command['properties']),
+                                        dispatch_group=''))
         return state, groups
 
     @staticmethod

@@ -132,8 +132,13 @@ class ProfileTests(unittest.TestCase):
                 if request.request_id not in catalog['assignments']:
                     original_id = self.resolver.profile_assignment_id(request.request_id)
                     original, = [row for row in requests if row.request_id == original_id]
-                    self.assertEqual(request.scope, self.core.KeymapScope('Object Mode'))
                     self.assertEqual(request.event, original.event)
+                    if request.request_id.endswith(':dopesheet-frames'):
+                        self.assertEqual(request.scope, self.core.KeymapScope('Frames'))
+                        self.assertEqual(request.target, self.core.KeymapTarget(
+                            'wm.bh_dopesheet_frame_jump', original.target.properties))
+                        continue
+                    self.assertEqual(request.scope, self.core.KeymapScope('Object Mode'))
                     self.assertEqual(request.target, original.target)
                     object_mode_keys.append(request.event.type)
                     continue

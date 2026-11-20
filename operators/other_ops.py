@@ -89,6 +89,25 @@ class WM_OT_Disable_Deluxe_Keymaps(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class WM_OT_BH_dopesheet_frame_jump(bpy.types.Operator):
+    """Jump to the scene boundary from the Dope Sheet window"""
+    bl_idname = 'wm.bh_dopesheet_frame_jump'
+    bl_label = 'Dope Sheet Frame Jump'
+    bl_options = {'INTERNAL'}
+
+    end: BoolProperty(default=False)
+
+    @classmethod
+    def poll(cls, context):
+        area, region = context.area, context.region
+        return (area is not None and area.type == 'DOPESHEET_EDITOR'
+                and region is not None and region.type == 'WINDOW'
+                and bpy.ops.screen.frame_jump.poll())
+
+    def execute(self, context):
+        return bpy.ops.screen.frame_jump(end=self.end)
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -97,6 +116,7 @@ classes = (
     WM_OT_URLOpen,
     WM_OT_Apply_Deluxe_Prefs,
     WM_OT_Disable_Deluxe_Keymaps,
+    WM_OT_BH_dopesheet_frame_jump,
 )
 
 
