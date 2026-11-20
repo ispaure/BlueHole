@@ -28,6 +28,7 @@ class RuntimeParityTests(unittest.TestCase):
         handle = self.core.register_feature('provider', assignments=(self.h.assignment(),))
         self.assertEqual(len(handle.owned_pairs), 1)
         item = handle.owned_pairs[0][1]
+        properties = item.properties
         class PoisonedProperties:
             @property
             def bl_rna(self):
@@ -35,11 +36,19 @@ class RuntimeParityTests(unittest.TestCase):
         item.properties = PoisonedProperties()
         del self.runtime.bpy.ops.bluehole.replacement
         handle.release()
-        self.assertEqual(self.core.pending_cleanup()[0]['reason'], 'owned_snapshot_unavailable')
-        # Provider removal eventually deletes its native item; cleanup then drains.
-        self.runtime.configs.addon.keymaps.get('3D View').keymap_items.remove(item)
+        self.assertEqual(self.core.pending_cleanup()[0]['reason'], 'owned_operator_unavailable')
+        self.assertFalse(self.core.blocking_cleanup())
+        self.assertFalse(self.core.drain_cleanup())
+        # Once the operator returns, the exact original snapshot still governs
+        # removal. An intervening native edit transfers the row to the artist.
+        self.runtime.bpy.ops.bluehole.replacement = operator
+        item.properties = properties
+        item.type = 'F19'
+        self.assertTrue(self.core.blocking_cleanup())
         self.core.retry_unreadable_cleanup(16)
         self.assertFalse(self.core.pending_cleanup())
+        self.assertEqual(len(self.core.retained_edits()), 1)
+        self.assertEqual(item.type, 'F19')
 
     def test_modal_alias_precedes_wildcard_and_releases_without_touching_source(self):
         km = self.runtime.map('default', 'Knife Tool Modal Map', space='EMPTY', modal=True)

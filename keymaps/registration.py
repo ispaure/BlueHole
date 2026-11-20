@@ -199,7 +199,7 @@ class RegistrationService:
             if not self.restore_stock_add():
                 raise ProfileError('Stock Add bindings still await restoration')
         runtime.release_features(owners)
-        if self.stock_cleanup_pending or default_bindings.pending_cleanup() or runtime.pending_cleanup():
+        if self.stock_cleanup_pending or default_bindings.pending_cleanup() or runtime.blocking_cleanup():
             raise ProfileError('Native keymap cleanup is pending')
         self.register(candidate, owners=owners, rule_ids=rule_ids, plan=new_plan)
         if verify:

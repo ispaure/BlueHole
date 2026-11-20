@@ -124,7 +124,18 @@ def _scope_event(request):
 def _assignment_dependency_ready(request):
     if request.required_class and not hasattr(getattr(bpy, 'types', None), request.required_class):
         return False
-    return not request.required_addon or _addon_enabled(request.required_addon)
+    if request.required_addon and not _addon_enabled(request.required_addon):
+        return False
+    return not request.requires_operator or _operator_available(request.target.idname)
+
+
+def _operator_available(idname):
+    try:
+        namespace, name = idname.split('.')
+        getattr(getattr(bpy.ops, namespace), name).get_rna_type()
+    except (AttributeError, KeyError, ReferenceError, RuntimeError, TypeError, ValueError):
+        return False
+    return True
 
 
 def _addon_enabled(name):
@@ -180,7 +191,8 @@ _CREATED_MAPS = {}
 _RETAINED_EDITED = {}
 _PAIR_ALIASES = {}
 _PENDING_CLEANUP = {}
-_CLEANUP_RETRY_REASONS = frozenset(('owned_remove_failed', 'owned_snapshot_unavailable'))
+_UNREADABLE_CLEANUP_REASONS = frozenset(('owned_snapshot_unavailable', 'owned_operator_unavailable'))
+_CLEANUP_RETRY_REASONS = _UNREADABLE_CLEANUP_REASONS | {'owned_remove_failed'}
 _PROVIDER_REF_IDS = {}
 _RECONCILE_CURSOR = 0
 _MERGED_BATCH_DEPTH = 0
@@ -247,7 +259,9 @@ def _update_merged():
     update = getattr(getattr(wm, 'keyconfigs', None), 'update', None)
     if callable(update):
         try:
-            update()
+            # Keep backing properties through Blender's operator-type rebind.
+            # They are needed to distinguish artist edits when a provider returns.
+            update(keep_properties=True)
         except (AttributeError, ReferenceError, RuntimeError, TypeError) as exc:
             raise _Pending('merged_update_failed') from exc
     _MERGED_DIRTY = False
@@ -294,12 +308,8 @@ def _properties(item):
     # Blender may leave that item's property RNA pointing at the freed type;
     # even asking for properties.bl_rna can then segfault (not raise Python).
     # Resolve the live operator first, without touching the property pointer.
-    if hasattr(getattr(bpy, 'app', None), 'version'):
-        try:
-            namespace, name = item.idname.split('.')
-            getattr(getattr(bpy.ops, namespace), name).get_rna_type()
-        except (AttributeError, KeyError, ReferenceError, RuntimeError, TypeError, ValueError) as exc:
-            raise _Pending('waiting_for_provider') from exc
+    if hasattr(getattr(bpy, 'app', None), 'version') and not _operator_available(item.idname):
+        raise _Pending('waiting_for_provider')
     props = getattr(item, 'properties', None)
     if props is None:
         raise _Pending('unreadable_property_schema')
@@ -561,9 +571,13 @@ def _remove_owned(owned):
         if _snapshot(item, _scope(map_).is_modal) != owned.snapshot:
             _retain_edited(owned)
             return 'user_edited_owned_item_retained'
-    except _Pending:
-        _queue_cleanup(owned, 'owned_snapshot_unavailable')
-        return 'owned_snapshot_unavailable'
+    except _Pending as issue:
+        reason = 'owned_snapshot_unavailable'
+        if (issue.reason == 'waiting_for_provider' and owned.snapshot
+                and item.idname == owned.snapshot[1].idname):
+            reason = 'owned_operator_unavailable'
+        _queue_cleanup(owned, reason)
+        return reason
     try:
         _remove_native_item(map_, item)
         _COUNTS['removed'] += 1
@@ -603,7 +617,18 @@ def _cleanup_one(owned):
 def _retry_cleanup_key(key):
     records = _PENDING_CLEANUP.get(key, ())
     remaining = []
-    for owned, _ in records:
+    for owned, reason in records:
+        if _dormant_cleanup(owned, reason):
+            remaining.append((owned, reason))
+            continue
+        if reason == 'owned_operator_unavailable' and _valid_owned(owned):
+            try:
+                # Operator registration can queue Blender's property-RNA
+                # rebind. Flush it before touching a previously freed pointer.
+                _update_merged()
+            except _Pending:
+                remaining.append((owned, reason))
+                continue
         outcome = _cleanup_one(owned)
         if outcome in _CLEANUP_RETRY_REASONS:
             remaining.append((owned, outcome))
@@ -616,10 +641,23 @@ def _retry_cleanup_key(key):
         _PENDING_CLEANUP[key] = remaining
 
 
-def _retry_cleanup(limit=None, *, reason=None):
+def _dormant_cleanup(owned, reason):
+    if reason != 'owned_operator_unavailable':
+        return False
+    live = _live_owned_members(owned)
+    return (live is not None and live[1].idname == owned.snapshot[1].idname
+            and not _operator_available(live[1].idname))
+
+
+def _ready_cleanup_keys():
+    return tuple(key for key, records in _PENDING_CLEANUP.items()
+                 if any(not _dormant_cleanup(owned, reason) for owned, reason in records))
+
+
+def _retry_cleanup(limit=None, *, keys=None):
     diagnostics = []
-    keys = tuple(key for key, records in _PENDING_CLEANUP.items()
-                 if reason is None or any(why == reason for _, why in records))
+    if keys is None:
+        keys = _ready_cleanup_keys()
     for key in keys[:limit]:
         _retry_cleanup_key(key)
         pending = _PENDING_CLEANUP.get(key)
@@ -631,15 +669,26 @@ def _retry_cleanup(limit=None, *, reason=None):
 
 def retry_unreadable_cleanup(budget):
     """Retry released bindings during preference reload without registering anything."""
-    _retry_cleanup(limit=budget, reason='owned_snapshot_unavailable')
-    return any(reason == 'owned_snapshot_unavailable'
-               for records in _PENDING_CLEANUP.values() for _, reason in records)
+    keys = tuple(key for key in _ready_cleanup_keys() if any(
+        reason in _UNREADABLE_CLEANUP_REASONS for _, reason in _PENDING_CLEANUP[key]))
+    _retry_cleanup(limit=budget, keys=keys)
+    return unreadable_cleanup_pending()
 
 
 def pending_cleanup():
     return tuple({'owner_id': owner_id, 'request_id': request_id, 'reason': reason}
                  for (owner_id, request_id), records in _PENDING_CLEANUP.items()
                  for _, reason in records)
+
+
+def blocking_cleanup():
+    """An unloaded operator can't dispatch. Its row still requires exact cleanup."""
+    return bool(_ready_cleanup_keys())
+
+
+def unreadable_cleanup_pending():
+    return any(reason in _UNREADABLE_CLEANUP_REASONS
+               for records in _PENDING_CLEANUP.values() for _, reason in records)
 
 
 def drain_cleanup(budget=16):
@@ -1350,12 +1399,6 @@ class FeatureHandle:
                 else:
                     if request.scope.is_tool is not None and request.scope.is_tool is not False:
                         raise _Pending('unproved_tool_scope', 'unsupported')
-                    if request.requires_operator:
-                        namespace, name = request.target.idname.split('.')
-                        try:
-                            getattr(getattr(bpy.ops, namespace), name).get_rna_type()
-                        except (AttributeError, KeyError, RuntimeError, TypeError, ValueError):
-                            raise _Pending('waiting_for_provider') from None
                     staged.append((request, None))
             except _Pending as issue:
                 diagnostics.append(_diagnostic(self, request, issue.status, issue.reason, issue.role, issue.capability))
@@ -1468,8 +1511,9 @@ def reconcile(budget=16, *, max_requests=None, time_budget=0.004):
     global _RECONCILE_CURSOR
     remaining = max(0, budget if max_requests is None else max_requests)
     deadline = time.monotonic() + max(0.0, time_budget)
-    cleanup_count = min(remaining, len(_PENDING_CLEANUP))
-    result = list(_retry_cleanup(limit=cleanup_count)) if cleanup_count else []
+    cleanup = _ready_cleanup_keys()
+    cleanup_count = min(remaining, len(cleanup))
+    result = list(_retry_cleanup(limit=cleanup_count, keys=cleanup))
     remaining -= cleanup_count
     handles = tuple(_FEATURES.values())
     if not handles:

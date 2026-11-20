@@ -243,7 +243,7 @@ class FakeConfigs(SimpleNamespace):
         super().__init__(**roles)
         self.update_calls = []
 
-    def update(self):
+    def update(self, *, keep_properties=False):
         self.update_calls.append(tuple(
             (map_.name, tuple(item.idname for item in map_.keymap_items))
             for map_ in self.addon.keymaps))

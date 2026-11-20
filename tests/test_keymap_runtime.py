@@ -1882,16 +1882,16 @@ class LifecycleIntegrationTests(unittest.TestCase):
         update = self.runtime.configs.update
         attempts = []
 
-        def fail_once():
-            attempts.append(True)
+        def fail_once(*, keep_properties):
+            attempts.append(keep_properties)
             if len(attempts) == 1:
                 raise RuntimeError('merge failed')
-            update()
+            update(keep_properties=keep_properties)
 
         with patch.object(self.runtime.configs, 'update', side_effect=fail_once):
             with self.assertRaises(self.core._Pending):
                 self.orchestrator.register()
-        self.assertEqual(len(attempts), 2)
+        self.assertEqual(attempts, [True, True])
         self.assertEqual(self.addon_names(), [])
         self.assertEqual(self.core.runtime_stats()['tracked_resources'], 0)
         self.assertEqual(self.timers, {})

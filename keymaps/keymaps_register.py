@@ -168,7 +168,7 @@ def _install_profile(candidate, previous):
             _apply_categories(profile=candidate)
         else:
             store.update_registration(candidate, previous)
-        if keymap_utils.pending_cleanup() or default_bindings.pending_cleanup():
+        if keymap_utils.blocking_cleanup() or default_bindings.pending_cleanup():
             raise ProfileError('Native keymap cleanup is pending')
         if before is not None:
             store.check_registration(candidate, before)
@@ -202,7 +202,7 @@ def _apply_categories(*, profile=None):
     total = 0
     try:
         _clear_categories()
-        if _retired_stock_services or default_bindings.pending_cleanup() or keymap_utils.pending_cleanup():
+        if _retired_stock_services or default_bindings.pending_cleanup() or keymap_utils.blocking_cleanup():
             raise RuntimeError('Blender default bindings still await restoration')
         p = prefs()
         if runtime_keymaps_allowed(bpy.context, p.keymap):
@@ -302,8 +302,8 @@ def unregister():
         _clear_categories()
     finally:
         # Read Preferences may unload us before Blender restores operator RNA.
-        if (_retired_stock_services or default_bindings.pending_cleanup() or
-                any(row['reason'] == 'owned_snapshot_unavailable' for row in keymap_utils.pending_cleanup())):
+        if (_retired_stock_services or default_bindings.pending_cleanup()
+                or keymap_utils.unreadable_cleanup_pending()):
             if not bpy.app.timers.is_registered(_retry_unload_cleanup):
                 _unload_cleanup_attempts = UNLOAD_CLEANUP_ATTEMPTS
                 bpy.app.timers.register(_retry_unload_cleanup, first_interval=WATCH_INTERVAL)
