@@ -22,6 +22,8 @@ from ..Lib.commonUtils.integrations.web import open_url
 from ..Lib.commonUtils.runtime.diagnostics import Severity, log
 from ..overlays.deluxe import applyDeluxePrefs
 from ..preferences.prefs import prefs
+from ..keymaps import keymap_utils
+from ..keymaps.event_overlap import events_overlap
 
 # ----------------------------------------------------------------------------------------------------------------------
 # OPERATORS
@@ -108,6 +110,50 @@ class WM_OT_BH_dopesheet_frame_jump(bpy.types.Operator):
         return bpy.ops.screen.frame_jump(end=self.end)
 
 
+_STOCK_NODE_LINK = keymap_utils.KeymapSelector(
+    keymap_utils.KeymapScope('Node Editor', 'NODE_EDITOR'),
+    keymap_utils.KeymapEvent('LEFTMOUSE', 'CLICK_DRAG', map_type='MOUSE'),
+    keymap_utils.KeymapTarget('node.link', {
+        'delay': .5, 'detach': False, 'drag_start': (0.0, 0.0),
+        'inside_padding': 2.0, 'max_speed': 26.0, 'outside_padding': 0.0,
+        'speed_ramp': 1.0, 'zoom_influence': .5,
+    }))
+
+
+def _stock_node_link_available():
+    selector = _STOCK_NODE_LINK
+    try:
+        default = keymap_utils.configuration('default')
+        if not keymap_utils.same_identity(keymap_utils.configuration('active'), default):
+            return False
+        _, _, source = keymap_utils.exact_source(selector)
+        merged = keymap_utils.matching_map(keymap_utils.configuration('user'), selector.scope)
+        item = merged.keymap_items.from_id(source.id)
+        if (item is None or item.is_user_modified or item.is_user_defined
+                or keymap_utils.snapshot_item(item, False) != (selector.event, selector.target, True)):
+            return False
+        return not any(
+            row.active and (row.is_user_modified or row.is_user_defined)
+            and events_overlap(keymap_utils.capture_event(row), selector.event)
+            for row in merged.keymap_items)
+    except (keymap_utils.Pending, AttributeError, ReferenceError, RuntimeError):
+        return False
+
+
+class NODE_OT_BH_link_socket(bpy.types.Macro):
+    """Give Blender's inherited socket drag first refusal over Deluxe node movement"""
+    bl_idname = 'node.bh_link_socket'
+    bl_label = 'Link Node Socket'
+    bl_options = {'INTERNAL', 'REGISTER', 'UNDO', 'BLOCKING'}
+
+    @classmethod
+    def poll(cls, context):
+        area, region = context.area, context.region
+        return (area is not None and area.type == 'NODE_EDITOR'
+                and region is not None and region.type == 'WINDOW'
+                and _stock_node_link_available())
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # REGISTER / UNREGISTER
 
@@ -117,12 +163,16 @@ classes = (
     WM_OT_Apply_Deluxe_Prefs,
     WM_OT_Disable_Deluxe_Keymaps,
     WM_OT_BH_dopesheet_frame_jump,
+    NODE_OT_BH_link_socket,
 )
 
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
+    # A native macro forwards the original click-drag event and its press
+    # coordinates to Blender's socket hit test.
+    NODE_OT_BH_link_socket.define('NODE_OT_link').properties.detach = False
 
 
 # Unregister

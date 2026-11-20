@@ -54,6 +54,32 @@ assert 'bpy' not in sys.modules
         settings.keymap.enable_keymaps = False
         self.assertEqual(companions(), [])
 
+    def test_node_socket_companion_follows_the_reviewed_drag_chain(self):
+        from types import SimpleNamespace
+        from keymaps.catalog_inventory import read_catalog
+        from keymaps.catalog_plan import CatalogPlanner, NODE_DRAG_CHAIN
+
+        catalog, _ = read_catalog(ROOT / 'keymaps/deluxe-defaults.json')
+        planner = CatalogPlanner(catalog)
+        settings = SimpleNamespace(keymap=SimpleNamespace(enable_keymaps=True))
+
+        def chain():
+            _, groups = planner.plan(catalog, settings)
+            return [request for requests in groups.values() for request in requests
+                    if request.dispatch_group == NODE_DRAG_CHAIN
+                    or request.target.idname == 'node.bh_link_socket']
+
+        routes = chain()
+        self.assertEqual([request.target.idname for request in routes],
+                         ['node.translate_attach', 'transform.translate', 'node.bh_link_socket'])
+        self.assertEqual(routes[-1].event, routes[0].event)
+        self.assertEqual(routes[-1].scope, routes[0].scope)
+        catalog['sections']['other.parity-node-editor']['enabled'] = False
+        self.assertEqual(chain(), [])
+        catalog['sections']['other.parity-node-editor']['enabled'] = True
+        catalog['assignments'][routes[0].request_id]['event'] = 'g-press-4f6a072800f4'
+        self.assertEqual(chain(), [])
+
     def test_ui_and_profile_do_not_reach_into_native_ownership(self):
         for path in [ROOT / 'keymaps/deluxe_profiles.py', * (ROOT / 'preferences/addon/keymaps').glob('*.py')]:
             text = path.read_text()

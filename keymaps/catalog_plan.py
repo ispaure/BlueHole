@@ -17,6 +17,8 @@ COLLECTION_NUMBER_EVENTS = frozenset(contract.KeymapEvent(key) for key in (
     'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'ZERO'))
 MODE_OPERATORS = frozenset({'object.mode_set', 'object.mode_set_with_submode'})
 CONTEXT_MODE_OPERATORS = frozenset({'object.bh_face_select_or_pose'})
+NODE_DRAG_CHAIN = 'parity-chain-f46ef69f5ead'
+NODE_LINK_TARGET = contract.KeymapTarget('node.bh_link_socket')
 
 
 def profile_assignment_id(request_id):
@@ -45,6 +47,7 @@ class CatalogPlanner:
                        self.section_enabled(catalog, preferences, id_))
                  for id_, section in sections.items()}
         groups = {}
+        node_drag = None
         commands = catalog['commands']
         dispatch_groups = reviewed_groups(catalog)
         rows = catalog['assignments'].items() if assignment_ids is None else (
@@ -70,6 +73,8 @@ class CatalogPlanner:
                 required_class=required_class(command))
             requests = groups.setdefault(owner, [])
             requests.append(request)
+            if request.active and request.dispatch_group == NODE_DRAG_CHAIN:
+                node_drag = owner, request
             # The viewport dispatches Object Mode before Object Non-modal.
             # Give compatible native mode changes a chance before stock collection
             # selection. The original route remains available in other modes.
@@ -88,6 +93,13 @@ class CatalogPlanner:
                                         target=contract.KeymapTarget('wm.bh_dopesheet_frame_jump',
                                                                      command['properties']),
                                         dispatch_group=''))
+        if node_drag:
+            # Blender prepends add-on bindings. Give the stock socket handler
+            # first refusal before the reviewed Deluxe translation chain.
+            owner, request = node_drag
+            groups[owner + ':node-socket'] = [replace(
+                request, request_id=request.request_id + ':node-socket', target=NODE_LINK_TARGET,
+                requires_operator=True)]
         return state, groups
 
     @staticmethod
