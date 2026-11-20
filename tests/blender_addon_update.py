@@ -12,7 +12,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, mkdtemp
 import time
 import traceback
 
@@ -99,8 +99,8 @@ def native(root, output):
                 area=max(bpy.context.window.screen.areas,key=lambda a:a.width*a.height);area.type='PREFERENCES'
                 with bpy.context.temp_override(area=area):bpy.ops.preferences.addon_show(module='BlueHole')
                 if os.environ.get('BLUEHOLE_UPDATE_LOCAL'):
-                    workspace = TemporaryDirectory(prefix='.bluehole-update-local-', dir=package.parent)
-                    snapshot = Path(workspace.name)/'snapshot'
+                    workspace = Path(mkdtemp(prefix='.bluehole-update-local-', dir=package.parent))
+                    snapshot = workspace/'snapshot'
                     shutil.copytree(package,snapshot,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
                     (snapshot/'envFiles/default/obsolete-test-file.txt').unlink()
                     shutil.rmtree(snapshot/'envFiles/Update Test Studio')
@@ -145,8 +145,8 @@ def native(root, output):
                 bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP',iterations=2)
                 bpy.ops.screen.screenshot(filepath=str(output/'update-complete.png'))
                 # A separately staged broken candidate verifies native rollback.
-                workspace=TemporaryDirectory(prefix='.rollback-test-',dir=package.parent)
-                snapshot=Path(workspace.name)/'snapshot'
+                workspace=Path(mkdtemp(prefix='.rollback-test-',dir=package.parent))
+                snapshot=workspace/'snapshot'
                 shutil.copytree(package,snapshot,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
                 with (snapshot/'__init__.py').open('a') as stream:
                     stream.write('\n_original_register = register\ndef register():\n    _original_register()\n    raise RuntimeError("Deliberate update validation failure")\n')

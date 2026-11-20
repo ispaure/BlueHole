@@ -31,11 +31,27 @@ class BH_OT_update_addon(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class BH_OT_cancel_update(bpy.types.Operator):
+    bl_idname = 'wm.bh_cancel_update'
+    bl_label = 'Cancel Blue Hole Update'
+
+    def execute(self, _context):
+        try:
+            addon_updates.cancel()
+        except (OSError, ValueError) as error:
+            self.report({'WARNING'}, str(error))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
+_CLASSES = (BH_OT_check_update, BH_OT_update_addon, BH_OT_cancel_update)
+
+
 def register():
-    for cls in (BH_OT_check_update, BH_OT_update_addon):
+    for cls in _CLASSES:
         bpy.utils.register_class(cls)
 
 
 def unregister():
-    for cls in (BH_OT_update_addon, BH_OT_check_update):
+    for cls in reversed(_CLASSES):
         bpy.utils.unregister_class(cls)

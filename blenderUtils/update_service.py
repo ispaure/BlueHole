@@ -90,8 +90,16 @@ def install_blocker(root):
     if any((parent / '.git').exists() for parent in (root, *root.parents)):
         return 'Development checkout: update its source through Git or Logistics.'
     managed = logistics_manifest(root)
-    if managed and managed[1].get('bluehole', {}).get('source') == 'local':
-        return 'Local checkout: update its source through Git or Logistics.'
+    if managed:
+        state = managed[1]
+        choice = state.get('bluehole', {})
+        installed = state.get('installed_bluehole') or {}
+        if choice.get('source') == 'local':
+            return 'Local checkout: update its source through Git or Logistics.'
+        branch = installed.get('branch')
+        if choice.get('enabled') is False or (branch and choice.get('branch')
+                and branch.rsplit('/', 1)[-1] != choice['branch']):
+            return 'Apply the pending Blue Hole selection in Logistics before updating in Blender.'
     return ''
 
 
@@ -194,9 +202,9 @@ class Installation:
         self.release = release
         self.backup = self.staged.parent / 'previous'
         self.failed = self.staged.parent / 'failed'
-        self.published = False
         self.lock = None
         self.managed = None
+        self.cleanup_error = ''
         blocker = install_blocker(self.root)
         if blocker:
             raise ValueError(blocker)
@@ -205,8 +213,8 @@ class Installation:
             raise ValueError('Invalid update identity')
 
     def prepare(self):
-        self.managed = logistics_manifest(self.root)
-        lock_root = self.managed[0].parent if self.managed else self.root
+        managed = logistics_manifest(self.root)
+        lock_root = managed[0].parent if managed else self.root
         self.lock = lock_root.with_name('.' + lock_root.name + '.lock')
         try:
             self.lock.mkdir()
@@ -214,6 +222,12 @@ class Installation:
             self.lock = None
             raise ValueError('Another update owns this installation; try again when it finishes') from None
         try:
+            blocker = install_blocker(self.root)
+            if blocker:
+                raise ValueError(blocker)
+            self.managed = logistics_manifest(self.root)
+            if (self.managed[0] if self.managed else None) != (managed[0] if managed else None):
+                raise ValueError('Logistics ownership changed while starting the update')
             preserve_environments(self.root, self.staged)
             atomic_json(self.staged / MARKER, self.release)
         except Exception:
@@ -224,10 +238,12 @@ class Installation:
         os.replace(self.root, self.backup)
         try:
             os.replace(self.staged, self.root)
-        except Exception:
-            os.replace(self.backup, self.root)
+        except Exception as error:
+            try:
+                self._restore_files()
+            except OSError as recovery:
+                raise ValueError(f'{error}; immediate file recovery: {recovery}') from recovery
             raise
-        self.published = True
 
     def finish(self):
         if self.managed:
@@ -243,14 +259,22 @@ class Installation:
             if release.get('package_digest'):
                 entry['digest'] = release['package_digest']
             atomic_json(path, state)
-        self.unlock()
+        try:
+            self.unlock()
+        except OSError as error:
+            # The installed files and receipt already agree. A lock cleanup
+            # failure must not roll back the files alone.
+            self.cleanup_error = f'Could not remove update lock {self.lock}: {error}'
 
     def rollback(self):
-        if self.published:
-            os.replace(self.root, self.failed)
-            os.replace(self.backup, self.root)
-            self.published = False
+        self._restore_files()
         self.unlock()
+
+    def _restore_files(self):
+        if self.backup.exists():
+            if self.root.exists():
+                os.replace(self.root, self.failed)
+            os.replace(self.backup, self.root)
 
     def unlock(self):
         if self.lock is not None:

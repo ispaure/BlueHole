@@ -3,9 +3,10 @@ import importlib
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
-from tempfile import TemporaryDirectory
+from tempfile import mkdtemp
 from time import monotonic
 
 import addon_utils
@@ -48,25 +49,47 @@ def start(action):
         blocker = service.install_blocker(ROOT)
         if blocker:
             raise ValueError(blocker)
-        if not state['release'] or state['channel'] != channel:
+        if state['status'] == 'current' and state['channel'] == channel:
+            raise ValueError('Blue Hole is already up to date in the selected channel')
+        if state['status'] not in {'available', 'unverified', 'ahead', 'different'} or state['channel'] != channel:
             raise ValueError('Check for updates in the selected channel first')
-    workspace = TemporaryDirectory(prefix='.bluehole-update-', dir=ROOT.parent if action == 'install' else None)
-    folder = Path(workspace.name)
+    workspace = Path(mkdtemp(prefix='.bluehole-update-', dir=ROOT.parent if action == 'install' else None))
     request = {'action': 'check' if action == 'check' else 'stage', 'channel': channel,
-               'blender_version': list(bpy.app.version), 'workspace': str(folder), 'release': state['release'],
+               'blender_version': list(bpy.app.version), 'workspace': str(workspace), 'release': state['release'],
                'installed_root': str(ROOT)}
-    (folder / 'request.json').write_text(json.dumps(request), encoding='utf-8')
     try:
-        with (folder / 'worker.log').open('wb') as output:
+        (workspace / 'request.json').write_text(json.dumps(request), encoding='utf-8')
+        with (workspace / 'worker.log').open('wb') as output:
             process = subprocess.Popen([sys.executable, *bpy.app.python_args,
-                str(ROOT / 'blenderUtils/update_worker.py'), str(folder / 'request.json'), str(folder / 'response.json')],
+                str(ROOT / 'blenderUtils/update_worker.py'), str(workspace / 'request.json'), str(workspace / 'response.json')],
                 stdin=subprocess.DEVNULL, stdout=output, stderr=output,
                 creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0), env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'})
     except Exception:
-        workspace.cleanup()
+        shutil.rmtree(workspace)
         raise
     _job = (process, workspace, action, monotonic())
     state.update(status='checking' if action == 'check' else 'downloading', channel=channel, message='')
+    if action == 'check':
+        state.update(release=None, blocked='')
+    redraw()
+
+
+def _stop_job():
+    global _job
+    if _job is not None:
+        process, workspace, *_ = _job
+        if process.poll() is None:
+            process.kill()
+            process.wait()
+        _job = None
+        shutil.rmtree(workspace)
+
+
+def cancel():
+    if _job is None or _handoff:
+        raise ValueError('There is no Blue Hole check or download to cancel')
+    _stop_job()
+    state.update(status='cancelled', release=None, channel=None, message='Blue Hole update cancelled.')
     redraw()
 
 
@@ -103,7 +126,7 @@ def poll():
     _job = None
     handed_off = False
     try:
-        response = Path(workspace.name) / 'response.json'
+        response = workspace / 'response.json'
         if process.returncode or not response.is_file():
             raise ValueError('The update helper stopped. Check your connection and try again.')
         result = json.loads(response.read_text(encoding='utf-8'))
@@ -119,7 +142,7 @@ def poll():
             require_saved_draft()
             _handoff = True
             state.update(status='installing', message='Reloading Blue Hole…')
-            session = ReloadSession(ROOT, Path(workspace.name) / 'snapshot', release, workspace)
+            session = ReloadSession(ROOT, workspace / 'snapshot', release, workspace)
             handed_off = True
             session.begin()
     except Exception as error:
@@ -127,7 +150,7 @@ def poll():
         state.update(status='error', message=str(error))
     finally:
         if not handed_off:
-            workspace.cleanup()
+            shutil.rmtree(workspace)
     redraw()
     return None if handed_off else 1.0
 
@@ -200,19 +223,18 @@ class ReloadSession(ReloadTransaction):
         self.done = True
         runtime = sys.modules.get(MODULE + '.blenderUtils.addon_updates')
         message = (f'Update failed; previous Blue Hole restored. {self.error}' if self.error and recovered else
-                   f'Update failed. Restart Blender before continuing. Recovery files: {self.workspace.name}. {self.error}'
+                   f'Update failed. Close Blender before continuing. Recovery files: {self.workspace}. {self.error}'
                    if self.error else f'Blue Hole updated to {self.release["branch"]}.')
+        if self.installation.cleanup_error:
+            message += ' ' + self.installation.cleanup_error
+        if recovered:
+            try:
+                shutil.rmtree(self.workspace)
+            except OSError as error:
+                message += f' Temporary files could not be removed: {error}'
         if runtime is not None:
             runtime.state.update(status='error' if self.error else 'current', message=message,
                                  channel=self.release['channel'], release=self.release)
-        if recovered:
-            try:
-                self.workspace.cleanup()
-            except OSError as error:
-                message += f' Temporary files could not be removed: {error}'
-        else:
-            # TemporaryDirectory must not remove a recovery backup on GC.
-            self.workspace._finalizer.detach()
         print(message)
         if not bpy.app.background:
             def draw(menu, _context):
@@ -229,6 +251,8 @@ def draw_update(layout, *, details=False):
         row.enabled = False
         row.label(text={'checking': 'Checking for Blue Hole updates…', 'downloading': 'Downloading Blue Hole update…',
                         'installing': 'Reloading Blue Hole…'}[status], icon='TIME')
+        if status != 'installing':
+            layout.operator('wm.bh_cancel_update', text='Cancel Update', icon='CANCEL')
     elif status in {'available', 'unverified', 'ahead', 'different'} and release:
         row = layout.row()
         row.enabled = not bool(state['blocked'])
@@ -259,13 +283,6 @@ def register():
 
 
 def unregister():
-    global _job
     if bpy.app.timers.is_registered(poll):
         bpy.app.timers.unregister(poll)
-    if _job is not None:
-        process, workspace, *_ = _job
-        if process.poll() is None:
-            process.kill()
-            process.wait()
-        workspace.cleanup()
-        _job = None
+    _stop_job()

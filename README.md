@@ -22,7 +22,8 @@ show update status and provide **Check for Updates** and **Update Blue Hole**.
 Choose **Main** (default), **Beta**, or **Alpha** in Help & Updates. Like Logistics,
 Blue Hole selects the newest branch whose Blender minimum does not exceed the
 running Blender version. Checks respect Blender's **Allow Online Access** setting.
-Updates install only when you press the update button.
+Updates install only when you press the update button. You can cancel a check or
+download before Blue Hole starts reloading.
 
 Installed copies download and validate a commit-pinned package, unload Blue Hole,
 replace its files, and reload it without restarting Blender. Custom `envFiles`
@@ -31,6 +32,21 @@ Blender preferences and the open scene are retained. Failed activation restores
 the previous installation. A Logistics-managed preset also receives the new
 installed revision and channel so subsequent launches keep that selection.
 Git checkouts and checkout links remain managed through Git or Logistics.
+Apply any pending Blue Hole source, channel or disable change in Logistics before
+updating that preset in Blender.
+
+If Blender exits during the folder swap, close all Blender instances and wait
+for any Logistics operation on the preset to finish. Look beside the `BlueHole`
+add-on folder for `.bluehole-update-*`. Its `previous` folder holds the previous
+installation. If `BlueHole` is missing, move `previous` back to `BlueHole`. If a
+replacement is present in a Logistics preset, compare its `.bluehole-update.json`
+commit with `installed_bluehole.commit` in the preset's `.logistics-addons.json`.
+When they differ, move the replacement aside and move `previous` back to `BlueHole`.
+For a standalone install interrupted during reload, you can restore `previous`
+the same way. After recovery, remove the stale update lock if no operation owns
+it. The lock is `.BlueHole.lock` beside a standalone add-on or `.<preset name>.lock`
+beside a Logistics preset. Reopen Blender and check the installed version before
+discarding the recovery folder.
 
 ## What you can do
 

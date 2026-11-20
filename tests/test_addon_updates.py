@@ -94,6 +94,23 @@ class UpdateTests(unittest.TestCase):
         self.assertEqual(state['installed_bluehole']['commit'],'a'*40)
         self.assertEqual(state['installed']['legacy:BlueHole']['digest'],'c'*64)
 
+    def test_pending_logistics_selection_cannot_be_overwritten_while_staging(self):
+        path = self.root.parents[2] / '.logistics-addons.json'
+        preset = dict(installed={'legacy:BlueHole': {'path': 'scripts/addons/BlueHole'}},
+                      installed_bluehole={'branch': 'blender-5.2.2/main'},
+                      bluehole={'enabled': True, 'branch': 'main', 'source': 'github'})
+        for change in ({'branch': 'alpha'}, {'enabled': False}, {'source': 'local'}):
+            with self.subTest(change=change):
+                path.write_text(json.dumps(preset))
+                install = service.Installation(self.root, self.staged, self.release, (5, 2, 2))
+                pending = {**preset, 'bluehole': {**preset['bluehole'], **change}}
+                path.write_text(json.dumps(pending))
+                with self.assertRaisesRegex(ValueError, 'pending Blue Hole selection|Local checkout'):
+                    install.prepare()
+                self.assertEqual(json.loads(path.read_text()), pending)
+                self.assertEqual((self.root / 'envFiles/default/settings.ini').read_text(), 'old')
+                self.assertFalse((self.root.parents[3] / '.preset.lock').exists())
+
     def test_checkouts_and_links_are_never_replaced(self):
         (self.root/'.git').mkdir()
         with self.assertRaisesRegex(ValueError,'Development checkout'):
@@ -162,6 +179,47 @@ class UpdateTests(unittest.TestCase):
             install.publish()
         install.unlock()
         self.assertEqual((self.root/'envFiles/default/settings.ini').read_text(),'old')
+
+    def test_rollback_retries_after_the_swap_and_immediate_restore_both_fail(self):
+        install = service.Installation(self.root, self.staged, self.release, (5, 2, 2))
+        install.prepare()
+        replace = service.os.replace
+
+        def fail(source, destination):
+            if source in (self.staged, install.backup):
+                raise OSError('temporarily locked')
+            return replace(source, destination)
+
+        with patch.object(service.os, 'replace', side_effect=fail):
+            with self.assertRaisesRegex(ValueError, 'immediate file recovery'):
+                install.publish()
+            self.assertFalse(self.root.exists())
+            self.assertTrue(install.backup.is_dir())
+        install.rollback()
+        self.assertEqual((self.root / 'envFiles/default/settings.ini').read_text(), 'old')
+        self.assertFalse(install.backup.exists())
+        self.assertIsNone(install.lock)
+
+    def test_rollback_retries_after_moving_candidate_aside(self):
+        install = service.Installation(self.root, self.staged, self.release, (5, 2, 2))
+        install.prepare()
+        install.publish()
+        replace = service.os.replace
+
+        def fail(source, destination):
+            if source == install.backup:
+                raise OSError('temporarily locked')
+            return replace(source, destination)
+
+        with patch.object(service.os, 'replace', side_effect=fail):
+            with self.assertRaisesRegex(OSError, 'temporarily locked'):
+                install.rollback()
+            self.assertFalse(self.root.exists())
+            self.assertTrue(install.backup.is_dir())
+            self.assertTrue(install.failed.is_dir())
+        install.rollback()
+        self.assertEqual((self.root / 'envFiles/default/settings.ini').read_text(), 'old')
+        self.assertIsNone(install.lock)
 
     def test_parallel_installation_is_rejected_without_removing_its_lock(self):
         lock = self.root.with_name('.BlueHole.lock');lock.mkdir()
