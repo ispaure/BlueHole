@@ -38,7 +38,12 @@ class ManagerSuiteTests(unittest.TestCase):
         native = self.plan('Check', 'blender.integration')
         self.assertEqual([phase.id for phase in native.phases], ['blender-integration'])
         self.assertIn('junit', native.phases[0].artifact_types.values())
-        self.assertEqual([phase.id for phase in self.plan('Check').phases], ['portable-contracts','blender-integration'])
+        check = self.plan('Check')
+        self.assertEqual([phase.id for phase in check.phases], ['portable-contracts','blender-integration'])
+        self.assertTrue(Path(check.workspace).is_relative_to(ROOT / 'tmp/test-results'))
+        for phase in check.phases:
+            for artifact in phase.artifacts:
+                self.assertTrue(Path(artifact).is_relative_to(ROOT / 'tmp/test-results/checks'))
 
     def test_release_identifier_is_suggested_without_creating_or_publishing_tags(self):
         with patch('Scripts.release_adapter.subprocess.check_output',return_value='bluehole-v6.9.21-blender5.2.2-alpha.3\n') as read:

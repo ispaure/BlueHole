@@ -36,11 +36,11 @@ From the repository root:
 
 ```sh
 python3 -m unittest discover -s tests -p 'test_keymap_baseline.py' -v
-mkdir -p test-results/deluxe-keymaps-baseline
+mkdir -p tmp/test-results/deluxe-keymaps-baseline
 python3 tests/blender_keymap_baseline.py \
   --compare tests/fixtures/deluxe_keymaps/sample-stock.json \
             tests/fixtures/deluxe_keymaps/sample-full.json \
-  --output test-results/deluxe-keymaps-baseline/sample-comparison.json
+  --output tmp/test-results/deluxe-keymaps-baseline/sample-comparison.json
 ```
 
 The exporter is read-only. In an **already verified disposable Blender GUI

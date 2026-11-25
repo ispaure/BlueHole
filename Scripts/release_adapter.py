@@ -17,7 +17,7 @@ sys.path.insert(0,str(ROOT))
 FILES={'__init__.py','LICENSE.md','url_database.ini'}
 DIRECTORIES={'actions','blenderUtils','debug','environment','keymaps','operators','overlays',
              'preferences','ui','unrealUtils','wrappers','Lib','envFiles'}
-EXCLUDE={'.git','.github','__pycache__','tests','test-results','.venv','docs','user_docs','.ruff_cache'}
+EXCLUDE={'.git','.github','__pycache__','tests','test-results','tmp','.venv','docs','user_docs','.ruff_cache'}
 # Exclude legacy overlays even if an old payload has been restored locally.
 LEGACY_DELUXE_PAYLOAD=PurePosixPath('overlays/deluxe/payload')
 
@@ -92,7 +92,7 @@ def check_shared(upstream):
     upstream=Path(upstream).expanduser().resolve()
     expected=(ROOT/'Lib/commonUtils.revision').read_text().strip()
     # Read the exact recorded commit without changing the operator's checkout.
-    with tempfile.TemporaryDirectory(prefix='shared-check-',dir=storage()) as directory:
+    with tempfile.TemporaryDirectory(prefix='shared-check-',dir=test_storage()) as directory:
         clone=Path(directory)/'commonUtils'
         subprocess.run(['git','clone','--quiet','--shared','--no-checkout',str(upstream),str(clone)],check=True,timeout=60)
         subprocess.run(['git','-C',str(clone),'checkout','--quiet','--detach',expected],check=True,timeout=60)
@@ -105,6 +105,13 @@ def storage():
     path=ROOT/'test-results/release';path.mkdir(parents=True,exist_ok=True);return path
 
 
+def test_storage():
+    from Scripts.build_retention import CHECK_RESULTS
+    path = ROOT / CHECK_RESULTS
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 def checks(upstream=None, *, junit=None, pattern='test*.py'):
     before=source_identity()
     expected=os.environ.get('BLUEHOLE_MANAGER_SOURCE')
@@ -112,7 +119,7 @@ def checks(upstream=None, *, junit=None, pattern='test*.py'):
     import unittest
     from uuid import uuid4
     from build_manager.reporting import run_suite
-    report = Path(junit) if junit else storage() / (uuid4().hex + '-portable.xml')
+    report = Path(junit) if junit else test_storage() / (uuid4().hex + '-portable.xml')
     class SharedCopy(unittest.TestCase):
         def test_pinned_shared_copy(self):
             check_shared(upstream or os.environ.get('BLUEHOLE_SHARED_SOURCE'))

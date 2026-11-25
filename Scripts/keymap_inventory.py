@@ -1,6 +1,6 @@
 """Print reproducible catalog evidence without importing Blender or the addon.
 
-python Scripts/keymap_inventory.py --output test-results/keymaps/inventory.json
+python Scripts/keymap_inventory.py --output tmp/test-results/keymaps/inventory.json
 """
 import argparse
 import json

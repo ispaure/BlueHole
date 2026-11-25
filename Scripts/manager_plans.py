@@ -24,7 +24,8 @@ def make_plan(operation, target, backend, values, source, tools_env, origins, se
     if release and pattern:
         raise ValueError('Release acceptance cannot use a focused test pattern.')
     from Scripts.release_adapter import artifact_name
-    run = ROOT / 'test-results/release' / uuid4().hex
+    from Scripts.build_retention import CHECK_RESULTS
+    run = ROOT / (CHECK_RESULTS if operation == 'Check' else 'test-results/release') / uuid4().hex
     artifact = run / artifact_name()
     checks, inspection, native = (run / name for name in ('checks.json', 'inspection.json', 'native.json'))
     phases = []
@@ -66,7 +67,7 @@ def make_plan(operation, target, backend, values, source, tools_env, origins, se
                     dependencies=('release-review',), environment=tools_env, timeout=300, kind='distribution',
                     effect='upload', provider='github', artifacts=(str(run / 'draft-receipt.json'),)))
     return Plan('Blue Hole', operation, dict(source, destination='ispaure/BlueHole', channel='alpha',
-                test_suite=suite or 'full declared operation', focused_test_pattern=pattern, release_tag=values.get('release_tag','')), tuple(phases), str(ROOT / 'test-results/build-manager/workspace'),
+                test_suite=suite or 'full declared operation', focused_test_pattern=pattern, release_tag=values.get('release_tag','')), tuple(phases), str(ROOT / 'tmp/test-results/build-manager/workspace'),
                 effect='test' if operation == 'Check' else 'build', secret_environment=secrets,
                 resource_locks=(str(run / 'operation.lock'),),
                 settings=dict(values=tools_env, origins=dict(origins, BLUEHOLE_MANAGER_SOURCE='captured source identity')))

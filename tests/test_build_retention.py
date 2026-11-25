@@ -30,6 +30,20 @@ class BuildRetentionTests(unittest.TestCase):
             self.assertFalse(result['removed'])
             self.assertTrue(result['skipped'])
 
+    def test_new_check_preparations_and_legacy_packages_have_distinct_cleanup_paths(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            name = 'a' * 32
+            check = root / 'tmp/test-results/checks' / name
+            package = root / 'test-results/release' / name
+            for path in (check, package):
+                enroll_preparation(path / 'checks.json', root)
+            self.assertEqual({row['group'] for row in storage_inventory(root)},
+                             {'Test preparations', 'Package preparations'})
+            outcome = delete_storage({'Test preparations': [name]}, root)
+            self.assertEqual(outcome['removed'], [str(check)])
+            self.assertTrue(package.is_dir())
+
     def test_enrollment_does_not_claim_arbitrary_or_linked_outputs(self):
         with TemporaryDirectory() as directory:
             root = Path(directory).resolve(); outside = root / 'evidence'; outside.mkdir()

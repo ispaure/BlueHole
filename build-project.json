@@ -9,7 +9,8 @@
     "win32": ".venv/Scripts/python.exe"
   },
   "bridge": "Scripts/manager_bridge.py",
-  "results": "test-results/build-manager",
+  "results": "tmp/test-results/build-manager",
+  "legacy_results": ["test-results/build-manager"],
   "capabilities": {
     "platforms": [
       "blender"

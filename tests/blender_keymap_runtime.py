@@ -1085,7 +1085,7 @@ def cli():
     parser.add_argument('--blender', type=Path, required=True)
     parser.add_argument('--provider-source', type=Path)
     parser.add_argument('--stock-only', action='store_true', help='Exercise stock/modal dispatch without a third-party fixture')
-    parser.add_argument('--output', type=Path, default=REPO / 'test-results/deluxe-keymaps-runtime')
+    parser.add_argument('--output', type=Path, default=REPO / 'tmp/test-results/deluxe-keymaps-runtime')
     parser.add_argument('--test-minimum-version', help='Change only the disposable add-on copy, e.g. 4.5.1')
     args = parser.parse_args()
     if not args.stock_only and args.provider_source is None:

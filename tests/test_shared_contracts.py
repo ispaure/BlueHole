@@ -19,7 +19,7 @@ BLENDER_PROPERTIES = {'BoolProperty', 'BoolVectorProperty', 'CollectionProperty'
 
 
 def consumer_sources():
-    excluded = {'Lib', 'tests', '.git', '.github', '.venv', 'test-results', '.manager-tooling'}
+    excluded = {'Lib', 'tests', '.git', '.github', '.venv', 'test-results', 'tmp', '.manager-tooling'}
     return sorted(
         path for path in ROOT.rglob('*.py')
         if not excluded.intersection(path.relative_to(ROOT).parts)

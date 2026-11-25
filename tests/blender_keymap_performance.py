@@ -1,6 +1,6 @@
 """Measure Deluxe lifecycle in an isolated Blender GUI with factory preferences.
 
-Run with --blender /path/to/Blender --output test-results/keymap-performance.
+Run with --blender /path/to/Blender --output tmp/test-results/keymap-performance.
 Timings include synchronous merged-keymap updates, but exclude application startup.
 """
 

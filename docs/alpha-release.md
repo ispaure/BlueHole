@@ -124,9 +124,13 @@ consumers, with each checkout, interpreter and candidate path recorded.
 
 ## Local package storage
 
-The manager cleanup dialog lists explicitly marked package preparations under
-`test-results/release/`. `Scripts/build_retention.py` owns this project's policy:
-three newest entries, seven days, a 4 GiB soft budget and a one-hour grace period.
+Blue Hole writes new Check reports under ignored `tmp/test-results/checks/`.
+Manager records new managed runs under `tmp/test-results/build-manager/` and
+includes the legacy `test-results/build-manager/` path in History.
+The cleanup dialog lists marked test preparations and package preparations.
+Package and release artifacts use `test-results/release/`. Each preparation
+folder uses the project's retention policy of three newest entries, seven days,
+a 4 GiB soft budget and a one-hour grace period.
 Active preparation locks, workflow holds and `.keep` pins protect retained work.
 Validation marks newly generated manager preparation folders; unclassified older
 evidence is preserved. The optional storage-maintenance adapter action runs after

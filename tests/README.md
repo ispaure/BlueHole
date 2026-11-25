@@ -20,12 +20,12 @@ checked-in receipt; packing removes duplication without dropping evidence fields
 
 ## Reproducible keymap audit
 
-`python Scripts/keymap_inventory.py --output test-results/keymap-refactor/inventory.json`
+`python Scripts/keymap_inventory.py --output tmp/test-results/keymap-refactor/inventory.json`
 records source-file hashes, semantic catalog identity, provider counts, duplicate
 candidates, and every shared-event chain without importing Blender.
 
 `python tests/blender_keymap_preset.py --blender /path/to/Blender --preset
-/path/to/Logistics/preset --output test-results/keymap-refactor/preset` copies a
+/path/to/Logistics/preset --output tmp/test-results/keymap-refactor/preset` copies a
 plugin preset, redirects its preferences, and runs under macOS write/network
 confinement. The receipt records Blender/provider versions, source preservation,
 native parity checks, and toggle timings through Preferences redraw. Use
@@ -34,7 +34,7 @@ native parity checks, and toggle timings through Preferences redraw. Use
 It never runs the source preset. Third-party source stays in temporary copies.
 
 `python Scripts/keymap_compare.py before.json after.json --role user --output
-test-results/keymap-refactor/delta.json` compares exported snapshots without
+tmp/test-results/keymap-refactor/delta.json` compares exported snapshots without
 discarding duplicate bindings, unreadable values, or registration-order changes.
 Structural snapshot equality is not proof of keyboard dispatch; dispatch tests
 must record their actual event/context and observed outcome separately.
@@ -115,7 +115,7 @@ added `Path.is_junction`. Viewer tests remain in their Qt host suite.
 ## Deluxe lifecycle performance
 
 `python3 tests/blender_keymap_performance.py --blender /path/to/Blender --output
-test-results/keymap-performance` runs the current checkout in an isolated GUI
+tmp/test-results/keymap-performance` runs the current checkout in an isolated GUI
 with factory preferences. It records three load/unload cycles, three Deluxe
 toggle cycles, merged-update counts, and separate CPU profiles. Application
 startup and profiling overhead are excluded from the cycle timings. It also
@@ -193,7 +193,7 @@ writes outside the test output; temporary presets are removed on exit. The
 ```sh
 python3 tests/blender_zenuv.py --blender /path/to/Blender --version 5.2.2 \
   --logistics-source /path/to/logistics --library /path/to/Blender_Addons_Library \
-  --output test-results/zenuv-540/blender-522
+  --output tmp/test-results/zenuv-540/blender-522
 ```
 
 The Other reorganization is checked against the historical ordered binding
